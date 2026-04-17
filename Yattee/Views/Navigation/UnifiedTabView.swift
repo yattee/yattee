@@ -38,6 +38,7 @@ struct UnifiedTabView: View {
     @State private var settingsPath = NavigationPath()
     @State private var openURLPath = NavigationPath()
     @State private var remoteControlPath = NavigationPath()
+    @State private var continueWatchingPath = NavigationPath()
 
     // Current selection - initial value is a placeholder; actual startup tab is applied in onAppear
     @State private var selection: SidebarItem = .home
@@ -233,6 +234,16 @@ struct UnifiedTabView: View {
             } label: {
                 Label(SidebarItem.remoteControl.title, systemImage: SidebarItem.remoteControl.systemImage)
             }
+
+        case .continueWatching:
+            Tab(value: SidebarItem.continueWatching) {
+                NavigationStack(path: $continueWatchingPath) {
+                    ContinueWatchingView()
+                        .withNavigationDestinations()
+                }
+            } label: {
+                Label(SidebarItem.continueWatching.title, systemImage: SidebarItem.continueWatching.systemImage)
+            }
         }
     }
 
@@ -356,6 +367,7 @@ struct UnifiedTabView: View {
     @State private var settingsPath = NavigationPath()
     @State private var openURLPath = NavigationPath()
     @State private var remoteControlPath = NavigationPath()
+    @State private var continueWatchingPath = NavigationPath()
 
     // Current selection - initial value is a placeholder; actual startup tab is applied in onAppear
     @State private var selection: SidebarItem = .home
@@ -529,6 +541,16 @@ struct UnifiedTabView: View {
             } label: {
                 Label(SidebarItem.remoteControl.title, systemImage: SidebarItem.remoteControl.systemImage)
             }
+
+        case .continueWatching:
+            Tab(value: SidebarItem.continueWatching) {
+                NavigationStack(path: $continueWatchingPath) {
+                    ContinueWatchingView()
+                        .withNavigationDestinations()
+                }
+            } label: {
+                Label(SidebarItem.continueWatching.title, systemImage: SidebarItem.continueWatching.systemImage)
+            }
         }
     }
 
@@ -608,6 +630,7 @@ struct UnifiedTabView: View {
     @State private var settingsPath = NavigationPath()
     @State private var openURLPath = NavigationPath()
     @State private var remoteControlPath = NavigationPath()
+    @State private var continueWatchingPath = NavigationPath()
 
     // Current selection - initial value is a placeholder; actual startup tab is applied in onAppear
     @State private var selection: SidebarItem = .home
@@ -811,6 +834,16 @@ struct UnifiedTabView: View {
             } label: {
                 Label(SidebarItem.remoteControl.title, systemImage: SidebarItem.remoteControl.systemImage)
             }
+
+        case .continueWatching:
+            Tab(value: SidebarItem.continueWatching) {
+                NavigationStack(path: $continueWatchingPath) {
+                    ContinueWatchingView()
+                        .withNavigationDestinations()
+                }
+            } label: {
+                Label(SidebarItem.continueWatching.title, systemImage: SidebarItem.continueWatching.systemImage)
+            }
         }
     }
 
@@ -928,6 +961,8 @@ extension UnifiedTabView {
             openURLPath.append(destination)
         case .remoteControl:
             remoteControlPath.append(destination)
+        case .continueWatching:
+            continueWatchingPath.append(destination)
         }
         navigationCoordinator?.clearPendingNavigation()
     }

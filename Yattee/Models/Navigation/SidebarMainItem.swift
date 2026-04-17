@@ -21,12 +21,13 @@ enum SidebarMainItem: String, CaseIterable, Codable, Identifiable, Sendable {
     case settings
     case openURL
     case remoteControl
+    case continueWatching
 
     var id: String { rawValue }
 
     /// Default order for sidebar main items.
     static var defaultOrder: [SidebarMainItem] {
-        [.search, .home, .subscriptions, .bookmarks, .history, .channels, .playlists, .sources, .openURL, .remoteControl, .downloads, .settings]
+        [.search, .home, .subscriptions, .bookmarks, .history, .channels, .playlists, .sources, .openURL, .remoteControl, .downloads, .continueWatching, .settings]
     }
 
     /// Default visibility (all visible except subscriptions and channels).
@@ -44,7 +45,8 @@ enum SidebarMainItem: String, CaseIterable, Codable, Identifiable, Sendable {
             .sources: true,
             .settings: true,
             .openURL: false,
-            .remoteControl: true
+            .remoteControl: true,
+            .continueWatching: false
         ]
         #else
         [
@@ -59,7 +61,8 @@ enum SidebarMainItem: String, CaseIterable, Codable, Identifiable, Sendable {
             .sources: true,
             .settings: true,
             .openURL: false,
-            .remoteControl: false
+            .remoteControl: false,
+            .continueWatching: false
         ]
         #endif
     }
@@ -79,6 +82,7 @@ enum SidebarMainItem: String, CaseIterable, Codable, Identifiable, Sendable {
         case .settings: "gear"
         case .openURL: "link"
         case .remoteControl: "antenna.radiowaves.left.and.right"
+        case .continueWatching: "play.circle"
         }
     }
 
@@ -97,6 +101,7 @@ enum SidebarMainItem: String, CaseIterable, Codable, Identifiable, Sendable {
         case .settings: String(localized: "sidebar.mainItem.settings")
         case .openURL: String(localized: "sidebar.mainItem.openURL")
         case .remoteControl: String(localized: "sidebar.mainItem.remoteControl")
+        case .continueWatching: String(localized: "sidebar.mainItem.continueWatching")
         }
     }
 
@@ -142,6 +147,7 @@ enum SidebarMainItem: String, CaseIterable, Codable, Identifiable, Sendable {
         case .settings: return TabBarItem.settings.rawValue
         case .openURL: return "open-url"
         case .remoteControl: return "remote-control"
+        case .continueWatching: return "continue-watching"
         }
     }
 
@@ -160,6 +166,7 @@ enum SidebarMainItem: String, CaseIterable, Codable, Identifiable, Sendable {
         case .settings: return .settings
         case .openURL: return .openURL
         case .remoteControl: return .remoteControl
+        case .continueWatching: return .continueWatching
         }
     }
 

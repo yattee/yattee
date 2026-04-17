@@ -14311,6 +14311,17 @@
         }
       }
     },
+    "sidebar.mainItem.continueWatching" : {
+      "comment" : "Sidebar main navigation item for continue watching",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Continue Watching"
+          }
+        }
+      }
+    },
     "sidebar.mainItem.channels" : {
       "comment" : "Sidebar main navigation item for channels",
       "localizations" : {
