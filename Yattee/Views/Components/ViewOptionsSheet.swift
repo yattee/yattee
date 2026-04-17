@@ -82,6 +82,9 @@ struct ViewOptionsSheet: View {
                 }
             }
         }
+        .scrollClipDisabled()
+        .padding(.horizontal, 40)
+        .padding(.vertical, 24)
     }
     #endif
 

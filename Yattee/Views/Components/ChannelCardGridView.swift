@@ -72,8 +72,10 @@ struct ChannelCardGridView: View {
             .frame(maxWidth: .infinity)
         }
         .padding()
-        .background(.quaternary.opacity(0.3))
-        .clipShape(RoundedRectangle(cornerRadius: 12))
+        #if !os(tvOS)
+            .background(.quaternary.opacity(0.3))
+            .clipShape(RoundedRectangle(cornerRadius: 12))
+        #endif
         .contentShape(Rectangle())
     }
     

@@ -43,9 +43,15 @@ struct MediaBrowserViewOptionsSheet: View {
                     .listRowInsets(EdgeInsets(top: 8, leading: 0, bottom: 8, trailing: 0))
                 }
             }
+            #if os(tvOS)
+            .scrollClipDisabled()
+            .padding(.horizontal, 40)
+            .padding(.vertical, 24)
+            #else
             .navigationTitle("mediaBrowser.viewOptions.title")
             #if os(iOS)
             .navigationBarTitleDisplayMode(.inline)
+            #endif
             #endif
             .toolbar {
                 ToolbarItem(placement: .confirmationAction) {

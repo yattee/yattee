@@ -386,6 +386,7 @@ struct ManageChannelsView: View {
                 }
             }
         }
+        .scrollClipDisabled()
     }
 
     // MARK: - Helpers

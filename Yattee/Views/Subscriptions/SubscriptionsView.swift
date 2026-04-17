@@ -323,9 +323,15 @@ struct SubscriptionsView: View {
                                 }
                                 #endif
                             }
+                            #if os(tvOS)
+                            .scrollClipDisabled()
+                            .padding(.horizontal, 40)
+                            .padding(.vertical, 24)
+                            #else
                             .navigationTitle(String(localized: "subscriptions.viewOptions.title"))
                             #if os(iOS)
                             .navigationBarTitleDisplayMode(.inline)
+                            #endif
                             #endif
                         }
                         .presentationDetents([.height(420), .large])
