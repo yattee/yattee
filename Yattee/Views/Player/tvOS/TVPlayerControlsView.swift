@@ -39,6 +39,19 @@ struct TVPlayerControlsView: View {
 
     @State private var playNextTapCount = 0
     @State private var playPreviousTapCount = 0
+    @State private var playPauseTapCount = 0
+
+    private var isPlaying: Bool {
+        playerState?.playbackState == .playing
+    }
+
+    private var isTransportDisabled: Bool {
+        playerState?.isTransportDisabled ?? true
+    }
+
+    private var playPauseIcon: String {
+        isPlaying ? "pause.fill" : "play.fill"
+    }
 
     var body: some View {
         ZStack {
@@ -151,7 +164,21 @@ struct TVPlayerControlsView: View {
                 ProgressView()
                     .progressViewStyle(.circular)
                     .scaleEffect(1.5)
+                    .padding(.trailing, 8)
             }
+
+            // Close button — stops playback and dismisses.
+            // Menu button only hides the player (keeps background playback),
+            // so an explicit Close is kept here, icon-only in the top bar.
+            Button {
+                onClose()
+            } label: {
+                Image(systemName: "xmark")
+                    .font(.system(size: 26, weight: .semibold))
+            }
+            .buttonStyle(TVCloseButtonStyle())
+            .focused($focusedControl, equals: .closeButton)
+            .accessibilityLabel(Text("player.controls.close"))
         }
     }
 
@@ -162,143 +189,156 @@ struct TVPlayerControlsView: View {
     // MARK: - Action Buttons
 
     private var actionButtons: some View {
-        HStack(spacing: 40) {
-            // Settings (video / audio / subtitles / speed)
-            Button {
-                onShowSettings()
-            } label: {
-                VStack(spacing: 6) {
-                    Image(systemName: "gearshape")
-                        .font(.system(size: 28))
-                    Text("player.controls.settings")
-                        .font(.caption)
-                }
-            }
-            .buttonStyle(TVActionButtonStyle())
-            .focused($focusedControl, equals: .settingsButton)
-
-            // Info / Details
-            Button {
-                onShowDetails()
-            } label: {
-                VStack(spacing: 6) {
-                    Image(systemName: "info.circle")
-                        .font(.system(size: 28))
-                    Text("player.controls.info")
-                        .font(.caption)
-                }
-            }
-            .buttonStyle(TVActionButtonStyle())
-            .focused($focusedControl, equals: .infoButton)
-
-            // Comments (opens details panel on Comments tab)
-            if playerState?.currentVideo?.supportsComments == true {
+        HStack(spacing: 24) {
+            // MARK: Left cluster — info / meta actions
+            HStack(spacing: 24) {
                 Button {
-                    onShowComments()
+                    onShowSettings()
                 } label: {
-                    VStack(spacing: 6) {
-                        Image(systemName: "bubble.left.and.bubble.right")
-                            .font(.system(size: 28))
-                        Text("player.controls.comments")
-                            .font(.caption)
-                    }
+                    TVActionButtonLabel(
+                        systemImage: "gearshape",
+                        title: String(localized: "player.controls.settings")
+                    )
                 }
                 .buttonStyle(TVActionButtonStyle())
-                .focused($focusedControl, equals: .commentsButton)
-            }
+                .focused($focusedControl, equals: .settingsButton)
 
-            // Debug overlay (only when enabled in Developer settings)
-            if showDebugButton {
                 Button {
-                    onShowDebug()
+                    onShowDetails()
                 } label: {
-                    VStack(spacing: 6) {
-                        Image(systemName: "ant.circle")
-                            .font(.system(size: 28))
-                        Text(String(localized: "player.debug.titleShort"))
-                            .font(.caption)
-                    }
+                    TVActionButtonLabel(
+                        systemImage: "info.circle",
+                        title: String(localized: "player.controls.info")
+                    )
                 }
                 .buttonStyle(TVActionButtonStyle())
-                .focused($focusedControl, equals: .debugButton)
-            }
+                .focused($focusedControl, equals: .infoButton)
 
-            // Play previous button (shown whenever a queue is present; disabled when no history)
-            if let state = playerState, state.hasNext || state.hasPrevious {
+                if playerState?.currentVideo?.supportsComments == true {
+                    Button {
+                        onShowComments()
+                    } label: {
+                        TVActionButtonLabel(
+                            systemImage: "bubble.left.and.bubble.right",
+                            title: String(localized: "player.controls.comments")
+                        )
+                    }
+                    .buttonStyle(TVActionButtonStyle())
+                    .focused($focusedControl, equals: .commentsButton)
+                }
+
+                if showDebugButton {
+                    Button {
+                        onShowDebug()
+                    } label: {
+                        TVActionButtonLabel(
+                            systemImage: "ant.circle",
+                            title: String(localized: "player.debug.titleShort")
+                        )
+                    }
+                    .buttonStyle(TVActionButtonStyle())
+                    .focused($focusedControl, equals: .debugButton)
+                }
+
+                Spacer(minLength: 0)
+            }
+            .frame(maxWidth: .infinity, alignment: .leading)
+
+            // MARK: Center cluster — transport (circular, icon-only)
+            HStack(spacing: 20) {
+                // Previous is always rendered so Play/Next stay in a fixed
+                // position; disabled + dimmed when unavailable.
+                let hasPrevious = playerState?.hasPrevious == true
                 Button {
                     playPreviousTapCount += 1
                     Task { await playerService?.playPrevious() }
                 } label: {
-                    VStack(spacing: 6) {
-                        Image(systemName: "backward.fill")
-                            .font(.system(size: 28))
-                            .symbolEffect(.bounce.down.byLayer, options: .nonRepeating, value: playPreviousTapCount)
-                        Text(String(localized: "player.previous"))
-                            .font(.caption)
-                    }
+                    Image(systemName: "backward.fill")
+                        .font(.system(size: 26, weight: .semibold))
+                        .symbolEffect(.bounce.down.byLayer, options: .nonRepeating, value: playPreviousTapCount)
                 }
-                .buttonStyle(TVActionButtonStyle())
+                .buttonStyle(TVTransportButtonStyle())
                 .focused($focusedControl, equals: .playPrevious)
-                .disabled(!state.hasPrevious)
-                .opacity(state.hasPrevious ? 1.0 : 0.4)
-            }
+                .disabled(!hasPrevious)
+                .opacity(hasPrevious ? 1.0 : 0.3)
+                .accessibilityLabel(Text("player.previous"))
 
-            // Play next button (when queue has items)
-            if let state = playerState, state.hasNext {
+                Button {
+                    playPauseTapCount += 1
+                    playerService?.togglePlayPause()
+                } label: {
+                    Image(systemName: playPauseIcon)
+                        .font(.system(size: 32, weight: .semibold))
+                        .contentTransition(.symbolEffect(.replace, options: .speed(2)))
+                        .symbolEffect(.bounce.down.byLayer, options: .nonRepeating, value: playPauseTapCount)
+                }
+                .buttonStyle(TVTransportButtonStyle(isPrimary: true))
+                .focused($focusedControl, equals: .playPauseButton)
+                .disabled(isTransportDisabled)
+                .opacity(isTransportDisabled ? 0.3 : 1.0)
+                .accessibilityLabel(Text(isPlaying ? "player.controls.pause" : "player.controls.play"))
+
+                let hasNext = playerState?.hasNext == true
                 Button {
                     playNextTapCount += 1
                     Task { await playerService?.playNext() }
                 } label: {
-                    VStack(spacing: 6) {
-                        Image(systemName: "forward.fill")
-                            .font(.system(size: 28))
-                            .symbolEffect(.bounce.down.byLayer, options: .nonRepeating, value: playNextTapCount)
-                        Text(String(localized: "player.next"))
-                            .font(.caption)
-                    }
+                    Image(systemName: "forward.fill")
+                        .font(.system(size: 26, weight: .semibold))
+                        .symbolEffect(.bounce.down.byLayer, options: .nonRepeating, value: playNextTapCount)
                 }
-                .buttonStyle(TVActionButtonStyle())
+                .buttonStyle(TVTransportButtonStyle())
                 .focused($focusedControl, equals: .playNext)
+                .disabled(!hasNext)
+                .opacity(hasNext ? 1.0 : 0.3)
+                .accessibilityLabel(Text("player.next"))
             }
 
-            Spacer()
+            // MARK: Right cluster — queue
+            HStack(spacing: 24) {
+                Spacer(minLength: 0)
 
-            // Queue button (if videos in queue)
-            if let state = playerState, state.hasNext {
-                Button {
-                    onShowQueue()
-                } label: {
-                    VStack(spacing: 6) {
-                        Image(systemName: "list.bullet")
-                            .font(.system(size: 28))
-                        Text(String(localized: "queue.section.count \(state.queue.count)"))
-                            .font(.caption)
+                if let state = playerState, state.hasNext {
+                    Button {
+                        onShowQueue()
+                    } label: {
+                        TVActionButtonLabel(
+                            systemImage: "list.bullet",
+                            title: String(localized: "queue.section.count \(state.queue.count)")
+                        )
                     }
+                    .buttonStyle(TVActionButtonStyle())
+                    .focused($focusedControl, equals: .queueButton)
                 }
-                .buttonStyle(TVActionButtonStyle())
-                .focused($focusedControl, equals: .queueButton)
             }
+            .frame(maxWidth: .infinity, alignment: .trailing)
+        }
+    }
+}
 
-            // Close (stops playback and dismisses)
-            Button {
-                onClose()
-            } label: {
-                VStack(spacing: 6) {
-                    Image(systemName: "xmark.circle")
-                        .font(.system(size: 28))
-                    Text("player.controls.close")
-                        .font(.caption)
-                }
-            }
-            .buttonStyle(TVActionButtonStyle())
-            .focused($focusedControl, equals: .closeButton)
+// MARK: - Button Label
+
+/// Shared label for action buttons: icon always visible, title only on focus.
+private struct TVActionButtonLabel: View {
+    let systemImage: String
+    let title: String
+    var symbolEffectTrigger: Int = 0
+
+    var body: some View {
+        VStack(spacing: 6) {
+            Image(systemName: systemImage)
+                .font(.system(size: 28))
+                .symbolEffect(.bounce.down.byLayer, options: .nonRepeating, value: symbolEffectTrigger)
+            Text(title)
+                .font(.caption)
         }
     }
 }
 
 // MARK: - Button Styles
 
-/// Button style for action buttons (quality, captions, info).
+/// Button style for action buttons (settings, info, transport, queue).
+/// Width is adaptive so localized labels fit when revealed on focus.
 struct TVActionButtonStyle: ButtonStyle {
     @Environment(\.isFocused) private var isFocused
 
@@ -307,12 +347,54 @@ struct TVActionButtonStyle: ButtonStyle {
             .foregroundStyle(.white)
             .lineLimit(1)
             .minimumScaleFactor(0.8)
-            .frame(width: 140, height: 80)
+            .padding(.horizontal, 20)
+            .frame(minWidth: 100, minHeight: 80)
             .background(
                 RoundedRectangle(cornerRadius: 12)
                     .fill(isFocused ? .white.opacity(0.3) : .white.opacity(0.1))
             )
             .scaleEffect(configuration.isPressed ? 0.95 : (isFocused ? 1.05 : 1.0))
+            .animation(.easeInOut(duration: 0.15), value: isFocused)
+            .animation(.easeInOut(duration: 0.1), value: configuration.isPressed)
+    }
+}
+
+/// Circular icon-only button style for transport controls (previous / play-pause / next).
+/// Primary variant is larger and uses a filled white background when focused.
+struct TVTransportButtonStyle: ButtonStyle {
+    @Environment(\.isFocused) private var isFocused
+    var isPrimary: Bool = false
+
+    func makeBody(configuration: Configuration) -> some View {
+        let size: CGFloat = isPrimary ? 88 : 72
+        return configuration.label
+            .frame(width: size, height: size)
+            .background(
+                Circle()
+                    .fill(isFocused
+                        ? (isPrimary ? .white.opacity(0.95) : .white.opacity(0.3))
+                        : (isPrimary ? .white.opacity(0.25) : .white.opacity(0.12)))
+            )
+            .foregroundStyle(isFocused && isPrimary ? Color.black : .white)
+            .scaleEffect(configuration.isPressed ? 0.92 : (isFocused ? 1.08 : 1.0))
+            .animation(.easeInOut(duration: 0.15), value: isFocused)
+            .animation(.easeInOut(duration: 0.1), value: configuration.isPressed)
+    }
+}
+
+/// Compact circular button style for the top-right close affordance.
+struct TVCloseButtonStyle: ButtonStyle {
+    @Environment(\.isFocused) private var isFocused
+
+    func makeBody(configuration: Configuration) -> some View {
+        configuration.label
+            .foregroundStyle(.white)
+            .frame(width: 64, height: 64)
+            .background(
+                Circle()
+                    .fill(isFocused ? .white.opacity(0.3) : .white.opacity(0.12))
+            )
+            .scaleEffect(configuration.isPressed ? 0.92 : (isFocused ? 1.08 : 1.0))
             .animation(.easeInOut(duration: 0.15), value: isFocused)
             .animation(.easeInOut(duration: 0.1), value: configuration.isPressed)
     }

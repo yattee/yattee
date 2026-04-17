@@ -6671,6 +6671,26 @@
         }
       }
     },
+    "player.controls.pause" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pause"
+          }
+        }
+      }
+    },
+    "player.controls.play" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Play"
+          }
+        }
+      }
+    },
     "player.controls.quality" : {
       "extractionState" : "stale",
       "localizations" : {

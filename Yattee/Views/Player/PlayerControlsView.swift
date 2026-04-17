@@ -807,10 +807,7 @@ struct PlayerControlsView: View {
 
     /// Whether transport controls should be disabled (during loading/buffering or buffer not ready)
     private var isTransportDisabled: Bool {
-        playerState.playbackState == .loading ||
-        playerState.playbackState == .buffering ||
-        !playerState.isFirstFrameReady ||
-        !playerState.isBufferReady
+        playerState.isTransportDisabled
     }
 
     private var playPauseIcon: String {

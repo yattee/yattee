@@ -17,6 +17,7 @@ enum TVPlayerFocusTarget: Hashable {
     case commentsButton
     case debugButton
     case playPrevious
+    case playPauseButton
     case playNext
     case closeButton
     case queueButton

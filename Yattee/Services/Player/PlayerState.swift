@@ -422,6 +422,16 @@ final class PlayerState {
         videoAspectRatio ?? (16.0 / 9.0)
     }
 
+    /// Whether transport controls (play/pause, seek) should be blocked because
+    /// the player isn't ready yet — loading, buffering, or waiting for the
+    /// first frame / initial buffer. Shared by iOS and tvOS control overlays.
+    var isTransportDisabled: Bool {
+        playbackState == .loading
+            || playbackState == .buffering
+            || !isFirstFrameReady
+            || !isBufferReady
+    }
+
     // MARK: - Methods
 
     /// Updates the current video and stream.
