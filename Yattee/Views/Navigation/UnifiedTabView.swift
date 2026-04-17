@@ -901,9 +901,7 @@ extension UnifiedTabView {
         case .playlist(let id, _):
             playlistPaths[id, default: NavigationPath()].append(destination)
         case .mediaSource(let id, _, _):
-            #if os(iOS) || os(macOS)
             mediaSourcePaths[id, default: NavigationPath()].append(destination)
-            #endif
         case .instance(let id, _, _):
             instancePaths[id, default: NavigationPath()].append(destination)
         case .bookmarks:
