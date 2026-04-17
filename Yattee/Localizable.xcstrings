@@ -8359,6 +8359,16 @@
         }
       }
     },
+    "search.title" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Search"
+          }
+        }
+      }
+    },
     "search.type.all" : {
       "localizations" : {
         "en" : {
@@ -14212,17 +14222,6 @@
         }
       }
     },
-    "sidebar.mainItem.playlists" : {
-      "comment" : "Sidebar main navigation item for playlists",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Playlists"
-          }
-        }
-      }
-    },
     "sidebar.mainItem.downloads" : {
       "comment" : "Sidebar main navigation item for downloads",
       "localizations" : {
@@ -14263,6 +14262,17 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Open URL"
+          }
+        }
+      }
+    },
+    "sidebar.mainItem.playlists" : {
+      "comment" : "Sidebar main navigation item for playlists",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Playlists"
           }
         }
       }

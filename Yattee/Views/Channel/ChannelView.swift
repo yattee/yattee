@@ -84,7 +84,9 @@ struct ChannelView: View {
     #if os(tvOS)
     // tvOS-specific state
     @State private var isDescriptionScrollLocked = false
+    @State private var tvOSShowSearchTab = false
     @FocusState private var isSubscribeFocused: Bool
+    @FocusState private var isTVSearchFieldFocused: Bool
     #endif
 
     // Header configuration
@@ -630,13 +632,43 @@ struct ChannelView: View {
             ForEach([ChannelTab.videos, .shorts, .streams, .playlists]) { tab in
                 tvOSTabButton(for: tab)
             }
+            if supportsChannelSearch {
+                tvOSSearchTabButton
+            }
+        }
+    }
+
+    @ViewBuilder
+    private var tvOSSearchTabButton: some View {
+        let isSelected = tvOSShowSearchTab
+        let action = {
+            if !tvOSShowSearchTab {
+                tvOSShowSearchTab = true
+                isSearchActive = true
+            }
+        }
+        let label = Label(String(localized: "search.title"), systemImage: "magnifyingglass")
+            .fontWeight(isSelected ? .bold : .regular)
+            .lineLimit(1)
+
+        if isSelected {
+            Button(action: action) { label }
+                .buttonStyle(.borderedProminent)
+                .tint(accentColor)
+        } else {
+            Button(action: action) { label }
+                .buttonStyle(.bordered)
         }
     }
 
     @ViewBuilder
     private func tvOSTabButton(for tab: ChannelTab) -> some View {
-        let isSelected = selectedTab == tab
+        let isSelected = !tvOSShowSearchTab && selectedTab == tab
         let action = {
+            if tvOSShowSearchTab {
+                tvOSShowSearchTab = false
+                isSearchActive = false
+            }
             if selectedTab != tab {
                 selectedTab = tab
                 Task {
@@ -646,6 +678,7 @@ struct ChannelView: View {
         }
         let label = Label(tab.title, systemImage: tab.systemImage)
             .fontWeight(isSelected ? .bold : .regular)
+            .lineLimit(1)
 
         if isSelected {
             Button(action: action) { label }
@@ -663,27 +696,56 @@ struct ChannelView: View {
                 tvOSTabButtons
             }
 
-            ScrollView {
-                VStack(alignment: .leading, spacing: 0) {
-                    Group {
-                        switch selectedTab {
-                        case .videos:
-                            videosGrid
-                        case .shorts:
-                            shortsGrid
-                        case .streams:
-                            streamsGrid
-                        case .playlists:
-                            playlistsGrid
-                        case .about:
-                            videosGrid
+            if tvOSShowSearchTab {
+                tvOSChannelSearchContent
+            } else {
+                ScrollView {
+                    VStack(alignment: .leading, spacing: 0) {
+                        Group {
+                            switch selectedTab {
+                            case .videos:
+                                videosGrid
+                            case .shorts:
+                                shortsGrid
+                            case .streams:
+                                streamsGrid
+                            case .playlists:
+                                playlistsGrid
+                            case .about:
+                                videosGrid
+                            }
                         }
+                        .id(selectedTab)
                     }
-                    .id(selectedTab)
+                    .padding(.vertical, 20)
                 }
-                .padding(.vertical, 20)
+                .scrollClipDisabled()
+            }
+        }
+    }
+
+    private var tvOSChannelSearchContent: some View {
+        VStack(alignment: .leading, spacing: 20) {
+            HStack(spacing: 24) {
+                TextField(String(localized: "search.placeholder"), text: $searchText)
+                    .textFieldStyle(.plain)
+                    .focused($isTVSearchFieldFocused)
+                    .onSubmit {
+                        Task { await performSearch() }
+                    }
+            }
+            .focusSection()
+
+            ScrollView {
+                if hasSearched || isSearchLoading {
+                    searchResultsContent
+                        .padding(.vertical, 20)
+                }
             }
             .scrollClipDisabled()
+        }
+        .onAppear {
+            isTVSearchFieldFocused = true
         }
     }
 
