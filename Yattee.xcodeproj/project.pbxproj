@@ -13,7 +13,7 @@
 		378CF3012EF21783002C1CD7 /* MPVKit-GPL in Frameworks */ = {isa = PBXBuildFile; productRef = 378CF3002EF21783002C1CD7 /* MPVKit-GPL */; };
 		37BA19A62EE4DFEE001D7B0F /* Yattee2.icon in Resources */ = {isa = PBXBuildFile; fileRef = 37BA19A52EE4DFEE001D7B0F /* Yattee2.icon */; };
 		37BA19B52EE4EB7F001D7B0F /* YatteeShareExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 37BA19AB2EE4EB7F001D7B0F /* YatteeShareExtension.appex */; platformFilter = ios; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
-		37C0AAAA00000000AAAA000C /* YatteeTopShelf.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 37C0AAAA00000000AAAA0002 /* YatteeTopShelf.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		37C0AAAA00000000AAAA000C /* YatteeTopShelf.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 37C0AAAA00000000AAAA0002 /* YatteeTopShelf.appex */; platformFilters = (tvos, ); settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -67,6 +67,7 @@
 		37A11F692EDC5DD700213864 /* Exceptions for "Yattee" folder in "Yattee" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
+				"Info-tvOS.plist",
 				Info.plist,
 			);
 			target = 372D1A262EDB163800F58F7A /* Yattee */;
@@ -400,6 +401,9 @@
 		};
 		37C0AAAA00000000AAAA0007 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
+			platformFilters = (
+				tvos,
+			);
 			target = 37C0AAAA00000000AAAA0001 /* YatteeTopShelf */;
 			targetProxy = 37C0AAAA00000000AAAA0008 /* PBXContainerItemProxy */;
 		};
@@ -769,6 +773,7 @@
 				INFOPLIST_FILE = YatteeTopShelf/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = "Yattee Top Shelf";
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				LD_ENTRY_POINT = _NSExtensionMain;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -780,7 +785,6 @@
 				SDKROOT = appletvos;
 				SKIP_INSTALL = YES;
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
-				LD_ENTRY_POINT = _NSExtensionMain;
 				SUPPORTED_PLATFORMS = "appletvos appletvsimulator";
 				SWIFT_APPROACHABLE_CONCURRENCY = YES;
 				SWIFT_DEFAULT_ACTOR_ISOLATION = nonisolated;
@@ -803,6 +807,7 @@
 				INFOPLIST_FILE = YatteeTopShelf/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = "Yattee Top Shelf";
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				LD_ENTRY_POINT = _NSExtensionMain;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -814,7 +819,6 @@
 				SDKROOT = appletvos;
 				SKIP_INSTALL = YES;
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
-				LD_ENTRY_POINT = _NSExtensionMain;
 				SUPPORTED_PLATFORMS = "appletvos appletvsimulator";
 				SWIFT_APPROACHABLE_CONCURRENCY = YES;
 				SWIFT_DEFAULT_ACTOR_ISOLATION = nonisolated;
