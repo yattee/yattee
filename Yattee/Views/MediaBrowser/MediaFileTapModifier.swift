@@ -32,7 +32,6 @@ struct MediaFileTVOSTapButton<Label: View>: View {
         } label: {
             label()
         }
-        .buttonStyle(.plain)
     }
 }
 
@@ -43,7 +42,6 @@ struct MediaFileTVOSUnsupportedButton<Label: View>: View {
 
     var body: some View {
         Button(action: onTap) { label() }
-            .buttonStyle(.plain)
     }
 }
 #else
