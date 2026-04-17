@@ -569,6 +569,8 @@
 					"$(BUILT_PRODUCTS_DIR)/Libsmbclient.framework/Headers/samba-4.0",
 				);
 				INFOPLIST_FILE = Yattee/Info.plist;
+				"INFOPLIST_FILE[sdk=appletvos*]" = "Yattee/Info-tvOS.plist";
+				"INFOPLIST_FILE[sdk=appletvsimulator*]" = "Yattee/Info-tvOS.plist";
 				INFOPLIST_KEY_CFBundleDisplayName = Yattee;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.video";
 				INFOPLIST_KEY_NSLocalNetworkUsageDescription = "Yattee uses local network to discover and control playback on other Yattee devices.";
@@ -648,6 +650,8 @@
 					"$(BUILT_PRODUCTS_DIR)/Libsmbclient.framework/Headers/samba-4.0",
 				);
 				INFOPLIST_FILE = Yattee/Info.plist;
+				"INFOPLIST_FILE[sdk=appletvos*]" = "Yattee/Info-tvOS.plist";
+				"INFOPLIST_FILE[sdk=appletvsimulator*]" = "Yattee/Info-tvOS.plist";
 				INFOPLIST_KEY_CFBundleDisplayName = Yattee;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.video";
 				INFOPLIST_KEY_NSLocalNetworkUsageDescription = "Yattee uses local network to discover and control playback on other Yattee devices.";
