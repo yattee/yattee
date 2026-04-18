@@ -1,6 +1,14 @@
-## Build 241
+## Build 257 (v1.5.2)
 
 ## What's Changed
+* Fixed Finnish, Indonesian, Korean, Dutch and Swedish translations
+
+### Dependencies
+* Update dependencies
+
+## Previous builds
+
+## Build 241
 
 ### iOS Fixes
 * Fix menu text disappearing in navigation headers and playback settings
@@ -24,11 +32,6 @@
 ### Advanced Settings
 * Add experimental setting to hide videos without duration in Invidious instance settings (can be used to filter shorts)
 * Add optional AVPlayer support for non-streamable MP4/AVC1 formats in advanced settings with warnings about slow loading
-
-### Dependencies
-* Update dependencies
-
-## Previous builds
 
 ## Build 210
 
