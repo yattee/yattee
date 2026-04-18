@@ -9,7 +9,7 @@ on:
       build_tvos:
         description: 'Build tvOS (TestFlight)'
         type: boolean
-        default: false
+        default: true
       build_mac_beta:
         description: 'Build macOS (TestFlight)'
         type: boolean
