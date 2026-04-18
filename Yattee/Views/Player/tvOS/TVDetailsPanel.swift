@@ -706,7 +706,7 @@ struct TVFocusableCommentView: View {
                             Text("comments.replyCount \(comment.replyCount)")
                                 .font(.caption)
                         }
-                        .foregroundStyle(.blue)
+                        .foregroundStyle(.primary)
                     }
                 }
             }
@@ -747,7 +747,7 @@ struct TVFocusableCommentView: View {
                 } label: {
                     Text(String(localized: "comments.loadMoreReplies"))
                         .font(.caption)
-                        .foregroundStyle(.blue)
+                        .foregroundStyle(.primary)
                 }
                 .buttonStyle(.plain)
                 .padding(.leading, 52)
