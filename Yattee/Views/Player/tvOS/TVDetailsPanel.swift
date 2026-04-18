@@ -511,7 +511,7 @@ struct TVCommentsListView: View {
     }
 
     private var commentsList: some View {
-        LazyVStack(alignment: .leading, spacing: 0) {
+        LazyVStack(alignment: .leading, spacing: 8) {
             ForEach(comments) { comment in
                 TVFocusableCommentView(comment: comment, videoID: videoID)
                     .onAppear {
@@ -520,11 +520,6 @@ struct TVCommentsListView: View {
                             Task { await loadMoreComments() }
                         }
                     }
-
-                if comment.id != comments.last?.id {
-                    Divider()
-                        .background(.white.opacity(0.2))
-                }
             }
 
             // Loading more indicator
@@ -866,6 +861,7 @@ struct TVCommentButtonStyle: ButtonStyle {
 
     func makeBody(configuration: Configuration) -> some View {
         configuration.label
+            .padding(.horizontal, 16)
             .background(
                 RoundedRectangle(cornerRadius: 8)
                     .fill(isFocused ? .white.opacity(0.1) : .clear)
