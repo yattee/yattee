@@ -21,20 +21,6 @@
                ReferencedContainer = "container:Yattee.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
-         <BuildActionEntry
-            buildForTesting = "YES"
-            buildForRunning = "YES"
-            buildForProfiling = "YES"
-            buildForArchiving = "YES"
-            buildForAnalyzing = "YES">
-            <BuildableReference
-               BuildableIdentifier = "primary"
-               BlueprintIdentifier = "37BA19AA2EE4EB7F001D7B0F"
-               BuildableName = "YatteeShareExtension.appex"
-               BlueprintName = "YatteeShareExtension"
-               ReferencedContainer = "container:Yattee.xcodeproj">
-            </BuildableReference>
-         </BuildActionEntry>
       </BuildActionEntries>
    </BuildAction>
    <TestAction
