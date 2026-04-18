@@ -13,16 +13,34 @@
 # Uncomment the line if you want fastlane to automatically update itself
 # update_fastlane
 
+require 'tempfile'
+
 APP_NAME = ENV['APP_NAME']
 DEVELOPER_KEY_ID = ENV['DEVELOPER_KEY_ID']
 DEVELOPER_KEY_ISSUER_ID = ENV['DEVELOPER_KEY_ISSUER_ID']
-DEVELOPER_KEY_CONTENT = ENV['DEVELOPER_KEY_CONTENT']
 TEAM_ID = ENV['TEAM_ID']
 TEMP_KEYCHAIN_USER = ENV['TEMP_KEYCHAIN_USER']
 TEMP_KEYCHAIN_PASSWORD = ENV['TEMP_KEYCHAIN_PASSWORD']
 DEVELOPER_APP_IDENTIFIER = ENV['DEVELOPER_APP_IDENTIFIER']
 GIT_AUTHORIZATION = ENV['GIT_AUTHORIZATION']
 TESTFLIGHT_EXTERNAL_GROUPS = ENV['TESTFLIGHT_EXTERNAL_GROUPS']
+
+# Ruby's OpenSSL bindings (via OpenSSL::PKey::EC.new in spaceship) raise
+# "invalid curve name" on the hosted macOS runners when given Apple's PKCS#8
+# .p8 key directly. Shelling out to the system openssl to emit SEC1/traditional
+# PEM sidesteps the issue. See fastlane/fastlane#20593.
+def developer_key_content
+  return @developer_key_content if defined?(@developer_key_content)
+  content = ENV['DEVELOPER_KEY_CONTENT']
+  return @developer_key_content = nil if content.nil? || content.empty?
+  @developer_key_content = Tempfile.open(['AuthKey', '.p8']) do |f|
+    f.write(content)
+    f.flush
+    converted = `openssl pkey -in #{f.path} -traditional 2>&1`
+    raise "Failed to convert P8 key: #{converted}" unless $?.success?
+    converted
+  end
+end
 
 XCODEPROJ = "#{APP_NAME}.xcodeproj"
 
@@ -79,7 +97,7 @@ platform :ios do
     api_key = app_store_connect_api_key(
       key_id: DEVELOPER_KEY_ID,
       issuer_id: DEVELOPER_KEY_ISSUER_ID,
-      key_content: DEVELOPER_KEY_CONTENT
+      key_content: developer_key_content
     )
 
     build = get_build_number(xcodeproj: XCODEPROJ)
@@ -131,7 +149,7 @@ platform :tvos do
     api_key = app_store_connect_api_key(
       key_id: DEVELOPER_KEY_ID,
       issuer_id: DEVELOPER_KEY_ISSUER_ID,
-      key_content: DEVELOPER_KEY_CONTENT
+      key_content: developer_key_content
     )
 
     build = get_build_number(xcodeproj: XCODEPROJ)
@@ -183,7 +201,7 @@ platform :mac do
     api_key = app_store_connect_api_key(
       key_id: DEVELOPER_KEY_ID,
       issuer_id: DEVELOPER_KEY_ISSUER_ID,
-      key_content: DEVELOPER_KEY_CONTENT
+      key_content: developer_key_content
     )
 
     build = get_build_number(xcodeproj: XCODEPROJ)
@@ -234,7 +252,7 @@ platform :mac do
     api_key = app_store_connect_api_key(
       key_id: DEVELOPER_KEY_ID,
       issuer_id: DEVELOPER_KEY_ISSUER_ID,
-      key_content: DEVELOPER_KEY_CONTENT
+      key_content: developer_key_content
     )
 
     build = get_build_number(xcodeproj: XCODEPROJ)
