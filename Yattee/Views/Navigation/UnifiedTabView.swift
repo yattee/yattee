@@ -664,6 +664,11 @@ struct UnifiedTabView: View {
         .onChange(of: navigationCoordinator?.pendingNavigation) { _, newValue in
             handlePendingNavigation(newValue)
         }
+        .onChange(of: navigationCoordinator?.selectedSidebarItem) { _, newItem in
+            guard let item = newItem else { return }
+            selection = item
+            navigationCoordinator?.selectedSidebarItem = nil
+        }
     }
 
     /// Applies the configured startup tab on first appearance.

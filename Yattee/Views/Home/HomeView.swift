@@ -166,12 +166,63 @@ struct HomeView: View {
 
     // MARK: - Main Content
 
+    #if os(tvOS)
+    /// True on tvOS when no Home section would render content — prevents a focus trap
+    /// on fresh installs where the detail pane would otherwise be completely empty.
+    private var isHomeEmpty: Bool {
+        let sections = settingsManager?.visibleSections() ?? HomeSectionItem.defaultOrder.filter { HomeSectionItem.defaultVisibility[$0] == true }
+        for section in sections {
+            switch section {
+            case .continueWatching:
+                if !recentContinueWatching.isEmpty { return false }
+            case .feed:
+                if !feedCache.videos.isEmpty { return false }
+            case .bookmarks:
+                if !recentBookmarks.isEmpty { return false }
+            case .history:
+                if !recentHistory.isEmpty { return false }
+            case .downloads:
+                break
+            case .instanceContent, .mediaSource:
+                return false
+            }
+        }
+        return true
+    }
+
+    private var emptyHomeView: some View {
+        VStack(spacing: 32) {
+            VStack(spacing: 12) {
+                Text(String(localized: "home.tvos.empty.title"))
+                    .font(.title2)
+                    .fontWeight(.semibold)
+                Text(String(localized: "home.tvos.empty.message"))
+                    .foregroundStyle(.secondary)
+                    .multilineTextAlignment(.center)
+            }
+            Button {
+                appEnvironment?.navigationCoordinator.selectedSidebarItem = .sources
+            } label: {
+                Label(String(localized: "home.tvos.empty.openSources"), systemImage: "externaldrive.connected.to.line.below")
+                    .padding(.horizontal, 16)
+                    .padding(.vertical, 8)
+            }
+        }
+        .padding(60)
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+    }
+    #endif
+
     @ViewBuilder
     private var mainContent: some View {
         #if os(tvOS)
-        ScrollView {
-            LazyVStack(spacing: 0) {
-                homeContent
+        if isHomeEmpty {
+            emptyHomeView
+        } else {
+            ScrollView {
+                LazyVStack(spacing: 0) {
+                    homeContent
+                }
             }
         }
         #else

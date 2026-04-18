@@ -3624,6 +3624,39 @@
         }
       }
     },
+    "home.tvos.empty.title" : {
+      "comment" : "tvOS Home empty-state title shown on fresh install",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Welcome to Yattee"
+          }
+        }
+      }
+    },
+    "home.tvos.empty.message" : {
+      "comment" : "tvOS Home empty-state message shown on fresh install",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Add a media source to start watching."
+          }
+        }
+      }
+    },
+    "home.tvos.empty.openSources" : {
+      "comment" : "tvOS Home empty-state button that opens the Sources screen",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Open Sources"
+          }
+        }
+      }
+    },
     "home.history.clear" : {
       "comment" : "Clear history button",
       "localizations" : {
