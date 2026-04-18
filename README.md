@@ -11,8 +11,9 @@
 
 [![Discord](https://invidget.switchblade.xyz/pSnNKhZHEG)](https://yattee.stream/discord)
 
-![Screenshot](https://r.yattee.stream/screenshots/all-platforms.png)
-</div>
+> **Yattee 2 is in the works!** A new version of the app is being built with a refreshed experience for iOS, tvOS and soon for macOS.
+> It pairs with the new [Yattee Server](https://github.com/yattee/yattee-server) — a self-hosted backend powered by yt-dlp that supports 1000+ sites.
+> Join the [TestFlight beta](https://yattee.stream/beta2) to try early builds, and check the new documentation site at [docs.yattee.stream](https://docs.yattee.stream) for guides, roadmap and changelog.
 
 ## Features
 * Native user interface built with [SwiftUI](https://developer.apple.com/swiftui/) with customization settings
@@ -22,11 +23,6 @@
 * [SponsorBlock](https://sponsor.ajay.app/), configurable categories to skip
 
 ## Documentation
-* [Installation](https://github.com/yattee/yattee/wiki/Installation-Instructions)
-* [Building](https://github.com/yattee/yattee/wiki/Building-instructions)
-* [Features](https://github.com/yattee/yattee/wiki/Features)
-* [FAQ](https://github.com/yattee/yattee/wiki/FAQ)
-* [Screenshots Gallery](https://github.com/yattee/yattee/wiki/Screenshots-Gallery)
 * [Tips](https://github.com/yattee/yattee/wiki/Tips)
 * [Integrations](https://github.com/yattee/yattee/wiki/Integrations)
 * [Donations](https://github.com/yattee/yattee/wiki/Donations)
@@ -34,8 +30,7 @@
 ## Contributing
 If you're interestred in contributing, you can browse the [issues](https://github.com/yattee/yattee/issues) list or create a new one to discuss your feature idea. Every contribution is very welcome.
 
-Use [building instructions](https://github.com/yattee/yattee/wiki/Building-instructions) or
-join [Discord](https://yattee.stream/discord) or [Matrix Channel](https://matrix.to/#/#yattee:matrix.org) for a chat if you need an advice or want to discuss the project.
+Join [Discord](https://yattee.stream/discord) or [Matrix Channel](https://matrix.to/#/#yattee:matrix.org) for a chat if you need an advice or want to discuss the project.
 
 ## Translations
 
