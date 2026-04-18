@@ -17,6 +17,10 @@ struct SourcesListView: View {
     @State private var pendingDeleteInstance: Instance?
     @State private var pendingDeleteSource: MediaSource?
 
+    #if os(tvOS)
+    @FocusState private var firstSourceFocused: Bool
+    #endif
+
     private var instancesManager: InstancesManager? {
         appEnvironment?.instancesManager
     }
@@ -39,17 +43,26 @@ struct SourcesListView: View {
             #if os(tvOS)
             TVSidebarDetailContainer(
                 systemImage: "server.rack",
-                title: String(localized: "sources.title"),
-                bottomAction: {
-                    Button {
-                        showingAddSheet = true
-                    } label: {
-                        Label(String(localized: "sources.addSource"), systemImage: "plus")
-                    }
-                    .accessibilityIdentifier("sources.addButton")
-                }
+                title: String(localized: "sources.title")
             ) {
-                sourcesInner
+                VStack(spacing: 0) {
+                    HStack(spacing: 24) {
+                        Button {
+                            showingAddSheet = true
+                        } label: {
+                            Label(String(localized: "sources.addSource"), systemImage: "plus")
+                        }
+                        .accessibilityIdentifier("sources.addButton")
+                        Spacer()
+                    }
+                    .padding(.horizontal, 24)
+                    .padding(.top, 16)
+                    .padding(.bottom, 8)
+                    .focusSection()
+
+                    sourcesInner
+                        .focusSection()
+                }
             }
             #else
             sourcesInner
@@ -148,6 +161,13 @@ struct SourcesListView: View {
                     }
                 }
             )
+            #if os(tvOS)
+            .onAppear {
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.05) {
+                    firstSourceFocused = true
+                }
+            }
+            #endif
     }
 
     // MARK: - Section Header
@@ -199,14 +219,14 @@ struct SourcesListView: View {
             sectionCard {
                 ForEach(Array(instances.enumerated()), id: \.element.id) { index, instance in
                     let isLast = index == instances.count - 1
-                    instanceRowView(instance, isLast: isLast)
+                    instanceRowView(instance, isLast: isLast, isFirst: index == 0)
                 }
             }
         }
     }
 
     @ViewBuilder
-    private func instanceRowView(_ instance: Instance, isLast: Bool) -> some View {
+    private func instanceRowView(_ instance: Instance, isLast: Bool, isFirst: Bool = false) -> some View {
         #if os(tvOS)
         SourceListRow(isLast: isLast, listStyle: listStyle) {
             Button {
@@ -216,6 +236,7 @@ struct SourcesListView: View {
             }
             .foregroundStyle(.primary)
         }
+        .modifier(FirstRowFocusModifier(isFirst: isFirst, focus: $firstSourceFocused))
         #else
         SourceListRow(isLast: isLast, listStyle: listStyle) {
             Button {
@@ -314,13 +335,14 @@ struct SourcesListView: View {
     @ViewBuilder
     private var fileSourcesSection: some View {
         let allFileSources = allMediaSources
+        let noRemoteServers = instancesManager?.instances.isEmpty ?? true
         if !allFileSources.isEmpty {
             sectionHeader(String(localized: "sources.section.fileSources"))
 
             sectionCard {
                 ForEach(Array(allFileSources.enumerated()), id: \.element.id) { index, source in
                     let isLast = index == allFileSources.count - 1
-                    fileSourceRowView(source, isLast: isLast)
+                    fileSourceRowView(source, isLast: isLast, isFirst: noRemoteServers && index == 0)
                 }
             }
         }
@@ -338,7 +360,7 @@ struct SourcesListView: View {
     }
 
     @ViewBuilder
-    private func fileSourceRowView(_ source: MediaSource, isLast: Bool) -> some View {
+    private func fileSourceRowView(_ source: MediaSource, isLast: Bool, isFirst: Bool = false) -> some View {
         let needsPassword = mediaSourcesManager?.needsPassword(for: source) ?? false
 
         #if os(tvOS)
@@ -350,6 +372,7 @@ struct SourcesListView: View {
             }
             .foregroundStyle(.primary)
         }
+        .modifier(FirstRowFocusModifier(isFirst: isFirst, focus: $firstSourceFocused))
         #else
         SourceListRow(isLast: isLast, listStyle: listStyle) {
             Button {
@@ -464,6 +487,21 @@ struct SourcesListView: View {
         return String(localized: "sources.delete.confirmation")
     }
 }
+
+#if os(tvOS)
+private struct FirstRowFocusModifier: ViewModifier {
+    let isFirst: Bool
+    var focus: FocusState<Bool>.Binding
+
+    func body(content: Content) -> some View {
+        if isFirst {
+            content.focused(focus)
+        } else {
+            content
+        }
+    }
+}
+#endif
 
 // MARK: - Preview
 
