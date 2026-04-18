@@ -46,11 +46,25 @@ jobs:
         run: |
           sudo xcodebuild -downloadPlatform iOS || true
           sudo xcodebuild -downloadPlatform tvOS || true
-      - name: Clear SPM cache
+      - name: Resolve SPM dependencies (retry around SPM binary-target race)
         run: |
-          rm -rf ~/Library/Caches/org.swift.swiftpm
-          rm -rf ~/Library/org.swift.swiftpm
-          rm -rf ~/Library/Developer/Xcode/DerivedData
+          case "${{ matrix.lane }}" in
+            "ios beta") SCHEME="Yattee (iOS)" ;;
+            "tvos beta") SCHEME="Yattee (tvOS)" ;;
+            *) SCHEME="Yattee (iOS)" ;;
+          esac
+          set +e
+          for attempt in 1 2 3; do
+            rm -rf ~/Library/Caches/org.swift.swiftpm ~/Library/org.swift.swiftpm ~/Library/Developer/Xcode/DerivedData
+            echo "::group::Resolve attempt $attempt for $SCHEME"
+            xcodebuild -resolvePackageDependencies -project Yattee.xcodeproj -scheme "$SCHEME"
+            RC=$?
+            echo "::endgroup::"
+            [ $RC -eq 0 ] && exit 0
+            echo "Attempt $attempt failed (rc=$RC), retrying after 15s..."
+            sleep 15
+          done
+          exit 1
       - uses: maierj/fastlane-action@v3.0.0
         with:
           lane: ${{ matrix.lane }}
@@ -76,11 +90,20 @@ jobs:
       - uses: maxim-lobanov/setup-xcode@v1
         with:
           xcode-version: '26.0.1'
-      - name: Clear SPM cache
+      - name: Resolve SPM dependencies (retry around SPM binary-target race)
         run: |
-          rm -rf ~/Library/Caches/org.swift.swiftpm
-          rm -rf ~/Library/org.swift.swiftpm
-          rm -rf ~/Library/Developer/Xcode/DerivedData
+          set +e
+          for attempt in 1 2 3; do
+            rm -rf ~/Library/Caches/org.swift.swiftpm ~/Library/org.swift.swiftpm ~/Library/Developer/Xcode/DerivedData
+            echo "::group::Resolve attempt $attempt for Yattee (macOS)"
+            xcodebuild -resolvePackageDependencies -project Yattee.xcodeproj -scheme "Yattee (macOS)"
+            RC=$?
+            echo "::endgroup::"
+            [ $RC -eq 0 ] && exit 0
+            echo "Attempt $attempt failed (rc=$RC), retrying after 15s..."
+            sleep 15
+          done
+          exit 1
       - uses: maierj/fastlane-action@v3.0.0
         with:
           lane: mac build_and_notarize
