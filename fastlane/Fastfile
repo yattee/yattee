@@ -33,6 +33,10 @@ def developer_key_content
   return @developer_key_content if defined?(@developer_key_content)
   content = ENV['DEVELOPER_KEY_CONTENT']
   return @developer_key_content = nil if content.nil? || content.empty?
+  # GitHub secrets carry multi-line PEMs as a single line with literal "\n"
+  # escapes; fastlane's action un-escapes these before use, so do the same
+  # here before invoking openssl.
+  content = content.gsub('\n', "\n")
   @developer_key_content = Tempfile.open(['AuthKey', '.p8']) do |f|
     f.write(content)
     f.flush
