@@ -1,19 +1,26 @@
 ## What's Changed
 
+**tvOS support** — Yattee 2 is now available on Apple TV via TestFlight, bringing many new features with a native interface built for the large-screen layout
+
+* Redesigned player controls with a seek bar and storyboard support
+* Sidebar navigation
+* Two-column layouts for Video Info, Channel, Playlist detail, Subscriptions, and setting screens
+* Top Shelf extension
+
 ### New Features
 
-* Show seek time preview when no storyboards are available
-* Add separate glass capsule for chapter title above seek preview
+* Add List/Grid layout option for Home sections
+* Add Playlists entry to sidebar main navigation
+* Add Continue Watching toggles to tab bar and sidebar settings
+* Replace onboarding flow with silent v1 import and iCloud alert
 
 ### Bug Fixes
 
-* Fix 5 TestFlight crash types from builds 250-254
-* Fix HTTP basic auth credentials being stripped from instance URLs
-* Fix Home view showing zero counts after returning from background
-* Fix HomeView data staleness on new watch entries, tab switches, and settings dismissal
-* Fix missing leading padding on instance content section headers
+* Fix storyboard downloads with Yattee Server direct YouTube URLs
 
 ### Improvements
 
-* Deduplicate time formatting and clean up unused code
-* Update packages
+* Store higher-quality YouTube thumbnail URLs in recent playlists
+* Refresh expired thumbnail URLs for downloads and video info
+* Show video title placeholder while thumbnails load
+* Respect video tap action settings in the media browser
