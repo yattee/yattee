@@ -4,13 +4,13 @@
 "%@ Channel" = "%@ Csatorna";
 "%@ Playlist" = "%@ Lejátszási lista";
 "10 seconds forwards/backwards" = "10 másodperc előre/vissza";
-"%@ subscribers" = "%@ feliratkozók";
-"%lld videos" = "%lld videók";
+"%@ subscribers" = "%@ feliratkozó";
+"%lld videos" = "%lld videó";
 "No results" = "Nincsenek találatok";
 "No Playlists" = "Nincsenek lejátszási listák";
 "Mark video as watched after playing" = "Jelölje meg a videót megtekintettként lejátszás után";
 "Mark watched videos with" = "Megtekintett videók megjelölése a következővel";
-"Matrix Channel" = "Matrix csatorna";
+"Matrix Channel" = "Matrix-csatorna";
 "Find Other" = "Egyebek keresése";
 "Hour" = "Óra";
 "Month" = "Hónap";
@@ -156,7 +156,7 @@
 "Honor orientation lock" = "Tájolás zárolása";
 "I am lost" = "Elvesztem";
 "I found a bug /" = "Találtam egy hibát /";
-"I have a feature request" = "Van egy funkció kérésem";
+"I have a feature request" = "Van egy funkciójavaslatom";
 "I like this app!" = "Tetszik ez az alkalmazás!";
 "I want to ask a question" = "Szeretnék feltenni egy kérdést";
 "If you are interested what's coming in future updates, you can track project Milestones." = "Ha érdekli Önt, hogy mi várható a jövőbeni frissítésekben, akkor nyomon követheti a projekt mérföldköveit.";
@@ -218,7 +218,7 @@
 "Playback" = "Visszajátszás";
 "Player" = "Lejátszó";
 "Playlist" = "Lejátszási lista";
-"Playlist \"%@\" will be deleted.\nIt cannot be reverted." = "A(z) „%@” lejátszási lista törlésre kerül.\nEzt nem lehet visszaállítani.";
+"Playlist \"%@\" will be deleted.\nIt cannot be reverted." = "A(z) „%@” lejátszási lista törölve lesz.\nEzt nem lehet visszaállítani.";
 "Popular" = "Népszerű";
 "Preferred Formats" = "Előnyben részesített formátumok";
 "Proxy videos" = "Proxyzott videók";
@@ -276,7 +276,7 @@
 "Source" = "Forrás";
 "Sponsor" = "Szponzor";
 "SponsorBlock" = "SponsorBlock";
-"SponsorBlock API Instance" = "SponsorBlock API példány";
+"SponsorBlock API Instance" = "SponsorBlock API-példány";
 "Subscribe" = "Feliratkozás";
 "Subscriptions" = "Feliratkozások";
 "Switch to other public location" = "Váltás más nyilvános helyre";
@@ -329,7 +329,7 @@
 "Stream & Player" = "Közvetítő és lejátszó";
 "Statistics" = "Statisztika";
 "Hardware decoder" = "Hardveres dekódoló";
-"Stream FPS" = "FPS folyam";
+"Stream FPS" = "FPS-folyam";
 "Rate & Captions" = "Értékelés és feliratok";
 "Dropped frames" = "Eldobott keretek";
 "Any format" = "Bármilyen formátum";
@@ -395,7 +395,7 @@
 "Open Video" = "Videó megnyitása";
 "Default Profile" = "Alapértelmezett profil";
 "Share%@link" = "%@ hivatkozás megosztása";
-"\"%@\" will be irreversibly removed from this device." = "A(z) „%@” visszavonhatatlanul eltávolításra kerül erről az eszközről.";
+"\"%@\" will be irreversibly removed from this device." = "A(z) „%@” visszavonhatatlanul el lesz távolítva erről az eszközről.";
 "Could not delete document" = "A dokumentum törlése nem sikerült";
 "Are you sure you want to remove %@ location?" = "Biztosan törölni szeretné a(z) %@ helyet?";
 "Live Streams" = "Élő közvetítések";
@@ -471,7 +471,7 @@
 "Disable filters" = "Szűrők kikapcsolása";
 "You need to create an instance and accounts\nto access %@ section" = "Létre kell hoznia egy példányt és fiókokat\na(z) %@ szakasz eléréséhez";
 "You can switch between profiles in playback settings controls." = "A lejátszási beállítások vezérlőiben válthat a profilok között.";
-"Share files from Finder on a Mac\nor iTunes on Windows" = "Fájlok megosztása a Finderből Macen\nvagy iTunes használatával Windowson";
+"Share files from Finder on a Mac\nor iTunes on Windows" = "Fájlok megosztása a Finderből Mac számítógépen\nvagy iTunes használatával Windowson";
 "Open logs in Finder" = "Naplók megnyitása a Finderben";
 "Could not open playlist" = "Nem sikerült megnyitni a lejátszási listát";
 "Now Playing" = "Jelenleg lejátszás alatt";
