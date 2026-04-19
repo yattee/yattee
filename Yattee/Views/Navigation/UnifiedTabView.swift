@@ -376,17 +376,41 @@ struct UnifiedTabView: View {
     // Zoom transition namespace (local to this tab view)
     @Namespace private var zoomTransition
 
+    // Settings sheet (rendered from the NavigationSplitView toolbar so the gear sits
+    // immediately after the system-vended sidebar-toggle in the sidebar column).
+    @State private var showingSettings = false
+    @Namespace private var sheetTransition
+
     private var yatteeServerAuthHeader: String? {
         guard let server = appEnvironment?.instancesManager.enabledYatteeServerInstances.first else { return nil }
         return appEnvironment?.basicAuthCredentialsManager.basicAuthHeader(for: server)
     }
 
     var body: some View {
-        TabView(selection: $selection) {
-            mainTabs
-            sidebarSections
+        NavigationSplitView {
+            sidebar
+                .toolbar {
+                    ToolbarItem(placement: .primaryAction) {
+                        Button {
+                            showingSettings = true
+                        } label: {
+                            Image(systemName: "gear")
+                        }
+                        .accessibilityIdentifier("app.settingsButton")
+                        .accessibilityLabel(String(localized: "settings.title"))
+                        .liquidGlassTransitionSource(id: "appSettings", in: sheetTransition)
+                    }
+                }
+        } detail: {
+            detailForSelection
         }
-        .tabViewStyle(.sidebarAdaptable)
+        .sheet(isPresented: $showingSettings) {
+            SettingsView()
+                .liquidGlassSheetContent(sourceID: "appSettings", in: sheetTransition)
+        }
+        .onChange(of: appEnvironment?.navigationCoordinator.dismissSettingsTrigger) {
+            showingSettings = false
+        }
         .zoomTransitionNamespace(zoomTransition)
         .onAppear {
             configureSidebarManager()
@@ -420,177 +444,122 @@ struct UnifiedTabView: View {
         settingsManager?.visibleSidebarMainItems() ?? SidebarMainItem.defaultOrder
     }
 
-    // MARK: - Tab Builders
+    // MARK: - Sidebar
 
-    @TabContentBuilder<SidebarItem>
-    private var mainTabs: some TabContent<SidebarItem> {
-        ForEach(visibleMainItems) { item in
-            mainTab(for: item)
+    private var sidebar: some View {
+        List(selection: $selection) {
+            ForEach(visibleMainItems) { item in
+                sidebarRow(for: item)
+            }
+
+            if !sidebarManager.hasNoSources && (settingsManager?.sidebarSourcesEnabled ?? true) {
+                Section(String(localized: "sidebar.section.sources")) {
+                    ForEach(sidebarManager.sortedSourceItems) { item in
+                        NavigationLink(value: item) {
+                            Label(item.title, systemImage: item.systemImage)
+                        }
+                    }
+                }
+            }
+
+            if !sidebarManager.channelItems.isEmpty && (settingsManager?.sidebarChannelsEnabled ?? true) {
+                Section(String(localized: "sidebar.section.channels")) {
+                    ForEach(sidebarManager.channelItems) { item in
+                        NavigationLink(value: item) {
+                            channelLabel(for: item)
+                        }
+                    }
+                }
+            }
+
+            if !sidebarManager.playlistItems.isEmpty && (settingsManager?.sidebarPlaylistsEnabled ?? true) {
+                Section(String(localized: "sidebar.section.playlists")) {
+                    ForEach(sidebarManager.playlistItems) { item in
+                        NavigationLink(value: item) {
+                            playlistLabel(for: item)
+                        }
+                    }
+                }
+            }
         }
     }
 
-    @TabContentBuilder<SidebarItem>
-    private func mainTab(for item: SidebarMainItem) -> some TabContent<SidebarItem> {
-        switch item {
-        case .search:
-            Tab(value: SidebarItem.search, role: .search) {
-                NavigationStack(path: $searchPath) {
-                    SearchView().withNavigationDestinations()
-                }
-            } label: {
-                Label(SidebarItem.search.title, systemImage: SidebarItem.search.systemImage)
-            }
+    @ViewBuilder
+    private func sidebarRow(for item: SidebarMainItem) -> some View {
+        let sidebarItem = item.sidebarItem
+        NavigationLink(value: sidebarItem) {
+            Label(sidebarItem.title, systemImage: sidebarItem.systemImage)
+        }
+    }
 
+    // MARK: - Detail
+
+    @ViewBuilder
+    private var detailForSelection: some View {
+        switch selection {
         case .home:
-            Tab(value: SidebarItem.home) {
-                NavigationStack(path: $homePath) {
-                    HomeView().withNavigationDestinations()
-                }
-            } label: {
-                Label(SidebarItem.home.title, systemImage: SidebarItem.home.systemImage)
+            NavigationStack(path: $homePath) {
+                HomeView().withNavigationDestinations()
             }
-
-        case .subscriptions:
-            Tab(value: SidebarItem.subscriptionsFeed) {
-                NavigationStack(path: $subscriptionsFeedPath) {
-                    SubscriptionsView().withNavigationDestinations()
-                }
-            } label: {
-                Label(SidebarItem.subscriptionsFeed.title, systemImage: SidebarItem.subscriptionsFeed.systemImage)
+        case .search:
+            NavigationStack(path: $searchPath) {
+                SearchView().withNavigationDestinations()
             }
-
+        case .subscriptionsFeed:
+            NavigationStack(path: $subscriptionsFeedPath) {
+                SubscriptionsView().withNavigationDestinations()
+            }
         case .bookmarks:
-            Tab(value: SidebarItem.bookmarks) {
-                NavigationStack(path: $bookmarksPath) {
-                    BookmarksListView().withNavigationDestinations()
-                }
-            } label: {
-                Label(SidebarItem.bookmarks.title, systemImage: SidebarItem.bookmarks.systemImage)
+            NavigationStack(path: $bookmarksPath) {
+                BookmarksListView().withNavigationDestinations()
             }
-
         case .history:
-            Tab(value: SidebarItem.history) {
-                NavigationStack(path: $historyPath) {
-                    HistoryListView().withNavigationDestinations()
-                }
-            } label: {
-                Label(SidebarItem.history.title, systemImage: SidebarItem.history.systemImage)
+            NavigationStack(path: $historyPath) {
+                HistoryListView().withNavigationDestinations()
             }
-
         case .downloads:
-            Tab(value: SidebarItem.downloads) {
-                NavigationStack(path: $downloadsPath) {
-                    DownloadsView().withNavigationDestinations()
-                }
-            } label: {
-                Label(SidebarItem.downloads.title, systemImage: SidebarItem.downloads.systemImage)
+            NavigationStack(path: $downloadsPath) {
+                DownloadsView().withNavigationDestinations()
             }
-
-        case .channels:
-            Tab(value: SidebarItem.manageChannels) {
-                NavigationStack(path: $manageChannelsPath) {
-                    ManageChannelsView().withNavigationDestinations()
-                }
-            } label: {
-                Label(SidebarItem.manageChannels.title, systemImage: SidebarItem.manageChannels.systemImage)
+        case .manageChannels:
+            NavigationStack(path: $manageChannelsPath) {
+                ManageChannelsView().withNavigationDestinations()
             }
-
-        case .playlists:
-            Tab(value: SidebarItem.playlistsList) {
-                NavigationStack(path: $playlistsListPath) {
-                    PlaylistsListView().withNavigationDestinations()
-                }
-            } label: {
-                Label(SidebarItem.playlistsList.title, systemImage: SidebarItem.playlistsList.systemImage)
+        case .playlistsList:
+            NavigationStack(path: $playlistsListPath) {
+                PlaylistsListView().withNavigationDestinations()
             }
-
         case .sources:
-            Tab(value: SidebarItem.sources) {
-                NavigationStack(path: $sourcesPath) {
-                    MediaSourcesView().withNavigationDestinations()
-                }
-            } label: {
-                Label(SidebarItem.sources.title, systemImage: SidebarItem.sources.systemImage)
+            NavigationStack(path: $sourcesPath) {
+                MediaSourcesView().withNavigationDestinations()
             }
-
         case .settings:
-            Tab(value: SidebarItem.settings) {
-                NavigationStack(path: $settingsPath) {
-                    SettingsView().withNavigationDestinations()
-                }
-            } label: {
-                Label(SidebarItem.settings.title, systemImage: SidebarItem.settings.systemImage)
+            NavigationStack(path: $settingsPath) {
+                SettingsView().withNavigationDestinations()
             }
-
         case .openURL:
-            Tab(value: SidebarItem.openURL) {
-                NavigationStack(path: $openURLPath) {
-                    OpenLinkView().withNavigationDestinations()
-                }
-            } label: {
-                Label(SidebarItem.openURL.title, systemImage: SidebarItem.openURL.systemImage)
+            NavigationStack(path: $openURLPath) {
+                OpenLinkView().withNavigationDestinations()
             }
-
         case .remoteControl:
-            Tab(value: SidebarItem.remoteControl) {
-                NavigationStack(path: $remoteControlPath) {
-                    RemoteControlContentView(navigationStyle: .link)
-                        .navigationTitle(String(localized: "remoteControl.title"))
-                        .withNavigationDestinations()
-                }
-            } label: {
-                Label(SidebarItem.remoteControl.title, systemImage: SidebarItem.remoteControl.systemImage)
+            NavigationStack(path: $remoteControlPath) {
+                RemoteControlContentView(navigationStyle: .link)
+                    .navigationTitle(String(localized: "remoteControl.title"))
+                    .withNavigationDestinations()
             }
-
         case .continueWatching:
-            Tab(value: SidebarItem.continueWatching) {
-                NavigationStack(path: $continueWatchingPath) {
-                    ContinueWatchingView()
-                        .withNavigationDestinations()
-                }
-            } label: {
-                Label(SidebarItem.continueWatching.title, systemImage: SidebarItem.continueWatching.systemImage)
+            NavigationStack(path: $continueWatchingPath) {
+                ContinueWatchingView()
+                    .withNavigationDestinations()
             }
-        }
-    }
-
-    @TabContentBuilder<SidebarItem>
-    private var sidebarSections: some TabContent<SidebarItem> {
-        // Unified Sources Section (instances + media sources)
-        if !sidebarManager.hasNoSources && (settingsManager?.sidebarSourcesEnabled ?? true) {
-            TabSection(String(localized: "sidebar.section.sources")) {
-                ForEach(sidebarManager.sortedSourceItems) { item in
-                    Tab(value: item) {
-                        sourceContent(for: item)
-                    } label: {
-                        Label(item.title, systemImage: item.systemImage)
-                    }
-                }
-            }
-        }
-
-        if !sidebarManager.channelItems.isEmpty && (settingsManager?.sidebarChannelsEnabled ?? true) {
-            TabSection(String(localized: "sidebar.section.channels")) {
-                ForEach(sidebarManager.channelItems) { item in
-                    Tab(value: item) {
-                        channelContent(for: item)
-                    } label: {
-                        channelLabel(for: item)
-                    }
-                }
-            }
-        }
-
-        if !sidebarManager.playlistItems.isEmpty && (settingsManager?.sidebarPlaylistsEnabled ?? true) {
-            TabSection(String(localized: "sidebar.section.playlists")) {
-                ForEach(sidebarManager.playlistItems) { item in
-                    Tab(value: item) {
-                        playlistContent(for: item)
-                    } label: {
-                        playlistLabel(for: item)
-                    }
-                }
-            }
+        case .channel:
+            channelContent(for: selection)
+        case .playlist:
+            playlistContent(for: selection)
+        case .mediaSource, .instance:
+            sourceContent(for: selection)
+        case .nowPlaying:
+            EmptyView()
         }
     }
 

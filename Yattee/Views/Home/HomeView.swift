@@ -10,7 +10,9 @@ import SwiftUI
 struct HomeView: View {
     @Environment(\.appEnvironment) private var appEnvironment
     @Environment(\.scenePhase) private var scenePhase
+    #if !os(tvOS) && !os(macOS)
     @Namespace private var sheetTransition
+    #endif
     @State private var playlists: [LocalPlaylist] = []
     @State private var bookmarksCount: Int = 0
     @State private var recentBookmarks: [Bookmark] = []
@@ -18,7 +20,9 @@ struct HomeView: View {
     @State private var recentContinueWatching: [WatchEntry] = []
     @State private var historyCount: Int = 0
     @State private var recentHistory: [WatchEntry] = []
+    #if !os(tvOS) && !os(macOS)
     @State private var showingSettings = false
+    #endif
     @State private var showingOpenLink = false
     @State private var showingRemoteControl = false
     @State private var showingCustomizeHome = false
@@ -78,7 +82,7 @@ struct HomeView: View {
         .toolbarTitleDisplayMode(.inlineLarge)
         #endif
         .toolbar {
-            #if !os(tvOS)
+            #if !os(tvOS) && !os(macOS)
             ToolbarItem(placement: .primaryAction) {
                 Button {
                     showingSettings = true
@@ -91,7 +95,7 @@ struct HomeView: View {
             }
             #endif
         }
-        #if !os(tvOS)
+        #if !os(tvOS) && !os(macOS)
         .sheet(isPresented: $showingSettings) {
             SettingsView()
                 .liquidGlassSheetContent(sourceID: "homeSettings", in: sheetTransition)

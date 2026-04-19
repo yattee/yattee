@@ -167,6 +167,7 @@ struct YatteeApp: App {
         }
         #if os(macOS)
         .windowStyle(.hiddenTitleBar)
+        .windowToolbarStyle(.unified)
         .defaultSize(width: 1200, height: 800)
         // Handle URLs in the existing window instead of opening a new one
         .handlesExternalEvents(matching: Set(["*"]))
