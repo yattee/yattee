@@ -13,6 +13,9 @@ struct SubscriptionsView: View {
     #if os(tvOS)
     @FocusState private var focusedVideoID: String?
     #endif
+    #if os(iOS)
+    @Environment(\.horizontalSizeClass) private var horizontalSizeClass
+    #endif
     @State private var feedCache = SubscriptionFeedCache.shared
     @State private var subscriptions: [Subscription] = []
     @State private var subscriptionsLoaded = false
@@ -239,29 +242,41 @@ struct SubscriptionsView: View {
                         .frame(minWidth: 300, maxWidth: .infinity, maxHeight: .infinity)
                     }
                     #else
-                    Group {
-                        switch layout {
-                        case .list:
-                            listContent
-                        case .grid:
-                            gridContent
+                    if isIPadRegular && subscriptionsLoaded && subscriptions.count > 1 {
+                        HStack(spacing: 0) {
+                            iOSChannelsSidebar
+                                .frame(width: 260)
+
+                            Divider()
+
+                            feedLayout
+                                .frame(maxWidth: .infinity, maxHeight: .infinity)
                         }
-                    }
-                    .refreshable {
-                        guard let appEnvironment else { return }
-                        LoggingService.shared.info("User initiated pull-to-refresh in Subscriptions view", category: .general)
-                        await loadSubscriptionsAsync()
-                        await feedCache.refresh(using: appEnvironment)
-                        LoggingService.shared.info("Pull-to-refresh completed", category: .general)
+                        .refreshable {
+                            guard let appEnvironment else { return }
+                            LoggingService.shared.info("User initiated pull-to-refresh in Subscriptions view", category: .general)
+                            await loadSubscriptionsAsync()
+                            await feedCache.refresh(using: appEnvironment)
+                            LoggingService.shared.info("Pull-to-refresh completed", category: .general)
+                        }
+                    } else {
+                        feedLayout
+                            .refreshable {
+                                guard let appEnvironment else { return }
+                                LoggingService.shared.info("User initiated pull-to-refresh in Subscriptions view", category: .general)
+                                await loadSubscriptionsAsync()
+                                await feedCache.refresh(using: appEnvironment)
+                                LoggingService.shared.info("Pull-to-refresh completed", category: .general)
+                            }
                     }
                     #endif
 
-                    // Bottom overlay for filter strip (iOS only)
+                    // Bottom overlay for filter strip (iOS only, compact width)
                     #if os(iOS)
                     VStack {
                         Spacer()
 
-                        if subscriptionsLoaded && subscriptions.count > 1 && channelStripSize != .disabled && !isShowingFullScreenError {
+                        if subscriptionsLoaded && subscriptions.count > 1 && channelStripSize != .disabled && !isShowingFullScreenError && !isIPadRegular {
                             bottomFloatingFilterStrip
                                 .transition(.move(edge: .bottom).combined(with: .opacity))
                         }
@@ -270,7 +285,11 @@ struct SubscriptionsView: View {
                 }
                 #if !os(tvOS)
                 .navigationTitle(String(localized: "tabs.subscriptions"))
+                #if os(iOS)
+                .toolbarTitleDisplayMode(isIPadRegular ? .inline : .inlineLarge)
+                #else
                 .toolbarTitleDisplayMode(.inlineLarge)
+                #endif
                 .toolbar {
                     ToolbarItem(placement: .primaryAction) {
                         Button {
@@ -742,67 +761,182 @@ struct SubscriptionsView: View {
     }
     #endif
 
-    // MARK: - macOS Channels Sidebar
+    // MARK: - Channels Sidebar (macOS / iPad)
 
-    #if os(macOS)
-    private static let macOSAllChannelsTag = "__all__"
+    #if !os(tvOS)
+    private static let sidebarAllChannelsTag = "__all__"
 
-    private var macOSSidebarSelection: Binding<String?> {
+    private var sidebarSelection: Binding<String?> {
         Binding(
-            get: { selectedChannelID ?? Self.macOSAllChannelsTag },
+            get: { selectedChannelID ?? Self.sidebarAllChannelsTag },
             set: { newValue in
-                selectedChannelID = (newValue == Self.macOSAllChannelsTag) ? nil : newValue
+                selectedChannelID = (newValue == Self.sidebarAllChannelsTag) ? nil : newValue
             }
         )
     }
 
-    private var macOSChannelsSidebar: some View {
-        List(selection: macOSSidebarSelection) {
-            MacSubscriptionsSidebarRow(
-                name: String(localized: "subscriptions.allChannels"),
-                avatarURL: nil,
-                serverURL: nil,
-                authHeader: nil,
-                channelID: nil,
-                isAllChannels: true
+    @ViewBuilder
+    private var channelsSidebarContent: some View {
+        SubscriptionsSidebarRow(
+            name: String(localized: "subscriptions.allChannels"),
+            avatarURL: nil,
+            serverURL: nil,
+            authHeader: nil,
+            channelID: nil,
+            isAllChannels: true
+        )
+        .tag(Self.sidebarAllChannelsTag)
+        .contextMenu {
+            Button {
+                appEnvironment?.navigationCoordinator.navigate(to: .manageChannels)
+            } label: {
+                Label(String(localized: "sidebar.manageChannels"), systemImage: "person.2.badge.gearshape")
+            }
+        }
+
+        ForEach(sortedSubscriptions, id: \.channelID) { subscription in
+            SubscriptionsSidebarRow(
+                name: subscription.name,
+                avatarURL: subscription.avatarURL,
+                serverURL: yatteeServerURL,
+                authHeader: yatteeServerAuthHeader,
+                channelID: subscription.channelID,
+                isAllChannels: false
             )
-            .tag(Self.macOSAllChannelsTag)
+            .tag(Optional(subscription.channelID))
             .contextMenu {
                 Button {
-                    appEnvironment?.navigationCoordinator.navigate(to: .manageChannels)
+                    appEnvironment?.navigationCoordinator.navigate(
+                        to: .channel(subscription.channelID, subscription.contentSource)
+                    )
                 } label: {
-                    Label(String(localized: "sidebar.manageChannels"), systemImage: "person.2.badge.gearshape")
+                    Label(String(localized: "subscriptions.goToChannel"), systemImage: "person.circle")
                 }
-            }
-
-            ForEach(sortedSubscriptions, id: \.channelID) { subscription in
-                MacSubscriptionsSidebarRow(
-                    name: subscription.name,
-                    avatarURL: subscription.avatarURL,
-                    serverURL: yatteeServerURL,
-                    authHeader: yatteeServerAuthHeader,
-                    channelID: subscription.channelID,
-                    isAllChannels: false
-                )
-                .tag(Optional(subscription.channelID))
-                .contextMenu {
-                    Button {
-                        appEnvironment?.navigationCoordinator.navigate(
-                            to: .channel(subscription.channelID, subscription.contentSource)
-                        )
-                    } label: {
-                        Label(String(localized: "subscriptions.goToChannel"), systemImage: "person.circle")
-                    }
-                    Button(role: .destructive) {
-                        unsubscribeChannel(subscription.channelID)
-                    } label: {
-                        Label(String(localized: "channel.unsubscribe"), systemImage: "person.badge.minus")
-                    }
+                Button(role: .destructive) {
+                    unsubscribeChannel(subscription.channelID)
+                } label: {
+                    Label(String(localized: "channel.unsubscribe"), systemImage: "person.badge.minus")
                 }
             }
         }
+    }
+    #endif
+
+    #if os(macOS)
+    private var macOSChannelsSidebar: some View {
+        List(selection: sidebarSelection) {
+            channelsSidebarContent
+        }
         .listStyle(.sidebar)
         .scrollContentBackground(.hidden)
+    }
+    #endif
+
+    #if os(iOS)
+    private var isIPadRegular: Bool {
+        UIDevice.current.userInterfaceIdiom == .pad && horizontalSizeClass == .regular
+    }
+
+    @ViewBuilder
+    private var feedLayout: some View {
+        Group {
+            switch layout {
+            case .list:
+                listContent
+            case .grid:
+                gridContent
+            }
+        }
+    }
+
+    private var iOSChannelsSidebar: some View {
+        ScrollView {
+            LazyVStack(spacing: 2) {
+                iOSSidebarRow(
+                    name: String(localized: "subscriptions.allChannels"),
+                    avatarURL: nil,
+                    serverURL: nil,
+                    authHeader: nil,
+                    channelID: nil,
+                    isAllChannels: true,
+                    isSelected: selectedChannelID == nil
+                ) {
+                    if selectedChannelID != nil { selectedChannelID = nil }
+                }
+                .contextMenu {
+                    Button {
+                        appEnvironment?.navigationCoordinator.navigate(to: .manageChannels)
+                    } label: {
+                        Label(String(localized: "sidebar.manageChannels"), systemImage: "person.2.badge.gearshape")
+                    }
+                }
+
+                ForEach(sortedSubscriptions, id: \.channelID) { subscription in
+                    iOSSidebarRow(
+                        name: subscription.name,
+                        avatarURL: subscription.avatarURL,
+                        serverURL: yatteeServerURL,
+                        authHeader: yatteeServerAuthHeader,
+                        channelID: subscription.channelID,
+                        isAllChannels: false,
+                        isSelected: selectedChannelID == subscription.channelID
+                    ) {
+                        if selectedChannelID == subscription.channelID {
+                            selectedChannelID = nil
+                        } else {
+                            selectedChannelID = subscription.channelID
+                        }
+                    }
+                    .contextMenu {
+                        Button {
+                            appEnvironment?.navigationCoordinator.navigate(
+                                to: .channel(subscription.channelID, subscription.contentSource)
+                            )
+                        } label: {
+                            Label(String(localized: "subscriptions.goToChannel"), systemImage: "person.circle")
+                        }
+                        Button(role: .destructive) {
+                            unsubscribeChannel(subscription.channelID)
+                        } label: {
+                            Label(String(localized: "channel.unsubscribe"), systemImage: "person.badge.minus")
+                        }
+                    }
+                }
+            }
+            .padding(.horizontal, 8)
+            .padding(.vertical, 8)
+        }
+    }
+
+    @ViewBuilder
+    private func iOSSidebarRow(
+        name: String,
+        avatarURL: URL?,
+        serverURL: URL?,
+        authHeader: String?,
+        channelID: String?,
+        isAllChannels: Bool,
+        isSelected: Bool,
+        action: @escaping () -> Void
+    ) -> some View {
+        Button(action: action) {
+            SubscriptionsSidebarRow(
+                name: name,
+                avatarURL: avatarURL,
+                serverURL: serverURL,
+                authHeader: authHeader,
+                channelID: channelID,
+                isAllChannels: isAllChannels,
+                isSelected: isSelected
+            )
+            .padding(.horizontal, 10)
+            .padding(.vertical, 6)
+            .background(
+                RoundedRectangle(cornerRadius: 8, style: .continuous)
+                    .fill(isSelected ? accentColor.opacity(0.2) : Color.clear)
+            )
+        }
+        .buttonStyle(.plain)
     }
     #endif
 

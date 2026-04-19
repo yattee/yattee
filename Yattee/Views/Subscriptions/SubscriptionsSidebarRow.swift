@@ -1,22 +1,22 @@
 //
-//  MacSubscriptionsSidebarRow.swift
+//  SubscriptionsSidebarRow.swift
 //  Yattee
 //
-//  Compact row used in the macOS Subscriptions sidebar for the
+//  Compact row used in the Subscriptions sidebar (macOS and iPad) for the
 //  "All Channels" entry and each subscribed channel.
 //
 
-#if os(macOS)
 import SwiftUI
 import NukeUI
 
-struct MacSubscriptionsSidebarRow: View {
+struct SubscriptionsSidebarRow: View {
     let name: String
     let avatarURL: URL?
     let serverURL: URL?
     let authHeader: String?
     let channelID: String?
     let isAllChannels: Bool
+    var isSelected: Bool = false
 
     private let avatarSize: CGFloat = 28
 
@@ -37,6 +37,7 @@ struct MacSubscriptionsSidebarRow: View {
                 .clipShape(Circle())
 
             Text(name)
+                .fontWeight(isSelected ? .semibold : .regular)
                 .lineLimit(1)
 
             Spacer(minLength: 0)
@@ -74,4 +75,3 @@ struct MacSubscriptionsSidebarRow: View {
         }
     }
 }
-#endif
