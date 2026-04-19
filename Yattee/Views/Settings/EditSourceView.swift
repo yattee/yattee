@@ -101,6 +101,9 @@ private struct EditRemoteServerContent: View {
                 }
                 .accessibilityIdentifier("editSource.view")
         }
+        #if os(macOS)
+        .frame(minWidth: 500, minHeight: 450)
+        #endif
         #endif
     }
 

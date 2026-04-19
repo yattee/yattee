@@ -88,6 +88,9 @@ struct AddSourceView: View {
                     )
                 }
         }
+        #if os(macOS)
+        .frame(minWidth: 500, minHeight: 450)
+        #endif
         .sheet(isPresented: $showingNetworkDiscovery) {
             NetworkShareDiscoverySheet(filterType: selectedShareType) { share in
                 handleSelectedShare(share)
