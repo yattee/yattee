@@ -221,6 +221,23 @@ struct SubscriptionsView: View {
                     }
                     .padding(.horizontal, 16)
                     .padding(.top, 20)
+                    #elseif os(macOS)
+                    HSplitView {
+                        if subscriptionsLoaded && subscriptions.count > 1 {
+                            macOSChannelsSidebar
+                                .frame(minWidth: 180, idealWidth: 240, maxWidth: 400)
+                        }
+
+                        Group {
+                            switch layout {
+                            case .list:
+                                listContent
+                            case .grid:
+                                gridContent
+                            }
+                        }
+                        .frame(minWidth: 300, maxWidth: .infinity, maxHeight: .infinity)
+                    }
                     #else
                     Group {
                         switch layout {
@@ -239,8 +256,8 @@ struct SubscriptionsView: View {
                     }
                     #endif
 
-                    // Bottom overlay for filter strip
-                    #if !os(tvOS)
+                    // Bottom overlay for filter strip (iOS only)
+                    #if os(iOS)
                     VStack {
                         Spacer()
 
@@ -311,7 +328,7 @@ struct SubscriptionsView: View {
 
                                     Toggle("viewOptions.hideWatched", isOn: $hideWatched)
 
-                                    #if !os(tvOS)
+                                    #if os(iOS)
                                     Picker("viewOptions.channelStrip", selection: $channelStripSize) {
                                         ForEach(ChannelStripSize.allCases, id: \.self) { size in
                                             Text(size.displayName).tag(size)
@@ -435,10 +452,14 @@ struct SubscriptionsView: View {
         } content: {
             feedContentRows
         } footer: {
+            #if os(iOS)
             // Bottom spacer for channel strip overlay (outside the card)
             if channelStripSize != .disabled && subscriptions.count > 1 && !isShowingFullScreenError {
                 Color.clear.frame(height: channelStripSize.totalHeight)
             }
+            #else
+            EmptyView()
+            #endif
         }
     }
 
@@ -718,6 +739,70 @@ struct SubscriptionsView: View {
             }
             .scrollClipDisabled()
         }
+    }
+    #endif
+
+    // MARK: - macOS Channels Sidebar
+
+    #if os(macOS)
+    private static let macOSAllChannelsTag = "__all__"
+
+    private var macOSSidebarSelection: Binding<String?> {
+        Binding(
+            get: { selectedChannelID ?? Self.macOSAllChannelsTag },
+            set: { newValue in
+                selectedChannelID = (newValue == Self.macOSAllChannelsTag) ? nil : newValue
+            }
+        )
+    }
+
+    private var macOSChannelsSidebar: some View {
+        List(selection: macOSSidebarSelection) {
+            MacSubscriptionsSidebarRow(
+                name: String(localized: "subscriptions.allChannels"),
+                avatarURL: nil,
+                serverURL: nil,
+                authHeader: nil,
+                channelID: nil,
+                isAllChannels: true
+            )
+            .tag(Self.macOSAllChannelsTag)
+            .contextMenu {
+                Button {
+                    appEnvironment?.navigationCoordinator.navigate(to: .manageChannels)
+                } label: {
+                    Label(String(localized: "sidebar.manageChannels"), systemImage: "person.2.badge.gearshape")
+                }
+            }
+
+            ForEach(sortedSubscriptions, id: \.channelID) { subscription in
+                MacSubscriptionsSidebarRow(
+                    name: subscription.name,
+                    avatarURL: subscription.avatarURL,
+                    serverURL: yatteeServerURL,
+                    authHeader: yatteeServerAuthHeader,
+                    channelID: subscription.channelID,
+                    isAllChannels: false
+                )
+                .tag(Optional(subscription.channelID))
+                .contextMenu {
+                    Button {
+                        appEnvironment?.navigationCoordinator.navigate(
+                            to: .channel(subscription.channelID, subscription.contentSource)
+                        )
+                    } label: {
+                        Label(String(localized: "subscriptions.goToChannel"), systemImage: "person.circle")
+                    }
+                    Button(role: .destructive) {
+                        unsubscribeChannel(subscription.channelID)
+                    } label: {
+                        Label(String(localized: "channel.unsubscribe"), systemImage: "person.badge.minus")
+                    }
+                }
+            }
+        }
+        .listStyle(.sidebar)
+        .scrollContentBackground(.hidden)
     }
     #endif
 
