@@ -17720,6 +17720,16 @@
         }
       }
     },
+    "viewOptions.showSidebar" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Show Sidebar"
+          }
+        }
+      }
+    },
     "viewOptions.layout" : {
       "localizations" : {
         "en" : {

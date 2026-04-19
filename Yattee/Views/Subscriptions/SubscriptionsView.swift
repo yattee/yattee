@@ -30,6 +30,7 @@ struct SubscriptionsView: View {
     @AppStorage("subscriptionsGridColumns") private var gridColumns = 2
     @AppStorage("subscriptionsHideWatched") private var hideWatched = false
     @AppStorage("subscriptionsChannelStripSize") private var channelStripSize: ChannelStripSize = .normal
+    @AppStorage("subscriptionsShowSidebar") private var showSidebar = true
 
     /// List style from centralized settings.
     private var listStyle: VideoListStyle {
@@ -226,7 +227,7 @@ struct SubscriptionsView: View {
                     .padding(.top, 20)
                     #elseif os(macOS)
                     HSplitView {
-                        if subscriptionsLoaded && subscriptions.count > 1 {
+                        if showSidebar && subscriptionsLoaded && subscriptions.count > 1 {
                             macOSChannelsSidebar
                                 .frame(minWidth: 180, idealWidth: 240, maxWidth: 400)
                         }
@@ -242,7 +243,7 @@ struct SubscriptionsView: View {
                         .frame(minWidth: 300, maxWidth: .infinity, maxHeight: .infinity)
                     }
                     #else
-                    if isIPadRegular && subscriptionsLoaded && subscriptions.count > 1 {
+                    if isIPadRegular && showSidebar && subscriptionsLoaded && subscriptions.count > 1 {
                         HStack(spacing: 0) {
                             iOSChannelsSidebar
                                 .frame(width: 260)
@@ -276,7 +277,7 @@ struct SubscriptionsView: View {
                     VStack {
                         Spacer()
 
-                        if subscriptionsLoaded && subscriptions.count > 1 && channelStripSize != .disabled && !isShowingFullScreenError && !isIPadRegular {
+                        if subscriptionsLoaded && subscriptions.count > 1 && channelStripSize != .disabled && !isShowingFullScreenError && !(isIPadRegular && showSidebar) {
                             bottomFloatingFilterStrip
                                 .transition(.move(edge: .bottom).combined(with: .opacity))
                         }
@@ -305,18 +306,21 @@ struct SubscriptionsView: View {
                         NavigationStack {
                             Form {
                                 Section {
-                                    // Layout picker (segmented)
-                                    Picker(selection: $layout) {
+                                    // Layout picker (inline menu)
+                                    PlatformMenuPicker(String(localized: "viewOptions.layout"), selection: $layout) {
                                         ForEach(VideoListLayout.allCases, id: \.self) { option in
                                             Label(option.displayName, systemImage: option.systemImage)
                                                 .tag(option)
                                         }
-                                    } label: {
-                                        Text("viewOptions.layout")
                                     }
-                                    .pickerStyle(.segmented)
-                                    .listRowBackground(Color.clear)
-                                    .listRowInsets(EdgeInsets(top: 8, leading: 0, bottom: 8, trailing: 0))
+
+                                    #if os(macOS)
+                                    Toggle("viewOptions.showSidebar", isOn: $showSidebar)
+                                    #elseif os(iOS)
+                                    if isIPadRegular {
+                                        Toggle("viewOptions.showSidebar", isOn: $showSidebar)
+                                    }
+                                    #endif
 
                                     // List-specific options
                                     if layout == .list {
@@ -353,6 +357,7 @@ struct SubscriptionsView: View {
                                             Text(size.displayName).tag(size)
                                         }
                                     }
+                                    .disabled(isIPadRegular && showSidebar)
                                     #endif
                                 }
 
@@ -832,6 +837,16 @@ struct SubscriptionsView: View {
     }
     #endif
 
+    private var isSidebarVisible: Bool {
+        #if os(macOS)
+        return showSidebar && subscriptionsLoaded && subscriptions.count > 1
+        #elseif os(iOS)
+        return isIPadRegular && showSidebar && subscriptionsLoaded && subscriptions.count > 1
+        #else
+        return false
+        #endif
+    }
+
     #if os(iOS)
     private var isIPadRegular: Bool {
         UIDevice.current.userInterfaceIdiom == .pad && horizontalSizeClass == .regular
@@ -1005,6 +1020,8 @@ struct SubscriptionsView: View {
             Text("subscriptions.updatingChannels \(progress.loaded) \(progress.total)")
                 .monospacedDigit()
                 .foregroundStyle(.secondary)
+        } else if isSidebarVisible {
+            EmptyView()
         } else if let subscription = selectedSubscription {
             Button {
                 appEnvironment?.navigationCoordinator.navigate(
