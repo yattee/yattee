@@ -306,14 +306,6 @@ struct SubscriptionsView: View {
                         NavigationStack {
                             Form {
                                 Section {
-                                    // Layout picker (inline menu)
-                                    PlatformMenuPicker(String(localized: "viewOptions.layout"), selection: $layout) {
-                                        ForEach(VideoListLayout.allCases, id: \.self) { option in
-                                            Label(option.displayName, systemImage: option.systemImage)
-                                                .tag(option)
-                                        }
-                                    }
-
                                     #if os(macOS)
                                     Toggle("viewOptions.showSidebar", isOn: $showSidebar)
                                     #elseif os(iOS)
@@ -321,6 +313,13 @@ struct SubscriptionsView: View {
                                         Toggle("viewOptions.showSidebar", isOn: $showSidebar)
                                     }
                                     #endif
+
+                                    // Layout picker (inline menu)
+                                    PlatformMenuPicker(String(localized: "viewOptions.layout"), selection: $layout) {
+                                        ForEach(VideoListLayout.allCases, id: \.self) { option in
+                                            Text(option.displayName).tag(option)
+                                        }
+                                    }
 
                                     // List-specific options
                                     if layout == .list {
@@ -385,7 +384,7 @@ struct SubscriptionsView: View {
                         #if os(macOS)
                         .frame(minWidth: 500, minHeight: 450)
                         #endif
-                        .presentationDetents([.height(420), .large])
+                        .presentationDetents([.height(520), .large])
                         .presentationDragIndicator(.visible)
                         .liquidGlassSheetContent(sourceID: "subscriptionsViewOptions", in: sheetTransition)
                     }
