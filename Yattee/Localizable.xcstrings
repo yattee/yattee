@@ -7,6 +7,9 @@
     "-%@" : {
 
     },
+    "·" : {
+
+    },
     "%@" : {
 
     },
@@ -3624,39 +3627,6 @@
         }
       }
     },
-    "home.tvos.empty.title" : {
-      "comment" : "tvOS Home empty-state title shown on fresh install",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Welcome to Yattee"
-          }
-        }
-      }
-    },
-    "home.tvos.empty.message" : {
-      "comment" : "tvOS Home empty-state message shown on fresh install",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Add a media source to start watching."
-          }
-        }
-      }
-    },
-    "home.tvos.empty.openSources" : {
-      "comment" : "tvOS Home empty-state button that opens the Sources screen",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Open Sources"
-          }
-        }
-      }
-    },
     "home.history.clear" : {
       "comment" : "Clear history button",
       "localizations" : {
@@ -4295,6 +4265,39 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Subscriptions"
+          }
+        }
+      }
+    },
+    "home.tvos.empty.message" : {
+      "comment" : "tvOS Home empty-state message shown on fresh install",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Add a media source to start watching."
+          }
+        }
+      }
+    },
+    "home.tvos.empty.openSources" : {
+      "comment" : "tvOS Home empty-state button that opens the Sources screen",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Open Sources"
+          }
+        }
+      }
+    },
+    "home.tvos.empty.title" : {
+      "comment" : "tvOS Home empty-state title shown on fresh install",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Welcome to Yattee"
           }
         }
       }
@@ -11878,26 +11881,6 @@
         }
       }
     },
-    "settings.playback.tvOSMenuButtonClosesVideo" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Menu Button Closes Video"
-          }
-        }
-      }
-    },
-    "settings.playback.tvOSMenuButtonClosesVideo.footer" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "When enabled, the Siri remote Menu button stops playback and clears the queue. The close (X) button is hidden from the player. When disabled, Menu collapses the player and playback continues in the background."
-          }
-        }
-      }
-    },
     "settings.playback.behavior.header" : {
       "localizations" : {
         "en" : {
@@ -12263,6 +12246,26 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Playback Settings"
+          }
+        }
+      }
+    },
+    "settings.playback.tvOSMenuButtonClosesVideo" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Menu Button Closes Video"
+          }
+        }
+      }
+    },
+    "settings.playback.tvOSMenuButtonClosesVideo.footer" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "When enabled, the Siri remote Menu button stops playback and clears the queue. The close (X) button is hidden from the player. When disabled, Menu collapses the player and playback continues in the background."
           }
         }
       }
@@ -14384,17 +14387,6 @@
         }
       }
     },
-    "sidebar.mainItem.continueWatching" : {
-      "comment" : "Sidebar main navigation item for continue watching",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Continue Watching"
-          }
-        }
-      }
-    },
     "sidebar.mainItem.channels" : {
       "comment" : "Sidebar main navigation item for channels",
       "localizations" : {
@@ -14402,6 +14394,17 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Channels"
+          }
+        }
+      }
+    },
+    "sidebar.mainItem.continueWatching" : {
+      "comment" : "Sidebar main navigation item for continue watching",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Continue Watching"
           }
         }
       }
@@ -16721,6 +16724,17 @@
         }
       }
     },
+    "tabBar.item.continueWatching" : {
+      "comment" : "Tab bar item title for continue watching (short title)",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Continue"
+          }
+        }
+      }
+    },
     "tabBar.item.downloads" : {
       "comment" : "Tab bar item title for downloads",
       "localizations" : {
@@ -16761,17 +16775,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Settings"
-          }
-        }
-      }
-    },
-    "tabBar.item.continueWatching" : {
-      "comment" : "Tab bar item title for continue watching (short title)",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Continue"
           }
         }
       }
