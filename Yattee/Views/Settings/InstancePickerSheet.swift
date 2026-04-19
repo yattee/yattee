@@ -65,6 +65,9 @@ struct InstancePickerSheet: View {
             }
         }
         .presentationDetents([.medium, .large])
+        #if os(macOS)
+        .frame(minWidth: 450, minHeight: 500)
+        #endif
     }
 }
 

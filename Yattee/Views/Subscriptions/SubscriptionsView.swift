@@ -341,6 +341,9 @@ struct SubscriptionsView: View {
                             #endif
                             #endif
                         }
+                        #if os(macOS)
+                        .frame(minWidth: 500, minHeight: 450)
+                        #endif
                         .presentationDetents([.height(420), .large])
                         .presentationDragIndicator(.visible)
                         .liquidGlassSheetContent(sourceID: "subscriptionsViewOptions", in: sheetTransition)

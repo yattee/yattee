@@ -32,6 +32,9 @@ struct MediaBrowserViewOptionsSheet: View {
         .presentationDetents([.height(280)])
         .presentationDragIndicator(.visible)
         #endif
+        #if os(macOS)
+        .frame(minWidth: 420, minHeight: 320)
+        #endif
         .onAppear {
             // Reset sort order if current selection is not available for this source type
             if !availableSortOptions.contains(sortOrder) {

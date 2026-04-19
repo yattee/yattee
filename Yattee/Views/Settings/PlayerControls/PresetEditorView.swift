@@ -145,6 +145,9 @@ struct PresetEditorView: View {
         #if os(iOS)
         .presentationDetents([.medium])
         #endif
+        #if os(macOS)
+        .frame(minWidth: 500, minHeight: 350)
+        #endif
     }
 
     private func saveIfValid() {

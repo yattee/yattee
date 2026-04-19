@@ -308,6 +308,9 @@ private struct LogFiltersSheet: View {
             }
         }
         .presentationDetents([.medium])
+        #if os(macOS)
+        .frame(minWidth: 500, minHeight: 500)
+        #endif
     }
 
     private func binding(for category: LogCategory) -> Binding<Bool> {

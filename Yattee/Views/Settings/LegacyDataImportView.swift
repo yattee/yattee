@@ -219,6 +219,9 @@ struct LegacyDataImportView: View {
             .padding()
             .interactiveDismissDisabled()
         }
+        #if os(macOS)
+        .frame(minWidth: 500, minHeight: 450)
+        #endif
     }
 
     // MARK: - Actions

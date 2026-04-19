@@ -118,6 +118,9 @@ struct HomeView: View {
                         }
                     }
             }
+            #if os(macOS)
+            .frame(minWidth: 500, minHeight: 450)
+            #endif
         }
         #endif
         .onAppear {

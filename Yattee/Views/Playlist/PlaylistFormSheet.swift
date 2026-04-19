@@ -89,6 +89,9 @@ struct PlaylistFormSheet: View {
         #if os(iOS)
         .presentationDetents([.medium])
         #endif
+        #if os(macOS)
+        .frame(minWidth: 500, minHeight: 400)
+        #endif
     }
 
     // MARK: - Form Content

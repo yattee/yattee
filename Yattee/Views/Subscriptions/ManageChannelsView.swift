@@ -189,6 +189,9 @@ struct ManageChannelsView: View {
                 #endif
                 #endif
             }
+            #if os(macOS)
+            .frame(minWidth: 500, minHeight: 400)
+            #endif
             .presentationDetents([.height(360), .large])
             .presentationDragIndicator(.visible)
             .liquidGlassSheetContent(sourceID: "manageChannelsViewOptions", in: sheetTransition)
