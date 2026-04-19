@@ -45,6 +45,8 @@ struct SettingsView: View {
                     switch selectedSection {
                     case .sources:
                         SourcesListView()
+                    case .icloud:
+                        iCloudSettingsView()
                     case .appearance:
                         AppearanceSettingsView()
                     case .layoutNavigation:
@@ -345,6 +347,7 @@ struct SettingsView: View {
 
 enum SettingsSection: String, CaseIterable, Identifiable {
     case sources
+    case icloud
     case appearance
     case layoutNavigation
     case playback
@@ -360,6 +363,7 @@ enum SettingsSection: String, CaseIterable, Identifiable {
     var title: String {
         switch self {
         case .sources: return String(localized: "sources.title")
+        case .icloud: return String(localized: "settings.icloud.title")
         case .appearance: return String(localized: "settings.appearance.sectionTitle")
         case .layoutNavigation: return String(localized: "settings.layoutNavigation.title")
         case .playback: return String(localized: "settings.playback.sectionTitle")
@@ -375,6 +379,7 @@ enum SettingsSection: String, CaseIterable, Identifiable {
     var icon: String {
         switch self {
         case .sources: return "server.rack"
+        case .icloud: return "icloud"
         case .appearance: return "paintbrush"
         case .layoutNavigation: return "hand.tap"
         case .playback: return "play.circle"
