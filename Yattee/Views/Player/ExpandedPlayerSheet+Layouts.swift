@@ -200,6 +200,12 @@ extension ExpandedPlayerSheet {
         // Panel height when pinned (capped by maxPanelHeight for widescreen videos without description)
         let naturalPanelHeight = screenHeight - fitHeight
         let pinnedPanelHeight = min(naturalPanelHeight, maxPanelHeight)
+        let pillsOverlayOpacity: CGFloat = {
+            guard isPanelDragging, panelDragOffset > 0 else { return 1 }
+            let fadeDistance: CGFloat = 48
+            let progress = min(1, panelDragOffset / fadeDistance)
+            return 1 - progress
+        }()
 
         // Video area height (space above panel) - may be larger than fitHeight when panel is capped
         let videoAreaHeight = screenHeight - pinnedPanelHeight
@@ -413,6 +419,7 @@ extension ExpandedPlayerSheet {
                             } : nil,
                             playerControlsLayout: playerControlsLayout,
                             onFullscreen: { [self] in toggleFullscreen() },
+                            pillsOverlayOpacity: pillsOverlayOpacity,
                             onDragChanged: { [self] offset in
                                 // Set drag flags only on transition to avoid 120/sec @Observable writes
                                 if !isPanelDragging {

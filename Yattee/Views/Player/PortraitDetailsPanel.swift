@@ -16,6 +16,7 @@ struct PortraitDetailsPanel: View {
     let onChannelTap: (() -> Void)?
     let playerControlsLayout: PlayerControlsLayout
     let onFullscreen: (() -> Void)?
+    let pillsOverlayOpacity: CGFloat
 
     // Drag gesture callbacks
     var onDragChanged: ((CGFloat) -> Void)?
@@ -28,7 +29,6 @@ struct PortraitDetailsPanel: View {
     @State private var scrollToTopTrigger: Bool = false
     @State private var showQueueSheet: Bool = false
     @State private var showPlaylistSheet: Bool = false
-    @State private var panelHeight: CGFloat = 0
 
     private var settingsManager: SettingsManager? { appEnvironment?.settingsManager }
     private var accentColor: Color { settingsManager?.accentColor.color ?? .accentColor }
@@ -164,6 +164,7 @@ struct PortraitDetailsPanel: View {
                     .background {
                         // UIKit gesture handler for smooth overscroll-to-collapse
                         OverscrollGestureView(
+                            isEnabled: !isDraggingHandle,
                             onDragChanged: { offset in
                                 onDragChanged?(offset)
                             },
@@ -172,6 +173,7 @@ struct PortraitDetailsPanel: View {
                             }
                         )
                     }
+                    .scrollDisabled(isDraggingHandle)
                     .onScrollGeometryChange(for: CGFloat.self) { geometry in
                         geometry.contentOffset.y
                     } action: { _, newValue in
@@ -238,6 +240,8 @@ struct PortraitDetailsPanel: View {
             .overlay {
                 if !isCommentsExpanded {
                     pillsOverlay
+                        .opacity(pillsOverlayOpacity)
+                        .allowsHitTesting(pillsOverlayOpacity > 0.01)
                 }
             }
             // Expanded comments overlay
@@ -343,12 +347,6 @@ struct PortraitDetailsPanel: View {
             .animation(isPanelDragging ? nil : .spring(response: 0.35, dampingFraction: 0.8), value: hasCommentsPill)
             .animation(isPanelDragging ? nil : .spring(response: 0.3, dampingFraction: 0.7), value: shouldShowPlayerPill)
             .animation(isPanelDragging ? nil : .easeInOut(duration: 0.2), value: isScrolled)
-            .onAppear {
-                panelHeight = geometry.size.height
-            }
-            .onChange(of: geometry.size.height) { _, newValue in
-                panelHeight = newValue
-            }
         }
     }
 

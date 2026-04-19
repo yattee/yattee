@@ -13,6 +13,8 @@ import UIKit
 /// A transparent view that finds its parent UIScrollView and attaches an overscroll gesture handler.
 /// Use as a `.background` on a SwiftUI `ScrollView` to intercept pull-down gestures at scroll top.
 struct OverscrollGestureView: UIViewRepresentable {
+    /// Whether the handler should currently be attached.
+    var isEnabled: Bool = true
     /// Called during the drag with the vertical translation (positive = pulling down)
     var onDragChanged: ((CGFloat) -> Void)?
     /// Called when the drag ends with translation and predicted end translation
@@ -30,6 +32,10 @@ struct OverscrollGestureView: UIViewRepresentable {
         context.coordinator.onDragChanged = onDragChanged
         context.coordinator.onDragEnded = onDragEnded
 
+        guard isEnabled else {
+            return view
+        }
+
         // Schedule scroll view discovery after view is in hierarchy
         DispatchQueue.main.async {
             if let scrollView = Self.findScrollView(from: view) {
@@ -44,6 +50,11 @@ struct OverscrollGestureView: UIViewRepresentable {
         // Update callbacks
         context.coordinator.onDragChanged = onDragChanged
         context.coordinator.onDragEnded = onDragEnded
+
+        guard isEnabled else {
+            context.coordinator.gestureHandler.detach()
+            return
+        }
 
         // If not attached yet, try again
         if context.coordinator.gestureHandler.scrollView == nil {
