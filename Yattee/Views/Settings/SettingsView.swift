@@ -72,18 +72,6 @@ struct SettingsView: View {
                 }
             }
         }
-        .toolbar {
-            if showCloseButton {
-                ToolbarItem(placement: .confirmationAction) {
-                    Button(role: .cancel) {
-                        dismiss()
-                    } label: {
-                        Label(String(localized: "common.close"), systemImage: "xmark")
-                            .labelStyle(.iconOnly)
-                    }
-                }
-            }
-        }
     }
     #endif
 
