@@ -38,6 +38,16 @@ struct VideoRowView: View {
     private var metadataFont: Font {
         style == .compact ? .caption2 : .caption
     }
+    #elseif os(macOS)
+    private var titleFont: Font {
+        style == .compact ? .subheadline : .body
+    }
+    private var authorFont: Font {
+        style == .compact ? .caption : .subheadline
+    }
+    private var metadataFont: Font {
+        style == .compact ? .caption2 : .caption
+    }
     #else
     private var titleFont: Font {
         .subheadline

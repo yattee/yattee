@@ -30,6 +30,10 @@ struct VideoCardView: View {
     private var titleFont: Font { isCompact ? .subheadline : .body }
     private var authorFont: Font { isCompact ? .caption : .subheadline }
     private var metadataFont: Font { isCompact ? .caption : .caption }
+    #elseif os(macOS)
+    private var titleFont: Font { .body }
+    private var authorFont: Font { isCompact ? .caption : .subheadline }
+    private var metadataFont: Font { isCompact ? .caption2 : .caption }
     #else
     private var titleFont: Font { .subheadline }
     private var authorFont: Font { isCompact ? .caption2 : .caption }
