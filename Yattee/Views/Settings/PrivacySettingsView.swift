@@ -14,7 +14,7 @@ struct PrivacySettingsView: View {
     private let searchHistoryLimitOptions: [Int] = [10, 15, 25, 50, 100]
 
     var body: some View {
-        List {
+        SettingsFormContainer {
             incognitoSection
             historySection
             searchSection
@@ -32,15 +32,21 @@ struct PrivacySettingsView: View {
     @ViewBuilder
     private var incognitoSection: some View {
         if let settingsManager = appEnvironment?.settingsManager {
-            Section {
+            SettingsFormSection(footer: "settings.privacy.incognito.footer") {
                 Toggle(isOn: Bindable(settingsManager).incognitoModeEnabled) {
-                    Label(
-                        String(localized: "settings.behavior.incognitoMode"),
-                        image: "incognito"
-                    )
+                    Label {
+                        Text(String(localized: "settings.behavior.incognitoMode"))
+                    } icon: {
+                        #if os(macOS)
+                        Image("incognito")
+                            .resizable()
+                            .scaledToFit()
+                            .frame(width: 16, height: 16)
+                        #else
+                        Image("incognito")
+                        #endif
+                    }
                 }
-            } footer: {
-                Text(String(localized: "settings.privacy.incognito.footer"))
             }
         }
     }
@@ -48,7 +54,7 @@ struct PrivacySettingsView: View {
     @ViewBuilder
     private var historySection: some View {
         if let settingsManager = appEnvironment?.settingsManager {
-            Section {
+            SettingsFormSection("settings.behavior.historyRetention.header", footer: "settings.behavior.historyRetention.footer") {
                 Toggle(
                     String(localized: "settings.privacy.saveWatchHistory"),
                     isOn: Bindable(settingsManager).saveWatchHistory
@@ -66,10 +72,6 @@ struct PrivacySettingsView: View {
                             .tag(days)
                     }
                 }
-            } header: {
-                Text(String(localized: "settings.behavior.historyRetention.header"))
-            } footer: {
-                Text(String(localized: "settings.behavior.historyRetention.footer"))
             }
         }
     }
@@ -88,7 +90,7 @@ struct PrivacySettingsView: View {
     @ViewBuilder
     private var searchSection: some View {
         if let settingsManager = appEnvironment?.settingsManager {
-            Section {
+            SettingsFormSection("settings.behavior.searchHistoryLimit.header", footer: "settings.behavior.searchHistoryLimit.footer") {
                 Toggle(
                     String(localized: "settings.privacy.saveRecentSearches"),
                     isOn: Bindable(settingsManager).saveRecentSearches
@@ -116,10 +118,6 @@ struct PrivacySettingsView: View {
                             .tag(limit)
                     }
                 }
-            } header: {
-                Text(String(localized: "settings.behavior.searchHistoryLimit.header"))
-            } footer: {
-                Text(String(localized: "settings.behavior.searchHistoryLimit.footer"))
             }
         }
     }
