@@ -11,7 +11,7 @@ struct AppearanceSettingsView: View {
     @Environment(\.appEnvironment) private var appEnvironment
 
     var body: some View {
-        Form {
+        SettingsFormContainer {
             if let settings = appEnvironment?.settingsManager {
                 // Theme section
                 #if !os(tvOS)
@@ -52,7 +52,7 @@ private struct ThemeSection: View {
     @Bindable var settings: SettingsManager
 
     var body: some View {
-        Section(String(localized: "settings.appearance.theme.header")) {
+        SettingsFormSection("settings.appearance.theme.header") {
             Picker(
                 String(localized: "settings.appearance.theme"),
                 selection: $settings.theme
@@ -73,7 +73,7 @@ private struct AppIconSection: View {
     @Bindable var settings: SettingsManager
 
     var body: some View {
-        Section(String(localized: "settings.appearance.appIcon.header")) {
+        SettingsFormSection("settings.appearance.appIcon.header") {
             NavigationLink {
                 AppIconPickerView(settings: settings)
             } label: {
@@ -144,7 +144,7 @@ private struct AccentColorSection: View {
     @Bindable var settings: SettingsManager
 
     var body: some View {
-        Section(String(localized: "settings.appearance.accentColor.header")) {
+        SettingsFormSection("settings.appearance.accentColor.header") {
             LazyVGrid(columns: [GridItem(.adaptive(minimum: 50))], spacing: 16) {
                 ForEach(AccentColor.allCases, id: \.self) { accentColor in
                     AccentColorButton(
@@ -165,7 +165,7 @@ private struct ListStyleSection: View {
     @Bindable var settings: SettingsManager
 
     var body: some View {
-        Section {
+        SettingsFormSection("settings.appearance.listStyle.header") {
             Picker(selection: $settings.listStyle) {
                 ForEach(VideoListStyle.allCases, id: \.self) { style in
                     Text(style.displayName).tag(style)
@@ -173,8 +173,6 @@ private struct ListStyleSection: View {
             } label: {
                 Label(String(localized: "settings.appearance.listStyle"), systemImage: "list.bullet")
             }
-        } header: {
-            Text(String(localized: "settings.appearance.listStyle.header"))
         }
     }
 }
@@ -185,13 +183,11 @@ private struct ThumbnailSection: View {
     @Bindable var settings: SettingsManager
 
     var body: some View {
-        Section {
+        SettingsFormSection("settings.appearance.thumbnails.header") {
             Toggle(isOn: $settings.showWatchedCheckmark) {
                 Label(String(localized: "settings.appearance.showWatchedCheckmark"),
                       systemImage: "checkmark.circle.fill")
             }
-        } header: {
-            Text(String(localized: "settings.appearance.thumbnails.header"))
         }
     }
 }
