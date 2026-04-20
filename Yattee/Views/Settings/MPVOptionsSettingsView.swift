@@ -14,7 +14,7 @@ struct MPVOptionsSettingsView: View {
     @State private var editingOption: (name: String, value: String)?
 
     var body: some View {
-        List {
+        SettingsFormContainer {
             if let settings = appEnvironment?.settingsManager {
                 DefaultOptionsSection()
                 CustomOptionsSection(
@@ -59,13 +59,9 @@ private struct EditableOption: Identifiable {
 // MARK: - Default Options Section
 
 private struct DefaultOptionsSection: View {
-    #if !os(tvOS)
-    @State private var isExpanded = false
-    #endif
-
     var body: some View {
-        Section {
-            #if os(tvOS)
+        #if os(tvOS)
+        SettingsFormSection(footer: "settings.mpvOptions.defaultOptions.footer") {
             Text(String(localized: "settings.mpvOptions.defaultOptions"))
                 .font(.headline)
             ForEach(Self.defaultOptions, id: \.name) { option in
@@ -74,21 +70,22 @@ private struct DefaultOptionsSection: View {
                         .foregroundStyle(.secondary)
                 }
             }
-            #else
-            DisclosureGroup(isExpanded: $isExpanded) {
-                ForEach(Self.defaultOptions, id: \.name) { option in
-                    LabeledContent(option.name) {
-                        Text(option.value)
-                            .foregroundStyle(.secondary)
-                    }
-                }
-            } label: {
-                Text(String(localized: "settings.mpvOptions.defaultOptions"))
-            }
-            #endif
-        } footer: {
-            Text(String(localized: "settings.mpvOptions.defaultOptions.footer"))
         }
+        #else
+        SettingsFormSection("settings.mpvOptions.defaultOptions", footer: "settings.mpvOptions.defaultOptions.footer") {
+            ForEach(Self.defaultOptions, id: \.name) { option in
+                HStack(alignment: .firstTextBaseline) {
+                    Text(option.name)
+                        .monospaced()
+                    Spacer()
+                    Text(option.value)
+                        .monospaced()
+                        .foregroundStyle(.secondary)
+                        .multilineTextAlignment(.trailing)
+                }
+            }
+        }
+        #endif
     }
 
     /// Default MPV options from MPVClient.configureDefaultOptions()
@@ -135,7 +132,7 @@ private struct CustomOptionsSection: View {
     @Binding var editingOption: (name: String, value: String)?
 
     var body: some View {
-        Section {
+        SettingsFormSection("settings.mpvOptions.customOptions", footer: "settings.mpvOptions.customOptions.footer") {
             let sortedOptions = settings.customMPVOptions.sorted { $0.key < $1.key }
 
             if sortedOptions.isEmpty {
@@ -153,28 +150,45 @@ private struct CustomOptionsSection: View {
                             Text(value)
                                 .foregroundStyle(.secondary)
                         }
+                        .contentShape(Rectangle())
                     }
-                }
-                .onDelete { indexSet in
-                    var options = settings.customMPVOptions
-                    for index in indexSet {
-                        let key = sortedOptions[index].key
-                        options.removeValue(forKey: key)
+                    #if os(macOS)
+                    .buttonStyle(.plain)
+                    #endif
+                    #if os(iOS)
+                    .swipeActions(edge: .trailing, allowsFullSwipe: true) {
+                        Button(role: .destructive) {
+                            removeOption(named: name)
+                        } label: {
+                            Label(String(localized: "common.delete"), systemImage: "trash")
+                        }
                     }
-                    settings.customMPVOptions = options
+                    #endif
+                    .contextMenu {
+                        Button(role: .destructive) {
+                            removeOption(named: name)
+                        } label: {
+                            Label(String(localized: "common.delete"), systemImage: "trash")
+                        }
+                    }
                 }
             }
 
-            Button {
-                showingAddSheet = true
-            } label: {
-                Label(String(localized: "settings.mpvOptions.addOption"), systemImage: "plus")
+            HStack {
+                Button {
+                    showingAddSheet = true
+                } label: {
+                    Label(String(localized: "settings.mpvOptions.addOption"), systemImage: "plus")
+                }
+                Spacer()
             }
-        } header: {
-            Text(String(localized: "settings.mpvOptions.customOptions"))
-        } footer: {
-            Text(String(localized: "settings.mpvOptions.customOptions.footer"))
         }
+    }
+
+    private func removeOption(named name: String) {
+        var options = settings.customMPVOptions
+        options.removeValue(forKey: name)
+        settings.customMPVOptions = options
     }
 }
 
@@ -187,7 +201,69 @@ private struct AddMPVOptionSheet: View {
     @State private var optionName = ""
     @State private var optionValue = ""
 
+    private var trimmedName: String {
+        optionName.trimmingCharacters(in: .whitespacesAndNewlines)
+    }
+
+    private var trimmedValue: String {
+        optionValue.trimmingCharacters(in: .whitespacesAndNewlines)
+    }
+
+    private var canSave: Bool { !trimmedName.isEmpty && !trimmedValue.isEmpty }
+
+    private func save() {
+        if canSave {
+            var options = settings.customMPVOptions
+            options[trimmedName] = trimmedValue
+            settings.customMPVOptions = options
+        }
+        dismiss()
+    }
+
     var body: some View {
+        #if os(macOS)
+        VStack(alignment: .leading, spacing: 16) {
+            Text(String(localized: "settings.mpvOptions.addOption.title"))
+                .font(.headline)
+
+            Grid(alignment: .leadingFirstTextBaseline, horizontalSpacing: 12, verticalSpacing: 10) {
+                GridRow {
+                    Text(String(localized: "settings.mpvOptions.optionName"))
+                        .gridColumnAlignment(.trailing)
+                    TextField("", text: $optionName)
+                        .textFieldStyle(.roundedBorder)
+                        .autocorrectionDisabled()
+                }
+                GridRow {
+                    Text(String(localized: "settings.mpvOptions.optionValue"))
+                        .gridColumnAlignment(.trailing)
+                    TextField("", text: $optionValue)
+                        .textFieldStyle(.roundedBorder)
+                        .autocorrectionDisabled()
+                }
+            }
+
+            Text(String(localized: "settings.mpvOptions.addOption.footer"))
+                .font(.caption)
+                .foregroundStyle(.secondary)
+                .fixedSize(horizontal: false, vertical: true)
+
+            HStack {
+                Spacer()
+                Button(String(localized: "common.cancel")) {
+                    dismiss()
+                }
+                .keyboardShortcut(.cancelAction)
+                Button(String(localized: "common.add")) {
+                    save()
+                }
+                .keyboardShortcut(.defaultAction)
+                .disabled(!canSave)
+            }
+        }
+        .padding(20)
+        .frame(minWidth: 420)
+        #else
         NavigationStack {
             Form {
                 Section {
@@ -195,18 +271,14 @@ private struct AddMPVOptionSheet: View {
                         String(localized: "settings.mpvOptions.optionName"),
                         text: $optionName
                     )
-                    #if os(iOS)
                     .textInputAutocapitalization(.never)
-                    #endif
                     .autocorrectionDisabled()
 
                     TextField(
                         String(localized: "settings.mpvOptions.optionValue"),
                         text: $optionValue
                     )
-                    #if os(iOS)
                     .textInputAutocapitalization(.never)
-                    #endif
                     .autocorrectionDisabled()
                 } footer: {
                     Text(String(localized: "settings.mpvOptions.addOption.footer"))
@@ -224,22 +296,12 @@ private struct AddMPVOptionSheet: View {
                 }
                 ToolbarItem(placement: .confirmationAction) {
                     Button(String(localized: "common.add")) {
-                        let name = optionName.trimmingCharacters(in: .whitespacesAndNewlines)
-                        let value = optionValue.trimmingCharacters(in: .whitespacesAndNewlines)
-                        if !name.isEmpty && !value.isEmpty {
-                            var options = settings.customMPVOptions
-                            options[name] = value
-                            settings.customMPVOptions = options
-                        }
-                        dismiss()
+                        save()
                     }
-                    .disabled(optionName.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ||
-                              optionValue.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
+                    .disabled(!canSave)
                 }
             }
         }
-        #if os(macOS)
-        .frame(minWidth: 400, minHeight: 200)
         #endif
     }
 }
@@ -256,7 +318,89 @@ private struct EditMPVOptionSheet: View {
     @State private var optionValue = ""
     @State private var showingDeleteConfirmation = false
 
+    private var trimmedValue: String {
+        optionValue.trimmingCharacters(in: .whitespacesAndNewlines)
+    }
+
+    private var canSave: Bool { !trimmedValue.isEmpty }
+
+    private func save() {
+        if canSave {
+            var options = settings.customMPVOptions
+            options[originalName] = trimmedValue
+            settings.customMPVOptions = options
+        }
+        dismiss()
+    }
+
+    private func delete() {
+        var options = settings.customMPVOptions
+        options.removeValue(forKey: originalName)
+        settings.customMPVOptions = options
+        dismiss()
+    }
+
     var body: some View {
+        #if os(macOS)
+        VStack(alignment: .leading, spacing: 16) {
+            Text(String(localized: "settings.mpvOptions.editOption.title"))
+                .font(.headline)
+
+            Grid(alignment: .leadingFirstTextBaseline, horizontalSpacing: 12, verticalSpacing: 10) {
+                GridRow {
+                    Text(String(localized: "settings.mpvOptions.optionName"))
+                        .gridColumnAlignment(.trailing)
+                    Text(originalName)
+                        .monospaced()
+                        .foregroundStyle(.secondary)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                }
+                GridRow {
+                    Text(String(localized: "settings.mpvOptions.optionValue"))
+                        .gridColumnAlignment(.trailing)
+                    TextField("", text: $optionValue)
+                        .textFieldStyle(.roundedBorder)
+                        .autocorrectionDisabled()
+                }
+            }
+
+            HStack {
+                Button(role: .destructive) {
+                    showingDeleteConfirmation = true
+                } label: {
+                    Label(String(localized: "settings.mpvOptions.deleteOption"), systemImage: "trash")
+                }
+
+                Spacer()
+
+                Button(String(localized: "common.cancel")) {
+                    dismiss()
+                }
+                .keyboardShortcut(.cancelAction)
+
+                Button(String(localized: "common.save")) {
+                    save()
+                }
+                .keyboardShortcut(.defaultAction)
+                .disabled(!canSave)
+            }
+        }
+        .padding(20)
+        .frame(minWidth: 420)
+        .confirmationDialog(
+            String(localized: "settings.mpvOptions.deleteOption.confirmation"),
+            isPresented: $showingDeleteConfirmation,
+            titleVisibility: .visible
+        ) {
+            Button(String(localized: "common.delete"), role: .destructive) {
+                delete()
+            }
+            Button(String(localized: "common.cancel"), role: .cancel) {}
+        }
+        .onAppear {
+            optionValue = initialValue
+        }
+        #else
         NavigationStack {
             Form {
                 Section {
@@ -268,9 +412,7 @@ private struct EditMPVOptionSheet: View {
                         String(localized: "settings.mpvOptions.optionValue"),
                         text: $optionValue
                     )
-                    #if os(iOS)
                     .textInputAutocapitalization(.never)
-                    #endif
                     .autocorrectionDisabled()
                 }
 
@@ -294,15 +436,9 @@ private struct EditMPVOptionSheet: View {
                 }
                 ToolbarItem(placement: .confirmationAction) {
                     Button(String(localized: "common.save")) {
-                        let value = optionValue.trimmingCharacters(in: .whitespacesAndNewlines)
-                        if !value.isEmpty {
-                            var options = settings.customMPVOptions
-                            options[originalName] = value
-                            settings.customMPVOptions = options
-                        }
-                        dismiss()
+                        save()
                     }
-                    .disabled(optionValue.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
+                    .disabled(!canSave)
                 }
             }
             .confirmationDialog(
@@ -311,21 +447,16 @@ private struct EditMPVOptionSheet: View {
                 titleVisibility: .visible
             ) {
                 Button(String(localized: "common.delete"), role: .destructive) {
-                    var options = settings.customMPVOptions
-                    options.removeValue(forKey: originalName)
-                    settings.customMPVOptions = options
-                    dismiss()
+                    delete()
                 }
                 Button(String(localized: "common.cancel"), role: .cancel) {}
             }
             .presentationCompactAdaptation(.sheet)
         }
-        #if os(macOS)
-        .frame(minWidth: 400, minHeight: 200)
-        #endif
         .onAppear {
             optionValue = initialValue
         }
+        #endif
     }
 }
 
