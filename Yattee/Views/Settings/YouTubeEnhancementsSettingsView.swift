@@ -11,7 +11,7 @@ struct YouTubeEnhancementsSettingsView: View {
     @Environment(\.appEnvironment) private var appEnvironment
 
     var body: some View {
-        Form {
+        SettingsFormContainer {
             if let settings = appEnvironment?.settingsManager {
                 SponsorBlockSection(settings: settings)
                 ReturnYouTubeDislikeSection(settings: settings)
@@ -33,21 +33,18 @@ private struct SponsorBlockSection: View {
     @Bindable var settings: SettingsManager
 
     var body: some View {
-        Section {
-            NavigationLink {
-                SponsorBlockSettingsView()
-            } label: {
-                HStack {
-                    Label(String(localized: "settings.sponsorBlock.sectionTitle"), systemImage: "forward")
-                    Spacer()
+        SettingsFormSection(footer: "settings.youtubeEnhancements.sponsorBlock.footer") {
+            SettingsNavigationRow(
+                "settings.sponsorBlock.sectionTitle",
+                systemImage: "forward",
+                trailing: {
                     Text(settings.sponsorBlockEnabled
                          ? String(localized: "common.enabled")
                          : String(localized: "common.disabled"))
-                        .foregroundStyle(.secondary)
                 }
+            ) {
+                SponsorBlockSettingsView()
             }
-        } footer: {
-            Text(String(localized: "settings.youtubeEnhancements.sponsorBlock.footer"))
         }
     }
 }
@@ -58,21 +55,18 @@ private struct ReturnYouTubeDislikeSection: View {
     @Bindable var settings: SettingsManager
 
     var body: some View {
-        Section {
-            NavigationLink {
-                ReturnYouTubeDislikeSettingsView()
-            } label: {
-                HStack {
-                    Label(String(localized: "settings.returnYouTubeDislike.sectionTitle"), systemImage: "hand.thumbsdown")
-                    Spacer()
+        SettingsFormSection(footer: "settings.youtubeEnhancements.returnYouTubeDislike.footer") {
+            SettingsNavigationRow(
+                "settings.returnYouTubeDislike.sectionTitle",
+                systemImage: "hand.thumbsdown",
+                trailing: {
                     Text(settings.returnYouTubeDislikeEnabled
                          ? String(localized: "common.enabled")
                          : String(localized: "common.disabled"))
-                        .foregroundStyle(.secondary)
                 }
+            ) {
+                ReturnYouTubeDislikeSettingsView()
             }
-        } footer: {
-            Text(String(localized: "settings.youtubeEnhancements.returnYouTubeDislike.footer"))
         }
     }
 }
@@ -83,21 +77,18 @@ private struct DeArrowSection: View {
     @Bindable var settings: SettingsManager
 
     var body: some View {
-        Section {
-            NavigationLink {
-                DeArrowSettingsView()
-            } label: {
-                HStack {
-                    Label(String(localized: "settings.deArrow.sectionTitle"), systemImage: "textformat")
-                    Spacer()
+        SettingsFormSection(footer: "settings.youtubeEnhancements.deArrow.footer") {
+            SettingsNavigationRow(
+                "settings.deArrow.sectionTitle",
+                systemImage: "textformat",
+                trailing: {
                     Text(settings.deArrowEnabled
                          ? String(localized: "common.enabled")
                          : String(localized: "common.disabled"))
-                        .foregroundStyle(.secondary)
                 }
+            ) {
+                DeArrowSettingsView()
             }
-        } footer: {
-            Text(String(localized: "settings.youtubeEnhancements.deArrow.footer"))
         }
     }
 }

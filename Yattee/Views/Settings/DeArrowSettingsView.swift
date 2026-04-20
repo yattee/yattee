@@ -11,7 +11,7 @@ struct DeArrowSettingsView: View {
     @Environment(\.appEnvironment) private var appEnvironment
 
     var body: some View {
-        Form {
+        SettingsFormContainer {
             if let settings = appEnvironment?.settingsManager {
                 // Enable/Disable toggle
                 EnableSection(settings: settings)
@@ -44,13 +44,11 @@ private struct EnableSection: View {
     @Bindable var settings: SettingsManager
 
     var body: some View {
-        Section {
+        SettingsFormSection(footer: "settings.deArrow.footer") {
             Toggle(
                 String(localized: "settings.deArrow.enabled"),
                 isOn: $settings.deArrowEnabled
             )
-        } footer: {
-            Text(String(localized: "settings.deArrow.footer"))
         }
     }
 }
@@ -61,7 +59,7 @@ private struct OptionsSection: View {
     @Bindable var settings: SettingsManager
 
     var body: some View {
-        Section(String(localized: "settings.deArrow.options.header")) {
+        SettingsFormSection("settings.deArrow.options.header") {
             Toggle(
                 String(localized: "settings.deArrow.replaceTitles"),
                 isOn: $settings.deArrowReplaceTitles
@@ -84,7 +82,7 @@ private struct AdvancedSection: View {
     @State private var thumbnailAPIURLText: String = ""
 
     var body: some View {
-        Section {
+        SettingsFormSection("settings.deArrow.advanced.header", footer: "settings.deArrow.apiURL.footer") {
             TextField(
                 String(localized: "settings.deArrow.apiURL"),
                 text: $apiURLText,
@@ -140,10 +138,6 @@ private struct AdvancedSection: View {
                     syncAPIURLs()
                 }
             }
-        } header: {
-            Text(String(localized: "settings.deArrow.advanced.header"))
-        } footer: {
-            Text(String(localized: "settings.deArrow.apiURL.footer"))
         }
         .onAppear {
             let currentAPIURL = settings.deArrowAPIURL
@@ -169,7 +163,7 @@ private struct AdvancedSection: View {
 
 private struct AboutSection: View {
     var body: some View {
-        Section(String(localized: "settings.deArrow.about.header")) {
+        SettingsFormSection("settings.deArrow.about.header") {
             VStack(alignment: .leading, spacing: 8) {
                 Text(String(localized: "settings.deArrow.about.description"))
                     .font(.callout)

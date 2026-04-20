@@ -11,7 +11,7 @@ struct SponsorBlockSettingsView: View {
     @Environment(\.appEnvironment) private var appEnvironment
 
     var body: some View {
-        Form {
+        SettingsFormContainer {
             if let settings = appEnvironment?.settingsManager {
                 // Enable/Disable toggle
                 EnableSection(settings: settings)
@@ -44,13 +44,11 @@ private struct EnableSection: View {
     @Bindable var settings: SettingsManager
 
     var body: some View {
-        Section {
+        SettingsFormSection(footer: "settings.sponsorBlock.footer") {
             Toggle(
                 String(localized: "settings.sponsorBlock.enabled"),
                 isOn: $settings.sponsorBlockEnabled
             )
-        } footer: {
-            Text(String(localized: "settings.sponsorBlock.footer"))
         }
     }
 }
@@ -61,7 +59,7 @@ private struct CategoriesSection: View {
     @Bindable var settings: SettingsManager
 
     var body: some View {
-        Section {
+        SettingsFormSection("settings.sponsorBlock.categories.header", footer: "settings.sponsorBlock.categories.footer") {
             ForEach(SponsorBlockCategory.allCases, id: \.self) { category in
                 CategoryToggleRow(
                     category: category,
@@ -77,10 +75,6 @@ private struct CategoriesSection: View {
                     }
                 )
             }
-        } header: {
-            Text(String(localized: "settings.sponsorBlock.categories.header"))
-        } footer: {
-            Text(String(localized: "settings.sponsorBlock.categories.footer"))
         }
     }
 }
@@ -92,7 +86,7 @@ private struct AdvancedSection: View {
     @State private var apiURLText: String = ""
 
     var body: some View {
-        Section {
+        SettingsFormSection("settings.sponsorBlock.advanced.header", footer: "settings.sponsorBlock.apiURL.footer") {
             TextField(
                 String(localized: "settings.sponsorBlock.apiURL"),
                 text: $apiURLText,
@@ -118,10 +112,6 @@ private struct AdvancedSection: View {
                     settings.sponsorBlockAPIURL = SettingsManager.defaultSponsorBlockAPIURL
                 }
             }
-        } header: {
-            Text(String(localized: "settings.sponsorBlock.advanced.header"))
-        } footer: {
-            Text(String(localized: "settings.sponsorBlock.apiURL.footer"))
         }
         .onAppear {
             let currentURL = settings.sponsorBlockAPIURL
@@ -136,7 +126,7 @@ private struct AdvancedSection: View {
 
 private struct AboutSection: View {
     var body: some View {
-        Section(String(localized: "settings.sponsorBlock.about.header")) {
+        SettingsFormSection("settings.sponsorBlock.about.header") {
             VStack(alignment: .leading, spacing: 8) {
                 Text(String(localized: "settings.sponsorBlock.about.description"))
                     .font(.callout)

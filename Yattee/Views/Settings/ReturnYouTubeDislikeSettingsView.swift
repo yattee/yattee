@@ -11,20 +11,16 @@ struct ReturnYouTubeDislikeSettingsView: View {
     @Environment(\.appEnvironment) private var appEnvironment
 
     var body: some View {
-        Form {
+        SettingsFormContainer {
             if let settings = appEnvironment?.settingsManager {
-                // Enable/Disable toggle
-                Section {
+                SettingsFormSection(footer: "settings.returnYouTubeDislike.footer") {
                     Toggle(
                         String(localized: "settings.returnYouTubeDislike.enabled"),
                         isOn: Bindable(settings).returnYouTubeDislikeEnabled
                     )
-                } footer: {
-                    Text(String(localized: "settings.returnYouTubeDislike.footer"))
                 }
 
-                // About section
-                Section(String(localized: "settings.returnYouTubeDislike.about.header")) {
+                SettingsFormSection("settings.returnYouTubeDislike.about.header") {
                     VStack(alignment: .leading, spacing: 8) {
                         Text(String(localized: "settings.returnYouTubeDislike.about.description"))
                             .font(.callout)

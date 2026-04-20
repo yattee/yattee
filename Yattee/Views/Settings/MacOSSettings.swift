@@ -139,18 +139,21 @@ struct SettingsFormSection<Content: View>: View {
 /// On macOS it renders as a plain full-width list row with a trailing
 /// chevron, matching the native macOS System Settings look. On iOS/tvOS
 /// it renders as a standard `NavigationLink` with a `Label`.
-struct SettingsNavigationRow<Destination: View>: View {
+struct SettingsNavigationRow<Destination: View, Trailing: View>: View {
     let titleKey: LocalizedStringKey
     let systemImage: String
+    @ViewBuilder var trailing: () -> Trailing
     @ViewBuilder var destination: () -> Destination
 
     init(
         _ titleKey: LocalizedStringKey,
         systemImage: String,
+        @ViewBuilder trailing: @escaping () -> Trailing = { EmptyView() },
         @ViewBuilder destination: @escaping () -> Destination
     ) {
         self.titleKey = titleKey
         self.systemImage = systemImage
+        self.trailing = trailing
         self.destination = destination
     }
 
@@ -162,6 +165,8 @@ struct SettingsNavigationRow<Destination: View>: View {
             HStack(spacing: 8) {
                 Label(titleKey, systemImage: systemImage)
                 Spacer()
+                trailing()
+                    .foregroundStyle(.secondary)
                 Image(systemName: "chevron.right")
                     .font(.caption)
                     .foregroundStyle(.tertiary)
@@ -169,7 +174,12 @@ struct SettingsNavigationRow<Destination: View>: View {
             .frame(maxWidth: .infinity, alignment: .leading)
             .contentShape(Rectangle())
             #else
-            Label(titleKey, systemImage: systemImage)
+            HStack {
+                Label(titleKey, systemImage: systemImage)
+                Spacer()
+                trailing()
+                    .foregroundStyle(.secondary)
+            }
             #endif
         }
         #if os(macOS)
