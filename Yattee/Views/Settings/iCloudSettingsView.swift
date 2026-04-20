@@ -49,18 +49,16 @@ struct iCloudSettingsView: View {
     }
 
     var body: some View {
-        List {
+        SettingsFormContainer {
             #if DEBUG
-            Section {
+            SettingsFormSection(footer: "settings.icloud.dev.footer") {
                 Label(String(localized: "settings.icloud.dev.title"), systemImage: "hammer.fill")
                     .foregroundStyle(.orange)
                     .font(.subheadline)
-            } footer: {
-                Text(String(localized: "settings.icloud.dev.footer"))
             }
             #endif
 
-            Section {
+            SettingsFormSection(footer: "settings.icloud.footer") {
                 Toggle(isOn: Binding(
                     get: { settingsManager?.iCloudSyncEnabled ?? false },
                     set: { newValue in
@@ -73,8 +71,6 @@ struct iCloudSettingsView: View {
                 )) {
                     Label(String(localized: "settings.icloud.enable"), systemImage: "icloud")
                 }
-            } footer: {
-                Text(String(localized: "settings.icloud.footer"))
             }
 
             if settingsManager?.iCloudSyncEnabled == true {
@@ -167,7 +163,7 @@ struct iCloudSettingsView: View {
 
     @ViewBuilder
     private var syncCategoriesSection: some View {
-        Section {
+        SettingsFormSection(footer: "settings.icloud.categories.footer") {
             Toggle(isOn: Binding(
                 get: { settingsManager?.syncInstances ?? true },
                 set: { newValue in
@@ -271,16 +267,18 @@ struct iCloudSettingsView: View {
             )) {
                 Label(String(localized: "settings.icloud.category.mediaSources"), systemImage: "externaldrive.connected.to.line.below")
             }
-        } footer: {
-            Text(String(localized: "settings.icloud.categories.footer"))
         }
+        #if os(macOS)
+        .labelStyle(FixedIconWidthLabelStyle())
+        #endif
     }
 
     // MARK: - Sync Status Section
 
     @ViewBuilder
     private var syncStatusSection: some View {
-        Section {
+        let footer: LocalizedStringKey? = lastManualSyncRelative.map { LocalizedStringKey("settings.icloud.lastManualSync \($0)") }
+        SettingsFormSection(footer: footer) {
             // iCloud Account Status
             HStack {
                 Label(String(localized: "settings.icloud.account"), systemImage: "person.crop.circle")
@@ -357,11 +355,6 @@ struct iCloudSettingsView: View {
                 Label(String(localized: "settings.icloud.syncNow"), systemImage: syncNowIcon)
             }
             .disabled(cloudKitSync?.isSyncing == true)
-            
-        } footer: {
-            if let lastSync = lastManualSyncRelative {
-                Text(String(localized: "settings.icloud.lastManualSync \(lastSync)"))
-            }
         }
         .animation(.easeInOut(duration: 0.3), value: cloudKitSync?.syncStatus)
         .animation(.easeInOut(duration: 0.3), value: cloudKitSync?.uploadProgress)

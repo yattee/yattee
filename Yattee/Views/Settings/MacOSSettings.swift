@@ -134,6 +134,21 @@ struct SettingsFormSection<Content: View>: View {
     #endif
 }
 
+/// A label style that forces the icon to a fixed width so adjacent
+/// labels align regardless of icon glyph width. Use when a section has
+/// a vertical stack of `Label`s with mixed-width SF Symbols.
+struct FixedIconWidthLabelStyle: LabelStyle {
+    var iconWidth: CGFloat = 22
+
+    func makeBody(configuration: Configuration) -> some View {
+        HStack(spacing: 8) {
+            configuration.icon
+                .frame(width: iconWidth, alignment: .center)
+            configuration.title
+        }
+    }
+}
+
 /// A settings row that pushes a destination view onto the navigation stack.
 ///
 /// On macOS it renders as a plain full-width list row with a trailing
