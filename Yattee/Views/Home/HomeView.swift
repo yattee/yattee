@@ -301,6 +301,21 @@ struct HomeView: View {
 
     #if !os(tvOS)
     private var customizeButton: some View {
+        #if os(macOS)
+        HStack {
+            Spacer()
+            Button {
+                showingCustomizeHome = true
+            } label: {
+                Label(String(localized: "home.customize"), systemImage: "gear")
+            }
+            .buttonStyle(.bordered)
+            .controlSize(.regular)
+            Spacer()
+        }
+        .padding(.top, 16)
+        .padding(.bottom, 32)
+        #else
         Button {
             showingCustomizeHome = true
         } label: {
@@ -312,9 +327,11 @@ struct HomeView: View {
                 Spacer()
             }
         }
+        .buttonStyle(.plain)
         .foregroundStyle(.secondary)
         .padding(.top, 16)
         .padding(.bottom, 32)
+        #endif
     }
     #endif
 
