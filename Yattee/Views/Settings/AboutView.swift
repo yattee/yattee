@@ -12,17 +12,16 @@ struct AboutView: View {
     @Environment(\.openURL) private var openURL
 
     var body: some View {
-        Form {
+        SettingsFormContainer {
             #if !os(tvOS)
-            Section {
+            SettingsFormSection("settings.about.community") {
                 communityLink("GitHub", icon: "github", url: "https://github.com/yattee/yattee")
                 communityLink("Discord", icon: "discord", url: "https://yattee.stream/discord")
-            } header: {
-                Text(String(localized: "settings.about.community"))
             }
             #endif
 
-            Section {
+            SettingsFormSection {
+                #if os(tvOS)
                 NavigationLink {
                     ContributorsView()
                 } label: {
@@ -40,14 +39,34 @@ struct AboutView: View {
                 } label: {
                     Label(String(localized: "settings.acknowledgements.title"), systemImage: "heart.text.square")
                 }
+                #else
+                SettingsNavigationRow("settings.contributors.title", systemImage: "person.3") {
+                    ContributorsView()
+                }
+                SettingsNavigationRow("settings.translators.title", systemImage: "globe") {
+                    TranslationContributorsView()
+                }
+                SettingsNavigationRow("settings.acknowledgements.title", systemImage: "heart.text.square") {
+                    AcknowledgementsView()
+                }
+                #endif
             }
+            #if os(macOS)
+            .labelStyle(FixedIconWidthLabelStyle())
+            #endif
 
-            Section {
+            SettingsFormSection {
+                #if os(tvOS)
                 NavigationLink {
                     DeviceCapabilitiesView()
                 } label: {
                     Label(String(localized: "settings.advanced.deviceCapabilities"), systemImage: "cpu")
                 }
+                #else
+                SettingsNavigationRow("settings.advanced.deviceCapabilities", systemImage: "cpu") {
+                    DeviceCapabilitiesView()
+                }
+                #endif
             }
 
             versionInfoSection
@@ -65,26 +84,32 @@ struct AboutView: View {
 
     @ViewBuilder
     private var versionInfoSection: some View {
-        Section {
-            LabeledContent(String(localized: "settings.advanced.debug.appVersion")) {
-                Text(appVersion)
-            }
-
-            LabeledContent(String(localized: "settings.advanced.debug.buildNumber")) {
-                Text(buildNumber)
-            }
-
-            LabeledContent(String(localized: "settings.advanced.debug.osVersion")) {
-                Text(osVersion)
-            }
-        } header: {
-            Text(String(localized: "settings.about.versionInfo"))
+        SettingsFormSection("settings.about.versionInfo") {
+            versionInfoRow(label: String(localized: "settings.advanced.debug.appVersion"), value: appVersion)
+            versionInfoRow(label: String(localized: "settings.advanced.debug.buildNumber"), value: buildNumber)
+            versionInfoRow(label: String(localized: "settings.advanced.debug.osVersion"), value: osVersion)
         }
     }
 
     @ViewBuilder
+    private func versionInfoRow(label: String, value: String) -> some View {
+        #if os(macOS)
+        HStack {
+            Text(label)
+            Spacer()
+            Text(value)
+                .foregroundStyle(.secondary)
+        }
+        #else
+        LabeledContent(label) {
+            Text(value)
+        }
+        #endif
+    }
+
+    @ViewBuilder
     private var mpvInfoSection: some View {
-        Section {
+        SettingsFormSection("settings.about.mpvInfo") {
             if let versionInfo = appEnvironment?.playerService.mpvVersionInfo {
                 LabeledContent(String(localized: "settings.advanced.debug.mpvVersion")) {
                     Text(versionInfo.mpvVersion ?? "Unknown")
@@ -124,8 +149,6 @@ struct AboutView: View {
                     .foregroundStyle(.secondary)
                     .font(.footnote)
             }
-        } header: {
-            Text(String(localized: "settings.about.mpvInfo"))
         }
     }
 

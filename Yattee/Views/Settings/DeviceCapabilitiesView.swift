@@ -11,7 +11,7 @@ struct DeviceCapabilitiesView: View {
     @Environment(\.appEnvironment) private var appEnvironment
 
     var body: some View {
-        List {
+        SettingsFormContainer {
             hardwareDecodingSection
             networkStatusSection
             effectiveSettingsSection
@@ -26,7 +26,7 @@ struct DeviceCapabilitiesView: View {
 
     @ViewBuilder
     private var hardwareDecodingSection: some View {
-        Section {
+        SettingsFormSection("settings.deviceCapabilities.hardwareDecoding", footer: "settings.deviceCapabilities.hardwareDecoding.footer") {
             ForEach(HardwareCapabilities.shared.allCapabilities, id: \.name) { capability in
                 HStack {
                     Text(capability.name)
@@ -40,10 +40,6 @@ struct DeviceCapabilitiesView: View {
                     }
                 }
             }
-        } header: {
-            Text(String(localized: "settings.deviceCapabilities.hardwareDecoding"))
-        } footer: {
-            Text(String(localized: "settings.deviceCapabilities.hardwareDecoding.footer"))
         }
     }
 
@@ -52,9 +48,12 @@ struct DeviceCapabilitiesView: View {
     @ViewBuilder
     private var networkStatusSection: some View {
         if let connectivity = appEnvironment?.connectivityMonitor {
-            Section {
-                LabeledContent(String(localized: "settings.deviceCapabilities.network.connection")) {
+            SettingsFormSection("settings.deviceCapabilities.networkStatus", footer: "settings.deviceCapabilities.networkStatus.footer") {
+                HStack {
+                    Text(String(localized: "settings.deviceCapabilities.network.connection"))
+                    Spacer()
                     Text(connectionTypeString(connectivity))
+                        .foregroundStyle(.secondary)
                 }
 
                 HStack {
@@ -74,10 +73,6 @@ struct DeviceCapabilitiesView: View {
                     Spacer()
                     statusIndicator(connectivity.isConstrained)
                 }
-            } header: {
-                Text(String(localized: "settings.deviceCapabilities.networkStatus"))
-            } footer: {
-                Text(String(localized: "settings.deviceCapabilities.networkStatus.footer"))
             }
         }
     }
@@ -88,18 +83,20 @@ struct DeviceCapabilitiesView: View {
     private var effectiveSettingsSection: some View {
         if let settings = appEnvironment?.settingsManager,
            let connectivity = appEnvironment?.connectivityMonitor {
-            Section {
-                LabeledContent(String(localized: "settings.deviceCapabilities.effective.qualityLimit")) {
+            SettingsFormSection("settings.deviceCapabilities.effectiveSettings", footer: "settings.deviceCapabilities.effectiveSettings.footer") {
+                HStack {
+                    Text(String(localized: "settings.deviceCapabilities.effective.qualityLimit"))
+                    Spacer()
                     Text(effectiveQualityString(settings: settings, connectivity: connectivity))
+                        .foregroundStyle(.secondary)
                 }
 
-                LabeledContent(String(localized: "settings.deviceCapabilities.effective.preferredCodecs")) {
+                HStack {
+                    Text(String(localized: "settings.deviceCapabilities.effective.preferredCodecs"))
+                    Spacer()
                     Text(HardwareCapabilities.shared.preferredCodecOrder.joined(separator: ", "))
+                        .foregroundStyle(.secondary)
                 }
-            } header: {
-                Text(String(localized: "settings.deviceCapabilities.effectiveSettings"))
-            } footer: {
-                Text(String(localized: "settings.deviceCapabilities.effectiveSettings.footer"))
             }
         }
     }
