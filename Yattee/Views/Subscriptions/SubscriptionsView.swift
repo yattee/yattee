@@ -6,6 +6,9 @@
 //
 
 import SwiftUI
+#if os(macOS)
+import AppKit
+#endif
 
 struct SubscriptionsView: View {
     @Environment(\.appEnvironment) private var appEnvironment
@@ -31,6 +34,10 @@ struct SubscriptionsView: View {
     @AppStorage("subscriptionsHideWatched") private var hideWatched = false
     @AppStorage("subscriptionsChannelStripSize") private var channelStripSize: ChannelStripSize = .normal
     @AppStorage("subscriptionsShowSidebar") private var showSidebar = true
+    #if os(macOS)
+    @AppStorage("subscriptionsMacOSSidebarWidth") private var macOSSidebarWidth = 240.0
+    @State private var macOSSidebarDragStartWidth: Double?
+    #endif
 
     /// List style from centralized settings.
     private var listStyle: VideoListStyle {
@@ -226,10 +233,12 @@ struct SubscriptionsView: View {
                     .padding(.horizontal, 16)
                     .padding(.top, 20)
                     #elseif os(macOS)
-                    HSplitView {
+                    HStack(spacing: 0) {
                         if showSidebar && subscriptionsLoaded && subscriptions.count > 1 {
                             macOSChannelsSidebar
-                                .frame(minWidth: 180, idealWidth: 240, maxWidth: 400)
+                                .frame(width: clampedMacOSSidebarWidth)
+
+                            macOSSidebarResizeHandle
                         }
 
                         Group {
@@ -827,12 +836,60 @@ struct SubscriptionsView: View {
     #endif
 
     #if os(macOS)
+    private static let macOSSidebarMinWidth = 180.0
+    private static let macOSSidebarMaxWidth = 400.0
+
+    private var clampedMacOSSidebarWidth: CGFloat {
+        CGFloat(min(max(macOSSidebarWidth, Self.macOSSidebarMinWidth), Self.macOSSidebarMaxWidth))
+    }
+
     private var macOSChannelsSidebar: some View {
         List(selection: sidebarSelection) {
             channelsSidebarContent
         }
         .listStyle(.sidebar)
         .scrollContentBackground(.hidden)
+    }
+
+    private var macOSSidebarResizeHandle: some View {
+        ZStack {
+            Rectangle()
+                .fill(.separator.opacity(0.6))
+                .frame(width: 1)
+
+            Rectangle()
+                .fill(.clear)
+                .frame(width: 8)
+                .contentShape(Rectangle())
+        }
+        .frame(width: 8)
+        .frame(maxHeight: .infinity)
+        .background(.clear)
+        .contentShape(Rectangle())
+        .highPriorityGesture(macOSSidebarResizeGesture)
+        .onHover { isHovering in
+            if isHovering {
+                NSCursor.resizeLeftRight.push()
+            } else {
+                NSCursor.pop()
+            }
+        }
+    }
+
+    private var macOSSidebarResizeGesture: some Gesture {
+        DragGesture(minimumDistance: 0, coordinateSpace: .global)
+            .onChanged { value in
+                if macOSSidebarDragStartWidth == nil {
+                    macOSSidebarDragStartWidth = macOSSidebarWidth
+                }
+
+                let baseWidth = macOSSidebarDragStartWidth ?? macOSSidebarWidth
+                let newWidth = baseWidth + value.translation.width
+                macOSSidebarWidth = min(max(newWidth, Self.macOSSidebarMinWidth), Self.macOSSidebarMaxWidth)
+            }
+            .onEnded { _ in
+                macOSSidebarDragStartWidth = nil
+            }
     }
     #endif
 
