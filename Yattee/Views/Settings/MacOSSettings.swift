@@ -78,9 +78,9 @@ struct SettingsFormSection<Content: View>: View {
                     .padding(.horizontal, 16)
                     .padding(.top, 12)
                     .padding(.bottom, 4)
-            }
 
-            Divider()
+                Divider()
+            }
 
             VStack(alignment: .leading, spacing: 10) {
                 content()
@@ -132,4 +132,48 @@ struct SettingsFormSection<Content: View>: View {
         }
     }
     #endif
+}
+
+/// A settings row that pushes a destination view onto the navigation stack.
+///
+/// On macOS it renders as a plain full-width list row with a trailing
+/// chevron, matching the native macOS System Settings look. On iOS/tvOS
+/// it renders as a standard `NavigationLink` with a `Label`.
+struct SettingsNavigationRow<Destination: View>: View {
+    let titleKey: LocalizedStringKey
+    let systemImage: String
+    @ViewBuilder var destination: () -> Destination
+
+    init(
+        _ titleKey: LocalizedStringKey,
+        systemImage: String,
+        @ViewBuilder destination: @escaping () -> Destination
+    ) {
+        self.titleKey = titleKey
+        self.systemImage = systemImage
+        self.destination = destination
+    }
+
+    var body: some View {
+        NavigationLink {
+            destination()
+        } label: {
+            #if os(macOS)
+            HStack(spacing: 8) {
+                Label(titleKey, systemImage: systemImage)
+                Spacer()
+                Image(systemName: "chevron.right")
+                    .font(.caption)
+                    .foregroundStyle(.tertiary)
+            }
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .contentShape(Rectangle())
+            #else
+            Label(titleKey, systemImage: systemImage)
+            #endif
+        }
+        #if os(macOS)
+        .buttonStyle(.plain)
+        #endif
+    }
 }
