@@ -13,7 +13,7 @@ struct NotificationSettingsView: View {
     @State private var authorizationChecked = false
 
     var body: some View {
-        Form {
+        SettingsFormContainer {
             if let settings = appEnvironment?.settingsManager,
                let notificationManager = appEnvironment?.notificationManager {
                 // Master toggle section
@@ -56,7 +56,7 @@ private struct EnableSection: View {
     let appEnvironment: AppEnvironment?
 
     var body: some View {
-        Section {
+        SettingsFormSection(footer: "settings.notifications.footer") {
             Toggle(
                 String(localized: "settings.notifications.enable"),
                 isOn: Binding(
@@ -70,8 +70,6 @@ private struct EnableSection: View {
                     }
                 )
             )
-        } footer: {
-            Text(String(localized: "settings.notifications.footer"))
         }
     }
 
@@ -97,7 +95,7 @@ private struct PermissionSection: View {
     let notificationManager: NotificationManager
 
     var body: some View {
-        Section {
+        SettingsFormSection {
             HStack {
                 Text(String(localized: "settings.notifications.permission"))
                 Spacer()
@@ -123,15 +121,11 @@ private struct DefaultsSection: View {
     @Bindable var settings: SettingsManager
 
     var body: some View {
-        Section {
+        SettingsFormSection("settings.notifications.defaults.header", footer: "settings.notifications.defaultForNew.footer") {
             Toggle(
                 String(localized: "settings.notifications.defaultForNew"),
                 isOn: $settings.defaultNotificationsForNewChannels
             )
-        } header: {
-            Text(String(localized: "settings.notifications.defaults.header"))
-        } footer: {
-            Text(String(localized: "settings.notifications.defaultForNew.footer"))
         }
     }
 }
@@ -140,7 +134,8 @@ private struct DefaultsSection: View {
 
 private struct ManageChannelsSection: View {
     var body: some View {
-        Section {
+        SettingsFormSection {
+            #if os(tvOS)
             NavigationLink {
                 ManageChannelNotificationsView()
             } label: {
@@ -149,6 +144,11 @@ private struct ManageChannelsSection: View {
                     systemImage: "bell.badge"
                 )
             }
+            #else
+            SettingsNavigationRow("settings.notifications.manageChannels", systemImage: "bell.badge") {
+                ManageChannelNotificationsView()
+            }
+            #endif
         }
     }
 }
