@@ -12,7 +12,7 @@ struct SubtitlesSettingsView: View {
     @State private var settings: SubtitleSettings = .default
 
     var body: some View {
-        Form {
+        SettingsFormContainer {
             fontSection
             colorsSection
             styleSection
@@ -36,7 +36,7 @@ struct SubtitlesSettingsView: View {
     // MARK: - Font Section
 
     private var fontSection: some View {
-        Section {
+        SettingsFormSection {
             PlatformMenuPicker(
                 String(localized: "settings.subtitles.font"),
                 selection: $settings.font
@@ -84,7 +84,7 @@ struct SubtitlesSettingsView: View {
     // MARK: - Colors Section
 
     private var colorsSection: some View {
-        Section {
+        SettingsFormSection("settings.subtitles.colorsSection") {
             #if os(tvOS)
             HStack {
                 Text(String(localized: "settings.subtitles.textColor"))
@@ -175,15 +175,13 @@ struct SubtitlesSettingsView: View {
                 )
             }
             #endif
-        } header: {
-            Text(String(localized: "settings.subtitles.colorsSection"))
         }
     }
 
     // MARK: - Style Section
 
     private var styleSection: some View {
-        Section {
+        SettingsFormSection("settings.subtitles.styleSection") {
             Toggle(
                 String(localized: "settings.subtitles.bold"),
                 isOn: $settings.isBold
@@ -195,15 +193,13 @@ struct SubtitlesSettingsView: View {
                 isOn: $settings.isItalic
             )
             .onChange(of: settings.isItalic) { _, _ in saveSettings() }
-        } header: {
-            Text(String(localized: "settings.subtitles.styleSection"))
         }
     }
 
     // MARK: - Position Section
 
     private var positionSection: some View {
-        Section {
+        SettingsFormSection("settings.subtitles.positionSection", footer: "settings.subtitles.positionFooter") {
             #if os(tvOS)
             LabeledContent(
                 String(localized: "settings.subtitles.positionSection"),
@@ -218,17 +214,13 @@ struct SubtitlesSettingsView: View {
             )
             .onChange(of: settings.bottomMargin) { _, _ in saveSettings() }
             #endif
-        } header: {
-            Text(String(localized: "settings.subtitles.positionSection"))
-        } footer: {
-            Text(String(localized: "settings.subtitles.positionFooter"))
         }
     }
 
     // MARK: - Reset Section
 
     private var resetSection: some View {
-        Section {
+        SettingsFormSection {
             Button(role: .destructive) {
                 settings = .default
                 saveSettings()

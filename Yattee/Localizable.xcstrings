@@ -11924,6 +11924,7 @@
     },
     "settings.playback.macOS.header" : {
       "comment" : "macOS-specific playback settings section header",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -12064,6 +12065,7 @@
     },
     "settings.playback.queue.footer" : {
       "comment" : "Queue section footer",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -17730,16 +17732,6 @@
         }
       }
     },
-    "viewOptions.showSidebar" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Show Sidebar"
-          }
-        }
-      }
-    },
     "viewOptions.layout" : {
       "localizations" : {
         "en" : {
@@ -17826,6 +17818,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Regular"
+          }
+        }
+      }
+    },
+    "viewOptions.showSidebar" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Show Sidebar"
           }
         }
       }

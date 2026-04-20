@@ -41,33 +41,35 @@ struct SettingsView: View {
             .navigationSplitViewColumnWidth(min: 180, ideal: 200)
         } detail: {
             if appEnvironment != nil {
-                Group {
-                    switch selectedSection {
-                    case .sources:
-                        SourcesListView()
-                    case .icloud:
-                        iCloudSettingsView()
-                    case .appearance:
-                        AppearanceSettingsView()
-                    case .layoutNavigation:
-                        LayoutNavigationSettingsView()
-                    case .playback:
-                        PlaybackSettingsView()
-                    case .notifications:
-                        NotificationSettingsView()
-                    case .downloads:
-                        DownloadSettingsView()
-                    case .privacy:
-                        PrivacySettingsView()
-                    case .youtubeEnhancements:
-                        YouTubeEnhancementsSettingsView()
-                    case .advanced:
-                        AdvancedSettingsView()
-                    case .about:
-                        AboutView()
-                    case .none:
-                        Text(String(localized: "settings.placeholder.selectSection"))
-                            .frame(maxWidth: .infinity, maxHeight: .infinity)
+                NavigationStack {
+                    Group {
+                        switch selectedSection {
+                        case .sources:
+                            SourcesListView()
+                        case .icloud:
+                            iCloudSettingsView()
+                        case .appearance:
+                            AppearanceSettingsView()
+                        case .layoutNavigation:
+                            LayoutNavigationSettingsView()
+                        case .playback:
+                            PlaybackSettingsView()
+                        case .notifications:
+                            NotificationSettingsView()
+                        case .downloads:
+                            DownloadSettingsView()
+                        case .privacy:
+                            PrivacySettingsView()
+                        case .youtubeEnhancements:
+                            YouTubeEnhancementsSettingsView()
+                        case .advanced:
+                            AdvancedSettingsView()
+                        case .about:
+                            AboutView()
+                        case .none:
+                            Text(String(localized: "settings.placeholder.selectSection"))
+                                .frame(maxWidth: .infinity, maxHeight: .infinity)
+                        }
                     }
                 }
             }

@@ -11,7 +11,7 @@ struct PlaybackSettingsView: View {
     @Environment(\.appEnvironment) private var appEnvironment
 
     var body: some View {
-        Form {
+        SettingsFormContainer {
             if let settings = appEnvironment?.settingsManager {
                 QualitySection(settings: settings)
                 AudioSection(settings: settings)
@@ -20,9 +20,6 @@ struct PlaybackSettingsView: View {
                 QueueSection(settings: settings)
                 #if os(iOS)
                 OrientationSection(settings: settings)
-                #endif
-                #if os(macOS)
-                MacOSSection(settings: settings)
                 #endif
             }
         }
@@ -41,7 +38,7 @@ private struct QualitySection: View {
     @Bindable var settings: SettingsManager
 
     var body: some View {
-        Section {
+        SettingsFormSection("settings.playback.video.header") {
             PlatformMenuPicker(
                 String(localized: "settings.playback.quality.preferred"),
                 selection: $settings.preferredQuality
@@ -61,8 +58,6 @@ private struct QualitySection: View {
                 }
             }
             #endif
-        } header: {
-            Text(String(localized: "settings.playback.video.header"))
         }
     }
 }
@@ -161,7 +156,7 @@ private struct AudioSection: View {
     }
 
     var body: some View {
-        Section {
+        SettingsFormSection("settings.playback.audio.header") {
             Picker(
                 String(localized: "settings.playback.audio.preferredLanguage"),
                 selection: Binding(
@@ -178,8 +173,6 @@ private struct AudioSection: View {
                     Text(language.name).tag(language.code)
                 }
             }
-        } header: {
-            Text(String(localized: "settings.playback.audio.header"))
         }
     }
 }
@@ -205,7 +198,7 @@ private struct SubtitlesSection: View {
     }
 
     var body: some View {
-        Section {
+        SettingsFormSection("settings.playback.subtitles.header") {
             Picker(
                 String(localized: "settings.playback.subtitles.preferredLanguage"),
                 selection: Binding(
@@ -228,8 +221,6 @@ private struct SubtitlesSection: View {
             } label: {
                 Label(String(localized: "settings.playback.subtitles.appearance"), systemImage: "textformat.size")
             }
-        } header: {
-            Text(String(localized: "settings.playback.subtitles.header"))
         }
     }
 }
@@ -240,7 +231,29 @@ private struct BehaviorSection: View {
     @Bindable var settings: SettingsManager
 
     var body: some View {
-        Section {
+        #if os(tvOS)
+        let footer: LocalizedStringKey? = "settings.playback.tvOSMenuButtonClosesVideo.footer"
+        #else
+        let footer: LocalizedStringKey? = nil
+        #endif
+
+        SettingsFormSection("settings.playback.behavior.header", footer: footer) {
+            #if os(macOS)
+            PlatformMenuPicker(
+                String(localized: "settings.playback.macOS.playerMode"),
+                selection: $settings.macPlayerMode
+            ) {
+                ForEach(MacPlayerMode.allCases, id: \.self) { mode in
+                    Text(mode.displayName).tag(mode)
+                }
+            }
+
+            Toggle(
+                String(localized: "settings.playback.macOS.autoResizePlayer"),
+                isOn: $settings.playerSheetAutoResize
+            )
+            #endif
+
             PlatformMenuPicker(
                 String(localized: "settings.playback.resumeAction"),
                 selection: $settings.resumeAction
@@ -263,14 +276,6 @@ private struct BehaviorSection: View {
                 isOn: $settings.tvOSMenuButtonClosesVideo
             )
             #endif
-        } header: {
-            Text(String(localized: "settings.playback.behavior.header"))
-        } footer: {
-            #if os(tvOS)
-            Text(String(localized: "settings.playback.tvOSMenuButtonClosesVideo.footer"))
-            #else
-            EmptyView()
-            #endif
         }
     }
 }
@@ -281,7 +286,7 @@ private struct QueueSection: View {
     @Bindable var settings: SettingsManager
 
     var body: some View {
-        Section {
+        SettingsFormSection("settings.playback.queue.header") {
             Toggle(
                 String(localized: "settings.playback.queue.enabled"),
                 isOn: $settings.queueEnabled
@@ -319,12 +324,6 @@ private struct QueueSection: View {
             }
             .disabled(!settings.queueEnabled)
             #endif
-
-
-        } header: {
-            Text(String(localized: "settings.playback.queue.header"))
-        } footer: {
-            Text(String(localized: "settings.playback.queue.footer"))
         }
     }
 }
@@ -340,7 +339,7 @@ private struct OrientationSection: View {
     }
 
     var body: some View {
-        Section {
+        SettingsFormSection("settings.playback.orientation.header") {
             Toggle(
                 String(localized: "settings.playback.orientation.rotateToMatchAspectRatio"),
                 isOn: $settings.rotateToMatchAspectRatio
@@ -352,35 +351,6 @@ private struct OrientationSection: View {
                     isOn: $settings.preferPortraitBrowsing
                 )
             }
-        } header: {
-            Text(String(localized: "settings.playback.orientation.header"))
-        }
-    }
-}
-#endif
-
-// MARK: - macOS Section
-
-#if os(macOS)
-private struct MacOSSection: View {
-    @Bindable var settings: SettingsManager
-
-    var body: some View {
-        Section(String(localized: "settings.playback.macOS.header")) {
-            Picker(
-                String(localized: "settings.playback.macOS.playerMode"),
-                selection: $settings.macPlayerMode
-            ) {
-                ForEach(MacPlayerMode.allCases, id: \.self) { mode in
-                    Text(mode.displayName).tag(mode)
-                }
-            }
-            .pickerStyle(.segmented)
-
-            Toggle(
-                String(localized: "settings.playback.macOS.autoResizePlayer"),
-                isOn: $settings.playerSheetAutoResize
-            )
         }
     }
 }
