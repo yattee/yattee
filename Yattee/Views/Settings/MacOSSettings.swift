@@ -43,20 +43,10 @@ struct SettingsFormContainer<Content: View>: View {
 ///   content with consistent padding, a bottom divider, and an optional
 ///   caption-sized footer.
 /// - On iOS/tvOS: renders a standard `Section { } header: { } footer: { }`.
-struct SettingsFormSection<Content: View>: View {
+struct SettingsFormSection<Content: View, Footer: View>: View {
     let header: LocalizedStringKey?
-    let footer: LocalizedStringKey?
     @ViewBuilder let content: () -> Content
-
-    init(
-        _ header: LocalizedStringKey? = nil,
-        footer: LocalizedStringKey? = nil,
-        @ViewBuilder content: @escaping () -> Content
-    ) {
-        self.header = header
-        self.footer = footer
-        self.content = content
-    }
+    @ViewBuilder let footer: () -> Footer
 
     var body: some View {
         #if os(macOS)
@@ -91,47 +81,81 @@ struct SettingsFormSection<Content: View>: View {
 
             Divider()
 
-            if let footer {
-                Text(footer)
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                    .padding(.horizontal, 16)
-                    .padding(.top, 6)
-            }
+            footer()
+                .font(.caption)
+                .foregroundStyle(.secondary)
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .padding(.horizontal, 16)
+                .padding(.top, 6)
         }
         .padding(.bottom, 12)
     }
     #else
     @ViewBuilder
     private var platformSection: some View {
-        if let header, let footer {
+        if let header {
             Section {
                 content()
             } header: {
                 Text(header)
             } footer: {
-                Text(footer)
-            }
-        } else if let header {
-            Section {
-                content()
-            } header: {
-                Text(header)
-            }
-        } else if let footer {
-            Section {
-                content()
-            } footer: {
-                Text(footer)
+                footer()
             }
         } else {
             Section {
                 content()
+            } footer: {
+                footer()
             }
         }
     }
     #endif
+}
+
+extension SettingsFormSection where Footer == EmptyView {
+    init(
+        _ header: LocalizedStringKey? = nil,
+        @ViewBuilder content: @escaping () -> Content
+    ) {
+        self.header = header
+        self.content = content
+        self.footer = { EmptyView() }
+    }
+}
+
+extension SettingsFormSection where Footer == Text {
+    init(
+        _ header: LocalizedStringKey? = nil,
+        footer: LocalizedStringKey,
+        @ViewBuilder content: @escaping () -> Content
+    ) {
+        self.header = header
+        self.content = content
+        self.footer = { Text(footer) }
+    }
+
+    init(
+        _ header: LocalizedStringKey? = nil,
+        footer: LocalizedStringKey?,
+        @ViewBuilder content: @escaping () -> Content
+    ) {
+        self.header = header
+        self.content = content
+        let footerKey = footer
+        self.footer = { footerKey.map { Text($0) } ?? Text(verbatim: "") }
+    }
+}
+
+extension SettingsFormSection {
+    init(
+        _ header: LocalizedStringKey? = nil,
+        @ViewBuilder content: @escaping () -> Content,
+        @ViewBuilder footer: @escaping () -> Footer
+    ) {
+        self.header = header
+        self.content = content
+        self.footer = footer
+    }
 }
 
 /// A label style that forces the icon to a fixed width so adjacent

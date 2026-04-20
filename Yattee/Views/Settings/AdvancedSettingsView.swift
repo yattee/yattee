@@ -26,7 +26,7 @@ struct AdvancedSettingsView: View {
     @State private var isScanningStorage = false
 
     var body: some View {
-        List {
+        SettingsFormContainer {
             streamDetailsSection
             mpvSection
             settingsSection
@@ -98,7 +98,7 @@ struct AdvancedSettingsView: View {
 
     @ViewBuilder
     private func feedSection(settingsManager: SettingsManager) -> some View {
-        Section {
+        SettingsFormSection("settings.advanced.feed.sectionTitle") {
             PlatformMenuPicker(selection: Binding(
                 get: { settingsManager.feedCacheValidityMinutes },
                 set: { settingsManager.feedCacheValidityMinutes = $0 }
@@ -109,17 +109,13 @@ struct AdvancedSettingsView: View {
             } label: {
                 Label(String(localized: "settings.advanced.feed.cacheValidity"), systemImage: "clock")
             }
-        } header: {
-            Text(String(localized: "settings.advanced.feed.sectionTitle"))
         } footer: {
             VStack(alignment: .leading, spacing: 4) {
                 Text(String(localized: "settings.advanced.feed.footer"))
                 if let lastCheck = settingsManager.lastBackgroundCheck {
                     Text(String(localized: "settings.advanced.feed.lastBackgroundRefresh \(lastCheck.formatted(date: .abbreviated, time: .shortened))"))
-                        .foregroundStyle(.secondary)
                 } else {
                     Text(String(localized: "settings.advanced.feed.lastBackgroundRefresh.never"))
-                        .foregroundStyle(.secondary)
                 }
             }
         }
@@ -127,7 +123,7 @@ struct AdvancedSettingsView: View {
 
     @ViewBuilder
     private func userAgentSection(settingsManager: SettingsManager) -> some View {
-        Section {
+        SettingsFormSection("settings.advanced.userAgent.sectionTitle", footer: "settings.advanced.userAgent.footer") {
             Toggle(isOn: Binding(
                 get: { settingsManager.randomizeUserAgentPerRequest },
                 set: {
@@ -165,25 +161,19 @@ struct AdvancedSettingsView: View {
                     Label(String(localized: "settings.advanced.userAgent.randomize"), systemImage: "arrow.trianglehead.2.clockwise")
                 }
             }
-        } header: {
-            Text(String(localized: "settings.advanced.userAgent.sectionTitle"))
-        } footer: {
-            Text(String(localized: "settings.advanced.userAgent.footer"))
         }
     }
 
     @ViewBuilder
     private var streamDetailsSection: some View {
         if let settingsManager = appEnvironment?.settingsManager {
-            Section {
+            SettingsFormSection(footer: "settings.advanced.stream.showDetails.footer") {
                 Toggle(isOn: Binding(
                     get: { settingsManager.showAdvancedStreamDetails },
                     set: { settingsManager.showAdvancedStreamDetails = $0 }
                 )) {
                     Label(String(localized: "settings.advanced.stream.showDetails"), systemImage: "list.bullet.rectangle")
                 }
-            } footer: {
-                Text(String(localized: "settings.advanced.stream.showDetails.footer"))
             }
         }
     }
@@ -191,7 +181,7 @@ struct AdvancedSettingsView: View {
     @ViewBuilder
     private var mpvSection: some View {
         if let settingsManager = appEnvironment?.settingsManager {
-            Section {
+            SettingsFormSection("settings.advanced.mpv.title") {
                 PlatformMenuPicker(selection: Binding(
                     get: { settingsManager.mpvBufferSeconds },
                     set: { settingsManager.mpvBufferSeconds = $0 }
@@ -217,13 +207,17 @@ struct AdvancedSettingsView: View {
                     Label(String(localized: "settings.playback.dash"), systemImage: "bolt.horizontal")
                 }
 
+                #if os(tvOS)
                 NavigationLink {
                     MPVOptionsSettingsView()
                 } label: {
                     Label(String(localized: "settings.advanced.mpv.options"), systemImage: "slider.horizontal.3")
                 }
-            } header: {
-                Text(String(localized: "settings.advanced.mpv.title"))
+                #else
+                SettingsNavigationRow("settings.advanced.mpv.options", systemImage: "slider.horizontal.3") {
+                    MPVOptionsSettingsView()
+                }
+                #endif
             }
         }
     }
@@ -241,24 +235,26 @@ struct AdvancedSettingsView: View {
     #if !os(tvOS)
     @ViewBuilder
     private var downloadsStorageSection: some View {
-        Section {
+        SettingsFormSection("settings.advanced.storage.title") {
             // Storage diagnostic button
-            Button {
-                runStorageDiagnostics()
-            } label: {
-                HStack {
+            HStack {
+                Button {
+                    runStorageDiagnostics()
+                } label: {
                     Label(String(localized: "settings.advanced.storage.scan"), systemImage: "internaldrive")
-                    Spacer()
-                    if isScanningStorage {
-                        ProgressView()
-                            .controlSize(.small)
-                    } else if let diagnostics = storageDiagnostics {
-                        Text(diagnostics.formattedTotal)
-                            .foregroundStyle(.secondary)
-                    }
                 }
+                .disabled(isScanningStorage)
+
+                if isScanningStorage {
+                    ProgressView()
+                        .controlSize(.small)
+                } else if let diagnostics = storageDiagnostics {
+                    Text(diagnostics.formattedTotal)
+                        .foregroundStyle(.secondary)
+                }
+
+                Spacer()
             }
-            .disabled(isScanningStorage)
 
             // Show storage breakdown if scanned
             if let diagnostics = storageDiagnostics {
@@ -275,28 +271,31 @@ struct AdvancedSettingsView: View {
             }
 
             // Clear cache button
-            Button(role: .destructive) {
-                showingClearDataConfirmation = true
-            } label: {
-                Label(String(localized: "settings.advanced.data.clearCache"), systemImage: "trash")
+            HStack {
+                Button(role: .destructive) {
+                    showingClearDataConfirmation = true
+                } label: {
+                    Label(String(localized: "settings.advanced.data.clearCache"), systemImage: "trash")
+                }
+                Spacer()
             }
 
             // Delete orphaned files button
-            Button(role: .destructive) {
-                showingOrphanCleanupConfirmation = true
-            } label: {
-                HStack {
+            HStack {
+                Button(role: .destructive) {
+                    showingOrphanCleanupConfirmation = true
+                } label: {
                     Label(String(localized: "settings.advanced.storage.deleteOrphaned"), systemImage: "trash")
-                    Spacer()
-                    if isScanning {
-                        ProgressView()
-                            .controlSize(.small)
-                    }
                 }
+                .disabled(orphanedFilesCount == 0 || isScanning)
+
+                if isScanning {
+                    ProgressView()
+                        .controlSize(.small)
+                }
+
+                Spacer()
             }
-            .disabled(orphanedFilesCount == 0 || isScanning)
-        } header: {
-            Text(String(localized: "settings.advanced.storage.title"))
         } footer: {
             if isScanning {
                 Text(String(localized: "settings.advanced.storage.scanning"))
@@ -314,7 +313,7 @@ struct AdvancedSettingsView: View {
     @ViewBuilder
     private var deviceNameSection: some View {
         if let settingsManager = appEnvironment?.settingsManager {
-            Section {
+            SettingsFormSection("settings.advanced.remoteControl.sectionTitle") {
                 TextField(
                     LocalNetworkService.systemDeviceName,
                     text: Binding(
@@ -338,8 +337,6 @@ struct AdvancedSettingsView: View {
                     Label(String(localized: "remoteControl.hideWhenBackgrounded"), systemImage: "moon.fill")
                 }
                 #endif
-            } header: {
-                Text(String(localized: "settings.advanced.remoteControl.sectionTitle"))
             } footer: {
                 VStack(alignment: .leading, spacing: 4) {
                     Text(String(localized: "settings.advanced.remoteControl.footer"))
@@ -355,22 +352,32 @@ struct AdvancedSettingsView: View {
 
     @ViewBuilder
     private var developerSection: some View {
-        Section {
+        SettingsFormSection(footer: "settings.developer.footer") {
+            #if os(tvOS)
             NavigationLink {
                 DeveloperSettingsView()
             } label: {
                 Label(String(localized: "settings.developer.title"), systemImage: "hammer")
             }
+            #else
+            SettingsNavigationRow("settings.developer.title", systemImage: "hammer") {
+                DeveloperSettingsView()
+            }
+            #endif
 
             if appEnvironment?.legacyMigrationService.hasLegacyData() == true {
+                #if os(tvOS)
                 NavigationLink {
                     LegacyDataImportView()
                 } label: {
                     Label(String(localized: "settings.advanced.data.importLegacy"), systemImage: "arrow.up.doc")
                 }
+                #else
+                SettingsNavigationRow("settings.advanced.data.importLegacy", systemImage: "arrow.up.doc") {
+                    LegacyDataImportView()
+                }
+                #endif
             }
-        } footer: {
-            Text(String(localized: "settings.developer.footer"))
         }
     }
 

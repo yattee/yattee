@@ -20,7 +20,7 @@ struct DeveloperSettingsView: View {
     @State private var showingResetiCloudComplete = false
 
     var body: some View {
-        List {
+        SettingsFormContainer {
             loggingSection
             if loggingEnabled {
                 verboseLoggingSection
@@ -87,7 +87,7 @@ struct DeveloperSettingsView: View {
 
     @ViewBuilder
     private var loggingSection: some View {
-        Section {
+        SettingsFormSection("settings.advanced.logging.sectionTitle", footer: "settings.advanced.logging.footer") {
             Toggle(isOn: $loggingEnabled) {
                 Label(String(localized: "settings.advanced.logging.enable"), systemImage: "doc.text")
             }
@@ -96,6 +96,7 @@ struct DeveloperSettingsView: View {
             }
 
             if loggingEnabled {
+                #if os(tvOS)
                 NavigationLink {
                     LogViewerView()
                 } label: {
@@ -106,18 +107,23 @@ struct DeveloperSettingsView: View {
                             .foregroundStyle(.secondary)
                     }
                 }
+                #else
+                SettingsNavigationRow(
+                    "settings.advanced.logging.viewLogs",
+                    systemImage: "list.bullet.rectangle",
+                    trailing: { Text("\(loggingService.entries.count)") }
+                ) {
+                    LogViewerView()
+                }
+                #endif
             }
-        } header: {
-            Text(String(localized: "settings.advanced.logging.sectionTitle"))
-        } footer: {
-            Text(String(localized: "settings.advanced.logging.footer"))
         }
     }
 
     @ViewBuilder
     private var verboseLoggingSection: some View {
         if let settingsManager = appEnvironment?.settingsManager {
-            Section {
+            SettingsFormSection("settings.advanced.verboseLogging.sectionTitle") {
                 Toggle(isOn: Binding(
                     get: { settingsManager.verboseMPVLogging },
                     set: { settingsManager.verboseMPVLogging = $0 }
@@ -131,8 +137,6 @@ struct DeveloperSettingsView: View {
                 )) {
                     Label(String(localized: "settings.advanced.debug.verboseRemote"), systemImage: "antenna.radiowaves.left.and.right")
                 }
-            } header: {
-                Text(String(localized: "settings.advanced.verboseLogging.sectionTitle"))
             }
         }
     }
@@ -140,7 +144,7 @@ struct DeveloperSettingsView: View {
     @ViewBuilder
     private var debugSection: some View {
         if let settingsManager = appEnvironment?.settingsManager {
-            Section {
+            SettingsFormSection("settings.advanced.debug.sectionTitle") {
                 Toggle(isOn: Binding(
                     get: { settingsManager.showPlayerAreaDebug },
                     set: { settingsManager.showPlayerAreaDebug = $0 }
@@ -165,8 +169,6 @@ struct DeveloperSettingsView: View {
                     Label(String(localized: "settings.advanced.debug.showTVDebugButton"), systemImage: "ant.circle")
                 }
                 #endif
-            } header: {
-                Text(String(localized: "settings.advanced.debug.sectionTitle"))
             }
         }
     }
@@ -180,22 +182,24 @@ struct DeveloperSettingsView: View {
 
     @ViewBuilder
     private var dataSection: some View {
-        Section {
-            Button {
-                showingDeduplicateConfirmation = true
-            } label: {
-                Label(String(localized: "settings.advanced.data.removeDuplicates"), systemImage: "doc.on.doc")
+        SettingsFormSection("settings.advanced.data.sectionTitle", footer: "settings.advanced.data.footer") {
+            HStack {
+                Button {
+                    showingDeduplicateConfirmation = true
+                } label: {
+                    Label(String(localized: "settings.advanced.data.removeDuplicates"), systemImage: "doc.on.doc")
+                }
+                Spacer()
             }
 
-            Button(role: .destructive) {
-                showingResetiCloudConfirmation = true
-            } label: {
-                Label(String(localized: "settings.advanced.data.resetICloud"), systemImage: "icloud.slash")
+            HStack {
+                Button(role: .destructive) {
+                    showingResetiCloudConfirmation = true
+                } label: {
+                    Label(String(localized: "settings.advanced.data.resetICloud"), systemImage: "icloud.slash")
+                }
+                Spacer()
             }
-        } header: {
-            Text(String(localized: "settings.advanced.data.sectionTitle"))
-        } footer: {
-            Text(String(localized: "settings.advanced.data.footer"))
         }
     }
 
@@ -222,22 +226,24 @@ struct DeveloperSettingsView: View {
     #if !os(tvOS)
     @ViewBuilder
     private var notificationTestingSection: some View {
-        Section {
-            Button {
-                sendTestNotification()
-            } label: {
-                Label(String(localized: "settings.advanced.testing.sendTestNotification"), systemImage: "bell.badge")
+        SettingsFormSection("settings.advanced.testing.notifications.sectionTitle", footer: "settings.advanced.testing.notifications.footer") {
+            HStack {
+                Button {
+                    sendTestNotification()
+                } label: {
+                    Label(String(localized: "settings.advanced.testing.sendTestNotification"), systemImage: "bell.badge")
+                }
+                Spacer()
             }
 
-            Button {
-                triggerBackgroundRefresh()
-            } label: {
-                Label(String(localized: "settings.advanced.testing.triggerBackgroundRefresh"), systemImage: "arrow.clockwise")
+            HStack {
+                Button {
+                    triggerBackgroundRefresh()
+                } label: {
+                    Label(String(localized: "settings.advanced.testing.triggerBackgroundRefresh"), systemImage: "arrow.clockwise")
+                }
+                Spacer()
             }
-        } header: {
-            Text(String(localized: "settings.advanced.testing.notifications.sectionTitle"))
-        } footer: {
-            Text(String(localized: "settings.advanced.testing.notifications.footer"))
         }
     }
 
