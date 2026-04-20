@@ -37,6 +37,9 @@ struct SubscriptionsView: View {
     #if os(macOS)
     @AppStorage("subscriptionsMacOSSidebarWidth") private var macOSSidebarWidth = 240.0
     @State private var macOSSidebarDragStartWidth: Double?
+    #elseif os(iOS)
+    @AppStorage("subscriptionsIPadSidebarWidth") private var iPadSidebarWidth = 260.0
+    @State private var iPadSidebarDragStartWidth: Double?
     #endif
 
     /// List style from centralized settings.
@@ -255,9 +258,9 @@ struct SubscriptionsView: View {
                     if isIPadRegular && showSidebar && subscriptionsLoaded && subscriptions.count > 1 {
                         HStack(spacing: 0) {
                             iOSChannelsSidebar
-                                .frame(width: 260)
+                                .frame(width: clampedIPadSidebarWidth)
 
-                            Divider()
+                            iPadSidebarResizeHandle
 
                             feedLayout
                                 .frame(maxWidth: .infinity, maxHeight: .infinity)
@@ -904,8 +907,15 @@ struct SubscriptionsView: View {
     }
 
     #if os(iOS)
+    private static let iPadSidebarMinWidth = 220.0
+    private static let iPadSidebarMaxWidth = 420.0
+
     private var isIPadRegular: Bool {
         UIDevice.current.userInterfaceIdiom == .pad && horizontalSizeClass == .regular
+    }
+
+    private var clampedIPadSidebarWidth: CGFloat {
+        CGFloat(min(max(iPadSidebarWidth, Self.iPadSidebarMinWidth), Self.iPadSidebarMaxWidth))
     }
 
     @ViewBuilder
@@ -977,6 +987,35 @@ struct SubscriptionsView: View {
             .padding(.horizontal, 8)
             .padding(.vertical, 8)
         }
+    }
+
+    @ViewBuilder
+    private var iPadSidebarResizeHandle: some View {
+        if isIPadRegular {
+            Rectangle()
+                .fill(.separator.opacity(0.7))
+                .frame(width: 1)
+            .frame(width: 14)
+            .frame(maxHeight: .infinity)
+            .contentShape(Rectangle())
+            .highPriorityGesture(iPadSidebarResizeGesture)
+        }
+    }
+
+    private var iPadSidebarResizeGesture: some Gesture {
+        DragGesture(minimumDistance: 0, coordinateSpace: .global)
+            .onChanged { value in
+                if iPadSidebarDragStartWidth == nil {
+                    iPadSidebarDragStartWidth = iPadSidebarWidth
+                }
+
+                let baseWidth = iPadSidebarDragStartWidth ?? iPadSidebarWidth
+                let newWidth = baseWidth + value.translation.width
+                iPadSidebarWidth = min(max(newWidth, Self.iPadSidebarMinWidth), Self.iPadSidebarMaxWidth)
+            }
+            .onEnded { _ in
+                iPadSidebarDragStartWidth = nil
+            }
     }
 
     @ViewBuilder
