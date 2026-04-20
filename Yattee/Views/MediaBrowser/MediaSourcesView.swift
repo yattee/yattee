@@ -170,6 +170,16 @@ struct MediaSourcesView: View {
 
     @ViewBuilder
     private func sectionHeader(_ title: String) -> some View {
+        #if os(macOS)
+        Text(title)
+            .font(.subheadline)
+            .textCase(.uppercase)
+            .foregroundStyle(.secondary)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .padding(.horizontal, 16)
+            .padding(.top, 12)
+            .padding(.bottom, 4)
+        #else
         Text(title)
             .fontWeight(.semibold)
             .foregroundStyle(.secondary)
@@ -177,6 +187,7 @@ struct MediaSourcesView: View {
             .padding(.horizontal, listStyle == .inset ? 32 : 16)
             .padding(.top, 16)
             .padding(.bottom, 8)
+        #endif
     }
 
     private var sourcesList: some View {
@@ -333,6 +344,16 @@ struct MediaSourcesView: View {
 
     @ViewBuilder
     private func sectionCard<Content: View>(@ViewBuilder content: () -> Content) -> some View {
+        #if os(macOS)
+        VStack(spacing: 0) {
+            Divider()
+            LazyVStack(spacing: 0) {
+                content()
+            }
+            Divider()
+        }
+        .padding(.bottom, 12)
+        #else
         if listStyle == .inset {
             LazyVStack(spacing: 0) {
                 content()
@@ -347,6 +368,7 @@ struct MediaSourcesView: View {
             }
             .padding(.bottom, 16)
         }
+        #endif
     }
 
     @ViewBuilder
@@ -364,7 +386,11 @@ struct MediaSourcesView: View {
             NavigationLink(value: NavigationDestination.instanceBrowse(instance)) {
                 instanceRow(instance)
             }
+            #if os(macOS)
+            .buttonStyle(.plain)
+            #else
             .foregroundStyle(.primary)
+            #endif
         }
         #if os(tvOS)
         .modifier(FirstRowFocusModifier(isFirst: isFirst, focus: $firstSourceFocused))
@@ -416,12 +442,20 @@ struct MediaSourcesView: View {
                 } label: {
                     mediaSourceRow(source, needsPassword: true)
                 }
+                #if os(macOS)
+                .buttonStyle(.plain)
+                #else
                 .foregroundStyle(.primary)
+                #endif
             } else {
                 NavigationLink(value: NavigationDestination.mediaBrowser(source, path: "/")) {
                     mediaSourceRow(source, needsPassword: false)
                 }
+                #if os(macOS)
+                .buttonStyle(.plain)
+                #else
                 .foregroundStyle(.primary)
+                #endif
             }
         }
         #if os(tvOS)
@@ -460,15 +494,24 @@ struct MediaSourcesView: View {
         #else
         let rowSpacing: CGFloat = 12
         #endif
+        #if os(macOS)
+        let iconFont: Font = .title3
+        let iconFrameWidth: CGFloat = 24
+        let titleFont: Font = .body
+        #else
+        let iconFont: Font = .title2
+        let iconFrameWidth: CGFloat = 32
+        let titleFont: Font = .headline
+        #endif
         return HStack(spacing: rowSpacing) {
             Image(systemName: instance.type.systemImage)
-                .font(.title2)
+                .font(iconFont)
                 .foregroundStyle(.tint)
-                .frame(width: 32)
+                .frame(width: iconFrameWidth)
 
             VStack(alignment: .leading, spacing: 2) {
                 Text(instance.displayName)
-                    .font(.headline)
+                    .font(titleFont)
                     .foregroundStyle(.primary)
 
                 Text("\(instance.type.displayName) - \(instance.url.host ?? instance.url.absoluteString)")
@@ -478,10 +521,13 @@ struct MediaSourcesView: View {
 
             Spacer()
 
+            #if !os(macOS)
             Image(systemName: "chevron.right")
                 .font(.caption)
                 .foregroundStyle(.secondary)
+            #endif
         }
+        .contentShape(Rectangle())
     }
 
     private func mediaSourceRow(_ source: MediaSource, needsPassword: Bool) -> some View {
@@ -490,15 +536,24 @@ struct MediaSourcesView: View {
         #else
         let rowSpacing: CGFloat = 12
         #endif
+        #if os(macOS)
+        let iconFont: Font = .title3
+        let iconFrameWidth: CGFloat = 24
+        let titleFont: Font = .body
+        #else
+        let iconFont: Font = .title2
+        let iconFrameWidth: CGFloat = 32
+        let titleFont: Font = .headline
+        #endif
         return HStack(spacing: rowSpacing) {
             Image(systemName: source.type.systemImage)
-                .font(.title2)
+                .font(iconFont)
                 .foregroundStyle(.tint)
-                .frame(width: 32)
+                .frame(width: iconFrameWidth)
 
             VStack(alignment: .leading, spacing: 2) {
                 Text(source.name)
-                    .font(.headline)
+                    .font(titleFont)
                     .foregroundStyle(.primary)
 
                 Text("\(source.type.displayName) - \(source.urlDisplayString)")
@@ -514,10 +569,13 @@ struct MediaSourcesView: View {
 
             Spacer()
 
+            #if !os(macOS)
             Image(systemName: "chevron.right")
                 .font(.caption)
                 .foregroundStyle(.secondary)
+            #endif
         }
+        .contentShape(Rectangle())
     }
 }
 

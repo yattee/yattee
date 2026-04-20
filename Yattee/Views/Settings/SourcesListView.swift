@@ -174,6 +174,16 @@ struct SourcesListView: View {
 
     @ViewBuilder
     private func sectionHeader(_ title: String) -> some View {
+        #if os(macOS)
+        Text(title)
+            .font(.subheadline)
+            .textCase(.uppercase)
+            .foregroundStyle(.secondary)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .padding(.horizontal, 16)
+            .padding(.top, 12)
+            .padding(.bottom, 4)
+        #else
         Text(title)
             .fontWeight(.semibold)
             .foregroundStyle(.secondary)
@@ -181,12 +191,23 @@ struct SourcesListView: View {
             .padding(.horizontal, listStyle == .inset ? 32 : 16)
             .padding(.top, 16)
             .padding(.bottom, 8)
+        #endif
     }
 
     // MARK: - Section Card
 
     @ViewBuilder
     private func sectionCard<Content: View>(@ViewBuilder content: () -> Content) -> some View {
+        #if os(macOS)
+        VStack(spacing: 0) {
+            Divider()
+            LazyVStack(spacing: 0) {
+                content()
+            }
+            Divider()
+        }
+        .padding(.bottom, 12)
+        #else
         if listStyle == .inset {
             LazyVStack(spacing: 0) {
                 content()
@@ -205,6 +226,7 @@ struct SourcesListView: View {
             }
             .padding(.bottom, 16)
         }
+        #endif
     }
 
     // MARK: - Remote Servers Section
@@ -244,7 +266,11 @@ struct SourcesListView: View {
             } label: {
                 instanceRow(instance)
             }
+            #if os(macOS)
+            .buttonStyle(.plain)
+            #else
             .foregroundStyle(.primary)
+            #endif
         }
         .swipeActions {
             SwipeAction(symbolImage: "pencil", tint: .white, background: .orange) { reset in
@@ -280,16 +306,25 @@ struct SourcesListView: View {
         #else
         let rowSpacing: CGFloat = 12
         #endif
+        #if os(macOS)
+        let iconFont: Font = .title3
+        let iconFrameWidth: CGFloat = 24
+        let titleFont: Font = .body
+        #else
+        let iconFont: Font = .title2
+        let iconFrameWidth: CGFloat = 32
+        let titleFont: Font = .headline
+        #endif
         return HStack(spacing: rowSpacing) {
             Image(systemName: instance.type.systemImage)
-                .font(.title2)
+                .font(iconFont)
                 .foregroundStyle(.tint)
-                .frame(width: 32)
+                .frame(width: iconFrameWidth)
 
             VStack(alignment: .leading, spacing: 2) {
                 HStack {
                     Text(instance.displayName)
-                        .font(.headline)
+                        .font(titleFont)
                         .foregroundStyle(.primary)
 
                     if !instance.isEnabled {
@@ -306,10 +341,13 @@ struct SourcesListView: View {
 
             Spacer()
 
+            #if !os(macOS)
             Image(systemName: "chevron.right")
                 .font(.caption)
                 .foregroundStyle(.tertiary)
+            #endif
         }
+        .contentShape(Rectangle())
     }
 
     @ViewBuilder
@@ -380,7 +418,11 @@ struct SourcesListView: View {
             } label: {
                 mediaSourceRow(source, needsPassword: needsPassword)
             }
+            #if os(macOS)
+            .buttonStyle(.plain)
+            #else
             .foregroundStyle(.primary)
+            #endif
         }
         .swipeActions {
             SwipeAction(symbolImage: "pencil", tint: .white, background: .orange) { reset in
@@ -416,16 +458,25 @@ struct SourcesListView: View {
         #else
         let rowSpacing: CGFloat = 12
         #endif
+        #if os(macOS)
+        let iconFont: Font = .title3
+        let iconFrameWidth: CGFloat = 24
+        let titleFont: Font = .body
+        #else
+        let iconFont: Font = .title2
+        let iconFrameWidth: CGFloat = 32
+        let titleFont: Font = .headline
+        #endif
         return HStack(spacing: rowSpacing) {
             Image(systemName: source.type.systemImage)
-                .font(.title2)
+                .font(iconFont)
                 .foregroundStyle(.tint)
-                .frame(width: 32)
+                .frame(width: iconFrameWidth)
 
             VStack(alignment: .leading, spacing: 2) {
                 HStack {
                     Text(source.name)
-                        .font(.headline)
+                        .font(titleFont)
                         .foregroundStyle(.primary)
 
                     if !source.isEnabled {
@@ -446,10 +497,13 @@ struct SourcesListView: View {
 
             Spacer()
 
+            #if !os(macOS)
             Image(systemName: "chevron.right")
                 .font(.caption)
                 .foregroundStyle(.tertiary)
+            #endif
         }
+        .contentShape(Rectangle())
     }
 
     // MARK: - Disabled Badge
