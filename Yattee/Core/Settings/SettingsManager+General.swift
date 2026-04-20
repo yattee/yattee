@@ -8,6 +8,8 @@
 import Foundation
 #if os(iOS)
 import UIKit
+#elseif os(macOS)
+import AppKit
 #endif
 
 extension SettingsManager {
@@ -35,9 +37,8 @@ extension SettingsManager {
         }
     }
 
-    // MARK: - App Icon Settings (iOS only)
+    // MARK: - App Icon Settings
 
-    #if os(iOS)
     var appIcon: AppIcon {
         get {
             if let cached = _appIcon { return cached }
@@ -53,13 +54,52 @@ extension SettingsManager {
 
             // Apply the icon change
             Task { @MainActor in
+                #if os(iOS)
                 do {
                     try await UIApplication.shared.setAlternateIconName(newValue.alternateIconName)
                 } catch {
                     LoggingService.shared.error("Failed to set alternate icon: \(error)", category: .general)
                 }
+                #elseif os(macOS)
+                SettingsManager.applyMacAppIcon(newValue)
+                #endif
             }
         }
+    }
+
+    #if os(macOS)
+    static func applyMacAppIcon(_ icon: AppIcon) {
+        if icon == .default {
+            NSApp.applicationIconImage = nil
+        } else if let source = NSImage(named: icon.previewImageName) {
+            NSApp.applicationIconImage = makeMacIconImage(from: source)
+        }
+    }
+
+    /// Paints the source image onto a 1024×1024 canvas with the standard macOS
+    /// squircle mask and transparent padding so the Dock renders it like a
+    /// native app icon.
+    private static func makeMacIconImage(from source: NSImage) -> NSImage {
+        let canvasSize: CGFloat = 1024
+        // macOS icon grid: artwork occupies ~824×824 centered in a 1024 canvas,
+        // with a ~185pt corner radius on the masked rect.
+        let artworkSize: CGFloat = 824
+        let cornerRadius: CGFloat = 185
+        let inset = (canvasSize - artworkSize) / 2
+        let artworkRect = NSRect(x: inset, y: inset, width: artworkSize, height: artworkSize)
+
+        let image = NSImage(size: NSSize(width: canvasSize, height: canvasSize))
+        image.lockFocus()
+        let path = NSBezierPath(roundedRect: artworkRect, xRadius: cornerRadius, yRadius: cornerRadius)
+        path.addClip()
+        source.draw(in: artworkRect,
+                    from: .zero,
+                    operation: .sourceOver,
+                    fraction: 1.0,
+                    respectFlipped: true,
+                    hints: [.interpolation: NSImageInterpolation.high.rawValue])
+        image.unlockFocus()
+        return image
     }
     #endif
 

@@ -78,6 +78,11 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     func applicationDidFinishLaunching(_ notification: Notification) {
         LoggingService.shared.logCloudKit("Requesting remote notification registration...")
         NSApplication.shared.registerForRemoteNotifications()
+
+        if let rawValue = UserDefaults.standard.string(forKey: "appIcon"),
+           let icon = AppIcon(rawValue: rawValue) {
+            SettingsManager.applyMacAppIcon(icon)
+        }
     }
 
     func application(_ application: NSApplication, didRegisterForRemoteNotificationsWithDeviceToken deviceToken: Data) {

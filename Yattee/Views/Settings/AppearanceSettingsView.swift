@@ -18,8 +18,8 @@ struct AppearanceSettingsView: View {
                 ThemeSection(settings: settings)
                 #endif
 
-                // App icon section (iOS only)
-                #if os(iOS)
+                // App icon section
+                #if !os(tvOS)
                 AppIconSection(settings: settings)
                 #endif
 
@@ -66,9 +66,9 @@ private struct ThemeSection: View {
     }
 }
 
-// MARK: - App Icon Section (iOS only)
+// MARK: - App Icon Section
 
-#if os(iOS)
+#if !os(tvOS)
 private struct AppIconSection: View {
     @Bindable var settings: SettingsManager
 
@@ -131,7 +131,9 @@ private struct AppIconPickerView: View {
             }
         }
         .navigationTitle(String(localized: "settings.appearance.appIcon.header"))
+        #if os(iOS)
         .navigationBarTitleDisplayMode(.inline)
+        #endif
     }
 }
 #endif

@@ -52,7 +52,6 @@ enum AccentColor: String, CaseIterable, Codable {
     }
 }
 
-#if os(iOS)
 enum AppIcon: String, CaseIterable, Codable {
     case `default`
     case classic
@@ -89,7 +88,6 @@ enum AppIcon: String, CaseIterable, Codable {
         }
     }
 }
-#endif
 
 // MARK: - Video Quality
 
