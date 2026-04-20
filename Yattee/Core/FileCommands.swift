@@ -17,6 +17,14 @@ struct FileCommands: Commands {
             }
             .keyboardShortcut("o", modifiers: [.command])
         }
+        #if os(macOS)
+        CommandGroup(replacing: .appSettings) {
+            Button(String(localized: "menu.app.settings")) {
+                NotificationCenter.default.post(name: .showSettings, object: nil)
+            }
+            .keyboardShortcut(",", modifiers: [.command])
+        }
+        #endif
     }
 }
 #endif

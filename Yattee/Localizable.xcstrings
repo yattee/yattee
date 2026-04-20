@@ -5142,6 +5142,16 @@
         }
       }
     },
+    "menu.app.settings" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Settings..."
+          }
+        }
+      }
+    },
     "menu.file.openLink" : {
       "localizations" : {
         "en" : {
