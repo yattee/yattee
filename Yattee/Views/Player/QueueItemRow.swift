@@ -67,7 +67,7 @@ struct QueueItemRow: View {
             .contentShape(Rectangle())
         }
         .buttonStyle(.plain)
-        #if !os(tvOS)
+        #if os(iOS)
         .swipeActions(edge: .trailing, allowsFullSwipe: true) {
             Button(role: .destructive) {
                 onRemove()

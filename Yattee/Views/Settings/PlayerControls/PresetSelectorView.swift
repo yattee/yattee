@@ -380,7 +380,7 @@ private struct PresetRow: View {
             .contentShape(Rectangle())
         }
         .buttonStyle(.plain)
-        #if !os(tvOS)
+        #if os(iOS)
         .swipeActions(edge: .trailing, allowsFullSwipe: false) {
             if let onDelete, !preset.isBuiltIn, canDelete {
                 Button(role: .destructive) {

@@ -7,14 +7,22 @@
 
 import SwiftUI
 
-#if os(tvOS)
+#if !os(iOS)
 
 extension View {
-    /// On tvOS, swipe actions are not supported - returns the view unmodified.
+    /// Swipe actions are iOS-only; on macOS/tvOS this returns the view unmodified.
     @ViewBuilder
     func swipeActions(
-        config: SwipeActionConfig = .init(),
-        @SwipeActionBuilder actions: () -> [SwipeAction]
+        config _: SwipeActionConfig = .init(),
+        @SwipeActionBuilder actions _: () -> [SwipeAction]
+    ) -> some View {
+        self
+    }
+
+    @ViewBuilder
+    func swipeActions(
+        config _: SwipeActionConfig = .init(),
+        actionsArray _: [SwipeAction]
     ) -> some View {
         self
     }

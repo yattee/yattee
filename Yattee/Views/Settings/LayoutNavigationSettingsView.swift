@@ -196,11 +196,13 @@ private struct VideoActionsSection: View {
                 }
             }
 
+            #if os(iOS)
             NavigationLink {
                 SwipeActionsSettingsView()
             } label: {
                 Label(String(localized: "settings.appearance.swipeActions"), systemImage: "hand.draw")
             }
+            #endif
         } header: {
             Text(String(localized: "settings.videoActions.header"))
         }
