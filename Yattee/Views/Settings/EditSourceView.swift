@@ -118,6 +118,11 @@ private struct EditRemoteServerContent: View {
                 #if os(tvOS)
                 TVSettingsTextField(title: String(localized: "sources.field.name"), text: $name)
                 TVSettingsToggle(title: String(localized: "sources.field.enabled"), isOn: $isEnabled)
+                #elseif os(macOS)
+                LabeledContent(String(localized: "sources.field.name")) {
+                    TextField("", text: $name)
+                }
+                Toggle(String(localized: "sources.field.enabled"), isOn: $isEnabled)
                 #else
                 TextField(String(localized: "sources.field.name"), text: $name)
                 Toggle(String(localized: "sources.field.enabled"), isOn: $isEnabled)
@@ -128,6 +133,16 @@ private struct EditRemoteServerContent: View {
                 #if os(tvOS)
                 TVSettingsTextField(title: String(localized: "sources.field.username"), text: $basicAuthUsername)
                 TVSettingsTextField(title: String(localized: "sources.field.password"), text: $basicAuthPassword, isSecure: true)
+                #elseif os(macOS)
+                LabeledContent(String(localized: "sources.field.username")) {
+                    TextField("", text: $basicAuthUsername)
+                        .textContentType(.username)
+                        .autocorrectionDisabled()
+                }
+                LabeledContent(String(localized: "sources.field.password")) {
+                    SecureField("", text: $basicAuthPassword)
+                        .textContentType(.password)
+                }
                 #else
                 TextField(String(localized: "sources.field.username"), text: $basicAuthUsername)
                     .textContentType(.username)
@@ -320,6 +335,9 @@ private struct EditRemoteServerContent: View {
         }
         #if os(iOS)
         .scrollDismissesKeyboard(.interactively)
+        #endif
+        #if os(macOS)
+        .formStyle(.grouped)
         #endif
         .confirmationDialog(
             String(localized: "sources.delete.confirmation.single \(instance.displayName)"),
@@ -564,6 +582,11 @@ private struct EditFileSourceContent: View {
                 #if os(tvOS)
                 TVSettingsTextField(title: String(localized: "sources.field.name"), text: $name)
                 TVSettingsToggle(title: String(localized: "sources.field.enabled"), isOn: $isEnabled)
+                #elseif os(macOS)
+                LabeledContent(String(localized: "sources.field.name")) {
+                    TextField("", text: $name)
+                }
+                Toggle(String(localized: "sources.field.enabled"), isOn: $isEnabled)
                 #else
                 TextField(String(localized: "sources.field.name"), text: $name)
                 Toggle(String(localized: "sources.field.enabled"), isOn: $isEnabled)
@@ -615,6 +638,21 @@ private struct EditFileSourceContent: View {
                         text: $password,
                         isSecure: true
                     )
+                    #elseif os(macOS)
+                    LabeledContent(String(localized: "sources.field.username")) {
+                        TextField("", text: $username)
+                            .textContentType(.username)
+                            .autocorrectionDisabled()
+                    }
+                    LabeledContent(String(localized: "sources.field.password")) {
+                        SecureField(
+                            hasExistingPassword
+                                ? String(localized: "sources.field.passwordKeep")
+                                : String(localized: "sources.field.passwordRequired"),
+                            text: $password
+                        )
+                        .textContentType(.password)
+                    }
                     #else
                     TextField(String(localized: "sources.field.username"), text: $username)
                         .textContentType(.username)
@@ -717,6 +755,9 @@ private struct EditFileSourceContent: View {
         }
         #if os(iOS)
         .scrollDismissesKeyboard(.interactively)
+        #endif
+        #if os(macOS)
+        .formStyle(.grouped)
         #endif
         .confirmationDialog(
             String(localized: "sources.delete.confirmation.single \(source.name)"),

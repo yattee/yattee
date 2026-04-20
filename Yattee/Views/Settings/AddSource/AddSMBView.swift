@@ -39,6 +39,9 @@ struct AddSMBView: View {
     // MARK: - Body
 
     var body: some View {
+        #if os(macOS)
+        macOSBody
+        #else
         Form {
             nameSection
             serverSection
@@ -68,7 +71,99 @@ struct AddSMBView: View {
                 name = prefillName
             }
         }
+        #endif
     }
+
+    #if os(macOS)
+    private var macOSBody: some View {
+        Form {
+            Section {
+                LabeledContent(String(localized: "sources.field.name")) {
+                    TextField("", text: $name)
+                }
+            } footer: {
+                Text(String(localized: "sources.footer.displayName"))
+                    .font(.callout)
+                    .foregroundStyle(.secondary)
+            }
+
+            Section {
+                LabeledContent(String(localized: "sources.placeholder.smbServer")) {
+                    TextField("", text: $server)
+                        .autocorrectionDisabled()
+                }
+            } footer: {
+                Text(String(localized: "sources.footer.smb"))
+                    .font(.callout)
+                    .foregroundStyle(.secondary)
+            }
+
+            Section {
+                LabeledContent(String(localized: "sources.field.usernameOptional")) {
+                    TextField("", text: $username)
+                        .textContentType(.username)
+                        .autocorrectionDisabled()
+                }
+                LabeledContent(String(localized: "sources.field.passwordOptional")) {
+                    SecureField("", text: $password)
+                        .textContentType(.password)
+                }
+            } header: {
+                Text(String(localized: "sources.header.auth"))
+            } footer: {
+                Text(String(localized: "sources.footer.auth"))
+                    .font(.callout)
+                    .foregroundStyle(.secondary)
+            }
+
+            Section {
+                Picker(String(localized: "sources.field.smbProtocol"), selection: $protocolVersion) {
+                    ForEach(SMBProtocol.allCases, id: \.self) { proto in
+                        Text(proto.displayName).tag(proto)
+                    }
+                }
+            } header: {
+                Text(String(localized: "sources.header.advanced"))
+            } footer: {
+                Text(String(localized: "sources.footer.smbProtocol"))
+                    .font(.callout)
+                    .foregroundStyle(.secondary)
+            }
+
+            if let result = testResult {
+                SourceTestResultSection(result: result)
+            }
+        }
+        .formStyle(.grouped)
+        .navigationTitle(String(localized: "sources.addSMB"))
+        .toolbar {
+            ToolbarItem(placement: .confirmationAction) {
+                Button {
+                    addSource()
+                } label: {
+                    if isTesting {
+                        HStack(spacing: 6) {
+                            ProgressView().controlSize(.small)
+                            Text(testProgress ?? String(localized: "sources.testing"))
+                        }
+                    } else {
+                        Text(String(localized: "sources.addSource"))
+                    }
+                }
+                .disabled(!canAdd || isTesting)
+                .keyboardShortcut(.defaultAction)
+            }
+        }
+        .onAppear {
+            if let prefillServer {
+                server = prefillServer
+            }
+            if let prefillName, name.isEmpty {
+                name = prefillName
+            }
+        }
+    }
+    #endif
 
     // MARK: - Sections
 

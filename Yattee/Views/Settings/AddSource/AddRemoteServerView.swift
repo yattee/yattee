@@ -172,11 +172,37 @@ struct AddRemoteServerView: View {
 
             if isFieldsRevealed {
                 serverConfigurationFields
+                #if !os(macOS)
                 actionSection
+                #endif
             }
         }
         #if os(iOS)
         .scrollDismissesKeyboard(.interactively)
+        #endif
+        #if os(macOS)
+        .formStyle(.grouped)
+        .toolbar {
+            ToolbarItem(placement: .confirmationAction) {
+                if isFieldsRevealed {
+                    Button {
+                        addSource()
+                    } label: {
+                        if isValidatingCredentials {
+                            HStack(spacing: 6) {
+                                ProgressView().controlSize(.small)
+                                Text(String(localized: "sources.validatingCredentials"))
+                            }
+                        } else {
+                            Text(String(localized: "sources.addSource"))
+                        }
+                    }
+                    .disabled(!canAdd || isValidatingCredentials)
+                    .keyboardShortcut(.defaultAction)
+                    .accessibilityIdentifier("addRemoteServer.actionButton")
+                }
+            }
+        }
         #endif
     }
 
@@ -206,6 +232,35 @@ struct AddRemoteServerView: View {
                 }
                 .buttonStyle(TVSettingsButtonStyle())
                 .disabled(urlString.isEmpty || uiState == .detecting)
+            }
+            #elseif os(macOS)
+            LabeledContent(String(localized: "sources.field.url")) {
+                TextField("", text: $urlString, prompt: Text(String(localized: "sources.placeholder.urlOrAddress")))
+                    .textContentType(.URL)
+                    .autocorrectionDisabled()
+                    .accessibilityIdentifier("addRemoteServer.urlField")
+                    .onChange(of: urlString) { _, _ in
+                        handleURLChange()
+                    }
+            }
+
+            if !isFieldsRevealed && !isAwaitingBasicAuth {
+                HStack {
+                    Spacer()
+                    Button {
+                        startDetection()
+                    } label: {
+                        HStack(spacing: 6) {
+                            if case .detecting = uiState {
+                                ProgressView()
+                                    .controlSize(.small)
+                            }
+                            Text(String(localized: "sources.detect"))
+                        }
+                    }
+                    .disabled(urlString.isEmpty || uiState == .detecting)
+                    .accessibilityIdentifier("addRemoteServer.detectButton")
+                }
             }
             #else
             TextField(String(localized: "sources.placeholder.urlOrAddress"), text: $urlString)
@@ -277,6 +332,16 @@ struct AddRemoteServerView: View {
             #if os(tvOS)
             TVSettingsTextField(title: String(localized: "sources.field.username"), text: $basicAuthUsername)
             TVSettingsTextField(title: String(localized: "sources.field.password"), text: $basicAuthPassword, isSecure: true)
+            #elseif os(macOS)
+            LabeledContent(String(localized: "sources.field.username")) {
+                TextField("", text: $basicAuthUsername)
+                    .textContentType(.username)
+                    .autocorrectionDisabled()
+            }
+            LabeledContent(String(localized: "sources.field.password")) {
+                SecureField("", text: $basicAuthPassword)
+                    .textContentType(.password)
+            }
             #else
             TextField(String(localized: "sources.field.username"), text: $basicAuthUsername)
                 .textContentType(.username)
@@ -328,6 +393,10 @@ struct AddRemoteServerView: View {
         Section {
             #if os(tvOS)
             TVSettingsTextField(title: String(localized: "sources.field.nameOptional"), text: $name)
+            #elseif os(macOS)
+            LabeledContent(String(localized: "sources.field.name")) {
+                TextField("", text: $name, prompt: Text(String(localized: "sources.field.nameOptional")))
+            }
             #else
             TextField(String(localized: "sources.field.nameOptional"), text: $name)
             #endif
@@ -381,6 +450,16 @@ struct AddRemoteServerView: View {
                 #if os(tvOS)
                 TVSettingsTextField(title: String(localized: "sources.field.username"), text: $basicAuthUsername)
                 TVSettingsTextField(title: String(localized: "sources.field.password"), text: $basicAuthPassword, isSecure: true)
+                #elseif os(macOS)
+                LabeledContent(String(localized: "sources.field.username")) {
+                    TextField("", text: $basicAuthUsername)
+                        .textContentType(.username)
+                        .autocorrectionDisabled()
+                }
+                LabeledContent(String(localized: "sources.field.password")) {
+                    SecureField("", text: $basicAuthPassword)
+                        .textContentType(.password)
+                }
                 #else
                 TextField(String(localized: "sources.field.username"), text: $basicAuthUsername)
                     .textContentType(.username)

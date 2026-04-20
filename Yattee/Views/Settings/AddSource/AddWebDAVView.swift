@@ -40,6 +40,9 @@ struct AddWebDAVView: View {
     // MARK: - Body
 
     var body: some View {
+        #if os(macOS)
+        macOSBody
+        #else
         Form {
             nameSection
             serverSection
@@ -72,7 +75,99 @@ struct AddWebDAVView: View {
                 allowInvalidCertificates = true
             }
         }
+        #endif
     }
+
+    #if os(macOS)
+    private var macOSBody: some View {
+        Form {
+            Section {
+                LabeledContent(String(localized: "sources.field.name")) {
+                    TextField("", text: $name)
+                }
+            } footer: {
+                Text(String(localized: "sources.footer.displayName"))
+                    .font(.callout)
+                    .foregroundStyle(.secondary)
+            }
+
+            Section {
+                LabeledContent(String(localized: "sources.placeholder.webdavUrl")) {
+                    TextField("", text: $urlString)
+                        .textContentType(.URL)
+                        .autocorrectionDisabled()
+                }
+            } footer: {
+                Text(String(localized: "sources.footer.webdav"))
+                    .font(.callout)
+                    .foregroundStyle(.secondary)
+            }
+
+            Section {
+                LabeledContent(String(localized: "sources.field.usernameOptional")) {
+                    TextField("", text: $username)
+                        .textContentType(.username)
+                        .autocorrectionDisabled()
+                }
+                LabeledContent(String(localized: "sources.field.passwordOptional")) {
+                    SecureField("", text: $password)
+                        .textContentType(.password)
+                }
+            } header: {
+                Text(String(localized: "sources.header.auth"))
+            } footer: {
+                Text(String(localized: "sources.footer.auth"))
+                    .font(.callout)
+                    .foregroundStyle(.secondary)
+            }
+
+            Section {
+                Toggle(String(localized: "sources.field.allowInvalidCertificates"), isOn: $allowInvalidCertificates)
+            } header: {
+                Text(String(localized: "sources.header.security"))
+            } footer: {
+                Text(String(localized: "sources.footer.allowInvalidCertificates"))
+                    .font(.callout)
+                    .foregroundStyle(.secondary)
+            }
+
+            if let result = testResult {
+                SourceTestResultSection(result: result)
+            }
+        }
+        .formStyle(.grouped)
+        .navigationTitle(String(localized: "sources.addWebDAV"))
+        .toolbar {
+            ToolbarItem(placement: .confirmationAction) {
+                Button {
+                    addSource()
+                } label: {
+                    if isTesting {
+                        HStack(spacing: 6) {
+                            ProgressView().controlSize(.small)
+                            Text(testProgress ?? String(localized: "sources.testing"))
+                        }
+                    } else {
+                        Text(String(localized: "sources.addSource"))
+                    }
+                }
+                .disabled(!canAdd || isTesting)
+                .keyboardShortcut(.defaultAction)
+            }
+        }
+        .onAppear {
+            if let url = prefillURL {
+                urlString = url.absoluteString
+            }
+            if let prefillName, name.isEmpty {
+                name = prefillName
+            }
+            if prefillAllowInvalidCertificates {
+                allowInvalidCertificates = true
+            }
+        }
+    }
+    #endif
 
     // MARK: - Sections
 

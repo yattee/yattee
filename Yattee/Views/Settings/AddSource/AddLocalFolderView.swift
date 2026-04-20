@@ -34,6 +34,9 @@ struct AddLocalFolderView: View {
     // MARK: - Body
 
     var body: some View {
+        #if os(macOS)
+        macOSBody
+        #else
         Form {
             nameSection
             folderSection
@@ -53,7 +56,63 @@ struct AddLocalFolderView: View {
             }
         }
         #endif
+        #endif
     }
+
+    #if os(macOS)
+    private var macOSBody: some View {
+        Form {
+            Section {
+                LabeledContent(String(localized: "sources.field.name")) {
+                    TextField("", text: $name)
+                }
+            } footer: {
+                Text(String(localized: "sources.footer.displayName"))
+                    .font(.callout)
+                    .foregroundStyle(.secondary)
+            }
+
+            Section {
+                LabeledContent(String(localized: "sources.header.folder")) {
+                    HStack {
+                        if let url = selectedFolderURL {
+                            Text(url.path)
+                                .lineLimit(1)
+                                .truncationMode(.middle)
+                                .foregroundStyle(.secondary)
+                                .font(.system(.body, design: .monospaced))
+                        } else {
+                            Text(String(localized: "sources.selectFolder"))
+                                .foregroundStyle(.secondary)
+                        }
+                        Button(String(localized: "sources.selectFolder")) {
+                            selectFolderMacOS()
+                        }
+                    }
+                }
+            } footer: {
+                Text(String(localized: "sources.footer.folder"))
+                    .font(.callout)
+                    .foregroundStyle(.secondary)
+            }
+
+            if let result = testResult {
+                SourceTestResultSection(result: result)
+            }
+        }
+        .formStyle(.grouped)
+        .navigationTitle(String(localized: "sources.addLocalFolder"))
+        .toolbar {
+            ToolbarItem(placement: .confirmationAction) {
+                Button(String(localized: "sources.addSource")) {
+                    addSource()
+                }
+                .disabled(!canAdd)
+                .keyboardShortcut(.defaultAction)
+            }
+        }
+    }
+    #endif
 
     // MARK: - Sections
 
