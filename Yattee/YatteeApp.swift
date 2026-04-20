@@ -67,6 +67,7 @@ struct YatteeApp: App {
                 .tint(appEnvironment.settingsManager.accentColor.color)
                 #endif
                 #if os(macOS)
+                .frame(minWidth: 800, minHeight: 500)
                 // Required on the view to prevent new windows on URL open
                 .handlesExternalEvents(preferring: ["*"], allowing: ["*"])
                 #endif
