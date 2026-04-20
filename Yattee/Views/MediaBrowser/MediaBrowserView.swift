@@ -222,7 +222,11 @@ struct MediaBrowserView: View {
                                 NavigationLink(value: NavigationDestination.mediaBrowser(source, path: file.path, showOnlyPlayable: showOnlyPlayable)) {
                                     MediaFileRow(file: file, sortOrder: sortOrder)
                                 }
+                                #if os(macOS)
+                                .buttonStyle(.plain)
+                                #else
                                 .foregroundStyle(.primary)
+                                #endif
                             } else if file.isPlayable {
                                 playableFileRow(for: file)
                             } else {
@@ -275,6 +279,16 @@ struct MediaBrowserView: View {
 
     @ViewBuilder
     private func sectionCard<Content: View>(@ViewBuilder content: () -> Content) -> some View {
+        #if os(macOS)
+        VStack(spacing: 0) {
+            Divider()
+            LazyVStack(spacing: 0) {
+                content()
+            }
+            Divider()
+        }
+        .padding(.bottom, 12)
+        #else
         if listStyle == .inset {
             LazyVStack(spacing: 0) {
                 content()
@@ -289,6 +303,7 @@ struct MediaBrowserView: View {
             }
             .padding(.bottom, 16)
         }
+        #endif
     }
 
     // MARK: - Preferences
