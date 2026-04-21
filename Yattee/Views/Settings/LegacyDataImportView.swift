@@ -73,15 +73,13 @@ struct LegacyDataImportView: View {
     @ViewBuilder
     private var importContent: some View {
         VStack(spacing: 0) {
-            List {
-                Section {
+            SettingsFormContainer {
+                SettingsFormSection("migration.selectToImport") {
                     ForEach(items) { item in
                         MigrationImportRow(item: item) {
                             toggleItem(item)
                         }
                     }
-                } header: {
-                    Text(String(localized: "migration.selectToImport"))
                 } footer: {
                     VStack(alignment: .leading, spacing: 8) {
                         Text(String(localized: "migration.accountsHint"))
