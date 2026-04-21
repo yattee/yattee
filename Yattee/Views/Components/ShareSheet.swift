@@ -22,16 +22,14 @@ struct ShareSheet: View {
     let items: [Any]
 
     var body: some View {
-        VStack {
-            Text(String(localized: "settings.advanced.logs.export.instructions"))
-                .padding()
-
+        VStack(spacing: 12) {
             if let text = items.first as? String {
                 ScrollView {
                     Text(text)
                         .font(.caption)
                         .fontDesign(.monospaced)
                         .textSelection(.enabled)
+                        .frame(maxWidth: .infinity, alignment: .leading)
                         .padding()
                 }
                 .frame(maxHeight: 400)
@@ -43,9 +41,10 @@ struct ShareSheet: View {
                     NSPasteboard.general.setString(text, forType: .string)
                 }
             }
-            .padding()
+            .keyboardShortcut(.defaultAction)
         }
-        .frame(minWidth: 400, minHeight: 300)
+        .padding()
+        .frame(minWidth: 420, minHeight: 320)
     }
 }
 #endif

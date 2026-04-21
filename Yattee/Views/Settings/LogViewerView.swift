@@ -19,8 +19,38 @@ struct LogViewerView: View {
 
     var body: some View {
         VStack(spacing: 0) {
-            // Search bar
+            #if os(macOS)
+            HStack(spacing: 8) {
+                searchBar
+
+                Button {
+                    showingFilters = true
+                } label: {
+                    Label(String(localized: "settings.advanced.logs.filter"), systemImage: "line.3.horizontal.decrease.circle")
+                        .labelStyle(.iconOnly)
+                }
+                .help(String(localized: "settings.advanced.logs.filter"))
+
+                Button {
+                    showingExportSheet = true
+                } label: {
+                    Label(String(localized: "settings.advanced.logs.export"), systemImage: "square.and.arrow.up")
+                        .labelStyle(.iconOnly)
+                }
+                .help(String(localized: "settings.advanced.logs.export"))
+
+                Button(role: .destructive) {
+                    loggingService.clearLogs()
+                } label: {
+                    Label(String(localized: "settings.advanced.logs.clear"), systemImage: "trash")
+                        .labelStyle(.iconOnly)
+                }
+                .help(String(localized: "settings.advanced.logs.clear"))
+            }
+            .padding(.trailing)
+            #else
             searchBar
+            #endif
 
             // Log list
             logList
@@ -192,13 +222,18 @@ private struct LogEntryDetailView: View {
 
     var body: some View {
         NavigationStack {
-            List {
-                Section(String(localized: "settings.advanced.logs.detail.info")) {
-                    LabeledContent(String(localized: "settings.advanced.logs.detail.timestamp")) {
+            SettingsFormContainer {
+                SettingsFormSection("settings.advanced.logs.detail.info") {
+                    HStack {
+                        Text(String(localized: "settings.advanced.logs.detail.timestamp"))
+                        Spacer()
                         Text(entry.timestamp.formatted(date: .abbreviated, time: .standard))
+                            .foregroundStyle(.secondary)
                     }
 
-                    LabeledContent(String(localized: "settings.advanced.logs.detail.level")) {
+                    HStack {
+                        Text(String(localized: "settings.advanced.logs.detail.level"))
+                        Spacer()
                         HStack {
                             Image(systemName: entry.level.icon)
                             Text(entry.level.rawValue.capitalized)
@@ -206,27 +241,32 @@ private struct LogEntryDetailView: View {
                         .foregroundStyle(levelColor)
                     }
 
-                    LabeledContent(String(localized: "settings.advanced.logs.detail.category")) {
+                    HStack {
+                        Text(String(localized: "settings.advanced.logs.detail.category"))
+                        Spacer()
                         HStack {
                             Image(systemName: entry.category.icon)
                             Text(entry.category.rawValue)
                         }
+                        .foregroundStyle(.secondary)
                     }
                 }
 
-                Section(String(localized: "settings.advanced.logs.detail.message")) {
+                SettingsFormSection("settings.advanced.logs.detail.message") {
                     Text(entry.message)
                         .font(.body)
+                        .frame(maxWidth: .infinity, alignment: .leading)
                         #if !os(tvOS)
                         .textSelection(.enabled)
                         #endif
                 }
 
                 if let details = entry.details {
-                    Section(String(localized: "settings.advanced.logs.detail.details")) {
+                    SettingsFormSection("settings.advanced.logs.detail.details") {
                         Text(details)
                             .font(.caption)
                             .fontDesign(.monospaced)
+                            .frame(maxWidth: .infinity, alignment: .leading)
                             #if !os(tvOS)
                             .textSelection(.enabled)
                             #endif
@@ -249,6 +289,9 @@ private struct LogEntryDetailView: View {
             }
         }
         .presentationDetents([.medium, .large])
+        #if os(macOS)
+        .frame(minWidth: 500, minHeight: 400)
+        #endif
     }
 
     private var levelColor: Color {
@@ -269,28 +312,38 @@ private struct LogFiltersSheet: View {
 
     var body: some View {
         NavigationStack {
-            List {
-                Section(String(localized: "settings.advanced.logs.filter.categories")) {
+            SettingsFormContainer {
+                SettingsFormSection("settings.advanced.logs.filter.categories") {
                     ForEach(LogCategory.allCases, id: \.self) { category in
                         Toggle(isOn: binding(for: category)) {
                             Label(category.rawValue, systemImage: category.icon)
                         }
                     }
                 }
+                #if os(macOS)
+                .labelStyle(FixedIconWidthLabelStyle())
+                #endif
 
-                Section(String(localized: "settings.advanced.logs.filter.levels")) {
+                SettingsFormSection("settings.advanced.logs.filter.levels") {
                     ForEach(LogLevel.allCases, id: \.self) { level in
                         Toggle(isOn: binding(for: level)) {
                             Label(level.rawValue.capitalized, systemImage: level.icon)
                         }
                     }
                 }
+                #if os(macOS)
+                .labelStyle(FixedIconWidthLabelStyle())
+                #endif
 
-                Section {
+                HStack {
                     Button(String(localized: "settings.advanced.logs.filter.reset")) {
                         loggingService.resetFilters()
                     }
+                    Spacer()
                 }
+                .padding(.horizontal, 16)
+                .padding(.top, 4)
+                .padding(.bottom, 16)
             }
             .navigationTitle(String(localized: "settings.advanced.logs.filter.title"))
             #if os(iOS)
@@ -301,8 +354,7 @@ private struct LogFiltersSheet: View {
                     Button(role: .cancel) {
                         dismiss()
                     } label: {
-                        Label(String(localized: "common.close"), systemImage: "xmark")
-                            .labelStyle(.iconOnly)
+                        Text(String(localized: "common.close"))
                     }
                 }
             }
