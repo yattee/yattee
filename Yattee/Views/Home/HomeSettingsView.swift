@@ -43,6 +43,9 @@ struct HomeSettingsView: View {
         #if os(iOS)
         .environment(\.editMode, isEditMode ? .constant(.active) : .constant(.inactive))
         #endif
+        #if os(macOS)
+        .listStyle(.inset)
+        #endif
         #if !os(tvOS)
         .navigationTitle(String(localized: "home.settings.title"))
         #endif
