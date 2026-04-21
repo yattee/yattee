@@ -54,13 +54,11 @@ struct ContributorsView: View {
     }
 
     private var contributorsList: some View {
-        Form {
-            Section {
+        SettingsFormContainer {
+            SettingsFormSection(footer: "settings.contributors.section.footer") {
                 ForEach(contributors) { contributor in
                     contributorRow(contributor)
                 }
-            } footer: {
-                Text(String(localized: "settings.contributors.section.footer"))
             }
         }
     }
@@ -112,7 +110,11 @@ struct ContributorsView: View {
                 Image(systemName: "arrow.up.right")
                     .foregroundStyle(.secondary)
             }
+            .contentShape(Rectangle())
         }
+        #if os(macOS)
+        .buttonStyle(.plain)
+        #endif
     }
 
     // MARK: - Data Loading

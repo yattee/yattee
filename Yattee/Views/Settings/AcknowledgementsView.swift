@@ -11,13 +11,11 @@ struct AcknowledgementsView: View {
     @Environment(\.openURL) private var openURL
 
     var body: some View {
-        Form {
-            Section {
+        SettingsFormContainer {
+            SettingsFormSection("settings.acknowledgements.dependencies.header") {
                 dependencyLink("mpv", url: "https://github.com/mpv-player/mpv")
                 dependencyLink("MPVKit", url: "https://github.com/mpvkit/MPVKit")
                 dependencyLink("Nuke", url: "https://github.com/kean/Nuke")
-            } header: {
-                Text(String(localized: "settings.acknowledgements.dependencies.header"))
             }
         }
         .navigationTitle(String(localized: "settings.acknowledgements.title"))
@@ -42,7 +40,11 @@ struct AcknowledgementsView: View {
                 Image(systemName: "arrow.up.right")
                     .foregroundStyle(.secondary)
             }
+            .contentShape(Rectangle())
         }
+        #if os(macOS)
+        .buttonStyle(.plain)
+        #endif
         #endif
     }
 }

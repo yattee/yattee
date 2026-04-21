@@ -37,13 +37,11 @@ struct TranslationContributorsView: View {
     }
 
     private var contributorsList: some View {
-        Form {
-            Section {
+        SettingsFormContainer {
+            SettingsFormSection(footer: "settings.translators.section.footer") {
                 ForEach(contributors) { contributor in
                     contributorRow(contributor)
                 }
-            } footer: {
-                Text(String(localized: "settings.translators.section.footer"))
             }
         }
     }
