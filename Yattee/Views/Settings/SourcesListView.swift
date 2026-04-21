@@ -74,7 +74,7 @@ struct SourcesListView: View {
         #if os(iOS)
         .navigationBarTitleDisplayMode(.inline)
         #endif
-        #if !os(tvOS)
+        #if os(iOS)
         .toolbar {
             ToolbarItem(placement: .primaryAction) {
                 Button {
@@ -156,6 +156,20 @@ struct SourcesListView: View {
             .overlay(
                 ScrollView {
                     LazyVStack(spacing: 0) {
+                        #if os(macOS)
+                        HStack {
+                            Spacer()
+                            Button {
+                                showingAddSheet = true
+                            } label: {
+                                Label(String(localized: "sources.addSource"), systemImage: "plus")
+                            }
+                            .help(String(localized: "sources.addSource"))
+                            .accessibilityIdentifier("sources.addButton")
+                        }
+                        .padding(.horizontal, 16)
+                        .padding(.vertical, 8)
+                        #endif
                         remoteServersSection
                         fileSourcesSection
                     }
