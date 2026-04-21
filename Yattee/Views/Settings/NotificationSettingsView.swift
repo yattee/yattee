@@ -165,14 +165,14 @@ struct ManageChannelNotificationsView: View {
     private var subscriptionService: SubscriptionService? { appEnvironment?.subscriptionService }
 
     var body: some View {
-        List {
+        Group {
             if isLoading {
                 HStack {
                     Spacer()
                     ProgressView()
                     Spacer()
                 }
-                .listRowBackground(Color.clear)
+                .frame(maxHeight: .infinity)
             } else if let errorMessage {
                 ContentUnavailableView {
                     Label(
@@ -194,10 +194,14 @@ struct ManageChannelNotificationsView: View {
                 }
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
             } else {
-                ForEach(subscriptions, id: \.channelID) { subscription in
-                    ChannelNotificationToggle(subscription: subscription)
+                SettingsFormContainer {
+                    SettingsFormSection {
+                        ForEach(subscriptions, id: \.channelID) { subscription in
+                            ChannelNotificationToggle(subscription: subscription)
+                        }
+                        .id(refreshID)
+                    }
                 }
-                .id(refreshID)
             }
         }
         .navigationTitle(String(localized: "settings.notifications.manageChannels.title"))
