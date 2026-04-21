@@ -125,30 +125,38 @@ struct SidebarSettingsView: View {
     }
 
     var body: some View {
+        #if os(tvOS)
         NavigationStack {
-            List {
-                startupSection
-                mainNavigationSection
-                sourcesSection
-                channelsSection
-                playlistsSection
-            }
-            #if os(iOS)
-            .environment(\.editMode, .constant(.active))
-            #endif
-            #if !os(tvOS)
-            .navigationTitle(String(localized: "settings.sidebar.title"))
-            #endif
-            #if os(iOS)
-            .navigationBarTitleDisplayMode(.inline)
-            #endif
-            .onAppear {
-                loadMainNavigationSettings()
-            }
+            sidebarList
         }
-        #if os(macOS)
-        .frame(minWidth: 400, minHeight: 300)
+        #else
+        sidebarList
         #endif
+    }
+
+    private var sidebarList: some View {
+        List {
+            startupSection
+            mainNavigationSection
+            sourcesSection
+            channelsSection
+            playlistsSection
+        }
+        #if os(iOS)
+        .environment(\.editMode, .constant(.active))
+        #endif
+        #if os(macOS)
+        .listStyle(.inset)
+        #endif
+        #if !os(tvOS)
+        .navigationTitle(String(localized: "settings.sidebar.title"))
+        #endif
+        #if os(iOS)
+        .navigationBarTitleDisplayMode(.inline)
+        #endif
+        .onAppear {
+            loadMainNavigationSettings()
+        }
     }
 
     // MARK: - Startup Section
