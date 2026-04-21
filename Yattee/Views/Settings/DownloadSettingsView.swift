@@ -12,7 +12,7 @@ struct DownloadSettingsView: View {
     @Environment(\.appEnvironment) private var appEnvironment
 
     var body: some View {
-        Form {
+        SettingsFormContainer {
             if let downloadSettings = appEnvironment?.downloadSettings,
                let downloadManager = appEnvironment?.downloadManager {
                 StorageSection(downloadManager: downloadManager)
@@ -49,7 +49,8 @@ private struct StorageSection: View {
     }
 
     var body: some View {
-        Section {
+        SettingsFormSection {
+            #if os(iOS)
             NavigationLink {
                 DownloadsStorageView()
             } label: {
@@ -60,6 +61,15 @@ private struct StorageSection: View {
                         .foregroundStyle(.secondary)
                 }
             }
+            #else
+            SettingsNavigationRow(
+                "settings.downloads.usedStorage",
+                systemImage: "internaldrive",
+                trailing: { Text(formatBytes(storageUsed)) }
+            ) {
+                DownloadsStorageView()
+            }
+            #endif
         }
     }
 }
@@ -70,7 +80,7 @@ private struct QualitySection: View {
     @Bindable var downloadSettings: DownloadSettings
 
     var body: some View {
-        Section {
+        SettingsFormSection("settings.downloads.quality.header") {
             Picker(
                 String(localized: "settings.downloads.preferredQuality"),
                 selection: $downloadSettings.preferredDownloadQuality
@@ -86,8 +96,6 @@ private struct QualitySection: View {
                     isOn: $downloadSettings.includeSubtitlesInAutoDownload
                 )
             }
-        } header: {
-            Text(String(localized: "settings.downloads.quality.header"))
         } footer: {
             if downloadSettings.preferredDownloadQuality == .ask {
                 Text(String(localized: "settings.downloads.quality.ask.footer"))
@@ -104,7 +112,7 @@ private struct ConcurrencySection: View {
     @Bindable var downloadSettings: DownloadSettings
 
     var body: some View {
-        Section {
+        SettingsFormSection {
             #if os(iOS)
             Stepper(value: $downloadSettings.maxConcurrentDownloads, in: 1...5) {
                 HStack {
@@ -133,7 +141,7 @@ private struct CellularSection: View {
     let downloadManager: DownloadManager?
 
     var body: some View {
-        Section {
+        SettingsFormSection(footer: "settings.downloads.allowCellular.footer") {
             Toggle(
                 String(localized: "settings.downloads.allowCellular"),
                 isOn: $downloadSettings.allowCellularDownloads
@@ -141,8 +149,6 @@ private struct CellularSection: View {
             .onChange(of: downloadSettings.allowCellularDownloads) {
                 downloadManager?.refreshCellularAccessSetting()
             }
-        } footer: {
-            Text(String(localized: "settings.downloads.allowCellular.footer"))
         }
     }
 }
