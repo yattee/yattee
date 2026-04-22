@@ -302,7 +302,7 @@ struct YatteeApp: App {
         Window(String(localized: "menu.app.settings"), id: "settings") {
             SettingsView(showCloseButton: false)
                 .appEnvironment(appEnvironment)
-                .frame(minWidth: 600, idealWidth: 900, maxWidth: .infinity, minHeight: 400, idealHeight: 600, maxHeight: .infinity)
+                .frame(minWidth: 600, idealWidth: 900, maxWidth: .infinity, minHeight: 520, idealHeight: 600, maxHeight: .infinity)
         }
         .windowResizability(.contentMinSize)
         .defaultSize(width: 900, height: 600)

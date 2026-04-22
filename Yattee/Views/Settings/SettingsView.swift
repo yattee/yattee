@@ -20,7 +20,7 @@ struct SettingsView: View {
     var body: some View {
         #if os(macOS)
         macOSSettings
-            .frame(minWidth: 600, minHeight: 400)
+            .frame(minWidth: 600, minHeight: 520)
         #elseif os(tvOS)
         tvOSSettings
         #else
@@ -33,11 +33,16 @@ struct SettingsView: View {
     #if os(macOS)
     private var macOSSettings: some View {
         NavigationSplitView {
-            List(SettingsSection.allCases, selection: $selectedSection) { section in
-                Label(section.title, systemImage: section.icon)
-                    .tag(section)
+            VStack(spacing: 0) {
+                List(SettingsSection.allCases, selection: $selectedSection) { section in
+                    Label(section.title, systemImage: section.icon)
+                        .tag(section)
+                }
+                .listStyle(.sidebar)
+
+                Divider()
+                macOSSidebarFooter
             }
-            .listStyle(.sidebar)
             .navigationSplitViewColumnWidth(min: 180, ideal: 200)
         } detail: {
             if appEnvironment != nil {
@@ -74,6 +79,27 @@ struct SettingsView: View {
                 }
             }
         }
+    }
+
+    private var macOSSidebarFooter: some View {
+        VStack(spacing: 6) {
+            Image("AppIconPreview")
+                .resizable()
+                .scaledToFit()
+                .frame(width: 48, height: 48)
+                .clipShape(RoundedRectangle(cornerRadius: 10))
+
+            Text(verbatim: "Yattee")
+                .font(.callout)
+                .fontWeight(.semibold)
+
+            Text("\(appVersion) (\(buildNumber))")
+                .font(.caption)
+                .foregroundStyle(.secondary)
+        }
+        .frame(maxWidth: .infinity)
+        .padding(.vertical, 12)
+        .allowsHitTesting(false)
     }
     #endif
 
