@@ -382,6 +382,19 @@ struct ExpandedPlayerSheet: View {
         .sheet(isPresented: $showingErrorSheet) {
             ErrorDetailsSheet(errorMessage: playerState?.errorMessage ?? "Unknown error")
         }
+        .sheet(item: Binding<Video?>(
+            get: { appEnvironment?.navigationCoordinator.descriptionLinkQueueSheetVideo },
+            set: { newValue in
+                if newValue == nil {
+                    appEnvironment?.navigationCoordinator.descriptionLinkQueueSheetVideo = nil
+                }
+            }
+        )) { video in
+            if let appEnvironment {
+                QueueActionSheet(video: video)
+                    .appEnvironment(appEnvironment)
+            }
+        }
         #if os(iOS)
         .toolbar(.hidden, for: .navigationBar)
         .playerStatusBarHidden(isInWideScreenLayout || !isPortraitPanelVisible)

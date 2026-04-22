@@ -109,6 +109,22 @@ struct YatteeApp: App {
                     OpenLinkSheet(prefilledURL: url)
                         .appEnvironment(appEnvironment)
                 }
+                .sheet(item: Binding<Video?>(
+                    get: {
+                        // Only host the sheet here when the player is not expanded.
+                        // When expanded, ExpandedPlayerSheet hosts it so it appears above the player window.
+                        guard !appEnvironment.navigationCoordinator.isPlayerExpanded else { return nil }
+                        return appEnvironment.navigationCoordinator.descriptionLinkQueueSheetVideo
+                    },
+                    set: { newValue in
+                        if newValue == nil {
+                            appEnvironment.navigationCoordinator.descriptionLinkQueueSheetVideo = nil
+                        }
+                    }
+                )) { video in
+                    QueueActionSheet(video: video)
+                        .appEnvironment(appEnvironment)
+                }
                 #if !os(tvOS)
                 .sheet(isPresented: $showingDeepLinkDownloadSheet) {
                     if let video = deepLinkVideo {
@@ -164,6 +180,11 @@ struct YatteeApp: App {
                 .onReceive(NotificationCenter.default.publisher(for: .showOpenLinkSheet)) { _ in
                     appEnvironment.navigationCoordinator.isPlayerExpanded = false
                     showingOpenLinkSheet = true
+                }
+                .onReceive(NotificationCenter.default.publisher(for: .openDescriptionLink)) { notification in
+                    if let url = notification.object as? URL {
+                        handleDescriptionLink(url)
+                    }
                 }
         }
         #if os(macOS)
@@ -361,6 +382,59 @@ struct YatteeApp: App {
 
         // All other destinations use standard navigation
         appEnvironment.navigationCoordinator.navigate(to: destination)
+    }
+
+    /// Handle a link tapped inside a video description.
+    /// Video URLs that would interrupt active playback surface the queue sheet;
+    /// everything else reuses the standard deep-link pipeline.
+    private func handleDescriptionLink(_ url: URL) {
+        let router = URLRouter()
+        guard let destination = router.route(url) else { return }
+
+        if case .video(let source, _) = destination, case .id(let videoID) = source {
+            let queueEnabled = appEnvironment.settingsManager.queueEnabled
+            let somethingPlaying = appEnvironment.playerService.state.currentVideo != nil
+            if queueEnabled && somethingPlaying {
+                Task { await presentQueueSheetFromDeepLink(videoID: videoID) }
+                return
+            }
+        }
+
+        handleDeepLink(url)
+    }
+
+    /// Fetch a video by ID and present the queue action sheet for it.
+    private func presentQueueSheetFromDeepLink(videoID: VideoID) async {
+        guard let instance = appEnvironment.instancesManager.instance(for: videoID.source) else {
+            appEnvironment.toastManager.showError(
+                String(localized: "deepLink.noInstance.title", defaultValue: "Can't open video"),
+                subtitle: String(
+                    localized: "deepLink.noInstance.subtitle",
+                    defaultValue: "No source is configured for this video."
+                )
+            )
+            return
+        }
+
+        let toastID = appEnvironment.toastManager.show(
+            scopes: [.main, .player],
+            category: .loading,
+            title: String(localized: "deepLink.loading.title", defaultValue: "Loading video…"),
+            subtitle: instance.name,
+            autoDismissDelay: 30.0
+        )
+
+        do {
+            let video = try await appEnvironment.contentService.video(
+                id: videoID.videoID,
+                instance: instance
+            )
+            appEnvironment.toastManager.dismiss(id: toastID)
+            appEnvironment.navigationCoordinator.descriptionLinkQueueSheetVideo = video
+        } catch {
+            appEnvironment.toastManager.dismiss(id: toastID)
+            appEnvironment.navigationCoordinator.navigate(to: .video(.id(videoID)))
+        }
     }
 
     /// Handle video deep link based on default link action setting.

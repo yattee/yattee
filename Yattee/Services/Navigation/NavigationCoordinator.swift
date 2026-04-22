@@ -66,6 +66,12 @@ final class NavigationCoordinator {
     /// Whether the mini player queue sheet is showing.
     var isMiniPlayerQueueSheetPresented = false
 
+    /// Video to present in the queue action sheet (e.g. a video link tapped inside
+    /// a description). Set by the deep-link handler; cleared when the sheet dismisses.
+    /// Presented by YatteeApp when the player is collapsed and by ExpandedPlayerSheet
+    /// when the player is expanded, so the sheet always sits above the visible layer.
+    var descriptionLinkQueueSheetVideo: Video?
+
     /// Whether the mini player playlist sheet is showing.
     var isMiniPlayerPlaylistSheetPresented = false
 

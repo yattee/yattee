@@ -88,7 +88,9 @@ enum DescriptionText {
 // MARK: - OpenURL Action for Seeking
 
 extension View {
-    /// Adds a URL handler that intercepts timestamp links and seeks the player.
+    /// Adds a URL handler that intercepts timestamp links (seeks the player) and
+    /// known content URLs — YouTube/PeerTube video/channel/playlist links and external
+    /// video URLs — so they open in-app instead of the browser.
     func handleTimestampLinks(using playerService: PlayerService?) -> some View {
         self.environment(\.openURL, OpenURLAction { url in
             if let seconds = DescriptionText.seekSeconds(from: url) {
@@ -97,6 +99,12 @@ extension View {
                 }
                 return .handled
             }
+
+            if URLRouter().route(url) != nil {
+                NotificationCenter.default.post(name: .openDescriptionLink, object: url)
+                return .handled
+            }
+
             return .systemAction
         })
     }
