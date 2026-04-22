@@ -43,13 +43,14 @@ struct CommentView: View {
                     // Author name and badges
                     authorInfo
 
-                    // Comment content
-                    Text(comment.content)
+                    // Comment content — render with clickable URLs and timestamps
+                    Text(DescriptionText.attributed(comment.content, linkColor: accentColor))
                         .font(.subheadline)
                         .foregroundStyle(.primary)
                         .fixedSize(horizontal: false, vertical: true)
                         #if !os(tvOS)
                         .textSelection(.enabled)
+                        .handleTimestampLinks(using: appEnvironment?.playerService)
                         #endif
 
                     // Metadata row
