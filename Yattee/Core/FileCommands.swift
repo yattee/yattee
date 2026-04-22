@@ -17,14 +17,20 @@ struct FileCommands: Commands {
             }
             .keyboardShortcut("o", modifiers: [.command])
         }
-        #if os(macOS)
-        CommandGroup(replacing: .appSettings) {
-            Button(String(localized: "menu.app.settings")) {
-                NotificationCenter.default.post(name: .showSettings, object: nil)
-            }
-            .keyboardShortcut(",", modifiers: [.command])
+    }
+}
+#endif
+
+#if os(macOS)
+/// App menu Settings… item that opens the dedicated Settings window.
+struct SettingsWindowMenuItem: View {
+    @Environment(\.openWindow) private var openWindow
+
+    var body: some View {
+        Button(String(localized: "menu.app.settings")) {
+            openWindow(id: "settings")
         }
-        #endif
+        .keyboardShortcut(",", modifiers: [.command])
     }
 }
 #endif

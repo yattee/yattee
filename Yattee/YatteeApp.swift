@@ -46,7 +46,9 @@ struct YatteeApp: App {
     // First-launch state
     @State private var showingICloudAlert = false
     @State private var showingICloudProgress = false
+    #if os(iOS)
     @State private var showingSettings = false
+    #endif
     @State private var showingOpenLinkSheet = false
 
     init() {
@@ -164,19 +166,23 @@ struct YatteeApp: App {
                         .appEnvironment(appEnvironment)
                 }
                 #endif
-                #if !os(tvOS)
+                #if os(iOS)
                 .sheet(isPresented: $showingSettings) {
                     SettingsView()
                         .appEnvironment(appEnvironment)
                 }
+                #endif
+                #if !os(tvOS)
                 .sheet(isPresented: $showingOpenLinkSheet) {
                     OpenLinkSheet()
                         .appEnvironment(appEnvironment)
                 }
                 #endif
+                #if os(iOS)
                 .onReceive(NotificationCenter.default.publisher(for: .showSettings)) { _ in
                     showingSettings = true
                 }
+                #endif
                 .onReceive(NotificationCenter.default.publisher(for: .showOpenLinkSheet)) { _ in
                     appEnvironment.navigationCoordinator.isPlayerExpanded = false
                     showingOpenLinkSheet = true
@@ -289,6 +295,20 @@ struct YatteeApp: App {
                     appEnvironment.backgroundRefreshManager.scheduleIOSBackgroundRefresh()
                 }
                 #endif
+            }
+        }
+        #endif
+        #if os(macOS)
+        Window(String(localized: "menu.app.settings"), id: "settings") {
+            SettingsView(showCloseButton: false)
+                .appEnvironment(appEnvironment)
+                .frame(minWidth: 600, idealWidth: 900, maxWidth: .infinity, minHeight: 400, idealHeight: 600, maxHeight: .infinity)
+        }
+        .windowResizability(.contentMinSize)
+        .defaultSize(width: 900, height: 600)
+        .commands {
+            CommandGroup(replacing: .appSettings) {
+                SettingsWindowMenuItem()
             }
         }
         #endif
