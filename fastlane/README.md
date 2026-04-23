@@ -13,6 +13,14 @@ For _fastlane_ installation instructions, see [Installing _fastlane_](https://do
 
 # Available Actions
 
+### latest_build_number
+
+```sh
+[bundle exec] fastlane latest_build_number
+```
+
+Get latest TestFlight build number across all platforms
+
 ### bump_build
 
 ```sh

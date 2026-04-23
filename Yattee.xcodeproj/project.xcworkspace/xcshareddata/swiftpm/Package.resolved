@@ -1,184 +1,22 @@
 {
-  "originHash" : "173de1b718eb898698eaba0221b46be9781899a652725709c8400d3ddfb01980",
+  "originHash" : "50421f80aba6d558399198148743d5d479edb3f6cc10024acd55828f8cf63959",
   "pins" : [
-    {
-      "identity" : "activelabel.swift",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/yattee/ActiveLabel.swift.git",
-      "state" : {
-        "branch" : "feature/timestamp",
-        "revision" : "2a88b80e44f84aa614032466039307c65815b2f3"
-      }
-    },
-    {
-      "identity" : "alamofire",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/Alamofire/Alamofire.git",
-      "state" : {
-        "revision" : "513364f870f6bfc468f9d2ff0a95caccc10044c5",
-        "version" : "5.10.2"
-      }
-    },
-    {
-      "identity" : "cache",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/hyperoslo/Cache.git",
-      "state" : {
-        "revision" : "24e47109e31b2031cb26e25cc1b81b607496066c",
-        "version" : "7.4.0"
-      }
-    },
-    {
-      "identity" : "defaults",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/sindresorhus/Defaults",
-      "state" : {
-        "revision" : "3efef5a28ebdbbe922d4a2049493733ed14475a6",
-        "version" : "7.3.1"
-      }
-    },
-    {
-      "identity" : "keychainaccess",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/kishikawakatsumi/KeychainAccess.git",
-      "state" : {
-        "branch" : "master",
-        "revision" : "e0c7eebc5a4465a3c4680764f26b7a61f567cdaf"
-      }
-    },
-    {
-      "identity" : "libwebp-xcode",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/SDWebImage/libwebp-Xcode.git",
-      "state" : {
-        "revision" : "0d60654eeefd5d7d2bef3835804892c40225e8b2",
-        "version" : "1.5.0"
-      }
-    },
     {
       "identity" : "mpvkit",
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/mpvkit/MPVKit.git",
       "state" : {
-        "branch" : "main",
-        "revision" : "fef0f54bfd7e37e0547e057880b28992540ddbcc"
+        "revision" : "613c0ccc3acf70e136aaff880a9b5fe8fdfaf5b8",
+        "version" : "0.41.0"
       }
     },
     {
-      "identity" : "pincache",
+      "identity" : "nuke",
       "kind" : "remoteSourceControl",
-      "location" : "https://github.com/pinterest/PINCache",
+      "location" : "https://github.com/kean/Nuke",
       "state" : {
-        "revision" : "2fb85948463292c2e824148cf17dc62a4c217a94",
-        "version" : "3.0.4"
-      }
-    },
-    {
-      "identity" : "pinoperation",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/pinterest/PINOperation.git",
-      "state" : {
-        "revision" : "a74f978733bdaf982758bfa23d70a189f4b4c1b6",
-        "version" : "1.2.3"
-      }
-    },
-    {
-      "identity" : "reachability.swift",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/ashleymills/Reachability.swift",
-      "state" : {
-        "revision" : "21d1dc412cfecbe6e34f1f4c4eb88d3f912654a6",
-        "version" : "5.2.4"
-      }
-    },
-    {
-      "identity" : "repeat",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/malcommac/Repeat.git",
-      "state" : {
-        "revision" : "9df757d0936c15dfd9d01067766fab87e927f838",
-        "version" : "0.6.0"
-      }
-    },
-    {
-      "identity" : "sdwebimage",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/SDWebImage/SDWebImage",
-      "state" : {
-        "revision" : "2053b120767c42a70bcba21095f34e4cfb54a75d",
-        "version" : "5.21.3"
-      }
-    },
-    {
-      "identity" : "sdwebimagepinplugin",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/SDWebImage/SDWebImagePINPlugin.git",
-      "state" : {
-        "revision" : "bd73a4fb30352ec311303d811559c9c46df4caa4",
-        "version" : "0.3.0"
-      }
-    },
-    {
-      "identity" : "sdwebimageswiftui",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/SDWebImage/SDWebImageSwiftUI.git",
-      "state" : {
-        "revision" : "53573d6dd017e354c0e7d8f1c86b77ef1383c996",
-        "version" : "2.2.7"
-      }
-    },
-    {
-      "identity" : "sdwebimagewebpcoder",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/SDWebImage/SDWebImageWebPCoder.git",
-      "state" : {
-        "revision" : "12d83edbcc795fb7b5c0c3cb74d739108d3357d2",
-        "version" : "0.15.0"
-      }
-    },
-    {
-      "identity" : "siesta",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/bustoutsolutions/siesta",
-      "state" : {
-        "revision" : "43f34046ebb5beb6802200353c473af303bbc31e",
-        "version" : "1.5.2"
-      }
-    },
-    {
-      "identity" : "swift-log",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/apple/swift-log.git",
-      "state" : {
-        "revision" : "ce592ae52f982c847a4efc0dd881cc9eb32d29f2",
-        "version" : "1.6.4"
-      }
-    },
-    {
-      "identity" : "swiftui-cached-async-image",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/lorenzofiamingo/swiftui-cached-async-image",
-      "state" : {
-        "revision" : "467a3d17479887943ab917a379e62bbaff60ac8a",
-        "version" : "2.1.1"
-      }
-    },
-    {
-      "identity" : "swiftui-introspect",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/siteline/SwiftUI-Introspect.git",
-      "state" : {
-        "revision" : "a08b87f96b41055577721a6e397562b21ad52454",
-        "version" : "26.0.0"
-      }
-    },
-    {
-      "identity" : "swiftyjson",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/SwiftyJSON/SwiftyJSON.git",
-      "state" : {
-        "revision" : "af76cf3ef710b6ca5f8c05f3a31307d44a3c5828",
-        "version" : "5.0.2"
+        "revision" : "83e19143355b02e9261edb2323b3e1e93287ebb9",
+        "version" : "12.9.0"
       }
     }
   ],

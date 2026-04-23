@@ -1,0 +1,15 @@
+#!/bin/bash
+
+DEVICE_NAME="${1:-iPhone 17 Pro}"
+
+echo "Building Yattee for $DEVICE_NAME..."
+
+xcodebuild -project Yattee.xcodeproj -scheme "Yattee" -configuration Debug -destination "platform=iOS,name=$DEVICE_NAME" -derivedDataPath ./build build
+
+if [ $? -eq 0 ]; then
+    echo "Installing to $DEVICE_NAME..."
+    xcrun devicectl device install app --device "$DEVICE_NAME" ./build/Build/Products/Debug-iphoneos/Yattee.app
+else
+    echo "Build failed"
+    exit 1
+fi
