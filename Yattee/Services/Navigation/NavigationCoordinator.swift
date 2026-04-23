@@ -72,6 +72,16 @@ final class NavigationCoordinator {
     /// when the player is expanded, so the sheet always sits above the visible layer.
     var descriptionLinkQueueSheetVideo: Video?
 
+    /// Resolved short-link URL awaiting user confirmation ("Try in Yattee" vs
+    /// "Open in Browser"). Dual-hosted like `descriptionLinkQueueSheetVideo`
+    /// so the dialog is visible whether or not the expanded player is covering
+    /// the main app view.
+    var resolvedShortLinkPrompt: URL?
+
+    /// Candidate URL that isn't confidently a video (loose `.externalVideo`
+    /// match) awaiting user confirmation before yt-dlp extraction. Dual-hosted.
+    var ambiguousExternalLinkPrompt: URL?
+
     /// Whether the mini player playlist sheet is showing.
     var isMiniPlayerPlaylistSheetPresented = false
 

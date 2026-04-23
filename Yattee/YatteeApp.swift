@@ -51,6 +51,9 @@ struct YatteeApp: App {
     #endif
     @State private var showingOpenLinkSheet = false
 
+    // Ambiguous-link prompts are stored on NavigationCoordinator so they can
+    // be dual-hosted by the root app view (here) and the expanded player sheet.
+
     init() {
         // Configure Nuke image loading pipeline
         ImageLoadingService.shared.configure()
@@ -192,6 +195,23 @@ struct YatteeApp: App {
                         handleDescriptionLink(url)
                     }
                 }
+                .onReceive(NotificationCenter.default.publisher(for: .promptResolvedShortLink)) { notification in
+                    if let url = notification.object as? URL {
+                        appEnvironment.navigationCoordinator.resolvedShortLinkPrompt = url
+                    }
+                }
+                .onReceive(NotificationCenter.default.publisher(for: .promptAmbiguousExternalLink)) { notification in
+                    if let url = notification.object as? URL {
+                        appEnvironment.navigationCoordinator.ambiguousExternalLinkPrompt = url
+                    }
+                }
+                // Present confirmation dialogs at root level only when the expanded
+                // player isn't covering it. ExpandedPlayerSheet hosts the same
+                // dialogs when it *is* expanded, so they always sit on top.
+                .resolvedLinkPrompts(
+                    shouldHost: !appEnvironment.navigationCoordinator.isPlayerExpanded,
+                    appEnvironment: appEnvironment
+                )
         }
         #if os(macOS)
         .windowStyle(.hiddenTitleBar)

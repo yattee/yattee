@@ -16,6 +16,7 @@ struct YouTubeEnhancementsSettingsView: View {
                 SponsorBlockSection(settings: settings)
                 ReturnYouTubeDislikeSection(settings: settings)
                 DeArrowSection(settings: settings)
+                ResolveShortLinksSection(settings: settings)
             }
         }
         #if !os(tvOS)
@@ -89,6 +90,21 @@ private struct DeArrowSection: View {
             ) {
                 DeArrowSettingsView()
             }
+        }
+    }
+}
+
+// MARK: - Resolve Short Links Section
+
+private struct ResolveShortLinksSection: View {
+    @Bindable var settings: SettingsManager
+
+    var body: some View {
+        SettingsFormSection(footer: "settings.youtubeEnhancements.resolveShortLinks.footer") {
+            Toggle(
+                String(localized: "settings.resolveShortLinks.title"),
+                isOn: $settings.resolveShortLinksEnabled
+            )
         }
     }
 }

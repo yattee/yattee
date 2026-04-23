@@ -87,4 +87,21 @@ extension SettingsManager {
             set(newValue, for: .deArrowThumbnailAPIURL)
         }
     }
+
+    // MARK: - Short Link Resolution
+
+    /// When enabled, taps on known URL shorteners (bit.ly, tinyurl, t.co, …) in
+    /// descriptions and comments follow the redirect and, if the destination is a
+    /// supported YouTube/PeerTube URL, open it in-app. Off by default because it
+    /// performs a network request to the shortener host on tap.
+    var resolveShortLinksEnabled: Bool {
+        get {
+            if let cached = _resolveShortLinksEnabled { return cached }
+            return bool(for: .resolveShortLinksEnabled, default: false)
+        }
+        set {
+            _resolveShortLinksEnabled = newValue
+            set(newValue, for: .resolveShortLinksEnabled)
+        }
+    }
 }

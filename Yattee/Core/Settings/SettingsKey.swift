@@ -41,6 +41,9 @@ enum SettingsKey: String, CaseIterable {
     case deArrowAPIURL
     case deArrowThumbnailAPIURL
 
+    // Short link resolution
+    case resolveShortLinksEnabled
+
     // Platform-specific
     case macPlayerMode
     case playerSheetAutoResize

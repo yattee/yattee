@@ -140,6 +140,46 @@
     "1.2M subscribers" : {
 
     },
+    "alert.ambiguousLink.title" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Open Link"
+          }
+        }
+      }
+    },
+    "alert.ambiguousLink.message %@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@"
+          }
+        }
+      }
+    },
+    "alert.ambiguousLink.tryInYattee" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Try in Yattee"
+          }
+        }
+      }
+    },
+    "alert.ambiguousLink.openInBrowser" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Open in Browser"
+          }
+        }
+      }
+    },
     "alert.openVideo.message %@" : {
       "localizations" : {
         "en" : {
@@ -156,6 +196,46 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Open Video?"
+          }
+        }
+      }
+    },
+    "alert.resolvedShortLink.title" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Open Link"
+          }
+        }
+      }
+    },
+    "alert.resolvedShortLink.message %@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "This short link expands to:\n%@"
+          }
+        }
+      }
+    },
+    "alert.resolvedShortLink.openInYattee" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Try in Yattee"
+          }
+        }
+      }
+    },
+    "alert.resolvedShortLink.openInBrowser" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Open in Browser"
           }
         }
       }
@@ -14414,6 +14494,26 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Automatically skip sponsors, intros, and other unwanted segments."
+          }
+        }
+      }
+    },
+    "settings.youtubeEnhancements.resolveShortLinks.footer" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "When you tap a bit.ly, tinyurl, t.co, or similar short link in a description or comment, Yattee follows the redirect and opens the destination in-app if it's a supported video, channel, or playlist. Sends a network request to the shortener service."
+          }
+        }
+      }
+    },
+    "settings.resolveShortLinks.title" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Resolve Short Links"
           }
         }
       }

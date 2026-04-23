@@ -12,6 +12,18 @@ struct URLRouter: Sendable {
 
     // MARK: - Main Routing
 
+    /// Route a URL only if we are *confident* the app can handle it natively —
+    /// YouTube/PeerTube video/channel/playlist, direct media (mp4/m3u8/etc),
+    /// or the custom `yattee://` scheme. Unlike `route(_:)` this deliberately
+    /// skips the `.externalVideo` yt-dlp fallback, which matches almost any
+    /// http/https URL and is therefore unsafe to trigger blindly after
+    /// resolving a URL shortener.
+    func routeConfidently(_ url: URL) -> NavigationDestination? {
+        guard let destination = route(url) else { return nil }
+        if case .externalVideo = destination { return nil }
+        return destination
+    }
+
     /// Route a URL to a navigation destination.
     func route(_ url: URL) -> NavigationDestination? {
         // Try custom scheme first

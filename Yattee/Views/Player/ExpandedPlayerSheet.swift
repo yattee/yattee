@@ -395,6 +395,13 @@ struct ExpandedPlayerSheet: View {
                     .appEnvironment(appEnvironment)
             }
         }
+        // Host the resolved/ambiguous link confirmation dialogs while the
+        // expanded player is up so they appear above this sheet rather than
+        // being buried underneath it on the root app view.
+        .resolvedLinkPrompts(
+            shouldHost: (appEnvironment?.navigationCoordinator.isPlayerExpanded == true),
+            appEnvironment: appEnvironment
+        )
         #if os(iOS)
         .toolbar(.hidden, for: .navigationBar)
         .playerStatusBarHidden(isInWideScreenLayout || !isPortraitPanelVisible)

@@ -54,6 +54,9 @@ final class SettingsManager {
     var _deArrowAPIURL: String?
     var _deArrowThumbnailAPIURL: String?
 
+    // Short link resolution
+    var _resolveShortLinksEnabled: Bool?
+
     // User Agent
     var _customUserAgent: String?
     var _randomizeUserAgentPerRequest: Bool?
@@ -419,6 +422,7 @@ final class SettingsManager {
         _deArrowReplaceThumbnails = nil
         _deArrowAPIURL = nil
         _deArrowThumbnailAPIURL = nil
+        _resolveShortLinksEnabled = nil
         _customUserAgent = nil
         _randomizeUserAgentPerRequest = nil
         _feedCacheValidityMinutes = nil
