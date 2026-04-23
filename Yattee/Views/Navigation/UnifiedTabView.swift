@@ -879,8 +879,8 @@ extension UnifiedTabView {
             homePath.append(destination)
         case .search:
             searchPath.append(destination)
-        case .channel(let channelID, _, _):
-            channelPaths[channelID, default: NavigationPath()].append(destination)
+        case .channel:
+            channelPaths[selection.id, default: NavigationPath()].append(destination)
         case .playlist(let id, _):
             playlistPaths[id, default: NavigationPath()].append(destination)
         case .mediaSource(let id, _, _):
@@ -919,10 +919,10 @@ extension UnifiedTabView {
 
     // MARK: - Path Bindings
 
-    func channelPathBinding(for channelID: String) -> Binding<NavigationPath> {
+    func channelPathBinding(for item: SidebarItem) -> Binding<NavigationPath> {
         Binding(
-            get: { channelPaths[channelID] ?? NavigationPath() },
-            set: { channelPaths[channelID] = $0 }
+            get: { channelPaths[item.id] ?? NavigationPath() },
+            set: { channelPaths[item.id] = $0 }
         )
     }
 
@@ -952,10 +952,11 @@ extension UnifiedTabView {
     @ViewBuilder
     func channelContent(for item: SidebarItem) -> some View {
         if case .channel(let channelID, _, let source) = item {
-            NavigationStack(path: channelPathBinding(for: channelID)) {
+            NavigationStack(path: channelPathBinding(for: item)) {
                 ChannelView(channelID: channelID, source: source)
                     .withNavigationDestinations()
             }
+            .id(item.id)
         }
     }
 
@@ -983,6 +984,7 @@ extension UnifiedTabView {
                 UnifiedPlaylistDetailView(source: .local(id))
                     .withNavigationDestinations()
             }
+            .id(item.id)
         }
     }
 
@@ -1007,6 +1009,7 @@ extension UnifiedTabView {
                 MediaBrowserView(source: source, path: "/")
                     .withNavigationDestinations()
             }
+            .id(item.id)
         }
     }
 
@@ -1020,6 +1023,7 @@ extension UnifiedTabView {
                 InstanceBrowseView(instance: instance)
                     .withNavigationDestinations()
             }
+            .id(item.id)
         }
     }
 
