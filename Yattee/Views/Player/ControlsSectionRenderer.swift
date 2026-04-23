@@ -832,11 +832,7 @@ struct ControlsSectionRenderer: View {
     // MARK: - Transport State
 
     private var isTransportDisabled: Bool {
-        let state = actions.playerState
-        return state.playbackState == .loading ||
-               state.playbackState == .buffering ||
-               !state.isFirstFrameReady ||
-               !state.isBufferReady
+        actions.playerState.isTransportDisabled
     }
 
     // MARK: - Playback Speed Menu

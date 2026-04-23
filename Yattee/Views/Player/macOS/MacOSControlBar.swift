@@ -54,10 +54,7 @@ struct MacOSControlBar: View {
 
     /// Whether transport controls should be disabled
     private var isTransportDisabled: Bool {
-        playerState.playbackState == .loading ||
-        playerState.playbackState == .buffering ||
-        !playerState.isFirstFrameReady ||
-        !playerState.isBufferReady
+        playerState.isTransportDisabled
     }
 
     private var playPauseIcon: String {
@@ -167,22 +164,18 @@ struct MacOSControlBar: View {
             .disabled(isTransportDisabled)
 
             // Play/Pause
-            if !isTransportDisabled {
-                Button {
-                    onPlayPause()
-                } label: {
-                    Image(systemName: playPauseIcon)
-                        .font(.system(size: 16, weight: .medium))
-                        .frame(width: 32, height: 32)
-                        .contentShape(Rectangle())
-                        .contentTransition(.symbolEffect(.replace, options: .speed(2)))
-                }
-                .buttonStyle(MacOSControlButtonStyle())
-            } else {
-                // Spacer to maintain layout
-                Color.clear
+            Button {
+                onPlayPause()
+            } label: {
+                Image(systemName: playPauseIcon)
+                    .font(.system(size: 16, weight: .medium))
                     .frame(width: 32, height: 32)
+                    .contentShape(Rectangle())
+                    .contentTransition(.symbolEffect(.replace, options: .speed(2)))
             }
+            .buttonStyle(MacOSControlButtonStyle())
+            .disabled(isTransportDisabled)
+            .opacity(isTransportDisabled ? 0.3 : 1.0)
 
             // Skip forward
             Button {
