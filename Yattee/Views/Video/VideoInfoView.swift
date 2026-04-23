@@ -2136,7 +2136,7 @@ struct VideoInfoView: View {
             return
         }
         let videoID = base.id.videoID
-        
+
         // Skip if already loaded
         guard loadedVideoDetails[videoID] == nil else {
             isLoadingVideoDetails = false
@@ -2206,8 +2206,10 @@ struct VideoInfoView: View {
     /// payloads from Nuke's cache.
     @MainActor
     private func invalidateStaleThumbnails(old: Video, new: Video) {
-        let newURLs = Set(new.thumbnails.map(\.url))
-        for thumb in old.thumbnails where !newURLs.contains(thumb.url) {
+        // Compare by normalized cache key so URLs that only differ in a
+        // rotating signing `token` aren't considered stale and evicted.
+        let newKeys = Set(new.thumbnails.map { ImageLoadingService.cacheKey(for: $0.url) })
+        for thumb in old.thumbnails where !newKeys.contains(ImageLoadingService.cacheKey(for: thumb.url)) {
             ImageLoadingService.shared.removeCachedImage(for: thumb.url)
         }
     }

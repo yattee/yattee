@@ -13,7 +13,23 @@ import Nuke
 final class ImageLoadingService: Sendable {
     static let shared = ImageLoadingService()
 
+    private let pipelineDelegate = TokenStrippingPipelineDelegate()
+
     private init() {}
+
+    /// Returns a cache-stable key for an image URL by stripping query params
+    /// that rotate per-request (e.g. Yattee-server signed `token`). Images
+    /// whose path matches but token differs share a cache entry.
+    nonisolated static func cacheKey(for url: URL) -> String {
+        guard var components = URLComponents(url: url, resolvingAgainstBaseURL: false) else {
+            return url.absoluteString
+        }
+        if let items = components.queryItems {
+            let filtered = items.filter { $0.name != "token" }
+            components.queryItems = filtered.isEmpty ? nil : filtered
+        }
+        return components.url?.absoluteString ?? url.absoluteString
+    }
 
     /// Configure the shared ImagePipeline with app-specific settings.
     /// Call this once at app launch.
@@ -53,8 +69,10 @@ final class ImageLoadingService: Sendable {
         // Use default URLSession-based data loader
         config.dataLoader = DataLoader(configuration: .default)
 
-        // Set as shared pipeline
-        ImagePipeline.shared = ImagePipeline(configuration: config)
+        // Set as shared pipeline with a delegate that normalizes cache keys
+        // so signed thumbnail URLs whose only difference is a rotating `token`
+        // query param share a single cache entry.
+        ImagePipeline.shared = ImagePipeline(configuration: config, delegate: pipelineDelegate)
 
         LoggingService.shared.info(
             "Image pipeline configured",
@@ -97,5 +115,14 @@ final class ImageLoadingService: Sendable {
     func formattedDiskCacheSize() -> String {
         let size = diskCacheSize()
         return ByteCountFormatter.string(fromByteCount: Int64(size), countStyle: .file)
+    }
+}
+
+/// Pipeline delegate that normalizes Nuke's cache key by stripping per-request
+/// query params (`token`). Prevents churn when Yattee-server re-signs URLs.
+private final class TokenStrippingPipelineDelegate: ImagePipelineDelegate {
+    func cacheKey(for request: ImageRequest, pipeline _: ImagePipeline) -> String? {
+        guard let url = request.url else { return nil }
+        return ImageLoadingService.cacheKey(for: url)
     }
 }
