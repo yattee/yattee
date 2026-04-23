@@ -161,14 +161,14 @@ struct SettingsView: View {
                         Label(String(localized: "settings.privacy.title"), systemImage: "hand.raised")
                     }
 
-                    NavigationLink { TVSidebarDetailContainer(systemImage: "gearshape.2", title: String(localized: "settings.advanced.title")) { AdvancedSettingsView() } } label: {
-                        Label(String(localized: "settings.advanced.title"), systemImage: "gearshape.2")
-                    }
-
                     if appEnvironment.instancesManager.enabledInstances.contains(where: \.isYouTubeInstance) {
                         NavigationLink { TVSidebarDetailContainer(systemImage: "puzzlepiece.extension", title: String(localized: "settings.youtubeEnhancements.title")) { YouTubeEnhancementsSettingsView() } } label: {
                             Label(String(localized: "settings.youtubeEnhancements.title"), systemImage: "puzzlepiece.extension")
                         }
+                    }
+
+                    NavigationLink { TVSidebarDetailContainer(systemImage: "gearshape.2", title: String(localized: "settings.advanced.title")) { AdvancedSettingsView() } } label: {
+                        Label(String(localized: "settings.advanced.title"), systemImage: "gearshape.2")
                     }
 
                     NavigationLink { TVSidebarDetailContainer(systemImage: "info.circle", title: String(localized: "settings.about.title")) { AboutView() } } label: {
@@ -290,20 +290,18 @@ struct SettingsView: View {
                             Label(String(localized: "settings.privacy.title"), systemImage: "hand.raised")
                         }
 
-                        NavigationLink {
-                            AdvancedSettingsView()
-                        } label: {
-                            Label(String(localized: "settings.advanced.title"), systemImage: "gearshape.2")
-                        }
-                    }
-
-                    if appEnvironment.instancesManager.enabledInstances.contains(where: \.isYouTubeInstance) {
-                        Section {
+                        if appEnvironment.instancesManager.enabledInstances.contains(where: \.isYouTubeInstance) {
                             NavigationLink {
                                 YouTubeEnhancementsSettingsView()
                             } label: {
                                 Label(String(localized: "settings.youtubeEnhancements.title"), systemImage: "puzzlepiece.extension")
                             }
+                        }
+
+                        NavigationLink {
+                            AdvancedSettingsView()
+                        } label: {
+                            Label(String(localized: "settings.advanced.title"), systemImage: "gearshape.2")
                         }
                     }
 
