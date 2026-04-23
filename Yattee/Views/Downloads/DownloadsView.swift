@@ -347,6 +347,10 @@ private struct CompletedDownloadsSectionContentView: View {
     let listStyle: VideoListStyle
     let isGroupedMode: Bool
 
+    private var accentColor: Color {
+        appEnvironment?.settingsManager.accentColor.color ?? .accentColor
+    }
+
     private var completedFiltered: [Download] {
         guard !searchText.isEmpty else { return manager.completedDownloads }
         let query = searchText.lowercased()
@@ -502,7 +506,7 @@ private struct CompletedDownloadsSectionContentView: View {
                 Image(systemName: "chevron.right")
                     .font(.caption)
             }
-            .foregroundStyle(Color.accentColor)
+            .foregroundStyle(accentColor)
         }
         .zoomTransitionSource(id: channelID)
         .buttonStyle(.plain)

@@ -8,10 +8,15 @@
 import SwiftUI
 
 struct HomeShortcutCardView<StatusIndicator: View>: View {
+    @Environment(\.appEnvironment) private var appEnvironment
     @Environment(\.dynamicTypeSize) private var dynamicTypeSize
     #if os(tvOS)
     @Environment(\.isFocused) private var isFocused
     #endif
+
+    private var accentColor: Color {
+        appEnvironment?.settingsManager.accentColor.color ?? .accentColor
+    }
 
     let icon: String
     let title: String
@@ -76,7 +81,7 @@ struct HomeShortcutCardView<StatusIndicator: View>: View {
                 VStack(alignment: .leading, spacing: 8) {
                     Image(systemName: icon)
                         .font(.title3)
-                        .foregroundStyle(.tint)
+                        .foregroundStyle(accentColor)
                         .frame(width: iconSize)
 
                     VStack(alignment: .leading, spacing: 2) {
@@ -102,7 +107,7 @@ struct HomeShortcutCardView<StatusIndicator: View>: View {
                 HStack(alignment: .center, spacing: 8) {
                     Image(systemName: icon)
                         .font(.title3)
-                        .foregroundStyle(.tint)
+                        .foregroundStyle(accentColor)
                         .frame(width: iconSize)
 
                     VStack(alignment: .leading, spacing: 2) {
@@ -136,7 +141,7 @@ struct HomeShortcutCardView<StatusIndicator: View>: View {
         .background(cardBackground)
         .overlay(
             RoundedRectangle(cornerRadius: cornerRadius)
-                .strokeBorder(Color.accentColor.opacity(0.3), lineWidth: 1)
+                .strokeBorder(accentColor.opacity(0.3), lineWidth: 1)
         )
         .clipShape(RoundedRectangle(cornerRadius: cornerRadius))
     }
@@ -159,7 +164,7 @@ struct HomeShortcutCardView<StatusIndicator: View>: View {
         #if os(tvOS)
         isFocused ? Color.white.opacity(0.2) : Color.gray.opacity(0.3)
         #else
-        Color.accentColor.opacity(0.1)
+        accentColor.opacity(0.1)
         #endif
     }
 }

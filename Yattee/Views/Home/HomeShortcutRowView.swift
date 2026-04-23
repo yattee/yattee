@@ -8,10 +8,16 @@
 import SwiftUI
 
 struct HomeShortcutRowView<StatusIndicator: View>: View {
+    @Environment(\.appEnvironment) private var appEnvironment
+
     let icon: String
     let title: String
     let subtitle: String
     var statusIndicator: StatusIndicator?
+
+    private var accentColor: Color {
+        appEnvironment?.settingsManager.accentColor.color ?? .accentColor
+    }
 
     init(
         icon: String,
@@ -29,7 +35,7 @@ struct HomeShortcutRowView<StatusIndicator: View>: View {
         HStack(spacing: 12) {
             Image(systemName: icon)
                 .font(.title3)
-                .foregroundStyle(.tint)
+                .foregroundStyle(accentColor)
                 .frame(width: 28)
 
             VStack(alignment: .leading, spacing: 2) {

@@ -33,6 +33,10 @@ struct HomeView: View {
     private var dataManager: DataManager? { appEnvironment?.dataManager }
     private var settingsManager: SettingsManager? { appEnvironment?.settingsManager }
 
+    private var accentColor: Color {
+        appEnvironment?.settingsManager.accentColor.color ?? .accentColor
+    }
+
     #if !os(tvOS)
     private var downloadManager: DownloadManager? { appEnvironment?.downloadManager }
     #endif
@@ -273,7 +277,7 @@ struct HomeView: View {
             #if os(tvOS)
             Text(title)
                 .fontWeight(.semibold)
-                .foregroundStyle(Color.accentColor)
+                .foregroundStyle(accentColor)
             #else
             Button(action: action) {
                 HStack(spacing: 4) {
@@ -282,7 +286,7 @@ struct HomeView: View {
                     Image(systemName: "chevron.right")
                         .font(.caption)
                 }
-                .foregroundStyle(Color.accentColor)
+                .foregroundStyle(accentColor)
             }
             .buttonStyle(.plain)
             #endif
@@ -1291,7 +1295,7 @@ struct HomeView: View {
                     #if os(tvOS)
                     Text(verbatim: "\(contentType.localizedTitle) - \(instance.displayName)")
                         .fontWeight(.semibold)
-                        .foregroundStyle(Color.accentColor)
+                        .foregroundStyle(accentColor)
                     #else
                     Button {
                         appEnvironment?.navigationCoordinator.navigate(
@@ -1304,7 +1308,7 @@ struct HomeView: View {
                             Image(systemName: "chevron.right")
                                 .font(.caption)
                         }
-                        .foregroundStyle(Color.accentColor)
+                        .foregroundStyle(accentColor)
                     }
                     .buttonStyle(.plain)
                     #endif

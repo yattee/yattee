@@ -1129,7 +1129,7 @@ struct SubscriptionsView: View {
                     Image(systemName: "chevron.right")
                         .font(.caption)
                 }
-                .foregroundStyle(Color.accentColor)
+                .foregroundStyle(accentColor)
             }
             .buttonStyle(.plain)
         } else {
@@ -1140,7 +1140,7 @@ struct SubscriptionsView: View {
                     Image(systemName: "chevron.right")
                         .font(.caption)
                 }
-                .foregroundStyle(Color.accentColor)
+                .foregroundStyle(accentColor)
             }
             .buttonStyle(.plain)
         }
