@@ -284,6 +284,11 @@ struct ChannelView: View {
             isPlayerExpanded: appEnvironment?.navigationCoordinator.isPlayerExpanded ?? false
         ))
         .toolbar {
+            #if os(macOS)
+            ToolbarItem(placement: .principal) {
+                collapsedToolbarTitle(name: channel.name, thumbnailURL: channel.thumbnailURL)
+            }
+            #else
             ToolbarItem(placement: .principal) {
                 // Collapsed title in toolbar
                 HStack(spacing: 8) {
@@ -308,6 +313,7 @@ struct ChannelView: View {
                 }
                 .opacity(collapsedTitleOpacity)
             }
+            #endif
 
             ToolbarItem(placement: .primaryAction) {
                 Button {
@@ -437,6 +443,11 @@ struct ChannelView: View {
         .background(viewBackgroundColor)
         .ignoresSafeArea(edges: .top)
         .toolbar {
+            #if os(macOS)
+            ToolbarItem(placement: .principal) {
+                collapsedToolbarTitle(name: cached.name, thumbnailURL: cached.thumbnailURL)
+            }
+            #else
             ToolbarItem(placement: .principal) {
                 // Collapsed title in toolbar (using cached data)
                 HStack(spacing: 8) {
@@ -461,6 +472,7 @@ struct ChannelView: View {
                 }
                 .opacity(collapsedTitleOpacity)
             }
+            #endif
 
             ToolbarItem(placement: .primaryAction) {
                 Button {
@@ -806,6 +818,30 @@ struct ChannelView: View {
 
     // MARK: - Header
 
+    #if os(macOS)
+    private func collapsedToolbarTitle(name: String, thumbnailURL: URL?) -> some View {
+        HStack(spacing: 8) {
+            LazyImage(url: thumbnailURL) { state in
+                if let image = state.image {
+                    image
+                        .resizable()
+                        .aspectRatio(contentMode: .fill)
+                } else {
+                    Circle()
+                        .fill(.quaternary)
+                }
+            }
+            .frame(width: 28, height: 28)
+            .clipShape(Circle())
+
+            Text(name)
+                .font(.headline)
+                .lineLimit(1)
+        }
+        .padding(.horizontal, 10)
+    }
+    #endif
+
     private func header(_ channel: Channel) -> some View {
         header(name: channel.name, thumbnailURL: channel.thumbnailURL, bannerURL: channel.bannerURL)
     }
@@ -814,11 +850,17 @@ struct ChannelView: View {
         GeometryReader { geometry in
             // Calculate avatar vertical position
             let avatarBottomPadding: CGFloat = 20
+            #if os(macOS)
+            let headerAvatarSize = avatarSize
+            let nameSpace: CGFloat = 0
+            #else
             // Smoothly interpolate the space for channel name (40pt when visible, 0 when collapsed)
             // Name starts fading at progress 0, fully gone at 0.3
             let nameSpaceProgress = min(collapseProgress / 0.3, 1.0)
             let nameSpace: CGFloat = 40 * (1 - nameSpaceProgress)
-            let avatarContentHeight: CGFloat = currentAvatarSize + nameSpace + avatarBottomPadding
+            let headerAvatarSize = currentAvatarSize
+            #endif
+            let avatarContentHeight: CGFloat = headerAvatarSize + nameSpace + avatarBottomPadding
             let idealAvatarY = headerHeight - avatarContentHeight
             // Minimum Y position to prevent going into nav bar
             // On iOS 18+ iPhone, the search bar is present in the navigation area (~56pt + padding)
@@ -860,10 +902,14 @@ struct ChannelView: View {
                 .offset(y: pinOffset)
 
                 // Avatar and channel name - pinned to bottom of banner
+                #if os(macOS)
+                let avatarOpacity: CGFloat = 1
+                #else
                 // Smooth opacity fade based on collapse progress
                 let avatarOpacity = max(0, 1.0 - collapseProgress * 1.4)
                 // Channel name fades out faster than avatar (starts fading at 0, gone by 0.3)
                 let nameOpacity = max(0, 1.0 - collapseProgress * 3.3)
+                #endif
 
                 VStack(spacing: 8) {
                     LazyImage(url: thumbnailURL) { state in
@@ -876,12 +922,12 @@ struct ChannelView: View {
                                 .fill(.ultraThinMaterial)
                                 .overlay {
                                     Text(String(name.prefix(1)))
-                                        .font(.system(size: currentAvatarSize * 0.4, weight: .semibold))
+                                        .font(.system(size: headerAvatarSize * 0.4, weight: .semibold))
                                         .foregroundStyle(.secondary)
                                 }
                         }
                     }
-                    .frame(width: currentAvatarSize, height: currentAvatarSize)
+                    .frame(width: headerAvatarSize, height: headerAvatarSize)
                     .clipShape(Circle())
                     .overlay(
                         Circle()
@@ -889,6 +935,7 @@ struct ChannelView: View {
                     )
                     .shadow(color: .black.opacity(0.4), radius: 10, y: 5)
 
+                    #if !os(macOS)
                     // Channel name with smooth fade
                     Text(name)
                         .font(.title2)
@@ -896,6 +943,7 @@ struct ChannelView: View {
                         .foregroundStyle(.white)
                         .shadow(color: .black.opacity(0.6), radius: 4, y: 2)
                         .opacity(nameOpacity)
+                    #endif
                 }
                 .offset(y: clampedAvatarY + pinOffset)
                 .opacity(avatarOpacity)
@@ -2382,6 +2430,9 @@ private struct ChannelScrollOffsetModifier: ViewModifier {
     var isPlayerExpanded: Bool
 
     func body(content: Content) -> some View {
+        #if os(macOS)
+        content
+        #else
         content
             .onScrollGeometryChange(for: CGFloat.self) { geometry in
                 geometry.contentOffset.y
@@ -2393,6 +2444,7 @@ private struct ChannelScrollOffsetModifier: ViewModifier {
                     scrollOffset = newValue
                 }
             }
+        #endif
     }
 }
 
