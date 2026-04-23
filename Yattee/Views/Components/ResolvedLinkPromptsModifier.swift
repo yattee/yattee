@@ -96,9 +96,9 @@ struct ResolvedLinkPromptsModifier: ViewModifier {
 
     @MainActor
     private func openInSystemBrowser(_ url: URL) {
-        #if canImport(UIKit) && !os(watchOS)
+        #if os(iOS)
         UIApplication.shared.open(url)
-        #elseif canImport(AppKit)
+        #elseif os(macOS)
         NSWorkspace.shared.open(url)
         #endif
     }

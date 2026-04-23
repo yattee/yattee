@@ -166,8 +166,8 @@ struct SettingsView: View {
                     }
 
                     if appEnvironment.instancesManager.enabledInstances.contains(where: \.isYouTubeInstance) {
-                        NavigationLink { TVSidebarDetailContainer(systemImage: "play.rectangle", title: String(localized: "settings.youtubeEnhancements.title")) { YouTubeEnhancementsSettingsView() } } label: {
-                            Label(String(localized: "settings.youtubeEnhancements.title"), systemImage: "play.rectangle")
+                        NavigationLink { TVSidebarDetailContainer(systemImage: "puzzlepiece.extension", title: String(localized: "settings.youtubeEnhancements.title")) { YouTubeEnhancementsSettingsView() } } label: {
+                            Label(String(localized: "settings.youtubeEnhancements.title"), systemImage: "puzzlepiece.extension")
                         }
                     }
 
@@ -302,7 +302,7 @@ struct SettingsView: View {
                             NavigationLink {
                                 YouTubeEnhancementsSettingsView()
                             } label: {
-                                Label(String(localized: "settings.youtubeEnhancements.title"), systemImage: "play.rectangle")
+                                Label(String(localized: "settings.youtubeEnhancements.title"), systemImage: "puzzlepiece.extension")
                             }
                         }
                     }
@@ -402,7 +402,7 @@ enum SettingsSection: String, CaseIterable, Identifiable {
         case .notifications: return "bell.badge"
         case .downloads: return "arrow.down.circle"
         case .privacy: return "hand.raised"
-        case .youtubeEnhancements: return "play.rectangle"
+        case .youtubeEnhancements: return "puzzlepiece.extension"
         case .advanced: return "gearshape.2"
         case .about: return "info.circle"
         }

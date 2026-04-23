@@ -98,11 +98,13 @@ enum DescriptionText {
 /// fails or the destination isn't a URL the app can handle.
 @MainActor
 private func openInSystemBrowser(_ url: URL) {
-    #if canImport(UIKit) && !os(watchOS)
+    #if os(iOS)
     UIApplication.shared.open(url)
-    #elseif canImport(AppKit)
+    #elseif os(macOS)
     NSWorkspace.shared.open(url)
     #endif
+    // tvOS has no system browser and no way to tap description links in the
+    // first place — this path is unreachable there.
 }
 
 extension View {
