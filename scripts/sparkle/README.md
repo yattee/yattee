@@ -1,6 +1,6 @@
 # Sparkle appcast pipeline
 
-This directory contains the scripts and templates that sign Sparkle updates and maintain `appcast.xml` on the `gh-pages` branch. The feed is served at https://yattee.github.io/yattee/appcast.xml and consumed by Sparkle inside the Developer ID build of Yattee (see `Yattee/Services/Updates/SparkleUpdater.swift`).
+This directory contains the scripts and templates that sign Sparkle updates and maintain `appcast.xml` on the `gh-pages` branch. The feed is served at https://dl.yattee.stream/appcast.xml and consumed by Sparkle inside the Developer ID build of Yattee (see `Yattee/Services/Updates/SparkleUpdater.swift`).
 
 ## One-time setup
 
@@ -61,5 +61,5 @@ The `release_channel` workflow input (`beta` | `stable`, default `beta`) control
 
 ```bash
 # After a release:
-curl -sSL https://yattee.github.io/yattee/appcast.xml | xmllint --noout -
+curl -sSL https://dl.yattee.stream/appcast.xml | xmllint --noout -
 ```
