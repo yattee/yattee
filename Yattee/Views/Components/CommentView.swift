@@ -45,7 +45,11 @@ struct CommentView: View {
 
                     // Comment content — render with clickable URLs and timestamps
                     Text(DescriptionText.attributed(comment.content, linkColor: accentColor))
+                        #if os(macOS)
+                        .font(.body)
+                        #else
                         .font(.subheadline)
+                        #endif
                         .foregroundStyle(.primary)
                         .fixedSize(horizontal: false, vertical: true)
                         #if !os(tvOS)
@@ -106,7 +110,11 @@ struct CommentView: View {
     private var authorInfo: some View {
         HStack(spacing: 4) {
             Text(comment.author.name)
+                #if os(macOS)
+                .font(.subheadline)
+                #else
                 .font(.caption)
+                #endif
                 .fontWeight(.semibold)
                 .foregroundStyle(comment.isCreatorComment ? accentColor : .primary)
 
@@ -138,7 +146,11 @@ struct CommentView: View {
             // Published time
             if let publishedText = comment.formattedPublishedDate {
                 Text(publishedText)
+                    #if os(macOS)
+                    .font(.subheadline)
+                    #else
                     .font(.caption)
+                    #endif
                     .foregroundStyle(.secondary)
             }
 
@@ -146,9 +158,17 @@ struct CommentView: View {
             if let likeCount = comment.formattedLikeCount {
                 HStack(spacing: 2) {
                     Image(systemName: "hand.thumbsup")
-                        .font(.caption2)
-                    Text(likeCount)
+                        #if os(macOS)
                         .font(.caption)
+                        #else
+                        .font(.caption2)
+                        #endif
+                    Text(likeCount)
+                        #if os(macOS)
+                        .font(.subheadline)
+                        #else
+                        .font(.caption)
+                        #endif
                 }
                 .foregroundStyle(.secondary)
             }
@@ -185,7 +205,11 @@ struct CommentView: View {
                         .font(.caption2)
                         .rotationEffect(.degrees(showReplies ? -180 : 0))
                     Text(String(localized: "comments.showReplies \(comment.replyCount)"))
+                        #if os(macOS)
+                        .font(.subheadline)
+                        #else
                         .font(.caption)
+                        #endif
                         .fontWeight(.medium)
                 }
                 #if !os(tvOS)
@@ -223,7 +247,11 @@ struct CommentView: View {
                             Task { await loadReplies() }
                         } label: {
                             Text(String(localized: "comments.loadMoreReplies"))
+                                #if os(macOS)
+                                .font(.subheadline)
+                                #else
                                 .font(.caption)
+                                #endif
                                 .fontWeight(.medium)
                                 #if !os(tvOS)
                                 .foregroundStyle(accentColor)

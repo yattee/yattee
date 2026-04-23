@@ -1086,6 +1086,12 @@ struct VideoInfoView: View {
         action: @escaping () -> Void
     ) -> some View {
         Button(action: action) {
+            #if os(macOS)
+            Label(label, systemImage: icon)
+                .font(.body)
+                .frame(maxWidth: .infinity)
+                .padding(.vertical, 4)
+            #else
             VStack(spacing: 6) {
                 Image(systemName: icon)
                     .font(.system(size: 18))
@@ -1093,8 +1099,13 @@ struct VideoInfoView: View {
                     .font(.caption)
             }
             .frame(maxWidth: .infinity, minHeight: 50)
+            #endif
         }
+        #if os(macOS)
+        .buttonStyle(.bordered)
+        #else
         .buttonStyle(.borderedProminent)
+        #endif
     }
 
     private var actionButtons: some View {
@@ -1108,6 +1119,9 @@ struct VideoInfoView: View {
                     label: String(localized: "video.context.play"),
                     action: playVideo
                 )
+                #if os(macOS)
+                .tint(.accentColor)
+                #endif
 
                 // Download button
                 verticalDownloadActionButton
@@ -1115,6 +1129,12 @@ struct VideoInfoView: View {
                 // Share button
                 if let video = displayedVideo {
                     ShareLink(item: video.shareURL) {
+                        #if os(macOS)
+                        Label(String(localized: "video.share"), systemImage: "square.and.arrow.up")
+                            .font(.body)
+                            .frame(maxWidth: .infinity)
+                            .padding(.vertical, 4)
+                        #else
                         VStack(spacing: 6) {
                             Image(systemName: "square.and.arrow.up")
                                 .font(.system(size: 18))
@@ -1122,8 +1142,13 @@ struct VideoInfoView: View {
                                 .font(.caption)
                         }
                         .frame(maxWidth: .infinity, minHeight: 50)
+                        #endif
                     }
+                    #if os(macOS)
+                    .buttonStyle(.bordered)
+                    #else
                     .buttonStyle(.borderedProminent)
+                    #endif
                 }
             }
             .fixedSize(horizontal: false, vertical: true)
@@ -1153,7 +1178,9 @@ struct VideoInfoView: View {
                 .buttonStyle(.bordered)
             }
         }
+        #if !os(macOS)
         .fontWeight(.semibold)
+        #endif
         .frame(maxWidth: 400)
         .frame(maxWidth: .infinity)
         .padding(.horizontal)
@@ -1172,6 +1199,12 @@ struct VideoInfoView: View {
             Button(role: .destructive) {
                 showingRemoveDownloadConfirmation = true
             } label: {
+                #if os(macOS)
+                Label(String(localized: "video.downloaded"), systemImage: "checkmark.circle.fill")
+                    .font(.body)
+                    .frame(maxWidth: .infinity)
+                    .padding(.vertical, 4)
+                #else
                 VStack(spacing: 6) {
                     Image(systemName: "checkmark.circle.fill")
                         .font(.system(size: 18))
@@ -1179,13 +1212,39 @@ struct VideoInfoView: View {
                         .font(.caption)
                 }
                 .frame(maxWidth: .infinity, minHeight: 50)
+                #endif
             }
+            #if os(macOS)
+            .buttonStyle(.bordered)
+            #else
             .buttonStyle(.borderedProminent)
+            #endif
         } else if isDownloading || isEnqueuingDownload {
             // Downloading/enqueueing state - shows progress
             Button {
                 // No action while downloading
             } label: {
+                #if os(macOS)
+                HStack(spacing: 6) {
+                    ProgressView()
+                        .controlSize(.small)
+                    if isEnqueuingDownload {
+                        Text(String(localized: "video.downloading"))
+                            .allowsTightening(true)
+                    } else if let video = displayedVideo,
+                              let progress = downloadManager?.downloadProgressByVideo[video.id],
+                              !progress.isIndeterminate {
+                        Text("\(Int(progress.progress * 100))%")
+                            .monospacedDigit()
+                    } else {
+                        Text(String(localized: "video.downloading"))
+                            .allowsTightening(true)
+                    }
+                }
+                .font(.body)
+                .frame(maxWidth: .infinity)
+                .padding(.vertical, 4)
+                #else
                 VStack(spacing: 6) {
                     ProgressView()
                         .controlSize(.regular)
@@ -1206,14 +1265,25 @@ struct VideoInfoView: View {
                     }
                 }
                 .frame(maxWidth: .infinity, minHeight: 50)
+                #endif
             }
+            #if os(macOS)
+            .buttonStyle(.bordered)
+            #else
             .buttonStyle(.borderedProminent)
+            #endif
             .disabled(true)
         } else if let video = displayedVideo {
             // Default state - download button
             Button {
                 startDownload(for: video)
             } label: {
+                #if os(macOS)
+                Label(String(localized: "video.download"), systemImage: "arrow.down.circle")
+                    .font(.body)
+                    .frame(maxWidth: .infinity)
+                    .padding(.vertical, 4)
+                #else
                 VStack(spacing: 6) {
                     Image(systemName: "arrow.down.circle")
                         .font(.system(size: 18))
@@ -1221,8 +1291,13 @@ struct VideoInfoView: View {
                         .font(.caption)
                 }
                 .frame(maxWidth: .infinity, minHeight: 50)
+                #endif
             }
+            #if os(macOS)
+            .buttonStyle(.bordered)
+            #else
             .buttonStyle(.borderedProminent)
+            #endif
         }
     }
 
@@ -1618,11 +1693,19 @@ struct VideoInfoView: View {
     private func infoRow(label: String, value: String) -> some View {
         VStack(alignment: .leading, spacing: 2) {
             Text(label)
+                #if os(macOS)
+                .font(.subheadline)
+                #else
                 .font(.caption)
+                #endif
                 .foregroundStyle(.secondary)
 
             Text(value)
+                #if os(macOS)
+                .font(.body)
+                #else
                 .font(.subheadline)
+                #endif
                 .fontWeight(.medium)
         }
         .frame(maxWidth: .infinity, alignment: .leading)
@@ -1643,7 +1726,11 @@ struct VideoInfoView: View {
             } else if let description = displayedVideo?.description, !description.isEmpty {
                 // Description available
                 Text(DescriptionText.attributed(description, linkColor: accentColor))
+                    #if os(macOS)
+                    .font(.body)
+                    #else
                     .font(.subheadline)
+                    #endif
                     .foregroundStyle(.secondary)
                     .tint(accentColor)
                     .handleTimestampLinks(using: playerService)
@@ -1660,7 +1747,11 @@ struct VideoInfoView: View {
         CollapsibleSection(title: String(localized: "video.originalTitle"), isExpanded: $isOriginalTitleExpanded) {
             if let title = displayedVideo?.title {
                 Text(title)
+                    #if os(macOS)
+                    .font(.body)
+                    #else
                     .font(.subheadline)
+                    #endif
                     .foregroundStyle(.secondary)
                     #if !os(tvOS)
                     .textSelection(.enabled)
@@ -1727,7 +1818,11 @@ struct VideoInfoView: View {
                                 .font(.title2)
                                 .foregroundStyle(.secondary)
                             Text(String(localized: "videoInfo.comments.disabled"))
+                                #if os(macOS)
+                                .font(.body)
+                                #else
                                 .font(.subheadline)
+                                #endif
                                 .foregroundStyle(.secondary)
                         }
                         Spacer()
@@ -1742,7 +1837,11 @@ struct VideoInfoView: View {
                                 .font(.title2)
                                 .foregroundStyle(.secondary)
                             Text(String(localized: "videoInfo.comments.error"))
+                                #if os(macOS)
+                                .font(.body)
+                                #else
                                 .font(.subheadline)
+                                #endif
                                 .foregroundStyle(.secondary)
                         }
                         Spacer()
@@ -1754,7 +1853,11 @@ struct VideoInfoView: View {
                         HStack {
                             Spacer()
                             Text(String(localized: "videoInfo.comments.empty"))
+                                #if os(macOS)
+                                .font(.body)
+                                #else
                                 .font(.subheadline)
+                                #endif
                                 .foregroundStyle(.secondary)
                             Spacer()
                         }
@@ -1782,7 +1885,11 @@ struct VideoInfoView: View {
                                             .fontWeight(.medium)
                                         Image(systemName: "chevron.right")
                                     }
+                                    #if os(macOS)
+                                    .font(.body)
+                                    #else
                                     .font(.subheadline)
+                                    #endif
                                     #if !os(tvOS)
                                     .foregroundStyle(accentColor)
                                     #endif
