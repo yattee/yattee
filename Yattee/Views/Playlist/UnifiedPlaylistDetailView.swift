@@ -100,6 +100,14 @@ struct UnifiedPlaylistDetailView: View {
         return false
     }
 
+    private var navigationTitleText: String {
+        title.isEmpty ? cachedHeader?.title ?? String(localized: "playlist.title") : title
+    }
+
+    private var navigationThumbnailURL: URL? {
+        videos.first?.bestThumbnail?.url ?? thumbnailURL ?? cachedHeader?.thumbnailURL
+    }
+
     /// Summary text for the playlist (e.g., "5 videos · 1h 23m").
     private var playlistSummaryText: String? {
         var parts: [String] = []
@@ -144,9 +152,16 @@ struct UnifiedPlaylistDetailView: View {
             }
         }
         #if !os(tvOS)
-        .navigationTitle(title.isEmpty ? String(localized: "playlist.title") : title)
+        .navigationTitle(navigationTitleText)
         .toolbarTitleDisplayMode(.inlineLarge)
         .navigationSubtitleIfAvailable(playlistSummaryText)
+        #endif
+        #if os(macOS)
+        .toolbar {
+            ToolbarItem(placement: .principal) {
+                macOSNavigationTitle
+            }
+        }
         #endif
         .sheet(isPresented: $showingEditSheet) {
             if let localPlaylist {
@@ -186,6 +201,35 @@ struct UnifiedPlaylistDetailView: View {
     }
 
     // MARK: - Content
+
+    #if os(macOS)
+    private var macOSNavigationTitle: some View {
+        HStack(spacing: 8) {
+            LazyImage(url: navigationThumbnailURL) { state in
+                if let image = state.image {
+                    image
+                        .resizable()
+                        .aspectRatio(contentMode: .fill)
+                } else {
+                    RoundedRectangle(cornerRadius: 3)
+                        .fill(.quaternary)
+                        .overlay {
+                            Image(systemName: "list.bullet.rectangle")
+                                .font(.caption2)
+                                .foregroundStyle(.secondary)
+                        }
+                }
+            }
+            .frame(width: 26, height: 15)
+            .clipShape(RoundedRectangle(cornerRadius: 3))
+
+            Text(navigationTitleText)
+                .font(.headline)
+                .lineLimit(1)
+        }
+        .padding(.horizontal, 10)
+    }
+    #endif
 
     @ViewBuilder
     private var playlistContent: some View {
