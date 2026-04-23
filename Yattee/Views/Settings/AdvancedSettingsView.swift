@@ -27,6 +27,9 @@ struct AdvancedSettingsView: View {
 
     var body: some View {
         SettingsFormContainer {
+            #if SPARKLE && os(macOS)
+            updatesSection
+            #endif
             streamDetailsSection
             mpvSection
             settingsSection
@@ -349,6 +352,26 @@ struct AdvancedSettingsView: View {
     }
 
 
+
+    #if SPARKLE && os(macOS)
+    @ViewBuilder
+    private var updatesSection: some View {
+        SettingsFormSection("settings.updates.title", footer: "settings.updates.footer") {
+            Toggle(isOn: Binding(
+                get: { AppUpdater.shared.wantsBetaChannel },
+                set: { AppUpdater.shared.wantsBetaChannel = $0 }
+            )) {
+                Label(String(localized: "settings.updates.receiveBeta"), systemImage: "testtube.2")
+            }
+            Button {
+                AppUpdater.shared.checkForUpdates()
+            } label: {
+                Label(String(localized: "menu.app.checkForUpdates"), systemImage: "arrow.triangle.2.circlepath")
+            }
+            .disabled(!AppUpdater.shared.canCheckForUpdates)
+        }
+    }
+    #endif
 
     @ViewBuilder
     private var developerSection: some View {

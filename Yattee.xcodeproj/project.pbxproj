@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		370E71982F9A1A41000E04B2 /* Sparkle in Frameworks */ = {isa = PBXBuildFile; productRef = 370E71972F9A1A41000E04B2 /* Sparkle */; };
 		37767AB32F05766100D248FC /* Nuke in Frameworks */ = {isa = PBXBuildFile; productRef = 37767AB22F05766100D248FC /* Nuke */; };
 		37767AB52F05766100D248FC /* NukeUI in Frameworks */ = {isa = PBXBuildFile; productRef = 37767AB42F05766100D248FC /* NukeUI */; };
 		378CF2FE2EF21767002C1CD7 /* MPVKit-GPL in Frameworks */ = {isa = PBXBuildFile; productRef = 378CF2FD2EF21767002C1CD7 /* MPVKit-GPL */; };
@@ -125,6 +126,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				370E71982F9A1A41000E04B2 /* Sparkle in Frameworks */,
 				37767AB32F05766100D248FC /* Nuke in Frameworks */,
 				378CF2FE2EF21767002C1CD7 /* MPVKit-GPL in Frameworks */,
 				378CF3012EF21783002C1CD7 /* MPVKit-GPL in Frameworks */,
@@ -206,6 +208,7 @@
 				378CF3002EF21783002C1CD7 /* MPVKit-GPL */,
 				37767AB22F05766100D248FC /* Nuke */,
 				37767AB42F05766100D248FC /* NukeUI */,
+				370E71972F9A1A41000E04B2 /* Sparkle */,
 			);
 			productName = Yattee;
 			productReference = 372D1A272EDB163800F58F7A /* Yattee.app */;
@@ -315,6 +318,7 @@
 			packageReferences = (
 				378CF2FF2EF21783002C1CD7 /* XCRemoteSwiftPackageReference "MPVKit" */,
 				37767AB12F05766100D248FC /* XCRemoteSwiftPackageReference "Nuke" */,
+				370E71962F9A1A41000E04B2 /* XCRemoteSwiftPackageReference "Sparkle" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 372D1A282EDB163800F58F7A /* Products */;
@@ -1179,6 +1183,14 @@
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
+		370E71962F9A1A41000E04B2 /* XCRemoteSwiftPackageReference "Sparkle" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/sparkle-project/Sparkle";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 2.9.1;
+			};
+		};
 		37767AB12F05766100D248FC /* XCRemoteSwiftPackageReference "Nuke" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/kean/Nuke";
@@ -1198,6 +1210,11 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
+		370E71972F9A1A41000E04B2 /* Sparkle */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 370E71962F9A1A41000E04B2 /* XCRemoteSwiftPackageReference "Sparkle" */;
+			productName = Sparkle;
+		};
 		37767AB22F05766100D248FC /* Nuke */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = 37767AB12F05766100D248FC /* XCRemoteSwiftPackageReference "Nuke" */;

@@ -13,6 +13,18 @@ This project targets the latest OS versions only - use newest APIs freely withou
 **Test (single):** `xcodebuild test -scheme Yattee -destination 'platform=macOS' -only-testing:YatteeTests/TestSuiteName/testMethodName`  
 **Lint:** `periphery scan` (config: `.periphery.yml`)
 
+## Build Configurations
+
+Three configurations exist, mapped to distribution channels:
+
+| Configuration | Sparkle (`#if SPARKLE`) | Used for |
+|---|---|---|
+| `Debug` | off | local development, tests |
+| `Release` | off | App Store / TestFlight (`fastlane mac beta`) — must stay Sparkle-free, App Review rejects auto-update frameworks |
+| `Release-DeveloperID` | **on** | Developer ID notarized build (`fastlane mac build_and_notarize`), distributed via GitHub Releases + Homebrew cask, receives Sparkle updates |
+
+All Sparkle-dependent code must be wrapped in `#if SPARKLE ... #endif` so the `Release` variant links zero Sparkle symbols. When adding new Sparkle features, test both configs build clean on macOS.
+
 ## Code Style
 
 **Language:** Swift 5.0+ with strict concurrency (Swift 6 mode enabled)  

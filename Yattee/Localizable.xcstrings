@@ -5142,6 +5142,16 @@
         }
       }
     },
+    "menu.app.checkForUpdates" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Check for updates..."
+          }
+        }
+      }
+    },
     "menu.app.settings" : {
       "localizations" : {
         "en" : {
@@ -14334,6 +14344,36 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Translators"
+          }
+        }
+      }
+    },
+    "settings.updates.footer" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Check for and install new versions of Yattee. Beta updates include prereleases."
+          }
+        }
+      }
+    },
+    "settings.updates.receiveBeta" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Receive beta updates"
+          }
+        }
+      }
+    },
+    "settings.updates.title" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Updates"
           }
         }
       }

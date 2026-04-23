@@ -322,11 +322,13 @@ platform :mac do
       team_id: TEAM_ID,
       code_sign_identity: "Developer ID Application",
       profile_name: "match Direct #{DEVELOPER_APP_IDENTIFIER} macos",
-      targets: [SCHEME]
+      targets: [SCHEME],
+      build_configurations: ["Release-DeveloperID"]
     )
 
     build_mac_app(
       scheme: SCHEME,
+      configuration: "Release-DeveloperID",
       output_directory: "fastlane/builds/#{version}-#{build}/macOS",
       output_name: APP_NAME,
       export_method: "developer-id",
@@ -343,5 +345,23 @@ platform :mac do
       api_key: api_key,
       print_log: true
     )
+
+    # Staple the notarization ticket so Gatekeeper doesn't need to phone home
+    # when the user first launches from Sparkle/DMG.
+    sh "xcrun stapler staple 'fastlane/builds/#{version}-#{build}/macOS/#{APP_NAME}.app'"
+
+    # Package the stapled .app into a .zip (Sparkle) and .dmg (Homebrew / direct).
+    dir = "fastlane/builds/#{version}-#{build}/macOS"
+    app = "#{dir}/#{APP_NAME}.app"
+    zip = "#{dir}/#{APP_NAME}-#{version}-macOS.zip"
+    dmg = "#{dir}/#{APP_NAME}-#{version}-macOS.dmg"
+
+    # .zip: `ditto -c -k --keepParent` is Sparkle's expected archive layout
+    # (preserves the .app wrapper, resource forks, symlinks).
+    sh "/usr/bin/ditto -c -k --keepParent '#{app}' '#{zip}'"
+
+    # .dmg: read-only UDZO, overwrites any stale image from previous runs.
+    sh "/bin/rm -f '#{dmg}'"
+    sh "/usr/bin/hdiutil create -volname '#{APP_NAME} #{version}' -srcfolder '#{app}' -ov -format UDZO '#{dmg}'"
   end
 end

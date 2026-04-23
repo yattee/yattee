@@ -310,6 +310,11 @@ struct YatteeApp: App {
             CommandGroup(replacing: .appSettings) {
                 SettingsWindowMenuItem()
             }
+            #if SPARKLE
+            CommandGroup(after: .appInfo) {
+                CheckForUpdatesMenuItem()
+            }
+            #endif
         }
         #endif
     }
