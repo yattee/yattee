@@ -376,11 +376,6 @@ struct UnifiedTabView: View {
     // Zoom transition namespace (local to this tab view)
     @Namespace private var zoomTransition
 
-    // Settings sheet (rendered from the NavigationSplitView toolbar so the gear sits
-    // immediately after the system-vended sidebar-toggle in the sidebar column).
-    @State private var showingSettings = false
-    @Namespace private var sheetTransition
-
     private var yatteeServerAuthHeader: String? {
         guard let server = appEnvironment?.instancesManager.enabledYatteeServerInstances.first else { return nil }
         return appEnvironment?.basicAuthCredentialsManager.basicAuthHeader(for: server)
@@ -389,27 +384,8 @@ struct UnifiedTabView: View {
     var body: some View {
         NavigationSplitView {
             sidebar
-                .toolbar {
-                    ToolbarItem(placement: .primaryAction) {
-                        Button {
-                            showingSettings = true
-                        } label: {
-                            Image(systemName: "gear")
-                        }
-                        .accessibilityIdentifier("app.settingsButton")
-                        .accessibilityLabel(String(localized: "settings.title"))
-                        .liquidGlassTransitionSource(id: "appSettings", in: sheetTransition)
-                    }
-                }
         } detail: {
             detailForSelection
-        }
-        .sheet(isPresented: $showingSettings) {
-            SettingsView()
-                .liquidGlassSheetContent(sourceID: "appSettings", in: sheetTransition)
-        }
-        .onChange(of: appEnvironment?.navigationCoordinator.dismissSettingsTrigger) {
-            showingSettings = false
         }
         .zoomTransitionNamespace(zoomTransition)
         .onAppear {

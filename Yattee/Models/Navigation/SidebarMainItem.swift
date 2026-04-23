@@ -124,12 +124,6 @@ enum SidebarMainItem: String, CaseIterable, Codable, Identifiable, Sendable {
             #else
             return true
             #endif
-        case .settings:
-            #if os(macOS)
-            return false
-            #else
-            return true
-            #endif
         default:
             return true
         }
