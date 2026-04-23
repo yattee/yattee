@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Yattee — Downloads &amp; Distribution</title>
+  <meta name="description" content="Distribution endpoints for the Yattee app: Sparkle appcast, AltStore source, and install instructions.">
+  <style>
+    :root {
+      color-scheme: light dark;
+      --fg: #111;
+      --muted: #666;
+      --bg: #fafafa;
+      --card: #fff;
+      --accent: #d43f57;
+      --border: #e5e5e5;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --fg: #f1f1f1;
+        --muted: #aaa;
+        --bg: #0f0f10;
+        --card: #1a1a1d;
+        --border: #2a2a2e;
+      }
+    }
+    * { box-sizing: border-box; }
+    html, body { margin: 0; padding: 0; }
+    body {
+      font: 16px/1.5 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      color: var(--fg);
+      background: var(--bg);
+      padding: 2rem 1rem 4rem;
+      max-width: 720px;
+      margin: 0 auto;
+    }
+    h1 { font-size: 1.75rem; margin: 0 0 0.25rem; }
+    h2 { font-size: 1.1rem; margin: 1.5rem 0 0.5rem; }
+    p { color: var(--muted); }
+    a { color: var(--accent); }
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 1rem 1.25rem;
+      margin: 0.75rem 0;
+    }
+    code {
+      font: 0.9em ui-monospace, SFMono-Regular, Menlo, monospace;
+      background: var(--border);
+      padding: 0.1em 0.4em;
+      border-radius: 4px;
+    }
+    footer { margin-top: 3rem; font-size: 0.85rem; color: var(--muted); }
+  </style>
+</head>
+<body>
+  <h1>Yattee — Distribution</h1>
+  <p>Endpoints for Yattee app distribution across different channels.</p>
+
+  <h2>Channels</h2>
+
+  <div class="card">
+    <strong>macOS auto-updates (Sparkle)</strong>
+    <p>Used by the Developer ID build and the Homebrew cask. Point Sparkle clients at:</p>
+    <p><code><a href="/appcast.xml">https://dl.yattee.stream/appcast.xml</a></code></p>
+  </div>
+
+  <div class="card">
+    <strong>iOS sideloading (AltStore)</strong>
+    <p>Add Yattee as a source in AltStore using:</p>
+    <p><code>https://dl.yattee.stream/altstore.json</code> <em>(coming soon)</em></p>
+  </div>
+
+  <h2>Also see</h2>
+  <p>
+    Main project: <a href="https://github.com/yattee/yattee">github.com/yattee/yattee</a><br>
+    Website: <a href="https://yattee.stream">yattee.stream</a>
+  </p>
+
+  <footer>
+    This page is served from the <code>gh-pages</code> branch of the Yattee repository.
+  </footer>
+</body>
+</html>
