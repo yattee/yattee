@@ -2165,6 +2165,7 @@ struct VideoInfoView: View {
             do {
                 // Use extractURL method - just use the video part
                 let (fullVideo, _, _) = try await contentService.extractURL(originalURL, instance: instance)
+                await prefetchNewThumbnailIfNeeded(old: base, new: fullVideo)
                 invalidateStaleThumbnails(old: base, new: fullVideo)
                 loadedVideoDetails[videoID] = fullVideo
                 CachedChannelData.cacheAuthor(fullVideo.author)
@@ -2190,6 +2191,7 @@ struct VideoInfoView: View {
                 id: videoID,
                 instance: instance
             )
+            await prefetchNewThumbnailIfNeeded(old: base, new: fullVideo)
             invalidateStaleThumbnails(old: base, new: fullVideo)
             loadedVideoDetails[videoID] = fullVideo
             CachedChannelData.cacheAuthor(fullVideo.author)
@@ -2198,6 +2200,20 @@ struct VideoInfoView: View {
         }
 
         isLoadingVideoDetails = false
+    }
+
+    /// Warms the Nuke cache for the freshly fetched thumbnail *before* we
+    /// swap it into the view. Without this, the view observes a URL change,
+    /// flips `LazyImage` to the new URL, and briefly shows a placeholder
+    /// while the download happens — the "thumbnail flash". By the time the
+    /// swap lands, the image is already cached.
+    @MainActor
+    private func prefetchNewThumbnailIfNeeded(old: Video, new: Video) async {
+        guard let newURL = new.bestThumbnail?.url else { return }
+        let oldKey = old.bestThumbnail.map { ImageLoadingService.cacheKey(for: $0.url) }
+        let newKey = ImageLoadingService.cacheKey(for: newURL)
+        guard oldKey != newKey else { return }
+        await ImageLoadingService.shared.prefetchImage(for: newURL)
     }
 
     /// Evicts image cache entries for thumbnails whose URLs changed between

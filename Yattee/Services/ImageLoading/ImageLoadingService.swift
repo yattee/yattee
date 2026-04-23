@@ -81,6 +81,22 @@ final class ImageLoadingService: Sendable {
         )
     }
 
+    /// Warm the image cache for the given URL so a subsequent `LazyImage`
+    /// display hits the cache instantly. Returns after the image is cached
+    /// or the operation fails (silently). Bounded by `timeout` seconds.
+    nonisolated func prefetchImage(for url: URL, timeout: TimeInterval = 3) async {
+        await withTaskGroup(of: Void.self) { group in
+            group.addTask {
+                _ = try? await ImagePipeline.shared.image(for: url)
+            }
+            group.addTask {
+                try? await Task.sleep(nanoseconds: UInt64(timeout * 1_000_000_000))
+            }
+            await group.next()
+            group.cancelAll()
+        }
+    }
+
     /// Remove a specific URL from both the memory and disk image caches.
     /// Use when a previously cached URL is known to return stale or broken
     /// data (e.g. an expired proxied thumbnail URL).
