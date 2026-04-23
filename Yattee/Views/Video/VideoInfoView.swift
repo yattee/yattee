@@ -543,14 +543,34 @@ struct VideoInfoView: View {
                 .scrollDismissesKeyboard(.interactively)
                 #endif
                 .modifier(VideoInfoScrollOffsetModifier(scrollOffset: $scrollOffset))
-                // Navigation buttons overlay - floats above scrolling content in ZStack (macOS only)
+
                 #if os(macOS)
-                if videoQueueContext != nil {
-                    navigationButtonsOverlay
-                }
+                videoNavigationKeyboardShortcuts
                 #endif
             }
         }
+    }
+    #endif
+
+    #if os(macOS)
+    // Bare left/right arrow keys switch to previous/next video in the queue.
+    // Command-modified arrows are reserved for player seek shortcuts (see PlaybackCommands),
+    // so these don't collide. Disabled buttons don't fire their shortcuts, which also
+    // prevents activation when no queue context exists.
+    @ViewBuilder
+    private var videoNavigationKeyboardShortcuts: some View {
+        Group {
+            Button(action: navigateToPrevious) { EmptyView() }
+                .keyboardShortcut(.leftArrow, modifiers: [])
+                .disabled(!canNavigatePrevious)
+
+            Button(action: navigateToNext) { EmptyView() }
+                .keyboardShortcut(.rightArrow, modifiers: [])
+                .disabled(!canNavigateNext)
+        }
+        .frame(width: 0, height: 0)
+        .opacity(0)
+        .accessibilityHidden(true)
     }
     #endif
 
@@ -2432,44 +2452,6 @@ struct VideoInfoView: View {
         #endif
         loadComments()
     }
-    
-    #if os(macOS)
-    /// Navigation buttons overlay - floats at bottom of screen (macOS only)
-    @ViewBuilder
-    private var navigationButtonsOverlay: some View {
-        VStack {
-            Spacer()
-            
-            HStack {
-                // Previous button
-                if canNavigatePrevious {
-                    VideoNavigationButton(direction: .previous) {
-                        navigateToPrevious()
-                    }
-                    .transition(.opacity.combined(with: .scale))
-                }
-                
-                Spacer(minLength: 0)
-                
-                // Next button
-                if canNavigateNext {
-                    VideoNavigationButton(
-                        direction: .next,
-                        action: navigateToNext,
-                        isLoading: isLoadingMoreVideos,
-                        hasError: loadMoreError != nil
-                    )
-                    .transition(.opacity.combined(with: .scale))
-                }
-            }
-            .padding(.horizontal, 16)
-            .padding(.bottom, 16)
-            .contentShape(Rectangle())
-        }
-        .animation(.easeInOut(duration: 0.2), value: canNavigatePrevious)
-        .animation(.easeInOut(duration: 0.2), value: canNavigateNext)
-    }
-    #endif
     #endif
 }
 
