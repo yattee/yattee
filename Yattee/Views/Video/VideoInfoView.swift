@@ -1140,7 +1140,7 @@ struct VideoInfoView: View {
                     action: playVideo
                 )
                 #if os(macOS)
-                .tint(.accentColor)
+                .tint(accentColor)
                 #endif
 
                 // Download button
