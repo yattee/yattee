@@ -243,21 +243,23 @@ actor ContentService: ContentServiceProtocol {
         try await api(for: instance).channelSearch(id: id, query: query, instance: instance, page: page)
     }
 
-    /// Fetches streams with proxy URLs for faster LAN downloads (Yattee Server only).
-    /// For other backends, returns regular streams.
+    /// Fetches streams with proxy URLs for downloads (Yattee Server: hits /proxy/fast/
+    /// so the server caches the file on disk; other backends apply Invidious URL rewriting).
     func proxyStreams(videoID: String, instance: Instance) async throws -> [Stream] {
         if instance.type == .yatteeServer {
-            return try await yatteeServerAPI(for: instance).proxyStreams(videoID: videoID, instance: instance)
+            return try await yatteeServerAPI(for: instance)
+                .proxyStreams(videoID: videoID, instance: instance, mode: .download)
         }
         let fetchedStreams = try await streams(videoID: videoID, instance: instance)
         return await InvidiousAPI.proxyStreamsIfNeeded(fetchedStreams, instance: instance)
     }
 
-    /// Fetches video details, proxy streams, captions, and storyboards (Yattee Server only).
-    /// For other backends, applies Invidious proxy rewriting if enabled.
+    /// Fetches video details + streams for downloads. For Yattee Server this routes
+    /// through `/proxy/fast/`, which caches the file on disk on the server.
     func videoWithProxyStreamsAndCaptionsAndStoryboards(id: String, instance: Instance) async throws -> (video: Video, streams: [Stream], captions: [Caption], storyboards: [Storyboard]) {
         if instance.type == .yatteeServer {
-            return try await yatteeServerAPI(for: instance).videoWithProxyStreamsAndCaptionsAndStoryboards(id: id, instance: instance)
+            return try await yatteeServerAPI(for: instance)
+                .videoWithProxyStreamsAndCaptionsAndStoryboards(id: id, instance: instance, mode: .download)
         }
         var result = try await videoWithStreamsAndCaptionsAndStoryboards(id: id, instance: instance)
         result.streams = await InvidiousAPI.proxyStreamsIfNeeded(result.streams, instance: instance)
@@ -278,6 +280,15 @@ actor ContentService: ContentServiceProtocol {
         case .invidious:
             return try await invidiousAPI(for: instance).videoWithStreamsAndCaptionsAndStoryboards(id: id, instance: instance)
         case .yatteeServer:
+            // When the user has opted into proxying for this Yattee Server source,
+            // fetch playback streams through the server's /proxy/relay byte-relay
+            // (Range-friendly, fast TTFB). When off, leave routing to the server's
+            // per-site proxy_streaming flag — the server can still proxy by default,
+            // but the client doesn't force it on top.
+            if instance.proxiesVideos {
+                return try await yatteeServerAPI(for: instance)
+                    .videoWithProxyStreamsAndCaptionsAndStoryboards(id: id, instance: instance, mode: .relay)
+            }
             return try await yatteeServerAPI(for: instance).videoWithStreamsAndCaptionsAndStoryboards(id: id, instance: instance)
         case .piped:
             // Piped fallback - make separate calls (no storyboard support)

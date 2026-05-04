@@ -254,21 +254,36 @@ actor YatteeServerAPI: InstanceAPI {
         )
     }
 
-    // MARK: - Proxy Streams for Downloads
+    // MARK: - Proxy Streams
 
-    /// Fetches streams with URLs that proxy through the Yattee Server for faster LAN downloads.
-    /// The proxy URLs point to the server's /proxy/fast/{video_id}?itag=X endpoint instead of
-    /// directly to YouTube CDN, allowing the server to download at full speed and serve locally.
-    func proxyStreams(videoID: String, instance: Instance) async throws -> [Stream] {
-        let endpoint = GenericEndpoint.get("/api/v1/videos/\(videoID)", query: ["proxy": "true"])
+    /// Selects which yattee-server proxy endpoint stream URLs point at.
+    ///
+    /// - `relay`: signed `/proxy/relay` byte-relay — fast TTFB, supports HTTP
+    ///   Range, no on-disk caching. Right shape for playback.
+    /// - `download`: legacy `/proxy/fast/{video_id}` — runs yt-dlp on the
+    ///   server, writes a file to `/downloads`, then tails it. Right shape
+    ///   for downloads since the cached file accelerates repeated requests.
+    enum ProxyMode: String {
+        case relay
+        case download
+    }
+
+    /// Fetches streams with URLs that proxy through the Yattee Server.
+    func proxyStreams(videoID: String, instance: Instance, mode: ProxyMode) async throws -> [Stream] {
+        let endpoint = GenericEndpoint.get(
+            "/api/v1/videos/\(videoID)",
+            query: ["proxy": "true", "proxy_mode": mode.rawValue]
+        )
         let response: YatteeVideoDetails = try await httpClient.fetch(endpoint, baseURL: instance.url)
         return response.toStreams()
     }
 
     /// Fetches video details, proxy streams, captions, and storyboards in a single API call.
-    /// Use this for downloads to get streams that route through the server.
-    func videoWithProxyStreamsAndCaptionsAndStoryboards(id: String, instance: Instance) async throws -> (video: Video, streams: [Stream], captions: [Caption], storyboards: [Storyboard]) {
-        let endpoint = GenericEndpoint.get("/api/v1/videos/\(id)", query: ["proxy": "true"])
+    func videoWithProxyStreamsAndCaptionsAndStoryboards(id: String, instance: Instance, mode: ProxyMode) async throws -> (video: Video, streams: [Stream], captions: [Caption], storyboards: [Storyboard]) {
+        let endpoint = GenericEndpoint.get(
+            "/api/v1/videos/\(id)",
+            query: ["proxy": "true", "proxy_mode": mode.rawValue]
+        )
         let response: YatteeVideoDetails = try await httpClient.fetch(endpoint, baseURL: instance.url)
         return (
             video: response.toVideo(),

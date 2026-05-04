@@ -180,7 +180,7 @@ extension Instance {
 
     /// Whether this instance supports proxying video streams through itself.
     var supportsVideoProxying: Bool {
-        type == .invidious || type == .piped
+        type == .invidious || type == .piped || type == .yatteeServer
     }
 }
 
