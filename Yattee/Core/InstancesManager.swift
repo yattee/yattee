@@ -145,12 +145,17 @@ final class InstancesManager {
         }
 
         saveInstances()
+        Task { await ProxyDetectionCache.shared.invalidate(instance: instance) }
     }
 
     func update(_ instance: Instance) {
         if let index = instances.firstIndex(where: { $0.id == instance.id }) {
             instances[index] = instance
             saveInstances()
+            // Editing a source can change the proxy answer (URL change, toggle
+            // flip). Drop the cached auto-detect verdict so the next playback
+            // re-probes.
+            Task { await ProxyDetectionCache.shared.invalidate(instance: instance) }
         }
     }
 

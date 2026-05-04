@@ -1659,6 +1659,12 @@ final class PlayerService {
             return (result.video, result.streams, result.captions, [])
         }
 
+        // Race the proxy-detection HEAD against the video API call so the
+        // verdict is (usually) ready by the time streams come back. Cheap
+        // when there's nothing to do — it returns immediately if the
+        // verdict is already cached, or if no prior CDN sample exists.
+        async let _: Void = InvidiousAPI.prewarmProxyDetection(for: instance)
+
         // Fetch full video details, streams, captions, and storyboards in a single API call
         // (for Invidious, this is a single request; for other backends, calls are made in parallel)
         let result = try await contentService.videoWithStreamsAndCaptionsAndStoryboards(id: video.id.videoID, instance: instance)

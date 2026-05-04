@@ -602,18 +602,31 @@ extension InvidiousAPI {
         // URLs). Don't second-guess that here by host-rewriting CDN URLs.
         if instance.type == .yatteeServer { return streams }
 
-        // Find first YouTube CDN URL for 403 detection
         let firstCDNURL = streams.first(where: { isYouTubeCDNURL($0.url) })?.url
 
         let shouldProxy: Bool
         if instance.proxiesVideos {
             shouldProxy = true
             LoggingService.shared.info("Proxying streams through \(instance.displayName) (user-enabled)", category: .player)
-        } else if let cdnURL = firstCDNURL, await isForbidden(cdnURL) {
-            shouldProxy = true
-            LoggingService.shared.info("Proxying streams through \(instance.displayName) (auto-detected 403)", category: .player)
+        } else if let cdnURL = firstCDNURL {
+            // Auto-detect via cached HEAD probe. Cache cuts videos 2..N down
+            // to a synchronous lookup; on the first miss we pay the HEAD once.
+            shouldProxy = await ProxyDetectionCache.shared.decision(
+                for: instance,
+                sampleURL: cdnURL,
+                probe: { await isForbidden($0) }
+            )
+            if shouldProxy {
+                LoggingService.shared.info("Proxying streams through \(instance.displayName) (auto-detected 403)", category: .player)
+            }
         } else {
             shouldProxy = false
+        }
+
+        // Even when we don't end up proxying, remember a sample CDN URL so
+        // future videos can prewarm the probe before their API call returns.
+        if !shouldProxy, let cdnURL = firstCDNURL {
+            await ProxyDetectionCache.shared.record(decision: false, sampleURL: cdnURL, for: instance)
         }
 
         guard shouldProxy else { return streams }
@@ -624,6 +637,21 @@ extension InvidiousAPI {
             }
             return stream
         }
+    }
+
+    /// Kick off proxy auto-detection in the background using a previously-seen
+    /// CDN URL for this instance. Cheap when there's nothing to do (no sample
+    /// URL yet, or the decision is already cached). Call this when the player
+    /// starts loading so the verdict is ready by the time streams come back.
+    static func prewarmProxyDetection(for instance: Instance) async {
+        guard instance.supportsVideoProxying,
+              instance.type != .yatteeServer,
+              !instance.proxiesVideos else { return }
+
+        await ProxyDetectionCache.shared.prewarm(
+            instance: instance,
+            probe: { await isForbidden($0) }
+        )
     }
 }
 
