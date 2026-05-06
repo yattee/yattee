@@ -15094,6 +15094,17 @@
         }
       }
     },
+    "sources.error.pipedFrontendDetected" : {
+      "comment" : "Error when the URL points to the Piped web frontend (SPA) instead of its API backend. The frontend serves the same index.html for every path so detection cannot succeed.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "This URL is the Piped web frontend, not its API. Please enter the Piped API URL instead (for example, the frontend may be at piped.example.com while the API is at piped-api.example.com or pipedapi.example.com — check with the instance operator)."
+          }
+        }
+      }
+    },
     "sources.error.couldNotDetect" : {
       "comment" : "Error when source type could not be detected",
       "localizations" : {

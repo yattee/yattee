@@ -20,6 +20,10 @@ enum DetectionError: Error, Sendable {
     /// Detection was retried with HTTP Basic Auth credentials but the server still
     /// returned 401 — the credentials are invalid.
     case basicAuthInvalid
+    /// The URL points to the Piped web frontend SPA, not its API backend. The
+    /// frontend serves the same `index.html` for every path, so JSON probes can
+    /// never succeed — the user must supply the API URL instead.
+    case pipedFrontendDetected
 
     var localizedDescription: String {
         switch self {
@@ -37,6 +41,8 @@ enum DetectionError: Error, Sendable {
             return String(localized: "sources.error.basicAuthRequired")
         case .basicAuthInvalid:
             return String(localized: "sources.error.basicAuthInvalid")
+        case .pipedFrontendDetected:
+            return String(localized: "sources.error.pipedFrontendDetected")
         }
     }
 }
@@ -153,7 +159,30 @@ actor InstanceDetector {
         if sawUnauthorized {
             return .failure(basicAuthHeader == nil ? .basicAuthRequired : .basicAuthInvalid)
         }
+
+        if await looksLikePipedFrontend(url: url, extraHeaders: extraHeaders) {
+            return .failure(.pipedFrontendDetected)
+        }
+
         return .failure(.unknownType)
+    }
+
+    /// Detects the Piped Vue SPA by fetching `/` and looking for the
+    /// `<title>Piped</title>` fingerprint. The frontend serves the same
+    /// `index.html` for every path with HTTP 200, so a body-content check is
+    /// the cheapest reliable signal.
+    private func looksLikePipedFrontend(url: URL, extraHeaders: [String: String]? = nil) async -> Bool {
+        let endpoint = GenericEndpoint.get("/")
+        do {
+            let data = try await httpClient.fetchData(endpoint, baseURL: url, customHeaders: extraHeaders)
+            guard let body = String(data: data, encoding: .utf8) else { return false }
+            let lower = body.trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
+            let looksLikeHTML = lower.hasPrefix("<!doctype html") || lower.hasPrefix("<html")
+            let hasPipedTitle = lower.contains("<title>piped</title>")
+            return looksLikeHTML && hasPipedTitle
+        } catch {
+            return false
+        }
     }
 
     // MARK: - Detection Methods
