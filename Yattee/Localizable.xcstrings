@@ -15083,6 +15083,17 @@
         }
       }
     },
+    "sources.error.pipedBasicAuthUnsupported" : {
+      "comment" : "Error when a Piped instance is detected behind an HTTP Basic Auth proxy. Piped uses the same Authorization header for the user session, so the two cannot coexist.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Piped sources can't be used behind an HTTP Basic Auth proxy. Piped reuses the Authorization header for the user session, so it conflicts with the proxy's credentials."
+          }
+        }
+      }
+    },
     "sources.error.couldNotDetect" : {
       "comment" : "Error when source type could not be detected",
       "localizations" : {

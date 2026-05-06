@@ -439,11 +439,13 @@ struct AddRemoteServerView: View {
         }
 
         // HTTP Basic Auth credentials.
-        // Required for Yattee Server (always shown). Optional for other types — show only
-        // when credentials were already provided (e.g., via the basic-auth-required retry
-        // path), so we don't clutter the form for the normal "no proxy" case.
-        let showBasicAuthSection = detectedType == .yatteeServer
-            || (!basicAuthUsername.isEmpty || !basicAuthPassword.isEmpty)
+        // Required for Yattee Server (always shown). Optional for types that can sit
+        // behind a basic-auth proxy — show only when credentials were already provided
+        // (e.g., via the basic-auth-required retry path), so we don't clutter the form
+        // for the normal "no proxy" case.
+        let showBasicAuthSection = (detectedType?.supportsHTTPBasicAuthProxy ?? false) &&
+            (detectedType == .yatteeServer
+                || (!basicAuthUsername.isEmpty || !basicAuthPassword.isEmpty))
 
         if showBasicAuthSection {
             Section {
@@ -574,6 +576,14 @@ struct AddRemoteServerView: View {
             switch result {
             case .success(let detectionResult):
                 LoggingService.shared.debug("[AddRemoteServerView] Detection succeeded: \(detectionResult.type)", category: .api)
+
+                if basicAuthHeader != nil, !detectionResult.type.supportsHTTPBasicAuthProxy {
+                    withAnimation {
+                        self.uiState = .error(String(localized: "sources.error.pipedBasicAuthUnsupported"))
+                    }
+                    return
+                }
+
                 withAnimation {
                     self.detectedType = detectionResult.type
                     self.detectionResult = detectionResult
@@ -764,7 +774,7 @@ struct AddRemoteServerView: View {
             allowInvalidCertificates: allowInvalidCertificates
         )
 
-        if !basicAuthUsername.isEmpty && !basicAuthPassword.isEmpty {
+        if !basicAuthUsername.isEmpty, !basicAuthPassword.isEmpty {
             appEnvironment.basicAuthCredentialsManager.setCredentials(
                 username: basicAuthUsername,
                 password: basicAuthPassword,

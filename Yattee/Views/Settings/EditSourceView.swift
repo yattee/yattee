@@ -129,35 +129,37 @@ private struct EditRemoteServerContent: View {
                 #endif
             }
 
-            Section {
-                #if os(tvOS)
-                TVSettingsTextField(title: String(localized: "sources.field.username"), text: $basicAuthUsername)
-                TVSettingsTextField(title: String(localized: "sources.field.password"), text: $basicAuthPassword, isSecure: true)
-                #elseif os(macOS)
-                LabeledContent(String(localized: "sources.field.username")) {
-                    TextField("", text: $basicAuthUsername)
+            if instance.supportsHTTPBasicAuthProxy {
+                Section {
+                    #if os(tvOS)
+                    TVSettingsTextField(title: String(localized: "sources.field.username"), text: $basicAuthUsername)
+                    TVSettingsTextField(title: String(localized: "sources.field.password"), text: $basicAuthPassword, isSecure: true)
+                    #elseif os(macOS)
+                    LabeledContent(String(localized: "sources.field.username")) {
+                        TextField("", text: $basicAuthUsername)
+                            .textContentType(.username)
+                            .autocorrectionDisabled()
+                    }
+                    LabeledContent(String(localized: "sources.field.password")) {
+                        SecureField("", text: $basicAuthPassword)
+                            .textContentType(.password)
+                    }
+                    #else
+                    TextField(String(localized: "sources.field.username"), text: $basicAuthUsername)
                         .textContentType(.username)
+                        #if os(iOS)
+                        .textInputAutocapitalization(.never)
+                        #endif
                         .autocorrectionDisabled()
-                }
-                LabeledContent(String(localized: "sources.field.password")) {
-                    SecureField("", text: $basicAuthPassword)
-                        .textContentType(.password)
-                }
-                #else
-                TextField(String(localized: "sources.field.username"), text: $basicAuthUsername)
-                    .textContentType(.username)
-                    #if os(iOS)
-                    .textInputAutocapitalization(.never)
-                    #endif
-                    .autocorrectionDisabled()
 
-                SecureField(String(localized: "sources.field.password"), text: $basicAuthPassword)
-                    .textContentType(.password)
-                #endif
-            } header: {
-                Text(String(localized: instance.type == .yatteeServer ? "sources.header.auth" : "sources.header.basicAuth"))
-            } footer: {
-                Text(String(localized: instance.type == .yatteeServer ? "sources.footer.yatteeServerAuth" : "sources.footer.basicAuth"))
+                    SecureField(String(localized: "sources.field.password"), text: $basicAuthPassword)
+                        .textContentType(.password)
+                    #endif
+                } header: {
+                    Text(String(localized: instance.type == .yatteeServer ? "sources.header.auth" : "sources.header.basicAuth"))
+                } footer: {
+                    Text(String(localized: instance.type == .yatteeServer ? "sources.footer.yatteeServerAuth" : "sources.footer.basicAuth"))
+                }
             }
 
             if instance.type == .yatteeServer {
@@ -452,16 +454,20 @@ private struct EditRemoteServerContent: View {
         updated.allowInvalidCertificates = allowInvalidCertificates
         updated.proxiesVideos = proxiesVideos
 
-        // Save / clear HTTP Basic Auth credentials.
-        // Works for any instance type, but for Yattee Server we never auto-clear
-        // (credentials are required there; the user can re-enter to overwrite).
-        if !basicAuthUsername.isEmpty && !basicAuthPassword.isEmpty {
+        // Save / clear HTTP Basic Auth credentials. Yattee Server never auto-clears
+        // (credentials are required and the user re-enters to overwrite). Piped never
+        // persists them — its session token reuses the same Authorization header.
+        if !instance.supportsHTTPBasicAuthProxy {
+            if hadStoredBasicAuth {
+                appEnvironment?.basicAuthCredentialsManager.deleteCredentials(for: instance)
+            }
+        } else if !basicAuthUsername.isEmpty, !basicAuthPassword.isEmpty {
             appEnvironment?.basicAuthCredentialsManager.setCredentials(
                 username: basicAuthUsername,
                 password: basicAuthPassword,
                 for: instance
             )
-        } else if hadStoredBasicAuth && instance.type != .yatteeServer {
+        } else if hadStoredBasicAuth, instance.type != .yatteeServer {
             appEnvironment?.basicAuthCredentialsManager.deleteCredentials(for: instance)
         }
 

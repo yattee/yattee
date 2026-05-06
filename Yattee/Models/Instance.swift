@@ -182,6 +182,22 @@ extension Instance {
     var supportsVideoProxying: Bool {
         type == .invidious || type == .piped || type == .yatteeServer
     }
+
+    /// Whether this instance can sit behind an HTTP Basic Auth reverse proxy.
+    /// Piped is excluded: its session token is sent in the same `Authorization`
+    /// header that the proxy would consume, so logged-in features can't coexist
+    /// with proxy credentials.
+    var supportsHTTPBasicAuthProxy: Bool {
+        type.supportsHTTPBasicAuthProxy
+    }
+}
+
+extension InstanceType {
+    /// See `Instance.supportsHTTPBasicAuthProxy`. Type-only variant for flows
+    /// (e.g., AddRemoteServer detection) that don't yet have an `Instance`.
+    var supportsHTTPBasicAuthProxy: Bool {
+        self != .piped
+    }
 }
 
 // MARK: - Instance Validation
