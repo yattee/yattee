@@ -20,28 +20,15 @@ struct InstanceLoginView: View {
     @State private var errorMessage: String?
 
     var body: some View {
+        #if os(tvOS)
+        TVSidebarDetailContainer(systemImage: "person.badge.key", title: String(localized: "login.title")) {
+            formContent
+        }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .background(Color.black.ignoresSafeArea())
+        .accessibilityIdentifier("instance.login.view")
+        #else
         NavigationStack {
-            #if os(tvOS)
-            VStack(spacing: 0) {
-                HStack {
-                    Button(String(localized: "common.cancel")) {
-                        dismiss()
-                    }
-                    .buttonStyle(TVToolbarButtonStyle())
-                    Spacer()
-                    Text(String(localized: "login.title"))
-                        .font(.title2)
-                        .fontWeight(.semibold)
-                    Spacer()
-                    Color.clear.frame(width: 100)
-                }
-                .padding(.horizontal, 48)
-                .padding(.vertical, 24)
-
-                formContent
-            }
-            .accessibilityIdentifier("instance.login.view")
-            #else
             formContent
                 .navigationTitle(String(localized: "login.title"))
                 #if os(iOS)
@@ -55,8 +42,8 @@ struct InstanceLoginView: View {
                     }
                 }
                 .accessibilityIdentifier("instance.login.view")
-            #endif
         }
+        #endif
     }
 
     private var formContent: some View {

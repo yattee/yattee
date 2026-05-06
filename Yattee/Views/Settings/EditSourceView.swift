@@ -353,12 +353,21 @@ private struct EditRemoteServerContent: View {
             Button(String(localized: "common.cancel"), role: .cancel) {}
         }
         .presentationCompactAdaptation(.sheet)
+        #if os(tvOS)
+        .fullScreenCover(isPresented: $showLoginSheet) {
+            InstanceLoginView(instance: instance) { credential in
+                appEnvironment?.credentialsManager(for: instance)?.setCredential(credential, for: instance)
+                isLoggedIn = true
+            }
+        }
+        #else
         .sheet(isPresented: $showLoginSheet) {
             InstanceLoginView(instance: instance) { credential in
                 appEnvironment?.credentialsManager(for: instance)?.setCredential(credential, for: instance)
                 isLoggedIn = true
             }
         }
+        #endif
         .onAppear {
             isLoggedIn = appEnvironment?.credentialsManager(for: instance)?.isLoggedIn(for: instance) ?? false
 
