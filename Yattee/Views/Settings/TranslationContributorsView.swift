@@ -47,6 +47,16 @@ struct TranslationContributorsView: View {
     }
 
     private func contributorRow(_ contributor: TranslationContributor) -> some View {
+        #if os(tvOS)
+        Button {} label: {
+            contributorRowContent(contributor)
+        }
+        #else
+        contributorRowContent(contributor)
+        #endif
+    }
+
+    private func contributorRowContent(_ contributor: TranslationContributor) -> some View {
         HStack(spacing: 12) {
             // Avatar
             LazyImage(url: contributor.gravatarURL) { state in

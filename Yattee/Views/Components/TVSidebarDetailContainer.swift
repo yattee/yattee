@@ -9,22 +9,24 @@
 #if os(tvOS)
 import SwiftUI
 
-struct TVSidebarDetailContainer<Content: View, BottomAction: View>: View {
+struct TVSidebarDetailContainer<Content: View>: View {
     let content: Content
-    let bottomAction: BottomAction
     var systemImage: String?
     var title: String?
+    var showsDismissButton: Bool
+
+    @Environment(\.dismiss) private var dismiss
 
     init(
         systemImage: String? = nil,
         title: String? = nil,
-        @ViewBuilder bottomAction: () -> BottomAction = { EmptyView() },
+        showsDismissButton: Bool = false,
         @ViewBuilder content: () -> Content
     ) {
         self.content = content()
-        self.bottomAction = bottomAction()
         self.systemImage = systemImage
         self.title = title
+        self.showsDismissButton = showsDismissButton
     }
 
     var body: some View {
@@ -32,30 +34,19 @@ struct TVSidebarDetailContainer<Content: View, BottomAction: View>: View {
             .focusSection()
             .safeAreaInset(edge: .leading) {
                 if let systemImage {
-                    VStack(spacing: 0) {
-                        Spacer()
-                        VStack(spacing: 16) {
-                            Image(systemName: systemImage)
-                                .font(.system(size: 80))
+                    VStack(spacing: 16) {
+                        Image(systemName: systemImage)
+                            .font(.system(size: 80))
+                            .foregroundStyle(.secondary)
+                        if let title {
+                            Text(title)
+                                .font(.title3)
+                                .fontWeight(.semibold)
                                 .foregroundStyle(.secondary)
-                            if let title {
-                                Text(title)
-                                    .font(.title3)
-                                    .fontWeight(.semibold)
-                                    .foregroundStyle(.secondary)
-                                    .multilineTextAlignment(.center)
-                            }
+                                .multilineTextAlignment(.center)
                         }
-                        .allowsHitTesting(false)
-
-                        if BottomAction.self != EmptyView.self {
-                            bottomAction
-                                .padding(.top, 40)
-                                .focusSection()
-                        }
-
-                        Spacer()
                     }
+                    .allowsHitTesting(false)
                     .frame(width: 400)
                 } else {
                     Spacer()
@@ -63,22 +54,17 @@ struct TVSidebarDetailContainer<Content: View, BottomAction: View>: View {
                         .allowsHitTesting(false)
                 }
             }
-    }
-}
-
-struct TVDismissBottomButton: View {
-    var title: String = String(localized: "common.done")
-    var systemImage: String = "chevron.backward"
-
-    @Environment(\.dismiss) private var dismiss
-
-    var body: some View {
-        Button {
-            dismiss()
-        } label: {
-            Label(title, systemImage: systemImage)
-        }
-        .buttonStyle(TVSettingsButtonStyle())
+            .toolbar {
+                if showsDismissButton {
+                    ToolbarItem(placement: .cancellationAction) {
+                        Button {
+                            dismiss()
+                        } label: {
+                            Label(String(localized: "common.done"), systemImage: "chevron.backward")
+                        }
+                    }
+                }
+            }
     }
 }
 #endif

@@ -23,19 +23,34 @@ struct AboutView: View {
             SettingsFormSection {
                 #if os(tvOS)
                 NavigationLink {
-                    ContributorsView()
+                    TVSidebarDetailContainer(
+                        systemImage: "person.3",
+                        title: String(localized: "settings.contributors.title")
+                    ) {
+                        ContributorsView()
+                    }
                 } label: {
                     Label(String(localized: "settings.contributors.title"), systemImage: "person.3")
                 }
 
                 NavigationLink {
-                    TranslationContributorsView()
+                    TVSidebarDetailContainer(
+                        systemImage: "globe",
+                        title: String(localized: "settings.translators.title")
+                    ) {
+                        TranslationContributorsView()
+                    }
                 } label: {
                     Label(String(localized: "settings.translators.title"), systemImage: "globe")
                 }
 
                 NavigationLink {
-                    AcknowledgementsView()
+                    TVSidebarDetailContainer(
+                        systemImage: "heart.text.square",
+                        title: String(localized: "settings.acknowledgements.title")
+                    ) {
+                        AcknowledgementsView()
+                    }
                 } label: {
                     Label(String(localized: "settings.acknowledgements.title"), systemImage: "heart.text.square")
                 }
@@ -58,7 +73,13 @@ struct AboutView: View {
             SettingsFormSection {
                 #if os(tvOS)
                 NavigationLink {
-                    DeviceCapabilitiesView()
+                    TVSidebarDetailContainer(
+                        systemImage: "cpu",
+                        title: String(localized: "settings.advanced.deviceCapabilities"),
+                        showsDismissButton: true
+                    ) {
+                        DeviceCapabilitiesView()
+                    }
                 } label: {
                     Label(String(localized: "settings.advanced.deviceCapabilities"), systemImage: "cpu")
                 }

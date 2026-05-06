@@ -242,7 +242,8 @@ private struct EditRemoteServerContent: View {
                             #if os(tvOS)
                             TVSidebarDetailContainer(
                                 systemImage: "person.2",
-                                title: String(localized: "sources.import.subscriptions")
+                                title: String(localized: "sources.import.subscriptions"),
+                                showsDismissButton: true
                             ) {
                                 ImportSubscriptionsView(instance: instance)
                             }
@@ -258,7 +259,8 @@ private struct EditRemoteServerContent: View {
                             #if os(tvOS)
                             TVSidebarDetailContainer(
                                 systemImage: "list.bullet.rectangle",
-                                title: String(localized: "sources.import.playlists")
+                                title: String(localized: "sources.import.playlists"),
+                                showsDismissButton: true
                             ) {
                                 ImportPlaylistsView(instance: instance)
                             }

@@ -11,7 +11,6 @@ struct ImportSubscriptionsView: View {
     let instance: Instance
 
     @Environment(\.appEnvironment) private var appEnvironment
-    @Environment(\.dismiss) private var dismiss
 
     @State private var channels: [Channel] = []
     @State private var subscribedChannelIDs: Set<String> = []
@@ -51,15 +50,6 @@ struct ImportSubscriptionsView: View {
             .navigationBarTitleDisplayMode(.inline)
             #endif
             .toolbar {
-                #if os(tvOS)
-                ToolbarItem(placement: .cancellationAction) {
-                    Button {
-                        dismiss()
-                    } label: {
-                        Label(String(localized: "common.done"), systemImage: "chevron.backward")
-                    }
-                }
-                #endif
                 if !unsubscribedChannels.isEmpty {
                     ToolbarItem(placement: .primaryAction) {
                         Button {

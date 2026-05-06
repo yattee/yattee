@@ -26,9 +26,6 @@ struct AcknowledgementsView: View {
 
     @ViewBuilder
     private func dependencyLink(_ name: String, url: String) -> some View {
-        #if os(tvOS)
-        Text(name)
-        #else
         Button {
             if let url = URL(string: url) {
                 openURL(url)
@@ -37,14 +34,15 @@ struct AcknowledgementsView: View {
             HStack {
                 Text(name)
                 Spacer()
+                #if !os(tvOS)
                 Image(systemName: "arrow.up.right")
                     .foregroundStyle(.secondary)
+                #endif
             }
             .contentShape(Rectangle())
         }
         #if os(macOS)
         .buttonStyle(.plain)
-        #endif
         #endif
     }
 }
