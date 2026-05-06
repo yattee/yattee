@@ -65,4 +65,20 @@ struct TVSidebarDetailContainer<Content: View, BottomAction: View>: View {
             }
     }
 }
+
+struct TVDismissBottomButton: View {
+    var title: String = String(localized: "common.done")
+    var systemImage: String = "chevron.backward"
+
+    @Environment(\.dismiss) private var dismiss
+
+    var body: some View {
+        Button {
+            dismiss()
+        } label: {
+            Label(title, systemImage: systemImage)
+        }
+        .buttonStyle(TVSettingsButtonStyle())
+    }
+}
 #endif

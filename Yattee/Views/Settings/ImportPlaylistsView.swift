@@ -11,6 +11,7 @@ struct ImportPlaylistsView: View {
     let instance: Instance
 
     @Environment(\.appEnvironment) private var appEnvironment
+    @Environment(\.dismiss) private var dismiss
 
     @State private var playlists: [Playlist] = []
     @State private var importedPlaylistIDs: Set<String> = []
@@ -51,12 +52,23 @@ struct ImportPlaylistsView: View {
 
     var body: some View {
         content
+            #if !os(tvOS)
             .navigationTitle(String(localized: "import.playlists.title"))
+            #endif
             .accessibilityIdentifier(AccessibilityID.view)
             #if os(iOS)
             .navigationBarTitleDisplayMode(.inline)
             #endif
             .toolbar {
+                #if os(tvOS)
+                ToolbarItem(placement: .cancellationAction) {
+                    Button {
+                        dismiss()
+                    } label: {
+                        Label(String(localized: "common.done"), systemImage: "chevron.backward")
+                    }
+                }
+                #endif
                 if !unimportedPlaylists.isEmpty && importingPlaylistID == nil {
                     ToolbarItem(placement: .primaryAction) {
                         Button {

@@ -239,14 +239,32 @@ private struct EditRemoteServerContent: View {
                 if isLoggedIn && (instance.type == .invidious || instance.type == .piped) {
                     Section {
                         NavigationLink {
+                            #if os(tvOS)
+                            TVSidebarDetailContainer(
+                                systemImage: "person.2",
+                                title: String(localized: "sources.import.subscriptions")
+                            ) {
+                                ImportSubscriptionsView(instance: instance)
+                            }
+                            #else
                             ImportSubscriptionsView(instance: instance)
+                            #endif
                         } label: {
                             Label(String(localized: "sources.import.subscriptions"), systemImage: "person.2")
                         }
                         .accessibilityIdentifier("sources.import.subscriptions")
 
                         NavigationLink {
+                            #if os(tvOS)
+                            TVSidebarDetailContainer(
+                                systemImage: "list.bullet.rectangle",
+                                title: String(localized: "sources.import.playlists")
+                            ) {
+                                ImportPlaylistsView(instance: instance)
+                            }
+                            #else
                             ImportPlaylistsView(instance: instance)
+                            #endif
                         } label: {
                             Label(String(localized: "sources.import.playlists"), systemImage: "list.bullet.rectangle")
                         }
