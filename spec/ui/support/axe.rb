@@ -54,6 +54,60 @@ module UITest
       false
     end
 
+    # Whether any element in the given tree has an AXUniqueId starting with the
+    # given prefix. Pass an already-fetched tree to avoid re-spawning `axe`.
+    def self.id_with_prefix_in_tree?(node, prefix)
+      case node
+      when Hash
+        return true if node['AXUniqueId']&.start_with?(prefix)
+
+        node.each_value do |value|
+          return true if id_with_prefix_in_tree?(value, prefix)
+        end
+      when Array
+        node.each do |item|
+          return true if id_with_prefix_in_tree?(item, prefix)
+        end
+      end
+      false
+    end
+
+    # Whether any element in the given tree has an AXLabel containing `text`.
+    # Pass an already-fetched tree to avoid re-spawning `axe`.
+    def self.label_in_tree?(node, text)
+      case node
+      when Hash
+        return true if node['AXLabel']&.include?(text)
+
+        node.each_value do |value|
+          return true if label_in_tree?(value, text)
+        end
+      when Array
+        node.each do |item|
+          return true if label_in_tree?(item, text)
+        end
+      end
+      false
+    end
+
+    # Whether any element in the given tree has the given AXUniqueId. Pass an
+    # already-fetched tree to avoid re-spawning `axe`.
+    def self.id_in_tree?(node, identifier)
+      case node
+      when Hash
+        return true if node['AXUniqueId'] == identifier
+
+        node.each_value do |value|
+          return true if id_in_tree?(value, identifier)
+        end
+      when Array
+        node.each do |item|
+          return true if id_in_tree?(item, identifier)
+        end
+      end
+      false
+    end
+
     # Tap on an element by accessibility identifier
     # @param identifier [String] Accessibility identifier
     def tap_id(identifier)
