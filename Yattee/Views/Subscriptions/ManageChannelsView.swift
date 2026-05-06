@@ -81,24 +81,20 @@ struct ManageChannelsView: View {
 
     var body: some View {
         GeometryReader { geometry in
-            Group {
-                if isLoading && channels.isEmpty {
-                    ProgressView()
-                        .frame(maxWidth: .infinity, maxHeight: .infinity)
-                } else if channels.isEmpty {
-                    ContentUnavailableView {
-                        Label(String(localized: "subscriptions.channels.title"), systemImage: "person.2")
-                    } description: {
-                        Text(String(localized: "subscriptions.channels.empty"))
-                    }
-                    .frame(maxWidth: .infinity, maxHeight: .infinity)
-                } else {
-                    channelsView
-                }
+            #if os(tvOS)
+            VStack(spacing: 0) {
+                tvOSHeader
+                stateContent
             }
             .onChange(of: geometry.size.width, initial: true) { _, newWidth in
                 viewWidth = newWidth
             }
+            #else
+            stateContent
+                .onChange(of: geometry.size.width, initial: true) { _, newWidth in
+                    viewWidth = newWidth
+                }
+            #endif
         }
         #if !os(tvOS)
         .navigationTitle(String(localized: "subscriptions.channels.title"))
@@ -227,41 +223,60 @@ struct ManageChannelsView: View {
     // MARK: - Content Views
 
     @ViewBuilder
+    private var stateContent: some View {
+        if isLoading && channels.isEmpty {
+            ProgressView()
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+        } else if channels.isEmpty {
+            ContentUnavailableView {
+                Label(String(localized: "subscriptions.channels.title"), systemImage: "person.2")
+            } description: {
+                Text(String(localized: "subscriptions.channels.empty"))
+            }
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
+        } else {
+            channelsView
+        }
+    }
+
+    #if os(tvOS)
+    /// Header rendered above every state on tvOS so focus always has a target.
+    @ViewBuilder
+    private var tvOSHeader: some View {
+        HStack(spacing: 24) {
+            TextField("search.channels.placeholder", text: $searchText)
+                .textFieldStyle(.plain)
+
+            Button {
+                showViewOptions = true
+            } label: {
+                Label(String(localized: "viewOptions.title"), systemImage: "slider.horizontal.3")
+            }
+        }
+        .focusSection()
+        .padding(.horizontal, 48)
+        .padding(.top, 20)
+        .padding(.bottom, 20)
+    }
+    #endif
+
+    @ViewBuilder
     private var channelsView: some View {
         #if os(tvOS)
-        VStack(spacing: 0) {
-            // tvOS: Inline search field and action button for better focus navigation
-            HStack(spacing: 24) {
-                TextField("search.channels.placeholder", text: $searchText)
-                    .textFieldStyle(.plain)
-
-                Button {
-                    showViewOptions = true
-                } label: {
-                    Label(String(localized: "viewOptions.title"), systemImage: "slider.horizontal.3")
+        Group {
+            if filteredChannels.isEmpty {
+                ContentUnavailableView.search(text: searchText)
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+            } else {
+                switch layout {
+                case .list:
+                    listContent
+                case .grid:
+                    gridContent
                 }
             }
-            .focusSection()
-            .padding(.horizontal, 48)
-            .padding(.top, 20)
-            .padding(.bottom, 20)
-
-            // Content
-            Group {
-                if filteredChannels.isEmpty {
-                    ContentUnavailableView.search(text: searchText)
-                    .frame(maxWidth: .infinity, maxHeight: .infinity)
-                } else {
-                    switch layout {
-                    case .list:
-                        listContent
-                    case .grid:
-                        gridContent
-                    }
-                }
-            }
-            .focusSection()
         }
+        .focusSection()
         #else
         Group {
             if filteredChannels.isEmpty {

@@ -137,7 +137,13 @@ private struct ManageChannelsSection: View {
         SettingsFormSection {
             #if os(tvOS)
             NavigationLink {
-                ManageChannelNotificationsView()
+                TVSidebarDetailContainer(
+                    systemImage: "bell.badge",
+                    title: String(localized: "settings.notifications.manageChannels"),
+                    showsDismissButton: true
+                ) {
+                    ManageChannelNotificationsView()
+                }
             } label: {
                 Label(
                     String(localized: "settings.notifications.manageChannels"),
