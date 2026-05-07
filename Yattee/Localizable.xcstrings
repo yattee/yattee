@@ -12101,6 +12101,26 @@
         }
       }
     },
+    "settings.playback.quality.allowSoftwareDecoded" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Allow Software-Decoded Formats"
+          }
+        }
+      }
+    },
+    "settings.playback.quality.allowSoftwareDecoded.footer" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lets the player auto-select formats that aren't hardware decoded on this device. Playback may stutter on weaker devices."
+          }
+        }
+      }
+    },
     "settings.playback.quality.best" : {
       "localizations" : {
         "en" : {

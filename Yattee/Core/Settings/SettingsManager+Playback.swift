@@ -75,6 +75,20 @@ extension SettingsManager {
         }
     }
 
+    /// When enabled, the auto stream selector will consider video formats whose codec
+    /// is not hardware-decodable on this device. Disabled by default. Useful on Apple TV
+    /// where 4K VP9/AV1 is otherwise excluded from auto-selection.
+    var allowSoftwareDecodedFormats: Bool {
+        get {
+            if let cached = _allowSoftwareDecodedFormats { return cached }
+            return bool(for: .allowSoftwareDecodedFormats, default: false)
+        }
+        set {
+            _allowSoftwareDecodedFormats = newValue
+            set(newValue, for: .allowSoftwareDecodedFormats)
+        }
+    }
+
     /// Preferred audio language code (e.g., "en", "de", "ja").
     /// When set, audio streams in this language will be auto-selected and shown first.
     /// nil means no preference (use original/default audio).

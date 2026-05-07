@@ -40,6 +40,7 @@ final class SettingsManager {
     var _playerVolume: Float?
     var _resumeAction: ResumeAction?
     var _tvOSMenuButtonClosesVideo: Bool?
+    var _allowSoftwareDecodedFormats: Bool?
 
     // SponsorBlock
     var _sponsorBlockEnabled: Bool?
@@ -413,6 +414,7 @@ final class SettingsManager {
         _playerVolume = nil
         _resumeAction = nil
         _tvOSMenuButtonClosesVideo = nil
+        _allowSoftwareDecodedFormats = nil
         _sponsorBlockEnabled = nil
         _sponsorBlockCategories = nil
         _sponsorBlockAPIURL = nil

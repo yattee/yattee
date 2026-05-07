@@ -25,6 +25,7 @@ enum SettingsKey: String, CaseIterable {
     case preferredSubtitlesLanguage
     case resumeAction
     case tvOSMenuButtonClosesVideo
+    case allowSoftwareDecodedFormats
 
     // SponsorBlock
     case sponsorBlockEnabled
@@ -129,7 +130,7 @@ enum SettingsKey: String, CaseIterable {
     /// in both UserDefaults and iCloud, so each platform family syncs independently.
     var isPlatformSpecific: Bool {
         switch self {
-        case .preferredQuality, .cellularQuality, .macPlayerMode, .listStyle,
+        case .preferredQuality, .cellularQuality, .allowSoftwareDecodedFormats, .macPlayerMode, .listStyle,
              // Home layout — different UI paradigms per platform
              .homeShortcutOrder, .homeShortcutVisibility, .homeShortcutLayout,
              .homeSectionOrder, .homeSectionVisibility, .homeSectionItemsLimit, .homeSectionLayout,

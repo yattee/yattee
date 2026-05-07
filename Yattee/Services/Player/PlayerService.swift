@@ -1906,9 +1906,17 @@ final class PlayerService {
                 filteredVideoStreams = videoOnlyStreams
             }
 
-            // Filter out codecs with priority 0 (software decode) if hardware options exist
-            let hardwareDecodableStreams = filteredVideoStreams.filter { videoCodecPriority($0.videoCodec) > 0 }
-            let streamsToConsider = hardwareDecodableStreams.isEmpty ? filteredVideoStreams : hardwareDecodableStreams
+            // Filter out codecs with priority 0 (software decode) if hardware options exist,
+            // unless the user opted in to software-decoded formats (e.g. to unlock 4K VP9/AV1
+            // on Apple TV models without hardware decoders for those codecs).
+            let allowSoftware = settingsManager?.allowSoftwareDecodedFormats ?? false
+            let streamsToConsider: [Stream]
+            if allowSoftware {
+                streamsToConsider = filteredVideoStreams
+            } else {
+                let hardwareDecodableStreams = filteredVideoStreams.filter { videoCodecPriority($0.videoCodec) > 0 }
+                streamsToConsider = hardwareDecodableStreams.isEmpty ? filteredVideoStreams : hardwareDecodableStreams
+            }
 
             // Sort by resolution first, then by codec priority
             let sortedVideo = streamsToConsider.sorted { s1, s2 in

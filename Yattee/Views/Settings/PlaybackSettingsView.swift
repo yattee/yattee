@@ -38,7 +38,10 @@ private struct QualitySection: View {
     @Bindable var settings: SettingsManager
 
     var body: some View {
-        SettingsFormSection("settings.playback.video.header") {
+        SettingsFormSection(
+            "settings.playback.video.header",
+            footer: "settings.playback.quality.allowSoftwareDecoded.footer"
+        ) {
             PlatformMenuPicker(
                 String(localized: "settings.playback.quality.preferred"),
                 selection: $settings.preferredQuality
@@ -58,6 +61,11 @@ private struct QualitySection: View {
                 }
             }
             #endif
+
+            Toggle(
+                String(localized: "settings.playback.quality.allowSoftwareDecoded"),
+                isOn: $settings.allowSoftwareDecodedFormats
+            )
         }
     }
 }

@@ -92,17 +92,21 @@ extension QualitySelectorView {
     }
 
     /// Recommended video streams (hardware-decodable codecs).
+    /// When `allowSoftwareDecodedFormats` is ON, all video streams are considered recommended.
     var recommendedVideoStreams: [Stream] {
         videoStreams.filter { (stream: Stream) -> Bool in
             if stream.url.isFileURL { return true }
             if stream.isMuxed { return true }
+            if allowSoftwareDecodedFormats { return true }
             return !requiresSoftwareDecode(stream.videoCodec)
         }
     }
 
     /// Other video streams (software decode required).
+    /// Empty when `allowSoftwareDecodedFormats` is ON — those streams are now recommended.
     var otherVideoStreams: [Stream] {
-        videoStreams.filter { (stream: Stream) -> Bool in
+        if allowSoftwareDecodedFormats { return [] }
+        return videoStreams.filter { (stream: Stream) -> Bool in
             if stream.url.isFileURL { return false }
             if stream.isMuxed { return false }
             return requiresSoftwareDecode(stream.videoCodec)
