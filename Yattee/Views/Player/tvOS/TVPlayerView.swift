@@ -268,6 +268,30 @@ struct TVPlayerView: View {
                 .allowsHitTesting(false)
             }
 
+            // Press-and-hold continuous seek (UIPress-based; routes to the
+            // same accumulating seek functions as the discrete .onMoveCommand
+            // path).
+            TVRemoteHoldSeekOverlay(
+                isActive: !isDetailsPanelVisible
+                    && !isDebugOverlayVisible
+                    && !showingQualitySheet
+                    && !showingQueueSheet
+                    && !isScrubbing
+            ) { forward, step in
+                if controlsVisible, !isScrubbing {
+                    // Controls visible — mirror the discrete focused-bar
+                    // path. We do NOT gate on focusedControl == .progressBar
+                    // because tvOS focus may briefly drop while the window
+                    // recognizer captures the press; the user's intent is
+                    // clearly to scrub the visible bar.
+                    triggerScrubberRemoteSeek(forward: forward, stepSeconds: step)
+                } else {
+                    // Controls hidden — accumulating overlay seek.
+                    triggerRemoteSeek(forward: forward, stepSeconds: step)
+                }
+            }
+            .allowsHitTesting(false)
+
             // Autoplay countdown overlay
             if showAutoplayCountdown, let nextVideo = playerState?.nextQueuedVideo {
                 TVAutoplayCountdownView(
@@ -555,8 +579,7 @@ struct TVPlayerView: View {
     /// subtracts from the pending offset instead of restarting from the
     /// current playback time (e.g. right, right, left from 30s → +10s → 40s,
     /// not −10s → 20s).
-    private func triggerRemoteSeek(forward: Bool) {
-        let stepSeconds = 10
+    private func triggerRemoteSeek(forward: Bool, stepSeconds: Int = 10) {
         let currentTime = playerState?.currentTime ?? 0
         let duration = playerState?.duration ?? 0
 
@@ -586,8 +609,7 @@ struct TVPlayerView: View {
     /// controls are visible. Suppresses the circular feedback overlay — the
     /// visible scrubber shows the pending target instead — and uses the same
     /// signed net-offset accumulation as the hidden-controls flow.
-    private func triggerScrubberRemoteSeek(forward: Bool) {
-        let stepSeconds = 10
+    private func triggerScrubberRemoteSeek(forward: Bool, stepSeconds: Int = 10) {
         let currentTime = playerState?.currentTime ?? 0
         let duration = playerState?.duration ?? 0
 
@@ -606,8 +628,18 @@ struct TVPlayerView: View {
         let netMagnitude = abs(clampedNet)
         let netIsForward = clampedNet >= 0
 
-        scrubberRemoteSeek = (isForward: netIsForward, seconds: netMagnitude)
-        scrubberRemoteSeekTime = currentTime + TimeInterval(clampedNet)
+        // When the seek is clamped at the edge of the seekable range,
+        // successive ticks would write the same values; skip the @State
+        // assignments to avoid spurious SwiftUI invalidations.
+        if scrubberRemoteSeek?.isForward != netIsForward
+            || scrubberRemoteSeek?.seconds != netMagnitude
+        {
+            scrubberRemoteSeek = (isForward: netIsForward, seconds: netMagnitude)
+        }
+        let newSeekTime = currentTime + TimeInterval(clampedNet)
+        if scrubberRemoteSeekTime != newSeekTime {
+            scrubberRemoteSeekTime = newSeekTime
+        }
 
         scrubberRemoteSeekTask?.cancel()
         scrubberRemoteSeekTask = Task { @MainActor in
