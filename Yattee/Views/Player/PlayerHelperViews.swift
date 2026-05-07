@@ -113,6 +113,7 @@ struct ErrorDetailsSheet: View {
             .navigationBarTitleDisplayMode(.inline)
             #endif
             .toolbar {
+                #if !os(tvOS)
                 ToolbarItem(placement: .confirmationAction) {
                     Button(role: .cancel) {
                         dismiss()
@@ -131,14 +132,13 @@ struct ErrorDetailsSheet: View {
                     }
                     .accessibilityLabel(String(localized: "player.error.copy.accessibilityLabel"))
 
-                    #if os(iOS) || os(macOS)
                     // Share button (not available on tvOS)
                     ShareLink(item: errorMessage) {
                         Label(String(localized: "player.error.share"), systemImage: "square.and.arrow.up")
                     }
                     .accessibilityLabel(String(localized: "player.error.share.accessibilityLabel"))
-                    #endif
                 }
+                #endif
             }
         }
         #if os(iOS)

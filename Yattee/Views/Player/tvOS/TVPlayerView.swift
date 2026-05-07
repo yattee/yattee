@@ -21,6 +21,10 @@ enum TVPlayerFocusTarget: Hashable {
     case playNext
     case closeButton
     case queueButton
+    case errorDetails
+    case errorRetry
+    case errorPlayNext
+    case errorClose
 }
 
 /// Main tvOS fullscreen player view.
@@ -50,6 +54,9 @@ struct TVPlayerView: View {
 
     /// Whether the queue sheet is shown.
     @State private var showingQueueSheet = false
+
+    /// Whether the error details sheet is shown.
+    @State private var showingErrorSheet = false
 
     /// Whether the debug overlay is shown.
     @State private var isDebugOverlayVisible = false
@@ -121,6 +128,17 @@ struct TVPlayerView: View {
                         .fill(.ultraThinMaterial)
                         .ignoresSafeArea()
                     QueueManagementSheet()
+                }
+            }
+            .fullScreenCover(isPresented: $showingErrorSheet) {
+                ZStack {
+                    Rectangle()
+                        .fill(.ultraThinMaterial)
+                        .ignoresSafeArea()
+                    ErrorDetailsSheet(errorMessage: playerState?.errorMessage ?? "Unknown error")
+                        .frame(maxWidth: 1200, maxHeight: 700)
+                        .padding(.horizontal, 200)
+                        .padding(.vertical, 80)
                 }
             }
     }
@@ -302,7 +320,18 @@ struct TVPlayerView: View {
                 )
                 .transition(.opacity.combined(with: .scale(scale: 0.95)))
             }
+
+            // Playback failure overlay
+            if playerState?.isFailed == true {
+                failedOverlay
+                    .transition(.opacity)
+            } else if playerState?.retryState.exhausted == true {
+                retryExhaustedOverlay
+                    .transition(.opacity)
+            }
         }
+        .animation(.easeInOut(duration: 0.25), value: playerState?.isFailed)
+        .animation(.easeInOut(duration: 0.25), value: playerState?.retryState.exhausted)
         .onAppear {
             startControlsTimer()
             focusedControl = .progressBar
@@ -333,6 +362,13 @@ struct TVPlayerView: View {
                 startControlsTimer()
             } else if newState == .ended {
                 handleVideoEnded()
+            } else if case .failed = newState {
+                handleVideoFailed()
+            }
+        }
+        .onChange(of: playerState?.retryState.exhausted) { _, exhausted in
+            if exhausted == true {
+                handleVideoFailed()
             }
         }
         // Dismiss countdown if video changes during countdown (e.g., from remote control)
@@ -344,11 +380,156 @@ struct TVPlayerView: View {
         }
     }
 
+    // MARK: - Failure Overlays
+
+    /// Whether either failure overlay is currently visible.
+    private var isFailureOverlayVisible: Bool {
+        playerState?.isFailed == true || playerState?.retryState.exhausted == true
+    }
+
+    @ViewBuilder
+    private var failedOverlay: some View {
+        ZStack {
+            Color.black.opacity(0.55)
+                .ignoresSafeArea()
+
+            VStack(spacing: 36) {
+                VStack(spacing: 20) {
+                    Image(systemName: "exclamationmark.triangle.fill")
+                        .font(.system(size: 64, weight: .semibold))
+                        .foregroundStyle(.yellow)
+                    if let message = playerState?.errorMessage, !message.isEmpty {
+                        Text(message)
+                            .font(.system(size: 24))
+                            .foregroundStyle(.white.opacity(0.85))
+                            .multilineTextAlignment(.center)
+                            .lineLimit(3)
+                            .frame(maxWidth: 1000)
+                    }
+                }
+                .padding(.horizontal, 60)
+                .padding(.vertical, 36)
+                .glassBackground(.regular, in: .rect(cornerRadius: 28), fallback: .ultraThinMaterial)
+
+                HStack(spacing: 32) {
+                    failureButton(
+                        title: String(localized: "player.error.button"),
+                        systemImage: "info.circle",
+                        focus: .errorDetails,
+                        action: { showingErrorSheet = true }
+                    )
+
+                    failureButton(
+                        title: String(localized: "player.error.retry"),
+                        systemImage: "arrow.clockwise",
+                        focus: .errorRetry,
+                        action: { retryPlayback() }
+                    )
+
+                    if playerState?.nextQueuedVideo != nil {
+                        failureButton(
+                            title: String(localized: "player.autoplay.playNext"),
+                            systemImage: "forward.fill",
+                            focus: .errorPlayNext,
+                            action: { playNextInQueue() }
+                        )
+                    } else {
+                        failureButton(
+                            title: String(localized: "player.close"),
+                            systemImage: "xmark",
+                            focus: .errorClose,
+                            action: { closeVideo() }
+                        )
+                    }
+                }
+                .focusSection()
+            }
+        }
+    }
+
+    @ViewBuilder
+    private var retryExhaustedOverlay: some View {
+        ZStack {
+            Color.black.opacity(0.55)
+                .ignoresSafeArea()
+
+            VStack(spacing: 36) {
+                VStack(spacing: 12) {
+                    Image(systemName: "arrow.clockwise.circle")
+                        .font(.system(size: 56, weight: .semibold))
+                        .foregroundStyle(.white.opacity(0.85))
+                    Text(String(localized: "player.retry.button"))
+                        .font(.system(size: 32, weight: .semibold))
+                        .foregroundStyle(.white)
+                }
+
+                HStack(spacing: 32) {
+                    failureButton(
+                        title: String(localized: "player.error.retry"),
+                        systemImage: "arrow.clockwise",
+                        focus: .errorRetry,
+                        action: { retryPlayback() }
+                    )
+
+                    failureButton(
+                        title: String(localized: "player.close"),
+                        systemImage: "xmark",
+                        focus: .errorClose,
+                        action: { closeVideo() }
+                    )
+                }
+                .focusSection()
+            }
+        }
+    }
+
+    @ViewBuilder
+    private func failureButton(
+        title: String,
+        systemImage: String,
+        focus: TVPlayerFocusTarget,
+        action: @escaping () -> Void
+    ) -> some View {
+        Button(action: action) {
+            Label(title, systemImage: systemImage)
+                .font(.system(size: 22, weight: .semibold))
+                .foregroundStyle(.white)
+                .frame(width: 320, height: 80)
+        }
+        .buttonStyle(TVFailureButtonStyle())
+        .focused($focusedControl, equals: focus)
+    }
+
+    // MARK: - Failure Actions
+
+    /// Restart playback of the current video from scratch.
+    private func retryPlayback() {
+        guard let playerService, let video = playerState?.currentVideo else { return }
+        Task {
+            await playerService.play(video: video)
+        }
+    }
+
+    /// Called when playback enters the failed state or retries are exhausted.
+    private func handleVideoFailed() {
+        stopControlsTimer()
+        stopAutoplayCountdown()
+        withAnimation(.easeOut(duration: 0.25)) {
+            controlsVisible = false
+        }
+        // Defer focus assignment so the overlay is in the tree before the focus
+        // engine evaluates it.
+        Task { @MainActor in
+            try? await Task.sleep(for: .milliseconds(50))
+            focusedControl = .errorRetry
+        }
+    }
+
     // MARK: - Background Layer
 
     @ViewBuilder
     private var backgroundLayer: some View {
-        if !controlsVisible && !isDetailsPanelVisible && !isDebugOverlayVisible {
+        if !controlsVisible && !isDetailsPanelVisible && !isDebugOverlayVisible && !isFailureOverlayVisible {
             // When controls hidden, use a Button to capture both click and swipe
             Button {
                 showControls()
@@ -413,7 +594,7 @@ struct TVPlayerView: View {
 
     /// Whether the primary controls overlay should be visible right now.
     private var shouldShowControls: Bool {
-        controlsVisible && !isDetailsPanelVisible && !isDebugOverlayVisible
+        controlsVisible && !isDetailsPanelVisible && !isDebugOverlayVisible && !isFailureOverlayVisible
     }
 
     // MARK: - Controls Timer
@@ -682,7 +863,14 @@ struct TVPlayerView: View {
     }
 
     private func handleMenuButton() {
-        if showAutoplayCountdown {
+        if showingErrorSheet {
+            // Top priority: close the error details sheet
+            showingErrorSheet = false
+        } else if isFailureOverlayVisible {
+            // While the failure overlay is up, Menu closes the video so the
+            // user isn't stranded with no working remote affordance.
+            closeVideo()
+        } else if showAutoplayCountdown {
             // First priority: cancel countdown
             cancelAutoplay()
         } else if isDebugOverlayVisible {
@@ -813,6 +1001,24 @@ struct TVPlayerView: View {
 struct TVBackgroundButtonStyle: ButtonStyle {
     func makeBody(configuration: Configuration) -> some View {
         configuration.label
+    }
+}
+
+/// Glass-backed button style used by the playback failure overlay.
+/// Scales on focus and brightens the glass material to indicate selection.
+struct TVFailureButtonStyle: ButtonStyle {
+    @Environment(\.isFocused) private var isFocused
+
+    func makeBody(configuration: Configuration) -> some View {
+        configuration.label
+            .glassBackground(
+                isFocused ? .tinted(.white.opacity(0.25)) : .regular,
+                in: .capsule,
+                fallback: isFocused ? .ultraThickMaterial : .ultraThinMaterial
+            )
+            .scaleEffect(configuration.isPressed ? 0.95 : (isFocused ? 1.08 : 1.0))
+            .animation(.easeInOut(duration: 0.15), value: isFocused)
+            .animation(.easeInOut(duration: 0.1), value: configuration.isPressed)
     }
 }
 
