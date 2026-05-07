@@ -71,8 +71,6 @@ struct QualitySelectorView: View {
         appEnvironment?.settingsManager.showAdvancedStreamDetails ?? false
     }
 
-    /// Whether the user has opted in to software-decoded formats during auto-selection.
-    /// When enabled, software-decoded streams are treated as recommended (no split).
     var allowSoftwareDecodedFormats: Bool {
         appEnvironment?.settingsManager.allowSoftwareDecodedFormats ?? false
     }
