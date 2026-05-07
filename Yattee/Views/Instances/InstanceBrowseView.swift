@@ -170,11 +170,6 @@ struct InstanceBrowseView: View {
                             .padding()
                         }
 
-                        // Feed channel filter strip (hidden during search)
-                        if selectedTab == .feed && !feedSubscriptions.isEmpty && !isInSearchMode {
-                            feedChannelFilterStrip
-                        }
-
                         // Content
                         Group {
                             if isInSearchMode, let vm = searchViewModel {
