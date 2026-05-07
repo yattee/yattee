@@ -218,19 +218,27 @@ struct SubscriptionsView: View {
                 ZStack {
                     #if os(tvOS)
                     HStack(alignment: .top, spacing: 24) {
-                        tvOSChannelsSidebar
-                            .frame(width: max(geometry.size.width * 0.28, 360), alignment: .leading)
-                            .focusSection()
-
-                        Group {
-                            switch layout {
-                            case .list:
-                                listContent
-                            case .grid:
-                                gridContent
-                            }
+                        if showSidebar && subscriptionsLoaded && subscriptions.count > 1 {
+                            tvOSChannelsSidebar
+                                .frame(width: max(geometry.size.width * 0.28, 360), alignment: .leading)
+                                .focusSection()
                         }
-                        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
+
+                        VStack(alignment: .leading, spacing: 16) {
+                            if !showSidebar || subscriptions.count <= 1 {
+                                tvOSViewOptionsButton
+                            }
+
+                            Group {
+                                switch layout {
+                                case .list:
+                                    listContent
+                                case .grid:
+                                    gridContent
+                                }
+                            }
+                            .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
+                        }
                         .focusSection()
                     }
                     .padding(.horizontal, 16)
@@ -324,6 +332,8 @@ struct SubscriptionsView: View {
                                     if isIPadRegular {
                                         Toggle("viewOptions.showSidebar", isOn: $showSidebar)
                                     }
+                                    #elseif os(tvOS)
+                                    Toggle("viewOptions.showSidebar", isOn: $showSidebar)
                                     #endif
 
                                     // Layout picker (inline menu)
@@ -702,15 +712,19 @@ struct SubscriptionsView: View {
     // MARK: - tvOS Channels Sidebar
 
     #if os(tvOS)
+    private var tvOSViewOptionsButton: some View {
+        Button {
+            showViewOptions = true
+        } label: {
+            Label(String(localized: "viewOptions.title"), systemImage: "slider.horizontal.3")
+        }
+        .buttonStyle(.bordered)
+    }
+
     private var tvOSChannelsSidebar: some View {
         VStack(alignment: .leading, spacing: 16) {
-            Button {
-                showViewOptions = true
-            } label: {
-                Label(String(localized: "viewOptions.title"), systemImage: "slider.horizontal.3")
-                    .frame(maxWidth: .infinity, alignment: .leading)
-            }
-            .buttonStyle(.bordered)
+            tvOSViewOptionsButton
+                .frame(maxWidth: .infinity, alignment: .leading)
 
             ScrollView(.vertical, showsIndicators: false) {
                 LazyVStack(alignment: .leading, spacing: 20) {
@@ -901,6 +915,8 @@ struct SubscriptionsView: View {
         return showSidebar && subscriptionsLoaded && subscriptions.count > 1
         #elseif os(iOS)
         return isIPadRegular && showSidebar && subscriptionsLoaded && subscriptions.count > 1
+        #elseif os(tvOS)
+        return showSidebar && subscriptionsLoaded && subscriptions.count > 1
         #else
         return false
         #endif
