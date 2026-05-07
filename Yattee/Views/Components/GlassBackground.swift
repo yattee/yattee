@@ -68,11 +68,11 @@ struct GlassBackgroundModifier: ViewModifier {
         if #available(iOS 26.0, *) {
             content.modifier(LiquidGlassModifier(style: style, shape: shape, colorScheme: colorScheme))
         } else {
-            content.modifier(FallbackGlassModifier(shape: shape, material: fallbackMaterial))
+            content.modifier(FallbackGlassModifier(shape: shape, material: fallbackMaterial, colorScheme: colorScheme))
         }
         #else
-        // macOS doesn't have glassEffect, always use fallback material
-        content.modifier(FallbackGlassModifier(shape: shape, material: fallbackMaterial))
+        // macOS / tvOS don't have glassEffect, always use fallback material
+        content.modifier(FallbackGlassModifier(shape: shape, material: fallbackMaterial, colorScheme: colorScheme))
         #endif
     }
 }
@@ -127,6 +127,7 @@ private struct LiquidGlassModifier: ViewModifier {
 private struct FallbackGlassModifier: ViewModifier {
     let shape: GlassShape
     let material: GlassFallbackMaterial
+    let colorScheme: ColorScheme?
 
     func body(content: Content) -> some View {
         switch shape {
@@ -147,6 +148,15 @@ private struct FallbackGlassModifier: ViewModifier {
 
     @ViewBuilder
     private var materialBackground: some View {
+        if let colorScheme {
+            rawMaterialBackground.environment(\.colorScheme, colorScheme)
+        } else {
+            rawMaterialBackground
+        }
+    }
+
+    @ViewBuilder
+    private var rawMaterialBackground: some View {
         switch material {
         case .ultraThinMaterial:
             Rectangle().fill(.ultraThinMaterial)

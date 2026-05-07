@@ -353,9 +353,11 @@ struct TVActionButtonStyle: ButtonStyle {
             .minimumScaleFactor(0.8)
             .padding(.horizontal, 20)
             .frame(minWidth: 100, minHeight: 80)
-            .background(
-                RoundedRectangle(cornerRadius: 12)
-                    .fill(isFocused ? .white.opacity(0.3) : .white.opacity(0.1))
+            .glassBackground(
+                isFocused ? .tinted(.white.opacity(0.35)) : .regular,
+                in: .rect(cornerRadius: 12),
+                fallback: isFocused ? .ultraThickMaterial : .ultraThinMaterial,
+                colorScheme: .light
             )
             .scaleEffect(configuration.isPressed ? 0.95 : (isFocused ? 1.05 : 1.0))
             .animation(.easeInOut(duration: 0.15), value: isFocused)
@@ -371,14 +373,17 @@ struct TVTransportButtonStyle: ButtonStyle {
 
     func makeBody(configuration: Configuration) -> some View {
         let size: CGFloat = isPrimary ? 88 : 72
+        let style: GlassStyle = {
+            if isPrimary {
+                return isFocused ? .tinted(.white.opacity(0.85)) : .tinted(.white.opacity(0.35))
+            } else {
+                return isFocused ? .tinted(.white.opacity(0.35)) : .regular
+            }
+        }()
+        let fallback: GlassFallbackMaterial = (isFocused || isPrimary) ? .ultraThickMaterial : .ultraThinMaterial
         return configuration.label
             .frame(width: size, height: size)
-            .background(
-                Circle()
-                    .fill(isFocused
-                        ? (isPrimary ? .white.opacity(0.95) : .white.opacity(0.3))
-                        : (isPrimary ? .white.opacity(0.25) : .white.opacity(0.12)))
-            )
+            .glassBackground(style, in: .circle, fallback: fallback, colorScheme: .light)
             .foregroundStyle(isFocused && isPrimary ? Color.black : .white)
             .scaleEffect(configuration.isPressed ? 0.92 : (isFocused ? 1.08 : 1.0))
             .animation(.easeInOut(duration: 0.15), value: isFocused)
@@ -394,9 +399,11 @@ struct TVCloseButtonStyle: ButtonStyle {
         configuration.label
             .foregroundStyle(.white)
             .frame(width: 64, height: 64)
-            .background(
-                Circle()
-                    .fill(isFocused ? .white.opacity(0.3) : .white.opacity(0.12))
+            .glassBackground(
+                isFocused ? .tinted(.white.opacity(0.35)) : .regular,
+                in: .circle,
+                fallback: isFocused ? .ultraThickMaterial : .ultraThinMaterial,
+                colorScheme: .light
             )
             .scaleEffect(configuration.isPressed ? 0.92 : (isFocused ? 1.08 : 1.0))
             .animation(.easeInOut(duration: 0.15), value: isFocused)
