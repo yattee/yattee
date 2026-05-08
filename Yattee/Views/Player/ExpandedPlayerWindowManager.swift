@@ -21,9 +21,10 @@ final class ExpandedPlayerWindowManager: NSObject {
 
     // Configuration
     private let minWidth: CGFloat = 640
-    private let minHeight: CGFloat = 480
+    private let minHeight: CGFloat = 360
     private let maxScreenRatio: CGFloat = 0.7
     private let targetVideoHeight: CGFloat = 720
+    private let defaultAspectRatio: Double = 16.0 / 9.0
 
     var isPresented: Bool {
         playerWindow != nil
@@ -89,8 +90,11 @@ final class ExpandedPlayerWindowManager: NSObject {
         window.titleVisibility = .hidden
         window.isMovableByWindowBackground = true
         window.backgroundColor = NSColor.windowBackgroundColor
-        window.minSize = NSSize(width: minWidth, height: minHeight)
         window.contentViewController = hostingController
+
+        // Lock manual resize to the video aspect ratio. Seeded with 16:9 here;
+        // updated as soon as the real video aspect ratio is known.
+        applyAspectRatioConstraint(defaultAspectRatio, to: window)
 
         // Set up window delegate for close handling
         // Make ExpandedPlayerWindowManager itself the delegate to avoid lifecycle issues
@@ -256,6 +260,9 @@ final class ExpandedPlayerWindowManager: NSObject {
         guard let window = playerWindow else { return }
         guard aspectRatio > 0 else { return }
 
+        // Always update the aspect-ratio lock, even if we end up not resizing here.
+        applyAspectRatioConstraint(aspectRatio, to: window)
+
         // Get screen bounds
         guard let screen = window.screen ?? NSScreen.main else { return }
         let screenFrame = screen.visibleFrame
@@ -278,7 +285,31 @@ final class ExpandedPlayerWindowManager: NSObject {
         window.setFrame(adjustedFrame, display: true, animate: animated)
     }
 
+    /// Locks the window's resize behavior to the given aspect ratio without
+    /// changing the current frame. Use this when the auto-resize setting is
+    /// disabled but we still want manual resizing to be ratio-locked.
+    func lockAspectRatio(_ aspectRatio: Double) {
+        guard let window = playerWindow else { return }
+        guard aspectRatio > 0 else { return }
+        applyAspectRatioConstraint(aspectRatio, to: window)
+    }
+
     // MARK: - Private Helpers
+
+    /// Sets `contentAspectRatio` and a ratio-consistent `minSize` on the window
+    /// so that interactive resize couples width and height proportionally.
+    private func applyAspectRatioConstraint(_ aspectRatio: Double, to window: NSWindow) {
+        guard aspectRatio > 0 else { return }
+
+        // contentAspectRatio is expressed as a ratio; using (aspectRatio, 1) keeps it exact.
+        window.contentAspectRatio = NSSize(width: aspectRatio, height: 1)
+
+        // Derive a minimum size that lies on the same ratio so the lower bound
+        // doesn't force the window off-ratio (which would re-introduce bars).
+        // Anchor on minHeight and scale width by aspect.
+        let derivedMinWidth = max(minHeight * CGFloat(aspectRatio), 320)
+        window.minSize = NSSize(width: derivedMinWidth, height: minHeight)
+    }
 
     private func configureWindowLevel(_ window: NSWindow, floating: Bool) {
         if floating {

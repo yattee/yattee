@@ -953,6 +953,11 @@ private struct PlayerMacOSEventHandlersModifier: ViewModifier {
 
     private func handleAspectRatioChange(oldValue: Double?, newValue: Double?) {
         guard let newValue, newValue > 0 else { return }
+
+        // Always keep the manual-resize aspect lock in sync, regardless of the
+        // auto-resize setting — the user always wants resize to be ratio-locked.
+        ExpandedPlayerWindowManager.shared.lockAspectRatio(newValue)
+
         guard appEnvironment?.settingsManager.playerSheetAutoResize == true else { return }
 
         let shouldAnimate = oldValue != nil
@@ -982,9 +987,12 @@ private struct PlayerMacOSEventHandlersModifier: ViewModifier {
     }
 
     private func handleMacOSAppear() {
-        if appEnvironment?.settingsManager.playerSheetAutoResize == true,
-           let aspectRatio = playerState?.videoAspectRatio,
-           aspectRatio > 0 {
+        guard let aspectRatio = playerState?.videoAspectRatio, aspectRatio > 0 else { return }
+
+        // Lock aspect ratio for manual resize unconditionally.
+        ExpandedPlayerWindowManager.shared.lockAspectRatio(aspectRatio)
+
+        if appEnvironment?.settingsManager.playerSheetAutoResize == true {
             ExpandedPlayerWindowManager.shared.resizeToFitAspectRatio(aspectRatio, animated: false)
         }
     }
