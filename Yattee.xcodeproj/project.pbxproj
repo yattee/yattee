@@ -384,7 +384,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "if [ \"${CONFIGURATION}\" != \"Release-DeveloperID\" ]; then\n    FW=\"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Sparkle.framework\"\n    if [ -d \"$FW\" ]; then\n        echo \"Stripping Sparkle.framework (config=${CONFIGURATION})\"\n        chflags -R nouchg \"$FW\" 2>/dev/null || true\n        chmod -R u+w \"$FW\" 2>/dev/null || true\n        TMP=\"${FW}.stripping.$$\"\n        if mv \"$FW\" \"$TMP\" 2>/dev/null; then\n            TARGET=\"$TMP\"\n        else\n            TARGET=\"$FW\"\n        fi\n        for i in 1 2 3 4 5; do\n            rm -rf \"$TARGET\" && break\n            sleep 0.2\n        done\n        if [ -e \"$TARGET\" ]; then\n            echo \"warning: failed to fully remove $TARGET\" >&2\n            exit 1\n        fi\n    fi\nfi\n";
+			shellScript = "if [ \"${CONFIGURATION}\" = \"Release-DeveloperID\" ] || [ \"${CONFIGURATION}\" = \"Debug\" ]; then\n    echo \"Skipping Sparkle strip (config=${CONFIGURATION})\"\n    exit 0\nfi\nFW=\"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Sparkle.framework\"\nif [ -d \"$FW\" ]; then\n    echo \"Stripping Sparkle.framework (config=${CONFIGURATION})\"\n    chflags -R nouchg \"$FW\" 2>/dev/null || true\n    chmod -R u+w \"$FW\" 2>/dev/null || true\n    TMP=\"${FW}.stripping.$$\"\n    if mv \"$FW\" \"$TMP\" 2>/dev/null; then\n        TARGET=\"$TMP\"\n    else\n        TARGET=\"$FW\"\n    fi\n    for i in 1 2 3 4 5; do\n        rm -rf \"$TARGET\" && break\n        sleep 0.2\n    done\n    if [ -e \"$TARGET\" ]; then\n        echo \"warning: failed to fully remove $TARGET\" >&2\n        exit 1\n    fi\nfi\n";
 		};
 /* End PBXShellScriptBuildPhase section */
 
