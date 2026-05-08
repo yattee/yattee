@@ -373,18 +373,12 @@ struct TVTransportButtonStyle: ButtonStyle {
 
     func makeBody(configuration: Configuration) -> some View {
         let size: CGFloat = isPrimary ? 88 : 72
-        let style: GlassStyle = {
-            if isPrimary {
-                return isFocused ? .tinted(.white.opacity(0.85)) : .tinted(.white.opacity(0.35))
-            } else {
-                return isFocused ? .tinted(.white.opacity(0.35)) : .regular
-            }
-        }()
-        let fallback: GlassFallbackMaterial = (isFocused || isPrimary) ? .ultraThickMaterial : .ultraThinMaterial
+        let style: GlassStyle = isFocused ? .tinted(.white.opacity(0.35)) : .regular
+        let fallback: GlassFallbackMaterial = isFocused ? .ultraThickMaterial : .ultraThinMaterial
         return configuration.label
             .frame(width: size, height: size)
             .glassBackground(style, in: .circle, fallback: fallback, colorScheme: .light)
-            .foregroundStyle(isFocused && isPrimary ? Color.black : .white)
+            .foregroundStyle(isFocused ? Color.black : .white)
             .scaleEffect(configuration.isPressed ? 0.92 : (isFocused ? 1.08 : 1.0))
             .animation(.easeInOut(duration: 0.15), value: isFocused)
             .animation(.easeInOut(duration: 0.1), value: configuration.isPressed)
