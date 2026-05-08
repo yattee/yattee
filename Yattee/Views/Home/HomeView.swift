@@ -277,7 +277,6 @@ struct HomeView: View {
             #if os(tvOS)
             Text(title)
                 .fontWeight(.semibold)
-                .foregroundStyle(accentColor)
             #else
             Button(action: action) {
                 HStack(spacing: 4) {
