@@ -333,7 +333,10 @@ struct SubscriptionsView: View {
                                         Toggle("viewOptions.showSidebar", isOn: $showSidebar)
                                     }
                                     #elseif os(tvOS)
-                                    Toggle("viewOptions.showSidebar", isOn: $showSidebar)
+                                    PlatformMenuPicker(String(localized: "viewOptions.showSidebar"), selection: $showSidebar) {
+                                        Text("common.on").tag(true)
+                                        Text("common.off").tag(false)
+                                    }
                                     #endif
 
                                     // Layout picker (inline menu)
@@ -370,7 +373,14 @@ struct SubscriptionsView: View {
                                         #endif
                                     }
 
+                                    #if os(tvOS)
+                                    PlatformMenuPicker(String(localized: "viewOptions.hideWatched"), selection: $hideWatched) {
+                                        Text("common.on").tag(true)
+                                        Text("common.off").tag(false)
+                                    }
+                                    #else
                                     Toggle("viewOptions.hideWatched", isOn: $hideWatched)
+                                    #endif
 
                                     #if os(iOS)
                                     Picker("viewOptions.channelStrip", selection: $channelStripSize) {
