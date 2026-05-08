@@ -31,12 +31,15 @@ struct ToastOverlayView: View {
                     onDismiss: {
                         toastManager?.dismiss(id: toast.id)
                     },
-                    onAction: toast.action?.handler
+                    onAction: toast.action?.handler,
+                    onDragBegan: {
+                        toastManager?.pauseAutoDismiss(id: toast.id)
+                    },
+                    onDragCancelled: {
+                        toastManager?.resumeAutoDismiss(id: toast.id)
+                    }
                 )
                 .transition(.move(edge: .top).combined(with: .opacity))
-                #if !os(tvOS)
-                .gesture(swipeGesture(for: toast))
-                #endif
             }
         }
         .padding(.top, topPadding)
@@ -56,18 +59,6 @@ struct ToastOverlayView: View {
         return 60
         #endif
     }
-
-    #if !os(tvOS)
-    private func swipeGesture(for toast: Toast) -> some Gesture {
-        DragGesture()
-            .onEnded { value in
-                // Swipe up to dismiss
-                if value.translation.height < -50 {
-                    toastManager?.dismiss(id: toast.id)
-                }
-            }
-    }
-    #endif
 }
 
 // MARK: - View Extension

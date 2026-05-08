@@ -12,8 +12,14 @@ struct ToastCardView: View {
     let toast: Toast
     let onDismiss: () -> Void
     let onAction: (() async -> Void)?
+    var onDragBegan: (() -> Void)? = nil
+    var onDragCancelled: (() -> Void)? = nil
 
     @State private var isAnimating = false
+    #if os(iOS)
+    @State private var dragOffset: CGFloat = 0
+    @State private var didNotifyDragBegan = false
+    #endif
 
     var body: some View {
         HStack(spacing: Self.iconSpacing) {
@@ -49,12 +55,54 @@ struct ToastCardView: View {
         .glassBackground(.regular, in: .capsule, fallback: .regularMaterial)
         .shadow(color: .black.opacity(0.15), radius: 10, y: 4)
         .scaleEffect(isAnimating ? 1 : 0.9)
+        #if os(iOS)
+        .compositingGroup()
+        .opacity(Double(1 - min(abs(min(dragOffset, 0)) / 120, 1)))
+        .offset(y: min(dragOffset, 0))
+        .contentShape(Capsule())
+        .simultaneousGesture(swipeGesture)
+        #endif
         .onAppear {
             withAnimation(.spring(response: 0.3, dampingFraction: 0.7)) {
                 isAnimating = true
             }
         }
     }
+
+    #if os(iOS)
+    private var swipeGesture: some Gesture {
+        DragGesture()
+            .onChanged { value in
+                if !didNotifyDragBegan {
+                    didNotifyDragBegan = true
+                    onDragBegan?()
+                }
+                let h = value.translation.height
+                let target: CGFloat = h < 0 ? h : h * 0.2
+                var tx = Transaction()
+                tx.disablesAnimations = true
+                withTransaction(tx) {
+                    dragOffset = target
+                }
+            }
+            .onEnded { value in
+                didNotifyDragBegan = false
+                let translation = value.translation.height
+                let predicted = value.predictedEndTranslation.height
+                if translation < -60 || predicted < -200 {
+                    withAnimation(.easeOut(duration: 0.2)) {
+                        dragOffset = -200
+                    }
+                    onDismiss()
+                } else {
+                    withAnimation(.spring(response: 0.3, dampingFraction: 0.7)) {
+                        dragOffset = 0
+                    }
+                    onDragCancelled?()
+                }
+            }
+    }
+    #endif
 
     @ViewBuilder
     private var leadingIcon: some View {

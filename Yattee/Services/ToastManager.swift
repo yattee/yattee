@@ -380,6 +380,20 @@ final class ToastManager {
         LoggingService.shared.info("Dismissed toast: \(id)", category: .general)
     }
 
+    /// Cancel the pending auto-dismiss timer for a toast (e.g. while user is interacting with it).
+    func pauseAutoDismiss(id: UUID) {
+        dismissTasks[id]?.cancel()
+        dismissTasks.removeValue(forKey: id)
+    }
+
+    /// Re-arm the auto-dismiss timer for a toast using its original delay.
+    func resumeAutoDismiss(id: UUID) {
+        guard let toast = activeToasts.first(where: { $0.id == id }) else { return }
+        guard !toast.isPersistent || toast.autoDismissDelay > 0 else { return }
+        dismissTasks[id]?.cancel()
+        scheduleAutoDismiss(for: toast)
+    }
+
     private func scheduleAutoDismiss(for toast: Toast) {
         let task = Task { [weak self] in
             try? await Task.sleep(for: .seconds(toast.autoDismissDelay))
