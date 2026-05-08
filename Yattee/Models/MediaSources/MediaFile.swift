@@ -67,7 +67,14 @@ struct MediaFile: Identifiable, Hashable, Sendable {
 
     /// Full URL to this file.
     var url: URL {
-        source.url.appendingPathComponent(path)
+        // For local folders, the persisted `source.url` may point at a stale app
+        // container path after iOS reinstall/restore. Prefer the freshly resolved
+        // bookmark URL stored in `LocalFolderURLResolver` when available.
+        if source.type == .localFolder,
+           let resolved = LocalFolderURLResolver.resolvedURL(for: source.id) {
+            return resolved.appendingPathComponent(path)
+        }
+        return source.url.appendingPathComponent(path)
     }
 
     /// File extension (lowercase).

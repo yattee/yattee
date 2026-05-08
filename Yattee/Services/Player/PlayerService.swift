@@ -1394,8 +1394,20 @@ final class PlayerService {
         LoggingService.shared.debug("[SubtitleDebug] Found source: \(source.name), type: \(source.type)", category: .player)
 
         let password = mediaSourcesManager?.password(for: source)
-        let parentPath = (filePath as NSString).deletingLastPathComponent
-        let fileName = (filePath as NSString).lastPathComponent
+
+        // Legacy video IDs for `.localFolder` sources may carry an absolute container
+        // path (recorded before relative paths were computed correctly). Normalize
+        // against the source folder name so the path becomes relative and doesn't
+        // get appended onto the freshly resolved bookmark base, which would produce
+        // a doubled `/Documents/<folder>/private/var/.../Documents/<folder>/...` path.
+        let normalizedFilePath: String
+        if source.type == .localFolder {
+            normalizedFilePath = LocalFileClient.normalizeAbsolutePath(filePath, sourceFolderName: source.url.lastPathComponent)
+        } else {
+            normalizedFilePath = filePath
+        }
+        let parentPath = (normalizedFilePath as NSString).deletingLastPathComponent
+        let fileName = (normalizedFilePath as NSString).lastPathComponent
 
         LoggingService.shared.debug("[SubtitleDebug] parentPath: \(parentPath), fileName: \(fileName)", category: .player)
 
