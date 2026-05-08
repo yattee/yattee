@@ -64,6 +64,7 @@ struct SearchView: View {
 
     // Grid layout configuration
     @State private var viewWidth: CGFloat = 0
+    @State private var watchEntriesMap: [String: WatchEntry] = [:]
     private var gridConfig: GridLayoutConfiguration {
         GridLayoutConfiguration(viewWidth: viewWidth, gridColumns: gridColumns)
     }
@@ -151,6 +152,12 @@ struct SearchView: View {
         }
         .onReceive(NotificationCenter.default.publisher(for: .searchHistoryDidChange)) { _ in
             loadSearchHistory()
+        }
+        .onReceive(NotificationCenter.default.publisher(for: .watchHistoryDidChange)) { _ in
+            loadWatchEntries()
+        }
+        .task {
+            loadWatchEntries()
         }
         .onReceive(NotificationCenter.default.publisher(for: .recentChannelsDidChange)) { _ in
             loadRecentChannels()
@@ -1110,7 +1117,7 @@ struct SearchView: View {
         ) {
             switch item {
             case .video(let video, let videoIndex):
-                VideoRowView(video: video, style: rowStyle)
+                VideoRowView(video: video, style: rowStyle, watchProgress: watchProgress(for: video))
                     .tappableVideo(
                         video,
                         queueSource: searchQueueSource,
@@ -1181,6 +1188,7 @@ struct SearchView: View {
                         case .video(let video, let videoIndex):
                             VideoCardView(
                                 video: video,
+                                watchProgress: watchProgress(for: video),
                                 isCompact: gridConfig.isCompactCards
                             )
                             .frame(maxHeight: .infinity, alignment: .top)
@@ -1251,6 +1259,16 @@ struct SearchView: View {
     }
 
     // MARK: - Search History Helpers
+
+    private func loadWatchEntries() {
+        watchEntriesMap = appEnvironment?.dataManager.watchEntriesMap() ?? [:]
+    }
+
+    private func watchProgress(for video: Video) -> Double? {
+        guard let entry = watchEntriesMap[video.id.videoID] else { return nil }
+        let progress = entry.progress
+        return progress > 0 && progress < 1 ? progress : nil
+    }
 
     private func loadSearchHistory() {
         guard appEnvironment?.settingsManager.saveRecentSearches != false else {

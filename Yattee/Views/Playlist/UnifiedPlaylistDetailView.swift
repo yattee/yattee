@@ -92,6 +92,8 @@ struct UnifiedPlaylistDetailView: View {
     @State private var hasLoadedDownloadState = false
     #endif
 
+    @State private var watchEntriesMap: [String: WatchEntry] = [:]
+
     private var dataManager: DataManager? { appEnvironment?.dataManager }
     private var isQueueEnabled: Bool { appEnvironment?.settingsManager.queueEnabled ?? true }
 
@@ -186,6 +188,9 @@ struct UnifiedPlaylistDetailView: View {
         .presentationCompactAdaptation(.sheet)
         .task {
             await loadPlaylist()
+        }
+        .onReceive(NotificationCenter.default.publisher(for: .watchHistoryDidChange)) { _ in
+            loadWatchEntries()
         }
         #if !os(tvOS)
         .batchDownload(coordinator: downloadCoordinator)
@@ -663,6 +668,7 @@ struct UnifiedPlaylistDetailView: View {
                         PlaylistVideoRowView(
                             index: index + 1,
                             video: video,
+                            watchProgress: watchProgress(for: video),
                             onRemove: isLocal ? { removeVideo(at: index) } : nil
                         )
                     }
@@ -697,6 +703,17 @@ struct UnifiedPlaylistDetailView: View {
         case .remote(let playlistID, let instance, _):
             await loadRemotePlaylist(playlistID: playlistID, instance: instance)
         }
+        loadWatchEntries()
+    }
+
+    private func loadWatchEntries() {
+        watchEntriesMap = dataManager?.watchEntriesMap() ?? [:]
+    }
+
+    private func watchProgress(for video: Video) -> Double? {
+        guard let entry = watchEntriesMap[video.id.videoID] else { return nil }
+        let progress = entry.progress
+        return progress > 0 && progress < 1 ? progress : nil
     }
 
     private func loadLocalPlaylist() {

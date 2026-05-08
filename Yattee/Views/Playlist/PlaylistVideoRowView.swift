@@ -13,12 +13,14 @@ import SwiftUI
 struct PlaylistVideoRowView: View {
     let index: Int
     let video: Video
+    var watchProgress: Double? = nil
     var onRemove: (() -> Void)? = nil
 
     var body: some View {
         VideoRowView(
             video: video,
             style: .regular,
+            watchProgress: watchProgress,
             index: index
         )
         .videoContextMenu(
@@ -40,9 +42,10 @@ struct PlaylistVideoRowView: View {
 
 extension PlaylistVideoRowView {
     /// Initialize from a LocalPlaylistItem model.
-    init(item: LocalPlaylistItem, index: Int, onRemove: @escaping () -> Void) {
+    init(item: LocalPlaylistItem, index: Int, watchProgress: Double? = nil, onRemove: @escaping () -> Void) {
         self.index = index
         self.video = item.toVideo()
+        self.watchProgress = watchProgress
         self.onRemove = onRemove
     }
 }

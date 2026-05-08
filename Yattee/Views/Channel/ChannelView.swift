@@ -176,6 +176,12 @@ struct ChannelView: View {
         watchEntriesMap = appEnvironment?.dataManager.watchEntriesMap() ?? [:]
     }
 
+    private func watchProgress(for video: Video) -> Double? {
+        guard let entry = watchEntriesMap[video.id.videoID] else { return nil }
+        let progress = entry.progress
+        return progress > 0 && progress < 1 ? progress : nil
+    }
+
     // MARK: - Computed Properties for Scroll Animation
 
     /// Progress from 0 (fully expanded) to 1 (fully collapsed)
@@ -1255,7 +1261,7 @@ struct ChannelView: View {
                         rowStyle: rowStyle,
                         listStyle: listStyle
                     ) {
-                        VideoRowView(video: video, style: rowStyle)
+                        VideoRowView(video: video, style: rowStyle, watchProgress: watchProgress(for: video))
                             .tappableVideo(
                                 video,
                                 queueSource: videosQueueSource,
@@ -1315,7 +1321,7 @@ struct ChannelView: View {
     private var videosGridContent: some View {
         VideoGridContent(columns: gridConfig.effectiveColumns) {
             ForEach(Array(filteredVideos.enumerated()), id: \.element.id) { index, video in
-                VideoCardView(video: video, isCompact: gridConfig.isCompactCards)
+                VideoCardView(video: video, watchProgress: watchProgress(for: video), isCompact: gridConfig.isCompactCards)
                     .tappableVideo(
                         video,
                         queueSource: videosQueueSource,
@@ -1500,7 +1506,7 @@ struct ChannelView: View {
                         rowStyle: rowStyle,
                         listStyle: listStyle
                     ) {
-                        VideoRowView(video: video, style: rowStyle)
+                        VideoRowView(video: video, style: rowStyle, watchProgress: watchProgress(for: video))
                             .tappableVideo(
                                 video,
                                 queueSource: shortsQueueSource,
@@ -1540,7 +1546,7 @@ struct ChannelView: View {
 
         VideoGridContent(columns: gridConfig.effectiveColumns) {
             ForEach(Array(filteredShorts.enumerated()), id: \.element.id) { index, video in
-                VideoCardView(video: video, isCompact: gridConfig.isCompactCards)
+                VideoCardView(video: video, watchProgress: watchProgress(for: video), isCompact: gridConfig.isCompactCards)
                     .tappableVideo(
                         video,
                         queueSource: shortsQueueSource,
@@ -1620,7 +1626,7 @@ struct ChannelView: View {
                         rowStyle: rowStyle,
                         listStyle: listStyle
                     ) {
-                        VideoRowView(video: video, style: rowStyle)
+                        VideoRowView(video: video, style: rowStyle, watchProgress: watchProgress(for: video))
                             .tappableVideo(
                                 video,
                                 queueSource: streamsQueueSource,
@@ -1660,7 +1666,7 @@ struct ChannelView: View {
 
         VideoGridContent(columns: gridConfig.effectiveColumns) {
             ForEach(Array(filteredStreams.enumerated()), id: \.element.id) { index, video in
-                VideoCardView(video: video, isCompact: gridConfig.isCompactCards)
+                VideoCardView(video: video, watchProgress: watchProgress(for: video), isCompact: gridConfig.isCompactCards)
                     .tappableVideo(
                         video,
                         queueSource: streamsQueueSource,
@@ -1736,7 +1742,7 @@ struct ChannelView: View {
                 ) {
                     switch item {
                     case .video(let video):
-                        VideoRowView(video: video, style: rowStyle)
+                        VideoRowView(video: video, style: rowStyle, watchProgress: watchProgress(for: video))
                             .tappableVideo(
                                 video,
                                 queueSource: searchQueueSource,
@@ -1770,7 +1776,7 @@ struct ChannelView: View {
             ForEach(searchResults.items) { item in
                 switch item {
                 case .video(let video):
-                    VideoCardView(video: video, isCompact: gridConfig.isCompactCards)
+                    VideoCardView(video: video, watchProgress: watchProgress(for: video), isCompact: gridConfig.isCompactCards)
                         .tappableVideo(
                             video,
                             queueSource: searchQueueSource,
