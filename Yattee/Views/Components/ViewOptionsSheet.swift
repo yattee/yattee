@@ -28,7 +28,7 @@ struct ViewOptionsSheet: View {
 
     /// Effective columns clamped to valid range.
     private var effectiveColumns: Int {
-        min(max(1, gridColumns), maxGridColumns)
+        min(max(GridConstants.minAllowedColumns, gridColumns), max(GridConstants.minAllowedColumns, maxGridColumns))
     }
 
     var body: some View {
@@ -64,7 +64,7 @@ struct ViewOptionsSheet: View {
 
                     if layout == .grid {
                         Picker("viewOptions.columns.header", selection: $gridColumns) {
-                            ForEach(1...maxGridColumns, id: \.self) { count in
+                            ForEach(GridConstants.minAllowedColumns...max(GridConstants.minAllowedColumns, maxGridColumns), id: \.self) { count in
                                 Text("\(count)").tag(count)
                             }
                         }
@@ -123,7 +123,7 @@ struct ViewOptionsSheet: View {
                 if layout == .grid {
                     #if os(tvOS)
                     Picker("viewOptions.columns.header", selection: $gridColumns) {
-                        ForEach(1...maxGridColumns, id: \.self) { count in
+                        ForEach(GridConstants.minAllowedColumns...max(GridConstants.minAllowedColumns, maxGridColumns), id: \.self) { count in
                             Text("\(count)").tag(count)
                         }
                     }
@@ -131,7 +131,7 @@ struct ViewOptionsSheet: View {
                     Stepper(
                         "viewOptions.columns \(effectiveColumns)",
                         value: $gridColumns,
-                        in: 1...maxGridColumns
+                        in: GridConstants.minAllowedColumns...max(GridConstants.minAllowedColumns, maxGridColumns)
                     )
                     #endif
                 }

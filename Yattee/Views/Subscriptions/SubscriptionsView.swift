@@ -359,16 +359,16 @@ struct SubscriptionsView: View {
                                     if layout == .grid {
                                         #if os(tvOS)
                                         Picker("viewOptions.columns.header", selection: $gridColumns) {
-                                            ForEach(1...max(1, gridConfig.maxColumns), id: \.self) { count in
+                                            ForEach(GridConstants.minAllowedColumns...max(GridConstants.minAllowedColumns, gridConfig.maxColumns), id: \.self) { count in
                                                 Text("\(count)").tag(count)
                                             }
                                         }
                                         .pickerStyle(.segmented)
                                         #else
                                         Stepper(
-                                            "viewOptions.columns \(min(max(1, gridColumns), gridConfig.maxColumns))",
+                                            "viewOptions.columns \(min(max(GridConstants.minAllowedColumns, gridColumns), gridConfig.maxColumns))",
                                             value: $gridColumns,
-                                            in: 1...gridConfig.maxColumns
+                                            in: GridConstants.minAllowedColumns...max(GridConstants.minAllowedColumns, gridConfig.maxColumns)
                                         )
                                         #endif
                                     }

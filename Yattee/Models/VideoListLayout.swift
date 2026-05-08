@@ -55,6 +55,15 @@ enum GridConstants {
     /// Maximum allowed columns (to prevent excessive density).
     static let maxAllowedColumns = 6
 
+    /// Minimum allowed columns. tvOS doesn't make sense with a single column.
+    static let minAllowedColumns: Int = {
+        #if os(tvOS)
+        2
+        #else
+        1
+        #endif
+    }()
+
     /// Threshold for compact card styling (columns >= this use compact mode).
     static let compactThreshold = 3
 }
@@ -74,14 +83,14 @@ func maxGridColumns(
     // Formula: availableWidth = (columns * minCardWidth) + ((columns - 1) * spacing)
     // Solving for columns: columns = (availableWidth + spacing) / (minCardWidth + spacing)
     let maxColumns = Int((availableWidth + spacing) / (minCardWidth + spacing))
-    return max(1, min(maxColumns, GridConstants.maxAllowedColumns))
+    return max(GridConstants.minAllowedColumns, min(maxColumns, GridConstants.maxAllowedColumns))
 }
 
 /// Creates grid columns for a LazyVGrid with the specified count.
 /// - Parameter count: Number of columns
 /// - Returns: Array of flexible GridItems with top alignment
 func makeGridColumns(count: Int) -> [GridItem] {
-    Array(repeating: GridItem(.flexible(), spacing: GridConstants.spacing, alignment: .top), count: max(1, count))
+    Array(repeating: GridItem(.flexible(), spacing: GridConstants.spacing, alignment: .top), count: max(GridConstants.minAllowedColumns, count))
 }
 
 // MARK: - Grid Layout Configuration
@@ -118,7 +127,7 @@ struct GridLayoutConfiguration {
 
     /// Effective column count, clamped to valid range.
     var effectiveColumns: Int {
-        min(max(1, gridColumns), max(1, maxColumns))
+        min(max(GridConstants.minAllowedColumns, gridColumns), max(GridConstants.minAllowedColumns, maxColumns))
     }
 
     /// Whether cards should use compact styling (3+ columns).
