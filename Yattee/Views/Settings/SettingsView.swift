@@ -107,9 +107,8 @@ struct SettingsView: View {
 
     #if os(tvOS)
     private var tvOSSettings: some View {
-        NavigationStack {
-            List {
-                if let appEnvironment {
+        List {
+            if let appEnvironment {
                     NavigationLink {
                         SourcesListView()
                     } label: {
@@ -201,7 +200,6 @@ struct SettingsView: View {
                 .allowsHitTesting(false)
             }
             .accessibilityIdentifier("settings.view")
-        }
     }
     #endif
 

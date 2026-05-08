@@ -9,6 +9,10 @@
 #if os(tvOS)
 import SwiftUI
 
+extension Notification.Name {
+    static let yatteeTVForcePopDetail = Notification.Name("yatteeTVForcePopDetail")
+}
+
 struct TVSidebarDetailContainer<Content: View>: View {
     let content: Content
     var systemImage: String?
@@ -64,6 +68,9 @@ struct TVSidebarDetailContainer<Content: View>: View {
                         }
                     }
                 }
+            }
+            .onReceive(NotificationCenter.default.publisher(for: .yatteeTVForcePopDetail)) { _ in
+                dismiss()
             }
     }
 }

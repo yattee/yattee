@@ -614,6 +614,55 @@ struct UnifiedTabView: View {
             selection = item
             navigationCoordinator?.selectedSidebarItem = nil
         }
+        .onChange(of: selection) { oldValue, _ in
+            resetPath(for: oldValue)
+            // Force any pushed TVSidebarDetailContainer (used by Settings
+            // sub-pages and similar detail screens) to dismiss. Without this,
+            // tvOS's sidebarAdaptable TabView leaves the previously-pushed
+            // detail visible until the user manually presses Menu.
+            NotificationCenter.default.post(name: .yatteeTVForcePopDetail, object: nil)
+        }
+    }
+
+    /// Pops the previously-selected tab's NavigationStack to its root so its
+    /// pushed views don't linger after the user picks another sidebar item.
+    private func resetPath(for item: SidebarItem) {
+        switch item {
+        case .home:
+            homePath = NavigationPath()
+        case .search:
+            searchPath = NavigationPath()
+        case .subscriptionsFeed:
+            subscriptionsFeedPath = NavigationPath()
+        case .bookmarks:
+            bookmarksPath = NavigationPath()
+        case .history:
+            historyPath = NavigationPath()
+        case .manageChannels:
+            manageChannelsPath = NavigationPath()
+        case .playlistsList:
+            playlistsListPath = NavigationPath()
+        case .sources:
+            sourcesPath = NavigationPath()
+        case .settings:
+            settingsPath = NavigationPath()
+        case .openURL:
+            openURLPath = NavigationPath()
+        case .remoteControl:
+            remoteControlPath = NavigationPath()
+        case .continueWatching:
+            continueWatchingPath = NavigationPath()
+        case let .channel(channelID, _, _):
+            channelPaths[channelID] = NavigationPath()
+        case let .playlist(id, _):
+            playlistPaths[id] = NavigationPath()
+        case let .instance(id, _, _):
+            instancePaths[id] = NavigationPath()
+        case let .mediaSource(id, _, _):
+            mediaSourcePaths[id] = NavigationPath()
+        case .nowPlaying, .downloads:
+            break
+        }
     }
 
     /// Applies the configured startup tab on first appearance.
