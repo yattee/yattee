@@ -97,7 +97,7 @@ protocol MPVClientDelegate: AnyObject {
     func mpvClient(_ client: MPVClient, didUpdateProperty property: String, value: Any?)
     func mpvClient(_ client: MPVClient, didReceiveEvent event: mpv_event_id)
     func mpvClient(_ client: MPVClient, didUpdateCacheState cacheState: MPVCacheState)
-    func mpvClientDidEndFile(_ client: MPVClient, reason: MPVEndFileReason)
+    func mpvClientDidEndFile(_ client: MPVClient, reason: MPVEndFileReason, errorCode: Int32, errorString: String?)
 }
 
 enum MPVEndFileReason {
@@ -107,6 +107,27 @@ enum MPVEndFileReason {
     case error
     case redirect
     case unknown
+}
+
+/// A captured mpv log message. `level` matches mpv's level strings: "fatal", "error", "warn", "info", "v", "debug", "trace".
+struct MPVLogLine {
+    let prefix: String
+    let level: String
+    let text: String
+
+    var formatted: String { "[\(prefix)/\(level)] \(text)" }
+
+    /// Numeric severity for ranking. Higher = more severe.
+    var severity: Int {
+        switch level {
+        case "fatal": return 5
+        case "error": return 4
+        case "warn":  return 3
+        case "info":  return 2
+        case "v":     return 1
+        default:      return 0
+        }
+    }
 }
 
 // MARK: - MPV Client
@@ -133,6 +154,12 @@ final class MPVClient: @unchecked Sendable {
 
     /// Semaphore signaled when event loop exits
     private let eventLoopExitSemaphore = DispatchSemaphore(value: 0)
+
+    /// Ring buffer of recent mpv log messages (formatted "[prefix/level] text").
+    /// Guarded by `logBufferLock`. Used to enrich load-error reports surfaced to the UI.
+    private var recentLogBuffer: [MPVLogLine] = []
+    private let logBufferLock = NSLock()
+    private let recentLogBufferCapacity = 32
 
     /// Callback for render updates (called when mpv wants to redraw)
     var onRenderUpdate: (() -> Void)?
@@ -178,6 +205,52 @@ final class MPVClient: @unchecked Sendable {
         }
     }
 
+    /// Handle MPV_EVENT_LOG_MESSAGE: trim, store in ring buffer, and forward to LoggingService.
+    private func handleLogMessage(_ msg: mpv_event_log_message) {
+        let prefix = String(cString: msg.prefix)
+        let level = String(cString: msg.level)
+        var text = String(cString: msg.text)
+        // mpv text usually ends with a newline; trim for tidy logs.
+        while text.hasSuffix("\n") || text.hasSuffix("\r") {
+            text.removeLast()
+        }
+        guard !text.isEmpty else { return }
+
+        let line = MPVLogLine(prefix: prefix, level: level, text: text)
+
+        logBufferLock.lock()
+        recentLogBuffer.append(line)
+        if recentLogBuffer.count > recentLogBufferCapacity {
+            recentLogBuffer.removeFirst(recentLogBuffer.count - recentLogBufferCapacity)
+        }
+        logBufferLock.unlock()
+
+        let formatted = line.formatted
+        switch level {
+        case "fatal", "error":
+            Task { @MainActor in LoggingService.shared.logMPVError(formatted) }
+        case "warn":
+            Task { @MainActor in LoggingService.shared.logMPVWarning(formatted) }
+        default:
+            Task { @MainActor in LoggingService.shared.logMPV(formatted) }
+        }
+    }
+
+    /// Snapshot the recent log buffer (most-recent-last). Thread-safe.
+    func recentLogLines(minimumSeverity: Int = 0) -> [MPVLogLine] {
+        logBufferLock.lock()
+        defer { logBufferLock.unlock() }
+        if minimumSeverity <= 0 { return recentLogBuffer }
+        return recentLogBuffer.filter { $0.severity >= minimumSeverity }
+    }
+
+    /// Clear the recent log buffer. Call before starting a fresh load attempt.
+    func clearRecentLogLines() {
+        logBufferLock.lock()
+        recentLogBuffer.removeAll(keepingCapacity: true)
+        logBufferLock.unlock()
+    }
+
     // MARK: - Lifecycle
 
     /// Initialize the MPV instance with default options.
@@ -217,6 +290,14 @@ final class MPVClient: @unchecked Sendable {
             }
 
             log("Initialized, setting up property observers...")
+
+            // Subscribe to mpv log messages so we can capture HTTP/demuxer/decoder errors
+            // and surface them when load fails. "warn" covers HTTP errors, demuxer/codec
+            // failures, and network issues without flooding on the happy path.
+            let logLevelResult = mpv_request_log_messages(mpv, "warn")
+            if logLevelResult < 0 {
+                logWarning("Failed to subscribe to mpv log messages: \(String(cString: mpv_error_string(logLevelResult)))")
+            }
 
             // Log hwdec diagnostics
             #if os(tvOS)
@@ -1388,23 +1469,28 @@ final class MPVClient: @unchecked Sendable {
             if let data = event.data {
                 let endFile = data.assumingMemoryBound(to: mpv_event_end_file.self).pointee
                 let reason = mapEndFileReason(endFile.reason)
-                
-                // Log detailed error information when file load fails
-                if endFile.reason == MPV_END_FILE_REASON_ERROR {
-                    let errorCode = endFile.error
-                    let errorString = String(cString: mpv_error_string(errorCode))
-                    logError("End file with error", details: "code=\(errorCode), message=\(errorString)")
-                    
-                    // Also try to get more detailed error from mpv properties
+
+                let isErrorReason = endFile.reason == MPV_END_FILE_REASON_ERROR
+                let errorCode: Int32 = isErrorReason ? endFile.error : 0
+                let errorString: String? = isErrorReason ? String(cString: mpv_error_string(errorCode)) : nil
+
+                if isErrorReason, let mappedString = errorString {
+                    logError("End file with error", details: "code=\(errorCode), message=\(mappedString)")
                     Task { @MainActor in
-                        LoggingService.shared.logMPVError("MPV end-file error: \(errorString) (code: \(errorCode))")
+                        LoggingService.shared.logMPVError("MPV end-file error: \(mappedString) (code: \(errorCode))")
                     }
                 }
-                
+
                 Task { @MainActor [weak self] in
                     guard let self else { return }
-                    self.delegate?.mpvClientDidEndFile(self, reason: reason)
+                    self.delegate?.mpvClientDidEndFile(self, reason: reason, errorCode: errorCode, errorString: errorString)
                 }
+            }
+
+        case MPV_EVENT_LOG_MESSAGE:
+            if let data = event.data {
+                let msg = data.assumingMemoryBound(to: mpv_event_log_message.self).pointee
+                handleLogMessage(msg)
             }
 
         case MPV_EVENT_FILE_LOADED:

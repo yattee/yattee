@@ -109,6 +109,12 @@ final class MPVBackend: PlayerBackend {
     private var currentLoadingID: UUID?   // Tracks current load operation for cancellation
     private var isWaitingForExternalAudio = false  // True when waiting for external audio track to load
 
+    // Captured detail from the most recent failed load attempt (mpv error string + recent log lines).
+    // Surfaced through BackendError.loadFailed so users see the underlying cause.
+    private var lastLoadErrorDetail: String?
+    // Set when MPV reports an END_FILE error during initial load so waitForReady can fail fast.
+    private var loadFailedDuringWait = false
+
     // Buffer stall detection - triggers stream refresh when buffer stuck at 0% for too long
     private var bufferStallStartTime: Date?
     private let bufferStallTimeout: TimeInterval = 30  // Trigger refresh after 30 seconds of stall
@@ -442,6 +448,9 @@ final class MPVBackend: PlayerBackend {
         // Reset state (but keep videoWidth/videoHeight for smooth aspect ratio transition)
         isReady = false
         isInitialLoading = true
+        loadFailedDuringWait = false
+        lastLoadErrorDetail = nil
+        mpvClient?.clearRecentLogLines()
         isSeeking = false
         hasDisplayedVideo = false
         hasStartedPlayback = false
@@ -1381,6 +1390,51 @@ final class MPVBackend: PlayerBackend {
         }
     }
 
+    /// Pick the most informative recent mpv log line and combine with the END_FILE error string.
+    /// Used to populate `BackendError.loadFailed` so the user sees the underlying cause.
+    private func composeLoadErrorDetail(errorCode: Int32, errorString: String?) -> String {
+        let logLines = mpvClient?.recentLogLines() ?? []
+        let preferred = pickMostInformativeLogLine(logLines)
+        if let preferred {
+            if let errorString, !errorString.isEmpty {
+                return "\(errorString): \(preferred)"
+            }
+            return preferred
+        }
+        return errorString ?? "unknown error (code \(errorCode))"
+    }
+
+    /// Returns ` — <line>` for inclusion in a timeout message if a useful log line exists; otherwise empty.
+    private func logBufferDetailIfAny() -> String {
+        guard let mpvClient else { return "" }
+        if let line = pickMostInformativeLogLine(mpvClient.recentLogLines()) {
+            return " — \(line)"
+        }
+        return ""
+    }
+
+    /// Pick the most relevant line: prefer error-level entries containing keywords like
+    /// "HTTP error", "Failed", "error", falling back to the most recent error/warn line.
+    private func pickMostInformativeLogLine(_ lines: [MPVLogLine]) -> String? {
+        guard !lines.isEmpty else { return nil }
+        let keywords = ["HTTP error", "Failed", "Cannot open", "No such", "refused", "timed out", "resolve"]
+
+        // Search most-recent-first.
+        let reversed = Array(lines.reversed())
+
+        if let keywordHit = reversed.first(where: { line in
+            line.severity >= 3 && keywords.contains(where: { line.text.localizedCaseInsensitiveContains($0) })
+        }) {
+            return keywordHit.formatted
+        }
+
+        if let errorLine = reversed.first(where: { $0.severity >= 4 }) {
+            return errorLine.formatted
+        }
+
+        return reversed.first(where: { $0.severity >= 3 })?.formatted
+    }
+
     private func waitForReady(loadingID: UUID) async throws {
         let start = Date()
         let timeout = currentLoadTimeout
@@ -1394,8 +1448,15 @@ final class MPVBackend: PlayerBackend {
                 throw CancellationError()
             }
 
+            // Fail fast: MPV already reported an END_FILE error for this load.
+            if loadFailedDuringWait {
+                let detail = lastLoadErrorDetail ?? "MPV reported load error"
+                throw BackendError.loadFailed("Failed to load stream: \(detail)")
+            }
+
             if Date().timeIntervalSince(start) > timeout {
-                throw BackendError.loadFailed("Timeout waiting for MPV to load stream (\(Int(timeout))s)")
+                let detail = lastLoadErrorDetail.map { " — \($0)" } ?? logBufferDetailIfAny()
+                throw BackendError.loadFailed("Timeout waiting for MPV to load stream (\(Int(timeout))s)\(detail)")
             }
 
             try await Task.sleep(for: .milliseconds(100))
@@ -1409,8 +1470,14 @@ final class MPVBackend: PlayerBackend {
                     throw CancellationError()
                 }
 
+                if loadFailedDuringWait {
+                    let detail = lastLoadErrorDetail ?? "MPV reported load error"
+                    throw BackendError.loadFailed("Failed to load audio track: \(detail)")
+                }
+
                 if Date().timeIntervalSince(start) > timeout {
-                    throw BackendError.loadFailed("Timeout waiting for audio track (\(Int(timeout))s)")
+                    let detail = lastLoadErrorDetail.map { " — \($0)" } ?? logBufferDetailIfAny()
+                    throw BackendError.loadFailed("Timeout waiting for audio track (\(Int(timeout))s)\(detail)")
                 }
 
                 try await Task.sleep(for: .milliseconds(100))
@@ -1442,9 +1509,9 @@ extension MPVBackend: MPVClientDelegate {
         // Cache state is used for buffer display on seek bar - no action needed here
     }
 
-    nonisolated func mpvClientDidEndFile(_ client: MPVClient, reason: MPVEndFileReason) {
+    nonisolated func mpvClientDidEndFile(_ client: MPVClient, reason: MPVEndFileReason, errorCode: Int32, errorString: String?) {
         Task { @MainActor [weak self] in
-            self?.handleEndFile(reason: reason)
+            self?.handleEndFile(reason: reason, errorCode: errorCode, errorString: errorString)
         }
     }
 
@@ -1764,7 +1831,7 @@ extension MPVBackend: MPVClientDelegate {
     }
     #endif
 
-    private func handleEndFile(reason: MPVEndFileReason) {
+    private func handleEndFile(reason: MPVEndFileReason, errorCode: Int32 = 0, errorString: String? = nil) {
         switch reason {
         case .eof:
             LoggingService.shared.debug("MPV: End of file", category: .mpv)
@@ -1783,7 +1850,10 @@ extension MPVBackend: MPVClientDelegate {
                 LoggingService.shared.logMPV("MPV: Requesting stream refresh for mid-playback error")
                 delegate?.backend(self, didRequestStreamRefresh: currentTime)
             } else {
-                LoggingService.shared.debug("MPV: Load error (will retry)", category: .mpv)
+                // Capture detailed cause for waitForReady to surface in BackendError.loadFailed.
+                lastLoadErrorDetail = composeLoadErrorDetail(errorCode: errorCode, errorString: errorString)
+                loadFailedDuringWait = true
+                LoggingService.shared.debug("MPV: Load error (will retry) — \(lastLoadErrorDetail ?? errorString ?? "unknown")", category: .mpv)
             }
 
         case .stop:
