@@ -348,7 +348,7 @@ struct TVActionButtonStyle: ButtonStyle {
 
     func makeBody(configuration: Configuration) -> some View {
         configuration.label
-            .foregroundStyle(.white)
+            .foregroundStyle(isFocused ? Color.black : .white)
             .lineLimit(1)
             .minimumScaleFactor(0.8)
             .padding(.horizontal, 20)
@@ -391,7 +391,7 @@ struct TVCloseButtonStyle: ButtonStyle {
 
     func makeBody(configuration: Configuration) -> some View {
         configuration.label
-            .foregroundStyle(.white)
+            .foregroundStyle(isFocused ? Color.black : .white)
             .frame(width: 64, height: 64)
             .glassBackground(
                 isFocused ? .tinted(.white.opacity(0.35)) : .regular,
