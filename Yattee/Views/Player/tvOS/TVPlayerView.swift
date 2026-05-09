@@ -232,6 +232,7 @@ struct TVPlayerView: View {
                 onShowComments: { showDetailsPanel(tab: .comments) },
                 onShowDebug: { showDebugOverlay() },
                 onClose: { closeVideo() },
+                onTogglePlayPause: { handlePlayPause() },
                 onScrubbingChanged: { scrubbing in
                     isScrubbing = scrubbing
                     if scrubbing {

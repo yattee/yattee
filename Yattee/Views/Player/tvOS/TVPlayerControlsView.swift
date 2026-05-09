@@ -21,6 +21,10 @@ struct TVPlayerControlsView: View {
     let onShowComments: () -> Void
     let onShowDebug: () -> Void
     let onClose: () -> Void
+    /// Called when the on-screen play/pause button is tapped. Parent routes
+    /// through `handlePlayPause()` so visibility/auto-hide timer behave
+    /// consistently with the Siri Remote's hardware Play/Pause button.
+    let onTogglePlayPause: () -> Void
     /// Called when scrubbing state changes - parent should stop auto-hide timer when true
     var onScrubbingChanged: ((Bool) -> Void)?
     /// Pending target time for the bar's accumulating remote-seek flow (arrow
@@ -269,7 +273,7 @@ struct TVPlayerControlsView: View {
 
                 Button {
                     playPauseTapCount += 1
-                    playerService?.togglePlayPause()
+                    onTogglePlayPause()
                 } label: {
                     Image(systemName: playPauseIcon)
                         .font(.system(size: 32, weight: .semibold))
