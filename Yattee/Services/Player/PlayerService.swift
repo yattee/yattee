@@ -498,6 +498,16 @@ final class PlayerService {
             LoggingService.shared.logPlayer("Playback cancelled: \(video.id.id)")
             sleepPreventionService.allowSleep()
         } catch {
+            // If the user has already switched to a different video while this one was
+            // still loading/retrying, suppress the error — it no longer applies to what
+            // is on screen. loadingVideoID is reassigned by every new play() call and
+            // cleared on success, so a mismatch means we are no longer the active load.
+            guard loadingVideoID == video.id else {
+                LoggingService.shared.logPlayer("Ignoring stale playback error for \(video.id.id) — user switched videos")
+                sleepPreventionService.allowSleep()
+                return
+            }
+
             LoggingService.shared.logPlayerError("Playback failed: \(video.id.id)", error: error)
             sleepPreventionService.allowSleep()
             state.videoDetailsState = .error
