@@ -49,8 +49,8 @@ struct TVDetailsPanel: View {
                     }
                 }
                 .pickerStyle(.segmented)
-                .padding(.horizontal, 120)
-                .padding(.top, 60)
+                .padding(.horizontal, 40)
+                .padding(.top, 40)
                 .padding(.bottom, 20)
                 .focused($focusedItem, equals: .tabPicker)
                 .transition(.opacity.combined(with: .move(edge: .top)))
@@ -65,7 +65,7 @@ struct TVDetailsPanel: View {
                     commentsContent
                 }
             }
-            .padding(.horizontal, 88)
+            .padding(.horizontal, 40)
             .frame(maxHeight: .infinity)
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)

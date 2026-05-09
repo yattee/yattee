@@ -264,14 +264,20 @@ struct TVPlayerView: View {
             .disabled(!shouldShowControls)
             .animation(.easeInOut(duration: 0.25), value: shouldShowControls)
 
-            // Swipe-up details panel
+            // Right-side details panel (covers ~50% of screen)
             if isDetailsPanelVisible {
-                TVDetailsPanel(
-                    video: playerState?.currentVideo,
-                    initialTab: detailsPanelInitialTab,
-                    onDismiss: { hideDetailsPanel() }
-                )
-                .transition(.move(edge: .bottom).combined(with: .opacity))
+                GeometryReader { geo in
+                    HStack(spacing: 0) {
+                        Spacer(minLength: 0)
+                        TVDetailsPanel(
+                            video: playerState?.currentVideo,
+                            initialTab: detailsPanelInitialTab,
+                            onDismiss: { hideDetailsPanel() }
+                        )
+                        .frame(width: geo.size.width / 2)
+                    }
+                }
+                .transition(.move(edge: .trailing).combined(with: .opacity))
             }
 
             // Debug overlay
