@@ -844,6 +844,7 @@ struct PlayerControlsView: View {
                     Rectangle()
                         .fill(.red.opacity(0.6))
                         .frame(height: 4)
+                        .clipShape(Capsule())
                 } else {
                     // Regular VOD progress bar with chapter segments
                     SegmentedProgressBar(
@@ -859,16 +860,17 @@ struct PlayerControlsView: View {
                         sponsorSegments: playerState.sponsorSegments,
                         sponsorBlockSettings: activeLayout.progressBarSettings.sponsorBlockSettings
                     )
+                    .clipShape(Capsule())
 
-                    // Scrubber handle - fixed 20x20 frame to prevent layout shift
-                    // Hidden when controls are locked to show only the progress bar
+                    // Scrubber handle - only visible while dragging, zooms in/out
                     Circle()
                         .fill(activeLayout.progressBarSettings.playedColor.color)
                         .frame(width: 20, height: 20)
-                        .scaleEffect(isDragging ? 1.0 : 0.75)
-                        .offset(x: geometry.size.width * displayProgress - 10, y: 8)
-                        .animation(.easeInOut(duration: 0.1), value: isDragging)
-                        .opacity(playerState.isControlsLocked ? 0 : 1)
+                        .scaleEffect(isDragging ? 1.0 : 0.0)
+                        .opacity(isDragging ? 1 : 0)
+                        .offset(x: geometry.size.width * dragProgress - 10, y: 8)
+                        .animation(.spring(response: 0.3, dampingFraction: 0.7), value: isDragging)
+                        .allowsHitTesting(false)
                 }
             }
             .frame(height: 20)
@@ -996,15 +998,6 @@ struct PlayerControlsView: View {
 
     private func chapterForSeekTime(_ seekTime: TimeInterval) -> VideoChapter? {
         playerState.chapters.last { $0.startTime <= seekTime }
-    }
-
-    private var displayProgress: Double {
-        (isDragging || isPendingSeek) ? dragProgress : playerState.progress
-    }
-
-    private var bufferedProgress: Double {
-        guard playerState.duration > 0 else { return 0 }
-        return playerState.bufferedTime / playerState.duration
     }
 
     // MARK: - Timer Management
