@@ -545,6 +545,8 @@ final class MPVClient: @unchecked Sendable {
         observeProperty("video-codec", format: MPV_FORMAT_STRING)
         observeProperty("hwdec-current", format: MPV_FORMAT_STRING)
         observeProperty("hwdec-interop", format: MPV_FORMAT_STRING)
+        // Color transfer for tvOS dynamic-range matching (SDR / HDR10 / HLG)
+        observeProperty("video-params/gamma", format: MPV_FORMAT_STRING)
     }
 
     // MARK: - Options

@@ -108,6 +108,8 @@ enum SettingsKey: String, CaseIterable {
     case mpvBufferSeconds
     case mpvUseEDLStreams
     case zoomTransitionsEnabled
+    case tvMatchDisplayFrameRate
+    case tvMatchDisplayDynamicRange
 
     // Details panel
     case floatingDetailsPanelSide // Landscape only - which side the panel appears on

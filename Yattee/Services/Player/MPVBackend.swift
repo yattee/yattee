@@ -133,6 +133,9 @@ final class MPVBackend: PlayerBackend {
     private var videoCodec: String = ""
     private var hwdecCurrent: String = ""
     private var hwdecInterop: String = ""
+    #if os(tvOS)
+    private var videoGamma: String = ""
+    #endif
     
     // Async initialization tracking
     private var setupTask: Task<Void, Error>?
@@ -753,6 +756,10 @@ final class MPVBackend: PlayerBackend {
         duration = 0
         bufferedTime = 0
         currentStream = nil
+        #if os(tvOS)
+        videoGamma = ""
+        clearTVDisplayCriteria()
+        #endif
         delegate?.backend(self, didChangeState: .idle)
     }
 
@@ -1631,7 +1638,18 @@ extension MPVBackend: MPVClientDelegate {
             if let fps = value as? Double, fps > 0 {
                 containerFps = fps
                 updateRenderViewFPS()
+                #if os(tvOS)
+                applyTVDisplayCriteria()
+                #endif
             }
+
+        #if os(tvOS)
+        case "video-params/gamma":
+            if let gamma = value as? String {
+                videoGamma = gamma
+                applyTVDisplayCriteria()
+            }
+        #endif
 
         case "paused-for-cache":
             if let isPausedForCache = value as? Bool {
@@ -1706,6 +1724,25 @@ extension MPVBackend: MPVClientDelegate {
         checkAndMarkReadyIfVideoAvailable()
     }
 
+    #if os(tvOS)
+    /// Apply tvOS display-mode criteria (frame rate / dynamic range) based on the
+    /// currently-cached MPV video parameters. Safe to call repeatedly as more info
+    /// arrives (fps may land before gamma or vice versa).
+    private func applyTVDisplayCriteria() {
+        let fps = containerFps > 0 ? containerFps : nil
+        let gamma = videoGamma.isEmpty ? nil : videoGamma
+        Task { @MainActor in
+            TVDisplayModeManager.shared.apply(fps: fps, gamma: gamma)
+        }
+    }
+
+    private func clearTVDisplayCriteria() {
+        Task { @MainActor in
+            TVDisplayModeManager.shared.clear()
+        }
+    }
+    #endif
+
     /// Update render view's video FPS for display link frame rate matching
     private func updateRenderViewFPS() {
         // Use cached container-fps (set via property observation to avoid sync fetch on main thread)
@@ -1771,6 +1808,7 @@ extension MPVBackend: MPVClientDelegate {
             let hwdec = hwdecCurrent.isEmpty ? "none" : hwdecCurrent
             let interop = hwdecInterop.isEmpty ? "none" : hwdecInterop
             LoggingService.shared.debug("MPV: Video codec: \(codec), hwdec-current: \(hwdec), hwdec-interop: \(interop)", category: .mpv)
+            applyTVDisplayCriteria()
             #endif
             #if os(iOS) || os(tvOS)
             reactivateAudioSession()

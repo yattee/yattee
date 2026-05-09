@@ -141,6 +141,36 @@ extension SettingsManager {
         }
     }
 
+    /// Whether tvOS should request the Apple TV switch its HDMI output to match the
+    /// playing video's frame rate. Has no effect unless the user also enables
+    /// "Match Content → Frame Rate" in tvOS Settings → Video and Audio.
+    /// Default is true on tvOS (no-op on other platforms).
+    var tvMatchDisplayFrameRate: Bool {
+        get {
+            if let cached = _tvMatchDisplayFrameRate { return cached }
+            return bool(for: .tvMatchDisplayFrameRate, default: false)
+        }
+        set {
+            _tvMatchDisplayFrameRate = newValue
+            set(newValue, for: .tvMatchDisplayFrameRate)
+        }
+    }
+
+    /// Whether tvOS should request the Apple TV switch its HDMI output to match the
+    /// playing video's dynamic range (SDR / HDR10 / HLG). Has no effect unless the
+    /// user also enables "Match Content → Dynamic Range" in tvOS Settings.
+    /// Default is true on tvOS (no-op on other platforms).
+    var tvMatchDisplayDynamicRange: Bool {
+        get {
+            if let cached = _tvMatchDisplayDynamicRange { return cached }
+            return bool(for: .tvMatchDisplayDynamicRange, default: false)
+        }
+        set {
+            _tvMatchDisplayDynamicRange = newValue
+            set(newValue, for: .tvMatchDisplayDynamicRange)
+        }
+    }
+
     /// Whether zoom navigation transitions are enabled (iOS only).
     /// When enabled, navigating to video/channel/playlist details shows a zoom animation
     /// from the source thumbnail. Disable if experiencing visual glitches with swipe-back gestures.

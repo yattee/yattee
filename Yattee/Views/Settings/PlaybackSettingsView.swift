@@ -17,6 +17,9 @@ struct PlaybackSettingsView: View {
                 AudioSection(settings: settings)
                 SubtitlesSection(settings: settings)
                 BehaviorSection(settings: settings)
+                #if os(tvOS)
+                TVDisplayMatchingSection(settings: settings)
+                #endif
                 QueueSection(settings: settings)
                 #if os(iOS)
                 OrientationSection(settings: settings)
@@ -285,6 +288,31 @@ private struct BehaviorSection: View {
         }
     }
 }
+
+// MARK: - TV Display Matching Section
+
+#if os(tvOS)
+private struct TVDisplayMatchingSection: View {
+    @Bindable var settings: SettingsManager
+
+    var body: some View {
+        SettingsFormSection(
+            "settings.playback.tvDisplayMatching.header",
+            footer: "settings.playback.tvDisplayMatching.footer"
+        ) {
+            Toggle(
+                String(localized: "settings.playback.tvDisplayMatching.frameRate"),
+                isOn: $settings.tvMatchDisplayFrameRate
+            )
+
+            Toggle(
+                String(localized: "settings.playback.tvDisplayMatching.dynamicRange"),
+                isOn: $settings.tvMatchDisplayDynamicRange
+            )
+        }
+    }
+}
+#endif
 
 // MARK: - Queue Section
 

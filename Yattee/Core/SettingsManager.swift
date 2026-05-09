@@ -158,6 +158,8 @@ final class SettingsManager {
     var _mpvBufferSeconds: Double?
     var _mpvUseEDLStreams: Bool?
     var _zoomTransitionsEnabled: Bool?
+    var _tvMatchDisplayFrameRate: Bool?
+    var _tvMatchDisplayDynamicRange: Bool?
 
     // Details panel settings
     var _floatingDetailsPanelSide: FloatingPanelSide?
@@ -492,6 +494,8 @@ final class SettingsManager {
         _mpvBufferSeconds = nil
         _mpvUseEDLStreams = nil
         _zoomTransitionsEnabled = nil
+        _tvMatchDisplayFrameRate = nil
+        _tvMatchDisplayDynamicRange = nil
         _floatingDetailsPanelSide = nil
         _floatingDetailsPanelWidth = nil
         _landscapeDetailsPanelVisible = nil

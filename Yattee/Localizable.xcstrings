@@ -12372,6 +12372,48 @@
         }
       }
     },
+    "settings.playback.tvDisplayMatching.dynamicRange" : {
+      "comment" : "Toggle label (tvOS only)",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Match Dynamic Range"
+          }
+        }
+      }
+    },
+    "settings.playback.tvDisplayMatching.footer" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Asks the Apple TV to switch its HDMI output mode to match the video being played. Also requires Match Content → Frame Rate / Dynamic Range to be enabled in tvOS Settings → Video and Audio."
+          }
+        }
+      }
+    },
+    "settings.playback.tvDisplayMatching.frameRate" : {
+      "comment" : "Toggle label (tvOS only)",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Match Frame Rate"
+          }
+        }
+      }
+    },
+    "settings.playback.tvDisplayMatching.header" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Display"
+          }
+        }
+      }
+    },
     "settings.playback.tvOSMenuButtonClosesVideo" : {
       "localizations" : {
         "en" : {
