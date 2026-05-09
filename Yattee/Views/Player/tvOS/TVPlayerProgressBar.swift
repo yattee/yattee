@@ -160,10 +160,12 @@ struct TVPlayerProgressBar: View {
     private func enterScrubMode() {
         scrubTime = currentTime
         panAccumulator = 0
+        lastLiveSeekTime = nil
         withAnimation(.easeOut(duration: 0.15)) {
             isScrubbing = true
         }
         onScrubbingChanged?(true)
+        scheduleIdleAutoCommit()
     }
 
     private var progressContent: some View {
@@ -241,27 +243,35 @@ struct TVPlayerProgressBar: View {
 
     @ViewBuilder
     private func scrubPreviewOverlay(geometry: GeometryProxy) -> some View {
-        if isScrubbing || showArrowSeekPreview {
-            let seekTime = displayTime
-            let currentChapter = showChapters ? chapters.last(where: { $0.startTime <= seekTime }) : nil
-            // Storyboard panel is 320 thumbnail + 4pt horizontal padding * 2 = 328, plus shadow.
-            // Use a slightly larger clamp width so the shadow stays on screen.
-            let panelWidth: CGFloat = 344
-            // Panel height: thumbnail 180 + 4pt vertical padding * 2 = 188 (round up for shadow).
-            let panelHeight: CGFloat = 200
-            let capsuleSpacing: CGFloat = 8
-            // Approximate capsule height (24pt text + 6pt padding * 2 + shadow) — used only
-            // for vertical positioning, not for layout sizing.
-            let capsuleApproxHeight: CGFloat = 44
+        // Storyboard panel: only for arrow-seek (accumulator mode). During
+        // SELECT-based scrub we live-seek the underlying frame, so the
+        // storyboard would just duplicate what's already on screen.
+        // Chapter capsule: shown for either scrub mode — it conveys info the
+        // raw frame doesn't (chapter title) and stays useful during live seek.
+        let seekTime = displayTime
+        let currentChapter = showChapters ? chapters.last(where: { $0.startTime <= seekTime }) : nil
+        // Storyboard panel is 320 thumbnail + 4pt horizontal padding * 2 = 328, plus shadow.
+        // Use a slightly larger clamp width so the shadow stays on screen.
+        let panelWidth: CGFloat = 344
+        // Panel height: thumbnail 180 + 4pt vertical padding * 2 = 188 (round up for shadow).
+        let panelHeight: CGFloat = 200
+        let capsuleSpacing: CGFloat = 8
+        // Approximate capsule height (24pt text + 6pt padding * 2 + shadow) — used only
+        // for vertical positioning, not for layout sizing.
+        let capsuleApproxHeight: CGFloat = 44
 
-            let xTarget = geometry.size.width * progress
-            let halfPanel = panelWidth / 2
-            let clampedPanelX = max(halfPanel, min(geometry.size.width - halfPanel, xTarget))
-            let panelCenterY = -panelHeight / 2 - 16
-            let capsuleCenterY = -panelHeight - 16 - capsuleSpacing - capsuleApproxHeight / 2
+        let xTarget = geometry.size.width * progress
+        let halfPanel = panelWidth / 2
+        let clampedPanelX = max(halfPanel, min(geometry.size.width - halfPanel, xTarget))
+        let panelCenterY = -panelHeight / 2 - 16
+        // When the storyboard panel is hidden, place the capsule where the
+        // panel would have been so it doesn't float far above the bar.
+        let capsuleCenterY = showArrowSeekPreview
+            ? -panelHeight - 16 - capsuleSpacing - capsuleApproxHeight / 2
+            : -16 - capsuleApproxHeight / 2
 
-            ZStack {
-                // Storyboard panel — follows scrub handle, tight horizontal clamp.
+        ZStack {
+            if showArrowSeekPreview {
                 Group {
                     if let storyboard {
                         TVSeekPreviewView(
@@ -283,18 +293,17 @@ struct TVPlayerProgressBar: View {
                 }
                 .fixedSize()
                 .position(x: clampedPanelX, y: panelCenterY)
-
-                // Chapter capsule — sized to its title (up to screen width minus margin),
-                // positioned to follow the scrub handle and clamped to stay on screen.
-                if let currentChapter {
-                    TVChapterCapsuleView(title: currentChapter.title)
-                        .positioned(xTarget: xTarget, availableWidth: geometry.size.width)
-                        .position(x: geometry.size.width / 2, y: capsuleCenterY)
-                }
+                .transition(.scale.combined(with: .opacity))
             }
-            .transition(.scale.combined(with: .opacity))
-            .allowsHitTesting(false)
+
+            if (isScrubbing || showArrowSeekPreview), let currentChapter {
+                TVChapterCapsuleView(title: currentChapter.title)
+                    .positioned(xTarget: xTarget, availableWidth: geometry.size.width)
+                    .position(x: geometry.size.width / 2, y: capsuleCenterY)
+                    .transition(.opacity)
+            }
         }
+        .allowsHitTesting(false)
     }
 
     // MARK: - Pan Gesture Handling
@@ -302,8 +311,7 @@ struct TVPlayerProgressBar: View {
     private func handlePan(translation: CGFloat, velocity: CGFloat) {
         guard duration > 0, isScrubbing else { return }
 
-        // Cancel any pending seek when user starts new pan
-        seekTask?.cancel()
+        scheduleIdleAutoCommit()
 
         // Calculate scrub sensitivity based on duration
         // Lower values = slower/finer scrubbing
@@ -328,28 +336,78 @@ struct TVPlayerProgressBar: View {
         let timeChange = TimeInterval(delta * adjustedSensitivity)
         let currentScrubTime = scrubTime ?? currentTime
         scrubTime = min(max(0, currentScrubTime + timeChange), duration)
+
+        scheduleLiveSeek()
     }
 
     private func handlePanEnded() {
         // Reset accumulator for next swipe
         panAccumulator = 0
-        // Schedule debounced seek but stay in scrub mode
-        scheduleSeek()
+        // Flush any pending throttled seek so the underlying frame catches up
+        // immediately when the user lifts their finger.
+        flushLiveSeek()
+        scheduleIdleAutoCommit()
     }
 
     @State private var seekTask: Task<Void, Never>?
+    @State private var lastLiveSeekTime: Date?
 
-    private func scheduleSeek() {
-        seekTask?.cancel()
-        seekTask = Task {
-            try? await Task.sleep(for: .milliseconds(1000))
-            guard !Task.isCancelled else { return }
-            await MainActor.run {
+    /// Live-seek throttle: ~150ms leading + trailing.
+    /// Keeps the underlying frame in sync with the storyboard preview while
+    /// scrubbing without flooding the backend with seek calls.
+    private func scheduleLiveSeek() {
+        let interval: TimeInterval = 0.15
+        let now = Date()
+        let elapsed = lastLiveSeekTime.map { now.timeIntervalSince($0) } ?? .infinity
+
+        if elapsed >= interval {
+            seekTask?.cancel()
+            seekTask = nil
+            lastLiveSeekTime = now
+            if let time = scrubTime {
+                onSeek(time)
+            }
+        } else if seekTask == nil {
+            let delay = interval - elapsed
+            seekTask = Task { @MainActor in
+                try? await Task.sleep(for: .seconds(delay))
+                guard !Task.isCancelled else { return }
+                seekTask = nil
+                lastLiveSeekTime = Date()
                 if let time = scrubTime {
                     onSeek(time)
                 }
             }
         }
+    }
+
+    private func flushLiveSeek() {
+        seekTask?.cancel()
+        seekTask = nil
+        lastLiveSeekTime = Date()
+        if let time = scrubTime {
+            onSeek(time)
+        }
+    }
+
+    // MARK: - Idle auto-commit
+
+    /// Auto-commit timer: AVPlayerViewController commits scrub mode after a
+    /// few seconds of inactivity so playback can resume.
+    @State private var idleAutoCommitTask: Task<Void, Never>?
+
+    private func scheduleIdleAutoCommit() {
+        idleAutoCommitTask?.cancel()
+        idleAutoCommitTask = Task { @MainActor in
+            try? await Task.sleep(for: .seconds(3))
+            guard !Task.isCancelled, isScrubbing else { return }
+            commitScrub()
+        }
+    }
+
+    private func cancelIdleAutoCommit() {
+        idleAutoCommitTask?.cancel()
+        idleAutoCommitTask = nil
     }
 
     // MARK: - D-Pad Fallback
@@ -395,7 +453,8 @@ struct TVPlayerProgressBar: View {
             } else {
                 scrubTime = min(duration, currentScrubTime + scrubAmount)
             }
-            scheduleSeek()
+            scheduleLiveSeek()
+            scheduleIdleAutoCommit()
 
         case .up, .down:
             // Exit scrub mode and let navigation happen
@@ -414,6 +473,7 @@ struct TVPlayerProgressBar: View {
     private func commitScrub() {
         seekTask?.cancel()
         seekTask = nil
+        cancelIdleAutoCommit()
 
         let wasScrubbing = isScrubbing
 
@@ -430,6 +490,7 @@ struct TVPlayerProgressBar: View {
         dpadStreakCount = 0
         lastDPadTime = nil
         lastDPadDirection = nil
+        lastLiveSeekTime = nil
         arrowSeekPreviewHideTask?.cancel()
         arrowSeekPreviewHideTask = nil
 
@@ -441,6 +502,7 @@ struct TVPlayerProgressBar: View {
     private func cancelScrub() {
         seekTask?.cancel()
         seekTask = nil
+        cancelIdleAutoCommit()
 
         let wasScrubbing = isScrubbing
 
@@ -453,6 +515,7 @@ struct TVPlayerProgressBar: View {
         dpadStreakCount = 0
         lastDPadTime = nil
         lastDPadDirection = nil
+        lastLiveSeekTime = nil
         arrowSeekPreviewHideTask?.cancel()
         arrowSeekPreviewHideTask = nil
 
