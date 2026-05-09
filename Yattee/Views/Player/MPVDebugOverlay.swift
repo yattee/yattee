@@ -54,21 +54,14 @@ struct MPVDebugOverlay: View {
     let stats: MPVDebugStats
     @Binding var isVisible: Bool
     var isLandscape: Bool = false
-    /// Callback for tvOS close button (tvOS can't tap outside to dismiss)
-    var onClose: (() -> Void)?
 
     @Environment(\.colorScheme) private var colorScheme
-
-    #if os(tvOS)
-    @FocusState private var isCloseButtonFocused: Bool
-    #endif
 
     // Font sizes - platform-specific (tvOS needs larger sizes for TV viewing distance)
     #if os(tvOS)
     private var headerSize: CGFloat { 32 }
     private var sectionSize: CGFloat { 26 }
     private var rowSize: CGFloat { 24 }
-    private var closeButtonSize: CGFloat { 28 }
     private var columnSpacing: CGFloat { 40 }
     private var columnMinWidth: CGFloat { 280 }
     private var maxOverlayWidth: CGFloat { 1450 }  // Extra width for Frame Sync column
@@ -139,53 +132,12 @@ struct MPVDebugOverlay: View {
                 portraitLayout
             }
             #endif
-
-            // tvOS close button at bottom
-            #if os(tvOS)
-            tvOSCloseButton
-            #endif
         }
         .padding(padding)
         .glassBackground(.regular, in: .rect(cornerRadius: cornerRadius))
         .shadow(radius: isLandscape ? 8 : 6)
         .frame(maxWidth: maxOverlayWidth)
-        #if os(tvOS)
-        .onAppear {
-            isCloseButtonFocused = true
-        }
-        .onExitCommand {
-            onClose?()
-        }
-        #endif
     }
-
-    #if os(tvOS)
-    @ViewBuilder
-    private var tvOSCloseButton: some View {
-        Button {
-            onClose?()
-        } label: {
-            HStack(spacing: 12) {
-                Image(systemName: "xmark.circle")
-                    .font(.system(size: closeButtonSize))
-                Text(String(localized: "common.close"))
-                    .font(.system(size: rowSize, weight: .medium))
-            }
-            .foregroundStyle(.white)
-            .frame(width: 180, height: 70)
-            .background(
-                RoundedRectangle(cornerRadius: 12)
-                    .fill(isCloseButtonFocused ? .white.opacity(0.3) : .white.opacity(0.15))
-            )
-        }
-        .buttonStyle(.plain)
-        .scaleEffect(isCloseButtonFocused ? 1.05 : 1.0)
-        .animation(.easeInOut(duration: 0.15), value: isCloseButtonFocused)
-        .focused($isCloseButtonFocused)
-        .padding(.top, 20)
-        .frame(maxWidth: .infinity)
-    }
-    #endif
 
     // MARK: - Portrait Layout (Compact)
 

@@ -286,8 +286,7 @@ struct TVPlayerView: View {
                 MPVDebugOverlay(
                     stats: debugStats,
                     isVisible: $isDebugOverlayVisible,
-                    isLandscape: true,
-                    onClose: { hideDebugOverlay() }
+                    isLandscape: true
                 )
                 .transition(.opacity.combined(with: .scale(scale: 0.95)))
             }
