@@ -916,11 +916,22 @@ final class PlayerService {
         let mpvPiPActive = false
         #endif
 
-        // If this video is already playing, just expand the player (unless PiP is active)
+        // If this video is already loaded, optionally seek/resume instead of reloading.
         if isCurrentlyPlaying(video: video) {
-            LoggingService.shared.logPlayer("Video already playing, just expanding")
+            LoggingService.shared.logPlayer("Video already loaded, applying seek/resume instead of reload (startTime=\(startTime ?? -1), state=\(state.playbackState))")
             if !mpvPiPActive {
                 navigationCoordinator?.expandPlayer()
+            }
+            let wasPaused = state.playbackState == .paused
+            if let startTime {
+                Task { @MainActor in
+                    await seek(to: startTime)
+                    if wasPaused || state.playbackState == .paused {
+                        resume()
+                    }
+                }
+            } else if wasPaused {
+                resume()
             }
             return
         }
@@ -958,10 +969,13 @@ final class PlayerService {
         let mpvPiPActive = false
         #endif
 
-        // If this video is already playing, just expand the player (unless PiP is active)
+        // If this video is already loaded, optionally resume instead of reloading.
         if isCurrentlyPlaying(video: video) {
             if !mpvPiPActive {
                 navigationCoordinator?.expandPlayer()
+            }
+            if state.playbackState == .paused {
+                resume()
             }
             return
         }

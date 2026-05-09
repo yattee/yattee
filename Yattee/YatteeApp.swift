@@ -484,11 +484,12 @@ struct YatteeApp: App {
 
     /// Handle video deep link based on default link action setting.
     private func handleVideoDeepLink(videoID: VideoID, originalURL: URL, action: DefaultLinkAction) {
+        let startTime = URLRouter().parseTimestamp(originalURL)
         switch action {
         case .open:
             // Play directly (existing behavior)
             Task {
-                await playVideoFromDeepLink(videoID: videoID)
+                await playVideoFromDeepLink(videoID: videoID, startTime: startTime)
             }
 
         case .download:
@@ -500,7 +501,7 @@ struct YatteeApp: App {
             #else
             // tvOS doesn't support downloads, fall back to open
             Task {
-                await playVideoFromDeepLink(videoID: videoID)
+                await playVideoFromDeepLink(videoID: videoID, startTime: startTime)
             }
             #endif
 
@@ -540,9 +541,9 @@ struct YatteeApp: App {
     }
 
     /// Play a video from a deep link.
-    private func playVideoFromDeepLink(videoID: VideoID) async {
+    private func playVideoFromDeepLink(videoID: VideoID, startTime: TimeInterval? = nil) async {
         LoggingService.shared.info(
-            "Deep link play: videoID=\(videoID.videoID) source=\(videoID.source)",
+            "Deep link play: videoID=\(videoID.videoID) source=\(videoID.source) startTime=\(startTime ?? -1)",
             category: .general
         )
         guard let instance = appEnvironment.instancesManager.instance(for: videoID.source) else {
@@ -579,7 +580,7 @@ struct YatteeApp: App {
             )
             LoggingService.shared.info("Deep link play: fetched video, opening player", category: .general)
             appEnvironment.toastManager.dismiss(id: toastID)
-            appEnvironment.playerService.openVideo(video)
+            appEnvironment.playerService.openVideo(video, startTime: startTime)
         } catch {
             LoggingService.shared.error(
                 "Deep link play: video fetch failed (\(error.localizedDescription)), falling back to info view",

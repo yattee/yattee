@@ -96,6 +96,63 @@ struct URLRouter: Sendable {
         return true
     }
 
+    // MARK: - Timestamp Parsing
+
+    /// Extract a timestamp (seconds) from a URL's query, supporting `t`, `time`, and `start`.
+    /// Accepts plain seconds (`90`, `90.5`), YouTube-style `90s`, and `1h2m3s` / `2m30s` forms.
+    func parseTimestamp(_ url: URL) -> TimeInterval? {
+        guard let components = URLComponents(url: url, resolvingAgainstBaseURL: false),
+              let items = components.queryItems else {
+            return nil
+        }
+        for name in ["t", "time", "start"] {
+            if let raw = items.first(where: { $0.name == name })?.value,
+               let parsed = Self.parseTimestampValue(raw) {
+                return parsed
+            }
+        }
+        return nil
+    }
+
+    /// Parse a single timestamp string. Returns nil if unparseable or zero-length.
+    static func parseTimestampValue(_ raw: String) -> TimeInterval? {
+        let trimmed = raw.trimmingCharacters(in: .whitespaces)
+        guard !trimmed.isEmpty else { return nil }
+
+        // Plain numeric value (e.g. "90", "90.5")
+        if let value = TimeInterval(trimmed) {
+            return value >= 0 ? value : nil
+        }
+
+        // Compound form like "1h2m3s", "2m30s", "90s"
+        var total: TimeInterval = 0
+        var current = ""
+        var matched = false
+        for ch in trimmed {
+            if ch.isNumber || ch == "." {
+                current.append(ch)
+            } else {
+                guard let value = TimeInterval(current) else { return nil }
+                let unit: TimeInterval
+                switch ch {
+                case "h", "H": unit = 3600
+                case "m", "M": unit = 60
+                case "s", "S": unit = 1
+                default: return nil
+                }
+                total += value * unit
+                current = ""
+                matched = true
+            }
+        }
+        // Trailing digits without a unit suffix (e.g. "1m30") — treat as seconds.
+        if !current.isEmpty, let value = TimeInterval(current) {
+            total += value
+            matched = true
+        }
+        return matched ? total : nil
+    }
+
     // MARK: - Custom Scheme
 
     /// Parse yattee:// scheme URLs.
