@@ -49,5 +49,8 @@ struct HomeHorizontalCards: View {
             .focusSection()
             #endif
         }
+        #if os(tvOS)
+        .scrollClipDisabled()
+        #endif
     }
 }

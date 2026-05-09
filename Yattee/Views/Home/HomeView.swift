@@ -235,6 +235,7 @@ struct HomeView: View {
                     homeContent
                 }
             }
+            .scrollClipDisabled()
         }
         #else
         let backgroundStyle: ListBackgroundStyle = listStyle == .inset ? .grouped : .plain
