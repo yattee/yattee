@@ -27,6 +27,13 @@ final class NowPlayingService {
 
     private var currentVideo: Video?
     private var artworkImage: NowPlayingImage?
+    private var cachedNowPlayingInfo: [String: Any]?
+
+    #if os(tvOS)
+    private var audioRouteChangeObserver: NSObjectProtocol?
+    private var hasActivatedAudioSessionForRouteEvaluation = false
+    private var suppressesSystemControlsForAirPlay = false
+    #endif
 
     weak var playerService: PlayerService?
     weak var deArrowBrandingProvider: DeArrowBrandingProvider?
@@ -36,7 +43,20 @@ final class NowPlayingService {
     // MARK: - Initialization
 
     init() {
+        #if os(tvOS)
+        startAudioRouteMonitoring()
+        clearPublishedMediaIntegration()
+        #else
         configureRemoteCommands()
+        #endif
+    }
+
+    deinit {
+        #if os(tvOS)
+        if let audioRouteChangeObserver {
+            NotificationCenter.default.removeObserver(audioRouteChangeObserver)
+        }
+        #endif
     }
 
     // MARK: - Public Methods
@@ -92,6 +112,19 @@ final class NowPlayingService {
             category: .player
         )
 
+        cachedNowPlayingInfo = nowPlayingInfo
+
+        #if os(tvOS)
+        guard hasActivatedAudioSessionForRouteEvaluation, !suppressesSystemControlsForAirPlay else {
+            clearPublishedMediaIntegration()
+            LoggingService.shared.debug(
+                "Suppressed Now Playing update while AirPlay/HomePod route is active",
+                category: .player
+            )
+            return
+        }
+        #endif
+
         infoCenter.nowPlayingInfo = nowPlayingInfo
 
         // Only set playbackState on non-tvOS platforms.
@@ -109,11 +142,17 @@ final class NowPlayingService {
 
     /// Updates playback time without changing other metadata.
     func updatePlaybackTime(currentTime: TimeInterval, duration: TimeInterval, isPlaying: Bool) {
-        guard var info = infoCenter.nowPlayingInfo else { return }
+        guard var info = cachedNowPlayingInfo ?? infoCenter.nowPlayingInfo else { return }
 
         info[MPNowPlayingInfoPropertyElapsedPlaybackTime] = currentTime
         info[MPMediaItemPropertyPlaybackDuration] = duration
         info[MPNowPlayingInfoPropertyPlaybackRate] = isPlaying ? 1.0 : 0.0
+
+        cachedNowPlayingInfo = info
+
+        #if os(tvOS)
+        guard hasActivatedAudioSessionForRouteEvaluation, !suppressesSystemControlsForAirPlay else { return }
+        #endif
 
         infoCenter.nowPlayingInfo = info
 
@@ -130,7 +169,7 @@ final class NowPlayingService {
             category: .player
         )
 
-        guard var info = infoCenter.nowPlayingInfo else {
+        guard var info = cachedNowPlayingInfo ?? infoCenter.nowPlayingInfo else {
             LoggingService.shared.warning(
                 "updatePlaybackRate: nowPlayingInfo is nil, cannot update",
                 category: .player
@@ -147,6 +186,18 @@ final class NowPlayingService {
             info[MPNowPlayingInfoPropertyElapsedPlaybackTime] = time
         }
 
+        cachedNowPlayingInfo = info
+
+        #if os(tvOS)
+        guard hasActivatedAudioSessionForRouteEvaluation, !suppressesSystemControlsForAirPlay else {
+            LoggingService.shared.debug(
+                "Suppressed playback rate update while AirPlay/HomePod route is active",
+                category: .player
+            )
+            return
+        }
+        #endif
+
         infoCenter.nowPlayingInfo = info
 
         #if !os(tvOS)
@@ -161,8 +212,14 @@ final class NowPlayingService {
 
     /// Immediately updates elapsed playback time (used for seek feedback in Control Center).
     func updatePlaybackTimeImmediate(_ time: TimeInterval) {
-        guard var info = infoCenter.nowPlayingInfo else { return }
+        guard var info = cachedNowPlayingInfo ?? infoCenter.nowPlayingInfo else { return }
         info[MPNowPlayingInfoPropertyElapsedPlaybackTime] = time
+        cachedNowPlayingInfo = info
+
+        #if os(tvOS)
+        guard hasActivatedAudioSessionForRouteEvaluation, !suppressesSystemControlsForAirPlay else { return }
+        #endif
+
         infoCenter.nowPlayingInfo = info
     }
 
@@ -231,10 +288,10 @@ final class NowPlayingService {
     /// Helper to update Now Playing info with current artwork
     private func updateNowPlayingWithCurrentArtwork() {
         if let video = currentVideo,
-           let info = infoCenter.nowPlayingInfo,
-           let duration = info[MPMediaItemPropertyPlaybackDuration] as? TimeInterval,
+           let info = cachedNowPlayingInfo ?? infoCenter.nowPlayingInfo,
            let currentTime = info[MPNowPlayingInfoPropertyElapsedPlaybackTime] as? TimeInterval,
            let rate = info[MPNowPlayingInfoPropertyPlaybackRate] as? Double {
+            let duration = info[MPMediaItemPropertyPlaybackDuration] as? TimeInterval ?? video.duration
             updateNowPlaying(
                 video: video,
                 currentTime: currentTime,
@@ -246,9 +303,13 @@ final class NowPlayingService {
 
     /// Clears Now Playing info.
     func clearNowPlaying() {
-        infoCenter.nowPlayingInfo = nil
+        cachedNowPlayingInfo = nil
 
-        #if !os(tvOS)
+        #if os(tvOS)
+        hasActivatedAudioSessionForRouteEvaluation = false
+        clearPublishedMediaIntegration()
+        #else
+        infoCenter.nowPlayingInfo = nil
         infoCenter.playbackState = .stopped
         #endif
 
@@ -258,18 +319,141 @@ final class NowPlayingService {
         LoggingService.shared.debug("Cleared Now Playing info", category: .player)
     }
 
+    #if os(tvOS)
+    /// Re-evaluates whether system media integration is safe for the current tvOS route.
+    /// AirPlay/HomePod routes add a downstream audio buffer when remote commands are enabled.
+    func refreshSystemControlsForCurrentAudioRoute(reason: String) {
+        let wasWaitingForActiveAudioRoute = !hasActivatedAudioSessionForRouteEvaluation
+        hasActivatedAudioSessionForRouteEvaluation = true
+
+        let shouldSuppress = isAirPlayOutputActive
+        let routeDescription = currentAudioRouteDescription()
+
+        guard shouldSuppress != suppressesSystemControlsForAirPlay || wasWaitingForActiveAudioRoute else {
+            if shouldSuppress {
+                clearPublishedMediaIntegration()
+            }
+            LoggingService.shared.debug(
+                "tvOS audio route unchanged (\(reason)): suppressSystemControls=\(shouldSuppress), route=\(routeDescription)",
+                category: .player
+            )
+            return
+        }
+
+        suppressesSystemControlsForAirPlay = shouldSuppress
+
+        if shouldSuppress {
+            clearPublishedMediaIntegration()
+            LoggingService.shared.warning(
+                "Disabled Now Playing and remote commands for AirPlay/HomePod route (\(reason)): \(routeDescription)",
+                category: .player
+            )
+        } else {
+            LoggingService.shared.info(
+                "Restoring Now Playing and remote commands for tvOS route (\(reason)): \(routeDescription)",
+                category: .player
+            )
+            configureRemoteCommands()
+            if let cachedNowPlayingInfo {
+                infoCenter.nowPlayingInfo = cachedNowPlayingInfo
+            }
+        }
+    }
+
+    private func startAudioRouteMonitoring() {
+        audioRouteChangeObserver = NotificationCenter.default.addObserver(
+            forName: AVAudioSession.routeChangeNotification,
+            object: AVAudioSession.sharedInstance(),
+            queue: .main
+        ) { [weak self] _ in
+            Task { @MainActor [weak self] in
+                self?.handleAudioRouteChange()
+            }
+        }
+    }
+
+    private func handleAudioRouteChange() {
+        guard hasActivatedAudioSessionForRouteEvaluation else {
+            clearPublishedMediaIntegration()
+            LoggingService.shared.debug(
+                "Deferred tvOS route change until audio session activation: \(currentAudioRouteDescription())",
+                category: .player
+            )
+            return
+        }
+
+        refreshSystemControlsForCurrentAudioRoute(reason: "route change")
+    }
+
+    private var isAirPlayOutputActive: Bool {
+        AVAudioSession.sharedInstance().currentRoute.outputs.contains { output in
+            output.portType == .airPlay ||
+            output.portType.rawValue.localizedCaseInsensitiveContains("airplay") ||
+            output.portName.localizedCaseInsensitiveContains("HomePod")
+        }
+    }
+
+    private func currentAudioRouteDescription() -> String {
+        let outputs = AVAudioSession.sharedInstance().currentRoute.outputs
+        guard !outputs.isEmpty else { return "no outputs" }
+
+        return outputs
+            .map { "\($0.portName) (\($0.portType.rawValue))" }
+            .joined(separator: ", ")
+    }
+
+    private func clearPublishedMediaIntegration() {
+        infoCenter.nowPlayingInfo = nil
+        disableAllRemoteCommands()
+    }
+    #endif
+
     // MARK: - Remote Commands
 
     /// Removes all existing command targets to allow reconfiguration.
     private func removeAllTargets() {
         commandCenter.playCommand.removeTarget(nil)
         commandCenter.pauseCommand.removeTarget(nil)
+        commandCenter.stopCommand.removeTarget(nil)
         commandCenter.togglePlayPauseCommand.removeTarget(nil)
         commandCenter.skipForwardCommand.removeTarget(nil)
         commandCenter.skipBackwardCommand.removeTarget(nil)
+        commandCenter.seekForwardCommand.removeTarget(nil)
+        commandCenter.seekBackwardCommand.removeTarget(nil)
         commandCenter.changePlaybackPositionCommand.removeTarget(nil)
+        commandCenter.changePlaybackRateCommand.removeTarget(nil)
+        commandCenter.changeRepeatModeCommand.removeTarget(nil)
+        commandCenter.changeShuffleModeCommand.removeTarget(nil)
         commandCenter.nextTrackCommand.removeTarget(nil)
         commandCenter.previousTrackCommand.removeTarget(nil)
+        commandCenter.ratingCommand.removeTarget(nil)
+        commandCenter.likeCommand.removeTarget(nil)
+        commandCenter.dislikeCommand.removeTarget(nil)
+        commandCenter.bookmarkCommand.removeTarget(nil)
+    }
+
+    /// Disables every remote command exposed by the command center.
+    private func disableAllRemoteCommands() {
+        removeAllTargets()
+
+        commandCenter.playCommand.isEnabled = false
+        commandCenter.pauseCommand.isEnabled = false
+        commandCenter.stopCommand.isEnabled = false
+        commandCenter.togglePlayPauseCommand.isEnabled = false
+        commandCenter.skipForwardCommand.isEnabled = false
+        commandCenter.skipBackwardCommand.isEnabled = false
+        commandCenter.seekForwardCommand.isEnabled = false
+        commandCenter.seekBackwardCommand.isEnabled = false
+        commandCenter.changePlaybackPositionCommand.isEnabled = false
+        commandCenter.changePlaybackRateCommand.isEnabled = false
+        commandCenter.changeRepeatModeCommand.isEnabled = false
+        commandCenter.changeShuffleModeCommand.isEnabled = false
+        commandCenter.nextTrackCommand.isEnabled = false
+        commandCenter.previousTrackCommand.isEnabled = false
+        commandCenter.ratingCommand.isEnabled = false
+        commandCenter.likeCommand.isEnabled = false
+        commandCenter.dislikeCommand.isEnabled = false
+        commandCenter.bookmarkCommand.isEnabled = false
     }
 
     /// Configures remote commands based on current settings.
@@ -278,8 +462,28 @@ final class NowPlayingService {
         mode: SystemControlsMode? = nil,
         duration: SystemControlsSeekDuration? = nil
     ) {
+        #if os(tvOS)
+        guard hasActivatedAudioSessionForRouteEvaluation else {
+            clearPublishedMediaIntegration()
+            LoggingService.shared.debug(
+                "Deferred remote command configuration until tvOS audio session activation",
+                category: .player
+            )
+            return
+        }
+
+        guard !suppressesSystemControlsForAirPlay else {
+            clearPublishedMediaIntegration()
+            LoggingService.shared.debug(
+                "Skipped remote command configuration while AirPlay/HomePod route is active",
+                category: .player
+            )
+            return
+        }
+        #endif
+
         // Remove existing targets to prevent duplicate handlers
-        removeAllTargets()
+        disableAllRemoteCommands()
 
         // If explicit values provided, use them directly (bypasses debounce)
         if let mode, let duration {
@@ -313,8 +517,28 @@ final class NowPlayingService {
     ///   - mode: The system controls mode (seek or skip track).
     ///   - duration: The seek duration when mode is .seek.
     private func configureRemoteCommandsWithSettings(mode: SystemControlsMode, duration: SystemControlsSeekDuration) {
+        #if os(tvOS)
+        guard hasActivatedAudioSessionForRouteEvaluation else {
+            clearPublishedMediaIntegration()
+            LoggingService.shared.debug(
+                "Deferred remote command configuration with settings until tvOS audio session activation",
+                category: .player
+            )
+            return
+        }
+
+        guard !suppressesSystemControlsForAirPlay else {
+            clearPublishedMediaIntegration()
+            LoggingService.shared.debug(
+                "Skipped remote command configuration with settings while AirPlay/HomePod route is active",
+                category: .player
+            )
+            return
+        }
+        #endif
+
         // Remove existing targets (in case called from async path)
-        removeAllTargets()
+        disableAllRemoteCommands()
 
         // Play
         commandCenter.playCommand.isEnabled = true

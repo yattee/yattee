@@ -1563,6 +1563,10 @@ final class PlayerService {
             try session.setCategory(.playback, mode: .moviePlayback)
             try session.setActive(true)
 
+            #if os(tvOS)
+            nowPlayingService.refreshSystemControlsForCurrentAudioRoute(reason: "audio session activation")
+            #endif
+
             // Only register observer once
             guard !hasRegisteredInterruptionObserver else { return }
             hasRegisteredInterruptionObserver = true
