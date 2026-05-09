@@ -131,11 +131,20 @@ struct VideoThumbnailView: View {
     @ViewBuilder
     private var watchedCheckmark: some View {
         if isWatched && !isLive {
+            #if os(tvOS)
+            Image(systemName: "checkmark.circle.fill")
+                .font(.system(size: cornerRadius > 6 ? 32 : 22, weight: .bold))
+                .symbolRenderingMode(.palette)
+                .foregroundStyle(Color.white, Color.black)
+                .shadow(color: .black.opacity(0.5), radius: 4, x: 0, y: 2)
+                .padding(cornerRadius > 6 ? 4 : 2)
+            #else
             Image(systemName: "checkmark.circle.fill")
                 .font(.system(size: cornerRadius > 6 ? 20 : 14))
                 .symbolRenderingMode(.palette)
                 .foregroundStyle(.background, .tint)
                 .padding(cornerRadius > 6 ? 3 : 2)
+            #endif
         }
     }
 }
