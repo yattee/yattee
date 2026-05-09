@@ -627,11 +627,26 @@ final class CloudKitSyncEngine: @unchecked Sendable {
     }
     
     // MARK: - WatchEntry Sync Operations
-    
+
+    /// Whether a watch entry is eligible for iCloud sync.
+    /// Local-folder media plays from a per-device path, so syncing its watch progress
+    /// to other devices (where the file is not reachable) is wasted noise.
+    private func shouldSyncWatchEntry(sourceRawValue: String, externalExtractor: String?) -> Bool {
+        !(sourceRawValue == "extracted" && externalExtractor == MediaFile.localFolderProvider)
+    }
+
+    private func shouldSyncWatchEntry(_ watchEntry: WatchEntry) -> Bool {
+        shouldSyncWatchEntry(sourceRawValue: watchEntry.sourceRawValue, externalExtractor: watchEntry.externalExtractor)
+    }
+
     /// Queue a watch entry for sync (debounced).
     func queueWatchEntrySave(_ watchEntry: WatchEntry) {
         guard canSyncPlaybackHistory else { return }
-        
+        guard shouldSyncWatchEntry(watchEntry) else {
+            LoggingService.shared.logCloudKit("Skipping local-folder watch entry: \(watchEntry.videoID)")
+            return
+        }
+
         Task {
             let record = await recordMapper.toCKRecord(watchEntry: watchEntry)
             
@@ -686,7 +701,8 @@ final class CloudKitSyncEngine: @unchecked Sendable {
         
         // Get all local watch history (limit to reasonable amount)
         let watchHistory = dataManager.watchHistory(limit: 5000)
-        
+            .filter { shouldSyncWatchEntry($0) }
+
         guard !watchHistory.isEmpty else {
             LoggingService.shared.logCloudKit("No local watch history to upload")
             return
@@ -2099,7 +2115,12 @@ extension CloudKitSyncEngine: CKSyncEngineDelegate {
             case RecordType.watchEntry:
                 guard canSyncPlaybackHistory else { return .success }
                 let watchEntry = try await recordMapper.toWatchEntry(from: record)
-                
+
+                guard shouldSyncWatchEntry(watchEntry) else {
+                    LoggingService.shared.logCloudKit("Ignoring incoming local-folder watch entry: \(watchEntry.videoID)")
+                    return .success
+                }
+
                 // Check if exists locally
                 if let existing = dataManager.watchEntry(for: watchEntry.videoID) {
                     // Conflict - resolve it
