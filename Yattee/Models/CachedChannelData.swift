@@ -14,6 +14,7 @@ struct CachedChannelData: Codable {
     let thumbnailURL: URL?
     let bannerURL: URL?
     let subscriberCount: Int?
+    let description: String?
 
     /// In-memory cache of author data from video detail API responses.
     @MainActor
@@ -32,21 +33,25 @@ struct CachedChannelData: Codable {
             .appendingPathComponent("authors.json")
     }
 
-    init(name: String, thumbnailURL: URL?, bannerURL: URL?, subscriberCount: Int?) {
+    init(name: String, thumbnailURL: URL?, bannerURL: URL?, subscriberCount: Int?, description: String? = nil) {
         self.name = name
         self.thumbnailURL = thumbnailURL
         self.bannerURL = bannerURL
         self.subscriberCount = subscriberCount
+        self.description = description
     }
 
     @MainActor
     static func cacheAuthor(_ author: Author) {
-        guard author.thumbnailURL != nil || author.subscriberCount != nil else { return }
+        guard !author.id.isEmpty, !author.name.isEmpty else { return }
+        loadFromDiskIfNeeded()
+        let existing = authorCache[author.id]
         authorCache[author.id] = CachedChannelData(
             name: author.name,
-            thumbnailURL: author.thumbnailURL,
-            bannerURL: nil,
-            subscriberCount: author.subscriberCount
+            thumbnailURL: author.thumbnailURL ?? existing?.thumbnailURL,
+            bannerURL: existing?.bannerURL,
+            subscriberCount: author.subscriberCount ?? existing?.subscriberCount,
+            description: existing?.description
         )
 
         // Evict oldest entries if over limit
@@ -101,6 +106,7 @@ struct CachedChannelData: Codable {
         thumbnailURL = subscription.avatarURL
         bannerURL = subscription.bannerURL
         subscriberCount = subscription.subscriberCount
+        description = subscription.channelDescription
     }
 
     init(from recentChannel: RecentChannel) {
@@ -108,6 +114,7 @@ struct CachedChannelData: Codable {
         thumbnailURL = recentChannel.thumbnailURLString.flatMap { URL(string: $0) }
         bannerURL = nil // RecentChannel doesn't store banner
         subscriberCount = recentChannel.subscriberCount
+        description = nil
     }
 
     /// Load cached data for a channel ID from Subscription or RecentChannel.

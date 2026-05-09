@@ -571,18 +571,33 @@ struct ChannelView: View {
 
     @ViewBuilder
     private func tvOSLeftColumn(channel: Channel, geometry: GeometryProxy) -> some View {
+        tvOSLeftColumnContent(
+            name: channel.name,
+            thumbnailURL: channel.thumbnailURL,
+            subscriberCount: channel.subscriberCount,
+            description: channel.description
+        )
+    }
+
+    @ViewBuilder
+    private func tvOSLeftColumnContent(
+        name: String,
+        thumbnailURL: URL?,
+        subscriberCount: Int?,
+        description: String?
+    ) -> some View {
         VStack(alignment: .leading, spacing: 24) {
-            tvOSAvatar(for: channel)
+            tvOSAvatar(name: name, thumbnailURL: thumbnailURL)
                 .frame(maxWidth: .infinity)
 
-            Text(channel.name)
+            Text(name)
                 .font(.title2)
                 .fontWeight(.bold)
                 .foregroundStyle(.white)
                 .fixedSize(horizontal: false, vertical: true)
                 .frame(maxWidth: .infinity, alignment: .leading)
 
-            if let subscriberCount = channel.subscriberCount {
+            if let subscriberCount {
                 Text(CountFormatter.compact(subscriberCount))
                     .fontWeight(.bold)
                 + Text(verbatim: " ")
@@ -593,7 +608,7 @@ struct ChannelView: View {
                 tvOSSubscribeButton
             }
 
-            if let description = channel.description, !description.isEmpty {
+            if let description, !description.isEmpty {
                 TVScrollableDescription(
                     description: description,
                     isScrollLocked: $isDescriptionScrollLocked
@@ -610,7 +625,12 @@ struct ChannelView: View {
 
     @ViewBuilder
     private func tvOSAvatar(for channel: Channel) -> some View {
-        LazyImage(url: channel.thumbnailURL) { state in
+        tvOSAvatar(name: channel.name, thumbnailURL: channel.thumbnailURL)
+    }
+
+    @ViewBuilder
+    private func tvOSAvatar(name: String, thumbnailURL: URL?) -> some View {
+        LazyImage(url: thumbnailURL) { state in
             if let image = state.image {
                 image
                     .resizable()
@@ -619,7 +639,7 @@ struct ChannelView: View {
                 Circle()
                     .fill(.ultraThinMaterial)
                     .overlay {
-                        Text(String(channel.name.prefix(1)))
+                        Text(String(name.prefix(1)))
                             .font(.system(size: 56, weight: .semibold))
                             .foregroundStyle(.secondary)
                     }
@@ -772,39 +792,14 @@ struct ChannelView: View {
         GeometryReader { geometry in
             let leftWidth = geometry.size.width * 0.30
             HStack(alignment: .top, spacing: 40) {
-                VStack(alignment: .leading, spacing: 24) {
-                    LazyImage(url: cached.thumbnailURL) { state in
-                        if let image = state.image {
-                            image
-                                .resizable()
-                                .aspectRatio(contentMode: .fill)
-                        } else {
-                            Circle()
-                                .fill(.ultraThinMaterial)
-                                .overlay {
-                                    Text(String(cached.name.prefix(1)))
-                                        .font(.system(size: 56, weight: .semibold))
-                                        .foregroundStyle(.secondary)
-                                }
-                        }
-                    }
-                    .frame(width: 140, height: 140)
-                    .clipShape(Circle())
-                    .overlay(
-                        Circle()
-                            .stroke(.white.opacity(0.8), lineWidth: 3)
-                    )
-                    .frame(maxWidth: .infinity)
-
-                    Text(cached.name)
-                        .font(.title2)
-                        .fontWeight(.bold)
-                        .foregroundStyle(.white)
-                        .frame(maxWidth: .infinity, alignment: .leading)
-
-                    Spacer(minLength: 0)
-                }
+                tvOSLeftColumnContent(
+                    name: cached.name,
+                    thumbnailURL: cached.thumbnailURL,
+                    subscriberCount: cached.subscriberCount,
+                    description: cached.description
+                )
                 .frame(width: leftWidth, alignment: .leading)
+                .focusSection()
 
                 VStack {
                     Spacer()

@@ -333,6 +333,7 @@ final class NavigationCoordinator {
         } else if case .extracted = video.id.source, let authorURL = video.author.url {
             navigate(to: .externalChannel(authorURL))
         } else {
+            CachedChannelData.cacheAuthor(video.author)
             navigate(to: .channel(video.author.id, video.authorSource))
         }
     }
