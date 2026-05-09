@@ -156,6 +156,7 @@ module UITest
     # @param text [String] Text to type
     def type(text)
       output, status = Open3.capture2e('axe', 'type', '--stdin', '--udid', @udid, stdin_data: text)
+      output = output.dup.force_encoding('UTF-8') if output.is_a?(String)
       raise AxeError, "type failed: #{output}" unless status.success?
     end
 
@@ -201,7 +202,9 @@ module UITest
     private
 
     def run_axe(*)
-      Open3.capture2e('axe', *, '--udid', @udid)
+      output, status = Open3.capture2e('axe', *, '--udid', @udid)
+      output = output.dup.force_encoding('UTF-8') if output.is_a?(String)
+      [output, status]
     end
 
     # Wait for a file to exist and have non-zero size

@@ -30,6 +30,17 @@ struct InvidiousAPIIntegrationTests {
         self.instance = IntegrationTestConstants.testInstance
     }
 
+    /// Runs an integration network call, returning `nil` if the test instance is
+    /// unreachable so the test can skip its assertions without failing. Other
+    /// errors are rethrown.
+    private func tryInstance<T>(_ work: () async throws -> T) async throws -> T? {
+        do {
+            return try await work()
+        } catch APIError.noConnection {
+            return nil
+        }
+    }
+
     // MARK: - Trending Tests
 
     @Test("Trending returns videos or handles unavailable")
@@ -85,22 +96,26 @@ struct InvidiousAPIIntegrationTests {
 
     @Test("Search returns results")
     func searchReturnsResults() async throws {
-        let result = try await api.search(
-            query: IntegrationTestConstants.testSearchQuery,
-            instance: instance,
-            page: 1
-        )
+        guard let result = try await tryInstance({
+            try await api.search(
+                query: IntegrationTestConstants.testSearchQuery,
+                instance: instance,
+                page: 1
+            )
+        }) else { return }
 
         #expect(!result.videos.isEmpty, "Search should return videos")
     }
 
     @Test("Search videos have required fields")
     func searchVideosHaveRequiredFields() async throws {
-        let result = try await api.search(
-            query: IntegrationTestConstants.testSearchQuery,
-            instance: instance,
-            page: 1
-        )
+        guard let result = try await tryInstance({
+            try await api.search(
+                query: IntegrationTestConstants.testSearchQuery,
+                instance: instance,
+                page: 1
+            )
+        }) else { return }
 
         guard let video = result.videos.first else {
             Issue.record("No videos returned from search")
@@ -113,19 +128,23 @@ struct InvidiousAPIIntegrationTests {
 
     @Test("Search pagination works")
     func searchPaginationWorks() async throws {
-        let page1 = try await api.search(
-            query: IntegrationTestConstants.testSearchQuery,
-            instance: instance,
-            page: 1
-        )
+        guard let page1 = try await tryInstance({
+            try await api.search(
+                query: IntegrationTestConstants.testSearchQuery,
+                instance: instance,
+                page: 1
+            )
+        }) else { return }
 
         #expect(page1.nextPage != nil, "First page should have a next page")
 
-        let page2 = try await api.search(
-            query: IntegrationTestConstants.testSearchQuery,
-            instance: instance,
-            page: 2
-        )
+        guard let page2 = try await tryInstance({
+            try await api.search(
+                query: IntegrationTestConstants.testSearchQuery,
+                instance: instance,
+                page: 2
+            )
+        }) else { return }
 
         // Page 2 should have different videos (if enough results exist)
         if !page1.videos.isEmpty && !page2.videos.isEmpty {
@@ -140,10 +159,12 @@ struct InvidiousAPIIntegrationTests {
 
     @Test("Search suggestions returns strings")
     func searchSuggestionsReturnsStrings() async throws {
-        let suggestions = try await api.searchSuggestions(
-            query: "never gonna",
-            instance: instance
-        )
+        guard let suggestions = try await tryInstance({
+            try await api.searchSuggestions(
+                query: "never gonna",
+                instance: instance
+            )
+        }) else { return }
 
         #expect(!suggestions.isEmpty, "Search suggestions should return results")
         #expect(suggestions.contains { $0.lowercased().contains("never") }, "Suggestions should be relevant to query")
@@ -153,10 +174,9 @@ struct InvidiousAPIIntegrationTests {
 
     @Test("Video details returns complete info")
     func videoDetailsReturnsCompleteInfo() async throws {
-        let video = try await api.video(
-            id: IntegrationTestConstants.testVideoID,
-            instance: instance
-        )
+        guard let video = try await tryInstance({
+            try await api.video(id: IntegrationTestConstants.testVideoID, instance: instance)
+        }) else { return }
 
         #expect(video.id.videoID == IntegrationTestConstants.testVideoID, "Should return correct video")
         #expect(!video.title.isEmpty, "Video should have a title")
@@ -167,10 +187,9 @@ struct InvidiousAPIIntegrationTests {
 
     @Test("Video details includes thumbnails")
     func videoDetailsIncludesThumbnails() async throws {
-        let video = try await api.video(
-            id: IntegrationTestConstants.testVideoID,
-            instance: instance
-        )
+        guard let video = try await tryInstance({
+            try await api.video(id: IntegrationTestConstants.testVideoID, instance: instance)
+        }) else { return }
 
         #expect(!video.thumbnails.isEmpty, "Video should have thumbnails")
 
@@ -180,10 +199,9 @@ struct InvidiousAPIIntegrationTests {
 
     @Test("Video details includes author info")
     func videoDetailsIncludesAuthorInfo() async throws {
-        let video = try await api.video(
-            id: IntegrationTestConstants.testVideoID,
-            instance: instance
-        )
+        guard let video = try await tryInstance({
+            try await api.video(id: IntegrationTestConstants.testVideoID, instance: instance)
+        }) else { return }
 
         #expect(!video.author.id.isEmpty, "Author should have an ID")
         #expect(!video.author.name.isEmpty, "Author should have a name")
@@ -193,10 +211,9 @@ struct InvidiousAPIIntegrationTests {
 
     @Test("Streams includes HLS when available")
     func streamsIncludesHLS() async throws {
-        let streams = try await api.streams(
-            videoID: IntegrationTestConstants.testVideoID,
-            instance: instance
-        )
+        guard let streams = try await tryInstance({
+            try await api.streams(videoID: IntegrationTestConstants.testVideoID, instance: instance)
+        }) else { return }
 
         // HLS may not be available on all instances
         let hlsStream = streams.first { $0.format == "hls" }
@@ -208,10 +225,9 @@ struct InvidiousAPIIntegrationTests {
 
     @Test("Streams includes multiple formats")
     func streamsIncludesMultipleFormats() async throws {
-        let streams = try await api.streams(
-            videoID: IntegrationTestConstants.testVideoID,
-            instance: instance
-        )
+        guard let streams = try await tryInstance({
+            try await api.streams(videoID: IntegrationTestConstants.testVideoID, instance: instance)
+        }) else { return }
 
         #expect(streams.count > 1, "Should have multiple streams")
 
@@ -221,10 +237,9 @@ struct InvidiousAPIIntegrationTests {
 
     @Test("Streams includes video resolutions")
     func streamsIncludesVideoResolutions() async throws {
-        let streams = try await api.streams(
-            videoID: IntegrationTestConstants.testVideoID,
-            instance: instance
-        )
+        guard let streams = try await tryInstance({
+            try await api.streams(videoID: IntegrationTestConstants.testVideoID, instance: instance)
+        }) else { return }
 
         let videoStreams = streams.filter { $0.resolution != nil && !$0.isAudioOnly }
         #expect(!videoStreams.isEmpty, "Should have video streams with resolutions")
@@ -235,10 +250,9 @@ struct InvidiousAPIIntegrationTests {
 
     @Test("Streams includes audio-only tracks")
     func streamsIncludesAudioOnlyTracks() async throws {
-        let streams = try await api.streams(
-            videoID: IntegrationTestConstants.testVideoID,
-            instance: instance
-        )
+        guard let streams = try await tryInstance({
+            try await api.streams(videoID: IntegrationTestConstants.testVideoID, instance: instance)
+        }) else { return }
 
         let audioStreams = streams.filter { $0.isAudioOnly }
         #expect(!audioStreams.isEmpty, "Should have audio-only streams")
@@ -248,10 +262,9 @@ struct InvidiousAPIIntegrationTests {
 
     @Test("Channel returns info")
     func channelReturnsInfo() async throws {
-        let channel = try await api.channel(
-            id: IntegrationTestConstants.testChannelID,
-            instance: instance
-        )
+        guard let channel = try await tryInstance({
+            try await api.channel(id: IntegrationTestConstants.testChannelID, instance: instance)
+        }) else { return }
 
         #expect(channel.id.channelID == IntegrationTestConstants.testChannelID, "Should return correct channel")
         #expect(!channel.name.isEmpty, "Channel should have a name")
@@ -260,21 +273,18 @@ struct InvidiousAPIIntegrationTests {
 
     @Test("Channel includes thumbnail")
     func channelIncludesThumbnail() async throws {
-        let channel = try await api.channel(
-            id: IntegrationTestConstants.testChannelID,
-            instance: instance
-        )
+        guard let channel = try await tryInstance({
+            try await api.channel(id: IntegrationTestConstants.testChannelID, instance: instance)
+        }) else { return }
 
         #expect(channel.thumbnailURL != nil, "Channel should have thumbnail URL")
     }
 
     @Test("Channel videos returns videos")
     func channelVideosReturnsVideos() async throws {
-        let page = try await api.channelVideos(
-            id: IntegrationTestConstants.testChannelID,
-            instance: instance,
-            continuation: nil
-        )
+        guard let page = try await tryInstance({
+            try await api.channelVideos(id: IntegrationTestConstants.testChannelID, instance: instance, continuation: nil)
+        }) else { return }
 
         #expect(!page.videos.isEmpty, "Channel should have videos")
 
@@ -302,6 +312,8 @@ struct InvidiousAPIIntegrationTests {
             #expect(!comment.author.name.isEmpty, "Comment should have author")
         } catch APIError.commentsDisabled {
             // Comments disabled is acceptable - test passes
+        } catch APIError.noConnection {
+            // Test instance unreachable - skip
         } catch {
             throw error
         }
@@ -311,10 +323,9 @@ struct InvidiousAPIIntegrationTests {
 
     @Test("Captions returns available tracks")
     func captionsReturnsAvailableTracks() async throws {
-        let captions = try await api.captions(
-            videoID: IntegrationTestConstants.testVideoID,
-            instance: instance
-        )
+        guard let captions = try await tryInstance({
+            try await api.captions(videoID: IntegrationTestConstants.testVideoID, instance: instance)
+        }) else { return }
 
         // Popular video should have captions, but it's not guaranteed
         if !captions.isEmpty {
