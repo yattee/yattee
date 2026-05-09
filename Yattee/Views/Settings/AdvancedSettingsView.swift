@@ -212,7 +212,12 @@ struct AdvancedSettingsView: View {
 
                 #if os(tvOS)
                 NavigationLink {
-                    MPVOptionsSettingsView()
+                    TVSidebarDetailContainer(
+                        systemImage: "slider.horizontal.3",
+                        title: String(localized: "settings.advanced.mpv.options")
+                    ) {
+                        MPVOptionsSettingsView()
+                    }
                 } label: {
                     Label(String(localized: "settings.advanced.mpv.options"), systemImage: "slider.horizontal.3")
                 }

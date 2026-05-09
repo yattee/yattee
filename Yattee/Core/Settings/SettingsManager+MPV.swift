@@ -16,6 +16,7 @@ extension SettingsManager {
     /// NOT synced to iCloud - local-only storage.
     var customMPVOptions: [String: String] {
         get {
+            if let cached = _customMPVOptions { return cached }
             guard let data = localDefaults.data(forKey: "customMPVOptions"),
                   let options = try? JSONDecoder().decode([String: String].self, from: data) else {
                 return [:]
@@ -23,6 +24,7 @@ extension SettingsManager {
             return options
         }
         set {
+            _customMPVOptions = newValue
             if let data = try? JSONEncoder().encode(newValue) {
                 localDefaults.set(data, forKey: "customMPVOptions")
             }

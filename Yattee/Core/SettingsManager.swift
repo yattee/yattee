@@ -117,6 +117,9 @@ final class SettingsManager {
     // Top Shelf (tvOS)
     var _topShelfSections: [TopShelfSection]?
 
+    // Custom MPV options (local-only)
+    var _customMPVOptions: [String: String]?
+
     // Tab bar settings (compact size class only - iOS)
     var _tabBarItemOrder: [TabBarItem]?
     var _tabBarItemVisibility: [TabBarItem: Bool]?
