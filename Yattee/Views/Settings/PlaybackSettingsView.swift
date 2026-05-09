@@ -271,12 +271,10 @@ private struct BehaviorSection: View {
                 }
             }
 
-            #if os(iOS) || os(macOS)
             Toggle(
                 String(localized: "settings.playback.backgroundPlayback"),
                 isOn: $settings.backgroundPlaybackEnabled
             )
-            #endif
 
             #if os(tvOS)
             Toggle(

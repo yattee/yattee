@@ -650,6 +650,15 @@ final class PlayerService {
         #else
         let isPiPActive = false
         #endif
+
+        #if os(tvOS)
+        LoggingService.shared.debug("PlayerService[tvOS-bg]: phase=\(phase) bgEnabled=\(backgroundEnabled) playbackState=\(state.playbackState)", category: .player)
+        if (phase == .background || phase == .inactive), !backgroundEnabled, state.playbackState == .playing {
+            LoggingService.shared.debug("PlayerService[tvOS-bg]: pausing playback (phase=\(phase), backgroundPlaybackEnabled=false)", category: .player)
+            pause()
+        }
+        #endif
+
         currentBackend?.handleScenePhase(phase, backgroundEnabled: backgroundEnabled, isPiPActive: isPiPActive)
     }
 

@@ -31,6 +31,7 @@ enum TVPlayerFocusTarget: Hashable {
 struct TVPlayerView: View {
     @Environment(\.appEnvironment) private var appEnvironment
     @Environment(\.dismiss) private var dismiss
+    @Environment(\.scenePhase) private var scenePhase
 
     // MARK: - State
 
@@ -394,6 +395,13 @@ struct TVPlayerView: View {
         .onChange(of: playerState?.currentVideo?.id) { _, _ in
             if showAutoplayCountdown {
                 stopAutoplayCountdown()
+                showControls()
+            }
+        }
+        // When app returns to foreground (e.g. after auto-pause from background),
+        // surface the controls so the user can immediately resume or navigate.
+        .onChange(of: scenePhase) { oldPhase, newPhase in
+            if newPhase == .active && oldPhase != .active {
                 showControls()
             }
         }

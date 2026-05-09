@@ -40,12 +40,20 @@ extension SettingsManager {
     var backgroundPlaybackEnabled: Bool {
         get {
             if let cached = _backgroundPlaybackEnabled { return cached }
-            return bool(for: .backgroundPlayback, default: true)
+            return bool(for: .backgroundPlayback, default: backgroundPlaybackDefault)
         }
         set {
             _backgroundPlaybackEnabled = newValue
             set(newValue, for: .backgroundPlayback)
         }
+    }
+
+    private var backgroundPlaybackDefault: Bool {
+        #if os(tvOS)
+        return false
+        #else
+        return true
+        #endif
     }
 
     /// tvOS only: when enabled, the Siri remote Menu button closes the video
