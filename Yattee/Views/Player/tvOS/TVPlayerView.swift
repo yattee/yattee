@@ -49,6 +49,10 @@ struct TVPlayerView: View {
     /// Whether user is scrubbing the progress bar.
     @State private var isScrubbing = false
 
+    /// Whether playback was active when the current scrub session began;
+    /// used to decide whether to resume on scrub end.
+    @State private var wasPlayingBeforeScrub = false
+
     /// Whether the quality sheet is shown.
     @State private var showingQualitySheet = false
 
@@ -237,8 +241,16 @@ struct TVPlayerView: View {
                     isScrubbing = scrubbing
                     if scrubbing {
                         stopControlsTimer()
+                        wasPlayingBeforeScrub = playerService?.state.playbackState == .playing
+                        if wasPlayingBeforeScrub {
+                            playerService?.pause()
+                        }
                     } else {
                         startControlsTimer()
+                        if wasPlayingBeforeScrub {
+                            playerService?.resume()
+                        }
+                        wasPlayingBeforeScrub = false
                     }
                 },
                 remoteSeekTime: scrubberRemoteSeekTime,
