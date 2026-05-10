@@ -553,6 +553,15 @@ struct TVPlayerView: View {
     private func handleVideoFailed() {
         stopControlsTimer()
         stopAutoplayCountdown()
+        if showingQualitySheet {
+            hideQualitySheet()
+        }
+        if showingQueueSheet {
+            hideQueueSheet()
+        }
+        if isDetailsPanelVisible {
+            hideDetailsPanel()
+        }
         withAnimation(.easeOut(duration: 0.25)) {
             controlsVisible = false
         }
