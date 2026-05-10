@@ -27,7 +27,7 @@ struct YatteeApp: App {
     @NSApplicationDelegateAdaptor(AppDelegate.self) private var appDelegate
     #endif
 
-    @State private var appEnvironment = AppEnvironment()
+    @State private var appEnvironment = AppEnvironment.shared
     @State private var backgroundTasksRegistered = false
     @State private var showingClipboardAlert = false
     @State private var detectedClipboardURL: URL?

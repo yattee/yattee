@@ -146,10 +146,14 @@ final class DownloadManager: NSObject {
     func setDownloadSettings(_ settings: DownloadSettings) {
         let isInitialSetup = self.downloadSettings == nil
         self.downloadSettings = settings
-        // Invalidate old session before creating new one with correct settings
-        urlSession?.invalidateAndCancel()
-        urlSession = nil
-        setupSession()
+
+        // Create the background session only once. The background URLSession's
+        // identifier is process-global, so tearing it down here would cancel any
+        // in-flight downloads. Cellular-access changes are handled separately via
+        // refreshCellularAccessSetting(), which migrates active downloads safely.
+        if urlSession == nil {
+            setupSession()
+        }
 
         // Resume interrupted downloads only on initial setup
         if isInitialSetup {

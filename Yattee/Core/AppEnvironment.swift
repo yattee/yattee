@@ -56,6 +56,21 @@ final class AppEnvironment {
     let legacyMigrationService: LegacyDataMigrationService
     let sourcesSettings: SourcesSettings
 
+    // MARK: - Shared Instance
+
+    /// The single, process-wide app environment.
+    ///
+    /// SwiftUI may evaluate a `@State` property's default-value autoclosure more
+    /// than once (it keeps only the first result but still runs the side effects
+    /// of the discarded instances). Constructing `AppEnvironment` more than once
+    /// would create multiple `DownloadManager`s — and therefore multiple
+    /// background `URLSession`s registered under the same identifier — causing
+    /// download-completion delegate callbacks to be delivered to an instance
+    /// whose `activeDownloads` is empty (the finished file is then dropped).
+    /// Referencing this `static let` from the App's `@State` guarantees exactly
+    /// one instance for the lifetime of the process.
+    static let shared = AppEnvironment()
+
     // MARK: - Initialization
 
     init(

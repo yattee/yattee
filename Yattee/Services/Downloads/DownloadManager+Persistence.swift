@@ -71,7 +71,7 @@ extension DownloadManager {
 
     func loadDownloads() {
         let decoder = JSONDecoder()
-        
+
         // ==== ACTIVE DOWNLOADS ====
         if let activeData = UserDefaults.standard.data(forKey: "activeDownloads") {
             LoggingService.shared.logDownload(
