@@ -404,7 +404,9 @@ final class PlayerService {
             // Check for cancellation after stream load completes
             try Task.checkCancellation()
 
-            await backend.seek(to: seekTime, showLoading: false)
+            if seekTime > 0 {
+                await backend.seek(to: seekTime, showLoading: false)
+            }
 
             // Wait for player sheet animation to complete before starting playback
             await navigationCoordinator?.waitForPlayerSheetAnimation()

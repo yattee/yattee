@@ -456,8 +456,19 @@ final class MPVClient: @unchecked Sendable {
 
         // Cache settings for network streams
         setOptionSync("cache", "yes")
+        #if os(tvOS)
+        // Apple TV can decode 1080p60 easily, but aggressively filling a large
+        // demuxer cache during startup competes with the first seconds of
+        // rendering. Keep enough readahead for smooth playback without racing
+        // hundreds of seconds ahead immediately after load/seek.
+        setOptionSync("cache-secs", "30")
+        setOptionSync("demuxer-readahead-secs", "20")
+        setOptionSync("demuxer-max-bytes", "24MiB")
+        setOptionSync("demuxer-max-back-bytes", "8MiB")
+        #else
         setOptionSync("demuxer-max-bytes", "50MiB")
         setOptionSync("demuxer-max-back-bytes", "25MiB")
+        #endif
 
         // Logging - minimal logging for release builds
         setOptionSync("terminal", "no")

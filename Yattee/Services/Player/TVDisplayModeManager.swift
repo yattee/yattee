@@ -78,8 +78,8 @@ final class TVDisplayModeManager {
     /// Pass `nil` for fields you don't have yet; this method is safe to call
     /// repeatedly as more info becomes available (e.g. fps arrives before gamma).
     func apply(fps: Double?, gamma: String?) {
-        let matchFrameRate = readBoolDefaultFalse(key: "tvMatchDisplayFrameRate")
-        let matchDynamicRange = readBoolDefaultFalse(key: "tvMatchDisplayDynamicRange")
+        let matchFrameRate = readBool(key: "tvMatchDisplayFrameRate", default: false)
+        let matchDynamicRange = readBool(key: "tvMatchDisplayDynamicRange", default: false)
 
         guard matchFrameRate || matchDynamicRange else {
             clear()
@@ -136,10 +136,13 @@ final class TVDisplayModeManager {
 
     // MARK: - Helpers
 
-    private func readBoolDefaultFalse(key: String) -> Bool {
+    private func readBool(key: String, default defaultValue: Bool) -> Bool {
         // The SettingsManager stores these unprefixed (not platform-specific keys),
-        // so we can read them directly from standard UserDefaults. Missing key = off.
-        UserDefaults.standard.bool(forKey: key)
+        // so we can read them directly from standard UserDefaults.
+        guard UserDefaults.standard.object(forKey: key) != nil else {
+            return defaultValue
+        }
+        return UserDefaults.standard.bool(forKey: key)
     }
 
     private func activeDisplayManager() -> AVDisplayManager? {

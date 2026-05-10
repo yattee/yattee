@@ -464,6 +464,8 @@ final class MPVBackend: PlayerBackend {
         currentTime = 0
         duration = 0
         bufferedTime = 0
+        containerFps = 0
+        renderView?.videoFPS = 60
         // When loading with external audio (non-EDL mode), wait for PLAYBACK_RESTART after audio is added
         // With EDL, both streams load atomically so no waiting needed
         isWaitingForExternalAudio = audioStream != nil && !useEDL
@@ -474,6 +476,7 @@ final class MPVBackend: PlayerBackend {
 
         // Reset first-frame tracking for new content
         renderView?.resetFirstFrameTracking()
+        applyStreamFrameRateHint(stream)
 
         // Pause MPV before loading new content to prevent audio from playing
         // before the thumbnail hides. This is critical when reusing the backend
@@ -1743,6 +1746,17 @@ extension MPVBackend: MPVClientDelegate {
     }
     #endif
 
+    /// Seed render/display cadence from API metadata before MPV finishes probing.
+    /// MPV will overwrite this later with the exact container FPS when available.
+    private func applyStreamFrameRateHint(_ stream: Stream) {
+        guard let fps = stream.fps, fps > 0 else { return }
+        containerFps = Double(fps)
+        updateRenderViewFPS()
+        #if os(tvOS)
+        applyTVDisplayCriteria()
+        #endif
+    }
+
     /// Update render view's video FPS for display link frame rate matching
     private func updateRenderViewFPS() {
         // Use cached container-fps (set via property observation to avoid sync fetch on main thread)
@@ -1778,6 +1792,12 @@ extension MPVBackend: MPVClientDelegate {
     /// This is a fallback when no video frames or dimensions are available
     private func checkAndMarkReadyIfAudioOnlyDetected() {
         guard !isReady, !isSeeking else { return }
+        // Only apply this path for streams the user actually selected as audio-only.
+        // For video streams with a separate audio track (DASH), PLAYBACK_RESTART can
+        // fire before mpv has demuxed the video — videoWidth/codec are still 0 — and
+        // we'd incorrectly mark ready as audio-only and start playback before video
+        // decoding catches up, producing an audible startup A/V desync.
+        guard currentStream?.isAudioOnly == true else { return }
         // Detect audio-only: no video codec and no video dimensions from MPV
         guard videoCodec.isEmpty, videoWidth == 0, videoHeight == 0 else { return }
         // Ensure stream metadata is loaded
