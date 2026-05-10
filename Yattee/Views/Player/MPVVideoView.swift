@@ -143,6 +143,13 @@ struct MPVVideoView: View {
             applies: appliesAspectRatio
         ))
         .onAppear {
+            #if os(iOS)
+            // Resume the MPV display link when the expanded video view appears.
+            // MiniPlayerView pauses rendering when its video preview hides during expand;
+            // PlayerService.playerSheetDidAppear is gated behind background playback, so it
+            // can't be relied on to resume.
+            backend.resumeRendering()
+            #endif
             // Start debug updates if overlay is already visible when view appears
             if playerState.showDebugOverlay {
                 startDebugUpdates()
