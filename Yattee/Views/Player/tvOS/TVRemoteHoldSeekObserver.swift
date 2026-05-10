@@ -26,10 +26,12 @@ struct TVRemoteHoldSeekOverlay: UIViewRepresentable {
     let isActive: Bool
     let onTick: TVRemoteHoldSeekTick
 
+    @MainActor
     func makeCoordinator() -> Coordinator {
         Coordinator(onTick: onTick)
     }
 
+    @MainActor
     func makeUIView(context: Context) -> UIView {
         let view = TVRemoteHoldSeekHostView()
         view.backgroundColor = .clear
@@ -38,6 +40,7 @@ struct TVRemoteHoldSeekOverlay: UIViewRepresentable {
         return view
     }
 
+    @MainActor
     func updateUIView(_: UIView, context: Context) {
         context.coordinator.update(onTick: onTick, isActive: isActive)
     }
