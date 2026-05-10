@@ -184,7 +184,7 @@ struct QueueManagementSheet: View {
                             String(localized: "queue.section.previously"),
                             count: history.count
                         )
-                        VStack(spacing: 8) {
+                        VStack(spacing: 20) {
                             ForEach(Array(history.enumerated()), id: \.element.id) { index, historyItem in
                                 QueueItemRow(
                                     queuedVideo: historyItem,
@@ -222,7 +222,7 @@ struct QueueManagementSheet: View {
                             String(localized: "queue.section.upNext"),
                             count: queue.count
                         )
-                        VStack(spacing: 8) {
+                        VStack(spacing: 20) {
                             ForEach(Array(queue.enumerated()), id: \.element.id) { index, queuedVideo in
                                 QueueItemRow(
                                     queuedVideo: queuedVideo,
