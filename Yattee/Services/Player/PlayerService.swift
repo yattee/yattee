@@ -207,14 +207,24 @@ final class PlayerService {
         // Set up audio session when playback actually starts (not at app launch)
         setupAudioSession()
 
+        let isNewVideo = state.currentVideo?.id != video.id
+
         // Save progress and sync for previous video before switching
         // Skip if video ended naturally - 100% was already saved in backendDidFinishPlaying
-        if state.currentVideo != nil && state.currentVideo?.id != video.id && !videoEndedNaturally {
+        if state.currentVideo != nil && isNewVideo && !videoEndedNaturally {
             saveProgressAndSync()
         }
 
         // Reset flag for the new video
         videoEndedNaturally = false
+
+        // Clear the previous video's track list when transitioning to a new
+        // video so the player settings sheet doesn't show stale tracks.
+        // Skipped for same-video calls (e.g. in-video quality switch) so the
+        // full stream list kept around for the picker survives the switch.
+        if isNewVideo {
+            availableStreams = []
+        }
 
         // Clear sponsor block state from previous video
         state.sponsorSegments = []
@@ -808,6 +818,14 @@ final class PlayerService {
                     loadCaption(match)
                 }
             }
+            // Fetch the full stream/caption list in the background so the
+            // quality / audio / subtitle picker isn't limited to the single
+            // pre-resolved stream that the queue item carried.
+            if case .global = queuedVideo.video.id.source {
+                Task { [weak self] in
+                    await self?.loadOnlineStreams()
+                }
+            }
         }
     }
 
@@ -1269,8 +1287,28 @@ final class PlayerService {
         do {
             let (_, streams, captions) = try await fetchVideoStreamsAndCaptions(for: video)
             // Combine downloaded streams with online streams (downloaded first)
-            availableStreams = downloadedStreams + streams
+            let combined = downloadedStreams + streams
+            availableStreams = combined
             availableCaptions = captions
+
+            // The freshly fetched streams have new (signed) URLs that won't
+            // match `state.currentStream`/`state.currentAudioStream` from the
+            // queue's pre-resolved entry — repoint state to the equivalent
+            // refreshed stream (matched by Stream.id which is
+            // resolution+fps+format) so the picker shows checkmarks on the
+            // currently playing tracks.
+            if let playing = state.currentStream,
+               !playing.url.isFileURL,
+               let refreshed = combined.first(where: { $0.id == playing.id })
+            {
+                state.updateCurrentStream(refreshed)
+            }
+            if let playingAudio = state.currentAudioStream,
+               !playingAudio.url.isFileURL,
+               let refreshedAudio = combined.first(where: { $0.id == playingAudio.id })
+            {
+                state.updateCurrentAudioStream(refreshedAudio)
+            }
             LoggingService.shared.logPlayer("Loaded \(streams.count) online streams and \(captions.count) captions (keeping \(downloadedStreams.count) downloaded)")
         } catch {
             LoggingService.shared.logPlayerError("Failed to load online streams", error: error)
