@@ -123,18 +123,6 @@ struct TVPlayerView: View {
         mpvPlayerContent
             .ignoresSafeArea()
             .playerToastOverlay()
-            // Quality / Settings selector (fullscreen cover gives tvOS enough room)
-            .fullScreenCover(isPresented: $showingQualitySheet) {
-                qualitySheetContent
-            }
-            .fullScreenCover(isPresented: $showingQueueSheet) {
-                ZStack {
-                    Rectangle()
-                        .fill(.ultraThinMaterial)
-                        .ignoresSafeArea()
-                    QueueManagementSheet()
-                }
-            }
             .fullScreenCover(isPresented: $showingErrorSheet) {
                 ZStack {
                     Rectangle()
@@ -148,65 +136,58 @@ struct TVPlayerView: View {
             }
     }
 
-    // MARK: - Quality Sheet Content
+    // MARK: - Quality Panel Content
 
+    /// Builds the quality/settings panel for the right-half overlay. The view
+    /// itself supplies its own glass backdrop (matches `TVDetailsPanel`).
     @ViewBuilder
-    private var qualitySheetContent: some View {
+    private var qualityPanelContent: some View {
         if let playerService {
             let dashEnabled = appEnvironment?.settingsManager.dashEnabled ?? false
             let supportedFormats = playerService.currentBackendType.supportedFormats
 
-            ZStack {
-                // Glass backdrop — matches info/comments panel for visual uniformity
-                Rectangle()
-                    .fill(.ultraThinMaterial)
-                    .ignoresSafeArea()
-
-                QualitySelectorView(
-                    streams: playerService.availableStreams.filter { stream in
-                        let format = StreamFormat.detect(from: stream)
-                        if format == .dash && !dashEnabled {
-                            return false
-                        }
-                        return supportedFormats.contains(format)
-                    },
-                    captions: playerService.availableCaptions,
-                    currentStream: playerState?.currentStream,
-                    currentAudioStream: playerState?.currentAudioStream,
-                    currentCaption: playerService.currentCaption,
-                    isLoading: playerState?.playbackState == .loading,
-                    currentDownload: playerService.currentDownload,
-                    isLoadingOnlineStreams: playerService.isLoadingOnlineStreams,
-                    localCaptionURL: playerService.currentDownload.flatMap { download in
-                        guard let path = download.localCaptionPath else { return nil }
-                        return appEnvironment?.downloadManager.downloadsDirectory().appendingPathComponent(path)
-                    },
-                    currentRate: playerState?.rate ?? .x1,
-                    onStreamSelected: { stream, audioStream in
-                        switchToStream(stream, audioStream: audioStream)
-                    },
-                    onCaptionSelected: { caption in
-                        playerService.loadCaption(caption)
-                    },
-                    onLoadOnlineStreams: {
-                        Task {
-                            await playerService.loadOnlineStreams()
-                        }
-                    },
-                    onSwitchToOnlineStream: { stream, audioStream in
-                        Task {
-                            await playerService.switchToOnlineStream(stream, audioStream: audioStream)
-                        }
-                    },
-                    onRateChanged: { rate in
-                        playerState?.rate = rate
-                        playerService.currentBackend?.rate = Float(rate.rawValue)
+            QualitySelectorView(
+                streams: playerService.availableStreams.filter { stream in
+                    let format = StreamFormat.detect(from: stream)
+                    if format == .dash && !dashEnabled {
+                        return false
                     }
-                )
-                .frame(maxWidth: 900, maxHeight: 700)
-                .padding(.horizontal, 200)
-                .padding(.vertical, 80)
-            }
+                    return supportedFormats.contains(format)
+                },
+                captions: playerService.availableCaptions,
+                currentStream: playerState?.currentStream,
+                currentAudioStream: playerState?.currentAudioStream,
+                currentCaption: playerService.currentCaption,
+                isLoading: playerState?.playbackState == .loading,
+                currentDownload: playerService.currentDownload,
+                isLoadingOnlineStreams: playerService.isLoadingOnlineStreams,
+                localCaptionURL: playerService.currentDownload.flatMap { download in
+                    guard let path = download.localCaptionPath else { return nil }
+                    return appEnvironment?.downloadManager.downloadsDirectory().appendingPathComponent(path)
+                },
+                currentRate: playerState?.rate ?? .x1,
+                onStreamSelected: { stream, audioStream in
+                    switchToStream(stream, audioStream: audioStream)
+                },
+                onCaptionSelected: { caption in
+                    playerService.loadCaption(caption)
+                },
+                onLoadOnlineStreams: {
+                    Task {
+                        await playerService.loadOnlineStreams()
+                    }
+                },
+                onSwitchToOnlineStream: { stream, audioStream in
+                    Task {
+                        await playerService.switchToOnlineStream(stream, audioStream: audioStream)
+                    }
+                },
+                onRateChanged: { rate in
+                    playerState?.rate = rate
+                    playerService.currentBackend?.rate = Float(rate.rawValue)
+                },
+                onDismiss: { hideQualitySheet() }
+            )
         }
     }
 
@@ -276,6 +257,38 @@ struct TVPlayerView: View {
                             onDismiss: { hideDetailsPanel() }
                         )
                         .frame(width: geo.size.width / 2)
+                    }
+                }
+                .transition(.move(edge: .trailing).combined(with: .opacity))
+            }
+
+            // Right-side quality / settings panel (covers ~50% of screen)
+            if showingQualitySheet {
+                GeometryReader { geo in
+                    HStack(spacing: 0) {
+                        Spacer(minLength: 0)
+                        qualityPanelContent
+                            .frame(width: geo.size.width / 2)
+                            // Ignore tvOS title-safe area on the trailing edge
+                            // so panel content lines up symmetrically with the
+                            // mid-screen leading edge instead of being inset
+                            // from the physical right edge.
+                            .ignoresSafeArea(.container, edges: .horizontal)
+                            .focusSection()
+                    }
+                }
+                .transition(.move(edge: .trailing).combined(with: .opacity))
+            }
+
+            // Right-side queue panel (covers ~50% of screen)
+            if showingQueueSheet {
+                GeometryReader { geo in
+                    HStack(spacing: 0) {
+                        Spacer(minLength: 0)
+                        QueueManagementSheet(onDismiss: { hideQueueSheet() })
+                            .frame(width: geo.size.width / 2)
+                            .ignoresSafeArea(.container, edges: .horizontal)
+                            .focusSection()
                     }
                 }
                 .transition(.move(edge: .trailing).combined(with: .opacity))
@@ -555,7 +568,12 @@ struct TVPlayerView: View {
 
     @ViewBuilder
     private var backgroundLayer: some View {
-        if !controlsVisible && !isDetailsPanelVisible && !isDebugOverlayVisible && !isFailureOverlayVisible {
+        if !controlsVisible
+            && !isDetailsPanelVisible
+            && !isDebugOverlayVisible
+            && !isFailureOverlayVisible
+            && !showingQualitySheet
+            && !showingQueueSheet {
             // When controls hidden, use a Button to capture both click and swipe
             Button {
                 showControls()
@@ -620,7 +638,12 @@ struct TVPlayerView: View {
 
     /// Whether the primary controls overlay should be visible right now.
     private var shouldShowControls: Bool {
-        controlsVisible && !isDetailsPanelVisible && !isDebugOverlayVisible && !isFailureOverlayVisible
+        controlsVisible
+            && !isDetailsPanelVisible
+            && !isDebugOverlayVisible
+            && !isFailureOverlayVisible
+            && !showingQualitySheet
+            && !showingQueueSheet
     }
 
     // MARK: - Controls Timer
@@ -674,12 +697,32 @@ struct TVPlayerView: View {
 
     private func showQualitySheet() {
         stopControlsTimer()
-        showingQualitySheet = true
+        withAnimation(.spring(response: 0.4, dampingFraction: 0.85)) {
+            showingQualitySheet = true
+            controlsVisible = false
+        }
+    }
+
+    private func hideQualitySheet() {
+        withAnimation(.spring(response: 0.35, dampingFraction: 0.9)) {
+            showingQualitySheet = false
+        }
+        showControls()
     }
 
     private func showQueueSheet() {
         stopControlsTimer()
-        showingQueueSheet = true
+        withAnimation(.spring(response: 0.4, dampingFraction: 0.85)) {
+            showingQueueSheet = true
+            controlsVisible = false
+        }
+    }
+
+    private func hideQueueSheet() {
+        withAnimation(.spring(response: 0.35, dampingFraction: 0.9)) {
+            showingQueueSheet = false
+        }
+        showControls()
     }
 
     private func switchToStream(_ stream: Stream, audioStream: Stream? = nil) {
@@ -749,8 +792,12 @@ struct TVPlayerView: View {
             return
         }
 
-        // Show controls if hidden (but not if debug overlay is visible), then toggle playback
-        if !controlsVisible && !isDetailsPanelVisible && !isDebugOverlayVisible {
+        // Show controls if hidden (but not if any overlay is visible), then toggle playback
+        if !controlsVisible
+            && !isDetailsPanelVisible
+            && !isDebugOverlayVisible
+            && !showingQualitySheet
+            && !showingQueueSheet {
             showControls()
         }
 
@@ -902,8 +949,14 @@ struct TVPlayerView: View {
         } else if isDebugOverlayVisible {
             // Second: hide debug overlay
             hideDebugOverlay()
+        } else if showingQualitySheet {
+            // Third: hide quality / settings panel
+            hideQualitySheet()
+        } else if showingQueueSheet {
+            // Fourth: hide queue panel
+            hideQueueSheet()
         } else if isDetailsPanelVisible {
-            // Third: hide details panel
+            // Fifth: hide details panel
             hideDetailsPanel()
         } else if isScrubbing {
             // Fourth: cancel scrub without seeking, then hide controls. The

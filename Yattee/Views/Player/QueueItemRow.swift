@@ -45,7 +45,11 @@ struct QueueItemRow: View {
                     cornerRadius: 6,
                     duration: queuedVideo.video.formattedDuration
                 )
+                #if os(tvOS)
+                .frame(width: 160, height: 90)
+                #else
                 .frame(width: 80, height: 45)
+                #endif
                 .opacity(isCurrentlyPlaying ? 0.6 : 1.0)
 
                 // Video info

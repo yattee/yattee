@@ -66,7 +66,16 @@ extension QualitySelectorView {
                     generalSectionContent
                 }
             }
+            #if os(tvOS)
+            // Explicit symmetric padding so rows are evenly inset from the
+            // half-screen panel's edges; matches the queue panel's 80pt
+            // breathing room so the focus halo around row buttons doesn't
+            // crowd the panel boundaries.
+            .padding(.horizontal, 80)
+            .padding(.vertical, 24)
+            #else
             .padding()
+            #endif
         }
         .onAppear {
             selectedTab = initialTab
@@ -87,6 +96,7 @@ extension QualitySelectorView {
                 systemImage: "film",
                 value: currentVideoDisplayValue
             )
+            .focused($inlinePanelInitialFocus)
             if availableTabs.contains(.audio) {
                 mediaSelectionRow(
                     destination: .audio,
@@ -195,63 +205,76 @@ extension QualitySelectorView {
 
     @ViewBuilder
     var videoDetailContent: some View {
-        ScrollView {
-            VStack(spacing: 16) {
-                if !adaptiveStreams.isEmpty {
-                    adaptiveSectionContent
-                }
-                if !videoStreams.isEmpty {
-                    videoSectionContent
-                }
+        detailContent(title: String(localized: "player.quality.video")) {
+            if !adaptiveStreams.isEmpty {
+                adaptiveSectionContent
             }
-            .padding()
+            if !videoStreams.isEmpty {
+                videoSectionContent
+            }
         }
-        #if os(tvOS)
-        .background(Color.clear)
-        #else
-        .background(ListBackgroundStyle.grouped.color)
-        #endif
-        .navigationTitle(String(localized: "player.quality.video"))
-        #if os(iOS)
-        .navigationBarTitleDisplayMode(.inline)
-        #endif
     }
 
     @ViewBuilder
     var audioDetailContent: some View {
-        ScrollView {
-            VStack(spacing: 16) {
-                audioSectionContent
-            }
-            .padding()
+        detailContent(title: String(localized: "stream.audio")) {
+            audioSectionContent
         }
-        #if os(tvOS)
-        .background(Color.clear)
-        #else
-        .background(ListBackgroundStyle.grouped.color)
-        #endif
-        .navigationTitle(String(localized: "stream.audio"))
-        #if os(iOS)
-        .navigationBarTitleDisplayMode(.inline)
-        #endif
     }
 
     @ViewBuilder
     var subtitlesDetailContent: some View {
+        detailContent(title: String(localized: "stream.subtitles")) {
+            subtitlesSectionContent
+        }
+    }
+
+    /// Shared layout for the pushed detail screens. On tvOS the destination
+    /// gets the same glass backdrop + custom title bar as the panel root so
+    /// the visual treatment is continuous as the user navigates in.
+    @ViewBuilder
+    private func detailContent<Content: View>(
+        title: String,
+        @ViewBuilder content: () -> Content
+    ) -> some View {
+        #if os(tvOS)
+        VStack(alignment: .leading, spacing: 0) {
+            ZStack {
+                Text(title)
+                    .font(.system(size: 32, weight: .semibold))
+                    .foregroundStyle(.primary)
+            }
+            .frame(maxWidth: .infinity)
+            .padding(.horizontal, 80)
+            .padding(.top, 32)
+            .padding(.bottom, 16)
+
+            ScrollView {
+                VStack(spacing: 16) {
+                    content()
+                }
+                .padding(.horizontal, 80)
+                .padding(.vertical, 24)
+            }
+        }
+        .background(
+            Rectangle()
+                .fill(.ultraThinMaterial)
+                .ignoresSafeArea()
+        )
+        .ignoresSafeArea(.container, edges: .horizontal)
+        #else
         ScrollView {
             VStack(spacing: 16) {
-                subtitlesSectionContent
+                content()
             }
             .padding()
         }
-        #if os(tvOS)
-        .background(Color.clear)
-        #else
         .background(ListBackgroundStyle.grouped.color)
-        #endif
-        .navigationTitle(String(localized: "stream.subtitles"))
+        .navigationTitle(title)
         #if os(iOS)
         .navigationBarTitleDisplayMode(.inline)
+        #endif
         #endif
     }
 
@@ -454,7 +477,7 @@ extension QualitySelectorView {
                             isPreferred: false,
                             onTap: {
                                 onCaptionSelected(nil)
-                                dismiss()
+                                performDismiss()
                             }
                         )
                         .padding(.vertical, 8)
@@ -467,7 +490,7 @@ extension QualitySelectorView {
                             localCaptionURL: localCaptionURL,
                             currentCaption: currentCaption,
                             onCaptionSelected: onCaptionSelected,
-                            onDismiss: { dismiss() }
+                            onDismiss: { performDismiss() }
                         )
                         .padding(.vertical, 8)
                         .padding(.horizontal, 12)
@@ -548,7 +571,7 @@ extension QualitySelectorView {
         } else {
             onStreamSelected(stream, nil)
         }
-        dismiss()
+        performDismiss()
     }
 
     // MARK: - Video Section
@@ -641,27 +664,27 @@ extension QualitySelectorView {
         if isDownloaded {
             if stream.isMuxed {
                 onStreamSelected(stream, nil)
-                dismiss()
+                performDismiss()
             } else {
                 selectedVideoStream = stream
                 if let audio = selectedAudioStream {
                     onStreamSelected(stream, audio)
-                    dismiss()
+                    performDismiss()
                 }
             }
         } else if isPlayingDownloadedContent {
             let audioStream: Stream? = stream.isVideoOnly ? (selectedAudioStream ?? defaultAudioStream) : nil
             onSwitchToOnlineStream(stream, audioStream)
-            dismiss()
+            performDismiss()
         } else {
             if stream.isMuxed {
                 onStreamSelected(stream, nil)
-                dismiss()
+                performDismiss()
             } else {
                 selectedVideoStream = stream
                 if let audio = selectedAudioStream {
                     onStreamSelected(stream, audio)
-                    dismiss()
+                    performDismiss()
                 }
             }
         }
@@ -730,7 +753,7 @@ extension QualitySelectorView {
         selectedAudioStream = stream
         if let video = selectedVideoStream, video.isVideoOnly {
             onStreamSelected(video, stream)
-            dismiss()
+            performDismiss()
         }
     }
 
@@ -803,7 +826,7 @@ extension QualitySelectorView {
         } else {
             onCaptionSelected(caption)
         }
-        dismiss()
+        performDismiss()
     }
 }
 

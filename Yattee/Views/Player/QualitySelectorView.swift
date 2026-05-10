@@ -44,6 +44,21 @@ struct QualitySelectorView: View {
     /// Whether to show the segmented tab picker (false for focused single-tab mode)
     var showTabPicker: Bool = true
 
+    /// Optional dismiss callback used when the view is presented inline (e.g. as
+    /// the tvOS half-screen panel). When nil, falls back to `@Environment(\.dismiss)`.
+    var onDismiss: (() -> Void)?
+
+    #if os(tvOS)
+    /// Bound to the first focusable row so we can programmatically pull focus
+    /// into the panel on appear (the system doesn't auto-focus an inline
+    /// overlay the way it does for `fullScreenCover`).
+    @FocusState var inlinePanelInitialFocus: Bool
+
+    /// Tracks pushed destinations so the Menu-button handler can pop instead
+    /// of dismissing when the user has navigated into a detail screen.
+    @State private var navigationPath = NavigationPath()
+    #endif
+
     // MARK: - State
     @State var selectedTab: QualitySelectorTab = .video
     @State var selectedVideoStream: Stream?
@@ -152,7 +167,8 @@ struct QualitySelectorView: View {
         onLoadOnlineStreams: @escaping () -> Void = {},
         onSwitchToOnlineStream: @escaping (Stream, Stream?) -> Void = { _, _ in },
         onRateChanged: ((PlaybackRate) -> Void)? = nil,
-        onLockToggled: ((Bool) -> Void)? = nil
+        onLockToggled: ((Bool) -> Void)? = nil,
+        onDismiss: (() -> Void)? = nil
     ) {
         self.streams = streams
         self.captions = captions
@@ -173,67 +189,139 @@ struct QualitySelectorView: View {
         self.onSwitchToOnlineStream = onSwitchToOnlineStream
         self.onRateChanged = onRateChanged
         self.onLockToggled = onLockToggled
+        self.onDismiss = onDismiss
     }
 
     // MARK: - Body
 
+    @ViewBuilder
+    private var rootContent: some View {
+        if isLoading {
+            loadingContent
+        } else if isPlayingDownloadedContent {
+            downloadedContent
+        } else if hasNoStreams {
+            emptyContent
+        } else {
+            streamsContent
+        }
+    }
+
     var body: some View {
-        NavigationStack {
-            Group {
-                if isLoading {
-                    loadingContent
-                } else if isPlayingDownloadedContent {
-                    downloadedContent
-                } else if hasNoStreams {
-                    emptyContent
-                } else {
-                    streamsContent
-                }
-            }
-            #if os(tvOS)
-            // On tvOS the quality sheet is presented over the player with an outer
-            // ultraThinMaterial backdrop (see TVPlayerView.qualitySheetContent), so
-            // the list itself must be transparent to let the glass show through.
-            .background(Color.clear)
-            #else
-            .background(ListBackgroundStyle.grouped.color)
-            #endif
-            .navigationTitle(navigationTitle)
-            #if os(iOS)
-            .navigationBarTitleDisplayMode(.inline)
-            #endif
-            #if os(tvOS)
-            // Menu at the root dismisses; pushed detail views use NavigationStack's
-            // default pop-on-Menu behavior and won't hit this handler.
-            .onExitCommand { dismiss() }
-            #else
-            .toolbar {
-                ToolbarItem(placement: .confirmationAction) {
-                    Button(role: .cancel) {
-                        dismiss()
-                    } label: {
-                        Label(String(localized: "common.close"), systemImage: "xmark")
-                            .labelStyle(.iconOnly)
-                    }
-                }
-            }
-            #endif
-            .navigationDestination(for: QualitySelectorDestination.self) { destination in
-                switch destination {
-                case .video:
-                    videoDetailContent
-                case .audio:
-                    audioDetailContent
-                case .subtitles:
-                    subtitlesDetailContent
-                }
-            }
-            .onAppear {
-                selectedVideoStream = currentStream
-                selectedAudioStream = currentAudioStream ?? defaultAudioStream
+        #if os(tvOS)
+        NavigationStack(path: $navigationPath) {
+            stackRoot
+        }
+        .onExitCommand {
+            // Pop the pushed detail view if present, otherwise dismiss the
+            // whole panel. (Without this, Menu always falls through to
+            // `performDismiss()` and closes the entire overlay even from a
+            // detail screen.)
+            if !navigationPath.isEmpty {
+                navigationPath.removeLast()
+            } else {
+                performDismiss()
             }
         }
+        #else
+        NavigationStack {
+            stackRoot
+        }
         .presentationDetents([.medium, .large])
+        #endif
+    }
+
+    @ViewBuilder
+    private var stackRoot: some View {
+        Group {
+            #if os(tvOS)
+            // Custom title bar matches the queue panel's style.
+            VStack(alignment: .leading, spacing: 0) {
+                ZStack {
+                    Text(navigationTitle)
+                        .font(.system(size: 32, weight: .semibold))
+                        .foregroundStyle(.primary)
+                }
+                .frame(maxWidth: .infinity)
+                .padding(.horizontal, 80)
+                .padding(.top, 32)
+                .padding(.bottom, 16)
+
+                rootContent
+            }
+            #else
+            rootContent
+            #endif
+        }
+        #if os(tvOS)
+        // On tvOS the panel is presented inline as a half-screen overlay; it
+        // supplies its own glass backdrop so the underlying video stays partly
+        // visible while the menu is readable on top of the bright frame.
+        .background(panelGlassBackground)
+        // Disable the title-safe-area inset that NavigationStack would
+        // otherwise apply on the trailing edge (because the panel sits at
+        // the physical right edge of the screen).
+        .ignoresSafeArea(.container, edges: .horizontal)
+        #else
+        .background(ListBackgroundStyle.grouped.color)
+        .navigationTitle(navigationTitle)
+        #endif
+        #if os(iOS)
+        .navigationBarTitleDisplayMode(.inline)
+        #endif
+        #if !os(tvOS)
+        .toolbar {
+            ToolbarItem(placement: .confirmationAction) {
+                Button(role: .cancel) {
+                    performDismiss()
+                } label: {
+                    Label(String(localized: "common.close"), systemImage: "xmark")
+                        .labelStyle(.iconOnly)
+                }
+            }
+        }
+        #endif
+        .navigationDestination(for: QualitySelectorDestination.self) { destination in
+            switch destination {
+            case .video:
+                videoDetailContent
+            case .audio:
+                audioDetailContent
+            case .subtitles:
+                subtitlesDetailContent
+            }
+        }
+        .onAppear {
+            selectedVideoStream = currentStream
+            selectedAudioStream = currentAudioStream ?? defaultAudioStream
+            #if os(tvOS)
+            // Defer until after the slide-in transition so the focus engine
+            // has finished routing focus away from the (now hidden) player
+            // controls, then pull focus into the first row.
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.45) {
+                inlinePanelInitialFocus = true
+            }
+            #endif
+        }
+    }
+
+    #if os(tvOS)
+    /// Reusable ultraThinMaterial backdrop applied to the panel root and to
+    /// each pushed destination view so the glass remains continuous as the
+    /// user navigates into Video / Audio / Subtitles detail screens.
+    private var panelGlassBackground: some View {
+        Rectangle()
+            .fill(.ultraThinMaterial)
+            .ignoresSafeArea()
+    }
+    #endif
+
+    func performDismiss() {
+        if let onDismiss {
+            onDismiss()
+        } else {
+            dismiss()
+        }
     }
 }
 
