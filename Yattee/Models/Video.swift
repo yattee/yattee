@@ -91,6 +91,15 @@ struct Video: Identifiable, Codable, Sendable {
         thumbnails.sorted { $0.quality > $1.quality }.first
     }
 
+    /// Thumbnail URLs ordered best-quality-first.
+    ///
+    /// Used as a fallback chain: backends (and YouTube's CDN) often advertise
+    /// `maxres`/`sddefault` variants that don't actually exist for a given video
+    /// and 404. Consumers try these in order and drop to the next when one fails.
+    var thumbnailURLsByQuality: [URL] {
+        thumbnails.sorted { $0.quality > $1.quality }.map(\.url)
+    }
+
     var formattedDuration: String {
         guard !isLive else { return "LIVE" }
         guard duration > 0 else { return "" }

@@ -18,6 +18,14 @@ import NukeUI
 struct VideoThumbnailView: View {
     let url: URL?
 
+    /// Lower-quality URLs to try, in priority order, if `url` fails to load.
+    ///
+    /// YouTube's CDN (and the backends that wrap it) frequently advertise
+    /// `maxresdefault`/`sddefault` thumbnails that don't exist for older or
+    /// low-resolution uploads and return 404. When the primary `url` fails we
+    /// step through these so a valid thumbnail is always shown.
+    var fallbackURLs: [URL] = []
+
     var cornerRadius: CGFloat = 8
     var watchProgress: Double? = nil
     var duration: String? = nil
@@ -30,8 +38,23 @@ struct VideoThumbnailView: View {
     var placeholderTitle: String? = nil
     var isWatched: Bool = false
 
+    /// Index into `candidates` of the URL currently being attempted.
+    @State private var candidateIndex = 0
+
+    /// De-duplicated candidate URLs, best-quality first.
+    private var candidates: [URL] {
+        var seen = Set<URL>()
+        return ([url] + fallbackURLs).compactMap { $0 }.filter { seen.insert($0).inserted }
+    }
+
+    /// The URL currently being shown, advancing through `candidates` on failure.
+    private var currentURL: URL? {
+        guard candidates.indices.contains(candidateIndex) else { return candidates.last }
+        return candidates[candidateIndex]
+    }
+
     var body: some View {
-        LazyImage(url: url) { state in
+        LazyImage(url: currentURL) { state in
             if let image = state.image {
                 image
                     .resizable()
@@ -52,6 +75,13 @@ struct VideoThumbnailView: View {
                     }
             }
         }
+        .onCompletion { result in
+            // On a failed load, fall back to the next (lower-quality) candidate.
+            if case .failure = result, candidateIndex < candidates.count - 1 {
+                candidateIndex += 1
+            }
+        }
+        .onChange(of: candidates) { candidateIndex = 0 }
         .aspectRatio(16/9, contentMode: .fit)
         .overlay(alignment: .bottom) {
             watchProgressBar

@@ -34,8 +34,15 @@ struct DeArrowVideoThumbnail: View {
         appEnvironment?.deArrowBrandingProvider
     }
 
-    private var displayThumbnailURL: URL? {
-        deArrowProvider?.thumbnailURL(for: video) ?? video.bestThumbnail?.url
+    /// Ordered thumbnail candidates: DeArrow branding (if any) first, then the
+    /// video's own thumbnails best-quality-first. The view falls back through
+    /// these so a thumbnail always shows even when higher-res variants 404.
+    private var thumbnailCandidates: (primary: URL?, fallbacks: [URL]) {
+        let videoURLs = video.thumbnailURLsByQuality
+        if let deArrowURL = deArrowProvider?.thumbnailURL(for: video) {
+            return (deArrowURL, videoURLs)
+        }
+        return (videoURLs.first, Array(videoURLs.dropFirst()))
     }
 
     #if !os(tvOS)
@@ -91,7 +98,8 @@ struct DeArrowVideoThumbnail: View {
 
     var body: some View {
         VideoThumbnailView(
-            url: displayThumbnailURL,
+            url: thumbnailCandidates.primary,
+            fallbackURLs: thumbnailCandidates.fallbacks,
             cornerRadius: cornerRadius,
             watchProgress: watchProgress,
             duration: duration,
