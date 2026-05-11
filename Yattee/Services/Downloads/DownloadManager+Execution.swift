@@ -705,8 +705,11 @@ extension DownloadManager {
         download.totalBytes = totalBytes
         download.downloadedBytes = totalBytes
 
-        // Move to completed
-        activeDownloads.remove(at: index)
+        // Move to completed. Remove by identity rather than the captured `index`:
+        // the `await` above is a suspension point during which another completing
+        // download may have mutated `activeDownloads`, leaving `index` stale and
+        // making `remove(at:)` crash with an out-of-bounds index.
+        activeDownloads.removeAll { $0.id == downloadID }
         completedDownloads.insert(download, at: 0)
 
         // Update cached Sets
