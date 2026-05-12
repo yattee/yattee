@@ -202,6 +202,16 @@ struct VideoSwipeActionsModifier: ViewModifier {
             while let presented = topVC.presentedViewController {
                 topVC = presented
             }
+            // On iPad UIActivityViewController is presented as a popover and
+            // requires an anchor; without sourceView/barButtonItem UIKit aborts
+            // in -[UIPopoverPresentationController presentationTransitionWillBegin].
+            if let popover = activityVC.popoverPresentationController {
+                popover.sourceView = topVC.view
+                popover.sourceRect = CGRect(x: topVC.view.bounds.midX,
+                                            y: topVC.view.bounds.midY,
+                                            width: 0, height: 0)
+                popover.permittedArrowDirections = []
+            }
             topVC.present(activityVC, animated: true)
         }
         #elseif os(macOS)
