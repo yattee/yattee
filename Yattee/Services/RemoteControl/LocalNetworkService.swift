@@ -1211,7 +1211,19 @@ final class LocalNetworkService {
             let state = ResumedState()
 
             connection.stateUpdateHandler = { [weak self] connectionState in
+                // Claim the continuation synchronously here. `stateUpdateHandler`
+                // runs on the serial `queue`, so this test-and-set is atomic.
+                // Previously `state.resumed = true` was set inside the dispatched
+                // MainActor Task, so two states arriving in quick succession (e.g.
+                // .ready then .failed) could both pass the guard before either Task
+                // ran, resuming the continuation twice and trapping.
+                let isTerminal: Bool
+                switch connectionState {
+                case .ready, .failed, .cancelled: isTerminal = true
+                default: isTerminal = false
+                }
                 guard !state.resumed else { return }
+                if isTerminal { state.resumed = true }
 
                 Task { @MainActor [weak self] in
                     let elapsed = Int(Date().timeIntervalSince(startTime) * 1000)
@@ -1227,25 +1239,20 @@ final class LocalNetworkService {
                         self?.rcLog("CONNECT", "[\(device.name)] State: waiting - \(error.localizedDescription) (\(elapsed)ms)", isWarning: true)
 
                     case .ready:
-                        state.resumed = true
                         self?.connectedPeers.insert(device.id)
                         self?.recentlySeenDevices[device.id] = Date()
                         self?.rcLog("CONNECT", "[\(device.name)] State: READY (\(elapsed)ms)", details: "connectedPeers=\(self?.connectedPeers.count ?? 0)")
                         continuation.resume()
 
                     case .failed(let error):
-                        state.resumed = true
                         self?.connections.removeValue(forKey: device.id)
                         self?.rcLog("CONNECT", "[\(device.name)] State: FAILED - \(error.localizedDescription) (\(elapsed)ms)", isError: true)
                         continuation.resume(throwing: error)
 
                     case .cancelled:
-                        if !state.resumed {
-                            state.resumed = true
-                            self?.connections.removeValue(forKey: device.id)
-                            self?.rcLog("CONNECT", "[\(device.name)] State: cancelled (\(elapsed)ms)", isWarning: true)
-                            continuation.resume(throwing: CancellationError())
-                        }
+                        self?.connections.removeValue(forKey: device.id)
+                        self?.rcLog("CONNECT", "[\(device.name)] State: cancelled (\(elapsed)ms)", isWarning: true)
+                        continuation.resume(throwing: CancellationError())
 
                     @unknown default:
                         self?.rcDebug("CONNECT", "[\(device.name)] State: unknown (\(elapsed)ms)")
