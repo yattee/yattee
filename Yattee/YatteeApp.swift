@@ -306,13 +306,37 @@ struct YatteeApp: App {
             // Flush pending CloudKit changes when entering background
             if newPhase == .background {
                 appEnvironment.cloudKitSync.stopForegroundPolling()
-                Task {
-                    await appEnvironment.cloudKitSync.flushPendingChanges()
-                }
 
                 #if os(iOS)
+                // Persist pending SwiftData changes and run the CloudKit flush
+                // inside a background-task assertion. iOS terminates apps with
+                // 0xdead10cc when they hold the SwiftData/SQLite database lock
+                // across suspension; committing now releases the lock, and the
+                // assertion keeps the app alive until the async flush finishes.
+                var backgroundTask: UIBackgroundTaskIdentifier = .invalid
+                backgroundTask = UIApplication.shared.beginBackgroundTask(withName: "PersistOnBackground") {
+                    if backgroundTask != .invalid {
+                        UIApplication.shared.endBackgroundTask(backgroundTask)
+                        backgroundTask = .invalid
+                    }
+                }
+                // Commit any pending changes synchronously so no open SQLite
+                // transaction is left behind at suspension.
+                appEnvironment.dataManager.save()
+                Task {
+                    await appEnvironment.cloudKitSync.flushPendingChanges()
+                    if backgroundTask != .invalid {
+                        UIApplication.shared.endBackgroundTask(backgroundTask)
+                        backgroundTask = .invalid
+                    }
+                }
+
                 if appEnvironment.settingsManager.backgroundNotificationsEnabled {
                     appEnvironment.backgroundRefreshManager.scheduleIOSBackgroundRefresh()
+                }
+                #else
+                Task {
+                    await appEnvironment.cloudKitSync.flushPendingChanges()
                 }
                 #endif
             }
