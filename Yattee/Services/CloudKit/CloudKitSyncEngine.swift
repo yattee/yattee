@@ -548,7 +548,7 @@ final class CloudKitSyncEngine: @unchecked Sendable {
         guard canSyncSubscriptions else { return }
         
         Task {
-            let record = await recordMapper.toCKRecord(subscription: subscription)
+            let record = recordMapper.toCKRecord(subscription: subscription)
             
             // Remove from deletes if it was queued for deletion
             pendingDeletes.removeAll { $0.recordName == record.recordID.recordName }
@@ -612,7 +612,7 @@ final class CloudKitSyncEngine: @unchecked Sendable {
         
         // Convert all to CKRecords and add to pending queue
         for subscription in subscriptions {
-            let record = await recordMapper.toCKRecord(subscription: subscription)
+            let record = recordMapper.toCKRecord(subscription: subscription)
             
             // Check if already queued
             if !pendingSaves.contains(where: { $0.recordID.recordName == record.recordID.recordName }) {
@@ -648,7 +648,7 @@ final class CloudKitSyncEngine: @unchecked Sendable {
         }
 
         Task {
-            let record = await recordMapper.toCKRecord(watchEntry: watchEntry)
+            let record = recordMapper.toCKRecord(watchEntry: watchEntry)
             
             // Remove from deletes if it was queued for deletion
             pendingDeletes.removeAll { $0.recordName == record.recordID.recordName }
@@ -713,7 +713,7 @@ final class CloudKitSyncEngine: @unchecked Sendable {
         
         // Convert all to CKRecords and add to pending queue
         for entry in watchHistory {
-            let record = await recordMapper.toCKRecord(watchEntry: entry)
+            let record = recordMapper.toCKRecord(watchEntry: entry)
             
             // Check if already queued
             if !pendingSaves.contains(where: { $0.recordID.recordName == record.recordID.recordName }) {
@@ -734,7 +734,7 @@ final class CloudKitSyncEngine: @unchecked Sendable {
         guard canSyncBookmarks else { return }
         
         Task {
-            let record = await recordMapper.toCKRecord(bookmark: bookmark)
+            let record = recordMapper.toCKRecord(bookmark: bookmark)
             
             // Remove from deletes if it was queued for deletion
             pendingDeletes.removeAll { $0.recordName == record.recordID.recordName }
@@ -798,7 +798,7 @@ final class CloudKitSyncEngine: @unchecked Sendable {
         
         // Convert all to CKRecords and add to pending queue
         for bookmark in bookmarks {
-            let record = await recordMapper.toCKRecord(bookmark: bookmark)
+            let record = recordMapper.toCKRecord(bookmark: bookmark)
             
             // Check if already queued
             if !pendingSaves.contains(where: { $0.recordID.recordName == record.recordID.recordName }) {
@@ -819,13 +819,13 @@ final class CloudKitSyncEngine: @unchecked Sendable {
         guard canSyncPlaylists else { return }
         
         Task {
-            let record = await recordMapper.toCKRecord(playlist: playlist)
+            let record = recordMapper.toCKRecord(playlist: playlist)
             pendingSaves.removeAll { $0.recordID.recordName == record.recordID.recordName }
             pendingSaves.append(record)
             
             // Also queue all items
             for item in playlist.items ?? [] {
-                let itemRecord = await recordMapper.toCKRecord(playlistItem: item)
+                let itemRecord = recordMapper.toCKRecord(playlistItem: item)
                 pendingSaves.removeAll { $0.recordID.recordName == itemRecord.recordID.recordName }
                 pendingSaves.append(itemRecord)
             }
@@ -892,14 +892,14 @@ final class CloudKitSyncEngine: @unchecked Sendable {
         
         // Convert all playlists and their items to CKRecords
         for playlist in playlists {
-            let record = await recordMapper.toCKRecord(playlist: playlist)
+            let record = recordMapper.toCKRecord(playlist: playlist)
             if !pendingSaves.contains(where: { $0.recordID.recordName == record.recordID.recordName }) {
                 pendingSaves.append(record)
             }
             
             // Add all items
             for item in playlist.items ?? [] {
-                let itemRecord = await recordMapper.toCKRecord(playlistItem: item)
+                let itemRecord = recordMapper.toCKRecord(playlistItem: item)
                 if !pendingSaves.contains(where: { $0.recordID.recordName == itemRecord.recordID.recordName }) {
                     pendingSaves.append(itemRecord)
                 }
@@ -921,7 +921,7 @@ final class CloudKitSyncEngine: @unchecked Sendable {
         guard canSyncSearchHistory else { return }
         
         Task {
-            let record = await recordMapper.toCKRecord(searchHistory: searchHistory)
+            let record = recordMapper.toCKRecord(searchHistory: searchHistory)
             
             pendingDeletes.removeAll { $0.recordName == record.recordID.recordName }
             pendingSaves.removeAll { $0.recordID.recordName == record.recordID.recordName }
@@ -972,7 +972,7 @@ final class CloudKitSyncEngine: @unchecked Sendable {
         uploadProgress?.totalOperations += searchHistory.count
         
         for entry in searchHistory {
-            let record = await recordMapper.toCKRecord(searchHistory: entry)
+            let record = recordMapper.toCKRecord(searchHistory: entry)
             if !pendingSaves.contains(where: { $0.recordID.recordName == record.recordID.recordName }) {
                 pendingSaves.append(record)
             }
@@ -989,7 +989,7 @@ final class CloudKitSyncEngine: @unchecked Sendable {
         guard canSyncSearchHistory else { return }
         
         Task {
-            let record = await recordMapper.toCKRecord(recentChannel: recentChannel)
+            let record = recordMapper.toCKRecord(recentChannel: recentChannel)
             
             pendingDeletes.removeAll { $0.recordName == record.recordID.recordName }
             pendingSaves.removeAll { $0.recordID.recordName == record.recordID.recordName }
@@ -1040,7 +1040,7 @@ final class CloudKitSyncEngine: @unchecked Sendable {
         uploadProgress?.totalOperations += recentChannels.count
         
         for channel in recentChannels {
-            let record = await recordMapper.toCKRecord(recentChannel: channel)
+            let record = recordMapper.toCKRecord(recentChannel: channel)
             if !pendingSaves.contains(where: { $0.recordID.recordName == record.recordID.recordName }) {
                 pendingSaves.append(record)
             }
@@ -1057,7 +1057,7 @@ final class CloudKitSyncEngine: @unchecked Sendable {
         guard canSyncSearchHistory else { return }
         
         Task {
-            let record = await recordMapper.toCKRecord(recentPlaylist: recentPlaylist)
+            let record = recordMapper.toCKRecord(recentPlaylist: recentPlaylist)
             
             pendingDeletes.removeAll { $0.recordName == record.recordID.recordName }
             pendingSaves.removeAll { $0.recordID.recordName == record.recordID.recordName }
@@ -1108,7 +1108,7 @@ final class CloudKitSyncEngine: @unchecked Sendable {
         uploadProgress?.totalOperations += recentPlaylists.count
         
         for playlist in recentPlaylists {
-            let record = await recordMapper.toCKRecord(recentPlaylist: playlist)
+            let record = recordMapper.toCKRecord(recentPlaylist: playlist)
             if !pendingSaves.contains(where: { $0.recordID.recordName == record.recordID.recordName }) {
                 pendingSaves.append(record)
             }
@@ -1125,7 +1125,7 @@ final class CloudKitSyncEngine: @unchecked Sendable {
         guard canSyncSubscriptions else { return }
         
         Task {
-            let record = await recordMapper.toCKRecord(channelNotificationSettings: settings)
+            let record = recordMapper.toCKRecord(channelNotificationSettings: settings)
             
             // Remove from deletes if it was queued for deletion
             pendingDeletes.removeAll { $0.recordName == record.recordID.recordName }
@@ -1185,7 +1185,7 @@ final class CloudKitSyncEngine: @unchecked Sendable {
         uploadProgress?.totalOperations += allSettings.count
         
         for settings in allSettings {
-            let record = await recordMapper.toCKRecord(channelNotificationSettings: settings)
+            let record = recordMapper.toCKRecord(channelNotificationSettings: settings)
             if !pendingSaves.contains(where: { $0.recordID.recordName == record.recordID.recordName }) {
                 pendingSaves.append(record)
             }
@@ -1222,7 +1222,7 @@ final class CloudKitSyncEngine: @unchecked Sendable {
         
         for preset in presets {
             do {
-                let record = try await recordMapper.toCKRecord(preset: preset)
+                let record = try recordMapper.toCKRecord(preset: preset)
                 if !pendingSaves.contains(where: { $0.recordID.recordName == record.recordID.recordName }) {
                     pendingSaves.append(record)
                 }
@@ -1244,7 +1244,7 @@ final class CloudKitSyncEngine: @unchecked Sendable {
         
         Task {
             do {
-                let record = try await recordMapper.toCKRecord(preset: preset)
+                let record = try recordMapper.toCKRecord(preset: preset)
                 
                 pendingDeletes.removeAll { $0.recordName == record.recordID.recordName }
                 pendingSaves.removeAll { $0.recordID.recordName == record.recordID.recordName }
@@ -1509,7 +1509,7 @@ final class CloudKitSyncEngine: @unchecked Sendable {
     /// Attaches a playlist item record to an existing playlist.
     private func attachItemToPlaylist(record: CKRecord, playlist: LocalPlaylist, dataManager: DataManager) async {
         do {
-            let (item, _) = try await recordMapper.toLocalPlaylistItem(from: record)
+            let (item, _) = try recordMapper.toLocalPlaylistItem(from: record)
             item.playlist = playlist
             dataManager.insertPlaylistItem(item)
             LoggingService.shared.logCloudKit("Attached item \(item.id) to playlist \(playlist.id)")
@@ -2072,14 +2072,14 @@ extension CloudKitSyncEngine: CKSyncEngineDelegate {
             switch record.recordType {
             case RecordType.subscription:
                 guard canSyncSubscriptions else { return .success }
-                let subscription = try await recordMapper.toSubscription(from: record)
+                let subscription = try recordMapper.toSubscription(from: record)
                 
                 // Check if exists locally
                 if let existing = dataManager.subscription(for: subscription.channelID) {
                     // Conflict - resolve it
-                    let localRecord = await recordMapper.toCKRecord(subscription: existing)
+                    let localRecord = recordMapper.toCKRecord(subscription: existing)
                     let resolved = await conflictResolver.resolveSubscriptionConflict(local: localRecord, server: record)
-                    let resolvedSubscription = try await recordMapper.toSubscription(from: resolved)
+                    let resolvedSubscription = try recordMapper.toSubscription(from: resolved)
                     
                     // Update existing subscription with resolved data
                     existing.name = resolvedSubscription.name
@@ -2114,7 +2114,7 @@ extension CloudKitSyncEngine: CKSyncEngineDelegate {
                 
             case RecordType.watchEntry:
                 guard canSyncPlaybackHistory else { return .success }
-                let watchEntry = try await recordMapper.toWatchEntry(from: record)
+                let watchEntry = try recordMapper.toWatchEntry(from: record)
 
                 guard shouldSyncWatchEntry(watchEntry) else {
                     LoggingService.shared.logCloudKit("Ignoring incoming local-folder watch entry: \(watchEntry.videoID)")
@@ -2124,9 +2124,9 @@ extension CloudKitSyncEngine: CKSyncEngineDelegate {
                 // Check if exists locally
                 if let existing = dataManager.watchEntry(for: watchEntry.videoID) {
                     // Conflict - resolve it
-                    let localRecord = await recordMapper.toCKRecord(watchEntry: existing)
+                    let localRecord = recordMapper.toCKRecord(watchEntry: existing)
                     let resolved = await conflictResolver.resolveWatchEntryConflict(local: localRecord, server: record)
-                    let resolvedEntry = try await recordMapper.toWatchEntry(from: resolved)
+                    let resolvedEntry = try recordMapper.toWatchEntry(from: resolved)
                     
                     // Update existing watch entry with resolved data
                     existing.watchedSeconds = resolvedEntry.watchedSeconds
@@ -2159,14 +2159,14 @@ extension CloudKitSyncEngine: CKSyncEngineDelegate {
                 
             case RecordType.bookmark:
                 guard canSyncBookmarks else { return .success }
-                let bookmark = try await recordMapper.toBookmark(from: record)
+                let bookmark = try recordMapper.toBookmark(from: record)
                 
                 // Check if exists locally
                 if let existing = dataManager.bookmark(for: bookmark.videoID) {
                     // Conflict - resolve it
-                    let localRecord = await recordMapper.toCKRecord(bookmark: existing)
+                    let localRecord = recordMapper.toCKRecord(bookmark: existing)
                     let resolved = await conflictResolver.resolveBookmarkConflict(local: localRecord, server: record)
-                    let resolvedBookmark = try await recordMapper.toBookmark(from: resolved)
+                    let resolvedBookmark = try recordMapper.toBookmark(from: resolved)
                     
                     // Update existing bookmark with resolved data
                     existing.title = resolvedBookmark.title
@@ -2203,7 +2203,7 @@ extension CloudKitSyncEngine: CKSyncEngineDelegate {
                 
             case RecordType.localPlaylist:
                 guard canSyncPlaylists else { return .success }
-                let playlist = try await recordMapper.toLocalPlaylist(from: record)
+                let playlist = try recordMapper.toLocalPlaylist(from: record)
 
                 // Check if exists locally
                 if let existing = dataManager.playlist(forID: playlist.id) {
@@ -2226,9 +2226,9 @@ extension CloudKitSyncEngine: CKSyncEngineDelegate {
                         LoggingService.shared.logCloudKit("Upgraded placeholder to real playlist: \(playlist.title)")
                     } else {
                         // Conflict - resolve it
-                        let localRecord = await recordMapper.toCKRecord(playlist: existing)
+                        let localRecord = recordMapper.toCKRecord(playlist: existing)
                         let resolved = await conflictResolver.resolveLocalPlaylistConflict(local: localRecord, server: record)
-                        let resolvedPlaylist = try await recordMapper.toLocalPlaylist(from: resolved)
+                        let resolvedPlaylist = try recordMapper.toLocalPlaylist(from: resolved)
 
                         // Update existing playlist with resolved data
                         existing.title = resolvedPlaylist.title
@@ -2254,14 +2254,14 @@ extension CloudKitSyncEngine: CKSyncEngineDelegate {
                 
             case RecordType.localPlaylistItem:
                 guard canSyncPlaylists else { return .success }
-                let (item, playlistID) = try await recordMapper.toLocalPlaylistItem(from: record)
+                let (item, playlistID) = try recordMapper.toLocalPlaylistItem(from: record)
                 
                 // Check if exists locally
                 if let existing = dataManager.playlistItem(forID: item.id) {
                     // Conflict - resolve it
-                    let localRecord = await recordMapper.toCKRecord(playlistItem: existing)
+                    let localRecord = recordMapper.toCKRecord(playlistItem: existing)
                     let resolved = await conflictResolver.resolveLocalPlaylistItemConflict(local: localRecord, server: record)
-                    let (resolvedItem, _) = try await recordMapper.toLocalPlaylistItem(from: resolved)
+                    let (resolvedItem, _) = try recordMapper.toLocalPlaylistItem(from: resolved)
                     
                     // Update existing item with resolved data
                     existing.title = resolvedItem.title
@@ -2299,14 +2299,14 @@ extension CloudKitSyncEngine: CKSyncEngineDelegate {
                 
             case RecordType.searchHistory:
                 guard canSyncSearchHistory else { return .success }
-                let searchHistory = try await recordMapper.toSearchHistory(from: record)
+                let searchHistory = try recordMapper.toSearchHistory(from: record)
                 
                 // Check if exists locally
                 if let existing = dataManager.searchHistoryEntry(forID: searchHistory.id) {
                     // Conflict - resolve it
-                    let localRecord = await recordMapper.toCKRecord(searchHistory: existing)
+                    let localRecord = recordMapper.toCKRecord(searchHistory: existing)
                     let resolved = await conflictResolver.resolveSearchHistoryConflict(local: localRecord, server: record)
-                    let resolvedHistory = try await recordMapper.toSearchHistory(from: resolved)
+                    let resolvedHistory = try recordMapper.toSearchHistory(from: resolved)
                     
                     // Update existing search history with resolved data
                     existing.query = resolvedHistory.query
@@ -2330,14 +2330,14 @@ extension CloudKitSyncEngine: CKSyncEngineDelegate {
                 
             case RecordType.recentChannel:
                 guard canSyncSearchHistory else { return .success }
-                let recentChannel = try await recordMapper.toRecentChannel(from: record)
+                let recentChannel = try recordMapper.toRecentChannel(from: record)
                 
                 // Check if exists locally
                 if let existing = dataManager.recentChannelEntry(forChannelID: recentChannel.channelID) {
                     // Conflict - resolve it
-                    let localRecord = await recordMapper.toCKRecord(recentChannel: existing)
+                    let localRecord = recordMapper.toCKRecord(recentChannel: existing)
                     let resolved = await conflictResolver.resolveRecentChannelConflict(local: localRecord, server: record)
-                    let resolvedChannel = try await recordMapper.toRecentChannel(from: resolved)
+                    let resolvedChannel = try recordMapper.toRecentChannel(from: resolved)
                     
                     // Update existing recent channel with resolved data
                     existing.name = resolvedChannel.name
@@ -2366,14 +2366,14 @@ extension CloudKitSyncEngine: CKSyncEngineDelegate {
                 
             case RecordType.recentPlaylist:
                 guard canSyncSearchHistory else { return .success }
-                let recentPlaylist = try await recordMapper.toRecentPlaylist(from: record)
+                let recentPlaylist = try recordMapper.toRecentPlaylist(from: record)
                 
                 // Check if exists locally
                 if let existing = dataManager.recentPlaylistEntry(forPlaylistID: recentPlaylist.playlistID) {
                     // Conflict - resolve it
-                    let localRecord = await recordMapper.toCKRecord(recentPlaylist: existing)
+                    let localRecord = recordMapper.toCKRecord(recentPlaylist: existing)
                     let resolved = await conflictResolver.resolveRecentPlaylistConflict(local: localRecord, server: record)
-                    let resolvedPlaylist = try await recordMapper.toRecentPlaylist(from: resolved)
+                    let resolvedPlaylist = try recordMapper.toRecentPlaylist(from: resolved)
                     
                     // Update existing recent playlist with resolved data
                     existing.title = resolvedPlaylist.title
@@ -2402,7 +2402,7 @@ extension CloudKitSyncEngine: CKSyncEngineDelegate {
                 
             case RecordType.channelNotificationSettings:
                 guard canSyncSubscriptions else { return .success }
-                let settings = try await recordMapper.toChannelNotificationSettings(from: record)
+                let settings = try recordMapper.toChannelNotificationSettings(from: record)
                 
                 // Use upsert which handles conflict resolution based on updatedAt
                 dataManager.upsertChannelNotificationSettings(settings)
@@ -2411,7 +2411,7 @@ extension CloudKitSyncEngine: CKSyncEngineDelegate {
                 
             case RecordType.controlsPreset:
                 guard canSyncControlsPresets else { return .success }
-                let preset = try await recordMapper.toLayoutPreset(from: record)
+                let preset = try recordMapper.toLayoutPreset(from: record)
 
                 // Only import if device class matches current device
                 guard preset.deviceClass == .current else {

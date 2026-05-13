@@ -9,7 +9,15 @@ import CloudKit
 import Foundation
 
 /// Maps SwiftData models to CloudKit records and vice versa.
-actor CloudKitRecordMapper {
+///
+/// This MUST be `@MainActor`: the `toCKRecord(...)` methods read live SwiftData
+/// `@Model` properties (e.g. `LocalPlaylistItem.authorName`) and the `to<Model>`
+/// methods create/insert models. SwiftData models are bound to the main
+/// `ModelContext` and are not thread-safe — when this was a standalone `actor`,
+/// `await recordMapper.toCKRecord(...)` hopped off the main actor and read the
+/// backing store from the wrong executor, causing EXC_BAD_ACCESS crashes.
+@MainActor
+final class CloudKitRecordMapper {
     private let zone: CKRecordZone
 
     /// Current schema version for CloudKit records.
