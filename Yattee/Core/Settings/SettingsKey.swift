@@ -110,6 +110,8 @@ enum SettingsKey: String, CaseIterable {
     case zoomTransitionsEnabled
     case tvMatchDisplayFrameRate
     case tvMatchDisplayDynamicRange
+    case tvAudioDelayMs
+    case tvVideoSyncMode
 
     // Details panel
     case floatingDetailsPanelSide // Landscape only - which side the panel appears on

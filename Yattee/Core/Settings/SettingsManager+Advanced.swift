@@ -156,6 +156,52 @@ extension SettingsManager {
         }
     }
 
+    /// Fixed audio-pipeline offset (in milliseconds) applied as MPV's `audio-delay`
+    /// on tvOS. Useful for compensating fixed HDMI/AVR output latency where MPV's
+    /// internal `avsync` reads 0 but audio is perceptibly ahead/behind video.
+    /// Positive values shift audio later; negative values shift it earlier.
+    /// Default is 0 (no offset). Setting is local-only and tvOS-only.
+    var tvAudioDelayMs: Double {
+        get {
+            if let cached = _tvAudioDelayMs { return cached }
+            let raw = localDefaults.object(forKey: "tvAudioDelayMs") as? Double
+            return raw ?? 0
+        }
+        set {
+            _tvAudioDelayMs = newValue
+            localDefaults.set(newValue, forKey: "tvAudioDelayMs")
+        }
+    }
+
+    /// Read tvOS audio-delay setting from a nonisolated context (e.g. MPVClient init).
+    /// Returns milliseconds; convert to seconds before passing to MPV.
+    nonisolated static func tvAudioDelayMsSync() -> Double {
+        guard UserDefaults.standard.object(forKey: "tvAudioDelayMs") != nil else { return 0 }
+        return UserDefaults.standard.double(forKey: "tvAudioDelayMs")
+    }
+
+    /// MPV `video-sync` mode override for tvOS (debug toggle). The shipped default
+    /// remains `display-vdrop`; this is exposed so we can A/B alternative modes on
+    /// real hardware when investigating A/V sync issues.
+    var tvVideoSyncMode: TVVideoSyncMode {
+        get {
+            if let cached = _tvVideoSyncMode { return cached }
+            guard let raw = localDefaults.string(forKey: "tvVideoSyncMode"),
+                  let mode = TVVideoSyncMode(rawValue: raw) else { return .displayVdrop }
+            return mode
+        }
+        set {
+            _tvVideoSyncMode = newValue
+            localDefaults.set(newValue.rawValue, forKey: "tvVideoSyncMode")
+        }
+    }
+
+    nonisolated static func tvVideoSyncModeSync() -> TVVideoSyncMode {
+        guard let raw = UserDefaults.standard.string(forKey: "tvVideoSyncMode"),
+              let mode = TVVideoSyncMode(rawValue: raw) else { return .displayVdrop }
+        return mode
+    }
+
     /// Whether tvOS should request the Apple TV switch its HDMI output to match the
     /// playing video's dynamic range (SDR / HDR10 / HLG). Has no effect unless the
     /// user also enables "Match Content → Dynamic Range" in tvOS Settings.

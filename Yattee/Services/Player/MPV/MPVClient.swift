@@ -439,8 +439,13 @@ final class MPVClient: @unchecked Sendable {
 
         // Use display-vdrop: drops/repeats frames to match display timing
         // This is lighter weight than display-resample (no interpolation overhead)
-        // and handles both hardware and software decode gracefully
+        // and handles both hardware and software decode gracefully.
+        // On tvOS, the user may override this via the debug Video Sync Mode setting.
+        #if os(tvOS)
+        setOptionSync("video-sync", SettingsManager.tvVideoSyncModeSync().rawValue)
+        #else
         setOptionSync("video-sync", "display-vdrop")
+        #endif
 
         // Allow frame dropping when decoder can't keep up (essential for software decode)
         // decoder+vo: drop at decoder level first, then at video output if still behind
@@ -480,8 +485,28 @@ final class MPVClient: @unchecked Sendable {
         // Apply subtitle appearance settings
         applySubtitleSettings()
 
+        // Apply user-configured fixed audio delay on tvOS (in seconds; setting is ms)
+        #if os(tvOS)
+        let delaySeconds = SettingsManager.tvAudioDelayMsSync() / 1000.0
+        setOptionSync("audio-delay", String(delaySeconds))
+        #endif
+
         // Apply user's custom MPV options (these can override defaults)
         applyCustomOptions()
+    }
+
+    /// Update the `audio-delay` property on a running MPV instance. Safe to call
+    /// while playback is active. Value is in milliseconds; converted to seconds
+    /// before being sent to MPV.
+    func updateAudioDelay(milliseconds: Double) {
+        mpvQueue.async { [weak self] in
+            guard let self, let mpv = self.mpv, !self.isDestroyed else { return }
+            let seconds = milliseconds / 1000.0
+            let str = String(seconds)
+            str.withCString { ptr in
+                _ = mpv_set_property_string(mpv, "audio-delay", ptr)
+            }
+        }
     }
 
     /// Apply subtitle appearance settings from user preferences.
@@ -981,6 +1006,14 @@ final class MPVClient: @unchecked Sendable {
         var videoSpeedCorrection: Double?
         var audioSpeedCorrection: Double?
         var framedrop: String?
+        var audioDelay: Double?
+        var currentVo: String?
+        var currentAo: String?
+        var audioDevice: String?
+        var displayWidth: Int?
+        var displayHeight: Int?
+        var displayNames: String?
+        var decoderFrameDropCount: Int?
     }
 
     /// Fetch all debug properties in a single sync block to avoid multiple lock acquisitions.
@@ -1052,6 +1085,14 @@ final class MPVClient: @unchecked Sendable {
             props.videoSpeedCorrection = getDouble("video-speed-correction")
             props.audioSpeedCorrection = getDouble("audio-speed-correction")
             props.framedrop = getString("framedrop")
+            props.audioDelay = getDouble("audio-delay")
+            props.currentVo = getString("current-vo")
+            props.currentAo = getString("current-ao")
+            props.audioDevice = getString("audio-device")
+            props.displayWidth = getInt("display-width")
+            props.displayHeight = getInt("display-height")
+            props.displayNames = getString("display-names")
+            props.decoderFrameDropCount = getInt("decoder-frame-drop-count")
             #endif
 
             return props
@@ -1281,8 +1322,16 @@ final class MPVClient: @unchecked Sendable {
                 props.videoSpeedCorrection = getDouble("video-speed-correction")
                 props.audioSpeedCorrection = getDouble("audio-speed-correction")
                 props.framedrop = getString("framedrop")
+                props.audioDelay = getDouble("audio-delay")
+                props.currentVo = getString("current-vo")
+                props.currentAo = getString("current-ao")
+                props.audioDevice = getString("audio-device")
+                props.displayWidth = getInt("display-width")
+                props.displayHeight = getInt("display-height")
+                props.displayNames = getString("display-names")
+                props.decoderFrameDropCount = getInt("decoder-frame-drop-count")
                 #endif
-                
+
                 continuation.resume(returning: props)
             }
         }

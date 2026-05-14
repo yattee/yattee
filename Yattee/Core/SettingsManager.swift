@@ -160,6 +160,8 @@ final class SettingsManager {
     var _zoomTransitionsEnabled: Bool?
     var _tvMatchDisplayFrameRate: Bool?
     var _tvMatchDisplayDynamicRange: Bool?
+    var _tvAudioDelayMs: Double?
+    var _tvVideoSyncMode: TVVideoSyncMode?
 
     // Details panel settings
     var _floatingDetailsPanelSide: FloatingPanelSide?
@@ -496,6 +498,8 @@ final class SettingsManager {
         _zoomTransitionsEnabled = nil
         _tvMatchDisplayFrameRate = nil
         _tvMatchDisplayDynamicRange = nil
+        _tvAudioDelayMs = nil
+        _tvVideoSyncMode = nil
         _floatingDetailsPanelSide = nil
         _floatingDetailsPanelWidth = nil
         _landscapeDetailsPanelVisible = nil

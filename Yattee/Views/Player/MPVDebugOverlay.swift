@@ -47,6 +47,14 @@ struct MPVDebugStats: Equatable {
     var audioSpeedCorrection: Double?   // Audio speed adjustment
     var framedrop: String?              // Frame drop mode (decoder, vo, decoder+vo)
     var displayLinkFps: Double?         // CADisplayLink preferred frame rate
+    var audioDelay: Double?             // Applied audio-delay (seconds)
+    var currentVo: String?              // Active video output driver
+    var currentAo: String?              // Active audio output driver
+    var audioDevice: String?            // Selected audio device id/name
+    var displayWidth: Int?              // tvOS panel width MPV sees
+    var displayHeight: Int?             // tvOS panel height MPV sees
+    var displayNames: String?           // tvOS display name(s)
+    var decoderFrameDropCount: Int?     // Frames dropped at the decoder
 }
 
 /// Debug overlay view for MPV player.
@@ -383,6 +391,52 @@ struct MPVDebugOverlay: View {
             let jitterMs = jitter * 1000
             let color: Color = jitterMs > 2 ? .orange : .green
             statRow("Vsync Jitter", String(format: "%.2f ms", jitterMs), valueColor: color)
+        }
+
+        // Display vs container fps mismatch — non-zero means tvOS display-mode
+        // matching never engaged for this content, which is the most common
+        // cause of "MPV says synced but it looks off" on tvOS.
+        if let displayFps = stats.displayFps, let containerFps = stats.containerFps,
+           displayFps > 0, containerFps > 0 {
+            let diff = displayFps - containerFps
+            let color: Color = abs(diff) > 0.5 ? .orange : .green
+            statRow("Disp−Cont", String(format: "%+.2f", diff), valueColor: color)
+        }
+
+        // Estimated output fps (what MPV is actually producing post-VO)
+        if let vfFps = stats.estimatedVfFps {
+            statRow("Est VF FPS", String(format: "%.2f", vfFps))
+        }
+
+        // Decoder-level drops (vs the VO-level drops shown in the Playback section)
+        if let decoderDrops = stats.decoderFrameDropCount, decoderDrops > 0 {
+            statRow("Dec Drops", "\(decoderDrops)", valueColor: .orange)
+        }
+
+        // Applied audio-delay (sanity check the setting is reaching MPV)
+        if let delay = stats.audioDelay {
+            let delayMs = delay * 1000
+            let color: Color = abs(delayMs) > 0.5 ? .orange : .green
+            statRow("Aud Delay", String(format: "%+.0f ms", delayMs), valueColor: color)
+        }
+
+        // Active VO / AO drivers (confirm libmpv + audiounit at runtime)
+        if let vo = stats.currentVo {
+            stackedRow("Current VO", vo)
+        }
+        if let ao = stats.currentAo {
+            stackedRow("Current AO", ao)
+        }
+        if let device = stats.audioDevice, !device.isEmpty {
+            stackedRow("Audio Dev", device)
+        }
+
+        // Panel info — catches surprising HDMI capability reports
+        if let w = stats.displayWidth, let h = stats.displayHeight, w > 0, h > 0 {
+            statRow("Panel", "\(w)×\(h)")
+        }
+        if let names = stats.displayNames, !names.isEmpty {
+            stackedRow("Display", names)
         }
     }
     #endif

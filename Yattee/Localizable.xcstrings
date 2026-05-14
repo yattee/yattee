@@ -12414,6 +12414,140 @@
         }
       }
     },
+    "settings.playback.tvAudioDelay" : {
+      "comment" : "Audio delay stepper label (tvOS only)",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Audio Delay"
+          }
+        }
+      }
+    },
+    "settings.playback.tvAudioDelay.minus100" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "−100 ms"
+          }
+        }
+      }
+    },
+    "settings.playback.tvAudioDelay.minus10" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "−10 ms"
+          }
+        }
+      }
+    },
+    "settings.playback.tvAudioDelay.plus10" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "+10 ms"
+          }
+        }
+      }
+    },
+    "settings.playback.tvAudioDelay.plus100" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "+100 ms"
+          }
+        }
+      }
+    },
+    "settings.playback.tvAudioDelay.reset" : {
+      "comment" : "Reset audio delay button label (tvOS only)",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Reset"
+          }
+        }
+      }
+    },
+    "settings.playback.tvSyncDiagnostics.header" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "A/V Sync Diagnostics"
+          }
+        }
+      }
+    },
+    "settings.playback.tvSyncDiagnostics.row" : {
+      "comment" : "Advanced settings navigation row label (tvOS only)",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "A/V Sync"
+          }
+        }
+      }
+    },
+    "settings.playback.tvSyncDiagnostics.footer" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Audio Delay shifts audio relative to video to compensate for fixed HDMI/AVR output lag (positive = audio later). Video Sync Mode changes how MPV reconciles video frames with display refresh; the default is recommended unless you are debugging."
+          }
+        }
+      }
+    },
+    "settings.playback.tvVideoSyncMode" : {
+      "comment" : "Picker label (tvOS only)",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Video Sync Mode"
+          }
+        }
+      }
+    },
+    "settings.playback.tvVideoSyncMode.displayVdrop" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Display (drop/repeat) — default"
+          }
+        }
+      }
+    },
+    "settings.playback.tvVideoSyncMode.displayResample" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Display (resample audio)"
+          }
+        }
+      }
+    },
+    "settings.playback.tvVideoSyncMode.audio" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Audio (video adapts)"
+          }
+        }
+      }
+    },
     "settings.playback.tvOSMenuButtonClosesVideo" : {
       "localizations" : {
         "en" : {

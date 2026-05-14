@@ -902,6 +902,12 @@ final class MPVBackend: PlayerBackend {
         mpvClient?.updateSubtitleSettings()
     }
 
+    /// Push the current tvOS audio-delay setting into the running MPV instance.
+    /// Caller passes milliseconds; MPVClient converts to seconds.
+    func updateAudioDelay(milliseconds: Double) {
+        mpvClient?.updateAudioDelay(milliseconds: milliseconds)
+    }
+
     /// Get the actual video track dimensions from MPV.
     /// Returns (width, height) or nil if not available.
     func getVideoSize() -> (width: Int, height: Int)? {
@@ -963,6 +969,14 @@ final class MPVBackend: PlayerBackend {
         stats.audioSpeedCorrection = props.audioSpeedCorrection
         stats.framedrop = props.framedrop
         stats.displayLinkFps = renderView?.displayLinkTargetFPS
+        stats.audioDelay = props.audioDelay
+        stats.currentVo = props.currentVo
+        stats.currentAo = props.currentAo
+        stats.audioDevice = props.audioDevice
+        stats.displayWidth = props.displayWidth
+        stats.displayHeight = props.displayHeight
+        stats.displayNames = props.displayNames
+        stats.decoderFrameDropCount = props.decoderFrameDropCount
         #endif
 
         return stats

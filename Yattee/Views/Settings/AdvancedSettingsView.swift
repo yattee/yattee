@@ -32,6 +32,9 @@ struct AdvancedSettingsView: View {
             #endif
             streamDetailsSection
             mpvSection
+            #if os(tvOS)
+            avSyncSection
+            #endif
             settingsSection
             #if !os(tvOS)
             downloadsStorageSection
@@ -229,6 +232,26 @@ struct AdvancedSettingsView: View {
             }
         }
     }
+
+    #if os(tvOS)
+    @ViewBuilder
+    private var avSyncSection: some View {
+        if let settings = appEnvironment?.settingsManager {
+            SettingsFormSection {
+                NavigationLink {
+                    TVSidebarDetailContainer(
+                        systemImage: "wave.3.right",
+                        title: String(localized: "settings.playback.tvSyncDiagnostics.header")
+                    ) {
+                        AVSyncDiagnosticsView(settings: settings)
+                    }
+                } label: {
+                    Label(String(localized: "settings.playback.tvSyncDiagnostics.row"), systemImage: "wave.3.right")
+                }
+            }
+        }
+    }
+    #endif
 
     private static let mpvBufferOptions: [Double] = [1.0, 2.0, 3.0, 4.0, 5.0]
 
