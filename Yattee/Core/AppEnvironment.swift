@@ -229,7 +229,7 @@ final class AppEnvironment {
         // Wire up SMB client to check if SMB playback is active
         // This prevents crashes from concurrent libsmbclient usage
         let smbClientRef = self.smbClient
-        Task {
+        Task { [weak player] in
             await smbClientRef.setPlaybackActiveCallback { [weak player] in
                 player?.state.isSMBPlaybackActive ?? false
             }
