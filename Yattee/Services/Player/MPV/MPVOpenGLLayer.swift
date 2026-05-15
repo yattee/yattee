@@ -38,6 +38,17 @@ private let glFormat10Bit: [CGLPixelFormatAttribute] = [
     CGLPixelFormatAttribute(0)
 ]
 
+/// Last-resort pixel format without `kCGLPFAAccelerated`, allowing a software
+/// renderer. This is what lets the app survive on GPU-less environments such as
+/// virtual machines, where no hardware-accelerated renderer is available.
+private let glFormatSoftware: [CGLPixelFormatAttribute] = [
+    kCGLPFAOpenGLProfile,
+    CGLPixelFormatAttribute(kCGLOGLPVersion_3_2_Core.rawValue),
+    kCGLPFADoubleBuffer,
+    kCGLPFAAllowOfflineRenderers,
+    CGLPixelFormatAttribute(0)
+]
+
 // MARK: - MPVOpenGLLayer
 
 /// OpenGL layer for MPV rendering on macOS.
@@ -141,16 +152,25 @@ final class MPVOpenGLLayer: CAOpenGLLayer {
     // MARK: - Initialization
 
     /// Creates an MPVOpenGLLayer for the given video view.
-    init(videoView: MPVOGLView) {
+    /// Returns `nil` when no OpenGL pixel format / context can be created
+    /// (e.g. on a GPU-less virtual machine), so callers can fail gracefully
+    /// instead of crashing the app at launch.
+    init?(videoView: MPVOGLView) {
         self.videoView = videoView
 
-        // Create pixel format (try 10-bit first, fall back to 8-bit)
-        let (pixelFormat, depth) = MPVOpenGLLayer.createPixelFormat()
+        // Create pixel format (try 10-bit, then 8-bit, then software renderer)
+        guard let (pixelFormat, depth) = MPVOpenGLLayer.createPixelFormat() else {
+            return nil
+        }
         self.cglPixelFormat = pixelFormat
         self.bufferDepth = depth
 
         // Create OpenGL context
-        self.cglContext = MPVOpenGLLayer.createContext(pixelFormat: pixelFormat)
+        guard let context = MPVOpenGLLayer.createContext(pixelFormat: pixelFormat) else {
+            CGLDestroyPixelFormat(pixelFormat)
+            return nil
+        }
+        self.cglContext = context
 
         super.init()
 
@@ -560,8 +580,11 @@ final class MPVOpenGLLayer: CAOpenGLLayer {
 
     // MARK: - Pixel Format and Context Creation
 
-    /// Create a CGL pixel format, trying 10-bit first, falling back to 8-bit.
-    private static func createPixelFormat() -> (CGLPixelFormatObj, GLint) {
+    /// Create a CGL pixel format, trying 10-bit first, falling back to 8-bit,
+    /// then to a software renderer. Returns `nil` if no pixel format can be
+    /// created (e.g. a GPU-less virtual machine) so the caller can fail
+    /// gracefully instead of crashing.
+    private static func createPixelFormat() -> (CGLPixelFormatObj, GLint)? {
         var pixelFormat: CGLPixelFormatObj?
         var numPixelFormats: GLint = 0
 
@@ -583,17 +606,30 @@ final class MPVOpenGLLayer: CAOpenGLLayer {
             return (pf, 8)
         }
 
-        // This should not happen on any reasonable Mac
-        fatalError("MPVOpenGLLayer: failed to create any OpenGL pixel format")
+        // Last resort: software renderer (no hardware acceleration). This keeps
+        // the app alive on machines without a usable GPU, such as VMs.
+        result = CGLChoosePixelFormat(glFormatSoftware, &pixelFormat, &numPixelFormats)
+        if result == kCGLNoError, let pf = pixelFormat {
+            Task { @MainActor in
+                LoggingService.shared.debug("MPVOpenGLLayer: created software (non-accelerated) pixel format", category: .mpv)
+            }
+            return (pf, 8)
+        }
+
+        // No pixel format available at all (e.g. GPU-less VM). Don't crash.
+        LoggingService.shared.error("MPVOpenGLLayer: failed to create any OpenGL pixel format (last error \(result.rawValue)) - video playback unavailable", category: .mpv)
+        return nil
     }
 
-    /// Create a CGL context with the given pixel format.
-    private static func createContext(pixelFormat: CGLPixelFormatObj) -> CGLContextObj {
+    /// Create a CGL context with the given pixel format. Returns `nil` on
+    /// failure so the caller can fail gracefully instead of crashing.
+    private static func createContext(pixelFormat: CGLPixelFormatObj) -> CGLContextObj? {
         var context: CGLContextObj?
         let result = CGLCreateContext(pixelFormat, nil, &context)
 
         guard result == kCGLNoError, let ctx = context else {
-            fatalError("MPVOpenGLLayer: failed to create OpenGL context: \(result)")
+            LoggingService.shared.error("MPVOpenGLLayer: failed to create OpenGL context: \(result.rawValue)", category: .mpv)
+            return nil
         }
 
         // Enable vsync
