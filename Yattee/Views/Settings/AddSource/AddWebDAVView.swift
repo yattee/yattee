@@ -37,6 +37,21 @@ struct AddWebDAVView: View {
         !name.isEmpty && !urlString.isEmpty && URL(string: urlString) != nil
     }
 
+    /// macOS surfaces toolbar confirmation items from a pushed-in-sheet view
+    /// reliably only from macOS 26 onward. On older macOS we render the
+    /// "Add Source" action button inline in the form instead.
+    private var usesToolbarActionButton: Bool {
+        #if os(macOS)
+        if #available(macOS 26, *) {
+            return true
+        } else {
+            return false
+        }
+        #else
+        return false
+        #endif
+    }
+
     // MARK: - Body
 
     var body: some View {
@@ -134,25 +149,31 @@ struct AddWebDAVView: View {
             if let result = testResult {
                 SourceTestResultSection(result: result)
             }
+
+            if !usesToolbarActionButton {
+                actionSection
+            }
         }
         .formStyle(.grouped)
         .navigationTitle(String(localized: "sources.addWebDAV"))
         .toolbar {
-            ToolbarItem(placement: .confirmationAction) {
-                Button {
-                    addSource()
-                } label: {
-                    if isTesting {
-                        HStack(spacing: 6) {
-                            ProgressView().controlSize(.small)
-                            Text(testProgress ?? String(localized: "sources.testing"))
+            if usesToolbarActionButton {
+                ToolbarItem(placement: .confirmationAction) {
+                    Button {
+                        addSource()
+                    } label: {
+                        if isTesting {
+                            HStack(spacing: 6) {
+                                ProgressView().controlSize(.small)
+                                Text(testProgress ?? String(localized: "sources.testing"))
+                            }
+                        } else {
+                            Text(String(localized: "sources.addSource"))
                         }
-                    } else {
-                        Text(String(localized: "sources.addSource"))
                     }
+                    .disabled(!canAdd || isTesting)
+                    .keyboardShortcut(.defaultAction)
                 }
-                .disabled(!canAdd || isTesting)
-                .keyboardShortcut(.defaultAction)
             }
         }
         .onAppear {

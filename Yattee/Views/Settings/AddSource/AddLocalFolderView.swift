@@ -31,6 +31,21 @@ struct AddLocalFolderView: View {
         !name.isEmpty && selectedFolderURL != nil
     }
 
+    /// macOS surfaces toolbar confirmation items from a pushed-in-sheet view
+    /// reliably only from macOS 26 onward. On older macOS we render the
+    /// "Add Source" action button inline in the form instead.
+    private var usesToolbarActionButton: Bool {
+        #if os(macOS)
+        if #available(macOS 26, *) {
+            return true
+        } else {
+            return false
+        }
+        #else
+        return false
+        #endif
+    }
+
     // MARK: - Body
 
     var body: some View {
@@ -99,16 +114,22 @@ struct AddLocalFolderView: View {
             if let result = testResult {
                 SourceTestResultSection(result: result)
             }
+
+            if !usesToolbarActionButton {
+                actionSection
+            }
         }
         .formStyle(.grouped)
         .navigationTitle(String(localized: "sources.addLocalFolder"))
         .toolbar {
-            ToolbarItem(placement: .confirmationAction) {
-                Button(String(localized: "sources.addSource")) {
-                    addSource()
+            if usesToolbarActionButton {
+                ToolbarItem(placement: .confirmationAction) {
+                    Button(String(localized: "sources.addSource")) {
+                        addSource()
+                    }
+                    .disabled(!canAdd)
+                    .keyboardShortcut(.defaultAction)
                 }
-                .disabled(!canAdd)
-                .keyboardShortcut(.defaultAction)
             }
         }
     }

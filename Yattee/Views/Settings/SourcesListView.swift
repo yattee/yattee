@@ -64,6 +64,16 @@ struct SourcesListView: View {
                         .focusSection()
                 }
             }
+            #elseif os(macOS)
+            VStack(spacing: 0) {
+                // macOS 15 does not surface a detail-pane NavigationStack's
+                // toolbar items to the window title bar, so the toolbar
+                // "Add Source" button is invisible there. Show an inline
+                // header button as a fallback on older macOS. On macOS 26+
+                // the toolbar button works, so this header is omitted.
+                macOSLegacyAddHeader
+                sourcesInner
+            }
             #else
             sourcesInner
             #endif
@@ -76,13 +86,15 @@ struct SourcesListView: View {
         #endif
         #if os(iOS) || os(macOS)
         .toolbar {
-            ToolbarItem(placement: .primaryAction) {
-                Button {
-                    showingAddSheet = true
-                } label: {
-                    Label(String(localized: "sources.addSource"), systemImage: "plus")
+            if showAddButtonInToolbar {
+                ToolbarItem(placement: .primaryAction) {
+                    Button {
+                        showingAddSheet = true
+                    } label: {
+                        Label(String(localized: "sources.addSource"), systemImage: "plus")
+                    }
+                    .accessibilityIdentifier("sources.addButton")
                 }
-                .accessibilityIdentifier("sources.addButton")
             }
         }
         #endif
@@ -121,6 +133,47 @@ struct SourcesListView: View {
         .presentationCompactAdaptation(.sheet)
         #endif
     }
+
+    /// Whether the "Add Source" button should be placed in the window/navigation
+    /// toolbar. On macOS this only works reliably from macOS 26 onward (see
+    /// `macOSLegacyAddHeader`); iOS always uses the toolbar.
+    private var showAddButtonInToolbar: Bool {
+        #if os(iOS)
+        return true
+        #elseif os(macOS)
+        if #available(macOS 26, *) {
+            return true
+        } else {
+            return false
+        }
+        #else
+        return false
+        #endif
+    }
+
+    #if os(macOS)
+    // Inline fallback "Add Source" button for macOS versions where the
+    // detail-pane toolbar item is not shown (pre-macOS 26). Only needed when
+    // there are existing sources — the empty state already offers its own
+    // add button.
+    @ViewBuilder
+    private var macOSLegacyAddHeader: some View {
+        if !showAddButtonInToolbar, !isEmpty {
+            HStack {
+                Spacer()
+                Button {
+                    showingAddSheet = true
+                } label: {
+                    Label(String(localized: "sources.addSource"), systemImage: "plus")
+                }
+                .accessibilityIdentifier("sources.addButton")
+            }
+            .padding(.horizontal, 16)
+            .padding(.top, 12)
+            .padding(.bottom, 4)
+        }
+    }
+    #endif
 
     @ViewBuilder
     private var sourcesInner: some View {

@@ -87,6 +87,22 @@ struct AddRemoteServerView: View {
         return false
     }
 
+    /// macOS surfaces toolbar confirmation items from a pushed-in-sheet view
+    /// reliably only from macOS 26 onward. On older macOS (and on iOS/tvOS) we
+    /// render the "Add Source" action button inline in the form instead, so it
+    /// is always visible.
+    private var usesToolbarActionButton: Bool {
+        #if os(macOS)
+        if #available(macOS 26, *) {
+            return true
+        } else {
+            return false
+        }
+        #else
+        return false
+        #endif
+    }
+
     private var canAdd: Bool {
         guard !urlString.isEmpty else { return false }
 
@@ -172,9 +188,9 @@ struct AddRemoteServerView: View {
 
             if isFieldsRevealed {
                 serverConfigurationFields
-                #if !os(macOS)
-                actionSection
-                #endif
+                if !usesToolbarActionButton {
+                    actionSection
+                }
             }
         }
         #if os(iOS)
@@ -183,8 +199,8 @@ struct AddRemoteServerView: View {
         #if os(macOS)
         .formStyle(.grouped)
         .toolbar {
-            ToolbarItem(placement: .confirmationAction) {
-                if isFieldsRevealed {
+            if isFieldsRevealed, usesToolbarActionButton {
+                ToolbarItem(placement: .confirmationAction) {
                     Button {
                         addSource()
                     } label: {
