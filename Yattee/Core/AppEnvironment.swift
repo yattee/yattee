@@ -293,6 +293,10 @@ final class AppEnvironment {
         self.legacyMigrationService = LegacyDataMigrationService(
             instancesManager: instances,
             basicAuthCredentialsManager: basicAuthCreds,
+            invidiousCredentialsManager: invidiousCreds,
+            pipedCredentialsManager: pipedCreds,
+            invidiousAPI: invidiousAPI,
+            pipedAPI: pipedAPI,
             httpClient: client
         )
 

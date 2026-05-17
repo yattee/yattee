@@ -416,15 +416,15 @@ struct AdvancedSettingsView: View {
             }
             #endif
 
-            if appEnvironment?.legacyMigrationService.hasLegacyData() == true {
+            if appEnvironment?.legacyMigrationService.hasLegacyAccountsToImport() == true {
                 #if os(tvOS)
                 NavigationLink {
                     LegacyDataImportView()
                 } label: {
-                    Label(String(localized: "settings.advanced.data.importLegacy"), systemImage: "arrow.up.doc")
+                    Label(String(localized: "migration.accounts.title"), systemImage: "person.badge.key")
                 }
                 #else
-                SettingsNavigationRow("settings.advanced.data.importLegacy", systemImage: "arrow.up.doc") {
+                SettingsNavigationRow("migration.accounts.title", systemImage: "person.badge.key") {
                     LegacyDataImportView()
                 }
                 #endif

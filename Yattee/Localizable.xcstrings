@@ -5532,6 +5532,156 @@
         }
       }
     },
+    "migration.accounts.addSourcesFooter" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Review accounts from the previous Yattee app and sign in again to add their sources."
+          }
+        }
+      }
+    },
+    "migration.accounts.addSourcesLink" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Import Legacy Accounts"
+          }
+        }
+      }
+    },
+    "migration.accounts.empty.description" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "All legacy accounts have been imported or removed."
+          }
+        }
+      }
+    },
+    "migration.accounts.empty.title" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No Legacy Accounts"
+          }
+        }
+      }
+    },
+    "migration.accounts.footer" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Enter your current password to sign in again. Importing creates or reuses the matching source."
+          }
+        }
+      }
+    },
+    "migration.accounts.imported.title" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Account Imported"
+          }
+        }
+      }
+    },
+    "migration.accounts.prompt.later" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Not Now"
+          }
+        }
+      }
+    },
+    "migration.accounts.prompt.message" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Yattee found accounts from the previous app. Review them to sign in again, or remove any accounts you do not want to import."
+          }
+        }
+      }
+    },
+    "migration.accounts.prompt.review" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Review"
+          }
+        }
+      }
+    },
+    "migration.accounts.prompt.title" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Legacy Accounts Found"
+          }
+        }
+      }
+    },
+    "migration.accounts.remove.confirm" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Remove"
+          }
+        }
+      }
+    },
+    "migration.accounts.remove.message %@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "This will remove \"%@\" from the legacy import list. It will not be imported."
+          }
+        }
+      }
+    },
+    "migration.accounts.remove.title" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Remove Legacy Account?"
+          }
+        }
+      }
+    },
+    "migration.accounts.section" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Accounts"
+          }
+        }
+      }
+    },
+    "migration.accounts.title" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Legacy Accounts"
+          }
+        }
+      }
+    },
     "migration.accountsHint" : {
       "comment" : "Hint about needing to re-add accounts after migration",
       "localizations" : {

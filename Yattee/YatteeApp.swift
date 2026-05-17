@@ -46,6 +46,8 @@ struct YatteeApp: App {
     // First-launch state
     @State private var showingICloudAlert = false
     @State private var showingICloudProgress = false
+    @State private var showingLegacyAccountsAlert = false
+    @State private var showingLegacyAccountsImport = false
     #if os(iOS)
     @State private var showingSettings = false
     #endif
@@ -152,10 +154,21 @@ struct YatteeApp: App {
                         enableICloudAndWait()
                     }
                     Button(String(localized: "common.cancel"), role: .cancel) {
-                        appEnvironment.settingsManager.onboardingCompleted = true
+                        finishFirstLaunchFlow()
                     }
                 } message: {
                     Text(String(localized: "settings.icloud.enable.confirmation.message"))
+                }
+                .alert(
+                    String(localized: "migration.accounts.prompt.title"),
+                    isPresented: $showingLegacyAccountsAlert
+                ) {
+                    Button(String(localized: "migration.accounts.prompt.review")) {
+                        showingLegacyAccountsImport = true
+                    }
+                    Button(String(localized: "migration.accounts.prompt.later"), role: .cancel) {}
+                } message: {
+                    Text(String(localized: "migration.accounts.prompt.message"))
                 }
                 #if os(macOS)
                 .sheet(isPresented: $showingICloudProgress) {
@@ -169,6 +182,15 @@ struct YatteeApp: App {
                         .appEnvironment(appEnvironment)
                 }
                 #endif
+                .sheet(isPresented: $showingLegacyAccountsImport) {
+                    NavigationStack {
+                        LegacyAccountsImportView()
+                            .appEnvironment(appEnvironment)
+                    }
+                    #if os(macOS)
+                    .frame(minWidth: 560, minHeight: 560)
+                    #endif
+                }
                 #if os(iOS)
                 .sheet(isPresented: $showingSettings) {
                     SettingsView()
@@ -377,10 +399,9 @@ struct YatteeApp: App {
         // Auto-delete old history entries based on retention setting
         performHistoryCleanup()
 
-        // Run first-launch tasks: silently import v1 data, then offer iCloud sync.
+        // Run first-launch tasks: offer iCloud sync, then optionally ask about legacy accounts.
         if !appEnvironment.settingsManager.onboardingCompleted {
             Task {
-                await appEnvironment.legacyMigrationService.autoImportIfNeeded()
                 await appEnvironment.cloudKitSync.refreshAccountStatus()
 
                 if appEnvironment.cloudKitSync.accountStatus == .available {
@@ -388,9 +409,11 @@ struct YatteeApp: App {
                     try? await Task.sleep(nanoseconds: 500_000_000)
                     showingICloudAlert = true
                 } else {
-                    appEnvironment.settingsManager.onboardingCompleted = true
+                    finishFirstLaunchFlow()
                 }
             }
+        } else {
+            presentLegacyAccountsPromptIfNeeded()
         }
     }
 
@@ -412,8 +435,24 @@ struct YatteeApp: App {
             appEnvironment.instancesManager.replaceWithiCloudData()
             appEnvironment.mediaSourcesManager.replaceWithiCloudData()
 
-            settings.onboardingCompleted = true
             showingICloudProgress = false
+            finishFirstLaunchFlow()
+        }
+    }
+
+    /// Completes first-launch bookkeeping and then shows the one-time legacy account prompt if needed.
+    private func finishFirstLaunchFlow() {
+        appEnvironment.settingsManager.onboardingCompleted = true
+        presentLegacyAccountsPromptIfNeeded()
+    }
+
+    /// Shows a one-time prompt for unresolved v1 accounts.
+    private func presentLegacyAccountsPromptIfNeeded() {
+        guard appEnvironment.legacyMigrationService.shouldShowLegacyAccountsPrompt else { return }
+
+        appEnvironment.legacyMigrationService.markLegacyAccountsPromptShown()
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+            showingLegacyAccountsAlert = true
         }
     }
 

@@ -11,7 +11,7 @@ import Foundation
 
 /// Represents a v1 Instance stored in UserDefaults under the "instances" key.
 /// The v1 format used Defaults.Serializable with a bridge that stored instances as [String: String] dictionaries.
-struct LegacyInstance {
+struct LegacyInstance: Sendable {
     /// The app type: "invidious", "piped", "peerTube", "local"
     let app: String
 
@@ -79,6 +79,55 @@ struct LegacyInstance {
     }
 }
 
+// MARK: - Legacy Account
+
+/// Represents a v1 account stored in UserDefaults under the "accounts" key.
+/// Credentials moved between UserDefaults and the old Keychain across v1 releases,
+/// so v2 only uses this metadata to help the user sign in again.
+struct LegacyAccount: Sendable {
+    /// Legacy account identifier, also used by v1 Keychain keys.
+    let id: String
+
+    /// Legacy instance identifier this account belonged to.
+    let instanceID: String
+
+    /// User-facing account name.
+    let name: String
+
+    /// The account/server URL string.
+    let apiURL: String
+
+    /// Stored username/email, when present in UserDefaults.
+    let username: String
+
+    /// Password value from very old defaults exports, if present.
+    let password: String?
+
+    /// Parses a dictionary from v1 UserDefaults format.
+    /// - Parameter dictionary: The serialized account dictionary
+    /// - Returns: A LegacyAccount if parsing succeeds, nil otherwise
+    static func parse(from dictionary: [String: Any]) -> LegacyAccount? {
+        guard let id = dictionary["id"] as? String,
+              let apiURL = dictionary["apiURL"] as? String,
+              let username = dictionary["username"] as? String else {
+            return nil
+        }
+
+        let instanceID = dictionary["instanceID"] as? String ?? ""
+        let name = dictionary["name"] as? String ?? ""
+        let password = dictionary["password"] as? String
+
+        return LegacyAccount(
+            id: id,
+            instanceID: instanceID,
+            name: name,
+            apiURL: apiURL,
+            username: username,
+            password: password?.isEmpty == true ? nil : password
+        )
+    }
+}
+
 // MARK: - Legacy Import Item
 
 /// Represents an instance to be imported from v1 data.
@@ -112,6 +161,57 @@ struct LegacyImportItem: Identifiable, Sendable {
     var displayName: String {
         if let name, !name.isEmpty {
             return name
+        }
+        return url.host ?? url.absoluteString
+    }
+}
+
+// MARK: - Legacy Account Import Item
+
+/// Represents a legacy account that can be re-created by signing in to v2.
+struct LegacyAccountImportItem: Identifiable, Sendable {
+    /// The original v1 account ID.
+    let legacyAccountID: String
+
+    /// The original v1 instance ID.
+    let legacyInstanceID: String
+
+    /// The type of instance this account belongs to.
+    let instanceType: InstanceType
+
+    /// The instance URL.
+    let url: URL
+
+    /// User-defined instance name, if any.
+    let instanceName: String?
+
+    /// Legacy account display name, if any.
+    let accountName: String?
+
+    /// Legacy username/email.
+    let username: String
+
+    /// Whether this instance proxies videos.
+    let proxiesVideos: Bool
+
+    /// Stable identifier for SwiftUI lists.
+    var id: String { legacyAccountID }
+
+    /// Display name for the account row.
+    var displayName: String {
+        if let accountName, !accountName.isEmpty {
+            return accountName
+        }
+        if !username.isEmpty {
+            return username
+        }
+        return instanceDisplayName
+    }
+
+    /// Display name for the associated instance.
+    var instanceDisplayName: String {
+        if let instanceName, !instanceName.isEmpty {
+            return instanceName
         }
         return url.host ?? url.absoluteString
     }
