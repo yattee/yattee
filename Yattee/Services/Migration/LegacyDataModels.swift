@@ -100,9 +100,6 @@ struct LegacyAccount: Sendable {
     /// Stored username/email, when present in UserDefaults.
     let username: String
 
-    /// Password value from very old defaults exports, if present.
-    let password: String?
-
     /// Parses a dictionary from v1 UserDefaults format.
     /// - Parameter dictionary: The serialized account dictionary
     /// - Returns: A LegacyAccount if parsing succeeds, nil otherwise
@@ -115,54 +112,14 @@ struct LegacyAccount: Sendable {
 
         let instanceID = dictionary["instanceID"] as? String ?? ""
         let name = dictionary["name"] as? String ?? ""
-        let password = dictionary["password"] as? String
 
         return LegacyAccount(
             id: id,
             instanceID: instanceID,
             name: name,
             apiURL: apiURL,
-            username: username,
-            password: password?.isEmpty == true ? nil : password
+            username: username
         )
-    }
-}
-
-// MARK: - Legacy Import Item
-
-/// Represents an instance to be imported from v1 data.
-/// Only instances are imported - users need to re-add their accounts after import.
-struct LegacyImportItem: Identifiable, Sendable {
-    /// New UUID for UI identification
-    let id: UUID
-
-    /// The original v1 instance ID
-    let legacyInstanceID: String
-
-    /// The type of instance (Invidious or Piped)
-    let instanceType: InstanceType
-
-    /// The instance URL
-    let url: URL
-
-    /// User-defined name for the instance
-    let name: String?
-
-    /// Whether this instance proxies videos
-    var proxiesVideos: Bool = false
-
-    /// Whether this item is selected for import
-    var isSelected: Bool = true
-
-    /// Current reachability status
-    var reachabilityStatus: ReachabilityStatus = .unknown
-
-    /// Display name for the UI
-    var displayName: String {
-        if let name, !name.isEmpty {
-            return name
-        }
-        return url.host ?? url.absoluteString
     }
 }
 
@@ -214,60 +171,5 @@ struct LegacyAccountImportItem: Identifiable, Sendable {
             return instanceName
         }
         return url.host ?? url.absoluteString
-    }
-}
-
-// MARK: - Reachability Status
-
-/// Status of an instance's reachability check.
-enum ReachabilityStatus: Sendable {
-    /// Not yet checked
-    case unknown
-    /// Currently checking
-    case checking
-    /// Instance is reachable
-    case reachable
-    /// Instance is unreachable
-    case unreachable
-}
-
-// MARK: - Migration Result
-
-/// Result of an import operation.
-struct MigrationResult {
-    /// Items that were successfully imported
-    let succeeded: [LegacyImportItem]
-
-    /// Items that failed to import with their errors
-    let failed: [(item: LegacyImportItem, error: MigrationError)]
-
-    /// Items that were skipped because they already exist
-    let skippedDuplicates: [LegacyImportItem]
-
-    /// Whether all selected items were successfully imported
-    var isFullSuccess: Bool {
-        failed.isEmpty
-    }
-
-    /// Total number of items processed
-    var totalProcessed: Int {
-        succeeded.count + failed.count + skippedDuplicates.count
-    }
-}
-
-// MARK: - Migration Error
-
-/// Errors that can occur during migration.
-enum MigrationError: LocalizedError, Sendable {
-    case invalidURL
-    case unknown(String)
-
-    var errorDescription: String? {
-        switch self {
-        case .invalidURL:
-            return String(localized: "migration.error.invalidURL")
-        case .unknown(let message):
-            return message
-        }
     }
 }

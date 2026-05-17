@@ -296,8 +296,7 @@ final class AppEnvironment {
             invidiousCredentialsManager: invidiousCreds,
             pipedCredentialsManager: pipedCreds,
             invidiousAPI: invidiousAPI,
-            pipedAPI: pipedAPI,
-            httpClient: client
+            pipedAPI: pipedAPI
         )
 
         // Initialize Sources Settings
