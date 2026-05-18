@@ -416,7 +416,7 @@ struct AdvancedSettingsView: View {
             }
             #endif
 
-            if appEnvironment?.legacyMigrationService.hasLegacyAccountsToImport() == true {
+            if appEnvironment?.legacyMigrationService.hasLegacyDataToImport() == true {
                 #if os(tvOS)
                 NavigationLink {
                     LegacyDataImportView()

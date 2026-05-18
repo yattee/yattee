@@ -173,3 +173,35 @@ struct LegacyAccountImportItem: Identifiable, Sendable {
         return url.host ?? url.absoluteString
     }
 }
+
+// MARK: - Legacy Instance Import Item
+
+/// Represents a legacy instance (source) that can be re-created without signing in.
+/// Used for v1 instances that have no associated account.
+struct LegacyInstanceImportItem: Identifiable, Sendable {
+    /// The original v1 instance ID.
+    let legacyInstanceID: String
+
+    /// The type of instance.
+    let instanceType: InstanceType
+
+    /// The instance URL.
+    let url: URL
+
+    /// User-defined instance name, if any.
+    let instanceName: String?
+
+    /// Whether this instance proxies videos.
+    let proxiesVideos: Bool
+
+    /// Stable identifier for SwiftUI lists.
+    var id: String { legacyInstanceID }
+
+    /// Display name for the source row.
+    var instanceDisplayName: String {
+        if let instanceName, !instanceName.isEmpty {
+            return instanceName
+        }
+        return url.host ?? url.absoluteString
+    }
+}

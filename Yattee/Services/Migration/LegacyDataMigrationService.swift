@@ -32,8 +32,8 @@ final class LegacyDataMigrationService {
 
     // MARK: - State
 
-    /// Changes whenever legacy account defaults are resolved, so SwiftUI views refresh.
-    private(set) var legacyAccountsRevision = 0
+    /// Changes whenever legacy account or instance defaults are resolved, so SwiftUI views refresh.
+    private(set) var legacyDataRevision = 0
 
     // MARK: - Initialization
 
@@ -57,13 +57,24 @@ final class LegacyDataMigrationService {
 
     /// Whether there are legacy accounts left for the user to review.
     func hasLegacyAccountsToImport() -> Bool {
-        _ = legacyAccountsRevision
+        _ = legacyDataRevision
         return !parseLegacyAccountsForImport().isEmpty
     }
 
-    /// Whether the one-time legacy account prompt should be shown.
+    /// Whether there are account-less legacy instances (sources) left to import.
+    func hasLegacyInstancesToImport() -> Bool {
+        _ = legacyDataRevision
+        return !parseLegacyInstancesForImport().isEmpty
+    }
+
+    /// Whether there is any legacy data (accounts or sources) left to import.
+    func hasLegacyDataToImport() -> Bool {
+        hasLegacyAccountsToImport() || hasLegacyInstancesToImport()
+    }
+
+    /// Whether the one-time legacy data prompt should be shown.
     var shouldShowLegacyAccountsPrompt: Bool {
-        hasLegacyAccountsToImport() && !UserDefaults.standard.bool(forKey: legacyAccountsPromptShownKey)
+        hasLegacyDataToImport() && !UserDefaults.standard.bool(forKey: legacyAccountsPromptShownKey)
     }
 
     /// Marks the one-time legacy account prompt as shown.
@@ -131,6 +142,52 @@ final class LegacyDataMigrationService {
         return importItems
     }
 
+    /// Parses account-less legacy instances that can be re-added as sources.
+    /// Instances tied to an account are handled by `parseLegacyAccountsForImport`
+    /// and are omitted here; instances already present in v2 are omitted too.
+    func parseLegacyInstancesForImport() -> [LegacyInstanceImportItem] {
+        let defaults = UserDefaults.standard
+        let legacyInstances = parseLegacyInstances(from: defaults)
+        let accounts = parseLegacyAccounts(from: defaults)
+
+        // Instances that already have an account are covered by the accounts section.
+        let accountInstanceIDs = Set(accounts.map(\.instanceID))
+        let accountHosts = Set(accounts.compactMap { account -> String? in
+            guard let url = URL(string: account.apiURL) else { return nil }
+            return Self.splitCredentials(from: url).cleanURL.host
+        })
+
+        return legacyInstances.compactMap { instance in
+            guard let instanceType = instance.instanceType,
+                  instanceType == .invidious || instanceType == .piped,
+                  let url = instance.url
+            else {
+                return nil
+            }
+
+            if accountInstanceIDs.contains(instance.id) {
+                return nil
+            }
+
+            let (cleanURL, _) = Self.splitCredentials(from: url)
+            if let host = cleanURL.host, accountHosts.contains(host) {
+                return nil
+            }
+
+            if isLegacyInstanceAlreadyImported(instanceType: instanceType, url: url) {
+                return nil
+            }
+
+            return LegacyInstanceImportItem(
+                legacyInstanceID: instance.id,
+                instanceType: instanceType,
+                url: url,
+                instanceName: instance.name.isEmpty ? nil : instance.name,
+                proxiesVideos: instance.proxiesVideos
+            )
+        }
+    }
+
     // MARK: - Import
 
     /// Re-creates a legacy account by signing in with fresh credentials.
@@ -180,6 +237,39 @@ final class LegacyDataMigrationService {
         return instance
     }
 
+    /// Re-creates a legacy instance (source) without signing in.
+    /// The matching source is created if needed; otherwise the existing one is reused.
+    /// - Parameter item: The legacy instance to import
+    /// - Returns: The instance that was created or reused
+    @discardableResult
+    func importLegacyInstance(_ item: LegacyInstanceImportItem) -> Instance {
+        let (cleanURL, basicAuthCredentials) = Self.splitCredentials(from: item.url)
+
+        let instance = instancesManager.instances.first { existing in
+            existing.url.host == cleanURL.host && existing.type == item.instanceType
+        } ?? Instance(
+            id: UUID(),
+            type: item.instanceType,
+            url: cleanURL,
+            name: item.instanceName,
+            isEnabled: true,
+            proxiesVideos: item.proxiesVideos
+        )
+
+        addInstanceIfNeeded(instance)
+
+        if let basicAuthCredentials {
+            basicAuthCredentialsManager.setCredentials(
+                username: basicAuthCredentials.username,
+                password: basicAuthCredentials.password,
+                for: instance
+            )
+        }
+
+        removeLegacyInstance(item)
+        return instance
+    }
+
     private func instanceForAccountImport(_ item: LegacyAccountImportItem) -> Instance {
         let (cleanURL, _) = Self.splitCredentials(from: item.url)
         if let existing = instancesManager.instances.first(where: { existing in
@@ -222,6 +312,13 @@ final class LegacyDataMigrationService {
             return pipedCredentialsManager.isLoggedIn(for: existingInstance)
         default:
             return false
+        }
+    }
+
+    private func isLegacyInstanceAlreadyImported(instanceType: InstanceType, url: URL) -> Bool {
+        let (cleanURL, _) = Self.splitCredentials(from: url)
+        return instancesManager.instances.contains { existing in
+            existing.url.host == cleanURL.host && existing.type == instanceType
         }
     }
 
@@ -285,7 +382,42 @@ final class LegacyDataMigrationService {
             defaults.set(accounts, forKey: legacyAccountsKey)
         }
 
-        legacyAccountsRevision += 1
+        legacyDataRevision += 1
+    }
+
+    /// Removes one legacy instance after import or explicit user dismissal.
+    /// If this was the last instance, the instance defaults key is removed.
+    func removeLegacyInstance(_ item: LegacyInstanceImportItem) {
+        removeLegacyInstances(withIDs: [item.legacyInstanceID])
+    }
+
+    private func removeLegacyInstances(withIDs ids: [String]) {
+        let defaults = UserDefaults.standard
+        let ids = Set(ids)
+
+        guard var instances = defaults.array(forKey: legacyInstancesKey) as? [[String: Any]] else {
+            return
+        }
+
+        let originalCount = instances.count
+        instances.removeAll { dictionary in
+            guard let instanceID = dictionary["id"] as? String else {
+                return false
+            }
+            return ids.contains(instanceID)
+        }
+
+        guard instances.count != originalCount else {
+            return
+        }
+
+        if instances.isEmpty {
+            defaults.removeObject(forKey: legacyInstancesKey)
+        } else {
+            defaults.set(instances, forKey: legacyInstancesKey)
+        }
+
+        legacyDataRevision += 1
     }
 
     // MARK: - Prompt State

@@ -2,7 +2,7 @@
 //  LegacyDataImportView.swift
 //  Yattee
 //
-//  View for reviewing and re-creating accounts from the legacy v1 app.
+//  View for reviewing and re-creating accounts and sources from the legacy v1 app.
 //
 
 import SwiftUI
@@ -13,15 +13,21 @@ struct LegacyAccountsImportView: View {
 
     var showsDoneButton = true
 
-    @State private var items: [LegacyAccountImportItem] = []
+    @State private var accountItems: [LegacyAccountImportItem] = []
+    @State private var instanceItems: [LegacyInstanceImportItem] = []
     @State private var rowStates: [String: LegacyAccountRowState] = [:]
     @State private var isLoading = true
-    @State private var pendingRemoval: LegacyAccountImportItem?
+    @State private var pendingRemoval: PendingRemoval?
+    @State private var importSuccessTitle = ""
     @State private var importedInstanceName = ""
     @State private var showingImportSuccess = false
 
     private var legacyMigrationService: LegacyDataMigrationService? {
         appEnvironment?.legacyMigrationService
+    }
+
+    private var isEmpty: Bool {
+        accountItems.isEmpty && instanceItems.isEmpty
     }
 
     var body: some View {
@@ -30,10 +36,10 @@ struct LegacyAccountsImportView: View {
                 ProgressView()
                     .controlSize(.large)
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
-            } else if items.isEmpty {
+            } else if isEmpty {
                 emptyState
             } else {
-                accountList
+                contentList
             }
         }
         .navigationTitle(String(localized: "migration.accounts.title"))
@@ -52,44 +58,62 @@ struct LegacyAccountsImportView: View {
             #endif
         }
         .task {
-            loadLegacyAccounts()
+            loadLegacyData()
         }
         .confirmationDialog(
-            String(localized: "migration.accounts.remove.title"),
+            pendingRemoval?.confirmationTitle ?? "",
             item: $pendingRemoval,
             titleVisibility: .visible
-        ) { item in
+        ) { removal in
             Button(String(localized: "migration.accounts.remove.confirm"), role: .destructive) {
-                removeLegacyAccount(item)
+                confirmRemoval(removal)
             }
             Button(String(localized: "common.cancel"), role: .cancel) {}
-        } message: { item in
-            Text(String(localized: "migration.accounts.remove.message \(item.displayName)"))
+        } message: { removal in
+            Text(String(localized: "migration.accounts.remove.message \(removal.displayName)"))
         }
-        .alert(String(localized: "migration.accounts.imported.title"), isPresented: $showingImportSuccess) {
+        .alert(importSuccessTitle, isPresented: $showingImportSuccess) {
             Button(String(localized: "common.ok"), role: .cancel) {}
         } message: {
             Text(importedInstanceName)
         }
     }
 
-    private var accountList: some View {
+    private var contentList: some View {
         Form {
-            Section {
-                ForEach(items) { item in
-                    LegacyAccountImportRow(
-                        item: item,
-                        state: stateBinding(for: item)
-                    ) {
-                        importLegacyAccount(item)
-                    } onRemove: {
-                        pendingRemoval = item
+            if !accountItems.isEmpty {
+                Section {
+                    ForEach(accountItems) { item in
+                        LegacyAccountImportRow(
+                            item: item,
+                            state: stateBinding(for: item)
+                        ) {
+                            importLegacyAccount(item)
+                        } onRemove: {
+                            pendingRemoval = .account(item)
+                        }
                     }
+                } header: {
+                    Text(String(localized: "migration.accounts.section"))
+                } footer: {
+                    Text(String(localized: "migration.accounts.footer"))
                 }
-            } header: {
-                Text(String(localized: "migration.accounts.section"))
-            } footer: {
-                Text(String(localized: "migration.accounts.footer"))
+            }
+
+            if !instanceItems.isEmpty {
+                Section {
+                    ForEach(instanceItems) { item in
+                        LegacyInstanceImportRow(item: item) {
+                            importLegacyInstance(item)
+                        } onRemove: {
+                            pendingRemoval = .instance(item)
+                        }
+                    }
+                } header: {
+                    Text(String(localized: "migration.sources.section"))
+                } footer: {
+                    Text(String(localized: "migration.sources.footer"))
+                }
             }
         }
         #if os(iOS)
@@ -106,10 +130,11 @@ struct LegacyAccountsImportView: View {
         .frame(maxWidth: .infinity, maxHeight: .infinity)
     }
 
-    private func loadLegacyAccounts() {
-        let loadedItems = legacyMigrationService?.parseLegacyAccountsForImport() ?? []
-        items = loadedItems
-        for item in loadedItems where rowStates[item.legacyAccountID] == nil {
+    private func loadLegacyData() {
+        let loadedAccounts = legacyMigrationService?.parseLegacyAccountsForImport() ?? []
+        accountItems = loadedAccounts
+        instanceItems = legacyMigrationService?.parseLegacyInstancesForImport() ?? []
+        for item in loadedAccounts where rowStates[item.legacyAccountID] == nil {
             rowStates[item.legacyAccountID] = LegacyAccountRowState(username: item.username)
         }
         isLoading = false
@@ -137,15 +162,26 @@ struct LegacyAccountsImportView: View {
                     username: state.username,
                     password: state.password
                 )
+                importSuccessTitle = String(localized: "migration.accounts.imported.title")
                 importedInstanceName = importedInstance.displayName
                 showingImportSuccess = true
-                removeResolvedItem(item)
+                accountItems.removeAll { $0.legacyAccountID == item.legacyAccountID }
+                rowStates.removeValue(forKey: item.legacyAccountID)
             } catch APIError.unauthorized {
                 setImportError(String(localized: "login.error.invalidCredentials"), for: item)
             } catch {
                 setImportError(error.localizedDescription, for: item)
             }
         }
+    }
+
+    private func importLegacyInstance(_ item: LegacyInstanceImportItem) {
+        guard let service = legacyMigrationService else { return }
+        let importedInstance = service.importLegacyInstance(item)
+        importSuccessTitle = String(localized: "migration.sources.imported.title")
+        importedInstanceName = importedInstance.displayName
+        showingImportSuccess = true
+        instanceItems.removeAll { $0.legacyInstanceID == item.legacyInstanceID }
     }
 
     private func setImportError(_ message: String, for item: LegacyAccountImportItem) {
@@ -155,16 +191,54 @@ struct LegacyAccountsImportView: View {
         rowStates[item.legacyAccountID] = state
     }
 
-    private func removeLegacyAccount(_ item: LegacyAccountImportItem) {
-        legacyMigrationService?.removeLegacyAccount(item)
-        removeResolvedItem(item)
-    }
-
-    private func removeResolvedItem(_ item: LegacyAccountImportItem) {
-        items.removeAll { $0.legacyAccountID == item.legacyAccountID }
-        rowStates.removeValue(forKey: item.legacyAccountID)
+    private func confirmRemoval(_ removal: PendingRemoval) {
+        switch removal {
+        case .account(let item):
+            legacyMigrationService?.removeLegacyAccount(item)
+            accountItems.removeAll { $0.legacyAccountID == item.legacyAccountID }
+            rowStates.removeValue(forKey: item.legacyAccountID)
+        case .instance(let item):
+            legacyMigrationService?.removeLegacyInstance(item)
+            instanceItems.removeAll { $0.legacyInstanceID == item.legacyInstanceID }
+        }
     }
 }
+
+// MARK: - Pending Removal
+
+private enum PendingRemoval: Identifiable {
+    case account(LegacyAccountImportItem)
+    case instance(LegacyInstanceImportItem)
+
+    var id: String {
+        switch self {
+        case .account(let item):
+            return "account:\(item.id)"
+        case .instance(let item):
+            return "instance:\(item.id)"
+        }
+    }
+
+    var displayName: String {
+        switch self {
+        case .account(let item):
+            return item.displayName
+        case .instance(let item):
+            return item.instanceDisplayName
+        }
+    }
+
+    var confirmationTitle: String {
+        switch self {
+        case .account:
+            return String(localized: "migration.accounts.remove.title")
+        case .instance:
+            return String(localized: "migration.sources.remove.title")
+        }
+    }
+}
+
+// MARK: - Account Row
 
 private struct LegacyAccountImportRow: View {
     let item: LegacyAccountImportItem
@@ -179,7 +253,7 @@ private struct LegacyAccountImportRow: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
             HStack(alignment: .top, spacing: 12) {
-                Image(systemName: iconName)
+                Image(systemName: legacyInstanceIcon(for: item.instanceType))
                     .font(.title2)
                     .foregroundStyle(.secondary)
                     .frame(width: 28)
@@ -263,16 +337,63 @@ private struct LegacyAccountImportRow: View {
             return String(localized: "login.username")
         }
     }
+}
 
-    private var iconName: String {
-        switch item.instanceType {
-        case .invidious:
-            return "server.rack"
-        case .piped:
-            return "cloud"
-        default:
-            return "globe"
+// MARK: - Source Row
+
+private struct LegacyInstanceImportRow: View {
+    let item: LegacyInstanceImportItem
+    let onImport: () -> Void
+    let onRemove: () -> Void
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            HStack(alignment: .top, spacing: 12) {
+                Image(systemName: legacyInstanceIcon(for: item.instanceType))
+                    .font(.title2)
+                    .foregroundStyle(.secondary)
+                    .frame(width: 28)
+
+                VStack(alignment: .leading, spacing: 3) {
+                    Text(item.instanceDisplayName)
+                        .font(.headline)
+
+                    Text(item.url.host ?? item.url.absoluteString)
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                        .lineLimit(1)
+                }
+
+                Spacer()
+            }
+
+            HStack {
+                Button(role: .destructive, action: onRemove) {
+                    Text(String(localized: "common.remove"))
+                }
+                .foregroundStyle(.red)
+                .tint(.red)
+
+                Spacer()
+
+                Button(action: onImport) {
+                    Text(String(localized: "migration.import"))
+                }
+                .buttonStyle(.borderedProminent)
+            }
         }
+        .padding(.vertical, 8)
+    }
+}
+
+private func legacyInstanceIcon(for type: InstanceType) -> String {
+    switch type {
+    case .invidious:
+        return "server.rack"
+    case .piped:
+        return "cloud"
+    default:
+        return "globe"
     }
 }
 

@@ -241,7 +241,7 @@ struct AddSourceView: View {
         .task {
             refreshLegacyAccountsVisibility()
         }
-        .onChange(of: appEnvironment?.legacyMigrationService.legacyAccountsRevision ?? 0) {
+        .onChange(of: appEnvironment?.legacyMigrationService.legacyDataRevision ?? 0) {
             refreshLegacyAccountsVisibility()
         }
     }
@@ -262,7 +262,7 @@ struct AddSourceView: View {
     }
 
     private func refreshLegacyAccountsVisibility() {
-        hasLegacyAccountsToImport = appEnvironment?.legacyMigrationService.hasLegacyAccountsToImport() == true
+        hasLegacyAccountsToImport = appEnvironment?.legacyMigrationService.hasLegacyDataToImport() == true
     }
 }
 

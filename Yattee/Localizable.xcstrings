@@ -5828,6 +5828,46 @@
         }
       }
     },
+    "migration.sources.footer" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Add these sources from the previous Yattee app. No sign-in is required."
+          }
+        }
+      }
+    },
+    "migration.sources.imported.title" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Source Added"
+          }
+        }
+      }
+    },
+    "migration.sources.remove.title" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Remove Legacy Source?"
+          }
+        }
+      }
+    },
+    "migration.sources.section" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sources"
+          }
+        }
+      }
+    },
     "migration.subtitle" : {
       "extractionState" : "stale",
       "localizations" : {
