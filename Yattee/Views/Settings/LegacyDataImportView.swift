@@ -137,10 +137,6 @@ struct LegacyAccountsImportView: View {
                     username: state.username,
                     password: state.password
                 )
-                appEnvironment?.toastManager.showSuccess(
-                    String(localized: "migration.accounts.imported.title"),
-                    subtitle: importedInstance.displayName
-                )
                 importedInstanceName = importedInstance.displayName
                 showingImportSuccess = true
                 removeResolvedItem(item)
