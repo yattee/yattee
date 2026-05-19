@@ -5607,7 +5607,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Yattee found accounts from the previous app. Review them to sign in again, or remove any accounts you do not want to import."
+            "value" : "Yattee found accounts and sources from the previous app. Review them to sign in again or add them, or remove anything you do not want to import."
           }
         }
       }
@@ -5627,7 +5627,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Legacy Accounts Found"
+            "value" : "Import from Previous App"
           }
         }
       }
