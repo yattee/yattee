@@ -15317,26 +15317,6 @@
         }
       }
     },
-    "sources.bandwidth.download %@" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Download: %@"
-          }
-        }
-      }
-    },
-    "sources.bandwidth.upload %@" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Upload: %@"
-          }
-        }
-      }
-    },
     "sources.browsePeerTube" : {
       "comment" : "Menu item to browse PeerTube instances",
       "localizations" : {
@@ -16318,17 +16298,6 @@
         }
       }
     },
-    "sources.status.connected" : {
-      "comment" : "Status when connected",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Connected"
-          }
-        }
-      }
-    },
     "sources.status.disabled" : {
       "comment" : "Status when source is disabled",
       "localizations" : {
@@ -16336,39 +16305,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Disabled"
-          }
-        }
-      }
-    },
-    "sources.status.readOnly" : {
-      "comment" : "Status when source is read-only",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Read-only access"
-          }
-        }
-      }
-    },
-    "sources.test.success" : {
-      "comment" : "Test connection success message",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Connected successfully"
-          }
-        }
-      }
-    },
-    "sources.testConnection" : {
-      "comment" : "Button to test connection",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Test Connection"
           }
         }
       }

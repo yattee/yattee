@@ -476,51 +476,6 @@ extension SMBClient {
     }
 }
 
-// MARK: - Bandwidth Testing
-
-extension SMBClient {
-
-    /// Tests bandwidth to an SMB server.
-    /// 
-    /// Note: This is a placeholder implementation.
-    /// Real bandwidth testing would require file upload/download operations.
-    /// 
-    /// - Parameters:
-    ///   - source: The media source configuration.
-    ///   - password: The password for authentication.
-    ///   - testFileSizeMB: Size of test file in megabytes.
-    ///   - progressHandler: Optional callback for progress updates.
-    /// - Returns: BandwidthTestResult with speed measurements (same type as WebDAV).
-    func testBandwidth(
-        source: MediaSource,
-        password: String?,
-        testFileSizeMB: Int = 5,
-        progressHandler: (@Sendable (String) -> Void)? = nil
-    ) async throws -> BandwidthTestResult {
-        guard source.type == .smb else {
-            throw MediaSourceError.unknown("Invalid source type for SMB client")
-        }
-
-        progressHandler?("Connecting...")
-        
-        // Validate connection
-        _ = try await testConnection(source: source, password: password)
-        
-        progressHandler?("Complete")
-
-        // TODO: Implement actual bandwidth testing
-        LoggingService.shared.logMediaSourcesWarning("SMB bandwidth testing not yet implemented")
-        
-        return BandwidthTestResult(
-            hasWriteAccess: false,
-            uploadSpeed: nil,
-            downloadSpeed: nil,
-            testFileSize: 0,
-            warning: "Bandwidth testing not available for SMB sources"
-        )
-    }
-}
-
 // MARK: - URL Extension for Sanitization
 
 extension URL {
