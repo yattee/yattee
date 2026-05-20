@@ -306,16 +306,13 @@ final class BackendSwitcher {
             filteredMuxed = muxedStreams
         }
 
-        // Sort: prefer non-HLS/DASH (progressive) formats, then by resolution
+        // Sort: prefer progressive formats, then HLS, and only fall back to DASH as a last
+        // resort (DASH should never be chosen when any other format is available).
         let sortedMuxed = filteredMuxed.sorted { s1, s2 in
-            let format1 = StreamFormat.detect(from: s1)
-            let format2 = StreamFormat.detect(from: s2)
-            let isAdaptive1 = format1 == .hls || format1 == .dash
-            let isAdaptive2 = format2 == .hls || format2 == .dash
-
-            // Prefer progressive formats for non-live content
-            if isAdaptive1 != isAdaptive2 {
-                return !isAdaptive1 // non-adaptive (false) comes first
+            let rank1 = muxedFormatRank(StreamFormat.detect(from: s1))
+            let rank2 = muxedFormatRank(StreamFormat.detect(from: s2))
+            if rank1 != rank2 {
+                return rank1 < rank2
             }
             return (s1.resolution ?? .p360) > (s2.resolution ?? .p360)
         }
@@ -330,6 +327,17 @@ final class BackendSwitcher {
         }
 
         return nil
+    }
+
+    /// Ranks muxed formats for fallback selection (lower = preferred).
+    /// Progressive formats win, then HLS; DASH is the last resort and is only
+    /// selected when it is the only format available.
+    private func muxedFormatRank(_ format: StreamFormat) -> Int {
+        switch format {
+        case .dash: return 2
+        case .hls: return 1
+        default: return 0 // progressive
+        }
     }
 
     /// Returns codec priority for video streams (higher = better for MPV).

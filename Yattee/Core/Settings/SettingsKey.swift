@@ -20,7 +20,6 @@ enum SettingsKey: String, CaseIterable {
     case cellularQuality
     case autoplay
     case backgroundPlayback
-    case dashEnabled
     case preferredAudioLanguage
     case preferredSubtitlesLanguage
     case resumeAction

@@ -1901,7 +1901,6 @@ final class PlayerService {
 
     private func selectStreams(for backendType: PlayerBackendType, from streams: [Stream]) -> (video: Stream, audio: Stream?)? {
         let supportedFormats = backendType.supportedFormats
-        let dashEnabled = settingsManager?.dashEnabled ?? false
 
         // Get user's original quality preference (before network adjustments)
         let userPreferredQuality = settingsManager?.preferredQuality ?? .auto
@@ -1932,7 +1931,6 @@ final class PlayerService {
         let muxedStreams = streams.filter { stream in
             let format = StreamFormat.detect(from: stream)
             guard supportedFormats.contains(format) else { return false }
-            if format == .dash && !dashEnabled { return false }
             // Only include HLS/DASH if they have video (audio-only HLS/DASH should be treated as audio streams)
             if format == .hls || format == .dash {
                 return !stream.isAudioOnly
@@ -1972,7 +1970,7 @@ final class PlayerService {
                 LoggingService.shared.debug("Stream selection: Using HLS for live stream", category: .player)
                 return (hlsStream, nil)
             }
-            if dashEnabled, let dashStream = muxedStreams.first(where: { StreamFormat.detect(from: $0) == .dash }) {
+            if let dashStream = muxedStreams.first(where: { StreamFormat.detect(from: $0) == .dash }) {
                 LoggingService.shared.debug("Stream selection: Using DASH for live stream", category: .player)
                 return (dashStream, nil)
             }
@@ -2065,16 +2063,13 @@ final class PlayerService {
             filteredMuxed = muxedStreams
         }
 
-        // Sort: prefer non-HLS/DASH (progressive) formats, then by resolution
+        // Sort: prefer progressive formats, then HLS, and only fall back to DASH as a last
+        // resort (DASH should never be chosen when any other format is available).
         let sortedMuxed = filteredMuxed.sorted { s1, s2 in
-            let format1 = StreamFormat.detect(from: s1)
-            let format2 = StreamFormat.detect(from: s2)
-            let isAdaptive1 = format1 == .hls || format1 == .dash
-            let isAdaptive2 = format2 == .hls || format2 == .dash
-
-            // Prefer progressive formats for non-live content
-            if isAdaptive1 != isAdaptive2 {
-                return !isAdaptive1 // non-adaptive (false) comes first
+            let rank1 = muxedFormatRank(StreamFormat.detect(from: s1))
+            let rank2 = muxedFormatRank(StreamFormat.detect(from: s2))
+            if rank1 != rank2 {
+                return rank1 < rank2
             }
             return (s1.resolution ?? .p360) > (s2.resolution ?? .p360)
         }
@@ -2089,6 +2084,17 @@ final class PlayerService {
         }
 
         return nil
+    }
+
+    /// Ranks muxed formats for fallback selection (lower = preferred).
+    /// Progressive formats win, then HLS; DASH is the last resort and is only
+    /// selected when it is the only format available.
+    private func muxedFormatRank(_ format: StreamFormat) -> Int {
+        switch format {
+        case .dash: return 2
+        case .hls: return 1
+        default: return 0 // progressive
+        }
     }
 
     /// Returns codec priority for video streams (higher = better).

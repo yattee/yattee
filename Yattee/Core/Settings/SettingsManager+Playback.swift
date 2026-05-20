@@ -70,19 +70,6 @@ extension SettingsManager {
         }
     }
 
-    /// Whether DASH streams are enabled (MPV only).
-    /// Disabled by default as DASH can be unreliable with some Invidious instances.
-    var dashEnabled: Bool {
-        get {
-            if let cached = _dashEnabled { return cached }
-            return bool(for: .dashEnabled, default: false)
-        }
-        set {
-            _dashEnabled = newValue
-            set(newValue, for: .dashEnabled)
-        }
-    }
-
     var allowSoftwareDecodedFormats: Bool {
         get {
             if let cached = _allowSoftwareDecodedFormats { return cached }

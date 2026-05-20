@@ -34,7 +34,6 @@ final class SettingsManager {
     var _preferredQuality: VideoQuality?
     var _cellularQuality: VideoQuality?
     var _backgroundPlaybackEnabled: Bool?
-    var _dashEnabled: Bool?
     var _preferredAudioLanguage: String?
     var _preferredSubtitlesLanguage: String?
     var _playerVolume: Float?
@@ -415,7 +414,6 @@ final class SettingsManager {
         _preferredQuality = nil
         _cellularQuality = nil
         _backgroundPlaybackEnabled = nil
-        _dashEnabled = nil
         _preferredAudioLanguage = nil
         _preferredSubtitlesLanguage = nil
         _playerVolume = nil

@@ -143,13 +143,13 @@ struct TVPlayerView: View {
     @ViewBuilder
     private var qualityPanelContent: some View {
         if let playerService {
-            let dashEnabled = appEnvironment?.settingsManager.dashEnabled ?? false
             let supportedFormats = playerService.currentBackendType.supportedFormats
 
             QualitySelectorView(
                 streams: playerService.availableStreams.filter { stream in
                     let format = StreamFormat.detect(from: stream)
-                    if format == .dash && !dashEnabled {
+                    // DASH is never offered for manual selection
+                    if format == .dash {
                         return false
                     }
                     return supportedFormats.contains(format)

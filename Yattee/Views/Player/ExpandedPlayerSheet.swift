@@ -667,12 +667,11 @@ private struct PlayerSheetsModifier: ViewModifier {
     private var qualitySelectorSheet: some View {
         if let playerService {
             let supportedFormats = playerService.currentBackendType.supportedFormats
-            let dashEnabled = appEnvironment?.settingsManager.dashEnabled ?? false
             QualitySelectorView(
                 streams: playerService.availableStreams.filter { stream in
                     let format = StreamFormat.detect(from: stream)
-                    // Filter out DASH streams if disabled in settings
-                    if format == .dash && !dashEnabled {
+                    // DASH is never offered for manual selection
+                    if format == .dash {
                         return false
                     }
                     return supportedFormats.contains(format)

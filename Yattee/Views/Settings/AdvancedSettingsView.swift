@@ -206,13 +206,6 @@ struct AdvancedSettingsView: View {
                     Label(String(localized: "settings.advanced.mpv.edl"), systemImage: "arrow.trianglehead.merge")
                 }
 
-                Toggle(isOn: Binding(
-                    get: { settingsManager.dashEnabled },
-                    set: { settingsManager.dashEnabled = $0 }
-                )) {
-                    Label(String(localized: "settings.playback.dash"), systemImage: "bolt.horizontal")
-                }
-
                 #if os(tvOS)
                 NavigationLink {
                     TVSidebarDetailContainer(

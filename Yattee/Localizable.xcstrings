@@ -12181,16 +12181,6 @@
         }
       }
     },
-    "settings.playback.dash" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Enable DASH"
-          }
-        }
-      }
-    },
     "settings.playback.macOS.autoResizePlayer" : {
       "comment" : "Toggle for automatically resizing player window to match video aspect ratio",
       "localizations" : {
