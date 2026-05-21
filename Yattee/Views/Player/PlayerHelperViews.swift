@@ -144,6 +144,9 @@ struct ErrorDetailsSheet: View {
         #if os(iOS)
         .presentationDetents([.medium])
         #endif
+        #if os(macOS)
+        .frame(minWidth: 450, minHeight: 300)
+        #endif
     }
 
     private func copyToClipboard() {

@@ -43,6 +43,9 @@ struct InstanceLoginView: View {
                 }
                 .accessibilityIdentifier("instance.login.view")
         }
+        #if os(macOS)
+        .frame(minWidth: 450, minHeight: 350)
+        #endif
         #endif
     }
 

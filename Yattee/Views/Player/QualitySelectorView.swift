@@ -227,7 +227,12 @@ struct QualitySelectorView: View {
         NavigationStack {
             stackRoot
         }
+        #if os(iOS)
         .presentationDetents([.medium, .large])
+        #endif
+        #if os(macOS)
+        .frame(minWidth: 450, minHeight: 500)
+        #endif
         #endif
     }
 

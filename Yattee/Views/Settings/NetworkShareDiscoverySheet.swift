@@ -54,6 +54,9 @@ struct NetworkShareDiscoverySheet: View {
                     discoveryService?.stopDiscovery()
                 }
         }
+        #if os(macOS)
+        .frame(minWidth: 450, minHeight: 400)
+        #endif
     }
 
     @ViewBuilder

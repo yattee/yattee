@@ -140,16 +140,6 @@
     "1.2M subscribers" : {
 
     },
-    "alert.ambiguousLink.title" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Open Link"
-          }
-        }
-      }
-    },
     "alert.ambiguousLink.message %@" : {
       "localizations" : {
         "en" : {
@@ -160,22 +150,32 @@
         }
       }
     },
-    "alert.ambiguousLink.tryInYattee" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Try in Yattee"
-          }
-        }
-      }
-    },
     "alert.ambiguousLink.openInBrowser" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Open in Browser"
+          }
+        }
+      }
+    },
+    "alert.ambiguousLink.title" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Open Link"
+          }
+        }
+      }
+    },
+    "alert.ambiguousLink.tryInYattee" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Try in Yattee"
           }
         }
       }
@@ -200,22 +200,22 @@
         }
       }
     },
-    "alert.resolvedShortLink.title" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Open Link"
-          }
-        }
-      }
-    },
     "alert.resolvedShortLink.message %@" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "This short link expands to:\n%@"
+          }
+        }
+      }
+    },
+    "alert.resolvedShortLink.openInBrowser" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Open in Browser"
           }
         }
       }
@@ -230,12 +230,12 @@
         }
       }
     },
-    "alert.resolvedShortLink.openInBrowser" : {
+    "alert.resolvedShortLink.title" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Open in Browser"
+            "value" : "Open Link"
           }
         }
       }
@@ -5684,6 +5684,7 @@
     },
     "migration.accountsHint" : {
       "comment" : "Hint about needing to re-add accounts after migration",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -5694,6 +5695,7 @@
       }
     },
     "migration.continue" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -5704,6 +5706,7 @@
       }
     },
     "migration.error.invalidURL" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -5714,6 +5717,7 @@
       }
     },
     "migration.failedItems" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -5745,6 +5749,7 @@
     },
     "migration.noDataFound" : {
       "comment" : "Title when no legacy data found",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -5756,6 +5761,7 @@
     },
     "migration.noDataFoundDescription" : {
       "comment" : "Description when no legacy data found",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -5767,6 +5773,7 @@
     },
     "migration.partialMessage %lld %lld" : {
       "comment" : "Import result count",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -5777,6 +5784,7 @@
       }
     },
     "migration.partialTitle" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -5787,6 +5795,7 @@
       }
     },
     "migration.retry" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -5797,6 +5806,7 @@
       }
     },
     "migration.selectToImport" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -5808,6 +5818,7 @@
     },
     "migration.settingsFooter" : {
       "comment" : "Footer text in settings migration view",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -5891,6 +5902,7 @@
       }
     },
     "migration.unreachableImport" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -5901,6 +5913,7 @@
       }
     },
     "migration.unreachableMessage" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -5911,6 +5924,7 @@
       }
     },
     "migration.unreachableTitle" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -8979,6 +8993,7 @@
     },
     "settings.advanced.data.importLegacy" : {
       "comment" : "Button label for importing legacy v1 data",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -12552,6 +12567,68 @@
         }
       }
     },
+    "settings.playback.tvAudioDelay" : {
+      "comment" : "Audio delay stepper label (tvOS only)",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Audio Delay"
+          }
+        }
+      }
+    },
+    "settings.playback.tvAudioDelay.minus10" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "−10 ms"
+          }
+        }
+      }
+    },
+    "settings.playback.tvAudioDelay.minus100" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "−100 ms"
+          }
+        }
+      }
+    },
+    "settings.playback.tvAudioDelay.plus10" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "+10 ms"
+          }
+        }
+      }
+    },
+    "settings.playback.tvAudioDelay.plus100" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "+100 ms"
+          }
+        }
+      }
+    },
+    "settings.playback.tvAudioDelay.reset" : {
+      "comment" : "Reset audio delay button label (tvOS only)",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Reset"
+          }
+        }
+      }
+    },
     "settings.playback.tvDisplayMatching.dynamicRange" : {
       "comment" : "Toggle label (tvOS only)",
       "localizations" : {
@@ -12594,64 +12671,32 @@
         }
       }
     },
-    "settings.playback.tvAudioDelay" : {
-      "comment" : "Audio delay stepper label (tvOS only)",
+    "settings.playback.tvOSMenuButtonClosesVideo" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Audio Delay"
+            "value" : "Menu Button Closes Video"
           }
         }
       }
     },
-    "settings.playback.tvAudioDelay.minus100" : {
+    "settings.playback.tvOSMenuButtonClosesVideo.footer" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "−100 ms"
+            "value" : "When enabled, the Siri remote Menu button stops playback and clears the queue. The close (X) button is hidden from the player. When disabled, Menu collapses the player and playback continues in the background."
           }
         }
       }
     },
-    "settings.playback.tvAudioDelay.minus10" : {
+    "settings.playback.tvSyncDiagnostics.footer" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "−10 ms"
-          }
-        }
-      }
-    },
-    "settings.playback.tvAudioDelay.plus10" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "+10 ms"
-          }
-        }
-      }
-    },
-    "settings.playback.tvAudioDelay.plus100" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "+100 ms"
-          }
-        }
-      }
-    },
-    "settings.playback.tvAudioDelay.reset" : {
-      "comment" : "Reset audio delay button label (tvOS only)",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Reset"
+            "value" : "Audio Delay shifts audio relative to video to compensate for fixed HDMI/AVR output lag (positive = audio later). Video Sync Mode changes how MPV reconciles video frames with display refresh; the default is recommended unless you are debugging."
           }
         }
       }
@@ -12677,16 +12722,6 @@
         }
       }
     },
-    "settings.playback.tvSyncDiagnostics.footer" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Audio Delay shifts audio relative to video to compensate for fixed HDMI/AVR output lag (positive = audio later). Video Sync Mode changes how MPV reconciles video frames with display refresh; the default is recommended unless you are debugging."
-          }
-        }
-      }
-    },
     "settings.playback.tvVideoSyncMode" : {
       "comment" : "Picker label (tvOS only)",
       "localizations" : {
@@ -12694,26 +12729,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Video Sync Mode"
-          }
-        }
-      }
-    },
-    "settings.playback.tvVideoSyncMode.displayVdrop" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Display (drop/repeat) — default"
-          }
-        }
-      }
-    },
-    "settings.playback.tvVideoSyncMode.displayResample" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Display (resample audio)"
           }
         }
       }
@@ -12728,22 +12743,22 @@
         }
       }
     },
-    "settings.playback.tvOSMenuButtonClosesVideo" : {
+    "settings.playback.tvVideoSyncMode.displayResample" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Menu Button Closes Video"
+            "value" : "Display (resample audio)"
           }
         }
       }
     },
-    "settings.playback.tvOSMenuButtonClosesVideo.footer" : {
+    "settings.playback.tvVideoSyncMode.displayVdrop" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "When enabled, the Siri remote Menu button stops playback and clears the queue. The close (X) button is hidden from the player. When disabled, Menu collapses the player and playback continues in the background."
+            "value" : "Display (drop/repeat) — default"
           }
         }
       }
@@ -13774,6 +13789,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Privacy"
+          }
+        }
+      }
+    },
+    "settings.resolveShortLinks.title" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Resolve Short Links"
           }
         }
       }
@@ -14854,6 +14879,16 @@
         }
       }
     },
+    "settings.youtubeEnhancements.resolveShortLinks.footer" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "When you tap a bit.ly, tinyurl, t.co, or similar short link in a description or comment, Yattee follows the redirect and opens the destination in-app if it's a supported video, channel, or playlist. Sends a network request to the shortener service."
+          }
+        }
+      }
+    },
     "settings.youtubeEnhancements.returnYouTubeDislike.footer" : {
       "localizations" : {
         "en" : {
@@ -14870,26 +14905,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Automatically skip sponsors, intros, and other unwanted segments."
-          }
-        }
-      }
-    },
-    "settings.youtubeEnhancements.resolveShortLinks.footer" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "When you tap a bit.ly, tinyurl, t.co, or similar short link in a description or comment, Yattee follows the redirect and opens the destination in-app if it's a supported video, channel, or playlist. Sends a network request to the shortener service."
-          }
-        }
-      }
-    },
-    "settings.resolveShortLinks.title" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Resolve Short Links"
           }
         }
       }
@@ -15439,28 +15454,6 @@
         }
       }
     },
-    "sources.error.pipedBasicAuthUnsupported" : {
-      "comment" : "Error when a Piped instance is detected behind an HTTP Basic Auth proxy. Piped uses the same Authorization header for the user session, so the two cannot coexist.",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Piped sources can't be used behind an HTTP Basic Auth proxy. Piped reuses the Authorization header for the user session, so it conflicts with the proxy's credentials."
-          }
-        }
-      }
-    },
-    "sources.error.pipedFrontendDetected" : {
-      "comment" : "Error when the URL points to the Piped web frontend (SPA) instead of its API backend. The frontend serves the same index.html for every path so detection cannot succeed.",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "This URL is the Piped web frontend, not its API. Please enter the Piped API URL instead (for example, the frontend may be at piped.example.com while the API is at piped-api.example.com or pipedapi.example.com — check with the instance operator)."
-          }
-        }
-      }
-    },
     "sources.error.couldNotDetect" : {
       "comment" : "Error when source type could not be detected",
       "localizations" : {
@@ -15512,6 +15505,28 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Invalid SMB server address"
+          }
+        }
+      }
+    },
+    "sources.error.pipedBasicAuthUnsupported" : {
+      "comment" : "Error when a Piped instance is detected behind an HTTP Basic Auth proxy. Piped uses the same Authorization header for the user session, so the two cannot coexist.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Piped sources can't be used behind an HTTP Basic Auth proxy. Piped reuses the Authorization header for the user session, so it conflicts with the proxy's credentials."
+          }
+        }
+      }
+    },
+    "sources.error.pipedFrontendDetected" : {
+      "comment" : "Error when the URL points to the Piped web frontend (SPA) instead of its API backend. The frontend serves the same index.html for every path so detection cannot succeed.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "This URL is the Piped web frontend, not its API. Please enter the Piped API URL instead (for example, the frontend may be at piped.example.com while the API is at piped-api.example.com or pipedapi.example.com — check with the instance operator)."
           }
         }
       }

@@ -345,7 +345,12 @@ struct DownloadQualitySheet: View {
                 }
             }
         }
+        #if os(iOS)
         .presentationDetents([.medium, .large])
+        #endif
+        #if os(macOS)
+        .frame(minWidth: 500, minHeight: 500)
+        #endif
     }
 
     // MARK: - Main Content Views

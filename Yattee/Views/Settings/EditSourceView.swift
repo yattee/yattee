@@ -531,6 +531,9 @@ private struct EditFileSourceContent: View {
                     smbProtocolVersion = source.smbProtocolVersion ?? .auto
                 }
         }
+        #if os(macOS)
+        .frame(minWidth: 500, minHeight: 450)
+        #endif
         #endif
     }
 

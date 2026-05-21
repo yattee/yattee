@@ -1984,6 +1984,9 @@ struct VideoInfoView: View {
                 }
                 #endif
             }
+            #if os(macOS)
+            .frame(minWidth: 500, minHeight: 550)
+            #endif
         }
     }
 
