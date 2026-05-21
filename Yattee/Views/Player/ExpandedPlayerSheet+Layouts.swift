@@ -904,6 +904,9 @@ extension ExpandedPlayerSheet {
                     onPlayNext: {
                         await playerService.playNext()
                     },
+                    onPlayPrevious: {
+                        await playerService.playPrevious()
+                    },
                     onVolumeChanged: { [weak appEnvironment] volume in
                         playerService.currentBackend?.volume = volume
                         appEnvironment?.settingsManager.playerVolume = volume
@@ -917,6 +920,9 @@ extension ExpandedPlayerSheet {
                     },
                     onShowSettings: { [self] in
                         showingQualitySheet = true
+                    },
+                    onShowQueue: { [self] in
+                        showingQueueSheet = true
                     }
                 )
                 .frame(width: controlsWidth, height: controlsHeight)
@@ -1160,6 +1166,9 @@ extension ExpandedPlayerSheet {
                 onPlayNext: {
                     await playerService.playNext()
                 },
+                onPlayPrevious: {
+                    await playerService.playPrevious()
+                },
                 onVolumeChanged: { [weak appEnvironment] volume in
                     playerService.currentBackend?.volume = volume
                     appEnvironment?.settingsManager.playerVolume = volume
@@ -1173,6 +1182,9 @@ extension ExpandedPlayerSheet {
                 },
                 onShowSettings: { [self] in
                     showingQualitySheet = true
+                },
+                onShowQueue: { [self] in
+                    showingQueueSheet = true
                 }
             )
             .frame(width: controlsWidth, height: controlsHeight)
@@ -1560,6 +1572,9 @@ extension ExpandedPlayerSheet {
                     onPlayNext: {
                         await playerService.playNext()
                     },
+                    onPlayPrevious: {
+                        await playerService.playPrevious()
+                    },
                     onVolumeChanged: { [weak appEnvironment] volume in
                         playerService.currentBackend?.volume = volume
                         appEnvironment?.settingsManager.playerVolume = volume
@@ -1573,6 +1588,9 @@ extension ExpandedPlayerSheet {
                     },
                     onShowSettings: { [self] in
                         showingQualitySheet = true
+                    },
+                    onShowQueue: { [self] in
+                        showingQueueSheet = true
                     }
                 )
                 .frame(width: availableWidth, height: availableHeight)

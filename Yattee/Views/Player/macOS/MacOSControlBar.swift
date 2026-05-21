@@ -23,9 +23,11 @@ struct MacOSControlBar: View {
     var isFullscreen: Bool = false
     var onTogglePiP: (() -> Void)? = nil
     var onPlayNext: (() async -> Void)? = nil
+    var onPlayPrevious: (() async -> Void)? = nil
     var onVolumeChanged: ((Float) -> Void)? = nil
     var onMuteToggled: (() -> Void)? = nil
     var onShowSettings: (() -> Void)? = nil
+    var onShowQueue: (() -> Void)? = nil
     /// Whether to show chapter markers on the progress bar (default: true)
     var showChapters: Bool = true
     /// SponsorBlock segments to display on the progress bar.
@@ -47,8 +49,7 @@ struct MacOSControlBar: View {
     @State private var isHoveringProgress = false
     @State private var hoverProgress: Double = 0
     @State private var playNextTapCount = 0
-    @State private var seekBackwardTrigger = 0
-    @State private var seekForwardTrigger = 0
+    @State private var playPreviousTapCount = 0
 
     // MARK: - Computed Properties
 
@@ -149,19 +150,21 @@ struct MacOSControlBar: View {
 
     private var transportControls: some View {
         HStack(spacing: 4) {
-            // Skip backward
-            Button {
-                seekBackwardTrigger += 1
-                Task { await onSeekBackward(10) }
-            } label: {
-                Image(systemName: "10.arrow.trianglehead.counterclockwise")
-                    .font(.system(size: 14, weight: .medium))
-                    .frame(width: 28, height: 28)
-                    .contentShape(Rectangle())
-                    .symbolEffect(.rotate.byLayer, options: .speed(2).nonRepeating, value: seekBackwardTrigger)
+            // Play previous (disabled when no previous in queue)
+            if let onPlayPrevious {
+                Button {
+                    playPreviousTapCount += 1
+                    Task { await onPlayPrevious() }
+                } label: {
+                    Image(systemName: "backward.fill")
+                        .font(.system(size: 12, weight: .medium))
+                        .frame(width: 28, height: 28)
+                        .contentShape(Rectangle())
+                        .symbolEffect(.bounce.down.byLayer, options: .nonRepeating, value: playPreviousTapCount)
+                }
+                .buttonStyle(MacOSControlButtonStyle())
+                .disabled(!playerState.hasPrevious)
             }
-            .buttonStyle(MacOSControlButtonStyle())
-            .disabled(isTransportDisabled)
 
             // Play/Pause
             Button {
@@ -176,20 +179,6 @@ struct MacOSControlBar: View {
             .buttonStyle(MacOSControlButtonStyle())
             .disabled(isTransportDisabled)
             .opacity(isTransportDisabled ? 0.3 : 1.0)
-
-            // Skip forward
-            Button {
-                seekForwardTrigger += 1
-                Task { await onSeekForward(10) }
-            } label: {
-                Image(systemName: "10.arrow.trianglehead.clockwise")
-                    .font(.system(size: 14, weight: .medium))
-                    .frame(width: 28, height: 28)
-                    .contentShape(Rectangle())
-                    .symbolEffect(.rotate.byLayer, options: .speed(2).nonRepeating, value: seekForwardTrigger)
-            }
-            .buttonStyle(MacOSControlButtonStyle())
-            .disabled(isTransportDisabled)
 
             // Play next (if queue has items)
             if let onPlayNext, playerState.hasNext {
@@ -337,6 +326,32 @@ struct MacOSControlBar: View {
 
     private var trailingActionControls: some View {
         HStack(spacing: 4) {
+            // Queue
+            if let onShowQueue {
+                Button {
+                    onShowQueue()
+                } label: {
+                    Image(systemName: "list.bullet")
+                        .font(.system(size: 13, weight: .medium))
+                        .frame(width: 28, height: 28)
+                        .contentShape(Rectangle())
+                }
+                .buttonStyle(MacOSControlButtonStyle())
+            }
+
+            // More (context menu)
+            if let video = playerState.currentVideo {
+                VideoContextMenuView(
+                    video: video,
+                    accentColor: .primary,
+                    buttonSize: 28,
+                    buttonBackgroundStyle: .none,
+                    theme: .dark
+                )
+                .menuStyle(.borderlessButton)
+                .fixedSize()
+            }
+
             // Settings
             if let onShowSettings {
                 Button {
@@ -356,19 +371,6 @@ struct MacOSControlBar: View {
                     onTogglePiP()
                 } label: {
                     Image(systemName: playerState.pipState == .active ? "pip.exit" : "pip.enter")
-                        .font(.system(size: 13, weight: .medium))
-                        .frame(width: 28, height: 28)
-                        .contentShape(Rectangle())
-                }
-                .buttonStyle(MacOSControlButtonStyle())
-            }
-
-            // Fullscreen
-            if let onToggleFullscreen {
-                Button {
-                    onToggleFullscreen()
-                } label: {
-                    Image(systemName: isFullscreen ? "arrow.down.right.and.arrow.up.left" : "arrow.up.left.and.arrow.down.right")
                         .font(.system(size: 13, weight: .medium))
                         .frame(width: 28, height: 28)
                         .contentShape(Rectangle())

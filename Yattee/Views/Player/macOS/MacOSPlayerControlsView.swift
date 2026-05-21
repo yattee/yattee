@@ -27,9 +27,11 @@ struct MacOSPlayerControlsView: View {
     var onClose: (() -> Void)? = nil
     var onTogglePiP: (() -> Void)? = nil
     var onPlayNext: (() async -> Void)? = nil
+    var onPlayPrevious: (() async -> Void)? = nil
     var onVolumeChanged: ((Float) -> Void)? = nil
     var onMuteToggled: (() -> Void)? = nil
     var onShowSettings: (() -> Void)? = nil
+    var onShowQueue: (() -> Void)? = nil
 
     // MARK: - State
 
@@ -91,9 +93,11 @@ struct MacOSPlayerControlsView: View {
                         isFullscreen: isFullscreen,
                         onTogglePiP: onTogglePiP,
                         onPlayNext: onPlayNext,
+                        onPlayPrevious: onPlayPrevious,
                         onVolumeChanged: onVolumeChanged,
                         onMuteToggled: onMuteToggled,
                         onShowSettings: onShowSettings,
+                        onShowQueue: onShowQueue,
                         sponsorSegments: playerState.sponsorSegments,
                         onInteractionStarted: {
                             isInteracting = true
