@@ -67,12 +67,24 @@ final class ExpandedPlayerWindowManager: NSObject {
         // Get the current player mode for window configuration
         let mode = appEnvironment.settingsManager.macPlayerMode
 
-        // Create the player view
-        let playerView = ExpandedPlayerSheet()
+        // Host a lightweight two-phase root instead of ExpandedPlayerSheet directly.
+        // AppKit won't composite the window to screen until the hosted SwiftUI view
+        // finishes its first layout pass; ExpandedPlayerSheet is heavy (MPV setup,
+        // full controls, layout math), so building it inline leaves the alpha 0→1
+        // fade with nothing to draw and the window only pops in after the render.
+        // ExpandedPlayerWindowRoot paints black + spinner immediately, then defers
+        // building ExpandedPlayerSheet by one runloop so the window appears at once.
+        let playerView = ExpandedPlayerWindowRoot()
             .appEnvironment(appEnvironment)
 
         // Create hosting controller
         let hostingController = NSHostingController(rootView: playerView)
+        // Don't let the hosting controller drive the window size from the SwiftUI
+        // content's fitting size. The lightweight loading root (just a spinner) has a
+        // tiny ideal size, which would otherwise shrink the window and then grow it
+        // when ExpandedPlayerSheet builds. Window sizing is owned by `initialSize`
+        // below and `resizeToFitAspectRatio` once the real video ratio is known.
+        hostingController.sizingOptions = []
 
         // Calculate initial window size
         let initialSize = calculateInitialWindowSize()
@@ -95,6 +107,14 @@ final class ExpandedPlayerWindowManager: NSObject {
         // Lock manual resize to the video aspect ratio. Seeded with 16:9 here;
         // updated as soon as the real video aspect ratio is known.
         applyAspectRatioConstraint(defaultAspectRatio, to: window)
+
+        // Force the intended size. Assigning `contentViewController` above resizes
+        // the window to the hosting controller's fitting size — and the lightweight
+        // loading root has a tiny fitting size, which produced a tiny window that
+        // only grew once `resizeToFitAspectRatio` fired after streams loaded. Set
+        // the content size back to `initialSize` so the window opens full-sized
+        // during the loading phase too.
+        window.setContentSize(initialSize)
 
         // Set up window delegate for close handling
         // Make ExpandedPlayerWindowManager itself the delegate to avoid lifecycle issues
@@ -429,6 +449,42 @@ extension ExpandedPlayerWindowManager: NSWindowDelegate {
         }
         // Return false - we've already hidden the window with orderOut
         return false
+    }
+}
+
+// MARK: - Two-Phase Window Root
+
+/// Root view hosted in the expanded player window.
+///
+/// Shows a cheap black background + spinner on the first frame so the window
+/// composites and fades in immediately, then defers building the heavy
+/// `ExpandedPlayerSheet` by one runloop — after the window is already on screen.
+/// This is the macOS equivalent of the instant loading feedback iOS shows while
+/// its player window renders, and removes the perceptible "dead gap" between the
+/// click and the window appearing.
+private struct ExpandedPlayerWindowRoot: View {
+    @State private var showFullPlayer = false
+
+    var body: some View {
+        ZStack {
+            // Fills the window and matches the player's black background so the
+            // swap to ExpandedPlayerSheet is seamless.
+            Color.black
+
+            if showFullPlayer {
+                ExpandedPlayerSheet()
+            } else {
+                ProgressView()
+                    .controlSize(.large)
+                    .tint(.white)
+            }
+        }
+        .ignoresSafeArea()
+        .onAppear {
+            // Defer so the cheap branch composites first, then build the real
+            // player while the window is already visible.
+            DispatchQueue.main.async { showFullPlayer = true }
+        }
     }
 }
 #endif
