@@ -119,14 +119,17 @@ struct ContentView: View {
         let playerState = appEnvironment.playerService.state
         let hasActiveVideo = playerState.currentVideo != nil
         let isExpanded = appEnvironment.navigationCoordinator.isPlayerExpanded
+        // The expanded player is a separate window in window mode, so keep the capsule
+        // visible alongside it. In sheet mode the sheet covers the window, so hide it.
+        let usesWindow = appEnvironment.settingsManager.macPlayerMode.usesWindow
 
-        if hasActiveVideo && !isExpanded {
+        if hasActiveVideo && (!isExpanded || usesWindow) {
             VStack(spacing: 0) {
                 Spacer()
                 MiniPlayerView()
             }
-            // Add padding for tab bar
-            .padding(.bottom, 49)
+            // Float the capsule above the bottom edge (macOS uses a sidebar, not a tab bar)
+            .padding(.bottom, 16)
             // Use move-only transition (no opacity) to prevent thumbnail flash during collapse
             .transition(.move(edge: .bottom))
             .animation(.spring(response: 0.3), value: hasActiveVideo)

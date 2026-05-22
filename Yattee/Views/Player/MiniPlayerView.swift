@@ -115,11 +115,15 @@ struct MiniPlayerView: View {
 
     var body: some View {
         Group {
+            #if os(macOS)
+            macOSCapsuleLayout
+            #else
             if isTabAccessory {
                 accessoryLayout
             } else {
                 overlayLayout
             }
+            #endif
         }
         .accessibilityIdentifier("player.miniPlayer")
         .accessibilityLabel("player.miniPlayer")
@@ -253,6 +257,64 @@ struct MiniPlayerView: View {
             .frame(height: 2)
         }
     }
+
+    // MARK: - macOS Capsule Layout
+
+    #if os(macOS)
+    /// Compact, centered capsule shown in the main window on macOS (Music.app style).
+    /// The expanded player lives in a separate window, so this stays visible alongside it.
+    private var macOSCapsuleLayout: some View {
+        HStack(spacing: 10) {
+            // Video preview - tap for PiP (or expand if PiP unavailable)
+            videoPreviewView
+                .frame(width: 44, height: 26)
+                .clipShape(RoundedRectangle(cornerRadius: 4))
+                .contentShape(Rectangle())
+                .onTapGesture {
+                    handleVideoPreviewTap()
+                }
+
+            // Title/author area - tap to expand player (restores from PiP first if needed)
+            VStack(alignment: .leading, spacing: 1) {
+                MarqueeText(
+                    text: displayTitle,
+                    font: .subheadline,
+                    fontWeight: .medium,
+                    foregroundStyle: .primary
+                )
+
+                if let authorName = currentVideo?.author.name, !authorName.isEmpty {
+                    MarqueeText(
+                        text: authorName,
+                        font: .caption,
+                        foregroundStyle: .secondary
+                    )
+                }
+            }
+            .contentShape(Rectangle())
+            .onTapGesture {
+                expandPlayerWithPiPRestore()
+            }
+
+            // Dynamic buttons from settings (includes close by default - no separate close button)
+            buttonsView
+        }
+        .padding(.horizontal, 12)
+        .padding(.vertical, 6)
+        .frame(maxWidth: 420)
+        .glassBackground(.regular, in: .capsule, fallback: .regularMaterial)
+        .overlay(alignment: .bottom) {
+            GeometryReader { geo in
+                Rectangle()
+                    .fill(.red)
+                    .frame(width: geo.size.width * (playerState?.progress ?? 0), height: 2)
+            }
+            .frame(height: 2)
+        }
+        .clipShape(Capsule())
+        .shadow(color: .black.opacity(0.25), radius: 8, y: 4)
+    }
+    #endif
 
     // MARK: - Shared Components
 
