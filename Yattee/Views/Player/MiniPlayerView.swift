@@ -98,6 +98,16 @@ struct MiniPlayerView: View {
         }
     }
 
+    /// Closes the current video: stops playback, clears the queue, and dismisses
+    /// the expanded player (so the separate macOS player window is hidden too).
+    private func closeVideo() {
+        playerState?.isClosingVideo = true
+        queueManager?.clearQueue()
+        // Stop the player before dismissing the window so the backend is torn down first.
+        playerService?.stop()
+        navigationCoordinator?.isPlayerExpanded = false
+    }
+
     /// Expand player, restoring from PiP first if needed
     /// If PiP is active, stops PiP and waits for it to close before expanding
     private func expandPlayerWithPiPRestore() {
@@ -128,8 +138,7 @@ struct MiniPlayerView: View {
         .accessibilityIdentifier("player.miniPlayer")
         .accessibilityLabel("player.miniPlayer")
         .modifier(MiniPlayerContextMenuModifier(video: currentVideo) {
-            queueManager?.clearQueue()
-            playerService?.stop()
+            closeVideo()
         })
         .task {
             await loadMiniPlayerSettings()
@@ -487,8 +496,7 @@ struct MiniPlayerView: View {
 
     private var closeButton: some View {
         Button {
-            queueManager?.clearQueue()
-            playerService?.stop()
+            closeVideo()
         } label: {
             Image(systemName: "xmark")
                 .font(.subheadline)
