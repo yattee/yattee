@@ -93,9 +93,18 @@ struct ContentView: View {
             },
             set: { appEnvironment.navigationCoordinator.isPlayerExpanded = $0 }
         )) {
+            let size = expandedSheetSize(appEnvironment: appEnvironment)
             ExpandedPlayerSheet()
-                .frame(minWidth: 640, minHeight: 480)
+                // Only a floor — the content fills the sheet window so it tracks
+                // the window's animated resize with no gap. Do NOT pin an exact
+                // size here: a fixed frame snaps instantly while the window
+                // animates, exposing the window background as bars.
+                .frame(minWidth: 640, minHeight: 360)
                 .presentationSizing(.fitted)
+                // `.presentationSizing(.fitted)` only fits the sheet once, at
+                // presentation. Resize the backing window directly when the
+                // aspect-ratio-derived size changes so the sheet tracks the video.
+                .sheetWindowSize(size)
         }
         #elseif os(tvOS)
         .fullScreenCover(isPresented: Binding(
@@ -110,6 +119,22 @@ struct ContentView: View {
     #if os(macOS)
     private func presentExpandedPlayerWindow(appEnvironment: AppEnvironment) {
         ExpandedPlayerWindowManager.shared.show(with: appEnvironment, animated: true)
+    }
+
+    /// Size for the expanded-player sheet, derived from the current video aspect
+    /// ratio (when auto-resize is enabled) so the sheet re-fits like window mode.
+    /// Reading `videoAspectRatio` / `playerSheetAutoResize` here registers the
+    /// @Observable dependency that drives the re-fit.
+    private func expandedSheetSize(appEnvironment: AppEnvironment) -> CGSize {
+        let settings = appEnvironment.settingsManager
+        let aspect: Double
+        if settings.playerSheetAutoResize,
+           let ratio = appEnvironment.playerService.state.videoAspectRatio, ratio > 0 {
+            aspect = ratio
+        } else {
+            aspect = 16.0 / 9.0 // fixed default when auto-resize is off / not yet known
+        }
+        return ExpandedPlayerWindowManager.fittedSheetSize(for: aspect)
     }
     #endif
 

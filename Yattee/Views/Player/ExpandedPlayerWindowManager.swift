@@ -20,11 +20,11 @@ final class ExpandedPlayerWindowManager: NSObject {
     private weak var appEnvironment: AppEnvironment?
 
     // Configuration
-    private let minWidth: CGFloat = 640
-    private let minHeight: CGFloat = 360
-    private let maxScreenRatio: CGFloat = 0.7
-    private let targetVideoHeight: CGFloat = 720
-    private let defaultAspectRatio: Double = 16.0 / 9.0
+    private static let minWidth: CGFloat = 640
+    private static let minHeight: CGFloat = 360
+    private static let maxScreenRatio: CGFloat = 0.7
+    private static let targetVideoHeight: CGFloat = 720
+    private static let defaultAspectRatio: Double = 16.0 / 9.0
 
     var isPresented: Bool {
         playerWindow != nil
@@ -106,7 +106,7 @@ final class ExpandedPlayerWindowManager: NSObject {
 
         // Lock manual resize to the video aspect ratio. Seeded with 16:9 here;
         // updated as soon as the real video aspect ratio is known.
-        applyAspectRatioConstraint(defaultAspectRatio, to: window)
+        applyAspectRatioConstraint(Self.defaultAspectRatio, to: window)
 
         // Force the intended size. Assigning `contentViewController` above resizes
         // the window to the hosting controller's fitting size — and the lightweight
@@ -327,8 +327,8 @@ final class ExpandedPlayerWindowManager: NSObject {
         // Derive a minimum size that lies on the same ratio so the lower bound
         // doesn't force the window off-ratio (which would re-introduce bars).
         // Anchor on minHeight and scale width by aspect.
-        let derivedMinWidth = max(minHeight * CGFloat(aspectRatio), 320)
-        window.minSize = NSSize(width: derivedMinWidth, height: minHeight)
+        let derivedMinWidth = max(Self.minHeight * CGFloat(aspectRatio), 320)
+        window.minSize = NSSize(width: derivedMinWidth, height: Self.minHeight)
     }
 
     private func configureWindowLevel(_ window: NSWindow, floating: Bool) {
@@ -347,12 +347,12 @@ final class ExpandedPlayerWindowManager: NSObject {
         }
 
         let screenFrame = screen.visibleFrame
-        let maxWidth = screenFrame.width * maxScreenRatio
-        let maxHeight = screenFrame.height * maxScreenRatio
+        let maxWidth = screenFrame.width * Self.maxScreenRatio
+        let maxHeight = screenFrame.height * Self.maxScreenRatio
 
         // Start with 16:9 aspect ratio at target height
-        var width: CGFloat = targetVideoHeight * 16 / 9
-        var height: CGFloat = targetVideoHeight
+        var width: CGFloat = Self.targetVideoHeight * 16 / 9
+        var height: CGFloat = Self.targetVideoHeight
 
         // Scale down if needed
         if width > maxWidth {
@@ -364,10 +364,17 @@ final class ExpandedPlayerWindowManager: NSObject {
             width = height * 16 / 9
         }
 
-        return NSSize(width: max(width, minWidth), height: max(height, minHeight))
+        return NSSize(width: max(width, Self.minWidth), height: max(height, Self.minHeight))
     }
 
     private func calculateWindowSize(for aspectRatio: Double, screenFrame: NSRect) -> NSSize {
+        Self.fittedPlayerSize(for: aspectRatio, screenFrame: screenFrame)
+    }
+
+    /// Shared sizing math for both the standalone-window path and the sheet path.
+    /// Anchors on `targetVideoHeight`, derives width from the aspect ratio, then
+    /// clamps to `maxScreenRatio` of the screen and the minimum size.
+    static func fittedPlayerSize(for aspectRatio: Double, screenFrame: NSRect) -> NSSize {
         let maxWidth = screenFrame.width * maxScreenRatio
         let maxHeight = screenFrame.height * maxScreenRatio
 
@@ -395,6 +402,15 @@ final class ExpandedPlayerWindowManager: NSObject {
         height = max(height, minHeight)
 
         return NSSize(width: width, height: height)
+    }
+
+    /// Fitted sheet content size for a given aspect ratio, resolving the screen
+    /// internally so callers (e.g. `ContentView`) don't need AppKit. Returns a
+    /// plain `CGSize` (`NSSize == CGSize` on macOS).
+    static func fittedSheetSize(for aspectRatio: Double) -> CGSize {
+        let screenFrame = (NSScreen.main ?? NSScreen.screens.first)?.visibleFrame
+            ?? NSRect(x: 0, y: 0, width: 1280, height: 800)
+        return fittedPlayerSize(for: aspectRatio, screenFrame: screenFrame)
     }
 
     private func constrainToScreen(_ frame: NSRect, screen: NSScreen) -> NSRect {
@@ -485,6 +501,75 @@ private struct ExpandedPlayerWindowRoot: View {
             // player while the window is already visible.
             DispatchQueue.main.async { showFullPlayer = true }
         }
+    }
+}
+
+// MARK: - Sheet Window Resizer
+
+/// Resizes the hosting sheet's `NSWindow` to `targetSize` whenever it changes.
+///
+/// `.presentationSizing(.fitted)` only fits the sheet to its content once, at
+/// presentation time — it does not re-fit when the content's ideal size changes
+/// later (e.g. when the video aspect ratio is decoded). This reaches the sheet's
+/// backing window directly and resizes it, mirroring how the standalone window
+/// path drives `setFrame` in `resizeToFitAspectRatio`. It keeps the window
+/// horizontally centered and top-anchored so the sheet grows/shrinks the way an
+/// attached sheet naturally sits.
+struct SheetWindowResizer: NSViewRepresentable {
+    let targetSize: CGSize
+
+    func makeCoordinator() -> Coordinator { Coordinator() }
+
+    final class Coordinator {
+        var hasApplied = false
+    }
+
+    func makeNSView(context _: Context) -> NSView {
+        NSView(frame: .zero)
+    }
+
+    func updateNSView(_ nsView: NSView, context: Context) {
+        let target = targetSize
+        let coordinator = context.coordinator
+        // The window isn't attached during the same runloop tick as the SwiftUI
+        // update, so defer the resize until the view is in a window.
+        DispatchQueue.main.async {
+            guard target.width > 0, target.height > 0 else { return }
+            guard let window = nsView.window else { return }
+
+            // Paint the window/content black so that if the content ever lags the
+            // window frame mid-resize, the exposed area is black (matching the
+            // player background) rather than the system's light window color.
+            if window.backgroundColor != .black {
+                window.backgroundColor = .black
+                window.isOpaque = true
+            }
+
+            let current = window.frame
+            guard abs(current.width - target.width) > 1
+                || abs(current.height - target.height) > 1 else { return }
+
+            // Snap to the correct size the first time (no animation) so the sheet
+            // opens at the right aspect; animate later aspect-ratio changes.
+            let shouldAnimate = coordinator.hasApplied
+            coordinator.hasApplied = true
+
+            // Keep horizontally centered; anchor the top edge so the sheet grows
+            // downward (AppKit y-origin is bottom-left, so hold `maxY`).
+            let newOrigin = NSPoint(
+                x: current.midX - target.width / 2,
+                y: current.maxY - target.height
+            )
+            let newFrame = NSRect(origin: newOrigin, size: target)
+            window.setFrame(newFrame, display: true, animate: shouldAnimate)
+        }
+    }
+}
+
+extension View {
+    /// Resizes the hosting sheet window to `size` when it changes (macOS sheets).
+    func sheetWindowSize(_ size: CGSize) -> some View {
+        background(SheetWindowResizer(targetSize: size))
     }
 }
 #endif
