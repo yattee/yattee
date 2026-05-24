@@ -88,14 +88,7 @@ struct MediaBrowserViewOptionsSheet: View {
         .navigationBarTitleDisplayMode(.inline)
         #endif
         .toolbar {
-            ToolbarItem(placement: .confirmationAction) {
-                Button(role: .cancel) {
-                    dismiss()
-                } label: {
-                    Label(String(localized: "common.close"), systemImage: "xmark")
-                        .labelStyle(.iconOnly)
-                }
-            }
+            sheetCloseToolbarItem { dismiss() }
         }
     }
 }

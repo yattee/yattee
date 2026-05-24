@@ -89,22 +89,7 @@ struct PlaylistSelectorSheet: View {
             .navigationBarTitleDisplayMode(.inline)
             #endif
             .toolbar {
-                #if os(macOS)
-                ToolbarItem(placement: .cancellationAction) {
-                    Button(String(localized: "common.close"), role: .cancel) {
-                        dismiss()
-                    }
-                }
-                #else
-                ToolbarItem(placement: .confirmationAction) {
-                    Button(role: .cancel) {
-                        dismiss()
-                    } label: {
-                        Label(String(localized: "common.close"), systemImage: "xmark")
-                            .labelStyle(.iconOnly)
-                    }
-                }
-                #endif
+                sheetCloseToolbarItem { dismiss() }
             }
             #endif
             .sheet(isPresented: $showingNewPlaylist) {

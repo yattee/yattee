@@ -215,14 +215,7 @@ struct PeerTubeInstancesExploreView: View {
     @ToolbarContentBuilder
     private var toolbarContent: some ToolbarContent {
         #if !os(tvOS)
-        ToolbarItem(placement: .confirmationAction) {
-            Button(role: .cancel) {
-                dismiss()
-            } label: {
-                Label(String(localized: "common.close"), systemImage: "xmark")
-                    .labelStyle(.iconOnly)
-            }
-        }
+        sheetCloseToolbarItem { dismiss() }
         #endif
 
         ToolbarItem(placement: .primaryAction) {

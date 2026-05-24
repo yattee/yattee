@@ -1973,14 +1973,7 @@ struct VideoInfoView: View {
                 #endif
                 #if !os(tvOS)
                 .toolbar {
-                    ToolbarItem(placement: .confirmationAction) {
-                        Button(role: .cancel) {
-                            showingCommentsSheet = false
-                        } label: {
-                            Label(String(localized: "common.close"), systemImage: "xmark")
-                                .labelStyle(.iconOnly)
-                        }
-                    }
+                    sheetCloseToolbarItem { showingCommentsSheet = false }
                 }
                 #endif
             }

@@ -125,14 +125,7 @@ struct QueueManagementSheet: View {
                 ToolbarItem(placement: .cancellationAction) {
                     queueModeMenu
                 }
-                ToolbarItem(placement: .confirmationAction) {
-                    Button(role: .cancel) {
-                        performDismiss()
-                    } label: {
-                        Label(String(localized: "common.close"), systemImage: "xmark")
-                            .labelStyle(.iconOnly)
-                    }
-                }
+                sheetCloseToolbarItem { performDismiss() }
             }
         }
         .presentationDragIndicator(.visible)

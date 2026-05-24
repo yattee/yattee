@@ -187,14 +187,7 @@ struct TapGesturesSettingsView: View {
 
         TapZoneActionPicker(position: position, action: binding)
             .toolbar {
-                ToolbarItem(placement: .confirmationAction) {
-                    Button(role: .cancel) {
-                        selectedZonePosition = nil
-                    } label: {
-                        Label(String(localized: "common.close"), systemImage: "xmark")
-                            .labelStyle(.iconOnly)
-                    }
-                }
+                sheetCloseToolbarItem { selectedZonePosition = nil }
             }
     }
 

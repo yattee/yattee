@@ -24,14 +24,7 @@ struct RemoteDevicesSheet: View {
                     .frame(minWidth: 400, minHeight: 300)
                     #endif
                     .toolbar {
-                        ToolbarItem(placement: .confirmationAction) {
-                            Button(role: .cancel) {
-                                dismiss()
-                            } label: {
-                                Label(String(localized: "common.close"), systemImage: "xmark")
-                                    .labelStyle(.iconOnly)
-                            }
-                        }
+                        sheetCloseToolbarItem { dismiss() }
                     }
                     .navigationDestination(item: $selectedDevice) { device in
                         RemoteControlView(device: device)

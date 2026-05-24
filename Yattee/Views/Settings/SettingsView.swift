@@ -328,15 +328,7 @@ struct SettingsView: View {
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 if showCloseButton {
-                    ToolbarItem(placement: .confirmationAction) {
-                        Button(role: .cancel) {
-                            dismiss()
-                        } label: {
-                            Label(String(localized: "common.close"), systemImage: "xmark")
-                                .labelStyle(.iconOnly)
-                        }
-                        .accessibilityIdentifier("settings.doneButton")
-                    }
+                    sheetCloseToolbarItem(identifier: "settings.doneButton") { dismiss() }
                 }
             }
             .accessibilityIdentifier("settings.view")

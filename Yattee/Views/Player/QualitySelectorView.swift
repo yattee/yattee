@@ -276,14 +276,7 @@ struct QualitySelectorView: View {
         #endif
         #if !os(tvOS)
         .toolbar {
-            ToolbarItem(placement: .confirmationAction) {
-                Button(role: .cancel) {
-                    performDismiss()
-                } label: {
-                    Label(String(localized: "common.close"), systemImage: "xmark")
-                        .labelStyle(.iconOnly)
-                }
-            }
+            sheetCloseToolbarItem { performDismiss() }
         }
         #endif
         .navigationDestination(for: QualitySelectorDestination.self) { destination in
