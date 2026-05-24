@@ -180,8 +180,8 @@ struct MacOSControlBar: View {
             .disabled(isTransportDisabled)
             .opacity(isTransportDisabled ? 0.3 : 1.0)
 
-            // Play next (if queue has items)
-            if let onPlayNext, playerState.hasNext {
+            // Play next (disabled when no next in queue)
+            if let onPlayNext {
                 Button {
                     playNextTapCount += 1
                     Task { await onPlayNext() }
@@ -193,6 +193,7 @@ struct MacOSControlBar: View {
                         .symbolEffect(.bounce.down.byLayer, options: .nonRepeating, value: playNextTapCount)
                 }
                 .buttonStyle(MacOSControlButtonStyle())
+                .disabled(!playerState.hasNext)
             }
         }
     }
@@ -366,7 +367,7 @@ struct MacOSControlBar: View {
             }
 
             // PiP
-            if let onTogglePiP, playerState.isPiPPossible {
+            if let onTogglePiP {
                 Button {
                     onTogglePiP()
                 } label: {
@@ -376,6 +377,7 @@ struct MacOSControlBar: View {
                         .contentShape(Rectangle())
                 }
                 .buttonStyle(MacOSControlButtonStyle())
+                .disabled(!playerState.isPiPPossible)
             }
         }
     }
