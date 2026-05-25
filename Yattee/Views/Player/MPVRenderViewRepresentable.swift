@@ -184,10 +184,21 @@ private class MPVContainerNSView: NSView {
 
     override func viewWillMove(toSuperview newSuperview: NSView?) {
         super.viewWillMove(toSuperview: newSuperview)
-        // When being removed from superview, detach player view first
-        // This ensures proper cleanup order during window destruction
+        // When being removed from superview, detach the player view first for a clean
+        // teardown order during window destruction.
+        //
+        // The player view is a single SHARED instance (backend.playerView) that is
+        // re-parented between containers (mini bar ⇄ expanded sheet). When presenting
+        // the sheet, the new container attaches the shared view (AppKit auto-removes it
+        // from the old container) BEFORE this old container is torn down. So by the time
+        // we get here, `currentPlayerView` may already live in another container. Only
+        // remove it if it still actually belongs to us — otherwise we would rip the
+        // shared view out of its new home and blank the video (black screen on re-open,
+        // and a black mini-bar preview after collapse).
         if newSuperview == nil {
-            currentPlayerView?.removeFromSuperview()
+            if let playerView = currentPlayerView, playerView.superview === self {
+                playerView.removeFromSuperview()
+            }
             currentPlayerView = nil
             onDidMoveToWindow = nil
         }

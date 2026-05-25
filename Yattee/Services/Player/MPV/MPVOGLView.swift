@@ -170,6 +170,12 @@ final class MPVOGLView: NSView {
 
             // Update contents scale for new window
             videoLayer?.contentsScale = window.backingScaleFactor
+
+            // Reattaching (e.g. macOS player sheet dismissed via ESC then re-expanded)
+            // detaches this shared view without stopping playback. macOS drawing is
+            // pull-based, so force a redraw to repaint the current frame — otherwise
+            // the layer stays black until MPV emits a new frame (never, if paused).
+            resumeRendering()
         }
     }
 
