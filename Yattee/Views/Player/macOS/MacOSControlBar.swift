@@ -215,7 +215,7 @@ struct MacOSControlBar: View {
             } else {
                 // Current time
                 Text(playerState.formattedCurrentTime)
-                    .font(.system(size: 11, weight: .medium, design: .monospaced))
+                    .font(.system(size: 11, weight: .medium, design: .rounded).monospacedDigit())
                     .foregroundStyle(.primary)
                     .lineLimit(1)
                     .fixedSize()
@@ -225,7 +225,7 @@ struct MacOSControlBar: View {
 
                 // Duration
                 Text(playerState.formattedDuration)
-                    .font(.system(size: 11, weight: .medium, design: .monospaced))
+                    .font(.system(size: 11, weight: .medium, design: .rounded).monospacedDigit())
                     .foregroundStyle(.secondary)
                     .lineLimit(1)
                     .fixedSize()
