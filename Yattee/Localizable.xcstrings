@@ -4192,6 +4192,50 @@
         }
       }
     },
+    "home.settings.shortcuts.style" : {
+      "comment" : "Label for shortcuts card style picker in library settings",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Style"
+          }
+        }
+      }
+    },
+    "home.shortcuts.style.accent" : {
+      "comment" : "Accent card style option",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Accent"
+          }
+        }
+      }
+    },
+    "home.shortcuts.style.colorful" : {
+      "comment" : "Colorful card style option",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Colorful"
+          }
+        }
+      }
+    },
+    "home.shortcuts.style.plain" : {
+      "comment" : "Plain card style option",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Plain"
+          }
+        }
+      }
+    },
     "home.settings.sourceDisabled" : {
 
     },

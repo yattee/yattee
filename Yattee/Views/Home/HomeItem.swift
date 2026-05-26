@@ -30,6 +30,26 @@ enum HomeShortcutLayout: String, CaseIterable, Sendable {
     }
 }
 
+// MARK: - Home Shortcut Card Style
+
+/// Visual style for shortcut cards in the Home view (cards layout only).
+enum HomeShortcutCardStyle: String, CaseIterable, Sendable {
+    /// Current look: light accent tint background with an accent border.
+    case plain
+    /// Solid fill in the user's accent color, white icon/text.
+    case accent
+    /// Solid fill with a fixed color per shortcut type, white icon/text (Reminders-style).
+    case colorful
+
+    var displayName: LocalizedStringKey {
+        switch self {
+        case .plain: return "home.shortcuts.style.plain"
+        case .accent: return "home.shortcuts.style.accent"
+        case .colorful: return "home.shortcuts.style.colorful"
+        }
+    }
+}
+
 // MARK: - Home Section Layout
 
 /// Layout mode for the configurable home sections (Continue Watching, Feed, etc.).
@@ -188,6 +208,42 @@ enum HomeShortcutItem: Codable, Hashable, Identifiable, Sendable {
         case .mediaSource:
             return "Media Source"
         }
+    }
+
+    /// Fixed color for this shortcut used by the "colorful" card style.
+    /// Dynamic items (instance content / media sources) derive a stable color
+    /// from their identifier so multiple items get varied hues.
+    var cardColor: Color {
+        switch self {
+        case .openURL: return .blue
+        case .remoteControl: return .teal
+        case .playlists: return .indigo
+        case .bookmarks: return .pink
+        case .continueWatching: return .purple
+        case .history: return .orange
+        case .downloads: return .green
+        case .channels: return .red
+        case .subscriptions: return .cyan
+        case .mediaSources: return .brown
+        case .instanceContent(let instanceID, _):
+            return Self.colorfulPalette[Self.stableIndex(for: instanceID.uuidString, count: Self.colorfulPalette.count)]
+        case .mediaSource(let sourceID):
+            return Self.colorfulPalette[Self.stableIndex(for: sourceID.uuidString, count: Self.colorfulPalette.count)]
+        }
+    }
+
+    /// Palette used to assign stable colors to dynamic shortcut items.
+    private static let colorfulPalette: [Color] = [
+        .blue, .red, .orange, .pink, .teal, .green, .indigo, .purple, .cyan, .brown
+    ]
+
+    /// Deterministic (launch-stable) hash of a string into a palette index.
+    private static func stableIndex(for key: String, count: Int) -> Int {
+        var hash = 5381
+        for byte in key.utf8 {
+            hash = (hash &* 33) &+ Int(byte)
+        }
+        return abs(hash) % max(count, 1)
     }
 
     // MARK: - Codable Implementation

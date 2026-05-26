@@ -12,6 +12,7 @@ struct HomeSettingsView: View {
 
     // Local state for editing (copied from settings on appear, saved on dismiss)
     @State private var shortcutLayout: HomeShortcutLayout = .cards
+    @State private var shortcutCardStyle: HomeShortcutCardStyle = .plain
     @State private var shortcutOrder: [HomeShortcutItem] = []
     @State private var shortcutVisibility: [HomeShortcutItem: Bool] = [:]
     @State private var sectionOrder: [HomeSectionItem] = []
@@ -73,6 +74,15 @@ struct HomeSettingsView: View {
                 }
             }
             .pickerStyle(.segmented)
+
+            // Card style picker (Plain / Accent / Colorful) — only for cards layout
+            if shortcutLayout == .cards {
+                Picker(String(localized: "home.settings.shortcuts.style"), selection: $shortcutCardStyle) {
+                    ForEach(HomeShortcutCardStyle.allCases, id: \.self) { style in
+                        Text(style.displayName).tag(style)
+                    }
+                }
+            }
             #endif
 
             #if os(tvOS)
@@ -268,6 +278,7 @@ struct HomeSettingsView: View {
               let env = appEnvironment else { return }
 
         shortcutLayout = settings.homeShortcutLayout
+        shortcutCardStyle = settings.homeShortcutCardStyle
         shortcutOrder = settings.homeShortcutOrder
         shortcutVisibility = settings.homeShortcutVisibility
         sectionOrder = settings.homeSectionOrder
@@ -288,6 +299,7 @@ struct HomeSettingsView: View {
     private func saveSettings() {
         guard let settings = settingsManager else { return }
         settings.homeShortcutLayout = shortcutLayout
+        settings.homeShortcutCardStyle = shortcutCardStyle
         settings.homeShortcutOrder = shortcutOrder
         settings.homeShortcutVisibility = shortcutVisibility
         settings.homeSectionOrder = sectionOrder

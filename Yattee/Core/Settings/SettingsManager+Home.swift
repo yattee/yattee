@@ -95,6 +95,21 @@ extension SettingsManager {
         }
     }
 
+    /// Visual style for home shortcut cards (plain, accent-filled, or colorful). Default is plain.
+    var homeShortcutCardStyle: HomeShortcutCardStyle {
+        get {
+            if let cached = _homeShortcutCardStyle { return cached }
+            guard let rawValue = string(for: .homeShortcutCardStyle) else {
+                return .plain
+            }
+            return HomeShortcutCardStyle(rawValue: rawValue) ?? .plain
+        }
+        set {
+            _homeShortcutCardStyle = newValue
+            set(newValue.rawValue, for: .homeShortcutCardStyle)
+        }
+    }
+
     /// Layout mode for home sections (list or grid). Default is list on iOS/macOS, grid on tvOS.
     var homeSectionLayout: HomeSectionLayout {
         get {

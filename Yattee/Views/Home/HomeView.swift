@@ -485,7 +485,9 @@ struct HomeView: View {
                 icon: "link",
                 title: String(localized: "home.shortcut.openURL"),
                 count: 0,
-                subtitle: ""
+                subtitle: "",
+                showsCount: false,
+                colorfulColor: HomeShortcutItem.openURL.cardColor
             )
         }
         #if os(tvOS)
@@ -507,6 +509,8 @@ struct HomeView: View {
                 title: String(localized: "home.shortcut.remoteControl"),
                 count: discoveredDevicesCount,
                 subtitle: "",
+                showsCount: false,
+                colorfulColor: HomeShortcutItem.remoteControl.cardColor,
                 statusIndicator: Circle()
                     .fill(isHosting ? Color.green : Color.red)
                     .frame(width: 8, height: 8)
@@ -528,7 +532,8 @@ struct HomeView: View {
                 icon: "list.bullet.rectangle",
                 title: String(localized: "home.playlists.title"),
                 count: playlists.count,
-                subtitle: formatCount(playlists.count, singular: "home.count.playlist", plural: "home.count.playlists")
+                subtitle: formatCount(playlists.count, singular: "home.count.playlist", plural: "home.count.playlists"),
+                colorfulColor: HomeShortcutItem.playlists.cardColor
             )
         }
         #if os(tvOS)
@@ -547,7 +552,8 @@ struct HomeView: View {
                 icon: "bookmark",
                 title: String(localized: "home.bookmarks.title"),
                 count: bookmarksCount,
-                subtitle: formatCount(bookmarksCount, singular: "home.count.bookmark", plural: "home.count.bookmarks")
+                subtitle: formatCount(bookmarksCount, singular: "home.count.bookmark", plural: "home.count.bookmarks"),
+                colorfulColor: HomeShortcutItem.bookmarks.cardColor
             )
         }
         #if os(tvOS)
@@ -566,7 +572,8 @@ struct HomeView: View {
                 icon: "play.circle",
                 title: String(localized: "home.shortcut.continueWatching"),
                 count: continueWatchingCount,
-                subtitle: formatCount(continueWatchingCount, singular: "home.count.video", plural: "home.count.videos")
+                subtitle: formatCount(continueWatchingCount, singular: "home.count.video", plural: "home.count.videos"),
+                colorfulColor: HomeShortcutItem.continueWatching.cardColor
             )
         }
         #if os(tvOS)
@@ -585,7 +592,8 @@ struct HomeView: View {
                 icon: "clock",
                 title: String(localized: "home.history.title"),
                 count: historyCount,
-                subtitle: formatCount(historyCount, singular: "home.count.video", plural: "home.count.videos")
+                subtitle: formatCount(historyCount, singular: "home.count.video", plural: "home.count.videos"),
+                colorfulColor: HomeShortcutItem.history.cardColor
             )
         }
         #if os(tvOS)
@@ -606,7 +614,8 @@ struct HomeView: View {
                 icon: "arrow.down.circle",
                 title: String(localized: "home.downloads.title"),
                 count: count,
-                subtitle: formatCount(count, singular: "home.count.video", plural: "home.count.videos")
+                subtitle: formatCount(count, singular: "home.count.video", plural: "home.count.videos"),
+                colorfulColor: HomeShortcutItem.downloads.cardColor
             )
         }
         .buttonStyle(.plain)
@@ -622,7 +631,8 @@ struct HomeView: View {
                 icon: "person.2",
                 title: String(localized: "home.channels.title"),
                 count: channelsCount,
-                subtitle: formatCount(channelsCount, singular: "home.count.channel", plural: "home.count.channels")
+                subtitle: formatCount(channelsCount, singular: "home.count.channel", plural: "home.count.channels"),
+                colorfulColor: HomeShortcutItem.channels.cardColor
             )
         }
         #if os(tvOS)
@@ -641,7 +651,9 @@ struct HomeView: View {
                 icon: "play.square.stack",
                 title: String(localized: "home.subscriptions.title"),
                 count: 0,
-                subtitle: String(localized: "home.subscriptions.subtitle")
+                subtitle: String(localized: "home.subscriptions.subtitle"),
+                showsCount: false,
+                colorfulColor: HomeShortcutItem.subscriptions.cardColor
             )
         }
         #if os(tvOS)
@@ -663,7 +675,8 @@ struct HomeView: View {
                 icon: "externaldrive.connected.to.line.below",
                 title: "Sources",
                 count: count,
-                subtitle: count == 1 ? "1 source" : "\(count) sources"
+                subtitle: count == 1 ? "1 source" : "\(count) sources",
+                colorfulColor: HomeShortcutItem.mediaSources.cardColor
             )
         }
         #if os(tvOS)
@@ -686,7 +699,9 @@ struct HomeView: View {
                     icon: contentType.icon,
                     title: contentType.localizedTitle,
                     count: 0,
-                    subtitle: instance.displayName
+                    subtitle: instance.displayName,
+                    showsCount: false,
+                    colorfulColor: HomeShortcutItem.instanceContent(instanceID: instanceID, contentType: contentType).cardColor
                 )
             }
             #if os(tvOS)
@@ -709,7 +724,9 @@ struct HomeView: View {
                     icon: source.type.systemImage,
                     title: source.name,
                     count: 0,
-                    subtitle: source.type.displayName
+                    subtitle: source.type.displayName,
+                    showsCount: false,
+                    colorfulColor: HomeShortcutItem.mediaSource(sourceID: sourceID).cardColor
                 )
             }
             #if os(tvOS)
