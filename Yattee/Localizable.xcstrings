@@ -3674,6 +3674,17 @@
         }
       }
     },
+    "home.editShortcuts" : {
+      "comment" : "Context menu action on Home shortcuts to open Home settings",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Edit Shortcuts"
+          }
+        }
+      }
+    },
     "home.downloads.notAvailable" : {
       "comment" : "Downloads not available on tvOS",
       "localizations" : {

@@ -382,6 +382,9 @@ struct HomeView: View {
         return LazyVGrid(columns: columns, spacing: gridSpacing) {
             ForEach(settingsManager?.visibleShortcuts() ?? HomeShortcutItem.defaultOrder) { shortcut in
                 shortcutCardView(for: shortcut)
+                    #if !os(tvOS)
+                    .contextMenu { editShortcutsButton }
+                    #endif
             }
         }
         #if os(iOS)
@@ -404,8 +407,22 @@ struct HomeView: View {
             ) {
                 shortcutRowView(for: shortcut)
             }
+            #if !os(tvOS)
+            .contextMenu { editShortcutsButton }
+            #endif
         }
     }
+
+    #if !os(tvOS)
+    /// Context menu action that opens the Home settings sheet to reorder/toggle shortcuts.
+    private var editShortcutsButton: some View {
+        Button {
+            showingCustomizeHome = true
+        } label: {
+            Label(String(localized: "home.editShortcuts"), systemImage: "gear")
+        }
+    }
+    #endif
 
     @ViewBuilder
     private func shortcutCardView(for shortcut: HomeShortcutItem) -> some View {
