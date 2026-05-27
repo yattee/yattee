@@ -106,7 +106,7 @@ final class ExpandedPlayerWindowManager: NSObject {
 
         // Lock manual resize to the video aspect ratio. Seeded with 16:9 here;
         // updated as soon as the real video aspect ratio is known.
-        applyAspectRatioConstraint(Self.defaultAspectRatio, to: window)
+        Self.applyAspectRatioConstraint(Self.defaultAspectRatio, to: window)
 
         // Force the intended size. Assigning `contentViewController` above resizes
         // the window to the hosting controller's fitting size — and the lightweight
@@ -281,7 +281,7 @@ final class ExpandedPlayerWindowManager: NSObject {
         guard aspectRatio > 0 else { return }
 
         // Always update the aspect-ratio lock, even if we end up not resizing here.
-        applyAspectRatioConstraint(aspectRatio, to: window)
+        Self.applyAspectRatioConstraint(aspectRatio, to: window)
 
         // Get screen bounds
         guard let screen = window.screen ?? NSScreen.main else { return }
@@ -311,14 +311,16 @@ final class ExpandedPlayerWindowManager: NSObject {
     func lockAspectRatio(_ aspectRatio: Double) {
         guard let window = playerWindow else { return }
         guard aspectRatio > 0 else { return }
-        applyAspectRatioConstraint(aspectRatio, to: window)
+        Self.applyAspectRatioConstraint(aspectRatio, to: window)
     }
 
     // MARK: - Private Helpers
 
     /// Sets `contentAspectRatio` and a ratio-consistent `minSize` on the window
     /// so that interactive resize couples width and height proportionally.
-    private func applyAspectRatioConstraint(_ aspectRatio: Double, to window: NSWindow) {
+    /// Static so the inline-sheet path (`SheetWindowResizer`) can lock the sheet's
+    /// backing window to the same ratio the standalone window uses.
+    static func applyAspectRatioConstraint(_ aspectRatio: Double, to window: NSWindow) {
         guard aspectRatio > 0 else { return }
 
         // contentAspectRatio is expressed as a ratio; using (aspectRatio, 1) keeps it exact.
@@ -517,6 +519,10 @@ private struct ExpandedPlayerWindowRoot: View {
 /// attached sheet naturally sits.
 struct SheetWindowResizer: NSViewRepresentable {
     let targetSize: CGSize
+    /// Real video aspect ratio (width / height) to lock interactive resize to, or
+    /// `0` when unknown. Mirrors the standalone window's `contentAspectRatio` lock
+    /// so dragging the sheet edge keeps the video's ratio instead of adding bars.
+    let aspectRatio: Double
 
     func makeCoordinator() -> Coordinator { Coordinator() }
 
@@ -530,6 +536,7 @@ struct SheetWindowResizer: NSViewRepresentable {
 
     func updateNSView(_ nsView: NSView, context: Context) {
         let target = targetSize
+        let aspect = aspectRatio
         let coordinator = context.coordinator
         // The window isn't attached during the same runloop tick as the SwiftUI
         // update, so defer the resize until the view is in a window.
@@ -543,6 +550,13 @@ struct SheetWindowResizer: NSViewRepresentable {
             if window.backgroundColor != .black {
                 window.backgroundColor = .black
                 window.isOpaque = true
+            }
+
+            // Lock interactive resize to the video ratio so dragging the sheet's
+            // edge keeps the aspect (no black bars), matching the standalone
+            // window. Applied every pass so it tracks aspect-ratio changes.
+            if aspect > 0 {
+                ExpandedPlayerWindowManager.applyAspectRatioConstraint(aspect, to: window)
             }
 
             let current = window.frame
@@ -567,9 +581,11 @@ struct SheetWindowResizer: NSViewRepresentable {
 }
 
 extension View {
-    /// Resizes the hosting sheet window to `size` when it changes (macOS sheets).
-    func sheetWindowSize(_ size: CGSize) -> some View {
-        background(SheetWindowResizer(targetSize: size))
+    /// Resizes the hosting sheet window to `size` when it changes and locks its
+    /// interactive resize to `aspectRatio` (macOS sheets). Pass `aspectRatio == 0`
+    /// to leave resize unconstrained.
+    func sheetWindowSize(_ size: CGSize, aspectRatio: Double) -> some View {
+        background(SheetWindowResizer(targetSize: size, aspectRatio: aspectRatio))
     }
 }
 #endif

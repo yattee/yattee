@@ -94,6 +94,7 @@ struct ContentView: View {
             set: { appEnvironment.navigationCoordinator.isPlayerExpanded = $0 }
         )) {
             let size = expandedSheetSize(appEnvironment: appEnvironment)
+            let lockAspect = sheetLockAspectRatio(appEnvironment: appEnvironment)
             ExpandedPlayerSheet()
                 // Floor keeps the content flexible so it tracks the window's
                 // animated resize with no gap — do NOT pin an exact (max) size:
@@ -109,8 +110,9 @@ struct ContentView: View {
                 .presentationSizing(.fitted)
                 // `.presentationSizing(.fitted)` only fits the sheet once, at
                 // presentation. Resize the backing window directly when the
-                // aspect-ratio-derived size changes so the sheet tracks the video.
-                .sheetWindowSize(size)
+                // aspect-ratio-derived size changes so the sheet tracks the video,
+                // and lock interactive resize to the video ratio (no black bars).
+                .sheetWindowSize(size, aspectRatio: lockAspect)
         }
         #elseif os(tvOS)
         .fullScreenCover(isPresented: Binding(
@@ -141,6 +143,16 @@ struct ContentView: View {
             aspect = 16.0 / 9.0 // fixed default when auto-resize is off / not yet known
         }
         return ExpandedPlayerWindowManager.fittedSheetSize(for: aspect)
+    }
+
+    /// Real video aspect ratio to lock the sheet's interactive resize to, or `0`
+    /// when unknown. Unlike the sheet *size* (which honors `playerSheetAutoResize`),
+    /// the resize lock always follows the actual video ratio — mirroring the
+    /// standalone window, which locks unconditionally. Reading `videoAspectRatio`
+    /// here registers the @Observable dependency that keeps the lock in sync.
+    private func sheetLockAspectRatio(appEnvironment: AppEnvironment) -> Double {
+        let ratio = appEnvironment.playerService.state.videoAspectRatio ?? 0
+        return ratio > 0 ? ratio : 0
     }
     #endif
 
