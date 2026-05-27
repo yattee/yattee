@@ -95,11 +95,17 @@ struct ContentView: View {
         )) {
             let size = expandedSheetSize(appEnvironment: appEnvironment)
             ExpandedPlayerSheet()
-                // Only a floor — the content fills the sheet window so it tracks
-                // the window's animated resize with no gap. Do NOT pin an exact
-                // size here: a fixed frame snaps instantly while the window
-                // animates, exposing the window background as bars.
-                .frame(minWidth: 640, minHeight: 360)
+                // Floor keeps the content flexible so it tracks the window's
+                // animated resize with no gap — do NOT pin an exact (max) size:
+                // a fixed frame snaps instantly while the window animates,
+                // exposing the window background as bars. The ideal size makes
+                // `.presentationSizing(.fitted)` open the sheet at the correct
+                // aspect immediately when the video size is already known (e.g.
+                // re-opening while playing), avoiding a small-then-resize flash.
+                .frame(
+                    minWidth: 640, idealWidth: size.width,
+                    minHeight: 360, idealHeight: size.height
+                )
                 .presentationSizing(.fitted)
                 // `.presentationSizing(.fitted)` only fits the sheet once, at
                 // presentation. Resize the backing window directly when the
