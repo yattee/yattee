@@ -13,6 +13,8 @@ struct HomeSettingsView: View {
     // Local state for editing (copied from settings on appear, saved on dismiss)
     @State private var shortcutLayout: HomeShortcutLayout = .cards
     @State private var shortcutCardStyle: HomeShortcutCardStyle = .plain
+    @State private var shortcutColorfulPalette: HomeShortcutColorfulPalette = .classic
+    @State private var shortcutCustomPaletteColors: [String] = []
     @State private var shortcutOrder: [HomeShortcutItem] = []
     @State private var shortcutVisibility: [HomeShortcutItem: Bool] = [:]
     @State private var sectionOrder: [HomeSectionItem] = []
@@ -54,7 +56,11 @@ struct HomeSettingsView: View {
         #if os(macOS)
         .listStyle(.inset)
         .navigationDestination(isPresented: $showingStyleSettings) {
-            HomeShortcutStyleView(style: $shortcutCardStyle)
+            HomeShortcutStyleView(
+                style: $shortcutCardStyle,
+                palette: $shortcutColorfulPalette,
+                customColors: $shortcutCustomPaletteColors
+            )
         }
         #endif
         #if !os(tvOS)
@@ -111,7 +117,11 @@ struct HomeSettingsView: View {
                     systemImage: "paintpalette",
                     trailing: { Text(shortcutCardStyle.displayName) }
                 ) {
-                    HomeShortcutStyleView(style: $shortcutCardStyle)
+                    HomeShortcutStyleView(
+                        style: $shortcutCardStyle,
+                        palette: $shortcutColorfulPalette,
+                        customColors: $shortcutCustomPaletteColors
+                    )
                 }
                 #endif
             }
@@ -311,6 +321,8 @@ struct HomeSettingsView: View {
 
         shortcutLayout = settings.homeShortcutLayout
         shortcutCardStyle = settings.homeShortcutCardStyle
+        shortcutColorfulPalette = settings.homeShortcutColorfulPalette
+        shortcutCustomPaletteColors = settings.homeShortcutCustomPaletteColors
         shortcutOrder = settings.homeShortcutOrder
         shortcutVisibility = settings.homeShortcutVisibility
         sectionOrder = settings.homeSectionOrder
@@ -332,6 +344,8 @@ struct HomeSettingsView: View {
         guard let settings = settingsManager else { return }
         settings.homeShortcutLayout = shortcutLayout
         settings.homeShortcutCardStyle = shortcutCardStyle
+        settings.homeShortcutColorfulPalette = shortcutColorfulPalette
+        settings.homeShortcutCustomPaletteColors = shortcutCustomPaletteColors
         settings.homeShortcutOrder = shortcutOrder
         settings.homeShortcutVisibility = shortcutVisibility
         settings.homeSectionOrder = sectionOrder

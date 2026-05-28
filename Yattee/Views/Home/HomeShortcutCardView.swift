@@ -10,6 +10,8 @@ import SwiftUI
 struct HomeShortcutCardView<StatusIndicator: View>: View {
     @Environment(\.appEnvironment) private var appEnvironment
     @Environment(\.dynamicTypeSize) private var dynamicTypeSize
+    /// Position-resolved colorful color; when set it overrides `colorfulColor`.
+    @Environment(\.homeShortcutColorfulColor) private var positionColorfulColor
     #if os(tvOS)
     @Environment(\.isFocused) private var isFocused
     #endif
@@ -67,7 +69,7 @@ struct HomeShortcutCardView<StatusIndicator: View>: View {
     }
 
     private var fillColor: Color {
-        cardStyle == .colorful ? colorfulColor : accentColor
+        cardStyle == .colorful ? (positionColorfulColor ?? colorfulColor) : accentColor
     }
 
     private var iconColor: Color {

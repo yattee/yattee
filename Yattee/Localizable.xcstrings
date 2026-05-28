@@ -10,6 +10,9 @@
     "·" : {
 
     },
+    "#RRGGBB" : {
+
+    },
     "%@" : {
 
     },
@@ -3674,17 +3677,6 @@
         }
       }
     },
-    "home.editShortcuts" : {
-      "comment" : "Context menu action on Home shortcuts to open Home settings",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Edit Shortcuts"
-          }
-        }
-      }
-    },
     "home.downloads.notAvailable" : {
       "comment" : "Downloads not available on tvOS",
       "localizations" : {
@@ -3703,6 +3695,17 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Downloads"
+          }
+        }
+      }
+    },
+    "home.editShortcuts" : {
+      "comment" : "Context menu action on Home shortcuts to open Home settings",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Edit Shortcuts"
           }
         }
       }
@@ -4203,6 +4206,17 @@
         }
       }
     },
+    "home.settings.shortcuts.palette" : {
+      "comment" : "Label/header for the colorful palette picker",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Palette"
+          }
+        }
+      }
+    },
     "home.settings.shortcuts.style" : {
       "comment" : "Label for shortcuts card style picker in library settings",
       "localizations" : {
@@ -4221,39 +4235,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Preview"
-          }
-        }
-      }
-    },
-    "home.shortcuts.style.accent" : {
-      "comment" : "Accent card style option",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Accent"
-          }
-        }
-      }
-    },
-    "home.shortcuts.style.colorful" : {
-      "comment" : "Colorful card style option",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Colorful"
-          }
-        }
-      }
-    },
-    "home.shortcuts.style.plain" : {
-      "comment" : "Plain card style option",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Plain"
           }
         }
       }
@@ -4389,6 +4370,182 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "List"
+          }
+        }
+      }
+    },
+    "home.shortcuts.palette.berry" : {
+      "comment" : "Colorful palette name",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Berry"
+          }
+        }
+      }
+    },
+    "home.shortcuts.palette.classic" : {
+      "comment" : "Colorful palette name",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Classic"
+          }
+        }
+      }
+    },
+    "home.shortcuts.palette.custom" : {
+      "comment" : "Colorful palette name for the user-defined palette",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Custom"
+          }
+        }
+      }
+    },
+    "home.shortcuts.palette.custom.add" : {
+      "comment" : "Button to add a color to the custom palette",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Add Color"
+          }
+        }
+      }
+    },
+    "home.shortcuts.palette.custom.footer" : {
+      "comment" : "Footer explaining the custom palette editor",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Colors are applied to cards by position and repeat once the list runs out."
+          }
+        }
+      }
+    },
+    "home.shortcuts.palette.custom.header" : {
+      "comment" : "Header for the custom palette editor section",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Custom Colors"
+          }
+        }
+      }
+    },
+    "home.shortcuts.palette.custom.mode" : {
+      "comment" : "Accessibility label for the custom palette edit-mode picker",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Edit Mode"
+          }
+        }
+      }
+    },
+    "home.shortcuts.palette.custom.mode.list" : {
+      "comment" : "Custom palette edit mode: swatch list",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "List"
+          }
+        }
+      }
+    },
+    "home.shortcuts.palette.custom.mode.text" : {
+      "comment" : "Custom palette edit mode: raw text",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Text"
+          }
+        }
+      }
+    },
+    "home.shortcuts.palette.custom.placeholder" : {
+      "comment" : "Placeholder for the custom palette hex text field",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "#FF6B6B, #4D96FF, #6BCB77"
+          }
+        }
+      }
+    },
+    "home.shortcuts.palette.grape" : {
+      "comment" : "Colorful palette name",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Grape"
+          }
+        }
+      }
+    },
+    "home.shortcuts.palette.meadow" : {
+      "comment" : "Colorful palette name",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Meadow"
+          }
+        }
+      }
+    },
+    "home.shortcuts.palette.sunset" : {
+      "comment" : "Colorful palette name",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sunset"
+          }
+        }
+      }
+    },
+    "home.shortcuts.style.accent" : {
+      "comment" : "Accent card style option",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Accent"
+          }
+        }
+      }
+    },
+    "home.shortcuts.style.colorful" : {
+      "comment" : "Colorful card style option",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Colorful"
+          }
+        }
+      }
+    },
+    "home.shortcuts.style.plain" : {
+      "comment" : "Plain card style option",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Plain"
           }
         }
       }

@@ -109,6 +109,8 @@ final class SettingsManager {
     var _homeShortcutVisibility: [HomeShortcutItem: Bool]?
     var _homeShortcutLayout: HomeShortcutLayout?
     var _homeShortcutCardStyle: HomeShortcutCardStyle?
+    var _homeShortcutColorfulPalette: HomeShortcutColorfulPalette?
+    var _homeShortcutCustomPaletteColors: [String]?
     var _homeSectionOrder: [HomeSectionItem]?
     var _homeSectionVisibility: [HomeSectionItem: Bool]?
     var _homeSectionItemsLimit: Int?
@@ -465,6 +467,8 @@ final class SettingsManager {
         _homeShortcutVisibility = nil
         _homeShortcutLayout = nil
         _homeShortcutCardStyle = nil
+        _homeShortcutColorfulPalette = nil
+        _homeShortcutCustomPaletteColors = nil
         _homeSectionOrder = nil
         _homeSectionVisibility = nil
         _homeSectionItemsLimit = nil

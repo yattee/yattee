@@ -110,6 +110,40 @@ extension SettingsManager {
         }
     }
 
+    /// Palette used by the "colorful" card style. Colors are applied by grid
+    /// position. Default is Classic.
+    var homeShortcutColorfulPalette: HomeShortcutColorfulPalette {
+        get {
+            if let cached = _homeShortcutColorfulPalette { return cached }
+            guard let rawValue = string(for: .homeShortcutColorfulPalette) else {
+                return .classic
+            }
+            return HomeShortcutColorfulPalette(rawValue: rawValue) ?? .classic
+        }
+        set {
+            _homeShortcutColorfulPalette = newValue
+            set(newValue.rawValue, for: .homeShortcutColorfulPalette)
+        }
+    }
+
+    /// User-supplied hex colors for the custom "colorful" palette. Stored as a
+    /// single comma-separated string. Defaults to a starter set of colors.
+    var homeShortcutCustomPaletteColors: [String] {
+        get {
+            if let cached = _homeShortcutCustomPaletteColors { return cached }
+            guard let raw = string(for: .homeShortcutCustomPaletteColors) else {
+                return HomeShortcutColorfulPalette.customStarterColors
+            }
+            let colors = raw.split(separator: ",").map { $0.trimmingCharacters(in: .whitespaces) }.filter { !$0.isEmpty }
+            return colors
+        }
+        set {
+            _homeShortcutCustomPaletteColors = newValue
+            let joined = newValue.map { $0.trimmingCharacters(in: .whitespaces) }.filter { !$0.isEmpty }.joined(separator: ",")
+            set(joined, for: .homeShortcutCustomPaletteColors)
+        }
+    }
+
     /// Layout mode for home sections (list or grid). Default is list on iOS/macOS, grid on tvOS.
     var homeSectionLayout: HomeSectionLayout {
         get {

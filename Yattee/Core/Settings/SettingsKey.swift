@@ -65,6 +65,8 @@ enum SettingsKey: String, CaseIterable {
     case homeShortcutVisibility
     case homeShortcutLayout
     case homeShortcutCardStyle
+    case homeShortcutColorfulPalette
+    case homeShortcutCustomPaletteColors
     case homeSectionOrder
     case homeSectionVisibility
     case homeSectionItemsLimit
@@ -137,6 +139,7 @@ enum SettingsKey: String, CaseIterable {
         case .preferredQuality, .cellularQuality, .allowSoftwareDecodedFormats, .macPlayerMode, .listStyle,
              // Home layout — different UI paradigms per platform
              .homeShortcutOrder, .homeShortcutVisibility, .homeShortcutLayout, .homeShortcutCardStyle,
+             .homeShortcutColorfulPalette, .homeShortcutCustomPaletteColors,
              .homeSectionOrder, .homeSectionVisibility, .homeSectionItemsLimit, .homeSectionLayout,
              // Top Shelf — tvOS only
              .topShelfSections,

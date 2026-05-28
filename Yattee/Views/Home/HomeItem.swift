@@ -50,6 +50,67 @@ enum HomeShortcutCardStyle: String, CaseIterable, Sendable {
     }
 }
 
+// MARK: - Home Shortcut Colorful Palette
+
+/// Palette used by the "colorful" card style. Colors are applied by grid
+/// position (wrapping by palette length), so a card's color depends on where
+/// it sits, not on which shortcut it is.
+enum HomeShortcutColorfulPalette: String, CaseIterable, Sendable {
+    /// Default: reproduces the original per-position look (SwiftUI named colors).
+    case classic
+    case sunset
+    case meadow
+    case berry
+    case grape
+    /// User-supplied hex colors (stored in settings).
+    case custom
+
+    var displayName: LocalizedStringKey {
+        switch self {
+        case .classic: return "home.shortcuts.palette.classic"
+        case .sunset: return "home.shortcuts.palette.sunset"
+        case .meadow: return "home.shortcuts.palette.meadow"
+        case .berry: return "home.shortcuts.palette.berry"
+        case .grape: return "home.shortcuts.palette.grape"
+        case .custom: return "home.shortcuts.palette.custom"
+        }
+    }
+
+    /// Built-in colors for this palette; `nil` for `.custom` (resolved from
+    /// the user's stored hex list instead).
+    var builtInColors: [Color]? {
+        switch self {
+        case .classic:
+            // Ordered to match `HomeShortcutItem.defaultOrder` so the classic
+            // palette reproduces the app's original colorful appearance.
+            return [.blue, .teal, .indigo, .pink, .purple, .orange, .green, .red, .cyan, .brown]
+        case .sunset:
+            return ["#FF6B6B", "#F06595", "#CC5DE8", "#845EF7", "#FFA94D"].compactMap { Color(hex: $0) }
+        case .meadow:
+            return ["#2B8A3E", "#37B24D", "#66A80F", "#099268", "#0CA678"].compactMap { Color(hex: $0) }
+        case .berry:
+            return ["#E64980", "#C2255C", "#A61E4D", "#862E9C", "#5F3DC4"].compactMap { Color(hex: $0) }
+        case .grape:
+            return ["#7048E8", "#9C36B5", "#C2255C", "#E8590C", "#F08C00"].compactMap { Color(hex: $0) }
+        case .custom:
+            return nil
+        }
+    }
+
+    /// Starter hex colors used to seed a new custom palette.
+    static let customStarterColors = ["#007AFF", "#30B0C7", "#5856D6", "#FF2D55", "#AF52DE"]
+
+    /// Resolves the color for a shortcut at `position` in the grid, wrapping by
+    /// palette length. Falls back to the Classic palette if the selection yields
+    /// no usable colors (e.g. an empty or all-invalid custom list).
+    static func color(forPosition position: Int, palette: HomeShortcutColorfulPalette, customHex: [String]) -> Color {
+        let colors = palette == .custom ? customHex.compactMap { Color(hex: $0) } : (palette.builtInColors ?? [])
+        let usable = colors.isEmpty ? (classic.builtInColors ?? [.accentColor]) : colors
+        guard !usable.isEmpty else { return .accentColor }
+        return usable[position % usable.count]
+    }
+}
+
 // MARK: - Home Section Layout
 
 /// Layout mode for the configurable home sections (Continue Watching, Feed, etc.).

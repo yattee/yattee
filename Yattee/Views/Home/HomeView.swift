@@ -379,9 +379,12 @@ struct HomeView: View {
         let gridSpacing: CGFloat = 16
         #endif
 
+        let shortcuts = settingsManager?.visibleShortcuts() ?? HomeShortcutItem.defaultOrder
+
         return LazyVGrid(columns: columns, spacing: gridSpacing) {
-            ForEach(settingsManager?.visibleShortcuts() ?? HomeShortcutItem.defaultOrder) { shortcut in
+            ForEach(Array(shortcuts.enumerated()), id: \.element.id) { index, shortcut in
                 shortcutCardView(for: shortcut)
+                    .environment(\.homeShortcutColorfulColor, colorfulColor(atPosition: index))
                     #if !os(tvOS)
                     .contextMenu { editShortcutsButton }
                     #endif
@@ -394,6 +397,14 @@ struct HomeView: View {
         // geometry calculations from the parent collection view's layout system.
         .geometryGroup()
         #endif
+    }
+
+    /// Resolves the colorful-style color for a shortcut at the given grid
+    /// position from the selected palette (and custom colors when applicable).
+    private func colorfulColor(atPosition position: Int) -> Color {
+        let palette = settingsManager?.homeShortcutColorfulPalette ?? .classic
+        let customHex = settingsManager?.homeShortcutCustomPaletteColors ?? []
+        return HomeShortcutColorfulPalette.color(forPosition: position, palette: palette, customHex: customHex)
     }
 
     private var shortcutsList: some View {
