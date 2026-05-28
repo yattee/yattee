@@ -4214,6 +4214,17 @@
         }
       }
     },
+    "home.settings.shortcuts.style.preview" : {
+      "comment" : "Header for the shortcut style preview section",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Preview"
+          }
+        }
+      }
+    },
     "home.shortcuts.style.accent" : {
       "comment" : "Accent card style option",
       "localizations" : {

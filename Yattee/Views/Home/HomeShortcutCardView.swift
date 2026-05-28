@@ -27,6 +27,9 @@ struct HomeShortcutCardView<StatusIndicator: View>: View {
     var showsCount: Bool
     /// Fixed color used when the "colorful" card style is active.
     var colorfulColor: Color
+    /// Explicit style override. When set, takes precedence over the global
+    /// setting — used to render live previews of a not-yet-saved style.
+    var styleOverride: HomeShortcutCardStyle?
     var statusIndicator: StatusIndicator?
 
     init(
@@ -36,6 +39,7 @@ struct HomeShortcutCardView<StatusIndicator: View>: View {
         subtitle: String,
         showsCount: Bool = true,
         colorfulColor: Color = .accentColor,
+        styleOverride: HomeShortcutCardStyle? = nil,
         statusIndicator: StatusIndicator?
     ) {
         self.icon = icon
@@ -44,6 +48,7 @@ struct HomeShortcutCardView<StatusIndicator: View>: View {
         self.subtitle = subtitle
         self.showsCount = showsCount
         self.colorfulColor = colorfulColor
+        self.styleOverride = styleOverride
         self.statusIndicator = statusIndicator
     }
 
@@ -53,7 +58,7 @@ struct HomeShortcutCardView<StatusIndicator: View>: View {
         #if os(tvOS)
         return .plain
         #else
-        return appEnvironment?.settingsManager.homeShortcutCardStyle ?? .plain
+        return styleOverride ?? (appEnvironment?.settingsManager.homeShortcutCardStyle ?? .plain)
         #endif
     }
 
@@ -296,7 +301,8 @@ extension HomeShortcutCardView where StatusIndicator == EmptyView {
         count: Int,
         subtitle: String,
         showsCount: Bool = true,
-        colorfulColor: Color = .accentColor
+        colorfulColor: Color = .accentColor,
+        styleOverride: HomeShortcutCardStyle? = nil
     ) {
         self.icon = icon
         self.title = title
@@ -304,6 +310,7 @@ extension HomeShortcutCardView where StatusIndicator == EmptyView {
         self.subtitle = subtitle
         self.showsCount = showsCount
         self.colorfulColor = colorfulColor
+        self.styleOverride = styleOverride
         self.statusIndicator = nil
     }
 }

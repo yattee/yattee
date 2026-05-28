@@ -29,6 +29,13 @@ struct HomeSettingsView: View {
     // Edit mode for delete functionality
     @State private var isEditMode = false
 
+    #if os(macOS)
+    // macOS: drive the style page programmatically. A List-embedded NavigationLink
+    // gets stuck in the selected (blue) state after popping back and can't be
+    // re-activated, so navigate via navigationDestination(isPresented:) instead.
+    @State private var showingStyleSettings = false
+    #endif
+
     private var settingsManager: SettingsManager? { appEnvironment?.settingsManager }
 
     var body: some View {
@@ -46,6 +53,9 @@ struct HomeSettingsView: View {
         #endif
         #if os(macOS)
         .listStyle(.inset)
+        .navigationDestination(isPresented: $showingStyleSettings) {
+            HomeShortcutStyleView(style: $shortcutCardStyle)
+        }
         #endif
         #if !os(tvOS)
         .navigationTitle(String(localized: "home.settings.title"))
@@ -75,13 +85,35 @@ struct HomeSettingsView: View {
             }
             .pickerStyle(.segmented)
 
-            // Card style picker (Plain / Accent / Colorful) — only for cards layout
+            // Card style (Plain / Accent / Colorful) — navigates to a page with
+            // a selector and a live preview. Only for cards layout.
             if shortcutLayout == .cards {
-                Picker(String(localized: "home.settings.shortcuts.style"), selection: $shortcutCardStyle) {
-                    ForEach(HomeShortcutCardStyle.allCases, id: \.self) { style in
-                        Text(style.displayName).tag(style)
+                #if os(macOS)
+                Button {
+                    showingStyleSettings = true
+                } label: {
+                    HStack(spacing: 8) {
+                        Label(String(localized: "home.settings.shortcuts.style"), systemImage: "paintpalette")
+                        Spacer()
+                        Text(shortcutCardStyle.displayName)
+                            .foregroundStyle(.secondary)
+                        Image(systemName: "chevron.right")
+                            .font(.caption)
+                            .foregroundStyle(.tertiary)
                     }
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .contentShape(Rectangle())
                 }
+                .buttonStyle(.plain)
+                #else
+                SettingsNavigationRow(
+                    "home.settings.shortcuts.style",
+                    systemImage: "paintpalette",
+                    trailing: { Text(shortcutCardStyle.displayName) }
+                ) {
+                    HomeShortcutStyleView(style: $shortcutCardStyle)
+                }
+                #endif
             }
             #endif
 
