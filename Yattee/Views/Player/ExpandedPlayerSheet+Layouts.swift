@@ -1591,7 +1591,11 @@ extension ExpandedPlayerSheet {
                     },
                     onShowQueue: { [self] in
                         showingQueueSheet = true
-                    }
+                    },
+                    onTitleTap: {
+                        onTogglePanel()
+                    },
+                    isDetailsPanelVisible: isPanelVisible
                 )
                 .frame(width: availableWidth, height: availableHeight)
                 .offset(x: controlsOffset)

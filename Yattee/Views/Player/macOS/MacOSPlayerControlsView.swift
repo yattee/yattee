@@ -32,6 +32,11 @@ struct MacOSPlayerControlsView: View {
     var onMuteToggled: (() -> Void)? = nil
     var onShowSettings: (() -> Void)? = nil
     var onShowQueue: (() -> Void)? = nil
+    /// Tapping the avatar / title / author in the top bar toggles the video details panel.
+    var onTitleTap: (() -> Void)? = nil
+    /// Whether the floating video details panel is currently visible. When it opens,
+    /// the controls hide immediately instead of waiting for the auto-hide timer.
+    var isDetailsPanelVisible: Bool = false
 
     // MARK: - State
 
@@ -40,6 +45,12 @@ struct MacOSPlayerControlsView: View {
     @State private var isInteracting = false
     @State private var showControls: Bool?
     @State private var keyboardMonitor: Any?
+
+    /// Extra top inset for the top bar so its content drops below the window's
+    /// traffic-light buttons in the separate/floating window presentation, while
+    /// keeping the avatar/title aligned to the leading edge.
+    /// Stays 0 when there is no overlap (inline sheet, side panel, fullscreen).
+    @State private var trafficLightInset: CGFloat = 0
 
     // MARK: - Computed Properties
 
@@ -59,6 +70,80 @@ struct MacOSPlayerControlsView: View {
                playerState.isFailed
     }
 
+    /// Yattee Server URL used by `ChannelAvatarView` for avatar fallback.
+    private var yatteeServerURL: URL? {
+        appEnvironment?.instancesManager.yatteeServerInstances.first { $0.isEnabled }?.url
+    }
+
+    // MARK: - Top Bar
+
+    /// Top row showing channel avatar, video title, author name, and a close button.
+    /// Mirrors the tvOS `topBar`, scaled down for macOS.
+    private var topBar: some View {
+        HStack(alignment: .center, spacing: 12) {
+            if let video = playerState.currentVideo {
+                Button {
+                    onTitleTap?()
+                } label: {
+                    HStack(alignment: .center, spacing: 12) {
+                        ChannelAvatarView(
+                            author: video.author,
+                            size: 36,
+                            yatteeServerURL: yatteeServerURL,
+                            source: video.id.source
+                        )
+
+                        VStack(alignment: .leading, spacing: 2) {
+                            Text(video.title)
+                                .font(.headline)
+                                .lineLimit(1)
+                                .foregroundStyle(.white)
+                            Text(video.author.name)
+                                .font(.subheadline)
+                                .foregroundStyle(.white.opacity(0.7))
+                                .lineLimit(1)
+                        }
+                    }
+                    .contentShape(Rectangle())
+                }
+                .buttonStyle(.plain)
+                .disabled(onTitleTap == nil)
+                .help(Text("player.controls.info"))
+            }
+
+            Spacer(minLength: 12)
+
+            if onClose != nil {
+                Button {
+                    onClose?()
+                } label: {
+                    Image(systemName: "xmark")
+                        .font(.system(size: 15, weight: .semibold))
+                        .foregroundStyle(.white)
+                        .frame(width: 30, height: 30)
+                        .background(.ultraThinMaterial, in: Circle())
+                }
+                .buttonStyle(.plain)
+                .accessibilityLabel(Text("player.controls.close"))
+            }
+        }
+        .padding(.horizontal, 20)
+        .padding(.top, 16 + trafficLightInset)
+        .padding(.bottom, 24)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(
+            LinearGradient(
+                colors: [.black.opacity(0.55), .clear],
+                startPoint: .top, endPoint: .bottom
+            )
+            .allowsHitTesting(false)
+        )
+        .background(
+            TrafficLightInsetReader(inset: $trafficLightInset)
+                .allowsHitTesting(false)
+        )
+    }
+
     // MARK: - Body
 
     var body: some View {
@@ -72,8 +157,10 @@ struct MacOSPlayerControlsView: View {
                     }
                     .allowsHitTesting(playerState.playbackState != .ended && !playerState.isFailed)
 
-                // Control bar at bottom center
-                VStack {
+                // Top bar (title/author/avatar/close) + control bar at bottom center
+                VStack(spacing: 0) {
+                    topBar
+
                     Spacer()
 
                     MacOSControlBar(
@@ -109,8 +196,8 @@ struct MacOSPlayerControlsView: View {
                         }
                     )
                     .frame(width: 650)
+                    .padding(.bottom, 20)
                 }
-                .padding(.bottom, 20)
                 .opacity(shouldShowControls ? 1 : 0)
                 .allowsHitTesting(shouldShowControls)
             }
@@ -125,6 +212,16 @@ struct MacOSPlayerControlsView: View {
             case .ended:
                 isHovering = false
                 startHideTimer()
+            }
+        }
+        .onChange(of: isDetailsPanelVisible) { _, isVisible in
+            if isVisible {
+                // Hide controls immediately when the details panel opens.
+                showControls = false
+                cancelHideTimer()
+            } else {
+                // Restore default hover/paused-driven visibility when it closes.
+                showControls = nil
             }
         }
         .onChange(of: playerState.playbackState) { oldState, newState in
@@ -239,6 +336,116 @@ struct MacOSPlayerControlsView: View {
     private func cancelHideTimer() {
         hideTimer?.invalidate()
         hideTimer = nil
+    }
+}
+
+// MARK: - Traffic Light Inset Reader
+
+/// Reports how far the top bar's leading content must be pushed to clear the
+/// hosting window's traffic-light buttons (close/minimize/zoom).
+///
+/// Returns 0 whenever the buttons don't actually overlap this view — e.g. in
+/// fullscreen (buttons hidden), or when the controls render inside the inline
+/// sheet / side panel where the top bar sits below the window's titlebar.
+private struct TrafficLightInsetReader: NSViewRepresentable {
+    @Binding var inset: CGFloat
+
+    func makeNSView(context: Context) -> ReaderView {
+        let view = ReaderView()
+        view.onUpdate = { newInset in
+            if inset != newInset { inset = newInset }
+        }
+        return view
+    }
+
+    func updateNSView(_ nsView: ReaderView, context: Context) {
+        nsView.onUpdate = { newInset in
+            if inset != newInset { inset = newInset }
+        }
+        DispatchQueue.main.async { nsView.recompute() }
+    }
+
+    final class ReaderView: NSView {
+        var onUpdate: ((CGFloat) -> Void)?
+        private var observers: [NSObjectProtocol] = []
+
+        override func viewDidMoveToWindow() {
+            super.viewDidMoveToWindow()
+            removeObservers()
+            postsFrameChangedNotifications = true
+
+            guard let window else {
+                onUpdate?(0)
+                return
+            }
+
+            let center = NotificationCenter.default
+            let names: [NSNotification.Name] = [
+                NSWindow.didEnterFullScreenNotification,
+                NSWindow.didExitFullScreenNotification,
+                NSWindow.didResizeNotification,
+                NSWindow.didBecomeKeyNotification
+            ]
+            for name in names {
+                observers.append(center.addObserver(forName: name, object: window, queue: .main) { [weak self] _ in
+                    self?.recompute()
+                })
+            }
+            observers.append(center.addObserver(forName: NSView.frameDidChangeNotification, object: self, queue: .main) { [weak self] _ in
+                self?.recompute()
+            })
+
+            recompute()
+        }
+
+        func recompute() {
+            guard let window,
+                  !window.styleMask.contains(.fullScreen) else {
+                onUpdate?(0)
+                return
+            }
+
+            let buttons = [
+                window.standardWindowButton(.closeButton),
+                window.standardWindowButton(.miniaturizeButton),
+                window.standardWindowButton(.zoomButton)
+            ].compactMap { $0 }.filter { !$0.isHidden && $0.superview != nil }
+
+            guard !buttons.isEmpty else {
+                onUpdate?(0)
+                return
+            }
+
+            // Union of the traffic lights and this view, both in window base coords.
+            let buttonsRect = buttons
+                .map { $0.convert($0.bounds, to: nil) }
+                .reduce(NSRect.null) { $0.union($1) }
+            let selfRect = convert(bounds, to: nil)
+
+            // Only inset when the buttons actually sit over this view.
+            guard selfRect.intersects(buttonsRect) else {
+                onUpdate?(0)
+                return
+            }
+
+            // Window base coords have a bottom-left origin (Y grows upward), so the
+            // buttons' bottom edge is `buttonsRect.minY` and this view's top edge is
+            // `selfRect.maxY`. Drop the content from its top edge down to just below
+            // the buttons, keeping it aligned to the leading edge.
+            let overlap = selfRect.maxY - buttonsRect.minY
+            onUpdate?(max(0, overlap + 8))
+        }
+
+        private func removeObservers() {
+            for observer in observers {
+                NotificationCenter.default.removeObserver(observer)
+            }
+            observers.removeAll()
+        }
+
+        deinit {
+            removeObservers()
+        }
     }
 }
 
