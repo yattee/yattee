@@ -19,6 +19,12 @@ final class ExpandedPlayerWindowManager: NSObject {
     private var playerWindow: NSWindow?
     private weak var appEnvironment: AppEnvironment?
 
+    /// Whether the window has performed its first size application since being
+    /// shown. The first resize after each open snaps (no animation) so the player
+    /// appears at its final fixed layout; later resizes (e.g. switching to a
+    /// different-aspect video while the window stays open) animate normally.
+    private var hasCompletedInitialSizing = false
+
     // Configuration
     private static let minWidth: CGFloat = 640
     private static let minHeight: CGFloat = 360
@@ -77,6 +83,13 @@ final class ExpandedPlayerWindowManager: NSObject {
         let playerView = ExpandedPlayerWindowRoot()
             .appEnvironment(appEnvironment)
 
+        // Open at the real video aspect ratio when it's already known (e.g.
+        // expanding a video already playing in the mini bar) so the window appears
+        // at its final size with no snap-jump. Falls back to 16:9 when the ratio
+        // isn't decoded yet; the first-resize snap below removes any later grow.
+        let knownAspect = appEnvironment.playerService.state.videoAspectRatio ?? 0
+        let seedAspect = knownAspect > 0 ? knownAspect : Self.defaultAspectRatio
+
         // Create hosting controller
         let hostingController = NSHostingController(rootView: playerView)
         // Don't let the hosting controller drive the window size from the SwiftUI
@@ -86,8 +99,8 @@ final class ExpandedPlayerWindowManager: NSObject {
         // below and `resizeToFitAspectRatio` once the real video ratio is known.
         hostingController.sizingOptions = []
 
-        // Calculate initial window size
-        let initialSize = calculateInitialWindowSize()
+        // Calculate initial window size at the seeded aspect ratio
+        let initialSize = calculateInitialWindowSize(aspectRatio: seedAspect)
 
         // Create window with appropriate style
         let window = NSWindow(
@@ -104,9 +117,9 @@ final class ExpandedPlayerWindowManager: NSObject {
         window.backgroundColor = NSColor.windowBackgroundColor
         window.contentViewController = hostingController
 
-        // Lock manual resize to the video aspect ratio. Seeded with 16:9 here;
-        // updated as soon as the real video aspect ratio is known.
-        Self.applyAspectRatioConstraint(Self.defaultAspectRatio, to: window)
+        // Lock manual resize to the video aspect ratio. Seeded with the real ratio
+        // when known (else 16:9); updated as soon as the real ratio is known.
+        Self.applyAspectRatioConstraint(seedAspect, to: window)
 
         // Force the intended size. Assigning `contentViewController` above resizes
         // the window to the hosting controller's fitting size — and the lightweight
@@ -128,6 +141,10 @@ final class ExpandedPlayerWindowManager: NSObject {
 
         // Store reference
         self.playerWindow = window
+
+        // Fresh window: the next resize is the initial sizing and must snap
+        // (no animation) so the player appears at its final fixed layout.
+        hasCompletedInitialSizing = false
 
         // Show window
         if animated {
@@ -301,8 +318,21 @@ final class ExpandedPlayerWindowManager: NSObject {
         // Ensure frame stays on screen
         let adjustedFrame = constrainToScreen(newFrame, screen: screen)
 
+        // The first resize after each open snaps regardless of the requested
+        // animation, so the player appears at its final fixed layout instead of
+        // animating (the video/controls track the window's live size). Later
+        // resizes — e.g. switching to a different-aspect video while the window
+        // stays open — honor `animated`.
+        let effectiveAnimated = animated && hasCompletedInitialSizing
+        hasCompletedInitialSizing = true
+
+        LoggingService.shared.debug(
+            "resizeToFitAspectRatio aspect=\(aspectRatio) requested=\(animated) effective=\(effectiveAnimated) from=\(window.frame.size) to=\(adjustedFrame.size)",
+            category: .player
+        )
+
         // Apply the new frame
-        window.setFrame(adjustedFrame, display: true, animate: animated)
+        window.setFrame(adjustedFrame, display: true, animate: effectiveAnimated)
     }
 
     /// Locks the window's resize behavior to the given aspect ratio without
@@ -343,30 +373,18 @@ final class ExpandedPlayerWindowManager: NSObject {
         }
     }
 
-    private func calculateInitialWindowSize() -> NSSize {
+    /// Initial window size for a given aspect ratio. Delegates to the shared
+    /// `fittedPlayerSize` so the opening size and the later aspect-fitted size use
+    /// identical math (no mismatch → no grow when the two are compared).
+    private func calculateInitialWindowSize(aspectRatio: Double) -> NSSize {
+        let ratio = aspectRatio > 0 ? aspectRatio : Self.defaultAspectRatio
         guard let screen = NSScreen.main else {
-            return NSSize(width: 1280, height: 720)
+            return Self.fittedPlayerSize(
+                for: ratio,
+                screenFrame: NSRect(x: 0, y: 0, width: 1280, height: 720)
+            )
         }
-
-        let screenFrame = screen.visibleFrame
-        let maxWidth = screenFrame.width * Self.maxScreenRatio
-        let maxHeight = screenFrame.height * Self.maxScreenRatio
-
-        // Start with 16:9 aspect ratio at target height
-        var width: CGFloat = Self.targetVideoHeight * 16 / 9
-        var height: CGFloat = Self.targetVideoHeight
-
-        // Scale down if needed
-        if width > maxWidth {
-            width = maxWidth
-            height = width * 9 / 16
-        }
-        if height > maxHeight {
-            height = maxHeight
-            width = height * 16 / 9
-        }
-
-        return NSSize(width: max(width, Self.minWidth), height: max(height, Self.minHeight))
+        return Self.fittedPlayerSize(for: ratio, screenFrame: screen.visibleFrame)
     }
 
     private func calculateWindowSize(for aspectRatio: Double, screenFrame: NSRect) -> NSSize {
