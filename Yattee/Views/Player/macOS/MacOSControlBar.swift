@@ -58,6 +58,11 @@ struct MacOSControlBar: View {
         playerState.isTransportDisabled
     }
 
+    /// Whether the controls are locked (playback buttons/gestures disabled except Settings).
+    private var isLocked: Bool {
+        playerState.isControlsLocked
+    }
+
     private var playPauseIcon: String {
         switch playerState.playbackState {
         case .playing:
@@ -133,11 +138,15 @@ struct MacOSControlBar: View {
         HStack(spacing: 0) {
             // Left: Volume controls
             volumeControls
+                .disabled(isLocked)
+                .opacity(isLocked ? 0.5 : 1.0)
 
             Spacer()
 
             // Center: Transport controls
             transportControls
+                .disabled(isLocked)
+                .opacity(isLocked ? 0.5 : 1.0)
 
             Spacer()
 
@@ -264,6 +273,7 @@ struct MacOSControlBar: View {
             .gesture(
                 DragGesture(minimumDistance: 0)
                     .onChanged { value in
+                        guard !isLocked else { return }
                         if !isDragging {
                             isDragging = true
                             onInteractionStarted?()
@@ -272,6 +282,7 @@ struct MacOSControlBar: View {
                         dragProgress = progress
                     }
                     .onEnded { value in
+                        guard !isLocked else { return }
                         isDragging = false
                         let progress = max(0, min(1, value.location.x / geometry.size.width))
                         let seekTime = progress * playerState.duration
@@ -288,8 +299,10 @@ struct MacOSControlBar: View {
                     isHoveringProgress = false
                 }
             }
+            .allowsHitTesting(!isLocked)
         }
         .frame(height: 20)
+        .opacity(isLocked ? 0.5 : 1.0)
     }
 
     private func seekPreviewPosition(
@@ -338,6 +351,8 @@ struct MacOSControlBar: View {
                         .contentShape(Rectangle())
                 }
                 .buttonStyle(MacOSControlButtonStyle())
+                .disabled(isLocked)
+                .opacity(isLocked ? 0.5 : 1.0)
             }
 
             // More (context menu)
@@ -351,6 +366,8 @@ struct MacOSControlBar: View {
                 )
                 .menuStyle(.borderlessButton)
                 .fixedSize()
+                .disabled(isLocked)
+                .opacity(isLocked ? 0.5 : 1.0)
             }
 
             // Settings
@@ -377,7 +394,8 @@ struct MacOSControlBar: View {
                         .contentShape(Rectangle())
                 }
                 .buttonStyle(MacOSControlButtonStyle())
-                .disabled(!playerState.isPiPPossible)
+                .disabled(isLocked || !playerState.isPiPPossible)
+                .opacity(isLocked ? 0.5 : 1.0)
             }
         }
     }

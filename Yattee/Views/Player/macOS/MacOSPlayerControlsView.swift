@@ -107,7 +107,8 @@ struct MacOSPlayerControlsView: View {
                     .contentShape(Rectangle())
                 }
                 .buttonStyle(.plain)
-                .disabled(onTitleTap == nil)
+                .disabled(onTitleTap == nil || playerState.isControlsLocked)
+                .opacity(playerState.isControlsLocked ? 0.5 : 1.0)
                 .help(Text("player.controls.info"))
             }
 
@@ -129,6 +130,8 @@ struct MacOSPlayerControlsView: View {
                 .buttonStyle(.plain)
                 .help(Text("player.controls.keepOnTop"))
                 .accessibilityLabel(Text("player.controls.keepOnTop"))
+                .disabled(playerState.isControlsLocked)
+                .opacity(playerState.isControlsLocked ? 0.5 : 1.0)
             }
 
             if onClose != nil {
@@ -272,6 +275,24 @@ struct MacOSPlayerControlsView: View {
         keyboardMonitor = NSEvent.addLocalMonitorForEvents(matching: .keyDown) { [self] event in
             // Only handle events when the player window is key (active)
             guard NSApp.keyWindow != nil else { return event }
+
+            // When controls are locked, ignore playback keys (space/arrows/mute) and
+            // only keep fullscreen (F) and exit-fullscreen (Esc) working.
+            if playerState.isControlsLocked {
+                switch event.keyCode {
+                case 3: // F
+                    onToggleFullscreen?()
+                    return nil
+                case 53: // Escape
+                    if isFullscreen {
+                        onToggleFullscreen?()
+                        return nil
+                    }
+                    return event
+                default:
+                    return event // Pass through space/arrows/M while locked
+                }
+            }
 
             // Handle keyboard shortcuts
             switch event.keyCode {
