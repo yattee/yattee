@@ -7234,6 +7234,17 @@
         }
       }
     },
+    "player.controls.keepOnTop" : {
+      "comment" : "Toggles whether the player window floats above other windows",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Keep on Top"
+          }
+        }
+      }
+    },
     "player.controls.pause" : {
       "localizations" : {
         "en" : {
@@ -12442,46 +12453,13 @@
         }
       }
     },
-    "settings.playback.macOS.playerMode" : {
-      "comment" : "macOS player mode setting",
+    "settings.playback.macOS.separateWindow" : {
+      "comment" : "Toggle: play the expanded video in a separate window vs. an inline sheet",
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Player Mode"
-          }
-        }
-      }
-    },
-    "settings.playback.macOS.playerMode.floatingWindow" : {
-      "comment" : "Floating window player mode - stays on top of other windows",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Floating Window"
-          }
-        }
-      }
-    },
-    "settings.playback.macOS.playerMode.inline" : {
-      "comment" : "Inline (sheet) player mode",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Inline (Sheet)"
-          }
-        }
-      }
-    },
-    "settings.playback.macOS.playerMode.window" : {
-      "comment" : "Separate window player mode",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Separate Window"
+            "value" : "Play in a separate window"
           }
         }
       }

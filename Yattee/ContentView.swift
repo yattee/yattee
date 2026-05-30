@@ -61,7 +61,7 @@ struct ContentView: View {
         }
         #if os(macOS)
         .onChange(of: appEnvironment.navigationCoordinator.playerExpandTrigger) { _, _ in
-            if appEnvironment.settingsManager.macPlayerMode.usesWindow {
+            if appEnvironment.settingsManager.macPlayerSeparateWindow {
                 presentExpandedPlayerWindow(appEnvironment: appEnvironment)
             }
         }
@@ -70,26 +70,33 @@ struct ContentView: View {
                 ExpandedPlayerWindowManager.shared.hide()
             }
         }
-        .onChange(of: appEnvironment.settingsManager.macPlayerMode) { oldMode, newMode in
+        .onChange(of: appEnvironment.settingsManager.macPlayerSeparateWindow) { _, separateWindow in
             guard appEnvironment.navigationCoordinator.isPlayerExpanded else { return }
 
-            if oldMode.usesWindow && newMode.usesWindow {
-                ExpandedPlayerWindowManager.shared.updateWindowLevel(floating: newMode.isFloating)
-            } else if oldMode.usesWindow && !newMode.usesWindow {
-                ExpandedPlayerWindowManager.shared.hide(animated: false)
-            } else if !oldMode.usesWindow && newMode.usesWindow {
+            if separateWindow {
+                // Inline sheet → separate window: let the sheet dismiss first, then
+                // present the window (mirrors the previous inline→window transition).
                 Task { @MainActor in
                     try? await Task.sleep(for: .milliseconds(300))
                     if appEnvironment.navigationCoordinator.isPlayerExpanded {
                         presentExpandedPlayerWindow(appEnvironment: appEnvironment)
                     }
                 }
+            } else {
+                // Separate window → inline sheet: hide the window so the sheet binding
+                // (isPlayerExpanded && !separateWindow) takes over.
+                ExpandedPlayerWindowManager.shared.hide(animated: false)
             }
+        }
+        .onChange(of: appEnvironment.settingsManager.macPlayerFloating) { _, floating in
+            guard appEnvironment.navigationCoordinator.isPlayerExpanded,
+                  appEnvironment.settingsManager.macPlayerSeparateWindow else { return }
+            ExpandedPlayerWindowManager.shared.updateWindowLevel(floating: floating)
         }
         .sheet(isPresented: Binding(
             get: {
                 appEnvironment.navigationCoordinator.isPlayerExpanded &&
-                !appEnvironment.settingsManager.macPlayerMode.usesWindow
+                !appEnvironment.settingsManager.macPlayerSeparateWindow
             },
             set: { appEnvironment.navigationCoordinator.isPlayerExpanded = $0 }
         )) {
@@ -164,7 +171,7 @@ struct ContentView: View {
         let isExpanded = appEnvironment.navigationCoordinator.isPlayerExpanded
         // The expanded player is a separate window in window mode, so keep the capsule
         // visible alongside it. In sheet mode the sheet covers the window, so hide it.
-        let usesWindow = appEnvironment.settingsManager.macPlayerMode.usesWindow
+        let usesWindow = appEnvironment.settingsManager.macPlayerSeparateWindow
 
         if hasActiveVideo && (!isExpanded || usesWindow) {
             VStack(spacing: 0) {

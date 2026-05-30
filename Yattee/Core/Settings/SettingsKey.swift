@@ -45,7 +45,8 @@ enum SettingsKey: String, CaseIterable {
     case resolveShortLinksEnabled
 
     // Platform-specific
-    case macPlayerMode
+    case macPlayerSeparateWindow
+    case macPlayerFloating
     case playerSheetAutoResize
     case listStyle
 
@@ -136,7 +137,8 @@ enum SettingsKey: String, CaseIterable {
     /// in both UserDefaults and iCloud, so each platform family syncs independently.
     var isPlatformSpecific: Bool {
         switch self {
-        case .preferredQuality, .cellularQuality, .allowSoftwareDecodedFormats, .macPlayerMode, .listStyle,
+        case .preferredQuality, .cellularQuality, .allowSoftwareDecodedFormats,
+             .macPlayerSeparateWindow, .macPlayerFloating, .listStyle,
              // Home layout — different UI paradigms per platform
              .homeShortcutOrder, .homeShortcutVisibility, .homeShortcutLayout, .homeShortcutCardStyle,
              .homeShortcutColorfulPalette, .homeShortcutCustomPaletteColors,

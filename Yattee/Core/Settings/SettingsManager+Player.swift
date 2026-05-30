@@ -68,14 +68,30 @@ extension SettingsManager {
     #endif
 
     #if os(macOS)
-    var macPlayerMode: MacPlayerMode {
+    /// Whether the expanded player opens in a separate window (vs. an inline sheet).
+    /// Default is `true`.
+    var macPlayerSeparateWindow: Bool {
         get {
-            if let cached = _macPlayerMode { return cached }
-            return MacPlayerMode(rawValue: string(for: .macPlayerMode) ?? "") ?? .window
+            if let cached = _macPlayerSeparateWindow { return cached }
+            return bool(for: .macPlayerSeparateWindow, default: true)
         }
         set {
-            _macPlayerMode = newValue
-            set(newValue.rawValue, for: .macPlayerMode)
+            _macPlayerSeparateWindow = newValue
+            set(newValue, for: .macPlayerSeparateWindow)
+        }
+    }
+
+    /// Whether the separate player window floats above other windows (always on top).
+    /// Toggled live from the player's top-bar pin button and remembered across sessions.
+    /// Default is `false`.
+    var macPlayerFloating: Bool {
+        get {
+            if let cached = _macPlayerFloating { return cached }
+            return bool(for: .macPlayerFloating, default: false)
+        }
+        set {
+            _macPlayerFloating = newValue
+            set(newValue, for: .macPlayerFloating)
         }
     }
 

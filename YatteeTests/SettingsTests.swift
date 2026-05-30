@@ -174,38 +174,6 @@ struct SponsorBlockCategoryTests {
     }
 }
 
-// MARK: - MacPlayerMode Tests (macOS only)
-
-#if os(macOS)
-@Suite("MacPlayerMode Tests")
-@MainActor
-struct MacPlayerModeTests {
-
-    @Test("MacPlayerMode cases")
-    func allCases() {
-        let cases = MacPlayerMode.allCases
-        #expect(cases.contains(.window))
-        #expect(cases.contains(.inline))
-    }
-
-    @Test("MacPlayerMode display names")
-    func displayNames() {
-        #expect(MacPlayerMode.window.displayName == "Separate Window")
-        #expect(MacPlayerMode.floatingWindow.displayName == "Floating Window")
-        #expect(MacPlayerMode.inline.displayName == "Inline (Sheet)")
-    }
-
-    @Test("MacPlayerMode is Codable")
-    func codable() throws {
-        for mode in MacPlayerMode.allCases {
-            let encoded = try JSONEncoder().encode(mode)
-            let decoded = try JSONDecoder().decode(MacPlayerMode.self, from: encoded)
-            #expect(mode == decoded)
-        }
-    }
-}
-#endif
-
 // MARK: - UserAgentGenerator Tests
 
 @Suite("UserAgentGenerator Tests")

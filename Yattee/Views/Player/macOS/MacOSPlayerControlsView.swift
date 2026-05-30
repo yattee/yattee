@@ -113,6 +113,24 @@ struct MacOSPlayerControlsView: View {
 
             Spacer(minLength: 12)
 
+            // Floating (always-on-top) toggle — only meaningful for the separate
+            // window presentation, so hidden in the inline sheet and in fullscreen.
+            if let settings = appEnvironment?.settingsManager,
+               settings.macPlayerSeparateWindow, !isFullscreen {
+                Button {
+                    settings.macPlayerFloating.toggle()
+                } label: {
+                    Image(systemName: settings.macPlayerFloating ? "pin.fill" : "pin")
+                        .font(.system(size: 15, weight: .semibold))
+                        .foregroundStyle(.white)
+                        .frame(width: 30, height: 30)
+                        .background(.ultraThinMaterial, in: Circle())
+                }
+                .buttonStyle(.plain)
+                .help(Text("player.controls.keepOnTop"))
+                .accessibilityLabel(Text("player.controls.keepOnTop"))
+            }
+
             if onClose != nil {
                 Button {
                     onClose?()

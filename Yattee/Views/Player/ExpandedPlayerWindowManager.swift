@@ -70,8 +70,8 @@ final class ExpandedPlayerWindowManager: NSObject {
         // Mark expanding state for mini player coordination
         appEnvironment.navigationCoordinator.isPlayerExpanding = true
 
-        // Get the current player mode for window configuration
-        let mode = appEnvironment.settingsManager.macPlayerMode
+        // Whether the window should float above other windows (always on top).
+        let floating = appEnvironment.settingsManager.macPlayerFloating
 
         // Host a lightweight two-phase root instead of ExpandedPlayerSheet directly.
         // AppKit won't composite the window to screen until the hosted SwiftUI view
@@ -133,8 +133,8 @@ final class ExpandedPlayerWindowManager: NSObject {
         // Make ExpandedPlayerWindowManager itself the delegate to avoid lifecycle issues
         window.delegate = self
 
-        // Configure window level based on mode
-        configureWindowLevel(window, floating: mode.isFloating)
+        // Configure window level based on the floating preference
+        configureWindowLevel(window, floating: floating)
 
         // Center window on screen
         window.center()

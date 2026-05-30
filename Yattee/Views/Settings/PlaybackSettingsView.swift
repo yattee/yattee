@@ -250,14 +250,10 @@ private struct BehaviorSection: View {
 
         SettingsFormSection("settings.playback.behavior.header", footer: footer) {
             #if os(macOS)
-            PlatformMenuPicker(
-                String(localized: "settings.playback.macOS.playerMode"),
-                selection: $settings.macPlayerMode
-            ) {
-                ForEach(MacPlayerMode.allCases, id: \.self) { mode in
-                    Text(mode.displayName).tag(mode)
-                }
-            }
+            Toggle(
+                String(localized: "settings.playback.macOS.separateWindow"),
+                isOn: $settings.macPlayerSeparateWindow
+            )
 
             Toggle(
                 String(localized: "settings.playback.macOS.autoResizePlayer"),

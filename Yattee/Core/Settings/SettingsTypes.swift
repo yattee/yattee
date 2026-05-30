@@ -201,37 +201,6 @@ enum DownloadQuality: String, CaseIterable, Codable, Sendable {
     }
 }
 
-// MARK: - macOS Player Mode
-
-#if os(macOS)
-enum MacPlayerMode: String, CaseIterable, Codable {
-    case window
-    case floatingWindow
-    case inline
-
-    var displayName: String {
-        switch self {
-        case .window: return String(localized: "settings.playback.macOS.playerMode.window")
-        case .floatingWindow: return String(localized: "settings.playback.macOS.playerMode.floatingWindow")
-        case .inline: return String(localized: "settings.playback.macOS.playerMode.inline")
-        }
-    }
-
-    /// Whether this mode uses a separate window (vs sheet/inline)
-    var usesWindow: Bool {
-        switch self {
-        case .window, .floatingWindow: return true
-        case .inline: return false
-        }
-    }
-
-    /// Whether the window should float above other windows
-    var isFloating: Bool {
-        self == .floatingWindow
-    }
-}
-#endif
-
 // MARK: - Haptic Feedback
 
 /// Intensity levels for haptic feedback.

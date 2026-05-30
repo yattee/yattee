@@ -72,7 +72,8 @@ final class SettingsManager {
     var _preferPortraitBrowsing: Bool?
     #endif
     #if os(macOS)
-    var _macPlayerMode: MacPlayerMode?
+    var _macPlayerSeparateWindow: Bool?
+    var _macPlayerFloating: Bool?
     var _playerSheetAutoResize: Bool?
     #endif
 
@@ -456,7 +457,8 @@ final class SettingsManager {
         _syncSearchHistory = nil
         _searchHistoryLimit = nil
         #if os(macOS)
-        _macPlayerMode = nil
+        _macPlayerSeparateWindow = nil
+        _macPlayerFloating = nil
         _playerSheetAutoResize = nil
         #endif
         // miniPlayerShowVideo and miniPlayerVideoTapAction moved to preset
