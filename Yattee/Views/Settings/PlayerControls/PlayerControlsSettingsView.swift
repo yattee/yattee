@@ -74,7 +74,10 @@ private struct PlayerControlsSettingsContent: View {
 
     var body: some View {
         Form {
+            // The phone-shaped preview and comments pill don't apply to the macOS player.
+            #if os(iOS)
             PreviewSection(viewModel: viewModel, layout: previewLayout)
+            #endif
             PresetSection(
                 viewModel: viewModel,
                 trackedPresetName: $trackedActivePresetName,
@@ -87,13 +90,16 @@ private struct PlayerControlsSettingsContent: View {
                 fontStyle: $fontStyle
             )
             LayoutSectionsSection(viewModel: viewModel)
-            CommentsPillSection(viewModel: viewModel)
             #if os(iOS)
+            CommentsPillSection(viewModel: viewModel)
             GesturesSectionsSection(viewModel: viewModel)
             #endif
             SystemControlsSection(viewModel: viewModel)
             VolumeSection(viewModel: viewModel)
         }
+        #if os(macOS)
+        .formStyle(.grouped)
+        #endif
         .id(refreshID)
         .alert(
             String(localized: "settings.playerControls.error"),
@@ -237,6 +243,8 @@ private struct AppearanceSection: View {
 
     var body: some View {
         Section {
+            // The macOS bar draws its own glass capsule; the per-button style has no effect there.
+            #if os(iOS)
             Picker(
                 String(localized: "settings.playerControls.style"),
                 selection: $style
@@ -250,6 +258,7 @@ private struct AppearanceSection: View {
                 guard newStyle != viewModel.currentLayout.globalSettings.style else { return }
                 viewModel.updateGlobalSettingsSync { $0.style = newStyle }
             }
+            #endif
 
             Picker(
                 String(localized: "settings.playerControls.buttonSize"),
@@ -312,10 +321,17 @@ private struct LayoutSectionsSection: View {
             NavigationLink {
                 CenterControlsSettingsView(viewModel: viewModel)
             } label: {
+                #if os(macOS)
+                Label(
+                    String(localized: "settings.playerControls.seekDurations", defaultValue: "Seek Durations"),
+                    systemImage: "arrow.trianglehead.clockwise"
+                )
+                #else
                 Label(
                     String(localized: "settings.playerControls.centerControls"),
                     systemImage: "play.circle"
                 )
+                #endif
             }
             .disabled(!viewModel.canEditActivePreset)
 
@@ -336,10 +352,17 @@ private struct LayoutSectionsSection: View {
                 )
             } label: {
                 HStack {
+                    #if os(macOS)
+                    Label(
+                        String(localized: "settings.playerControls.controlBarButtons", defaultValue: "Control Bar Buttons"),
+                        systemImage: "rectangle.bottomthird.inset.filled"
+                    )
+                    #else
                     Label(
                         String(localized: "settings.playerControls.bottomButtons"),
                         systemImage: "rectangle.bottomthird.inset.filled"
                     )
+                    #endif
                     Spacer()
                     Text("\(viewModel.currentLayout.bottomSection.buttons.count)")
                         .foregroundStyle(.secondary)
@@ -347,6 +370,8 @@ private struct LayoutSectionsSection: View {
             }
             .disabled(!viewModel.canEditActivePreset)
 
+            // The player pill only exists in the iOS player.
+            #if os(iOS)
             NavigationLink {
                 PlayerPillEditorView(viewModel: viewModel)
             } label: {
@@ -361,6 +386,7 @@ private struct LayoutSectionsSection: View {
                 }
             }
             .disabled(!viewModel.canEditActivePreset)
+            #endif
 
             NavigationLink {
                 MiniPlayerEditorView(viewModel: viewModel)

@@ -59,6 +59,8 @@ struct SettingsView: View {
                             LayoutNavigationSettingsView()
                         case .playback:
                             PlaybackSettingsView()
+                        case .playerControls:
+                            PlayerControlsSettingsView()
                         case .notifications:
                             NotificationSettingsView()
                         case .downloads:
@@ -355,6 +357,7 @@ enum SettingsSection: String, CaseIterable, Identifiable {
     case appearance
     case layoutNavigation
     case playback
+    case playerControls
     case notifications
     case downloads
     case privacy
@@ -371,6 +374,7 @@ enum SettingsSection: String, CaseIterable, Identifiable {
         case .appearance: return String(localized: "settings.appearance.sectionTitle")
         case .layoutNavigation: return String(localized: "settings.layoutNavigation.title")
         case .playback: return String(localized: "settings.playback.sectionTitle")
+        case .playerControls: return String(localized: "settings.playerControls.title")
         case .notifications: return String(localized: "settings.notifications.title")
         case .downloads: return String(localized: "settings.downloads.title")
         case .privacy: return String(localized: "settings.privacy.title")
@@ -387,6 +391,7 @@ enum SettingsSection: String, CaseIterable, Identifiable {
         case .appearance: return "paintbrush"
         case .layoutNavigation: return "hand.tap"
         case .playback: return "play.circle"
+        case .playerControls: return "slider.horizontal.below.rectangle"
         case .notifications: return "bell.badge"
         case .downloads: return "arrow.down.circle"
         case .privacy: return "hand.raised"

@@ -7,10 +7,11 @@
 
 import SwiftUI
 
-#if os(iOS)
+#if os(iOS) || os(macOS)
 
 /// Consolidated actions and state for player control buttons.
-/// Used by `ControlsSectionRenderer` to render buttons dynamically.
+/// Used by `ControlsSectionRenderer` (iOS) and `MacOSControlsSectionRenderer`
+/// (macOS) to render buttons dynamically.
 @MainActor
 struct PlayerControlsActions {
     // MARK: - State
@@ -27,20 +28,26 @@ struct PlayerControlsActions {
     /// Whether the video is widescreen aspect ratio
     let isWidescreenVideo: Bool
 
+    #if os(iOS)
     /// Whether orientation is locked
     let isOrientationLocked: Bool
+    #endif
 
     /// Whether the side panel is visible
     let isPanelVisible: Bool
 
+    #if os(iOS)
     /// Whether the side panel is pinned (iPad landscape)
     let isPanelPinned: Bool
+    #endif
 
     /// Which side the panel is on
     let panelSide: FloatingPanelSide
 
+    #if os(iOS)
     /// Whether running on iPad
     let isIPad: Bool
+    #endif
 
     /// Whether volume controls should show (mpv mode)
     let showVolumeControls: Bool
@@ -69,11 +76,13 @@ struct PlayerControlsActions {
     /// Current audio stream
     let currentAudioStream: Stream?
 
+    #if os(iOS)
     /// Current panscan value (0.0 = fit, 1.0 = fill)
     let panscanValue: Double
 
     /// Whether panscan change is currently allowed
     let isPanscanAllowed: Bool
+    #endif
 
     /// Whether auto-play next is enabled
     let isAutoPlayNextEnabled: Bool
@@ -101,14 +110,18 @@ struct PlayerControlsActions {
     /// Toggle details visibility (portrait fullscreen)
     var onToggleDetailsVisibility: (() -> Void)?
 
+    #if os(iOS)
     /// Toggle orientation lock
     var onToggleOrientationLock: (() -> Void)?
+    #endif
 
     /// Toggle side panel
     var onTogglePanel: (() -> Void)?
 
+    #if os(iOS)
     /// Toggle panscan between 0 and 1
     var onTogglePanscan: (() -> Void)?
+    #endif
 
     /// Toggle auto-play next in queue
     var onToggleAutoPlayNext: (() -> Void)?
@@ -213,6 +226,17 @@ struct PlayerControlsActions {
         playerState.pipState == .active ? "pip.exit" : "pip.enter"
     }
 
+    #if os(macOS)
+    /// Fullscreen icon based on current state (no rotation semantics on macOS).
+    var fullscreenIcon: String {
+        isFullscreen ? "arrow.down.right.and.arrow.up.left" : "arrow.up.left.and.arrow.down.right"
+    }
+
+    /// Whether the fullscreen button should be shown
+    var shouldShowFullscreenButton: Bool {
+        onToggleFullscreen != nil
+    }
+    #else
     /// Fullscreen icon based on current state.
     /// Uses rotation icons when tapping will cause device rotation,
     /// otherwise uses standard fullscreen arrows.
@@ -278,6 +302,7 @@ struct PlayerControlsActions {
 
         return showFullscreenButton && hasFullscreenAction && !isPinnedPanelActive
     }
+    #endif
 
     /// Whether PiP button should be enabled
     var isPiPAvailable: Bool {

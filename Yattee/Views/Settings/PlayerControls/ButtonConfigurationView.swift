@@ -36,7 +36,9 @@ struct ButtonConfigurationView: View {
     var body: some View {
         if let config = configuration {
             Form {
-                // Visibility mode (all buttons)
+                // Visibility mode (all buttons); portrait/wide modes have no
+                // meaning on macOS, where every button is always shown.
+                #if os(iOS)
                 Section {
                     Picker(
                         String(localized: "settings.playerControls.visibility"),
@@ -54,15 +56,26 @@ struct ButtonConfigurationView: View {
                 } footer: {
                     Text(String(localized: "settings.playerControls.visibilityFooter"))
                 }
+                #endif
 
                 // Type-specific settings
                 if config.buttonType.hasSettings {
                     typeSpecificSettings(for: config)
                 }
+                #if os(macOS)
+                if !config.buttonType.hasSettings {
+                    Section {
+                        Text(String(localized: "settings.playerControls.noButtonSettings"))
+                            .foregroundStyle(.secondary)
+                    }
+                }
+                #endif
             }
             .navigationTitle(config.buttonType.displayName)
             #if os(iOS)
             .navigationBarTitleDisplayMode(.inline)
+            #elseif os(macOS)
+            .formStyle(.grouped)
             #endif
             .onAppear {
                 syncFromConfiguration(config)

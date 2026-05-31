@@ -85,39 +85,22 @@ struct PresetEditorView: View {
     }
 
     var body: some View {
+        #if os(macOS)
+        macOSDialog
+        #else
         NavigationStack {
             Form {
                 // Base Layout Picker (only for create mode)
                 if case .create(_, _) = mode {
                     Section {
-                        Picker(
-                            String(localized: "settings.playerControls.baseLayout"),
-                            selection: $selectedBaseLayoutID
-                        ) {
-                            ForEach(baseLayouts) { preset in
-                                Text(preset.name).tag(preset.id as UUID?)
-                            }
-                        }
+                        basePicker
                     }
                 }
 
                 Section {
-                    TextField(mode.placeholder, text: $name)
-                        .focused($isNameFocused)
-                        .submitLabel(.done)
-                        .onSubmit(saveIfValid)
+                    nameField
                 } footer: {
-                    HStack {
-                        if trimmedName.count > LayoutPreset.maxNameLength {
-                            Text(String(localized: "settings.playerControls.nameTooLong"))
-                                .foregroundStyle(.red)
-                        }
-                        Spacer()
-                        Text("\(trimmedName.count)/\(LayoutPreset.maxNameLength)")
-                            .foregroundStyle(
-                                trimmedName.count > LayoutPreset.maxNameLength ? .red : .secondary
-                            )
-                    }
+                    nameFooter
                 }
             }
             .navigationTitle(mode.title)
@@ -145,10 +128,86 @@ struct PresetEditorView: View {
         #if os(iOS)
         .presentationDetents([.medium])
         #endif
-        #if os(macOS)
-        .frame(minWidth: 500, minHeight: 350)
         #endif
     }
+
+    // MARK: - Shared Controls
+
+    private var basePicker: some View {
+        Picker(
+            String(localized: "settings.playerControls.baseLayout"),
+            selection: $selectedBaseLayoutID
+        ) {
+            ForEach(baseLayouts) { preset in
+                Text(preset.name).tag(preset.id as UUID?)
+            }
+        }
+    }
+
+    private var nameField: some View {
+        TextField(mode.placeholder, text: $name)
+            .focused($isNameFocused)
+            .submitLabel(.done)
+            .onSubmit(saveIfValid)
+    }
+
+    private var nameFooter: some View {
+        HStack {
+            if trimmedName.count > LayoutPreset.maxNameLength {
+                Text(String(localized: "settings.playerControls.nameTooLong"))
+                    .foregroundStyle(.red)
+            }
+            Spacer()
+            Text("\(trimmedName.count)/\(LayoutPreset.maxNameLength)")
+                .foregroundStyle(
+                    trimmedName.count > LayoutPreset.maxNameLength ? .red : .secondary
+                )
+        }
+    }
+
+    // MARK: - macOS Dialog
+
+    #if os(macOS)
+    /// Compact dialog layout matching native macOS sheets (title, fields,
+    /// trailing action buttons) instead of the iOS navigation-bar form.
+    private var macOSDialog: some View {
+        VStack(alignment: .leading, spacing: 16) {
+            Text(mode.title)
+                .font(.headline)
+
+            if case .create(_, _) = mode {
+                basePicker
+            }
+
+            VStack(alignment: .leading, spacing: 4) {
+                nameField
+                    .textFieldStyle(.roundedBorder)
+
+                nameFooter
+                    .font(.caption)
+            }
+
+            HStack {
+                Spacer()
+                Button(String(localized: "settings.playerControls.cancel")) {
+                    dismiss()
+                }
+                .keyboardShortcut(.cancelAction)
+
+                Button(mode.saveButtonTitle) {
+                    saveIfValid()
+                }
+                .keyboardShortcut(.defaultAction)
+                .disabled(!isValid)
+            }
+        }
+        .padding(20)
+        .frame(width: 400)
+        .onAppear {
+            isNameFocused = true
+        }
+    }
+    #endif
 
     private func saveIfValid() {
         guard isValid else { return }

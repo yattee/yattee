@@ -296,6 +296,10 @@ struct MPVVideoView: View {
                 playerService.currentBackend?.isMuted = newMuted
                 playerState.isMuted = newMuted
                 appEnvironment?.remoteControlCoordinator.broadcastStateUpdate()
+            },
+            onRateChanged: { rate in
+                playerState.rate = rate
+                playerService.currentBackend?.rate = Float(rate.rawValue)
             }
         )
         #else

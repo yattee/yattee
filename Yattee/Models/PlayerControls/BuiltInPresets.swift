@@ -11,7 +11,7 @@ extension LayoutPreset {
     /// Bump this version whenever any built-in preset definition changes.
     /// On launch, the app compares this against the last-applied version
     /// and replaces stale built-in presets with fresh copies from code.
-    static let builtInPresetsVersion = 5
+    static let builtInPresetsVersion = 7
 
     // MARK: - Built-in Preset IDs
 
@@ -25,6 +25,19 @@ extension LayoutPreset {
 
     /// Default preset with balanced controls for general use.
     static func defaultPreset(for deviceClass: DeviceClass = .current) -> LayoutPreset {
+        LayoutPreset(
+            id: BuiltInID.defaultPreset,
+            name: String(localized: "controls.preset.default"),
+            createdAt: Date(timeIntervalSince1970: 0),
+            updatedAt: Date(timeIntervalSince1970: 0),
+            isBuiltIn: true,
+            deviceClass: deviceClass,
+            layout: deviceClass == .macOS ? macOSDefaultLayout() : standardDefaultLayout()
+        )
+    }
+
+    /// Default layout for iOS/tvOS (touch-oriented overlay controls).
+    private static func standardDefaultLayout() -> PlayerControlsLayout {
         // Top buttons: titleAuthor (wideOnly), spacer, orientationLock, close
         let topButtons: [ControlButtonConfiguration] = [
             ControlButtonConfiguration(
@@ -110,7 +123,7 @@ extension LayoutPreset {
         // Mini player: show video, tap for PiP
         let miniPlayerSettings = MiniPlayerSettings()
 
-        let layout = PlayerControlsLayout(
+        return PlayerControlsLayout(
             topSection: LayoutSection(buttons: topButtons),
             centerSettings: centerSettings,
             bottomSection: LayoutSection(buttons: bottomButtons),
@@ -120,20 +133,84 @@ extension LayoutPreset {
             playerPillSettings: playerPillSettings,
             miniPlayerSettings: miniPlayerSettings
         )
+    }
 
-        return LayoutPreset(
-            id: BuiltInID.defaultPreset,
-            name: String(localized: "controls.preset.default"),
-            createdAt: Date(timeIntervalSince1970: 0),
-            updatedAt: Date(timeIntervalSince1970: 0),
-            isBuiltIn: true,
-            deviceClass: deviceClass,
-            layout: layout
+    /// Default layout for macOS, mirroring the QuickTime-style control bar:
+    /// top bar with title/author, keep-on-top pin and close; capsule row with
+    /// volume slider, transport and trailing actions around flexible spacers.
+    private static func macOSDefaultLayout() -> PlayerControlsLayout {
+        let topButtons: [ControlButtonConfiguration] = [
+            .defaultConfiguration(for: .titleAuthor),
+            .flexibleSpacer(),
+            .defaultConfiguration(for: .keepOnTop),
+            .defaultConfiguration(for: .close)
+        ]
+
+        let bottomButtons: [ControlButtonConfiguration] = [
+            ControlButtonConfiguration(
+                buttonType: .volume,
+                settings: .slider(SliderSettings(sliderBehavior: .alwaysVisible))
+            ),
+            .flexibleSpacer(),
+            .defaultConfiguration(for: .queue),
+            .defaultConfiguration(for: .playPrevious),
+            .defaultConfiguration(for: .playPause),
+            .defaultConfiguration(for: .playNext),
+            .flexibleSpacer(),
+            .defaultConfiguration(for: .contextMenu),
+            .defaultConfiguration(for: .settings),
+            .defaultConfiguration(for: .pictureInPicture),
+            .defaultConfiguration(for: .fullscreen)
+        ]
+
+        // On macOS center settings only drive seek amounts (keyboard arrows
+        // and default seek buttons); 5s preserves the historical arrow-key step.
+        let centerSettings = CenterSectionSettings(
+            showPlayPause: true,
+            showSeekBackward: true,
+            showSeekForward: true,
+            seekBackwardSeconds: 5,
+            seekForwardSeconds: 5,
+            leftSlider: .disabled,
+            rightSlider: .disabled
+        )
+
+        let globalSettings = GlobalLayoutSettings(
+            style: .plain,
+            buttonSize: .medium,
+            fontStyle: .system,
+            systemControlsMode: .seek,
+            systemControlsSeekDuration: .tenSeconds,
+            volumeMode: .mpv
+        )
+
+        return PlayerControlsLayout(
+            topSection: LayoutSection(buttons: topButtons),
+            centerSettings: centerSettings,
+            bottomSection: LayoutSection(buttons: bottomButtons),
+            globalSettings: globalSettings,
+            progressBarSettings: ProgressBarSettings(),
+            gesturesSettings: nil,
+            playerPillSettings: nil,
+            miniPlayerSettings: MiniPlayerSettings()
         )
     }
 
     /// Minimal preset with stripped-down controls for distraction-free playback.
     static func minimalPreset(for deviceClass: DeviceClass = .current) -> LayoutPreset {
+        LayoutPreset(
+            id: BuiltInID.minimalPreset,
+            name: String(localized: "controls.preset.minimal"),
+            createdAt: Date(timeIntervalSince1970: 0),
+            updatedAt: Date(timeIntervalSince1970: 0),
+            isBuiltIn: true,
+            deviceClass: deviceClass,
+            layout: deviceClass == .macOS ? macOSMinimalLayout() : standardMinimalLayout()
+        )
+    }
+
+    /// Minimal layout for iOS/tvOS.
+    private static func standardMinimalLayout() -> PlayerControlsLayout {
         let topButtons: [ControlButtonConfiguration] = [
             .flexibleSpacer(),
             .defaultConfiguration(for: .close)
@@ -200,7 +277,7 @@ extension LayoutPreset {
             sponsorBlockSettings: SponsorBlockSegmentSettings(showSegments: false)
         )
 
-        let layout = PlayerControlsLayout(
+        return PlayerControlsLayout(
             topSection: LayoutSection(buttons: topButtons),
             centerSettings: centerSettings,
             bottomSection: LayoutSection(buttons: bottomButtons),
@@ -210,15 +287,56 @@ extension LayoutPreset {
             playerPillSettings: playerPillSettings,
             miniPlayerSettings: miniPlayerSettings
         )
+    }
 
-        return LayoutPreset(
-            id: BuiltInID.minimalPreset,
-            name: String(localized: "controls.preset.minimal"),
-            createdAt: Date(timeIntervalSince1970: 0),
-            updatedAt: Date(timeIntervalSince1970: 0),
-            isBuiltIn: true,
-            deviceClass: deviceClass,
-            layout: layout
+    /// Minimal layout for macOS: bare play/pause and settings in the capsule,
+    /// close-only top bar, no chapters or SponsorBlock markers.
+    private static func macOSMinimalLayout() -> PlayerControlsLayout {
+        let topButtons: [ControlButtonConfiguration] = [
+            .flexibleSpacer(),
+            .defaultConfiguration(for: .close)
+        ]
+
+        let bottomButtons: [ControlButtonConfiguration] = [
+            .flexibleSpacer(),
+            .defaultConfiguration(for: .playPause),
+            .flexibleSpacer(),
+            .defaultConfiguration(for: .settings)
+        ]
+
+        let centerSettings = CenterSectionSettings(
+            showPlayPause: true,
+            showSeekBackward: true,
+            showSeekForward: true,
+            seekBackwardSeconds: 5,
+            seekForwardSeconds: 5,
+            leftSlider: .disabled,
+            rightSlider: .disabled
+        )
+
+        let globalSettings = GlobalLayoutSettings(
+            style: .plain,
+            buttonSize: .medium,
+            fontStyle: .system,
+            systemControlsMode: .seek,
+            systemControlsSeekDuration: .tenSeconds,
+            volumeMode: .mpv
+        )
+
+        let progressBarSettings = ProgressBarSettings(
+            showChapters: false,
+            sponsorBlockSettings: SponsorBlockSegmentSettings(showSegments: false)
+        )
+
+        return PlayerControlsLayout(
+            topSection: LayoutSection(buttons: topButtons),
+            centerSettings: centerSettings,
+            bottomSection: LayoutSection(buttons: bottomButtons),
+            globalSettings: globalSettings,
+            progressBarSettings: progressBarSettings,
+            gesturesSettings: nil,
+            playerPillSettings: nil,
+            miniPlayerSettings: MiniPlayerSettings()
         )
     }
 

@@ -37,6 +37,8 @@ struct MacOSPlayerControlsView: View {
     /// Whether the floating video details panel is currently visible. When it opens,
     /// the controls hide immediately instead of waiting for the auto-hide timer.
     var isDetailsPanelVisible: Bool = false
+    /// Change playback rate (used by the playback speed button).
+    var onRateChanged: ((PlaybackRate) -> Void)? = nil
 
     // MARK: - State
 
@@ -45,6 +47,10 @@ struct MacOSPlayerControlsView: View {
     @State private var isInteracting = false
     @State private var showControls: Bool?
     @State private var keyboardMonitor: Any?
+
+    /// The active player controls layout (macOS preset). `nil` until loaded, so
+    /// the bars don't flash a wrong default before the preset arrives.
+    @State private var layout: PlayerControlsLayout?
 
     /// Extra top inset for the top bar so its content drops below the window's
     /// traffic-light buttons in the separate/floating window presentation, while
@@ -77,77 +83,15 @@ struct MacOSPlayerControlsView: View {
 
     // MARK: - Top Bar
 
-    /// Top row showing channel avatar, video title, author name, and a close button.
-    /// Mirrors the tvOS `topBar`, scaled down for macOS.
-    private var topBar: some View {
-        HStack(alignment: .center, spacing: 12) {
-            if let video = playerState.currentVideo {
-                Button {
-                    onTitleTap?()
-                } label: {
-                    HStack(alignment: .center, spacing: 12) {
-                        ChannelAvatarView(
-                            author: video.author,
-                            size: 36,
-                            yatteeServerURL: yatteeServerURL,
-                            source: video.id.source
-                        )
-
-                        VStack(alignment: .leading, spacing: 2) {
-                            Text(video.title)
-                                .font(.headline)
-                                .lineLimit(1)
-                                .foregroundStyle(.white)
-                            Text(video.author.name)
-                                .font(.subheadline)
-                                .foregroundStyle(.white.opacity(0.7))
-                                .lineLimit(1)
-                        }
-                    }
-                    .contentShape(Rectangle())
-                }
-                .buttonStyle(.plain)
-                .disabled(onTitleTap == nil || playerState.isControlsLocked)
-                .opacity(playerState.isControlsLocked ? 0.5 : 1.0)
-                .help(Text("player.controls.info"))
-            }
-
-            Spacer(minLength: 12)
-
-            // Floating (always-on-top) toggle — only meaningful for the separate
-            // window presentation, so hidden in the inline sheet and in fullscreen.
-            if let settings = appEnvironment?.settingsManager,
-               settings.macPlayerSeparateWindow, !isFullscreen {
-                Button {
-                    settings.macPlayerFloating.toggle()
-                } label: {
-                    Image(systemName: settings.macPlayerFloating ? "pin.fill" : "pin")
-                        .font(.system(size: 15, weight: .semibold))
-                        .foregroundStyle(.white)
-                        .frame(width: 30, height: 30)
-                        .background(.ultraThinMaterial, in: Circle())
-                }
-                .buttonStyle(.plain)
-                .help(Text("player.controls.keepOnTop"))
-                .accessibilityLabel(Text("player.controls.keepOnTop"))
-                .disabled(playerState.isControlsLocked)
-                .opacity(playerState.isControlsLocked ? 0.5 : 1.0)
-            }
-
-            if onClose != nil {
-                Button {
-                    onClose?()
-                } label: {
-                    Image(systemName: "xmark")
-                        .font(.system(size: 15, weight: .semibold))
-                        .foregroundStyle(.white)
-                        .frame(width: 30, height: 30)
-                        .background(.ultraThinMaterial, in: Circle())
-                }
-                .buttonStyle(.plain)
-                .accessibilityLabel(Text("player.controls.close"))
-            }
-        }
+    /// Top row rendered from the active preset's top section (title/author,
+    /// keep-on-top pin, close by default).
+    private func topBar(layout: PlayerControlsLayout) -> some View {
+        MacOSControlsSectionRenderer(
+            section: layout.topSection,
+            actions: controlsActions(layout: layout),
+            globalSettings: layout.globalSettings,
+            context: .overlay
+        )
         .padding(.horizontal, 20)
         .padding(.top, 16 + trafficLightInset)
         .padding(.bottom, 24)
@@ -165,6 +109,74 @@ struct MacOSPlayerControlsView: View {
         )
     }
 
+    // MARK: - Actions
+
+    /// Consolidated actions for the section renderers.
+    private func controlsActions(layout: PlayerControlsLayout) -> PlayerControlsActions {
+        PlayerControlsActions(
+            playerState: playerState,
+            isWideScreenLayout: true,
+            isFullscreen: isFullscreen,
+            isWidescreenVideo: true,
+            isPanelVisible: isDetailsPanelVisible,
+            panelSide: .right,
+            showVolumeControls: layout.globalSettings.volumeMode == .mpv,
+            showDebugButton: true,
+            showCloseButton: onClose != nil,
+            currentVideo: playerState.currentVideo,
+            availableCaptions: [],
+            currentCaption: nil,
+            availableStreams: [],
+            currentStream: nil,
+            currentAudioStream: nil,
+            isAutoPlayNextEnabled: appEnvironment?.settingsManager.queueAutoPlayNext ?? true,
+            yatteeServerURL: yatteeServerURL,
+            deArrowBrandingProvider: appEnvironment?.deArrowBrandingProvider,
+            onClose: onClose,
+            onToggleDebug: { [self] in
+                withAnimation(.easeInOut(duration: 0.2)) {
+                    playerState.showDebugOverlay.toggle()
+                }
+            },
+            onTogglePiP: onTogglePiP,
+            onToggleFullscreen: onToggleFullscreen,
+            onToggleDetailsVisibility: onTitleTap,
+            onToggleAutoPlayNext: { [weak appEnvironment] in
+                appEnvironment?.settingsManager.queueAutoPlayNext.toggle()
+            },
+            onShowSettings: onShowSettings,
+            onPlayNext: onPlayNext,
+            onPlayPrevious: onPlayPrevious,
+            onPlayPause: { [self] in
+                let wasPaused = playerState.playbackState == .paused
+                onPlayPause()
+                showControls = true
+                if wasPaused {
+                    resetHideTimer()
+                }
+            },
+            onSeekForward: { seconds in await onSeekForward(seconds) },
+            onSeekBackward: { seconds in await onSeekBackward(seconds) },
+            onVolumeChanged: onVolumeChanged,
+            onMuteToggled: onMuteToggled,
+            onCancelHideTimer: { [self] in cancelHideTimer() },
+            onResetHideTimer: { [self] in resetHideTimer() },
+            onSliderAdjustmentChanged: { [self] adjusting in
+                isInteracting = adjusting
+                if adjusting {
+                    cancelHideTimer()
+                } else {
+                    resetHideTimer()
+                }
+            },
+            onRateChanged: onRateChanged,
+            onShowQueue: onShowQueue,
+            onControlsLockToggled: { [self] locked in
+                playerState.isControlsLocked = locked
+            }
+        )
+    }
+
     // MARK: - Body
 
     var body: some View {
@@ -178,49 +190,38 @@ struct MacOSPlayerControlsView: View {
                     }
                     .allowsHitTesting(playerState.playbackState != .ended && !playerState.isFailed)
 
-                // Top bar (title/author/avatar/close) + control bar at bottom center
-                VStack(spacing: 0) {
-                    topBar
+                // Top bar (from preset top section) + control bar at bottom center
+                if let layout {
+                    VStack(spacing: 0) {
+                        topBar(layout: layout)
 
-                    Spacer()
+                        Spacer()
 
-                    MacOSControlBar(
-                        playerState: playerState,
-                        onPlayPause: {
-                            let wasPaused = playerState.playbackState == .paused
-                            onPlayPause()
-                            showControls = true
-                            if wasPaused {
+                        MacOSControlBar(
+                            playerState: playerState,
+                            section: layout.bottomSection,
+                            globalSettings: layout.globalSettings,
+                            actions: controlsActions(layout: layout),
+                            onSeek: onSeek,
+                            showChapters: layout.progressBarSettings.showChapters,
+                            sponsorSegments: playerState.sponsorSegments,
+                            sponsorBlockSettings: layout.progressBarSettings.sponsorBlockSettings,
+                            playedColor: layout.progressBarSettings.playedColor.color,
+                            onInteractionStarted: {
+                                isInteracting = true
+                                cancelHideTimer()
+                            },
+                            onInteractionEnded: {
+                                isInteracting = false
                                 resetHideTimer()
                             }
-                        },
-                        onSeek: onSeek,
-                        onSeekForward: onSeekForward,
-                        onSeekBackward: onSeekBackward,
-                        onToggleFullscreen: onToggleFullscreen,
-                        isFullscreen: isFullscreen,
-                        onTogglePiP: onTogglePiP,
-                        onPlayNext: onPlayNext,
-                        onPlayPrevious: onPlayPrevious,
-                        onVolumeChanged: onVolumeChanged,
-                        onMuteToggled: onMuteToggled,
-                        onShowSettings: onShowSettings,
-                        onShowQueue: onShowQueue,
-                        sponsorSegments: playerState.sponsorSegments,
-                        onInteractionStarted: {
-                            isInteracting = true
-                            cancelHideTimer()
-                        },
-                        onInteractionEnded: {
-                            isInteracting = false
-                            resetHideTimer()
-                        }
-                    )
-                    .frame(width: 650)
-                    .padding(.bottom, 20)
+                        )
+                        .frame(width: 650)
+                        .padding(.bottom, 20)
+                    }
+                    .opacity(shouldShowControls ? 1 : 0)
+                    .allowsHitTesting(shouldShowControls)
                 }
-                .opacity(shouldShowControls ? 1 : 0)
-                .allowsHitTesting(shouldShowControls)
             }
             .frame(width: geometry.size.width, height: geometry.size.height)
         }
@@ -267,6 +268,22 @@ struct MacOSPlayerControlsView: View {
         .onDisappear {
             removeKeyboardMonitor()
         }
+        .task {
+            await loadLayout()
+        }
+        .onReceive(NotificationCenter.default.publisher(for: .playerControlsActivePresetDidChange)) { _ in
+            Task { await loadLayout() }
+        }
+        .onReceive(NotificationCenter.default.publisher(for: .playerControlsPresetsDidChange)) { _ in
+            Task { await loadLayout() }
+        }
+    }
+
+    // MARK: - Layout Loading
+
+    private func loadLayout() async {
+        guard let service = appEnvironment?.playerControlsLayoutService else { return }
+        layout = await service.activeLayout()
     }
 
     // MARK: - Keyboard Shortcuts
@@ -301,26 +318,32 @@ struct MacOSPlayerControlsView: View {
                 return nil // Consume event
 
             case 123: // Left arrow
-                Task { await onSeek(max(0, playerState.currentTime - 5)) }
+                let seconds = TimeInterval(layout?.centerSettings.seekBackwardSeconds ?? 5)
+                Task { await onSeekBackward(seconds) }
                 return nil
 
             case 124: // Right arrow
-                Task { await onSeek(min(playerState.duration, playerState.currentTime + 5)) }
+                let seconds = TimeInterval(layout?.centerSettings.seekForwardSeconds ?? 5)
+                Task { await onSeekForward(seconds) }
                 return nil
 
             case 126: // Up arrow
+                // In system volume mode MPV volume is pinned at 1.0; don't fight it.
+                guard layout?.globalSettings.volumeMode != .system else { return event }
                 let newVolume = min(1.0, playerState.volume + 0.1)
                 playerState.volume = newVolume
                 onVolumeChanged?(newVolume)
                 return nil
 
             case 125: // Down arrow
+                guard layout?.globalSettings.volumeMode != .system else { return event }
                 let newVolume = max(0, playerState.volume - 0.1)
                 playerState.volume = newVolume
                 onVolumeChanged?(newVolume)
                 return nil
 
             case 46: // M key
+                guard layout?.globalSettings.volumeMode != .system else { return event }
                 onMuteToggled?()
                 return nil
 

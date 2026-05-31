@@ -923,6 +923,10 @@ extension ExpandedPlayerSheet {
                     },
                     onShowQueue: { [self] in
                         showingQueueSheet = true
+                    },
+                    onRateChanged: { rate in
+                        playerState.rate = rate
+                        playerService.currentBackend?.rate = Float(rate.rawValue)
                     }
                 )
                 .frame(width: controlsWidth, height: controlsHeight)
@@ -1185,6 +1189,10 @@ extension ExpandedPlayerSheet {
                 },
                 onShowQueue: { [self] in
                     showingQueueSheet = true
+                },
+                onRateChanged: { rate in
+                    playerState.rate = rate
+                    playerService.currentBackend?.rate = Float(rate.rawValue)
                 }
             )
             .frame(width: controlsWidth, height: controlsHeight)
@@ -1595,7 +1603,11 @@ extension ExpandedPlayerSheet {
                     onTitleTap: {
                         onTogglePanel()
                     },
-                    isDetailsPanelVisible: isPanelVisible
+                    isDetailsPanelVisible: isPanelVisible,
+                    onRateChanged: { rate in
+                        playerState.rate = rate
+                        playerService.currentBackend?.rate = Float(rate.rawValue)
+                    }
                 )
                 .frame(width: availableWidth, height: availableHeight)
                 .offset(x: controlsOffset)

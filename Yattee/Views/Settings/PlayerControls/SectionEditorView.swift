@@ -30,7 +30,8 @@ struct SectionEditorView: View {
             .listRowInsets(EdgeInsets())
             .listRowBackground(Color.clear)
 
-            // Orientation toggle
+            // Orientation toggle; macOS has no portrait/landscape distinction
+            #if os(iOS)
             Picker(
                 String(localized: "settings.playerControls.previewOrientation"),
                 selection: $viewModel.isPreviewingLandscape
@@ -42,6 +43,7 @@ struct SectionEditorView: View {
             }
             .pickerStyle(.segmented)
             .listRowBackground(Color.clear)
+            #endif
 
             // Added buttons
             Section {
@@ -182,11 +184,13 @@ private struct ButtonRow: View {
             VStack(alignment: .leading, spacing: 2) {
                 Text(configuration.buttonType.displayName)
 
+                #if os(iOS)
                 if configuration.visibilityMode != .both {
                     Text(configuration.visibilityMode.displayName)
                         .font(.caption)
                         .foregroundStyle(.secondary)
                 }
+                #endif
             }
 
             Spacer()

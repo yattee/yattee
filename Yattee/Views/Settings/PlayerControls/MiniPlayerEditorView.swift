@@ -30,6 +30,8 @@ struct MiniPlayerEditorView: View {
         .navigationTitle(String(localized: "settings.playerControls.miniPlayer"))
         #if os(iOS)
         .navigationBarTitleDisplayMode(.inline)
+        #elseif os(macOS)
+        .formStyle(.grouped)
         #endif
         .onAppear {
             syncLocalState()
@@ -274,6 +276,8 @@ struct MiniPlayerButtonConfigurationView: View {
             .navigationTitle(config.buttonType.displayName)
             #if os(iOS)
             .navigationBarTitleDisplayMode(.inline)
+            #elseif os(macOS)
+            .formStyle(.grouped)
             #endif
             .onAppear {
                 syncFromConfiguration(config)

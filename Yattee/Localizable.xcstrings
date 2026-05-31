@@ -1469,6 +1469,16 @@
         }
       }
     },
+    "controls.button.keepOnTop" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Keep on Top"
+          }
+        }
+      }
+    },
     "controls.button.more" : {
       "localizations" : {
         "en" : {
@@ -13214,6 +13224,17 @@
         }
       }
     },
+    "settings.playerControls.center.seekDurationsFooter" : {
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Seek durations are used by the ← and → keyboard shortcuts and by seek buttons added to the player."
+          }
+        }
+      }
+    },
     "settings.playerControls.center.seekForward" : {
       "localizations" : {
         "en" : {
@@ -13290,6 +13311,17 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Center Controls"
+          }
+        }
+      }
+    },
+    "settings.playerControls.controlBarButtons" : {
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Control Bar Buttons"
           }
         }
       }
@@ -13500,6 +13532,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "New Preset"
+          }
+        }
+      }
+    },
+    "settings.playerControls.noButtonSettings" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "This button has no additional settings."
           }
         }
       }
@@ -13720,6 +13762,17 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Seconds"
+          }
+        }
+      }
+    },
+    "settings.playerControls.seekDurations" : {
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Seek Durations"
           }
         }
       }

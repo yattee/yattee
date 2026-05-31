@@ -20,8 +20,28 @@ struct CenterControlsSettingsView: View {
     @State private var leftSlider: SideSliderType = .disabled
     @State private var rightSlider: SideSliderType = .disabled
 
+    /// On macOS the center overlay doesn't exist; the seek durations always
+    /// apply (keyboard arrows and default seek buttons), so the controls are
+    /// always visible there.
+    private var seekBackwardControlsVisible: Bool {
+        #if os(macOS)
+        return true
+        #else
+        return showSeekBackward
+        #endif
+    }
+
+    private var seekForwardControlsVisible: Bool {
+        #if os(macOS)
+        return true
+        #else
+        return showSeekForward
+        #endif
+    }
+
     var body: some View {
         Form {
+            #if os(iOS)
             // Preview
             Section {
                 CenterPreviewView(
@@ -47,9 +67,11 @@ struct CenterControlsSettingsView: View {
             } header: {
                 Text(String(localized: "settings.playerControls.center.playback"))
             }
+            #endif
 
             // Seek backward settings
             Section {
+                #if os(iOS)
                 Toggle(
                     String(localized: "settings.playerControls.center.showSeekBackward"),
                     isOn: $showSeekBackward
@@ -57,8 +79,9 @@ struct CenterControlsSettingsView: View {
                 .onChange(of: showSeekBackward) { _, newValue in
                     viewModel.updateCenterSettingsSync { $0.showSeekBackward = newValue }
                 }
+                #endif
 
-                if showSeekBackward {
+                if seekBackwardControlsVisible {
                     #if !os(tvOS)
                     HStack {
                         Text(String(localized: "settings.playerControls.center.seekBackwardTime"))
@@ -97,6 +120,7 @@ struct CenterControlsSettingsView: View {
 
             // Seek forward settings
             Section {
+                #if os(iOS)
                 Toggle(
                     String(localized: "settings.playerControls.center.showSeekForward"),
                     isOn: $showSeekForward
@@ -104,8 +128,9 @@ struct CenterControlsSettingsView: View {
                 .onChange(of: showSeekForward) { _, newValue in
                     viewModel.updateCenterSettingsSync { $0.showSeekForward = newValue }
                 }
+                #endif
 
-                if showSeekForward {
+                if seekForwardControlsVisible {
                     #if !os(tvOS)
                     HStack {
                         Text(String(localized: "settings.playerControls.center.seekForwardTime"))
@@ -140,6 +165,13 @@ struct CenterControlsSettingsView: View {
                 }
             } header: {
                 Text(String(localized: "settings.playerControls.center.seekForward"))
+            } footer: {
+                #if os(macOS)
+                Text(String(
+                    localized: "settings.playerControls.center.seekDurationsFooter",
+                    defaultValue: "Seek durations are used by the ← and → keyboard shortcuts and by seek buttons added to the player."
+                ))
+                #endif
             }
 
             #if os(iOS)
@@ -175,7 +207,12 @@ struct CenterControlsSettingsView: View {
             }
             #endif
         }
+        #if os(macOS)
+        .formStyle(.grouped)
+        .navigationTitle(String(localized: "settings.playerControls.seekDurations", defaultValue: "Seek Durations"))
+        #else
         .navigationTitle(String(localized: "settings.playerControls.centerControls"))
+        #endif
         #if os(iOS)
         .navigationBarTitleDisplayMode(.inline)
         #endif

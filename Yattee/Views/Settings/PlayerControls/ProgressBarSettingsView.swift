@@ -29,6 +29,8 @@ struct ProgressBarSettingsView: View {
         .navigationTitle(String(localized: "settings.playerControls.progressBar"))
         #if os(iOS)
         .navigationBarTitleDisplayMode(.inline)
+        #elseif os(macOS)
+        .formStyle(.grouped)
         #endif
         .onAppear {
             loadSettings()

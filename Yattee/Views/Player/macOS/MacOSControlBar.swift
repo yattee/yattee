@@ -9,25 +9,22 @@
 
 import SwiftUI
 
-/// Condensed QuickTime-style control bar with transport, timeline, and action controls.
+/// Condensed QuickTime-style control bar with a preset-driven button row and timeline.
 struct MacOSControlBar: View {
     @Bindable var playerState: PlayerState
 
+    // MARK: - Layout & Actions
+
+    /// The button row rendered above the timeline, from the active preset's bottom section.
+    let section: LayoutSection
+    /// Global appearance settings from the active preset.
+    let globalSettings: GlobalLayoutSettings
+    /// Consolidated actions and state for the section renderer.
+    let actions: PlayerControlsActions
+
     // MARK: - Callbacks
 
-    let onPlayPause: () -> Void
     let onSeek: (TimeInterval) async -> Void
-    let onSeekForward: (TimeInterval) async -> Void
-    let onSeekBackward: (TimeInterval) async -> Void
-    var onToggleFullscreen: (() -> Void)? = nil
-    var isFullscreen: Bool = false
-    var onTogglePiP: (() -> Void)? = nil
-    var onPlayNext: (() async -> Void)? = nil
-    var onPlayPrevious: (() async -> Void)? = nil
-    var onVolumeChanged: ((Float) -> Void)? = nil
-    var onMuteToggled: (() -> Void)? = nil
-    var onShowSettings: (() -> Void)? = nil
-    var onShowQueue: (() -> Void)? = nil
     /// Whether to show chapter markers on the progress bar (default: true)
     var showChapters: Bool = true
     /// SponsorBlock segments to display on the progress bar.
@@ -48,28 +45,12 @@ struct MacOSControlBar: View {
     @State private var dragProgress: Double = 0
     @State private var isHoveringProgress = false
     @State private var hoverProgress: Double = 0
-    @State private var playNextTapCount = 0
-    @State private var playPreviousTapCount = 0
 
     // MARK: - Computed Properties
-
-    /// Whether transport controls should be disabled
-    private var isTransportDisabled: Bool {
-        playerState.isTransportDisabled
-    }
 
     /// Whether the controls are locked (playback buttons/gestures disabled except Settings).
     private var isLocked: Bool {
         playerState.isControlsLocked
-    }
-
-    private var playPauseIcon: String {
-        switch playerState.playbackState {
-        case .playing:
-            return "pause.fill"
-        default:
-            return "play.fill"
-        }
     }
 
     private var displayProgress: Double {
@@ -85,8 +66,13 @@ struct MacOSControlBar: View {
 
     var body: some View {
         VStack(spacing: 8) {
-            // Top row: volume | transport (centered) | actions
-            topRowControls
+            // Top row: preset-driven button row
+            MacOSControlsSectionRenderer(
+                section: section,
+                actions: actions,
+                globalSettings: globalSettings,
+                context: .bar
+            )
 
             // Bottom row: timeline (expanded width)
             timelineControls
@@ -132,81 +118,6 @@ struct MacOSControlBar: View {
         }
     }
 
-    // MARK: - Top Row Controls
-
-    private var topRowControls: some View {
-        HStack(spacing: 0) {
-            // Left: Volume controls
-            volumeControls
-                .disabled(isLocked)
-                .opacity(isLocked ? 0.5 : 1.0)
-
-            Spacer()
-
-            // Center: Transport controls
-            transportControls
-                .disabled(isLocked)
-                .opacity(isLocked ? 0.5 : 1.0)
-
-            Spacer()
-
-            // Right: Action buttons (settings, PiP, fullscreen)
-            trailingActionControls
-        }
-    }
-
-    // MARK: - Transport Controls
-
-    private var transportControls: some View {
-        HStack(spacing: 4) {
-            // Play previous (disabled when no previous in queue)
-            if let onPlayPrevious {
-                Button {
-                    playPreviousTapCount += 1
-                    Task { await onPlayPrevious() }
-                } label: {
-                    Image(systemName: "backward.fill")
-                        .font(.system(size: 12, weight: .medium))
-                        .frame(width: 28, height: 28)
-                        .contentShape(Rectangle())
-                        .symbolEffect(.bounce.down.byLayer, options: .nonRepeating, value: playPreviousTapCount)
-                }
-                .buttonStyle(MacOSControlButtonStyle())
-                .disabled(!playerState.hasPrevious)
-            }
-
-            // Play/Pause
-            Button {
-                onPlayPause()
-            } label: {
-                Image(systemName: playPauseIcon)
-                    .font(.system(size: 16, weight: .medium))
-                    .frame(width: 32, height: 32)
-                    .contentShape(Rectangle())
-                    .contentTransition(.symbolEffect(.replace, options: .speed(2)))
-            }
-            .buttonStyle(MacOSControlButtonStyle())
-            .disabled(isTransportDisabled)
-            .opacity(isTransportDisabled ? 0.3 : 1.0)
-
-            // Play next (disabled when no next in queue)
-            if let onPlayNext {
-                Button {
-                    playNextTapCount += 1
-                    Task { await onPlayNext() }
-                } label: {
-                    Image(systemName: "forward.fill")
-                        .font(.system(size: 12, weight: .medium))
-                        .frame(width: 28, height: 28)
-                        .contentShape(Rectangle())
-                        .symbolEffect(.bounce.down.byLayer, options: .nonRepeating, value: playNextTapCount)
-                }
-                .buttonStyle(MacOSControlButtonStyle())
-                .disabled(!playerState.hasNext)
-            }
-        }
-    }
-
     // MARK: - Timeline Controls
 
     private var timelineControls: some View {
@@ -224,7 +135,7 @@ struct MacOSControlBar: View {
             } else {
                 // Current time
                 Text(playerState.formattedCurrentTime)
-                    .font(.system(size: 11, weight: .medium, design: .rounded).monospacedDigit())
+                    .font(globalSettings.fontStyle.font(size: 11, weight: .medium))
                     .foregroundStyle(.primary)
                     .lineLimit(1)
                     .fixedSize()
@@ -234,7 +145,7 @@ struct MacOSControlBar: View {
 
                 // Duration
                 Text(playerState.formattedDuration)
-                    .font(.system(size: 11, weight: .medium, design: .rounded).monospacedDigit())
+                    .font(globalSettings.fontStyle.font(size: 11, weight: .medium))
                     .foregroundStyle(.secondary)
                     .lineLimit(1)
                     .fixedSize()
@@ -336,148 +247,41 @@ struct MacOSControlBar: View {
         .animation(.easeInOut(duration: 0.15), value: isDragging || isHoveringProgress)
     }
 
-    // MARK: - Trailing Action Controls
-
-    private var trailingActionControls: some View {
-        HStack(spacing: 4) {
-            // Queue
-            if let onShowQueue {
-                Button {
-                    onShowQueue()
-                } label: {
-                    Image(systemName: "list.bullet")
-                        .font(.system(size: 13, weight: .medium))
-                        .frame(width: 28, height: 28)
-                        .contentShape(Rectangle())
-                }
-                .buttonStyle(MacOSControlButtonStyle())
-                .disabled(isLocked)
-                .opacity(isLocked ? 0.5 : 1.0)
-            }
-
-            // More (context menu)
-            if let video = playerState.currentVideo {
-                VideoContextMenuView(
-                    video: video,
-                    accentColor: .primary,
-                    buttonSize: 28,
-                    buttonBackgroundStyle: .none,
-                    theme: .dark
-                )
-                .menuStyle(.borderlessButton)
-                .fixedSize()
-                .disabled(isLocked)
-                .opacity(isLocked ? 0.5 : 1.0)
-            }
-
-            // Settings
-            if let onShowSettings {
-                Button {
-                    onShowSettings()
-                } label: {
-                    Image(systemName: "gearshape")
-                        .font(.system(size: 13, weight: .medium))
-                        .frame(width: 28, height: 28)
-                        .contentShape(Rectangle())
-                }
-                .buttonStyle(MacOSControlButtonStyle())
-            }
-
-            // PiP
-            if let onTogglePiP {
-                Button {
-                    onTogglePiP()
-                } label: {
-                    Image(systemName: playerState.pipState == .active ? "pip.exit" : "pip.enter")
-                        .font(.system(size: 13, weight: .medium))
-                        .frame(width: 28, height: 28)
-                        .contentShape(Rectangle())
-                }
-                .buttonStyle(MacOSControlButtonStyle())
-                .disabled(isLocked || !playerState.isPiPPossible)
-                .opacity(isLocked ? 0.5 : 1.0)
-            }
-        }
-    }
-
-    private var volumeControls: some View {
-        HStack(spacing: 2) {
-            // Mute/unmute button
-            Button {
-                onMuteToggled?()
-            } label: {
-                Image(systemName: volumeIcon)
-                    .font(.system(size: 12, weight: .medium))
-                    .frame(width: 24, height: 28)
-                    .contentShape(Rectangle())
-            }
-            .buttonStyle(MacOSControlButtonStyle())
-
-            // Volume slider
-            Slider(
-                value: Binding(
-                    get: { Double(playerState.volume) },
-                    set: { newValue in
-                        playerState.volume = Float(newValue)
-                        onVolumeChanged?(Float(newValue))
-                    }
-                ),
-                in: 0...1,
-                onEditingChanged: { editing in
-                    if editing {
-                        onInteractionStarted?()
-                    } else {
-                        onInteractionEnded?()
-                    }
-                }
-            )
-            .frame(width: 70)
-            .controlSize(.mini)
-            .disabled(playerState.isMuted)
-            .opacity(playerState.isMuted ? 0.5 : 1.0)
-        }
-    }
-
-    private var volumeIcon: String {
-        if playerState.isMuted || playerState.volume == 0 {
-            return "speaker.slash.fill"
-        } else if playerState.volume < 0.33 {
-            return "speaker.wave.1.fill"
-        } else if playerState.volume < 0.66 {
-            return "speaker.wave.2.fill"
-        } else {
-            return "speaker.wave.3.fill"
-        }
-    }
-}
-
-// MARK: - Button Style
-
-/// Subtle button style for macOS control bar buttons.
-struct MacOSControlButtonStyle: ButtonStyle {
-    @Environment(\.isEnabled) private var isEnabled
-
-    func makeBody(configuration: Configuration) -> some View {
-        configuration.label
-            .foregroundStyle(isEnabled ? .primary : .secondary)
-            .opacity(configuration.isPressed ? 0.6 : 1.0)
-            .scaleEffect(configuration.isPressed ? 0.95 : 1.0)
-            .animation(.easeInOut(duration: 0.1), value: configuration.isPressed)
-    }
 }
 
 // MARK: - Preview
 
 #Preview {
+    let playerState = PlayerState()
+
     ZStack {
         Color.gray.opacity(0.3)
 
         MacOSControlBar(
-            playerState: PlayerState(),
-            onPlayPause: {},
-            onSeek: { _ in },
-            onSeekForward: { _ in },
-            onSeekBackward: { _ in }
+            playerState: playerState,
+            section: PlayerControlsLayout.default.bottomSection,
+            globalSettings: .default,
+            actions: PlayerControlsActions(
+                playerState: playerState,
+                isWideScreenLayout: true,
+                isFullscreen: false,
+                isWidescreenVideo: true,
+                isPanelVisible: false,
+                panelSide: .right,
+                showVolumeControls: true,
+                showDebugButton: false,
+                showCloseButton: false,
+                currentVideo: nil,
+                availableCaptions: [],
+                currentCaption: nil,
+                availableStreams: [],
+                currentStream: nil,
+                currentAudioStream: nil,
+                isAutoPlayNextEnabled: true,
+                yatteeServerURL: nil,
+                deArrowBrandingProvider: nil
+            ),
+            onSeek: { _ in }
         )
         .frame(width: 650)
     }

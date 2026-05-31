@@ -279,6 +279,10 @@ struct ControlsSectionRenderer: View {
             // These are center section only buttons, not rendered here
             EmptyView()
 
+        case .keepOnTop:
+            // macOS-only window pin button, not applicable on iOS
+            EmptyView()
+
         case .seek:
             if let settings = config.seekSettings {
                 seekButton(settings: settings, config: config)

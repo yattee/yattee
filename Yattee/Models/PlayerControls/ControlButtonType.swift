@@ -40,6 +40,7 @@ enum ControlButtonType: String, Codable, Hashable, Sendable, CaseIterable {
     case panscan
     case autoPlayNext
     case seek
+    case keepOnTop
 
     // MARK: - Version Tracking
 
@@ -117,6 +118,8 @@ enum ControlButtonType: String, Codable, Hashable, Sendable, CaseIterable {
             return String(localized: "controls.button.autoPlayNext")
         case .seek:
             return String(localized: "controls.button.seek")
+        case .keepOnTop:
+            return String(localized: "controls.button.keepOnTop")
         }
     }
 
@@ -185,6 +188,8 @@ enum ControlButtonType: String, Codable, Hashable, Sendable, CaseIterable {
             return "play.square.stack.fill"
         case .seek:
             return "goforward.10" // Default icon, actual icon is determined by settings
+        case .keepOnTop:
+            return "pin"
         }
     }
 
@@ -224,6 +229,30 @@ enum ControlButtonType: String, Codable, Hashable, Sendable, CaseIterable {
 
     /// Button types available for top/bottom sections.
     static var availableForHorizontalSections: [ControlButtonType] {
+        #if os(macOS)
+        [
+            .spacer,
+            .timeDisplay,
+            .titleAuthor,
+            .playPrevious,
+            .playPause,
+            .playNext,
+            .seek,
+            .queue,
+            .close,
+            .keepOnTop,
+            .volume,
+            .pictureInPicture,
+            .fullscreen,
+            .controlsLock,
+            .settings,
+            .playbackSpeed,
+            .share,
+            .contextMenu,
+            .autoPlayNext,
+            .mpvDebug
+        ]
+        #else
         [
             .spacer,
             .timeDisplay,
@@ -255,6 +284,7 @@ enum ControlButtonType: String, Codable, Hashable, Sendable, CaseIterable {
             .airplay,
             .mpvDebug
         ]
+        #endif
     }
 
     /// Button types for center section (play/pause, seek).
@@ -287,6 +317,24 @@ enum ControlButtonType: String, Codable, Hashable, Sendable, CaseIterable {
 
     /// Button types available for the mini player (curated subset for compact UI).
     static var availableForMiniPlayer: [ControlButtonType] {
+        #if os(macOS)
+        [
+            // Transport
+            .playPause,
+            .playPrevious,
+            .playNext,
+            .seek,
+            // Queue & Actions
+            .queue,
+            .close,
+            // Player Actions
+            .share,
+            .addToPlaylist,
+            .pictureInPicture,
+            // Utility
+            .playbackSpeed
+        ]
+        #else
         [
             // Transport
             .playPause,
@@ -304,5 +352,6 @@ enum ControlButtonType: String, Codable, Hashable, Sendable, CaseIterable {
             // Utility
             .playbackSpeed
         ]
+        #endif
     }
 }
