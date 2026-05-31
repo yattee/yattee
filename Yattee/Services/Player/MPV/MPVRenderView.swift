@@ -232,10 +232,17 @@ final class MPVRenderView: UIView {
         contentScaleFactor = UIScreen.main.scale
 
         // Configure EAGL layer
-        // Note: retainedBacking=true is required for glReadPixels to work (for PiP frame capture)
+        // Note: retainedBacking=true is required for glReadPixels to work (PiP frame capture).
+        // PiP exists only on iOS; on tvOS retained backing just forces the compositor to
+        // preserve the drawable's IOSurface every frame, adding GPU fence pressure (issue #949).
+        #if os(iOS)
+        let retainedBacking = true
+        #else
+        let retainedBacking = false
+        #endif
         eaglLayer?.isOpaque = true
         eaglLayer?.drawableProperties = [
-            kEAGLDrawablePropertyRetainedBacking: true,
+            kEAGLDrawablePropertyRetainedBacking: retainedBacking,
             kEAGLDrawablePropertyColorFormat: kEAGLColorFormatRGBA8
         ]
 
@@ -318,6 +325,9 @@ final class MPVRenderView: UIView {
                 MPVLogging.warn("EAGLContext.setCurrent failed in appDidEnterBackground")
             }
             glFinish()
+            // This sync block executes on the calling (main) thread — unbind so the
+            // context isn't left current on two threads.
+            EAGLContext.setCurrent(nil)
             MPVLogging.log("glFinish completed in appDidEnterBackground")
         }
     }
@@ -498,14 +508,14 @@ final class MPVRenderView: UIView {
         // Back on main thread for UIKit operations
         await MainActor.run {
             self.eaglContext = context
-            
-            // Make context current
-            EAGLContext.setCurrent(context)
-            
+
             // Create framebuffer only if view has valid bounds
+            // (createFramebuffer makes the context current itself and unbinds on exit)
             lastStableSize = bounds.size
             if bounds.size != .zero {
-                createFramebuffer()
+                renderQueue.sync {
+                    createFramebuffer()
+                }
             } else {
                 MPVLogging.log("setupAsync: deferring framebuffer creation (bounds are zero)")
             }
@@ -596,6 +606,10 @@ final class MPVRenderView: UIView {
         if !ctxSet {
             MPVLogging.warn("createFramebuffer: EAGLContext.setCurrent failed")
         }
+        // This runs on the main thread (setup/layout paths); unbind on exit so the
+        // context is never left current on two threads at once (performRender binds
+        // it on the render queue thread each frame).
+        defer { EAGLContext.setCurrent(nil) }
 
         // Generate framebuffer
         glGenFramebuffers(1, &framebuffer)
@@ -650,6 +664,12 @@ final class MPVRenderView: UIView {
             contextCurrent: EAGLContext.current() === eaglContext)
 
         EAGLContext.setCurrent(eaglContext)
+        // Unbind on exit — see createFramebuffer.
+        defer { EAGLContext.setCurrent(nil) }
+        // Drain all in-flight GPU work before deleting the renderbuffer: a pending
+        // presentRenderbuffer may still hold an IOFence on the CAEAGLLayer's IOSurface,
+        // and deleting/reallocating the surface underneath it deadlocks the GPU (issue #949).
+        glFinish()
         destroyFramebufferResources()
     }
 
@@ -807,8 +827,13 @@ final class MPVRenderView: UIView {
     /// Frame counter for periodic verbose logging (avoid spam)
     private var renderFrameLogCounter: UInt64 = 0
 
+    /// Slow-frame tracking (GPU stall diagnostics for issues #947/#949)
+    private var slowFrameCount: UInt64 = 0
+    private var lastSlowFrameWarning: Date = .distantPast
+
     private func performRender() {
         defer { isRendering = false }
+        let frameStart = Date()
 
         guard let eaglContext, let mpvClient, framebuffer != 0 else {
             // Log when render is skipped due to missing resources (rare but important)
@@ -871,6 +896,24 @@ final class MPVRenderView: UIView {
             if !presented {
                 MPVLogging.warn("performRender: presentRenderbuffer FAILED",
                     details: "fb:\(framebuffer) rb:\(colorRenderbuffer) layer:\(layer.bounds) superview:\(superview != nil)")
+            } else {
+                // Feed swap timing back to mpv — required for the display-* video-sync
+                // modes (tvOS default is display-vdrop) to pace frames correctly.
+                // macOS render views already do this.
+                mpvClient.reportSwap()
+            }
+        }
+
+        // Warn on GPU stalls: a render+present that takes far longer than a frame
+        // interval points at fence contention (see issues #947/#949). Rate-limited.
+        let frameDuration = Date().timeIntervalSince(frameStart)
+        if frameDuration > 0.05 {
+            slowFrameCount += 1
+            if Date().timeIntervalSince(lastSlowFrameWarning) > 5 {
+                lastSlowFrameWarning = Date()
+                MPVLogging.warn("performRender: slow frame",
+                    details: "duration=\(Int(frameDuration * 1000))ms slowFramesSinceLastWarning=\(slowFrameCount) size=\(renderWidth)x\(renderHeight)")
+                slowFrameCount = 0
             }
         }
 

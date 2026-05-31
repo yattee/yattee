@@ -24,6 +24,10 @@ enum MPVLogging {
     private static var _lastCheckTime: UInt64 = 0
     private static let cacheDurationNanos: UInt64 = 1_000_000_000 // 1 second
 
+    /// Whether verbose MPV logging is enabled (cached, safe from any thread).
+    /// Exposed for callers that gate their own logging on the same setting.
+    static var verboseEnabled: Bool { isEnabled() }
+
     /// Check if verbose logging is enabled (cached for performance).
     /// Safe to call from any thread.
     private static func isEnabled() -> Bool {

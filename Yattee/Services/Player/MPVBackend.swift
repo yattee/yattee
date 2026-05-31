@@ -120,6 +120,10 @@ final class MPVBackend: PlayerBackend {
     private let bufferStallTimeout: TimeInterval = 30  // Trigger refresh after 30 seconds of stall
     private var bufferStallCheckTask: Task<Void, Never>?
 
+    // Periodic playback stats logging so exported user logs can diagnose
+    // stuttering / cache starvation remotely (GitHub #947/#949)
+    private var playbackStatsTask: Task<Void, Never>?
+
     // Video dimensions for aspect ratio detection
     private var videoWidth: Int = 0
     private var videoHeight: Int = 0
@@ -378,6 +382,7 @@ final class MPVBackend: PlayerBackend {
     private func cleanup() {
         // Stop buffer stall detection
         stopBufferStallDetection()
+        stopPlaybackStatsLogging()
 
         #if os(macOS)
         // Clear MPV client callbacks before destroying - these reference the render view
@@ -749,6 +754,7 @@ final class MPVBackend: PlayerBackend {
 
         // Stop buffer stall detection
         stopBufferStallDetection()
+        stopPlaybackStatsLogging()
 
         mpvClient?.stop()
         isPlaying = false
@@ -1836,6 +1842,7 @@ extension MPVBackend: MPVClientDelegate {
         switch event {
         case MPV_EVENT_FILE_LOADED:
             LoggingService.shared.debug("MPV: File loaded", category: .mpv)
+            startPlaybackStatsLogging()
             // Log hwdec diagnostics on tvOS (use cached values to avoid sync fetch)
             #if os(tvOS)
             let codec = videoCodec.isEmpty ? "unknown" : videoCodec
@@ -1991,5 +1998,58 @@ extension MPVBackend: MPVClientDelegate {
         bufferStallCheckTask = nil
         bufferStallStartTime = nil
         LoggingService.shared.debug("MPV: Buffer stall detection stopped", category: .mpv)
+    }
+
+    // MARK: - Playback Stats Logging
+
+    /// Log cache/frame-drop/pacing stats every 10s while a file is loaded, at INFO level
+    /// so they appear in user-exported logs (diagnostics for GitHub #947/#949).
+    /// Only logs while verbose MPV logging is enabled in settings.
+    private func startPlaybackStatsLogging() {
+        guard playbackStatsTask == nil else { return }
+
+        playbackStatsTask = Task { @MainActor [weak self] in
+            while !Task.isCancelled {
+                try? await Task.sleep(for: .seconds(10))
+                guard let self, !Task.isCancelled, let client = self.mpvClient else { return }
+
+                // Gate on the verbose setting each tick (not at task start) so
+                // toggling it mid-playback takes effect without a reload
+                guard MPVLogging.verboseEnabled else { continue }
+
+                let props = await client.getDebugPropertiesAsync()
+
+                func megabytes(_ bytes: Int64) -> String {
+                    String(format: "%.1fMiB", Double(bytes) / 1_048_576)
+                }
+
+                var parts: [String] = ["paused=\(!self.isPlaying)"]
+                if let hwdec = props.hwdecCurrent { parts.append("hwdec=\(hwdec)") }
+                if let fps = props.estimatedVfFps { parts.append(String(format: "vf-fps=%.2f", fps)) }
+                if let avsync = props.avsync { parts.append(String(format: "avsync=%.3f", avsync)) }
+                var drops: [String] = []
+                if let vo = props.frameDropCount { drops.append("vo=\(vo)") }
+                if let dec = props.decoderFrameDropCount { drops.append("dec=\(dec)") }
+                if let mistimed = props.mistimedFrameCount { drops.append("mistimed=\(mistimed)") }
+                if let delayed = props.voDelayedFrameCount { drops.append("delayed=\(delayed)") }
+                if !drops.isEmpty { parts.append("dropped(\(drops.joined(separator: " ")))") }
+                var cache: [String] = []
+                if let duration = props.demuxerCacheDuration { cache.append(String(format: "dur=%.1fs", duration)) }
+                if let state = props.cacheState {
+                    cache.append("fw=\(megabytes(state.forwardBytes))")
+                    cache.append("rate=\(megabytes(state.inputRate))/s")
+                    cache.append("eof=\(state.eofCached)")
+                }
+                if !cache.isEmpty { parts.append("cache(\(cache.joined(separator: " ")))") }
+
+                LoggingService.shared.info("MPV playback stats: \(parts.joined(separator: " "))", category: .mpv)
+            }
+        }
+    }
+
+    /// Stop periodic playback stats logging.
+    private func stopPlaybackStatsLogging() {
+        playbackStatsTask?.cancel()
+        playbackStatsTask = nil
     }
 }
