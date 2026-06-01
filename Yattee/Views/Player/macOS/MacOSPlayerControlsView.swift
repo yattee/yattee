@@ -48,6 +48,10 @@ struct MacOSPlayerControlsView: View {
     @State private var showControls: Bool?
     @State private var keyboardMonitor: Any?
 
+    /// Window hosting these controls; keyboard shortcuts only apply to events
+    /// destined for this window (not e.g. the Settings window).
+    @State private var hostWindow: NSWindow?
+
     /// The active player controls layout (macOS preset). `nil` until loaded, so
     /// the bars don't flash a wrong default before the preset arrives.
     @State private var layout: PlayerControlsLayout?
@@ -225,6 +229,10 @@ struct MacOSPlayerControlsView: View {
             }
             .frame(width: geometry.size.width, height: geometry.size.height)
         }
+        .background(
+            HostWindowReader(window: $hostWindow)
+                .allowsHitTesting(false)
+        )
         .animation(.easeInOut(duration: 0.2), value: shouldShowControls)
         .onContinuousHover { phase in
             switch phase {
@@ -290,8 +298,12 @@ struct MacOSPlayerControlsView: View {
 
     private func setupKeyboardMonitor() {
         keyboardMonitor = NSEvent.addLocalMonitorForEvents(matching: .keyDown) { [self] event in
-            // Only handle events when the player window is key (active)
-            guard NSApp.keyWindow != nil else { return event }
+            // Only handle keys destined for the window hosting the player;
+            // pass through events for other windows (e.g. Settings).
+            guard let window = event.window, window === hostWindow else { return event }
+
+            // Let text fields receive typing (the field editor is an NSText).
+            if window.firstResponder is NSText { return event }
 
             // When controls are locked, ignore playback keys (space/arrows/mute) and
             // only keep fullscreen (F) and exit-fullscreen (Esc) working.
@@ -398,6 +410,41 @@ struct MacOSPlayerControlsView: View {
     private func cancelHideTimer() {
         hideTimer?.invalidate()
         hideTimer = nil
+    }
+}
+
+// MARK: - Host Window Reader
+
+/// Reports the `NSWindow` hosting this view so the keyboard monitor can ignore
+/// events destined for other windows. Tracks re-parenting (mini bar <-> sheet
+/// <-> floating window) via `viewDidMoveToWindow`.
+private struct HostWindowReader: NSViewRepresentable {
+    @Binding var window: NSWindow?
+
+    func makeNSView(context: Context) -> ReaderView {
+        let view = ReaderView()
+        view.onWindowChange = { newWindow in
+            if window !== newWindow { window = newWindow }
+        }
+        return view
+    }
+
+    func updateNSView(_ nsView: ReaderView, context: Context) {
+        nsView.onWindowChange = { newWindow in
+            if window !== newWindow { window = newWindow }
+        }
+    }
+
+    final class ReaderView: NSView {
+        var onWindowChange: ((NSWindow?) -> Void)?
+
+        override func viewDidMoveToWindow() {
+            super.viewDidMoveToWindow()
+            let window = window
+            DispatchQueue.main.async { [weak self] in
+                self?.onWindowChange?(window)
+            }
+        }
     }
 }
 
