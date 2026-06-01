@@ -31,6 +31,11 @@ struct HomeSettingsView: View {
     // Edit mode for delete functionality
     @State private var isEditMode = false
 
+    // Load settings only once per presentation: pushing a child page (e.g. the
+    // card style view) fires onDisappear/onAppear on this view, and re-running
+    // loadSettings on pop-back would clobber edits made through bindings.
+    @State private var hasLoadedSettings = false
+
     #if os(macOS)
     // macOS: drive the style page programmatically. A List-embedded NavigationLink
     // gets stuck in the selected (blue) state after popping back and can't be
@@ -59,7 +64,8 @@ struct HomeSettingsView: View {
             HomeShortcutStyleView(
                 style: $shortcutCardStyle,
                 palette: $shortcutColorfulPalette,
-                customColors: $shortcutCustomPaletteColors
+                customColors: $shortcutCustomPaletteColors,
+                onSave: saveSettingsIfLoaded
             )
         }
         #endif
@@ -70,6 +76,8 @@ struct HomeSettingsView: View {
         .navigationBarTitleDisplayMode(.inline)
         #endif
         .onAppear {
+            guard !hasLoadedSettings else { return }
+            hasLoadedSettings = true
             loadSettings()
         }
         .onDisappear {
@@ -120,7 +128,8 @@ struct HomeSettingsView: View {
                     HomeShortcutStyleView(
                         style: $shortcutCardStyle,
                         palette: $shortcutColorfulPalette,
-                        customColors: $shortcutCustomPaletteColors
+                        customColors: $shortcutCustomPaletteColors,
+                        onSave: saveSettingsIfLoaded
                     )
                 }
                 #endif
@@ -338,6 +347,11 @@ struct HomeSettingsView: View {
         let sources = env.mediaSourcesManager.sources
         availableShortcutsByMediaSource = settings.allAvailableMediaSourceShortcuts(sources: sources)
         availableSectionsByMediaSource = settings.allAvailableMediaSourceSections(sources: sources)
+    }
+
+    private func saveSettingsIfLoaded() {
+        guard hasLoadedSettings else { return }
+        saveSettings()
     }
 
     private func saveSettings() {

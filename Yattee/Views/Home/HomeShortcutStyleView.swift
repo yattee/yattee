@@ -14,6 +14,11 @@ struct HomeShortcutStyleView: View {
     @Binding var palette: HomeShortcutColorfulPalette
     @Binding var customColors: [String]
 
+    /// Called after any value changes so the owner persists immediately. The
+    /// owner sits covered in the navigation stack where its own onChange never
+    /// fires, and swipe-dismissing the sheet from here skips its lifecycle.
+    var onSave: (() -> Void)? = nil
+
     /// Editing mode for the custom palette.
     private enum CustomEditMode: String, CaseIterable {
         case list
@@ -87,6 +92,9 @@ struct HomeShortcutStyleView: View {
         #if os(iOS)
         .navigationBarTitleDisplayMode(.inline)
         #endif
+        .onChange(of: style) { onSave?() }
+        .onChange(of: palette) { onSave?() }
+        .onChange(of: customColors) { onSave?() }
     }
 
     // MARK: - Palette
