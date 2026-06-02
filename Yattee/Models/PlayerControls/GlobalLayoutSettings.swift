@@ -411,6 +411,9 @@ struct GlobalLayoutSettings: Codable, Hashable, Sendable {
     /// How volume is controlled during playback.
     var volumeMode: VolumeMode
 
+    /// Forced appearance for the macOS control bar's glass background.
+    var controlBarTheme: ControlsTheme
+
     /// Theme derived from style (for backwards compatibility).
     var theme: ControlsTheme { style.theme }
 
@@ -433,6 +436,7 @@ struct GlobalLayoutSettings: Codable, Hashable, Sendable {
         case systemControlsMode
         case systemControlsSeekDuration
         case volumeMode
+        case controlBarTheme
     }
 
     init(from decoder: Decoder) throws {
@@ -445,6 +449,7 @@ struct GlobalLayoutSettings: Codable, Hashable, Sendable {
         systemControlsMode = try container.decodeIfPresent(SystemControlsMode.self, forKey: .systemControlsMode) ?? .seek
         systemControlsSeekDuration = try container.decodeIfPresent(SystemControlsSeekDuration.self, forKey: .systemControlsSeekDuration) ?? .tenSeconds
         volumeMode = try container.decodeIfPresent(VolumeMode.self, forKey: .volumeMode) ?? .mpv
+        controlBarTheme = try container.decodeIfPresent(ControlsTheme.self, forKey: .controlBarTheme) ?? .system
     }
 
     func encode(to encoder: Encoder) throws {
@@ -457,6 +462,7 @@ struct GlobalLayoutSettings: Codable, Hashable, Sendable {
         try container.encode(systemControlsMode, forKey: .systemControlsMode)
         try container.encode(systemControlsSeekDuration, forKey: .systemControlsSeekDuration)
         try container.encode(volumeMode, forKey: .volumeMode)
+        try container.encode(controlBarTheme, forKey: .controlBarTheme)
     }
 
     // MARK: - Initialization
@@ -469,7 +475,8 @@ struct GlobalLayoutSettings: Codable, Hashable, Sendable {
         controlsFadeOpacity: Double = 0.5,
         systemControlsMode: SystemControlsMode = .seek,
         systemControlsSeekDuration: SystemControlsSeekDuration = .tenSeconds,
-        volumeMode: VolumeMode = .mpv
+        volumeMode: VolumeMode = .mpv,
+        controlBarTheme: ControlsTheme = .system
     ) {
         self.style = style
         self.buttonSize = buttonSize
@@ -478,6 +485,7 @@ struct GlobalLayoutSettings: Codable, Hashable, Sendable {
         self.systemControlsMode = systemControlsMode
         self.systemControlsSeekDuration = systemControlsSeekDuration
         self.volumeMode = volumeMode
+        self.controlBarTheme = controlBarTheme
     }
 
     // MARK: - Defaults

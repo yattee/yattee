@@ -1859,6 +1859,17 @@
         }
       }
     },
+    "controls.theme.auto" : {
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Auto"
+          }
+        }
+      }
+    },
     "controls.theme.dark" : {
       "localizations" : {
         "en" : {
@@ -13315,13 +13326,13 @@
         }
       }
     },
-    "settings.playerControls.controlBarButtons" : {
+    "settings.playerControls.controlBar" : {
       "extractionState" : "extracted_with_value",
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "Control Bar Buttons"
+            "value" : "Control Bar"
           }
         }
       }
@@ -13392,6 +13403,17 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Font Style"
+          }
+        }
+      }
+    },
+    "settings.playerControls.glassBackground" : {
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Glass Background"
           }
         }
       }

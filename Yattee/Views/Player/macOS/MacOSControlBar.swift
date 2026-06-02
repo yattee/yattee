@@ -80,7 +80,7 @@ struct MacOSControlBar: View {
         .padding(.horizontal, 16)
         .padding(.vertical, 10)
         .frame(maxWidth: 500)
-        .glassBackground(.regular, in: .rect(cornerRadius: 16))
+        .glassBackground(.regular, in: .rect(cornerRadius: 16), colorScheme: globalSettings.controlBarTheme.colorScheme)
         .shadow(color: .black.opacity(0.3), radius: 8, y: 4)
         // Seek preview overlay - positioned above the control bar
         .overlay(alignment: .bottom) {

@@ -354,7 +354,7 @@ private struct LayoutSectionsSection: View {
                 HStack {
                     #if os(macOS)
                     Label(
-                        String(localized: "settings.playerControls.controlBarButtons", defaultValue: "Control Bar Buttons"),
+                        String(localized: "settings.playerControls.controlBar", defaultValue: "Control Bar"),
                         systemImage: "rectangle.bottomthird.inset.filled"
                     )
                     #else
