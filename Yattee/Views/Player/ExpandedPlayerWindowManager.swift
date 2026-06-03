@@ -49,6 +49,13 @@ final class ExpandedPlayerWindowManager: NSObject {
     func show(with appEnvironment: AppEnvironment, animated: Bool = true) {
         // If window already exists (hidden for PiP), restore it instead of creating new one
         if let existingWindow = playerWindow {
+            // Already on screen (e.g. "Play Now" while playing) — just bring it
+            // forward; resetting alphaValue here would make the window blink.
+            if existingWindow.isVisible {
+                LoggingService.shared.debug("ExpandedPlayerWindowManager: show() - window already visible, bringing to front", category: .player)
+                existingWindow.makeKeyAndOrderFront(nil)
+                return
+            }
             LoggingService.shared.debug("ExpandedPlayerWindowManager: show() - restoring existing window (was hidden for PiP)", category: .player)
             if animated {
                 existingWindow.alphaValue = 0
