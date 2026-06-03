@@ -77,9 +77,6 @@ final class MPVOpenGLLayer: CAOpenGLLayer {
     /// Buffer depth (8 for standard, 16 for 10-bit).
     private var bufferDepth: GLint = 8
 
-    /// Current framebuffer object ID.
-    private var fbo: GLint = 1
-
     /// When `true` the frame needs to be rendered.
     private var needsFlip = false
     private let needsFlipLock = NSLock()
@@ -87,6 +84,15 @@ final class MPVOpenGLLayer: CAOpenGLLayer {
     /// When `true` drawing will proceed even if mpv indicates nothing needs to be done.
     private var forceDraw = false
     private let forceDrawLock = NSLock()
+
+    /// Retry bookkeeping for draws dropped due to a zero-sized viewport or
+    /// missing framebuffer (e.g. the shared view re-parented into a window
+    /// whose content hasn't been laid out yet).
+    private var droppedDrawRetries = 0
+    private let droppedDrawRetryLock = NSLock()
+
+    /// True while a forced draw has been requested but not yet executed.
+    var hasPendingForcedDraw: Bool { forceDrawLock.withLock { forceDraw } }
 
     /// Whether the layer has been set up with an MPV client.
     private var isSetup = false
@@ -317,14 +323,10 @@ final class MPVOpenGLLayer: CAOpenGLLayer {
     ) {
         guard !isUninited, isSetup, let mpvClient else { return }
 
-        // Reset flags
-        needsFlipLock.withLock { needsFlip = false }
-        forceDrawLock.withLock { forceDraw = false }
-
-        // Clear the buffer
-        glClear(GLbitfield(GL_COLOR_BUFFER_BIT))
-
-        // Get current FBO binding and viewport dimensions
+        // Validate the render target FIRST — before consuming flags or
+        // touching GL state. A forced draw that lands while the re-attached
+        // layer has no size/drawable must stay armed so a retry can repaint;
+        // consuming it here used to leave the video permanently black.
         var currentFBO: GLint = 0
         glGetIntegerv(GLenum(GL_DRAW_FRAMEBUFFER_BINDING), &currentFBO)
 
@@ -334,16 +336,30 @@ final class MPVOpenGLLayer: CAOpenGLLayer {
         let width = viewport[2]
         let height = viewport[3]
 
-        guard width > 0, height > 0 else { return }
-
-        // Use the detected FBO (or fallback to cached)
-        if currentFBO != 0 {
-            fbo = currentFBO
+        guard width > 0, height > 0, currentFBO != 0 else {
+            let boundsSize = bounds.size
+            let droppedFBO = currentFBO
+            Task { @MainActor in
+                LoggingService.shared.warning(
+                    "MPVOpenGLLayer: dropped draw - viewport \(width)x\(height), fbo=\(droppedFBO), bounds=\(boundsSize), re-arming forced draw",
+                    category: .mpv
+                )
+            }
+            scheduleDroppedDrawRetry()
+            return
         }
+
+        // Reset flags
+        needsFlipLock.withLock { needsFlip = false }
+        forceDrawLock.withLock { forceDraw = false }
+        droppedDrawRetryLock.withLock { droppedDrawRetries = 0 }
+
+        // Clear the buffer
+        glClear(GLbitfield(GL_COLOR_BUFFER_BIT))
 
         // Render the frame
         mpvClient.renderWithDepth(
-            fbo: fbo,
+            fbo: currentFBO,
             width: width,
             height: height,
             depth: bufferDepth
@@ -351,9 +367,20 @@ final class MPVOpenGLLayer: CAOpenGLLayer {
 
         glFlush()
 
+        if !hasRenderedFirstFrame {
+            let glError = glGetError()
+            let renderedFBO = currentFBO
+            Task { @MainActor in
+                LoggingService.shared.debug(
+                    "MPVOpenGLLayer: first-frame draw fbo=\(renderedFBO) viewport=\(width)x\(height) glError=\(glError)",
+                    category: .mpv
+                )
+            }
+        }
+
         // Capture frame for PiP if enabled
         if captureFramesForPiP {
-            captureFrameForPiP(viewWidth: width, viewHeight: height, mainFBO: fbo)
+            captureFrameForPiP(viewWidth: width, viewHeight: height, mainFBO: currentFBO)
         }
 
         // Mark that we've rendered a frame (for first-frame tracking)
@@ -446,6 +473,30 @@ final class MPVOpenGLLayer: CAOpenGLLayer {
             } else {
                 self.display()
             }
+        }
+    }
+
+    /// Schedule a bounded retry after a draw was dropped because the layer
+    /// had no valid viewport/framebuffer yet. Keeps retrying only while the
+    /// forced-draw request is still pending; `setFrameSize` on the hosting
+    /// view covers the case where the layer gains its size later than this.
+    private func scheduleDroppedDrawRetry() {
+        let attempt = droppedDrawRetryLock.withLock { () -> Int in
+            droppedDrawRetries += 1
+            return droppedDrawRetries
+        }
+        guard attempt <= 5 else { return }
+
+        renderQueue.asyncAfter(deadline: .now() + .milliseconds(50)) { [weak self] in
+            guard let self, !self.isUninited else { return }
+            guard self.hasPendingForcedDraw else { return }
+            Task { @MainActor in
+                LoggingService.shared.debug(
+                    "MPVOpenGLLayer: retrying dropped forced draw (attempt \(attempt))",
+                    category: .mpv
+                )
+            }
+            self.display()
         }
     }
 
@@ -563,10 +614,29 @@ final class MPVOpenGLLayer: CAOpenGLLayer {
         renderQueue.async { [weak self] in
             guard let self else { return }
 
+            CGLLockContext(self.cglContext)
             CGLSetCurrentContext(self.cglContext)
-            glClearColor(0.0, 0.0, 0.0, 1.0)
-            glClear(GLbitfield(GL_COLOR_BUFFER_BIT))
-            glFlush()
+
+            // Only clear when a framebuffer is actually bound. Clearing FBO 0
+            // on this core-profile context (no drawable attached outside of
+            // CAOpenGLLayer.draw) is framebuffer-incomplete and latches
+            // GL_INVALID_FRAMEBUFFER_OPERATION, which libmpv then reports as
+            // "after creating texture: OpenGL error INVALID_FRAMEBUFFER_OPERATION".
+            var boundFBO: GLint = 0
+            glGetIntegerv(GLenum(GL_DRAW_FRAMEBUFFER_BINDING), &boundFBO)
+            if boundFBO != 0 {
+                glClearColor(0.0, 0.0, 0.0, 1.0)
+                glClear(GLbitfield(GL_COLOR_BUFFER_BIT))
+                glFlush()
+            } else {
+                Task { @MainActor in
+                    LoggingService.shared.debug(
+                        "MPVOpenGLLayer: clearToBlack skipped glClear (no framebuffer bound)",
+                        category: .mpv
+                    )
+                }
+            }
+            CGLUnlockContext(self.cglContext)
 
             // Force a display to show the cleared frame
             self.update(force: true)

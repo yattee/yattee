@@ -191,6 +191,19 @@ final class MPVOGLView: NSView {
         updateDisplayRefreshRate()
     }
 
+    override func setFrameSize(_ newSize: NSSize) {
+        super.setFrameSize(newSize)
+
+        // If a forced draw was requested while the layer had no size/drawable
+        // (shared view re-parented into the deferred expanded sheet), repaint
+        // on the first non-zero layout. Gated on hasPendingForcedDraw so
+        // ordinary resizes don't trigger redundant redraws.
+        guard newSize.width > 0, newSize.height > 0,
+              let videoLayer, videoLayer.hasPendingForcedDraw else { return }
+        LoggingService.shared.debug("MPVOGLView: retrying pending forced draw after resize to \(newSize)", category: .mpv)
+        videoLayer.update(force: true)
+    }
+
     override func draw(_ dirtyRect: NSRect) {
         // No-op - the layer handles all drawing
     }
