@@ -521,8 +521,13 @@ final class MPVRenderView: UIView {
             }
         }
 
-        // Create MPV render context with our getProcAddress function
+        // Create MPV render context with our getProcAddress function.
+        // mpv_render_context_create probes GL (glGetString) on the calling thread —
+        // the EAGL context must be current here. Unbind after so it isn't left
+        // current on main (performRender binds it on the render queue per frame).
+        EAGLContext.setCurrent(context)
         let success = client.createRenderContext(getProcAddress: getProcAddress)
+        EAGLContext.setCurrent(nil)
         if !success {
             MPVLogging.warn("setupAsync: failed to create MPV render context")
             throw MPVRenderError.renderContextFailed(-1)
