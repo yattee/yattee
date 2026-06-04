@@ -475,6 +475,10 @@ extension ExpandedPlayerWindowManager: NSWindowDelegate {
             // Clear reference first so hide() becomes a no-op
             playerWindow = nil
 
+            // Clear queue so closing the window fully ends the session,
+            // matching the close button behavior
+            appEnvironment?.queueManager.clearQueue()
+
             // Stop player BEFORE cleaning up window to avoid crash
             // The player must be stopped while views still exist to ensure
             // proper cleanup of render resources
