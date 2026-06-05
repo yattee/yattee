@@ -453,7 +453,12 @@ final class MPVClient: @unchecked Sendable {
 
         // Audio
         setOptionSync("audio-client-name", "Yattee")
-        #if os(iOS) || os(tvOS)
+        #if os(tvOS)
+        // Prefer avfoundation (AVSampleBufferAudioRenderer): audiounit can't open
+        // 32-channel HDMI routes (Atmos "Continuous Audio Output") and stays silent.
+        // mpv falls back to audiounit if avfoundation fails to initialize.
+        setOptionSync("ao", "avfoundation,audiounit")
+        #elseif os(iOS)
         setOptionSync("ao", "audiounit")
         #elseif os(macOS)
         setOptionSync("ao", "coreaudio")
