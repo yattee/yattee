@@ -233,6 +233,52 @@ struct SearchView: View {
         .navigationTitle(String(localized: "tabs.search"))
         .toolbarTitleDisplayMode(.inlineLarge)
         .toolbar {
+            #if os(macOS)
+            if searchInstance?.supportsSearchFilters == true {
+                if #available(macOS 26, *) {
+                    // Items stay in the toolbar even before a search is submitted
+                    // (invisible and inert) so the search field keeps a stable size.
+                    ToolbarItem(placement: .navigation) {
+                        Button {
+                            showFilterSheet = true
+                        } label: {
+                            Label(String(localized: "search.filters"), systemImage: filtersIconName)
+                        }
+                        .opacity(hasSearched ? 1 : 0)
+                        .disabled(!hasSearched)
+                        .accessibilityHidden(!hasSearched)
+                    }
+                    .sharedBackgroundVisibility(hasSearched ? .automatic : .hidden)
+                    ToolbarItem(placement: .principal) {
+                        contentTypePicker
+                            .fixedSize()
+                            .opacity(hasSearched ? 1 : 0)
+                            .disabled(!hasSearched)
+                            .accessibilityHidden(!hasSearched)
+                    }
+                    .sharedBackgroundVisibility(hasSearched ? .automatic : .hidden)
+                } else if hasSearched {
+                    ToolbarItem(placement: .navigation) {
+                        Button {
+                            showFilterSheet = true
+                        } label: {
+                            Label(String(localized: "search.filters"), systemImage: filtersIconName)
+                        }
+                    }
+                    ToolbarItem(placement: .principal) {
+                        contentTypePicker
+                            .fixedSize()
+                    }
+                }
+            }
+            #endif
+            #if os(macOS)
+            // Pin the trailing group (view options + search field) to the right edge
+            // so it doesn't shift when the filter items appear/disappear.
+            if #available(macOS 26, *) {
+                ToolbarSpacer(.flexible, placement: .primaryAction)
+            }
+            #endif
             ToolbarItem(placement: .primaryAction) {
                 Button {
                     showViewOptions = true
@@ -246,6 +292,12 @@ struct SearchView: View {
         .onSubmit(of: .search) {
             searchViewModel?.cancelSuggestions()
             searchViewModel?.filters.type = .video
+            if let filters = searchViewModel?.filters {
+                saveFilters(filters)
+            }
+            Task { await searchViewModel?.search(query: searchTextBinding.wrappedValue) }
+        }
+        .onChange(of: searchViewModel?.filters.type) { _, _ in
             if let filters = searchViewModel?.filters {
                 saveFilters(filters)
             }
@@ -424,39 +476,41 @@ struct SearchView: View {
     }
 
     #if !os(tvOS)
+    private var filtersIconName: String {
+        (searchViewModel?.filters.isDefault ?? true)
+            ? "line.3.horizontal.decrease.circle"
+            : "line.3.horizontal.decrease.circle.fill"
+    }
+
+    // Content type segmented picker
+    private var contentTypePicker: some View {
+        Picker("", selection: Binding(
+            get: { searchViewModel?.filters.type ?? .video },
+            set: { searchViewModel?.filters.type = $0 }
+        )) {
+            ForEach(SearchContentType.allCases) { type in
+                Text(type.title).tag(type)
+            }
+        }
+        .pickerStyle(.segmented)
+    }
+    #endif
+
+    #if os(iOS)
     private var searchFiltersStrip: some View {
         HStack(spacing: 12) {
             // Filter button
             Button {
                 showFilterSheet = true
             } label: {
-                Image(systemName: (searchViewModel?.filters.isDefault ?? true)
-                    ? "line.3.horizontal.decrease.circle"
-                    : "line.3.horizontal.decrease.circle.fill")
+                Image(systemName: filtersIconName)
                     .font(.title2)
             }
 
-            // Content type segmented picker
-            Picker("", selection: Binding(
-                get: { searchViewModel?.filters.type ?? .video },
-                set: { searchViewModel?.filters.type = $0 }
-            )) {
-                ForEach(SearchContentType.allCases) { type in
-                    Text(type.title).tag(type)
-                }
-            }
-            .pickerStyle(.segmented)
+            contentTypePicker
         }
         .padding(.horizontal)
         .padding(.vertical, 8)
-        .onChange(of: searchViewModel?.filters.type) { _, _ in
-            if let filters = searchViewModel?.filters {
-                saveFilters(filters)
-            }
-            Task {
-                await searchViewModel?.search(query: searchTextBinding.wrappedValue)
-            }
-        }
     }
     #endif
 
@@ -973,9 +1027,11 @@ struct SearchView: View {
                 .overlay(
                     ScrollView {
                         VStack(spacing: 16) {
+                            #if os(iOS)
                             if searchInstance?.supportsSearchFilters == true {
                                 searchFiltersStrip
                             }
+                            #endif
 
                             ProgressView()
                                 .accessibilityIdentifier("search.loading")
@@ -1056,7 +1112,7 @@ struct SearchView: View {
         if let vm = searchViewModel {
             VStack(spacing: 0) {
                 // Filter strip at top (only for instances that support search filters)
-                #if !os(tvOS)
+                #if os(iOS)
                 if searchInstance?.supportsSearchFilters == true {
                     searchFiltersStrip
                 }
@@ -1084,7 +1140,7 @@ struct SearchView: View {
         if let vm = searchViewModel {
             VStack(spacing: 0) {
                 // Filter strip at top (only for instances that support search filters)
-                #if !os(tvOS)
+                #if os(iOS)
                 if searchInstance?.supportsSearchFilters == true {
                     searchFiltersStrip
                 }
@@ -1174,7 +1230,7 @@ struct SearchView: View {
         if let vm = searchViewModel {
             LazyVStack(spacing: 16) {
                 // Filter strip at top (only for instances that support search filters)
-                #if !os(tvOS)
+                #if os(iOS)
                 if searchInstance?.supportsSearchFilters == true {
                     searchFiltersStrip
                         .padding(.bottom, 8)
