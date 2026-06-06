@@ -79,6 +79,16 @@ struct HistoryListView: View {
         return ([], nil)
     }
 
+    private var viewOptionsSheetContent: some View {
+        ViewOptionsSheet(
+            layout: $layout,
+            rowStyle: $rowStyle,
+            gridColumns: $gridColumns,
+            hideWatched: nil,  // No hide watched for history view
+            maxGridColumns: gridConfig.maxColumns
+        )
+    }
+
     var body: some View {
         GeometryReader { geometry in
             #if os(tvOS)
@@ -165,6 +175,11 @@ struct HistoryListView: View {
                     Label(String(localized: "viewOptions.title"), systemImage: "slider.horizontal.3")
                 }
                 .liquidGlassTransitionSource(id: "historyViewOptions", in: sheetTransition)
+                #if os(macOS)
+                .popover(isPresented: $showViewOptions, arrowEdge: .bottom) {
+                    viewOptionsSheetContent
+                }
+                #endif
             }
 
             // Clear history menu (only when not empty)
@@ -186,16 +201,12 @@ struct HistoryListView: View {
             }
         }
         #endif
+        #if !os(macOS)
         .sheet(isPresented: $showViewOptions) {
-            ViewOptionsSheet(
-                layout: $layout,
-                rowStyle: $rowStyle,
-                gridColumns: $gridColumns,
-                hideWatched: nil,  // No hide watched for history view
-                maxGridColumns: gridConfig.maxColumns
-            )
-            .liquidGlassSheetContent(sourceID: "historyViewOptions", in: sheetTransition)
+            viewOptionsSheetContent
+                .liquidGlassSheetContent(sourceID: "historyViewOptions", in: sheetTransition)
         }
+        #endif
         .confirmationDialog(
             confirmationTitle,
             isPresented: $showingClearConfirmation,

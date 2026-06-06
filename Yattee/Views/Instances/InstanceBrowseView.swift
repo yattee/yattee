@@ -112,6 +112,16 @@ struct InstanceBrowseView: View {
         }
     }
 
+    private var viewOptionsSheetContent: some View {
+        ViewOptionsSheet(
+            layout: $layout,
+            rowStyle: $rowStyle,
+            gridColumns: $gridColumnCount,
+            hideWatched: $hideWatched,
+            maxGridColumns: gridConfig.maxColumns
+        )
+    }
+
     var body: some View {
         let backgroundStyle: ListBackgroundStyle = listStyle == .inset ? .grouped : .plain
         GeometryReader { geometry in
@@ -337,19 +347,20 @@ struct InstanceBrowseView: View {
                     Label(String(localized: "viewOptions.title"), systemImage: "slider.horizontal.3")
                 }
                 .liquidGlassTransitionSource(id: "instanceBrowseViewOptions", in: sheetTransition)
+                #if os(macOS)
+                .popover(isPresented: $showViewOptions, arrowEdge: .bottom) {
+                    viewOptionsSheetContent
+                }
+                #endif
             }
         }
         #endif
+        #if !os(macOS)
         .sheet(isPresented: $showViewOptions) {
-            ViewOptionsSheet(
-                layout: $layout,
-                rowStyle: $rowStyle,
-                gridColumns: $gridColumnCount,
-                hideWatched: $hideWatched,
-                maxGridColumns: gridConfig.maxColumns
-            )
-            .liquidGlassSheetContent(sourceID: "instanceBrowseViewOptions", in: sheetTransition)
+            viewOptionsSheetContent
+                .liquidGlassSheetContent(sourceID: "instanceBrowseViewOptions", in: sheetTransition)
         }
+        #endif
         .task {
             // Initialize search view model
             if let appEnvironment {

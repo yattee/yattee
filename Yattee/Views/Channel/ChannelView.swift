@@ -144,6 +144,16 @@ struct ChannelView: View {
         showInsetBackground ? ListBackgroundStyle.grouped.color : ListBackgroundStyle.plain.color
     }
 
+    private var viewOptionsSheetContent: some View {
+        ViewOptionsSheet(
+            layout: $layout,
+            rowStyle: $rowStyle,
+            gridColumns: $gridColumns,
+            hideWatched: $hideWatched,
+            maxGridColumns: gridConfig.maxColumns
+        )
+    }
+
     var body: some View {
         Group {
             if let channel {
@@ -328,6 +338,11 @@ struct ChannelView: View {
                     Label(String(localized: "viewOptions.title"), systemImage: "slider.horizontal.3")
                 }
                 .liquidGlassTransitionSource(id: "channelViewOptions", in: sheetTransition)
+                #if os(macOS)
+                .popover(isPresented: $showViewOptions, arrowEdge: .bottom) {
+                    viewOptionsSheetContent
+                }
+                #endif
             }
 
             #if !os(tvOS)
@@ -340,16 +355,12 @@ struct ChannelView: View {
                 channelMenu
             }
         }
+        #if !os(macOS)
         .sheet(isPresented: $showViewOptions) {
-            ViewOptionsSheet(
-                layout: $layout,
-                rowStyle: $rowStyle,
-                gridColumns: $gridColumns,
-                hideWatched: $hideWatched,
-                maxGridColumns: gridConfig.maxColumns
-            )
-            .liquidGlassSheetContent(sourceID: "channelViewOptions", in: sheetTransition)
+            viewOptionsSheetContent
+                .liquidGlassSheetContent(sourceID: "channelViewOptions", in: sheetTransition)
         }
+        #endif
         #if os(iOS)
         .toolbarBackground(collapseProgress > 0.8 ? .visible : .hidden, for: .navigationBar)
         .navigationBarTitleDisplayMode(.inline)
@@ -487,6 +498,11 @@ struct ChannelView: View {
                     Label(String(localized: "viewOptions.title"), systemImage: "slider.horizontal.3")
                 }
                 .liquidGlassTransitionSource(id: "channelViewOptions", in: sheetTransition)
+                #if os(macOS)
+                .popover(isPresented: $showViewOptions, arrowEdge: .bottom) {
+                    viewOptionsSheetContent
+                }
+                #endif
             }
 
             #if !os(tvOS)
@@ -499,16 +515,12 @@ struct ChannelView: View {
                 channelMenu
             }
         }
+        #if !os(macOS)
         .sheet(isPresented: $showViewOptions) {
-            ViewOptionsSheet(
-                layout: $layout,
-                rowStyle: $rowStyle,
-                gridColumns: $gridColumns,
-                hideWatched: $hideWatched,
-                maxGridColumns: gridConfig.maxColumns
-            )
-            .liquidGlassSheetContent(sourceID: "channelViewOptions", in: sheetTransition)
+            viewOptionsSheetContent
+                .liquidGlassSheetContent(sourceID: "channelViewOptions", in: sheetTransition)
         }
+        #endif
         #if os(iOS)
         .toolbarBackground(collapseProgress > 0.8 ? .visible : .hidden, for: .navigationBar)
         .navigationBarTitleDisplayMode(.inline)

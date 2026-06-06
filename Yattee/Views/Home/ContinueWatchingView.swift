@@ -41,6 +41,15 @@ struct ContinueWatchingView: View {
         GridLayoutConfiguration(viewWidth: viewWidth, gridColumns: gridColumns)
     }
 
+    private var viewOptionsSheetContent: some View {
+        ViewOptionsSheet(
+            layout: $layout,
+            rowStyle: $rowStyle,
+            gridColumns: $gridColumns,
+            maxGridColumns: gridConfig.maxColumns
+        )
+    }
+
     var body: some View {
         GeometryReader { geometry in
             #if os(tvOS)
@@ -122,6 +131,11 @@ struct ContinueWatchingView: View {
                         Label(String(localized: "viewOptions.title"), systemImage: "slider.horizontal.3")
                     }
                     .liquidGlassTransitionSource(id: "continueWatchingViewOptions", in: sheetTransition)
+                    #if os(macOS)
+                    .popover(isPresented: $showViewOptions, arrowEdge: .bottom) {
+                        viewOptionsSheetContent
+                    }
+                    #endif
                 }
                 ToolbarItem(placement: .primaryAction) {
                     Menu {
@@ -137,15 +151,12 @@ struct ContinueWatchingView: View {
             }
         }
         #endif
+        #if !os(macOS)
         .sheet(isPresented: $showViewOptions) {
-            ViewOptionsSheet(
-                layout: $layout,
-                rowStyle: $rowStyle,
-                gridColumns: $gridColumns,
-                maxGridColumns: gridConfig.maxColumns
-            )
-            .liquidGlassSheetContent(sourceID: "continueWatchingViewOptions", in: sheetTransition)
+            viewOptionsSheetContent
+                .liquidGlassSheetContent(sourceID: "continueWatchingViewOptions", in: sheetTransition)
         }
+        #endif
         .onAppear {
             loadHistory()
         }

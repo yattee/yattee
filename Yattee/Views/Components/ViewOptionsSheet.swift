@@ -156,7 +156,8 @@ struct ViewOptionsSheet: View {
         .presentationDragIndicator(.visible)
         #endif
         #if os(macOS)
-        .frame(minWidth: 420, minHeight: 320)
+        .padding()
+        .frame(width: 300)
         #endif
     }
 }

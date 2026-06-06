@@ -96,34 +96,20 @@ struct SearchView: View {
 
     var body: some View {
         tvOSOrDefaultContent
+        #if !os(macOS)
         .sheet(isPresented: $showFilterSheet) {
-            SearchFiltersSheet(onApply: {
-                if hasResults {
-                    Task { await searchViewModel?.search(query: searchTextBinding.wrappedValue) }
-                }
-            }, filters: Binding(
-                get: { searchViewModel?.filters ?? .defaults },
-                set: { newFilters in
-                    searchViewModel?.filters = newFilters
-                    saveFilters(newFilters)
-                }
-            ))
+            searchFiltersSheetContent
             #if !os(tvOS)
             .presentationDetents([.medium, .large])
             #endif
         }
         .sheet(isPresented: $showViewOptions) {
-            ViewOptionsSheet(
-                layout: $layout,
-                rowStyle: $rowStyle,
-                gridColumns: $gridColumns,
-                hideWatched: $hideWatched,
-                maxGridColumns: gridConfig.maxColumns
-            )
+            viewOptionsSheetContent
             #if !os(tvOS)
             .liquidGlassSheetContent(sourceID: "searchViewOptions", in: sheetTransition)
             #endif
         }
+        #endif
         .onChange(of: searchTextBinding.wrappedValue) { _, newValue in
             if newValue.isEmpty {
                 searchViewModel?.clearResults()  // Clear everything when empty
@@ -182,6 +168,43 @@ struct SearchView: View {
         }
     }
 
+    private var searchFiltersSheetContent: some View {
+        SearchFiltersSheet(onApply: {
+            if hasResults {
+                Task { await searchViewModel?.search(query: searchTextBinding.wrappedValue) }
+            }
+        }, filters: Binding(
+            get: { searchViewModel?.filters ?? .defaults },
+            set: { newFilters in
+                searchViewModel?.filters = newFilters
+                saveFilters(newFilters)
+            }
+        ))
+    }
+
+    private var viewOptionsSheetContent: some View {
+        ViewOptionsSheet(
+            layout: $layout,
+            rowStyle: $rowStyle,
+            gridColumns: $gridColumns,
+            hideWatched: $hideWatched,
+            maxGridColumns: gridConfig.maxColumns
+        )
+    }
+
+    #if os(macOS)
+    private var searchFiltersToolbarButton: some View {
+        Button {
+            showFilterSheet = true
+        } label: {
+            Label(String(localized: "search.filters"), systemImage: filtersIconName)
+        }
+        .popover(isPresented: $showFilterSheet, arrowEdge: .bottom) {
+            searchFiltersSheetContent
+        }
+    }
+    #endif
+
     @ViewBuilder
     private var tvOSOrDefaultContent: some View {
         #if os(tvOS)
@@ -239,14 +262,10 @@ struct SearchView: View {
                     // Items stay in the toolbar even before a search is submitted
                     // (invisible and inert) so the search field keeps a stable size.
                     ToolbarItem(placement: .navigation) {
-                        Button {
-                            showFilterSheet = true
-                        } label: {
-                            Label(String(localized: "search.filters"), systemImage: filtersIconName)
-                        }
-                        .opacity(hasSearched ? 1 : 0)
-                        .disabled(!hasSearched)
-                        .accessibilityHidden(!hasSearched)
+                        searchFiltersToolbarButton
+                            .opacity(hasSearched ? 1 : 0)
+                            .disabled(!hasSearched)
+                            .accessibilityHidden(!hasSearched)
                     }
                     .sharedBackgroundVisibility(hasSearched ? .automatic : .hidden)
                     ToolbarItem(placement: .principal) {
@@ -259,11 +278,7 @@ struct SearchView: View {
                     .sharedBackgroundVisibility(hasSearched ? .automatic : .hidden)
                 } else if hasSearched {
                     ToolbarItem(placement: .navigation) {
-                        Button {
-                            showFilterSheet = true
-                        } label: {
-                            Label(String(localized: "search.filters"), systemImage: filtersIconName)
-                        }
+                        searchFiltersToolbarButton
                     }
                     ToolbarItem(placement: .principal) {
                         contentTypePicker
@@ -286,6 +301,11 @@ struct SearchView: View {
                     Label(String(localized: "viewOptions.title"), systemImage: "slider.horizontal.3")
                 }
                 .liquidGlassTransitionSource(id: "searchViewOptions", in: sheetTransition)
+                #if os(macOS)
+                .popover(isPresented: $showViewOptions, arrowEdge: .bottom) {
+                    viewOptionsSheetContent
+                }
+                #endif
             }
         }
         .searchable(text: searchTextBinding, prompt: Text(String(localized: "search.placeholder")))
@@ -1493,45 +1513,15 @@ struct SearchFiltersSheet: View {
     @Binding var filters: SearchFilters
 
     var body: some View {
+        #if os(macOS)
+        // Popover content: filters apply live, click-outside dismisses.
+        filtersForm
+            .onChange(of: filters) { _, _ in onApply() }
+            .padding()
+            .frame(width: 300)
+        #else
         NavigationStack {
-            Form {
-                // Sort, Upload Date, Duration in one section
-                Section {
-                    Picker(String(localized: "search.sort"), selection: $filters.sort) {
-                        ForEach(SearchSortOption.allCases) { option in
-                            Text(option.title).tag(option)
-                        }
-                    }
-
-                    Picker(String(localized: "search.uploadDate"), selection: $filters.date) {
-                        ForEach(SearchDateFilter.allCases) { option in
-                            Text(option.title).tag(option)
-                        }
-                    }
-
-                    Picker(String(localized: "search.duration"), selection: $filters.duration) {
-                        ForEach(SearchDurationFilter.allCases) { option in
-                            Text(option.title).tag(option)
-                        }
-                    }
-                }
-
-                // Reset Button
-                Section {
-                    Button(role: .destructive) {
-                        let currentType = filters.type
-                        filters = .defaults
-                        filters.type = currentType
-                    } label: {
-                        HStack {
-                            Spacer()
-                            Text(String(localized: "search.filters.reset"))
-                            Spacer()
-                        }
-                    }
-                    .disabled(filters.isDefault)
-                }
-            }
+            filtersForm
             .navigationTitle(String(localized: "search.filters"))
             #if os(iOS)
             .navigationBarTitleDisplayMode(.inline)
@@ -1550,9 +1540,48 @@ struct SearchFiltersSheet: View {
                 }
             }
         }
-        #if os(macOS)
-        .frame(minWidth: 500, minHeight: 400)
         #endif
+    }
+
+    private var filtersForm: some View {
+        Form {
+            // Sort, Upload Date, Duration in one section
+            Section {
+                Picker(String(localized: "search.sort"), selection: $filters.sort) {
+                    ForEach(SearchSortOption.allCases) { option in
+                        Text(option.title).tag(option)
+                    }
+                }
+
+                Picker(String(localized: "search.uploadDate"), selection: $filters.date) {
+                    ForEach(SearchDateFilter.allCases) { option in
+                        Text(option.title).tag(option)
+                    }
+                }
+
+                Picker(String(localized: "search.duration"), selection: $filters.duration) {
+                    ForEach(SearchDurationFilter.allCases) { option in
+                        Text(option.title).tag(option)
+                    }
+                }
+            }
+
+            // Reset Button
+            Section {
+                Button(role: .destructive) {
+                    let currentType = filters.type
+                    filters = .defaults
+                    filters.type = currentType
+                } label: {
+                    HStack {
+                        Spacer()
+                        Text(String(localized: "search.filters.reset"))
+                        Spacer()
+                    }
+                }
+                .disabled(filters.isDefault)
+            }
+        }
     }
 }
 

@@ -15,46 +15,15 @@ struct PeerTubeFiltersSheet: View {
     let onApply: () -> Void
 
     var body: some View {
+        #if os(macOS)
+        // Popover content: filters apply live, click-outside dismisses.
+        filtersForm
+            .onChange(of: filters) { _, _ in onApply() }
+            .padding()
+            .frame(width: 300)
+        #else
         NavigationStack {
-            Form {
-                // Language filter
-                if !languages.isEmpty {
-                    Section {
-                        Picker(String(localized: "peertube.filter.language"), selection: $filters.language) {
-                            Text(String(localized: "common.any")).tag(nil as String?)
-                            ForEach(languages, id: \.self) { lang in
-                                Text(languageDisplayName(lang)).tag(lang as String?)
-                            }
-                        }
-                    }
-                }
-
-                // Country filter
-                if !countries.isEmpty {
-                    Section {
-                        Picker(String(localized: "peertube.filter.country"), selection: $filters.country) {
-                            Text(String(localized: "common.any")).tag(nil as String?)
-                            ForEach(countries, id: \.self) { country in
-                                Text(countryDisplayName(country)).tag(country as String?)
-                            }
-                        }
-                    }
-                }
-
-                // Reset button
-                Section {
-                    Button(role: .destructive) {
-                        filters = PeerTubeDirectoryFilters()
-                    } label: {
-                        HStack {
-                            Spacer()
-                            Text(String(localized: "common.reset"))
-                            Spacer()
-                        }
-                    }
-                    .disabled(filters.isDefault)
-                }
-            }
+            filtersForm
             #if os(tvOS)
             .scrollClipDisabled()
             .padding(.horizontal, 40)
@@ -63,9 +32,7 @@ struct PeerTubeFiltersSheet: View {
             .onChange(of: filters.country) { _, _ in onApply() }
             #else
             .navigationTitle(String(localized: "peertube.explore.filters"))
-            #if os(iOS)
             .navigationBarTitleDisplayMode(.inline)
-            #endif
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
                     Button(String(localized: "common.cancel")) {
@@ -83,9 +50,50 @@ struct PeerTubeFiltersSheet: View {
         }
         #if os(iOS)
         .presentationDetents([.medium])
-        #elseif os(macOS)
-        .frame(minWidth: 350, minHeight: 250)
         #endif
+        #endif
+    }
+
+    private var filtersForm: some View {
+        Form {
+            // Language filter
+            if !languages.isEmpty {
+                Section {
+                    Picker(String(localized: "peertube.filter.language"), selection: $filters.language) {
+                        Text(String(localized: "common.any")).tag(nil as String?)
+                        ForEach(languages, id: \.self) { lang in
+                            Text(languageDisplayName(lang)).tag(lang as String?)
+                        }
+                    }
+                }
+            }
+
+            // Country filter
+            if !countries.isEmpty {
+                Section {
+                    Picker(String(localized: "peertube.filter.country"), selection: $filters.country) {
+                        Text(String(localized: "common.any")).tag(nil as String?)
+                        ForEach(countries, id: \.self) { country in
+                            Text(countryDisplayName(country)).tag(country as String?)
+                        }
+                    }
+                }
+            }
+
+            // Reset button
+            Section {
+                Button(role: .destructive) {
+                    filters = PeerTubeDirectoryFilters()
+                } label: {
+                    HStack {
+                        Spacer()
+                        Text(String(localized: "common.reset"))
+                        Spacer()
+                    }
+                }
+                .disabled(filters.isDefault)
+            }
+        }
     }
 
     private func languageDisplayName(_ code: String) -> String {

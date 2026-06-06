@@ -12,6 +12,10 @@ struct ManageChannelsView: View {
     @Namespace private var sheetTransition
     @State private var channels: [Channel] = []
     @State private var showViewOptions = false
+    #if os(macOS)
+    @State private var showSubscriptionsData = false
+    @State private var pendingSubscriptionsData = false
+    #endif
     @State private var searchText = ""
     @State private var isLoading = false
     @State private var notificationStates: [String: Bool] = [:]
@@ -28,6 +32,92 @@ struct ManageChannelsView: View {
     private var listStyle: VideoListStyle {
         appEnvironment?.settingsManager.listStyle ?? .inset
     }
+
+    private var viewOptionsForm: some View {
+        Form {
+            // View options section
+            Section {
+                // Layout picker (segmented)
+                Picker(selection: $layout) {
+                    ForEach(VideoListLayout.allCases, id: \.self) { option in
+                        Label(option.displayName, systemImage: option.systemImage)
+                            .tag(option)
+                    }
+                } label: {
+                    Text("viewOptions.layout")
+                }
+                .pickerStyle(.segmented)
+                .listRowBackground(Color.clear)
+                .listRowInsets(EdgeInsets(top: 8, leading: 0, bottom: 8, trailing: 0))
+
+                // List-specific options
+                if layout == .list {
+                    PlatformMenuPicker(String(localized: "viewOptions.rowSize"), selection: $rowStyle) {
+                        Text("viewOptions.rowSize.compact").tag(VideoRowStyle.compact)
+                        Text("viewOptions.rowSize.regular").tag(VideoRowStyle.regular)
+                        Text("viewOptions.rowSize.large").tag(VideoRowStyle.large)
+                    }
+                }
+
+                // Grid-specific options
+                if layout == .grid {
+                    #if os(tvOS)
+                    Picker("viewOptions.columns.header", selection: $gridColumns) {
+                        ForEach(GridConstants.minAllowedColumns...max(GridConstants.minAllowedColumns, gridConfig.maxColumns), id: \.self) { count in
+                            Text("\(count)").tag(count)
+                        }
+                    }
+                    .pickerStyle(.segmented)
+                    #else
+                    Stepper(
+                        "viewOptions.columns \(min(max(GridConstants.minAllowedColumns, gridColumns), gridConfig.maxColumns))",
+                        value: $gridColumns,
+                        in: GridConstants.minAllowedColumns...max(GridConstants.minAllowedColumns, gridConfig.maxColumns)
+                    )
+                    #endif
+                }
+
+                PlatformMenuPicker(String(localized: "manageChannels.sortBy"), selection: $sortOrder) {
+                    Text("manageChannels.sortBy.name").tag(SidebarChannelSort.alphabetical)
+                    Text("manageChannels.sortBy.recentlySubscribed").tag(SidebarChannelSort.recentlySubscribed)
+                    Text("manageChannels.sortBy.lastUploaded").tag(SidebarChannelSort.lastUploaded)
+                }
+            }
+
+            #if os(macOS)
+            // Subscriptions Data (opens as a sheet; popovers can't push)
+            Section {
+                Button {
+                    pendingSubscriptionsData = true
+                    showViewOptions = false
+                } label: {
+                    Label(String(localized: "manageChannels.subscriptionsData"), systemImage: "person.2.badge.gearshape")
+                }
+            }
+            #elseif os(iOS)
+            // Subscriptions Data navigation link
+            Section {
+                NavigationLink {
+                    SubscriptionsSettingsView()
+                } label: {
+                    Label(String(localized: "manageChannels.subscriptionsData"), systemImage: "person.2.badge.gearshape")
+                }
+            }
+            #endif
+        }
+    }
+
+    #if os(macOS)
+    private var subscriptionsDataSheet: some View {
+        NavigationStack {
+            SubscriptionsSettingsView()
+                .toolbar {
+                    sheetCloseToolbarItem { showSubscriptionsData = false }
+                }
+        }
+        .frame(minWidth: 500, minHeight: 450)
+    }
+    #endif
 
     // Grid layout configuration
     @State private var viewWidth: CGFloat = 0
@@ -108,72 +198,32 @@ struct ManageChannelsView: View {
                     Label(String(localized: "viewOptions.title"), systemImage: "slider.horizontal.3")
                 }
                 .liquidGlassTransitionSource(id: "manageChannelsViewOptions", in: sheetTransition)
+                #if os(macOS)
+                .popover(isPresented: $showViewOptions, arrowEdge: .bottom) {
+                    viewOptionsForm
+                        .padding()
+                        .frame(width: 300)
+                        .onDisappear {
+                            // Present the sheet only after the popover is gone,
+                            // otherwise the presentation is swallowed.
+                            if pendingSubscriptionsData {
+                                pendingSubscriptionsData = false
+                                showSubscriptionsData = true
+                            }
+                        }
+                }
+                #endif
             }
         }
         #endif
+        #if os(macOS)
+        .sheet(isPresented: $showSubscriptionsData) {
+            subscriptionsDataSheet
+        }
+        #else
         .sheet(isPresented: $showViewOptions) {
             NavigationStack {
-                Form {
-                    // View options section
-                    Section {
-                        // Layout picker (segmented)
-                        Picker(selection: $layout) {
-                            ForEach(VideoListLayout.allCases, id: \.self) { option in
-                                Label(option.displayName, systemImage: option.systemImage)
-                                    .tag(option)
-                            }
-                        } label: {
-                            Text("viewOptions.layout")
-                        }
-                        .pickerStyle(.segmented)
-                        .listRowBackground(Color.clear)
-                        .listRowInsets(EdgeInsets(top: 8, leading: 0, bottom: 8, trailing: 0))
-
-                        // List-specific options
-                        if layout == .list {
-                            PlatformMenuPicker(String(localized: "viewOptions.rowSize"), selection: $rowStyle) {
-                                Text("viewOptions.rowSize.compact").tag(VideoRowStyle.compact)
-                                Text("viewOptions.rowSize.regular").tag(VideoRowStyle.regular)
-                                Text("viewOptions.rowSize.large").tag(VideoRowStyle.large)
-                            }
-                        }
-
-                        // Grid-specific options
-                        if layout == .grid {
-                            #if os(tvOS)
-                            Picker("viewOptions.columns.header", selection: $gridColumns) {
-                                ForEach(GridConstants.minAllowedColumns...max(GridConstants.minAllowedColumns, gridConfig.maxColumns), id: \.self) { count in
-                                    Text("\(count)").tag(count)
-                                }
-                            }
-                            .pickerStyle(.segmented)
-                            #else
-                            Stepper(
-                                "viewOptions.columns \(min(max(GridConstants.minAllowedColumns, gridColumns), gridConfig.maxColumns))",
-                                value: $gridColumns,
-                                in: GridConstants.minAllowedColumns...max(GridConstants.minAllowedColumns, gridConfig.maxColumns)
-                            )
-                            #endif
-                        }
-
-                        PlatformMenuPicker(String(localized: "manageChannels.sortBy"), selection: $sortOrder) {
-                            Text("manageChannels.sortBy.name").tag(SidebarChannelSort.alphabetical)
-                            Text("manageChannels.sortBy.recentlySubscribed").tag(SidebarChannelSort.recentlySubscribed)
-                            Text("manageChannels.sortBy.lastUploaded").tag(SidebarChannelSort.lastUploaded)
-                        }
-                    }
-
-                    #if !os(tvOS)
-                    // Subscriptions Data navigation link
-                    Section {
-                        NavigationLink {
-                            SubscriptionsSettingsView()
-                        } label: {
-                            Label(String(localized: "manageChannels.subscriptionsData"), systemImage: "person.2.badge.gearshape")
-                        }
-                    }
-                    #endif
-                }
+                viewOptionsForm
                 #if os(tvOS)
                 .scrollClipDisabled()
                 .padding(.horizontal, 40)
@@ -185,13 +235,11 @@ struct ManageChannelsView: View {
                 #endif
                 #endif
             }
-            #if os(macOS)
-            .frame(minWidth: 500, minHeight: 400)
-            #endif
             .presentationDetents([.height(360), .large])
             .presentationDragIndicator(.visible)
             .liquidGlassSheetContent(sourceID: "manageChannelsViewOptions", in: sheetTransition)
         }
+        #endif
         .onAppear {
             if let syncChannels = subscriptionService?.fetchSubscriptionsSync() {
                 channels = syncChannels

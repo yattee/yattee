@@ -93,17 +93,23 @@ struct PeerTubeInstancesExploreView: View {
         .task {
             await loadAllInstances()
         }
+        #if !os(macOS)
         .sheet(isPresented: $showFiltersSheet) {
-            PeerTubeFiltersSheet(
-                filters: $filters,
-                languages: availableLanguages,
-                countries: availableCountries,
-                onApply: {
-                    // Reset display limit when filters change
-                    displayLimit = pageSize
-                }
-            )
+            filtersSheetContent
         }
+        #endif
+    }
+
+    private var filtersSheetContent: some View {
+        PeerTubeFiltersSheet(
+            filters: $filters,
+            languages: availableLanguages,
+            countries: availableCountries,
+            onApply: {
+                // Reset display limit when filters change
+                displayLimit = pageSize
+            }
+        )
     }
 
     // MARK: - Content
@@ -227,6 +233,11 @@ struct PeerTubeInstancesExploreView: View {
                     systemImage: filters.isDefault ? "line.3.horizontal.decrease.circle" : "line.3.horizontal.decrease.circle.fill"
                 )
             }
+            #if os(macOS)
+            .popover(isPresented: $showFiltersSheet, arrowEdge: .bottom) {
+                filtersSheetContent
+            }
+            #endif
         }
     }
 
