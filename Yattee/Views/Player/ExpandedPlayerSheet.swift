@@ -18,7 +18,7 @@ struct ExpandedPlayerSheet: View {
     // MARK: - Sheet State
 
     @State var showingQualitySheet = false
-    @State private var showingPlaylistSheet = false
+    @State var showingPlaylistSheet = false
     @State var showingDownloadSheet = false
     @State var showingDeleteDownloadAlert = false
     @State var showingQueueSheet = false

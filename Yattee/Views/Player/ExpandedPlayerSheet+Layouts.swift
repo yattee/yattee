@@ -924,6 +924,9 @@ extension ExpandedPlayerSheet {
                     onShowQueue: { [self] in
                         showingQueueSheet = true
                     },
+                    onShowPlaylistSelector: { [self] in
+                        showingPlaylistSheet = true
+                    },
                     onRateChanged: { rate in
                         playerState.rate = rate
                         playerService.currentBackend?.rate = Float(rate.rawValue)
@@ -1189,6 +1192,9 @@ extension ExpandedPlayerSheet {
                 },
                 onShowQueue: { [self] in
                     showingQueueSheet = true
+                },
+                onShowPlaylistSelector: { [self] in
+                    showingPlaylistSheet = true
                 },
                 onRateChanged: { rate in
                     playerState.rate = rate
@@ -1599,6 +1605,9 @@ extension ExpandedPlayerSheet {
                     },
                     onShowQueue: { [self] in
                         showingQueueSheet = true
+                    },
+                    onShowPlaylistSelector: { [self] in
+                        showingPlaylistSheet = true
                     },
                     onTitleTap: {
                         onTogglePanel()

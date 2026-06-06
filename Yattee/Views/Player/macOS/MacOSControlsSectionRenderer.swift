@@ -215,6 +215,15 @@ struct MacOSControlsSectionRenderer: View {
                 .opacity(isLocked ? 0.5 : 1.0)
             }
 
+        case .addToPlaylist:
+            if actions.canAddToPlaylist, actions.onShowPlaylistSelector != nil {
+                controlButton(systemImage: "text.badge.plus", help: config.buttonType.displayName) {
+                    actions.onShowPlaylistSelector?()
+                }
+                .disabled(isLocked)
+                .opacity(isLocked ? 0.5 : 1.0)
+            }
+
         case .timeDisplay:
             timeDisplayView(config)
 

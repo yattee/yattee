@@ -121,6 +121,20 @@ struct ContentView: View {
                 // and lock interactive resize to the video ratio (no black bars).
                 .sheetWindowSize(size, aspectRatio: lockAspect)
         }
+        .sheet(isPresented: Binding(
+            get: { appEnvironment.navigationCoordinator.isMiniPlayerQueueSheetPresented },
+            set: { appEnvironment.navigationCoordinator.isMiniPlayerQueueSheetPresented = $0 }
+        )) {
+            QueueManagementSheet()
+        }
+        .sheet(isPresented: Binding(
+            get: { appEnvironment.navigationCoordinator.isMiniPlayerPlaylistSheetPresented },
+            set: { appEnvironment.navigationCoordinator.isMiniPlayerPlaylistSheetPresented = $0 }
+        )) {
+            if let video = appEnvironment.playerService.state.currentVideo {
+                PlaylistSelectorSheet(video: video)
+            }
+        }
         #elseif os(tvOS)
         .fullScreenCover(isPresented: Binding(
             get: { appEnvironment.navigationCoordinator.isPlayerExpanded },

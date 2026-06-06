@@ -32,6 +32,7 @@ struct MacOSPlayerControlsView: View {
     var onMuteToggled: (() -> Void)? = nil
     var onShowSettings: (() -> Void)? = nil
     var onShowQueue: (() -> Void)? = nil
+    var onShowPlaylistSelector: (() -> Void)? = nil
     /// Tapping the avatar / title / author in the top bar toggles the video details panel.
     var onTitleTap: (() -> Void)? = nil
     /// Whether the floating video details panel is currently visible. When it opens,
@@ -174,6 +175,7 @@ struct MacOSPlayerControlsView: View {
                 }
             },
             onRateChanged: onRateChanged,
+            onShowPlaylistSelector: onShowPlaylistSelector,
             onShowQueue: onShowQueue,
             onControlsLockToggled: { [self] locked in
                 playerState.isControlsLocked = locked
