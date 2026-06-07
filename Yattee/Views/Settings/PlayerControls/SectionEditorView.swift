@@ -81,6 +81,18 @@ struct SectionEditorView: View {
                     } label: {
                         ButtonRow(configuration: button)
                     }
+                    .contextMenu {
+                        if viewModel.canEditActivePreset {
+                            Button(role: .destructive) {
+                                removeButton(id: button.id)
+                            } label: {
+                                Label(
+                                    String(localized: "settings.playerControls.delete"),
+                                    systemImage: "trash"
+                                )
+                            }
+                        }
+                    }
                 }
                 .onMove { source, destination in
                     // Update local state immediately
@@ -93,16 +105,10 @@ struct SectionEditorView: View {
                     )
                 }
                 .onDelete { indexSet in
-                    // Get button IDs before removing from local state
                     let buttonIDs = indexSet.map { buttons[$0].id }
-                    // Update local state immediately
-                    buttons.remove(atOffsets: indexSet)
-                    // Sync to view model
                     for id in buttonIDs {
-                        viewModel.removeButtonSync(id, from: sectionType)
+                        removeButton(id: id)
                     }
-                    // Update available types
-                    syncAvailableTypes()
                 }
             } header: {
                 Text(String(localized: "settings.playerControls.addedButtons"))
@@ -173,6 +179,15 @@ struct SectionEditorView: View {
             // Spacer can be added multiple times
             buttonType == .spacer || !usedTypes.contains(buttonType)
         }
+    }
+
+    private func removeButton(id: UUID) {
+        // Update local state immediately
+        buttons.removeAll { $0.id == id }
+        // Sync to view model
+        viewModel.removeButtonSync(id, from: sectionType)
+        // Update available types
+        syncAvailableTypes()
     }
 
     private func addButton(_ buttonType: ControlButtonType) {

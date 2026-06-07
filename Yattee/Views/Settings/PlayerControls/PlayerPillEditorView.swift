@@ -88,17 +88,31 @@ struct PlayerPillEditorView: View {
 
     @ViewBuilder
     private func buttonRow(for config: ControlButtonConfiguration) -> some View {
-        if config.buttonType.hasSettings {
-            NavigationLink {
-                PillButtonConfigurationView(
-                    buttonID: config.id,
-                    viewModel: viewModel
-                )
-            } label: {
+        Group {
+            if config.buttonType.hasSettings {
+                NavigationLink {
+                    PillButtonConfigurationView(
+                        buttonID: config.id,
+                        viewModel: viewModel
+                    )
+                } label: {
+                    buttonRowContent(for: config)
+                }
+            } else {
                 buttonRowContent(for: config)
             }
-        } else {
-            buttonRowContent(for: config)
+        }
+        .contextMenu {
+            Button(role: .destructive) {
+                if let index = viewModel.pillButtons.firstIndex(where: { $0.id == config.id }) {
+                    viewModel.removePillButton(at: index)
+                }
+            } label: {
+                Label(
+                    String(localized: "settings.playerControls.delete"),
+                    systemImage: "trash"
+                )
+            }
         }
     }
 

@@ -105,17 +105,31 @@ struct MiniPlayerEditorView: View {
 
     @ViewBuilder
     private func buttonRow(for config: ControlButtonConfiguration) -> some View {
-        if config.buttonType.hasSettings {
-            NavigationLink {
-                MiniPlayerButtonConfigurationView(
-                    buttonID: config.id,
-                    viewModel: viewModel
-                )
-            } label: {
+        Group {
+            if config.buttonType.hasSettings {
+                NavigationLink {
+                    MiniPlayerButtonConfigurationView(
+                        buttonID: config.id,
+                        viewModel: viewModel
+                    )
+                } label: {
+                    buttonRowContent(for: config)
+                }
+            } else {
                 buttonRowContent(for: config)
             }
-        } else {
-            buttonRowContent(for: config)
+        }
+        .contextMenu {
+            Button(role: .destructive) {
+                if let index = viewModel.miniPlayerButtons.firstIndex(where: { $0.id == config.id }) {
+                    viewModel.removeMiniPlayerButton(at: index)
+                }
+            } label: {
+                Label(
+                    String(localized: "settings.playerControls.delete"),
+                    systemImage: "trash"
+                )
+            }
         }
     }
 
