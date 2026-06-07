@@ -100,10 +100,17 @@ struct PlaylistFormSheet: View {
     private var formContent: some View {
         Form {
             Section {
-                TextField(String(localized: "playlist.name"), text: $title)
-                    #if os(iOS)
-                    .textInputAutocapitalization(.sentences)
-                    #endif
+                TextField(
+                    String(localized: "playlist.name"),
+                    text: $title,
+                    prompt: Text(String(localized: "playlist.name"))
+                )
+                #if os(iOS)
+                .textInputAutocapitalization(.sentences)
+                #endif
+                #if os(macOS)
+                .labelsHidden()
+                #endif
             } header: {
                 Text(String(localized: "playlist.name"))
             }
@@ -130,6 +137,9 @@ struct PlaylistFormSheet: View {
         }
         #if os(iOS)
         .scrollDismissesKeyboard(.interactively)
+        #endif
+        #if os(macOS)
+        .formStyle(.grouped)
         #endif
     }
     #endif
