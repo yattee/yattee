@@ -246,7 +246,26 @@ final class ExpandedPlayerWindowManager: NSObject {
     /// Call this when the user changes the player mode setting.
     func updateWindowLevel(floating: Bool) {
         guard let window = playerWindow else { return }
+        // Don't touch level/collectionBehavior mid-fullscreen; the setting is
+        // re-read in windowDidExitFullScreen.
+        guard !window.styleMask.contains(.fullScreen) else { return }
         configureWindowLevel(window, floating: floating)
+    }
+
+    /// Toggles native fullscreen on the player window.
+    func toggleFullScreen() {
+        guard let window = playerWindow else {
+            // Inline-sheet presentation: fullscreen the main app window
+            NSApp.keyWindow?.toggleFullScreen(nil)
+            return
+        }
+        // A floating (pinned) window carries .fullScreenAuxiliary, which AppKit
+        // refuses to make a primary fullscreen window. Switch to the primary
+        // config for the transition; windowDidExitFullScreen restores floating.
+        if !window.styleMask.contains(.fullScreen) {
+            configureWindowLevel(window, floating: false)
+        }
+        window.toggleFullScreen(nil)
     }
 
     /// Restores a window that was hidden for PiP mode.
@@ -496,6 +515,16 @@ extension ExpandedPlayerWindowManager: NSWindowDelegate {
         }
         // Return false - we've already hidden the window with orderOut
         return false
+    }
+
+    nonisolated func windowDidExitFullScreen(_ notification: Notification) {
+        MainActor.assumeIsolated {
+            guard let window = playerWindow else { return }
+            // Restore the pinned (floating) config that toggleFullScreen
+            // dropped so the window could enter primary fullscreen.
+            let floating = appEnvironment?.settingsManager.macPlayerFloating ?? false
+            configureWindowLevel(window, floating: floating)
+        }
     }
 }
 

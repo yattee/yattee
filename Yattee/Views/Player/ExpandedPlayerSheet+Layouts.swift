@@ -1571,8 +1571,9 @@ extension ExpandedPlayerSheet {
                         playerService.seekBackward(by: seconds)
                     },
                     onToggleFullscreen: {
-                        // Toggle native macOS fullscreen
-                        NSApp.keyWindow?.toggleFullScreen(nil)
+                        // Toggle native macOS fullscreen (drops the floating
+                        // config first so a pinned window can enter fullscreen)
+                        ExpandedPlayerWindowManager.shared.toggleFullScreen()
                     },
                     isFullscreen: NSApp.keyWindow?.styleMask.contains(.fullScreen) == true,
                     onClose: { [self] in
