@@ -1290,6 +1290,12 @@ final class MPVBackend: PlayerBackend {
                 self?.onPiPDidStart?()
             } else {
                 self?._playerView?.captureFramesForPiP = false
+                // The layer was cleared to black when PiP started and macOS
+                // drawing is pull-based — force a repaint so the restored
+                // window shows the current frame even while paused. If the
+                // view isn't in a window yet, the forced draw stays armed and
+                // the setFrameSize/viewDidMoveToWindow retries complete it.
+                self?._playerView?.resumeRendering()
             }
         }
 

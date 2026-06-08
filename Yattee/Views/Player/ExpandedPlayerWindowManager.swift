@@ -69,6 +69,11 @@ final class ExpandedPlayerWindowManager: NSObject {
                 existingWindow.alphaValue = 1
                 existingWindow.makeKeyAndOrderFront(nil)
             }
+            // Any forced draw requested while the window was ordered out was
+            // dropped (no drawable); the layer is pull-based, so repaint now
+            // that the window is on screen — otherwise a paused video stays
+            // black until the next MPV frame (never, while paused).
+            (appEnvironment.playerService.currentBackend as? MPVBackend)?.resumeRendering()
             return
         }
 

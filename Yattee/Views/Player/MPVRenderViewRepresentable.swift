@@ -170,9 +170,24 @@ struct MPVRenderViewRepresentable: NSViewRepresentable {
 /// Container view that properly manages player view swapping on macOS
 private class MPVContainerNSView: NSView {
     private weak var currentPlayerView: NSView?
+    private let containerID = UUID()
+
+    /// Track all living containers so a container that releases the shared
+    /// player view can hand it to another container instead of orphaning it.
+    private static var livingContainers = NSHashTable<MPVContainerNSView>.weakObjects()
 
     /// Callback when view is added to a window
     var onDidMoveToWindow: (() -> Void)?
+
+    override init(frame frameRect: NSRect) {
+        super.init(frame: frameRect)
+        MPVContainerNSView.livingContainers.add(self)
+    }
+
+    required init?(coder: NSCoder) {
+        super.init(coder: coder)
+        MPVContainerNSView.livingContainers.add(self)
+    }
 
     override func viewDidMoveToWindow() {
         super.viewDidMoveToWindow()
@@ -197,19 +212,58 @@ private class MPVContainerNSView: NSView {
         // and a black mini-bar preview after collapse).
         if newSuperview == nil {
             if let playerView = currentPlayerView, playerView.superview === self {
-                playerView.removeFromSuperview()
+                // Hand the shared view to another living container that still has a
+                // window instead of orphaning it. SwiftUI is not guaranteed to re-run
+                // updateNSView on the other container (e.g. the expanded player window
+                // hidden for PiP re-shown on restore), so without this transfer the
+                // view can end up with no superview and the player renders only black.
+                if let target = MPVContainerNSView.findTransferTarget(excluding: self) {
+                    LoggingService.shared.debug(
+                        "MPVContainerNSView[\(containerID.uuidString.prefix(8))]: unmounting - transferring player view to container \(target.containerID.uuidString.prefix(8)) (windowVisible: \(target.window?.isVisible == true))",
+                        category: .mpv
+                    )
+                    target.setPlayerView(playerView)
+                } else {
+                    LoggingService.shared.debug(
+                        "MPVContainerNSView[\(containerID.uuidString.prefix(8))]: unmounting - no transfer target, removing player view",
+                        category: .mpv
+                    )
+                    playerView.removeFromSuperview()
+                }
             }
             currentPlayerView = nil
             onDidMoveToWindow = nil
         }
     }
 
-    func setPlayerView(_ playerView: NSView) {
-        // Skip if same view
-        guard playerView !== currentPlayerView else { return }
+    /// Another living container that can host the shared player view, preferring
+    /// one whose window is currently visible (a restoring window may not be
+    /// visible yet at transfer time, so a hidden window is still acceptable).
+    private static func findTransferTarget(excluding source: MPVContainerNSView) -> MPVContainerNSView? {
+        let candidates = livingContainers.allObjects.filter { $0 !== source && $0.window != nil }
+        return candidates.first { $0.window?.isVisible == true } ?? candidates.first
+    }
 
-        // Remove old view if present
-        currentPlayerView?.removeFromSuperview()
+    func setPlayerView(_ playerView: NSView) {
+        // Skip only if same view AND actually our subview. The weak ref can
+        // point to a view that was stolen by another container — e.g. the mini
+        // player preview takes the shared render view during PiP while the
+        // expanded window is hidden; on restore the view must be re-claimed
+        // here or it stays orphaned and the window shows only black.
+        if playerView === currentPlayerView && playerView.superview === self {
+            return
+        }
+
+        let previousSuperview = playerView.superview.map { String(describing: type(of: $0)) } ?? "nil"
+        LoggingService.shared.debug(
+            "MPVContainerNSView[\(containerID.uuidString.prefix(8))].setPlayerView: attaching (reclaim: \(playerView === currentPlayerView), previousSuperview: \(previousSuperview), window: \(window != nil), windowVisible: \(window?.isVisible == true))",
+            category: .mpv
+        )
+
+        // Remove old view if it's a different view that still belongs to us
+        if let oldView = currentPlayerView, oldView !== playerView, oldView.superview === self {
+            oldView.removeFromSuperview()
+        }
 
         // Add new view
         playerView.translatesAutoresizingMaskIntoConstraints = false
