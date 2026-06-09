@@ -3742,6 +3742,17 @@
         }
       }
     },
+    "home.hideShortcut" : {
+      "comment" : "Context menu action on Home shortcuts to hide the shortcut",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hide"
+          }
+        }
+      }
+    },
     "home.history.clear" : {
       "comment" : "Clear history button",
       "localizations" : {

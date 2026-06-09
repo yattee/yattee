@@ -386,7 +386,10 @@ struct HomeView: View {
                 shortcutCardView(for: shortcut)
                     .environment(\.homeShortcutColorfulColor, colorfulColor(atPosition: index))
                     #if !os(tvOS)
-                    .contextMenu { editShortcutsButton }
+                    .contextMenu {
+                        hideShortcutButton(for: shortcut)
+                        editShortcutsButton
+                    }
                     #endif
             }
         }
@@ -419,12 +422,27 @@ struct HomeView: View {
                 shortcutRowView(for: shortcut)
             }
             #if !os(tvOS)
-            .contextMenu { editShortcutsButton }
+            .contextMenu {
+                hideShortcutButton(for: shortcut)
+                editShortcutsButton
+            }
             #endif
         }
     }
 
     #if !os(tvOS)
+    /// Context menu action that hides the given shortcut from Home.
+    private func hideShortcutButton(for shortcut: HomeShortcutItem) -> some View {
+        Button {
+            guard let settingsManager else { return }
+            var visibility = settingsManager.homeShortcutVisibility
+            visibility[shortcut] = false
+            settingsManager.homeShortcutVisibility = visibility
+        } label: {
+            Label(String(localized: "home.hideShortcut"), systemImage: "eye.slash")
+        }
+    }
+
     /// Context menu action that opens the Home settings sheet to reorder/toggle shortcuts.
     private var editShortcutsButton: some View {
         Button {
