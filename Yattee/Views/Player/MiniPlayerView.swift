@@ -80,6 +80,13 @@ struct MiniPlayerView: View {
     /// Handle tap on video preview - action based on settings (PiP or expand)
     /// When video is disabled, always expand player since PiP needs the video view mounted
     private func handleVideoPreviewTap() {
+        // Don't start PiP while the expanded player is open (or opening) — PiP
+        // would play alongside the player window. Bring the window forward instead.
+        if let nav = navigationCoordinator, nav.isPlayerExpanded || nav.isPlayerExpanding {
+            nav.expandPlayer()
+            return
+        }
+
         // If video is disabled in mini player, always expand (can't start PiP without video view)
         guard miniPlayerSettings.showVideo else {
             navigationCoordinator?.expandPlayer()
@@ -560,6 +567,12 @@ struct MiniPlayerView: View {
     private func pipButton(config: ControlButtonConfiguration) -> some View {
         Button {
             incrementTapCount(for: config)
+            // Don't start PiP while the expanded player is open (or opening) — PiP
+            // would play alongside the player window. Bring the window forward instead.
+            if let nav = navigationCoordinator, nav.isPlayerExpanded || nav.isPlayerExpanding {
+                nav.expandPlayer()
+                return
+            }
             if let backend = playerService?.currentBackend as? MPVBackend {
                 backend.startPiP()
             }
