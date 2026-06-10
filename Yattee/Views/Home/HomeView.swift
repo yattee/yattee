@@ -43,9 +43,9 @@ struct HomeView: View {
 
     private var columns: [GridItem] {
         #if os(tvOS)
-        [GridItem(.adaptive(minimum: 280, maximum: 380), spacing: 32)]
+        [GridItem(.adaptive(minimum: 280, maximum: 380), spacing: 16)]
         #else
-        [GridItem(.adaptive(minimum: 150), spacing: 16)]
+        [GridItem(.adaptive(minimum: 150), spacing: 8)]
         #endif
     }
 
@@ -374,9 +374,9 @@ struct HomeView: View {
 
     private var shortcutsGrid: some View {
         #if os(tvOS)
-        let gridSpacing: CGFloat = 32
-        #else
         let gridSpacing: CGFloat = 16
+        #else
+        let gridSpacing: CGFloat = 8
         #endif
 
         let shortcuts = settingsManager?.visibleShortcuts() ?? HomeShortcutItem.defaultOrder
