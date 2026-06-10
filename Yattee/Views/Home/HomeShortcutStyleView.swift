@@ -34,7 +34,7 @@ struct HomeShortcutStyleView: View {
 
     @State private var customEditMode: CustomEditMode = .list
 
-    private let previewColumns = [GridItem(.adaptive(minimum: 150), spacing: 16)]
+    private let previewColumns = [GridItem(.adaptive(minimum: 150), spacing: 8)]
 
     /// All static shortcut types, previewed regardless of the user's current
     /// Home configuration so every style variation is visible.
@@ -62,7 +62,7 @@ struct HomeShortcutStyleView: View {
             }
 
             Section {
-                LazyVGrid(columns: previewColumns, spacing: 16) {
+                LazyVGrid(columns: previewColumns, spacing: 8) {
                     ForEach(Array(previewItems.enumerated()), id: \.element.id) { index, item in
                         HomeShortcutCardView(
                             icon: item.icon,
