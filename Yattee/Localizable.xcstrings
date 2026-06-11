@@ -4216,6 +4216,17 @@
         }
       }
     },
+    "home.settings.shortcuts.color" : {
+      "comment" : "Label/header for the card color emphasis picker",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Color"
+          }
+        }
+      }
+    },
     "home.settings.shortcuts.header" : {
       "comment" : "Header for shortcuts section in library settings",
       "localizations" : {
@@ -4229,28 +4240,6 @@
     },
     "home.settings.shortcuts.layout" : {
       "comment" : "Label for shortcuts layout picker in library settings",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Layout"
-          }
-        }
-      }
-    },
-    "home.settings.shortcuts.color" : {
-      "comment" : "Label/header for the card color emphasis picker",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Color"
-          }
-        }
-      }
-    },
-    "home.settings.shortcuts.layout" : {
-      "comment" : "Header for the card layout picker (Compact/Regular)",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -4406,39 +4395,6 @@
         }
       }
     },
-    "home.shortcuts.layout.cards" : {
-      "comment" : "Cards layout option for library shortcuts",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Cards"
-          }
-        }
-      }
-    },
-    "home.shortcuts.layout.list" : {
-      "comment" : "List layout option for library shortcuts",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "List"
-          }
-        }
-      }
-    },
-    "home.shortcuts.palette.berry" : {
-      "comment" : "Colorful palette name",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Berry"
-          }
-        }
-      }
-    },
     "home.shortcuts.color.soft" : {
       "comment" : "Soft card color option (tinted background)",
       "localizations" : {
@@ -4461,6 +4417,28 @@
         }
       }
     },
+    "home.shortcuts.layout.cards" : {
+      "comment" : "Cards layout option for library shortcuts",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cards"
+          }
+        }
+      }
+    },
+    "home.shortcuts.layout.list" : {
+      "comment" : "List layout option for library shortcuts",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "List"
+          }
+        }
+      }
+    },
     "home.shortcuts.palette.accent" : {
       "comment" : "Palette name for the uniform accent-color fill",
       "localizations" : {
@@ -4468,6 +4446,17 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Accent"
+          }
+        }
+      }
+    },
+    "home.shortcuts.palette.berry" : {
+      "comment" : "Colorful palette name",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Berry"
           }
         }
       }
@@ -5512,6 +5501,7 @@
       }
     },
     "mediaSources.browse %@" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {

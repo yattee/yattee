@@ -27,7 +27,6 @@ struct HomeSettingsView: View {
     @State private var availableShortcutsByInstance: [(instance: Instance, cards: [HomeShortcutItem])] = []
     @State private var availableSectionsByInstance: [(instance: Instance, sections: [HomeSectionItem])] = []
     @State private var availableShortcutsByMediaSource: [(source: MediaSource, cards: [HomeShortcutItem])] = []
-    @State private var availableSectionsByMediaSource: [(source: MediaSource, sections: [HomeSectionItem])] = []
     
     // Edit mode for delete functionality
     @State private var isEditMode = false
@@ -238,7 +237,7 @@ struct HomeSettingsView: View {
     
     private var availableSectionsSection: some View {
         Section {
-            if availableSectionsByInstance.isEmpty && availableSectionsByMediaSource.isEmpty {
+            if availableSectionsByInstance.isEmpty {
                 Text(String(localized: "home.settings.availableSections.empty"))
                     .foregroundStyle(.secondary)
                     .italic()
@@ -246,11 +245,6 @@ struct HomeSettingsView: View {
                 ForEach(availableSectionsByInstance, id: \.instance.id) { item in
                     ForEach(item.sections) { section in
                         availableSectionRow(for: section, instance: item.instance)
-                    }
-                }
-                ForEach(availableSectionsByMediaSource, id: \.source.id) { item in
-                    ForEach(item.sections) { section in
-                        availableMediaSourceSectionRow(for: section, source: item.source)
                     }
                 }
             }
@@ -350,7 +344,6 @@ struct HomeSettingsView: View {
 
         let sources = env.mediaSourcesManager.sources
         availableShortcutsByMediaSource = settings.allAvailableMediaSourceShortcuts(sources: sources)
-        availableSectionsByMediaSource = settings.allAvailableMediaSourceSections(sources: sources)
     }
 
     private func saveSettingsIfLoaded() {
@@ -407,16 +400,14 @@ struct HomeSettingsView: View {
         switch section {
         case .instanceContent(let instanceID, let contentType):
             settingsManager?.addToHome(instanceID: instanceID, contentType: contentType, asCard: false)
-        case .mediaSource(let sourceID):
-            settingsManager?.addToHome(sourceID: sourceID, asCard: false)
         default:
             break
         }
-        
+
         // Reload available items
         loadSettings()
     }
-    
+
     private func removeShortcut(_ card: HomeShortcutItem) {
         // Remove from local state
         shortcutOrder.removeAll { $0.id == card.id }
@@ -445,16 +436,14 @@ struct HomeSettingsView: View {
         switch section {
         case .instanceContent(let instanceID, let contentType):
             settingsManager?.removeFromHome(instanceID: instanceID, contentType: contentType)
-        case .mediaSource(let sourceID):
-            settingsManager?.removeFromHome(sourceID: sourceID)
         default:
             break
         }
-        
+
         // Reload available items
         loadSettings()
     }
-    
+
     private func canDelete(shortcut: HomeShortcutItem) -> Bool {
         if case .instanceContent = shortcut {
             return true
@@ -467,9 +456,6 @@ struct HomeSettingsView: View {
     
     private func canDelete(section: HomeSectionItem) -> Bool {
         if case .instanceContent = section {
-            return true
-        }
-        if case .mediaSource = section {
             return true
         }
         return false
@@ -579,35 +565,6 @@ struct HomeSettingsView: View {
                     }
                 }
             }
-        case .mediaSource(let sourceID):
-            if let source = appEnvironment?.mediaSourcesManager.sources.first(where: { $0.id == sourceID }) {
-                let isDisabled = !source.isEnabled
-                
-                HomeItemRow(
-                    icon: source.type.systemImage,
-                    title: "\(source.name) (\(source.type.displayName))",
-                    isVisible: sectionBinding(for: section),
-                    isDisabled: isDisabled,
-                    disabledReason: isDisabled ? String(localized: "home.settings.sourceDisabled") : nil
-                )
-                #if os(iOS)
-                .swipeActions(edge: .trailing, allowsFullSwipe: true) {
-                    Button(role: .destructive) {
-                        removeSection(section)
-                    } label: {
-                        Label(String(localized: "home.settings.remove"), systemImage: "trash")
-                    }
-                    .tint(.red)
-                }
-                #endif
-                .contextMenu {
-                    Button(role: .destructive) {
-                        removeSection(section)
-                    } label: {
-                        Label(String(localized: "home.settings.remove"), systemImage: "trash")
-                    }
-                }
-            }
         default:
             HomeItemRow(
                 icon: section.icon,
@@ -616,7 +573,7 @@ struct HomeSettingsView: View {
             )
         }
     }
-    
+
     @ViewBuilder
     private func availableShortcutRow(for card: HomeShortcutItem, instance: Instance) -> some View {
         if case .instanceContent(_, let contentType) = card {
@@ -715,37 +672,6 @@ struct HomeSettingsView: View {
                 
                 Button {
                     addShortcut(card)
-                } label: {
-                    Image(systemName: "plus.circle.fill")
-                        .foregroundStyle(.green)
-                        .imageScale(.large)
-                }
-                .buttonStyle(.plain)
-                .disabled(isDisabled)
-            }
-            #if !os(tvOS)
-            .help(isDisabled ? String(localized: "home.settings.sourceDisabled") : "")
-            #endif
-        }
-    }
-    
-    @ViewBuilder
-    private func availableMediaSourceSectionRow(for section: HomeSectionItem, source: MediaSource) -> some View {
-        if case .mediaSource = section {
-            let isDisabled = !source.isEnabled
-            
-            HStack {
-                Image(systemName: source.type.systemImage)
-                    .frame(width: 24)
-                    .foregroundStyle(isDisabled ? .tertiary : .secondary)
-                
-                Text("\(source.name) (\(source.type.displayName))")
-                    .foregroundStyle(isDisabled ? .tertiary : .primary)
-                
-                Spacer()
-                
-                Button {
-                    addSection(section)
                 } label: {
                     Image(systemName: "plus.circle.fill")
                         .foregroundStyle(.green)

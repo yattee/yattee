@@ -1057,8 +1057,11 @@ struct HomeView: View {
             #endif
         case .instanceContent(let instanceID, let contentType):
             instanceContentSection(instanceID: instanceID, contentType: contentType)
-        case .mediaSource(let sourceID):
-            mediaSourceSection(sourceID: sourceID)
+        case .mediaSource:
+            // Media sources are shortcuts-only; any legacy media-source section is
+            // stripped by removeAllHomeMediaSourceSections() on load, so this is
+            // unreachable in practice. Rendered as empty for defense-in-depth.
+            EmptyView()
         }
     }
 
@@ -1422,44 +1425,6 @@ struct HomeView: View {
         }
     }
 
-    @ViewBuilder
-    private func mediaSourceSection(sourceID: UUID) -> some View {
-        if let source = appEnvironment?.mediaSourcesManager.sources.first(where: { $0.id == sourceID }),
-           source.isEnabled {
-            VStack(alignment: .leading, spacing: 0) {
-                Text(source.name)
-                    .font(.subheadline.weight(.semibold))
-                    .foregroundStyle(.secondary)
-                    .padding(.horizontal, 32)
-                    .padding(.top, 16)
-                    .padding(.bottom, 8)
-                    .frame(maxWidth: .infinity, alignment: .leading)
-
-                VideoListContent(listStyle: listStyle) {
-                    VideoListRow(
-                        isLast: true,
-                        rowStyle: .regular,
-                        listStyle: listStyle
-                    ) {
-                        Button {
-                            appEnvironment?.navigationCoordinator.navigate(to: .mediaBrowser(source, path: "/"))
-                        } label: {
-                            HStack {
-                                Image(systemName: source.type.systemImage)
-                                    .foregroundStyle(.secondary)
-                                Text("mediaSources.browse \(source.name)")
-                                Spacer()
-                                Image(systemName: "chevron.right")
-                                    .foregroundStyle(.tertiary)
-                            }
-                        }
-                        .buttonStyle(.plain)
-                    }
-                }
-            }
-        }
-    }
-
     // MARK: - Data Loading
 
     private func loadData() {
@@ -1471,6 +1436,8 @@ struct HomeView: View {
         loadRemoteDevicesData()
         cleanupOrphanedHomeInstanceItems()
         cleanupOrphanedHomeMediaSourceItems()
+        // Media sources are shortcuts-only; drop any legacy media-source sections.
+        appEnvironment?.settingsManager.removeAllHomeMediaSourceSections()
     }
 
     private func cleanupOrphanedHomeInstanceItems() {

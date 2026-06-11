@@ -586,26 +586,11 @@ extension SettingsManager {
         return existingCards.contains(card.id) ? [] : [card]
     }
 
-    /// Returns all available section items for a media source that are NOT already added.
-    func availableSections(for source: MediaSource) -> [HomeSectionItem] {
-        let section = HomeSectionItem.mediaSource(sourceID: source.id)
-        let existingSections = Set(homeSectionOrder.map { $0.id })
-        return existingSections.contains(section.id) ? [] : [section]
-    }
-
     /// Returns all available cards across all media sources, grouped by source.
     func allAvailableMediaSourceShortcuts(sources: [MediaSource]) -> [(source: MediaSource, cards: [HomeShortcutItem])] {
         sources.compactMap { source in
             let cards = availableShortcuts(for: source)
             return cards.isEmpty ? nil : (source, cards)
-        }
-    }
-
-    /// Returns all available sections across all media sources, grouped by source.
-    func allAvailableMediaSourceSections(sources: [MediaSource]) -> [(source: MediaSource, sections: [HomeSectionItem])] {
-        sources.compactMap { source in
-            let sections = availableSections(for: source)
-            return sections.isEmpty ? nil : (source, sections)
         }
     }
 
@@ -679,6 +664,45 @@ extension SettingsManager {
 
         if !hadOrphans {
             LoggingService.shared.logCloudKit("cleanupOrphanedHomeMediaSourceItems: no orphans found, skipped all writes")
+        }
+    }
+
+    /// Removes ALL media-source Home *sections* (regardless of whether the source
+    /// still exists). Media sources are shortcuts-only now — a media-source
+    /// "section" was just a browse link and the feature was removed. Idempotent:
+    /// only writes when something changed, so it's safe to call on every load and
+    /// it also cleans up media-source sections that sync in from an older device.
+    /// Leaves media-source *shortcuts* (`homeShortcutOrder`/`homeShortcutVisibility`) untouched.
+    func removeAllHomeMediaSourceSections() {
+        var didChange = false
+
+        var sectionOrder = homeSectionOrder
+        let originalCount = sectionOrder.count
+        sectionOrder.removeAll { item in
+            if case .mediaSource = item { return true }
+            return false
+        }
+        if sectionOrder.count != originalCount {
+            LoggingService.shared.logCloudKit("removeAllHomeMediaSourceSections: removed \(originalCount - sectionOrder.count) media-source sections")
+            homeSectionOrder = sectionOrder
+            didChange = true
+        }
+
+        var sectionVis = homeSectionVisibility
+        let orphanedKeys = sectionVis.keys.filter { item in
+            if case .mediaSource = item { return true }
+            return false
+        }
+        if !orphanedKeys.isEmpty {
+            for key in orphanedKeys {
+                sectionVis.removeValue(forKey: key)
+            }
+            homeSectionVisibility = sectionVis
+            didChange = true
+        }
+
+        if didChange {
+            LoggingService.shared.logCloudKit("removeAllHomeMediaSourceSections: cleaned up media-source sections")
         }
     }
 

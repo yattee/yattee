@@ -435,6 +435,11 @@ enum HomeSectionItem: Codable, Hashable, Identifiable, Sendable {
     case history
     case downloads
     case instanceContent(instanceID: UUID, contentType: InstanceContentType)
+    /// Legacy, decode-only. Media sources are shortcuts-only now — a media-source
+    /// "section" was just a browse link. Kept so existing saved `homeSectionOrder`
+    /// data still decodes (the array decodes all-or-nothing); any such items are
+    /// stripped on load by `SettingsManager.removeAllHomeMediaSourceSections()`.
+    /// No longer user-addable and not rendered.
     case mediaSource(sourceID: UUID)
 
     var id: String {
