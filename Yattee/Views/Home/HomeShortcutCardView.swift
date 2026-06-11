@@ -27,11 +27,15 @@ struct HomeShortcutCardView<StatusIndicator: View>: View {
     /// Whether to show the count number in the filled (Reminders) layout.
     /// Cards without a meaningful count (Open Link, Remote, Subscriptions) hide it.
     var showsCount: Bool
-    /// Fixed color used when the "colorful" card style is active.
+    /// Palette-resolved color for this card (from position/palette). Used as the
+    /// tint in Soft and the solid fill in Vibrant.
     var colorfulColor: Color
-    /// Explicit style override. When set, takes precedence over the global
-    /// setting — used to render live previews of a not-yet-saved style.
+    /// Explicit layout override. When set, takes precedence over the global
+    /// setting — used to render live previews of a not-yet-saved layout.
     var styleOverride: HomeShortcutCardStyle?
+    /// Explicit color override. When set, takes precedence over the global
+    /// setting — used to render live previews of a not-yet-saved color.
+    var colorOverride: HomeShortcutCardColor?
     var statusIndicator: StatusIndicator?
 
     init(
@@ -42,6 +46,7 @@ struct HomeShortcutCardView<StatusIndicator: View>: View {
         showsCount: Bool = true,
         colorfulColor: Color = .accentColor,
         styleOverride: HomeShortcutCardStyle? = nil,
+        colorOverride: HomeShortcutCardColor? = nil,
         statusIndicator: StatusIndicator?
     ) {
         self.icon = icon
@@ -51,6 +56,7 @@ struct HomeShortcutCardView<StatusIndicator: View>: View {
         self.showsCount = showsCount
         self.colorfulColor = colorfulColor
         self.styleOverride = styleOverride
+        self.colorOverride = colorOverride
         self.statusIndicator = statusIndicator
     }
 
@@ -58,30 +64,40 @@ struct HomeShortcutCardView<StatusIndicator: View>: View {
 
     private var cardStyle: HomeShortcutCardStyle {
         #if os(tvOS)
-        return .plain
+        return .compact
         #else
-        return styleOverride ?? (appEnvironment?.settingsManager.homeShortcutCardStyle ?? .plain)
+        return styleOverride ?? (appEnvironment?.settingsManager.homeShortcutCardStyle ?? .regular)
         #endif
     }
 
-    private var isFilled: Bool {
-        cardStyle != .plain
+    private var cardColor: HomeShortcutCardColor {
+        #if os(tvOS)
+        return .soft
+        #else
+        return colorOverride ?? (appEnvironment?.settingsManager.homeShortcutCardColor ?? .soft)
+        #endif
     }
 
-    private var fillColor: Color {
-        cardStyle == .colorful ? (positionColorfulColor ?? colorfulColor) : accentColor
+    private var isVibrant: Bool {
+        cardColor == .vibrant
+    }
+
+    /// Palette-resolved color injected via the environment (the Accent palette
+    /// injects the accent color). Used as the tint in Soft and the fill in Vibrant.
+    private var paletteColor: Color {
+        positionColorfulColor ?? colorfulColor
     }
 
     private var iconColor: Color {
-        isFilled ? .white : accentColor
+        isVibrant ? .white : paletteColor
     }
 
     private var titleColor: Color {
-        isFilled ? .white : .primary
+        isVibrant ? .white : .primary
     }
 
     private var subtitleColor: Color {
-        isFilled ? Color.white.opacity(0.85) : .secondary
+        isVibrant ? Color.white.opacity(0.85) : .secondary
     }
 
     // Platform-specific styling
@@ -116,13 +132,13 @@ struct HomeShortcutCardView<StatusIndicator: View>: View {
         #endif
     }
 
-    /// Filled styles (accent/colorful) use a Reminders-style layout:
+    /// The Regular layout is the Reminders-style card:
     /// icon top-leading, count top-trailing, title at the bottom.
     private var useRemindersLayout: Bool {
         #if os(tvOS)
         return false
         #else
-        return isFilled
+        return cardStyle == .regular
         #endif
     }
 
@@ -204,7 +220,7 @@ struct HomeShortcutCardView<StatusIndicator: View>: View {
         .clipShape(RoundedRectangle(cornerRadius: cornerRadius))
     }
 
-    /// Reminders-style layout used by the accent/colorful filled styles:
+    /// Reminders-style layout used by the Regular layout:
     /// icon top-leading, count top-trailing, title anchored to the bottom.
     private var remindersLayout: some View {
         VStack(alignment: .leading, spacing: 8) {
@@ -270,9 +286,9 @@ struct HomeShortcutCardView<StatusIndicator: View>: View {
         #if os(tvOS)
         (isFocused ? Color.white.opacity(0.2) : Color.gray.opacity(0.3))
         #else
-        if isFilled {
+        if isVibrant {
             // Solid fill plus a subtle top-to-bottom sheen for a gentle gradient.
-            fillColor.overlay(
+            paletteColor.overlay(
                 LinearGradient(
                     colors: [Color.white.opacity(0.28), Color.clear, Color.black.opacity(0.10)],
                     startPoint: .top,
@@ -280,7 +296,7 @@ struct HomeShortcutCardView<StatusIndicator: View>: View {
                 )
             )
         } else {
-            accentColor.opacity(0.1)
+            paletteColor.opacity(0.1)
         }
         #endif
     }
@@ -289,7 +305,7 @@ struct HomeShortcutCardView<StatusIndicator: View>: View {
         #if os(tvOS)
         return accentColor.opacity(0.3)
         #else
-        return isFilled ? .clear : accentColor.opacity(0.3)
+        return isVibrant ? .clear : paletteColor.opacity(0.3)
         #endif
     }
 }
@@ -304,7 +320,8 @@ extension HomeShortcutCardView where StatusIndicator == EmptyView {
         subtitle: String,
         showsCount: Bool = true,
         colorfulColor: Color = .accentColor,
-        styleOverride: HomeShortcutCardStyle? = nil
+        styleOverride: HomeShortcutCardStyle? = nil,
+        colorOverride: HomeShortcutCardColor? = nil
     ) {
         self.icon = icon
         self.title = title
@@ -313,6 +330,7 @@ extension HomeShortcutCardView where StatusIndicator == EmptyView {
         self.showsCount = showsCount
         self.colorfulColor = colorfulColor
         self.styleOverride = styleOverride
+        self.colorOverride = colorOverride
         self.statusIndicator = nil
     }
 }

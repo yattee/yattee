@@ -10,9 +10,17 @@
 import SwiftUI
 
 struct HomeShortcutStyleView: View {
+    @Environment(\.appEnvironment) private var appEnvironment
+
     @Binding var style: HomeShortcutCardStyle
+    @Binding var color: HomeShortcutCardColor
     @Binding var palette: HomeShortcutColorfulPalette
     @Binding var customColors: [String]
+
+    /// The user's accent color, used by the Accent palette (uniform fill).
+    private var accentColor: Color {
+        appEnvironment?.settingsManager.accentColor.color ?? .accentColor
+    }
 
     /// Called after any value changes so the owner persists immediately. The
     /// owner sits covered in the navigation stack where its own onChange never
@@ -43,7 +51,7 @@ struct HomeShortcutStyleView: View {
     var body: some View {
         List {
             Section {
-                Picker(String(localized: "home.settings.shortcuts.style"), selection: $style) {
+                Picker(String(localized: "home.settings.shortcuts.layout"), selection: $style) {
                     ForEach(HomeShortcutCardStyle.allCases, id: \.self) { style in
                         Text(style.displayName).tag(style)
                     }
@@ -51,14 +59,27 @@ struct HomeShortcutStyleView: View {
                 #if os(iOS)
                 .pickerStyle(.segmented)
                 #endif
+            } header: {
+                Text(String(localized: "home.settings.shortcuts.layout"))
             }
 
-            if style == .colorful {
-                paletteSection
-
-                if palette == .custom {
-                    customColorsSection
+            Section {
+                Picker(String(localized: "home.settings.shortcuts.color"), selection: $color) {
+                    ForEach(HomeShortcutCardColor.allCases, id: \.self) { color in
+                        Text(color.displayName).tag(color)
+                    }
                 }
+                #if os(iOS)
+                .pickerStyle(.segmented)
+                #endif
+            } header: {
+                Text(String(localized: "home.settings.shortcuts.color"))
+            }
+
+            paletteSection
+
+            if palette == .custom {
+                customColorsSection
             }
 
             Section {
@@ -68,14 +89,15 @@ struct HomeShortcutStyleView: View {
                             icon: item.icon,
                             title: item.localizedTitle,
                             count: sampleCount(for: item),
-                            subtitle: "",
+                            subtitle: sampleSubtitle(for: item),
                             showsCount: showsCount(for: item),
                             colorfulColor: item.cardColor,
-                            styleOverride: style
+                            styleOverride: style,
+                            colorOverride: color
                         )
                         .environment(
                             \.homeShortcutColorfulColor,
-                            HomeShortcutColorfulPalette.color(forPosition: index, palette: palette, customHex: customColors)
+                            HomeShortcutColorfulPalette.color(forPosition: index, palette: palette, customHex: customColors, accentColor: accentColor)
                         )
                     }
                 }
@@ -93,6 +115,7 @@ struct HomeShortcutStyleView: View {
         .navigationBarTitleDisplayMode(.inline)
         #endif
         .onChange(of: style) { onSave?() }
+        .onChange(of: color) { onSave?() }
         .onChange(of: palette) { onSave?() }
         .onChange(of: customColors) { onSave?() }
     }
@@ -117,6 +140,9 @@ struct HomeShortcutStyleView: View {
 
     /// Colors shown in the selected-palette swatch strip.
     private var paletteSwatchColors: [Color] {
+        if palette == .accent {
+            return [accentColor]
+        }
         if palette == .custom {
             let parsed = customColors.compactMap { Color(hex: $0) }
             return parsed.isEmpty ? (HomeShortcutColorfulPalette.classic.builtInColors ?? []) : parsed
@@ -263,8 +289,8 @@ struct HomeShortcutStyleView: View {
         }
     }
 
-    /// Representative count so the accent/colorful (Reminders-style) layout
-    /// looks realistic in the preview.
+    /// Representative count so the Regular (Reminders-style) layout looks
+    /// realistic in the preview.
     private func sampleCount(for item: HomeShortcutItem) -> Int {
         switch item {
         case .playlists: return 8
@@ -277,12 +303,45 @@ struct HomeShortcutStyleView: View {
         default: return 0
         }
     }
+
+    /// The count subtitle shown on real Compact cards, mirroring `HomeView`'s
+    /// per-item subtitles so the Compact preview shows its second line.
+    private func sampleSubtitle(for item: HomeShortcutItem) -> String {
+        switch item {
+        case .openURL, .remoteControl:
+            return ""
+        case .playlists:
+            return formatCount(sampleCount(for: item), singular: "home.count.playlist", plural: "home.count.playlists")
+        case .bookmarks:
+            return formatCount(sampleCount(for: item), singular: "home.count.bookmark", plural: "home.count.bookmarks")
+        case .continueWatching, .history:
+            return formatCount(sampleCount(for: item), singular: "home.count.video", plural: "home.count.videos")
+        case .downloads:
+            return formatCount(sampleCount(for: item), singular: "home.count.video", plural: "home.count.videos")
+        case .channels:
+            return formatCount(sampleCount(for: item), singular: "home.count.channel", plural: "home.count.channels")
+        case .subscriptions:
+            return String(localized: "home.subscriptions.subtitle")
+        case .mediaSources:
+            return sampleCount(for: item) == 1 ? "1 source" : "\(sampleCount(for: item)) sources"
+        case .instanceContent, .mediaSource:
+            return ""
+        }
+    }
+
+    /// Localized "N items" string, mirroring `HomeView.formatCount`.
+    private func formatCount(_ count: Int, singular: String.LocalizationValue, plural: String.LocalizationValue) -> String {
+        let formattedCount = CountFormatter.compact(count)
+        let key = count == 1 ? singular : plural
+        return String(localized: "\(formattedCount) \(String(localized: key))")
+    }
 }
 
 #Preview {
     NavigationStack {
         HomeShortcutStyleView(
-            style: .constant(.colorful),
+            style: .constant(.regular),
+            color: .constant(.vibrant),
             palette: .constant(.classic),
             customColors: .constant(HomeShortcutColorfulPalette.customStarterColors)
         )

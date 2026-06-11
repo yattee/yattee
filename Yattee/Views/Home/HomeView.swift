@@ -402,12 +402,14 @@ struct HomeView: View {
         #endif
     }
 
-    /// Resolves the colorful-style color for a shortcut at the given grid
-    /// position from the selected palette (and custom colors when applicable).
+    /// Resolves the Regular-style fill color for a shortcut at the given grid
+    /// position from the selected palette (custom colors and accent color when
+    /// applicable).
     private func colorfulColor(atPosition position: Int) -> Color {
-        let palette = settingsManager?.homeShortcutColorfulPalette ?? .classic
+        let palette = settingsManager?.homeShortcutColorfulPalette ?? .accent
         let customHex = settingsManager?.homeShortcutCustomPaletteColors ?? []
-        return HomeShortcutColorfulPalette.color(forPosition: position, palette: palette, customHex: customHex)
+        let accentColor = settingsManager?.accentColor.color ?? .accentColor
+        return HomeShortcutColorfulPalette.color(forPosition: position, palette: palette, customHex: customHex, accentColor: accentColor)
     }
 
     private var shortcutsList: some View {

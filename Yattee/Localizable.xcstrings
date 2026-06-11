@@ -4238,6 +4238,28 @@
         }
       }
     },
+    "home.settings.shortcuts.color" : {
+      "comment" : "Label/header for the card color emphasis picker",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Color"
+          }
+        }
+      }
+    },
+    "home.settings.shortcuts.layout" : {
+      "comment" : "Header for the card layout picker (Compact/Regular)",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Layout"
+          }
+        }
+      }
+    },
     "home.settings.shortcuts.palette" : {
       "comment" : "Label/header for the colorful palette picker",
       "localizations" : {
@@ -4417,6 +4439,39 @@
         }
       }
     },
+    "home.shortcuts.color.soft" : {
+      "comment" : "Soft card color option (tinted background)",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Soft"
+          }
+        }
+      }
+    },
+    "home.shortcuts.color.vibrant" : {
+      "comment" : "Vibrant card color option (solid fill)",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vibrant"
+          }
+        }
+      }
+    },
+    "home.shortcuts.palette.accent" : {
+      "comment" : "Palette name for the uniform accent-color fill",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Accent"
+          }
+        }
+      }
+    },
     "home.shortcuts.palette.classic" : {
       "comment" : "Colorful palette name",
       "localizations" : {
@@ -4549,35 +4604,24 @@
         }
       }
     },
-    "home.shortcuts.style.accent" : {
-      "comment" : "Accent card style option",
+    "home.shortcuts.style.compact" : {
+      "comment" : "Compact card style option",
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Accent"
+            "value" : "Compact"
           }
         }
       }
     },
-    "home.shortcuts.style.colorful" : {
-      "comment" : "Colorful card style option",
+    "home.shortcuts.style.regular" : {
+      "comment" : "Regular card style option",
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Colorful"
-          }
-        }
-      }
-    },
-    "home.shortcuts.style.plain" : {
-      "comment" : "Plain card style option",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Plain"
+            "value" : "Regular"
           }
         }
       }

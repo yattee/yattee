@@ -95,14 +95,14 @@ extension SettingsManager {
         }
     }
 
-    /// Visual style for home shortcut cards (plain, accent-filled, or colorful). Default is plain.
+    /// Layout for home shortcut cards (compact or regular). Default is regular.
     var homeShortcutCardStyle: HomeShortcutCardStyle {
         get {
             if let cached = _homeShortcutCardStyle { return cached }
             guard let rawValue = string(for: .homeShortcutCardStyle) else {
-                return .plain
+                return .regular
             }
-            return HomeShortcutCardStyle(rawValue: rawValue) ?? .plain
+            return HomeShortcutCardStyle(rawValue: rawValue) ?? .regular
         }
         set {
             _homeShortcutCardStyle = newValue
@@ -110,15 +110,31 @@ extension SettingsManager {
         }
     }
 
-    /// Palette used by the "colorful" card style. Colors are applied by grid
-    /// position. Default is Classic.
+    /// Color emphasis for home shortcut cards (soft or vibrant), independent of
+    /// the layout style. Default is soft.
+    var homeShortcutCardColor: HomeShortcutCardColor {
+        get {
+            if let cached = _homeShortcutCardColor { return cached }
+            guard let rawValue = string(for: .homeShortcutCardColor) else {
+                return .soft
+            }
+            return HomeShortcutCardColor(rawValue: rawValue) ?? .soft
+        }
+        set {
+            _homeShortcutCardColor = newValue
+            set(newValue.rawValue, for: .homeShortcutCardColor)
+        }
+    }
+
+    /// Palette used by the "regular" card style. Colors are applied by grid
+    /// position. Default is Accent (the first palette option).
     var homeShortcutColorfulPalette: HomeShortcutColorfulPalette {
         get {
             if let cached = _homeShortcutColorfulPalette { return cached }
             guard let rawValue = string(for: .homeShortcutColorfulPalette) else {
-                return .classic
+                return .accent
             }
-            return HomeShortcutColorfulPalette(rawValue: rawValue) ?? .classic
+            return HomeShortcutColorfulPalette(rawValue: rawValue) ?? .accent
         }
         set {
             _homeShortcutColorfulPalette = newValue

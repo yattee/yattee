@@ -12,8 +12,9 @@ struct HomeSettingsView: View {
 
     // Local state for editing (copied from settings on appear, saved on dismiss)
     @State private var shortcutLayout: HomeShortcutLayout = .cards
-    @State private var shortcutCardStyle: HomeShortcutCardStyle = .plain
-    @State private var shortcutColorfulPalette: HomeShortcutColorfulPalette = .classic
+    @State private var shortcutCardStyle: HomeShortcutCardStyle = .regular
+    @State private var shortcutCardColor: HomeShortcutCardColor = .soft
+    @State private var shortcutColorfulPalette: HomeShortcutColorfulPalette = .accent
     @State private var shortcutCustomPaletteColors: [String] = []
     @State private var shortcutOrder: [HomeShortcutItem] = []
     @State private var shortcutVisibility: [HomeShortcutItem: Bool] = [:]
@@ -63,6 +64,7 @@ struct HomeSettingsView: View {
         .navigationDestination(isPresented: $showingStyleSettings) {
             HomeShortcutStyleView(
                 style: $shortcutCardStyle,
+                color: $shortcutCardColor,
                 palette: $shortcutColorfulPalette,
                 customColors: $shortcutCustomPaletteColors,
                 onSave: saveSettingsIfLoaded
@@ -99,8 +101,8 @@ struct HomeSettingsView: View {
             }
             .pickerStyle(.segmented)
 
-            // Card style (Plain / Accent / Colorful) — navigates to a page with
-            // a selector and a live preview. Only for cards layout.
+            // Card style (Compact / Regular) — navigates to a page with a
+            // selector and a live preview. Only for cards layout.
             if shortcutLayout == .cards {
                 #if os(macOS)
                 Button {
@@ -127,6 +129,7 @@ struct HomeSettingsView: View {
                 ) {
                     HomeShortcutStyleView(
                         style: $shortcutCardStyle,
+                        color: $shortcutCardColor,
                         palette: $shortcutColorfulPalette,
                         customColors: $shortcutCustomPaletteColors,
                         onSave: saveSettingsIfLoaded
@@ -330,6 +333,7 @@ struct HomeSettingsView: View {
 
         shortcutLayout = settings.homeShortcutLayout
         shortcutCardStyle = settings.homeShortcutCardStyle
+        shortcutCardColor = settings.homeShortcutCardColor
         shortcutColorfulPalette = settings.homeShortcutColorfulPalette
         shortcutCustomPaletteColors = settings.homeShortcutCustomPaletteColors
         shortcutOrder = settings.homeShortcutOrder
@@ -358,6 +362,7 @@ struct HomeSettingsView: View {
         guard let settings = settingsManager else { return }
         settings.homeShortcutLayout = shortcutLayout
         settings.homeShortcutCardStyle = shortcutCardStyle
+        settings.homeShortcutCardColor = shortcutCardColor
         settings.homeShortcutColorfulPalette = shortcutColorfulPalette
         settings.homeShortcutCustomPaletteColors = shortcutCustomPaletteColors
         settings.homeShortcutOrder = shortcutOrder

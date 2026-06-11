@@ -32,31 +32,50 @@ enum HomeShortcutLayout: String, CaseIterable, Sendable {
 
 // MARK: - Home Shortcut Card Style
 
-/// Visual style for shortcut cards in the Home view (cards layout only).
+/// Layout for shortcut cards in the Home view (cards layout only). Controls
+/// only how the icon / title / subtitle / counter are positioned — the color
+/// emphasis is a separate setting (`HomeShortcutCardColor`).
 enum HomeShortcutCardStyle: String, CaseIterable, Sendable {
-    /// Current look: light accent tint background with an accent border.
-    case plain
-    /// Solid fill in the user's accent color, white icon/text.
-    case accent
-    /// Solid fill with a fixed color per shortcut type, white icon/text (Reminders-style).
-    case colorful
+    /// Horizontal card: icon leading, title with a count subtitle beside it.
+    case compact
+    /// "Reminders-style" card: icon top-leading, count top-trailing, title bottom.
+    case regular
 
     var displayName: LocalizedStringKey {
         switch self {
-        case .plain: return "home.shortcuts.style.plain"
-        case .accent: return "home.shortcuts.style.accent"
-        case .colorful: return "home.shortcuts.style.colorful"
+        case .compact: return "home.shortcuts.style.compact"
+        case .regular: return "home.shortcuts.style.regular"
+        }
+    }
+}
+
+// MARK: - Home Shortcut Card Color
+
+/// Color emphasis for shortcut cards, independent of layout. The actual color
+/// comes from the selected `HomeShortcutColorfulPalette`.
+enum HomeShortcutCardColor: String, CaseIterable, Sendable {
+    /// Light tinted background, palette-colored icon, neutral (primary/secondary) text.
+    case soft
+    /// Solid palette fill with a gentle sheen, white icon/text.
+    case vibrant
+
+    var displayName: LocalizedStringKey {
+        switch self {
+        case .soft: return "home.shortcuts.color.soft"
+        case .vibrant: return "home.shortcuts.color.vibrant"
         }
     }
 }
 
 // MARK: - Home Shortcut Colorful Palette
 
-/// Palette used by the "colorful" card style. Colors are applied by grid
+/// Palette used by the "regular" card style. Colors are applied by grid
 /// position (wrapping by palette length), so a card's color depends on where
 /// it sits, not on which shortcut it is.
 enum HomeShortcutColorfulPalette: String, CaseIterable, Sendable {
-    /// Default: reproduces the original per-position look (SwiftUI named colors).
+    /// Uniform fill using the user's accent color on every card.
+    case accent
+    /// Reproduces the original per-position look (SwiftUI named colors).
     case classic
     case sunset
     case meadow
@@ -67,6 +86,7 @@ enum HomeShortcutColorfulPalette: String, CaseIterable, Sendable {
 
     var displayName: LocalizedStringKey {
         switch self {
+        case .accent: return "home.shortcuts.palette.accent"
         case .classic: return "home.shortcuts.palette.classic"
         case .sunset: return "home.shortcuts.palette.sunset"
         case .meadow: return "home.shortcuts.palette.meadow"
@@ -76,10 +96,12 @@ enum HomeShortcutColorfulPalette: String, CaseIterable, Sendable {
         }
     }
 
-    /// Built-in colors for this palette; `nil` for `.custom` (resolved from
-    /// the user's stored hex list instead).
+    /// Built-in colors for this palette; `nil` for `.accent` (resolved from the
+    /// user's accent color) and `.custom` (resolved from the stored hex list).
     var builtInColors: [Color]? {
         switch self {
+        case .accent:
+            return nil
         case .classic:
             // Ordered to match `HomeShortcutItem.defaultOrder` so the classic
             // palette reproduces the app's original colorful appearance.
@@ -101,9 +123,11 @@ enum HomeShortcutColorfulPalette: String, CaseIterable, Sendable {
     static let customStarterColors = ["#007AFF", "#30B0C7", "#5856D6", "#FF2D55", "#AF52DE"]
 
     /// Resolves the color for a shortcut at `position` in the grid, wrapping by
-    /// palette length. Falls back to the Classic palette if the selection yields
+    /// palette length. The `.accent` palette fills every position with
+    /// `accentColor`. Falls back to the Classic palette if the selection yields
     /// no usable colors (e.g. an empty or all-invalid custom list).
-    static func color(forPosition position: Int, palette: HomeShortcutColorfulPalette, customHex: [String]) -> Color {
+    static func color(forPosition position: Int, palette: HomeShortcutColorfulPalette, customHex: [String], accentColor: Color) -> Color {
+        if palette == .accent { return accentColor }
         let colors = palette == .custom ? customHex.compactMap { Color(hex: $0) } : (palette.builtInColors ?? [])
         let usable = colors.isEmpty ? (classic.builtInColors ?? [.accentColor]) : colors
         guard !usable.isEmpty else { return .accentColor }
