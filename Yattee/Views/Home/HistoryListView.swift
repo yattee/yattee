@@ -167,6 +167,13 @@ struct HistoryListView: View {
         .toolbarTitleDisplayMode(.inlineLarge)
         .searchable(text: $searchText, prompt: Text(String(localized: "history.search.placeholder")))
         .toolbar {
+            #if os(macOS)
+            // Pin the trailing group (search field + toolbar buttons) to the right edge,
+            // matching the global Search view.
+            if #available(macOS 26, *) {
+                ToolbarSpacer(.flexible, placement: .primaryAction)
+            }
+            #endif
             // View options button (always visible)
             ToolbarItem(placement: .primaryAction) {
                 Button {
@@ -184,7 +191,7 @@ struct HistoryListView: View {
 
             // Clear history menu (only when not empty)
             if !history.isEmpty {
-                ToolbarItem(placement: .automatic) {
+                ToolbarItem(placement: .primaryAction) {
                     Menu {
                         ForEach(ClearHistoryOption.allCases, id: \.self) { option in
                             Button(role: .destructive) {

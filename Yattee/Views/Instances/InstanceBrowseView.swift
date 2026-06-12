@@ -340,6 +340,13 @@ struct InstanceBrowseView: View {
         .navigationTitle(instance.displayName)
         .toolbarTitleDisplayMode(.inlineLarge)
         .toolbar {
+            #if os(macOS)
+            // Pin the trailing group (search field + toolbar buttons) to the right edge,
+            // matching the global Search view.
+            if #available(macOS 26, *) {
+                ToolbarSpacer(.flexible, placement: .primaryAction)
+            }
+            #endif
             ToolbarItem(placement: .primaryAction) {
                 Button {
                     showViewOptions = true

@@ -191,6 +191,13 @@ struct ManageChannelsView: View {
         .toolbarTitleDisplayMode(.inlineLarge)
         .searchable(text: $searchText, prompt: Text(String(localized: "channels.search.placeholder")))
         .toolbar {
+            #if os(macOS)
+            // Pin the trailing group (search field + toolbar buttons) to the right edge,
+            // matching the global Search view.
+            if #available(macOS 26, *) {
+                ToolbarSpacer(.flexible, placement: .primaryAction)
+            }
+            #endif
             ToolbarItem(placement: .primaryAction) {
                 Button {
                     showViewOptions = true
