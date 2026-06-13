@@ -155,17 +155,22 @@ struct ChannelView: View {
     }
 
     var body: some View {
-        Group {
-            if let channel {
-                channelContent(channel)
-            } else if let cachedHeader {
-                // Show header with cached data + spinner for content area
-                loadingContent(cachedHeader)
-            } else if isLoading {
-                ProgressView()
-                    .frame(maxWidth: .infinity, maxHeight: .infinity)
-            } else if let error = errorMessage {
-                errorView(error)
+        // The search modifier is hoisted above this state-switching Group so the
+        // search bar is present in every load state (loading spinner / cached header
+        // / loaded content) instead of only appearing once `channel != nil`.
+        channelSearchable {
+            Group {
+                if let channel {
+                    channelContent(channel)
+                } else if let cachedHeader {
+                    // Show header with cached data + spinner for content area
+                    loadingContent(cachedHeader)
+                } else if isLoading {
+                    ProgressView()
+                        .frame(maxWidth: .infinity, maxHeight: .infinity)
+                } else if let error = errorMessage {
+                    errorView(error)
+                }
             }
         }
         .background(showInsetBackground ? viewBackgroundColor : .clear)
@@ -180,6 +185,57 @@ struct ChannelView: View {
         .onReceive(NotificationCenter.default.publisher(for: .watchHistoryDidChange)) { _ in
             loadWatchEntries()
         }
+    }
+
+    /// Applies the channel `.searchable` field and its search handlers around the given
+    /// content. Kept outside `iOSChannelContent` so the search bar shows regardless of
+    /// channel load state. On tvOS there is no `.searchable` (it uses a custom search
+    /// tab), so this is a passthrough.
+    @ViewBuilder
+    private func channelSearchable(@ViewBuilder _ content: () -> some View) -> some View {
+        #if os(tvOS)
+        content()
+        #else
+        content()
+            #if os(iOS)
+            .if(supportsChannelSearch) { view in
+                view.searchable(
+                    text: $searchText,
+                    isPresented: $isSearchActive,
+                    placement: .navigationBarDrawer(displayMode: .automatic),
+                    prompt: Text("channel.search.placeholder")
+                )
+            }
+            #elseif os(macOS)
+            .if(supportsChannelSearch) { view in
+                view.searchable(
+                    text: $searchText,
+                    isPresented: $isSearchActive,
+                    placement: .toolbar,
+                    prompt: Text("channel.search.placeholder")
+                )
+            }
+            #endif
+            .onSubmit(of: .search) {
+                Task {
+                    await performSearch()
+                }
+            }
+            .onChange(of: searchText) { _, newValue in
+                if newValue.isEmpty && isSearchActive {
+                    // User cleared the search text, reset search state
+                    searchResults = .empty
+                }
+            }
+            .onChange(of: isSearchActive) { _, isActive in
+                if !isActive {
+                    // Search was dismissed, clear results
+                    hasSearched = false
+                    searchResults = .empty
+                    searchText = ""
+                }
+            }
+        #endif
     }
 
     private func loadWatchEntries() {
@@ -365,44 +421,6 @@ struct ChannelView: View {
         .toolbarBackground(collapseProgress > 0.8 ? .visible : .hidden, for: .navigationBar)
         .navigationBarTitleDisplayMode(.inline)
         #endif
-        #if os(iOS)
-        .if(supportsChannelSearch) { view in
-            view.searchable(
-                text: $searchText,
-                isPresented: $isSearchActive,
-                placement: .navigationBarDrawer(displayMode: .automatic),
-                prompt: Text("channel.search.placeholder")
-            )
-        }
-        #elseif os(macOS)
-        .if(supportsChannelSearch) { view in
-            view.searchable(
-                text: $searchText,
-                isPresented: $isSearchActive,
-                placement: .toolbar,
-                prompt: Text("channel.search.placeholder")
-            )
-        }
-        #endif
-        .onSubmit(of: .search) {
-            Task {
-                await performSearch()
-            }
-        }
-        .onChange(of: searchText) { _, newValue in
-            if newValue.isEmpty && isSearchActive {
-                // User cleared the search text, reset search state
-                searchResults = .empty
-            }
-        }
-        .onChange(of: isSearchActive) { _, isActive in
-            if !isActive {
-                // Search was dismissed, clear results
-                hasSearched = false
-                searchResults = .empty
-                searchText = ""
-            }
-        }
         .confirmationDialog(
             String(localized: "channel.unsubscribe.confirmation.title"),
             isPresented: $showingUnsubscribeConfirmation,
@@ -1032,9 +1050,10 @@ struct ChannelView: View {
     /// Icon for the channel menu based on subscription/notification state
     private var channelMenuIcon: String {
         if isSubscribed {
-            let notificationsEnabled = channel.map {
-                appEnvironment?.dataManager.notificationsEnabled(for: $0.id.channelID) ?? false
-            } ?? false
+            // Use the immediately-available channel ID so notification status is correct
+            // during loading, before the network-loaded `channel` is set.
+            let effectiveChannelID = channel?.id.channelID ?? channelID
+            let notificationsEnabled = appEnvironment?.dataManager.notificationsEnabled(for: effectiveChannelID) ?? false
             return notificationsEnabled ? "bell.fill" : "person.fill"
         }
         return "person.badge.plus"
@@ -1056,8 +1075,9 @@ struct ChannelView: View {
             }
 
             // Notifications toggle (only visible when subscribed)
-            if isSubscribed, let channel {
-                let notificationsEnabled = appEnvironment?.dataManager.notificationsEnabled(for: channel.id.channelID) ?? false
+            if isSubscribed {
+                let effectiveChannelID = channel?.id.channelID ?? channelID
+                let notificationsEnabled = appEnvironment?.dataManager.notificationsEnabled(for: effectiveChannelID) ?? false
                 Button {
                     toggleNotifications()
                 } label: {
