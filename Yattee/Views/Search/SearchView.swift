@@ -35,6 +35,11 @@ struct SearchView: View {
     @State private var showViewOptions = false
     @State private var isSearchHistoryExpanded = false
 
+    /// Suppresses the next onChange suggestion-fetch when the search text is set
+    /// programmatically (recent search / suggestion tap / deep link), so it goes
+    /// straight to results instead of re-showing suggestions.
+    @State private var suppressNextTextChangeSearch = false
+
     @AppStorage("searchFilters") private var savedFiltersData: Data?
 
     // Persisted search instance selection
@@ -111,6 +116,10 @@ struct SearchView: View {
         }
         #endif
         .onChange(of: searchTextBinding.wrappedValue) { _, newValue in
+            if suppressNextTextChangeSearch {
+                suppressNextTextChangeSearch = false
+                return
+            }
             if newValue.isEmpty {
                 searchViewModel?.clearResults()  // Clear everything when empty
                 searchViewModel?.filters = .defaults
@@ -127,6 +136,7 @@ struct SearchView: View {
         .task(id: initialQuery) {
             // Auto-execute search when opened with an initial query
             if let query = initialQuery, !query.isEmpty, searchTextBinding.wrappedValue.isEmpty {
+                suppressNextTextChangeSearch = true
                 searchTextBinding.wrappedValue = query
                 searchViewModel?.cancelSuggestions()
                 searchViewModel?.filters.type = .video
@@ -914,6 +924,7 @@ struct SearchView: View {
                 ForEach(vm.suggestions, id: \.self) { suggestion in
                     Button {
                         dismissKeyboard()
+                        suppressNextTextChangeSearch = (suggestion != searchTextBinding.wrappedValue)
                         searchTextBinding.wrappedValue = suggestion
                         vm.cancelSuggestions()
                         vm.filters.type = .video
@@ -1366,6 +1377,7 @@ struct SearchView: View {
 
     private func executeSearch(_ query: String) {
         dismissKeyboard()
+        suppressNextTextChangeSearch = (query != searchTextBinding.wrappedValue)
         searchTextBinding.wrappedValue = query
         searchViewModel?.cancelSuggestions()
         searchViewModel?.filters.type = .video
