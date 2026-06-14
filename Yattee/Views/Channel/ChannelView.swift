@@ -154,6 +154,15 @@ struct ChannelView: View {
         )
     }
 
+    /// View options button lives on the leading edge on macOS, trailing elsewhere.
+    private var viewOptionsPlacement: ToolbarItemPlacement {
+        #if os(macOS)
+        .navigation
+        #else
+        .primaryAction
+        #endif
+    }
+
     var body: some View {
         // The search modifier is hoisted above this state-switching Group so the
         // search bar is present in every load state (loading spinner / cached header
@@ -387,7 +396,7 @@ struct ChannelView: View {
             }
             #endif
 
-            ToolbarItem(placement: .primaryAction) {
+            ToolbarItem(placement: viewOptionsPlacement) {
                 Button {
                     showViewOptions = true
                 } label: {
@@ -401,8 +410,11 @@ struct ChannelView: View {
                 #endif
             }
 
-            #if !os(tvOS)
-            if #available(iOS 26, macOS 26, *) {
+            // iOS keeps a fixed gap between the trailing view options and channel
+            // menu buttons; on macOS view options moves to the leading edge, so no
+            // gap is needed here.
+            #if os(iOS)
+            if #available(iOS 26, *) {
                 ToolbarSpacer(.fixed, placement: .primaryAction)
             }
             #endif
@@ -509,7 +521,7 @@ struct ChannelView: View {
             }
             #endif
 
-            ToolbarItem(placement: .primaryAction) {
+            ToolbarItem(placement: viewOptionsPlacement) {
                 Button {
                     showViewOptions = true
                 } label: {
@@ -523,8 +535,11 @@ struct ChannelView: View {
                 #endif
             }
 
-            #if !os(tvOS)
-            if #available(iOS 26, macOS 26, *) {
+            // iOS keeps a fixed gap between the trailing view options and channel
+            // menu buttons; on macOS view options moves to the leading edge, so no
+            // gap is needed here.
+            #if os(iOS)
+            if #available(iOS 26, *) {
                 ToolbarSpacer(.fixed, placement: .primaryAction)
             }
             #endif

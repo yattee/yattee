@@ -318,6 +318,15 @@ struct SubscriptionsView: View {
         return progress > 0 && progress < 1 ? progress : nil
     }
 
+    /// View options button lives on the leading edge on macOS, trailing elsewhere.
+    private var viewOptionsPlacement: ToolbarItemPlacement {
+        #if os(macOS)
+        .navigation
+        #else
+        .primaryAction
+        #endif
+    }
+
     var body: some View {
         GeometryReader { geometry in
             ScrollViewReader { proxy in
@@ -418,7 +427,7 @@ struct SubscriptionsView: View {
                 .toolbarTitleDisplayMode(.inlineLarge)
                 #endif
                 .toolbar {
-                    ToolbarItem(placement: .primaryAction) {
+                    ToolbarItem(placement: viewOptionsPlacement) {
                         Button {
                             showViewOptions = true
                         } label: {

@@ -68,6 +68,15 @@ struct MediaBrowserView: View {
         )
     }
 
+    /// View options button lives on the leading edge on macOS, trailing elsewhere.
+    private var viewOptionsPlacement: ToolbarItemPlacement {
+        #if os(macOS)
+        .navigation
+        #else
+        .primaryAction
+        #endif
+    }
+
     var body: some View {
         content
             #if !os(tvOS)
@@ -88,7 +97,7 @@ struct MediaBrowserView: View {
                         }
                     }
                 }
-                ToolbarItem(placement: .primaryAction) {
+                ToolbarItem(placement: viewOptionsPlacement) {
                     Button {
                         showViewOptions = true
                     } label: {

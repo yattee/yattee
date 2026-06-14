@@ -99,6 +99,15 @@ struct SearchView: View {
         self.initialQuery = initialQuery
     }
 
+    /// View options button lives on the leading edge on macOS, trailing elsewhere.
+    private var viewOptionsPlacement: ToolbarItemPlacement {
+        #if os(macOS)
+        .navigation
+        #else
+        .primaryAction
+        #endif
+    }
+
     var body: some View {
         tvOSOrDefaultContent
         #if !os(macOS)
@@ -266,6 +275,20 @@ struct SearchView: View {
         .navigationTitle(String(localized: "tabs.search"))
         .toolbarTitleDisplayMode(.inlineLarge)
         .toolbar {
+            // View options first so it is the leftmost navigation item on macOS.
+            ToolbarItem(placement: viewOptionsPlacement) {
+                Button {
+                    showViewOptions = true
+                } label: {
+                    Label(String(localized: "viewOptions.title"), systemImage: "slider.horizontal.3")
+                }
+                .liquidGlassTransitionSource(id: "searchViewOptions", in: sheetTransition)
+                #if os(macOS)
+                .popover(isPresented: $showViewOptions, arrowEdge: .bottom) {
+                    viewOptionsSheetContent
+                }
+                #endif
+            }
             #if os(macOS)
             if searchInstance?.supportsSearchFilters == true {
                 if #available(macOS 26, *) {
@@ -298,25 +321,12 @@ struct SearchView: View {
             }
             #endif
             #if os(macOS)
-            // Pin the trailing group (view options + search field) to the right edge
+            // Pin the trailing group (search field) to the right edge
             // so it doesn't shift when the filter items appear/disappear.
             if #available(macOS 26, *) {
                 ToolbarSpacer(.flexible, placement: .primaryAction)
             }
             #endif
-            ToolbarItem(placement: .primaryAction) {
-                Button {
-                    showViewOptions = true
-                } label: {
-                    Label(String(localized: "viewOptions.title"), systemImage: "slider.horizontal.3")
-                }
-                .liquidGlassTransitionSource(id: "searchViewOptions", in: sheetTransition)
-                #if os(macOS)
-                .popover(isPresented: $showViewOptions, arrowEdge: .bottom) {
-                    viewOptionsSheetContent
-                }
-                #endif
-            }
         }
         .searchable(text: searchTextBinding, prompt: Text(String(localized: "search.placeholder")))
         .onSubmit(of: .search) {

@@ -27,6 +27,15 @@ struct DownloadsView: View {
         appEnvironment?.settingsManager.listStyle ?? .inset
     }
 
+    /// View options control lives on the leading edge on macOS, trailing elsewhere.
+    private var viewOptionsPlacement: ToolbarItemPlacement {
+        #if os(macOS)
+        .navigation
+        #else
+        .primaryAction
+        #endif
+    }
+
     var body: some View {
         Group {
             if let manager = downloadManager, let settings = downloadSettings {
@@ -45,7 +54,7 @@ struct DownloadsView: View {
                 ToolbarSpacer(.flexible, placement: .primaryAction)
             }
             #endif
-            ToolbarItem(placement: .primaryAction) {
+            ToolbarItem(placement: viewOptionsPlacement) {
                 if let settings = downloadSettings {
                     sortAndGroupMenu(settings)
                 }

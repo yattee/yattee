@@ -92,6 +92,15 @@ struct BookmarksListView: View {
         )
     }
 
+    /// View options button lives on the leading edge on macOS, trailing elsewhere.
+    private var viewOptionsPlacement: ToolbarItemPlacement {
+        #if os(macOS)
+        .navigation
+        #else
+        .primaryAction
+        #endif
+    }
+
     var body: some View {
         GeometryReader { geometry in
             #if os(tvOS)
@@ -160,7 +169,7 @@ struct BookmarksListView: View {
                 ToolbarSpacer(.flexible, placement: .primaryAction)
             }
             #endif
-            ToolbarItem(placement: .primaryAction) {
+            ToolbarItem(placement: viewOptionsPlacement) {
                 Button {
                     showViewOptions = true
                 } label: {

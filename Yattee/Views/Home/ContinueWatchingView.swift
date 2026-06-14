@@ -50,6 +50,15 @@ struct ContinueWatchingView: View {
         )
     }
 
+    /// View options button lives on the leading edge on macOS, trailing elsewhere.
+    private var viewOptionsPlacement: ToolbarItemPlacement {
+        #if os(macOS)
+        .navigation
+        #else
+        .primaryAction
+        #endif
+    }
+
     var body: some View {
         GeometryReader { geometry in
             #if os(tvOS)
@@ -124,7 +133,7 @@ struct ContinueWatchingView: View {
         .toolbarTitleDisplayMode(.inlineLarge)
         .toolbar {
             if !inProgressEntries.isEmpty {
-                ToolbarItem(placement: .primaryAction) {
+                ToolbarItem(placement: viewOptionsPlacement) {
                     Button {
                         showViewOptions = true
                     } label: {
