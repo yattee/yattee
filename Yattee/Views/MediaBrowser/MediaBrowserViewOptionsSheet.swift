@@ -24,7 +24,7 @@ struct MediaBrowserViewOptionsSheet: View {
         #if os(macOS)
         // Popover content: no navigation chrome, click-outside dismisses.
         formContent
-            .padding()
+            .formStyle(.grouped)
             .frame(width: 300)
             .onAppear {
                 // Reset sort order if current selection is not available for this source type

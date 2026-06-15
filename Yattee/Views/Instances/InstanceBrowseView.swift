@@ -357,30 +357,26 @@ struct InstanceBrowseView: View {
             }
             #if os(macOS)
             if #available(macOS 26, *) {
-                // Search filters button appears only while showing search results.
-                // Items stay mounted (invisible/inert) otherwise so the toolbar layout is stable.
-                ToolbarItem(placement: .navigation) {
-                    searchFiltersToolbarButton
-                        .opacity(showsSearchFiltersInToolbar ? 1 : 0)
-                        .disabled(!showsSearchFiltersInToolbar)
-                        .accessibilityHidden(!showsSearchFiltersInToolbar)
+                // Render the items bare (conditional `if`, no opacity/disabled
+                // wrappers): wrapping a `.segmented` Picker inserts a hosting layer
+                // that makes the toolbar fall back to a Liquid-Glass pill instead of
+                // the native segmented control. The search filters button shows only
+                // while displaying search results; the principal picker swaps between
+                // the browse tab picker and the search content type picker.
+                if showsSearchFiltersInToolbar {
+                    ToolbarItem(placement: .navigation) {
+                        searchFiltersToolbarButton
+                    }
                 }
-                .sharedBackgroundVisibility(showsSearchFiltersInToolbar ? .automatic : .hidden)
-                // Search content type picker while showing results, browse tab picker otherwise
-                ToolbarItem(placement: .principal) {
-                    Group {
+                if isToolbarPickerVisible {
+                    ToolbarItem(placement: .principal) {
                         if showsSearchFiltersInToolbar {
                             searchContentTypePicker
                         } else {
                             tabPicker
                         }
                     }
-                    .fixedSize()
-                    .opacity(isToolbarPickerVisible ? 1 : 0)
-                    .disabled(!isToolbarPickerVisible)
-                    .accessibilityHidden(!isToolbarPickerVisible)
                 }
-                .sharedBackgroundVisibility(isToolbarPickerVisible ? .automatic : .hidden)
             } else if showsSearchFiltersInToolbar {
                 ToolbarItem(placement: .navigation) {
                     searchFiltersToolbarButton

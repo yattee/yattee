@@ -291,29 +291,18 @@ struct SearchView: View {
             }
             #if os(macOS)
             if searchInstance?.supportsSearchFilters == true {
-                if #available(macOS 26, *) {
-                    // Items stay in the toolbar even before a search is submitted
-                    // (invisible and inert) so the search field keeps a stable size.
-                    ToolbarItem(placement: .navigation) {
-                        searchFiltersToolbarButton
-                            .opacity(hasSearched ? 1 : 0)
-                            .disabled(!hasSearched)
-                            .accessibilityHidden(!hasSearched)
-                    }
-                    .sharedBackgroundVisibility(hasSearched ? .automatic : .hidden)
-                    ToolbarItem(placement: .principal) {
+                // Filters button + content type picker are always visible on macOS.
+                // The picker is rendered bare (no opacity/disabled/fixedSize wrappers):
+                // wrapping a `.segmented` Picker in those modifiers inserts a hosting
+                // layer that makes the toolbar fall back to a Liquid-Glass pill instead
+                // of the native segmented control.
+                ToolbarItem(placement: .navigation) {
+                    searchFiltersToolbarButton
+                }
+                ToolbarItem(placement: .principal) {
+                    if #available(macOS 26, *) {
                         contentTypePicker
-                            .fixedSize()
-                            .opacity(hasSearched ? 1 : 0)
-                            .disabled(!hasSearched)
-                            .accessibilityHidden(!hasSearched)
-                    }
-                    .sharedBackgroundVisibility(hasSearched ? .automatic : .hidden)
-                } else if hasSearched {
-                    ToolbarItem(placement: .navigation) {
-                        searchFiltersToolbarButton
-                    }
-                    ToolbarItem(placement: .principal) {
+                    } else {
                         contentTypePicker
                             .fixedSize()
                     }
@@ -331,7 +320,11 @@ struct SearchView: View {
         .searchable(text: searchTextBinding, prompt: Text(String(localized: "search.placeholder")))
         .onSubmit(of: .search) {
             searchViewModel?.cancelSuggestions()
+            #if !os(macOS)
+            // On macOS the content type picker is always visible, so preserve the
+            // user's chosen type instead of resetting it to .video on each submit.
             searchViewModel?.filters.type = .video
+            #endif
             if let filters = searchViewModel?.filters {
                 saveFilters(filters)
             }
