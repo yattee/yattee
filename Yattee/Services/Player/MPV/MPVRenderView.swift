@@ -907,6 +907,12 @@ final class MPVRenderView: UIView {
                 // macOS render views already do this.
                 mpvClient.reportSwap()
             }
+        } else {
+            // PiP active: the frame is displayed via the PiP sample buffer layer instead
+            // of presentRenderbuffer. Keep feeding swap timing to mpv — display-vdrop
+            // relies on it once reports have started, and starving it makes mpv drop
+            // nearly every frame (low-FPS PiP).
+            mpvClient.reportSwap()
         }
 
         // Warn on GPU stalls: a render+present that takes far longer than a frame
