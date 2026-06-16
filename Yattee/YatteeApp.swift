@@ -761,7 +761,7 @@ struct YatteeApp: App {
             // Always expand player after handoff (unless PiP is active)
             // We add a small delay to ensure ContentView has set up its .onChange observers
             // (during app launch via Handoff, the trigger can fire before the view is ready)
-            #if os(iOS)
+            #if os(iOS) || os(macOS)
             let isPiPActive = appEnvironment.playerService.state.pipState == .active
             #else
             let isPiPActive = false

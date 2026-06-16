@@ -940,7 +940,7 @@ final class PlayerService {
     func openVideo(_ video: Video, startTime: TimeInterval? = nil) {
 
         // Check if MPV PiP is active - if so, don't expand the player
-        #if os(iOS)
+        #if os(iOS) || os(macOS)
         let mpvPiPActive = (currentBackend as? MPVBackend)?.isPiPActive ?? false
         #else
         let mpvPiPActive = false
@@ -993,7 +993,7 @@ final class PlayerService {
     ///   - captions: Optional array of external captions (e.g., from WebDAV subtitle files)
     func openVideo(_ video: Video, stream: Stream, audioStream: Stream? = nil, download: Download? = nil, captions: [Caption] = []) {
         // Check if MPV PiP is active - if so, don't expand the player
-        #if os(iOS)
+        #if os(iOS) || os(macOS)
         let mpvPiPActive = (currentBackend as? MPVBackend)?.isPiPActive ?? false
         #else
         let mpvPiPActive = false
