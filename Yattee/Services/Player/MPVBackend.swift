@@ -127,6 +127,8 @@ final class MPVBackend: PlayerBackend {
     // Video dimensions for aspect ratio detection
     private var videoWidth: Int = 0
     private var videoHeight: Int = 0
+    // Coalesces separate width/height property events into one PiP size update
+    private var pipVideoSizeUpdateTask: Task<Void, Never>?
     // Cached video FPS to avoid sync fetch on main thread
     private var containerFps: Double = 0
     // Cached cache state to avoid sync fetch on main thread
@@ -1732,17 +1734,28 @@ extension MPVBackend: MPVClientDelegate {
         LoggingService.shared.debug("MPV: Video size detected: \(videoWidth)x\(videoHeight)", category: .mpv)
         delegate?.backend(self, didUpdateVideoSize: videoWidth, height: videoHeight)
 
-        // Update PiP bridge with video aspect ratio for proper window sizing
+        // Update PiP capture dimensions and aspect ratio, coalesced.
+        // Width and height arrive as separate MPV property events and the old
+        // values are kept across video switches, so right after a switch one of
+        // them can still be stale (e.g. new width paired with old height).
+        // Debounce so capture buffers and the PiP window never see that
+        // transient mixed size.
         #if os(iOS) || os(macOS)
-        let aspectRatio = CGFloat(videoWidth) / CGFloat(videoHeight)
-        pipBridge?.updateVideoAspectRatio(aspectRatio)
-        #endif
-
-        // Update render view with video content dimensions for accurate PiP capture
-        // (avoids capturing letterbox/pillarbox black bars)
-        #if os(iOS) || os(macOS)
-        renderView?.videoContentWidth = videoWidth
-        renderView?.videoContentHeight = videoHeight
+        pipVideoSizeUpdateTask?.cancel()
+        pipVideoSizeUpdateTask = Task { [weak self] in
+            try? await Task.sleep(for: .milliseconds(100))
+            guard let self, !Task.isCancelled else { return }
+            let width = self.videoWidth
+            let height = self.videoHeight
+            guard width > 0, height > 0 else { return }
+            // Content dimensions must update before the aspect ratio: on macOS
+            // the aspect update flushes the PiP sample buffer during active PiP,
+            // and a stale-sized frame captured afterwards would make AVKit
+            // re-read the old dimensions.
+            self.renderView?.videoContentWidth = width
+            self.renderView?.videoContentHeight = height
+            self.pipBridge?.updateVideoAspectRatio(CGFloat(width) / CGFloat(height))
+        }
         #endif
 
         // Update render view with video FPS for display link frame rate matching

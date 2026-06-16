@@ -222,21 +222,40 @@ final class MPVPiPBridge: NSObject {
     /// - Parameter aspectRatio: Video width divided by height (e.g., 16/9 = 1.777...)
     func updateVideoAspectRatio(_ aspectRatio: CGFloat) {
         guard aspectRatio > 0 else { return }
+        #if os(macOS)
+        let previousAspectRatio = videoAspectRatio
+        #endif
         videoAspectRatio = aspectRatio
 
         #if os(macOS)
-        // On macOS, update layer bounds to match aspect ratio
-        // This helps AVKit size the PiP window correctly
-        let currentBounds = sampleBufferLayer.bounds
-        let newHeight = currentBounds.width / aspectRatio
-        let newBounds = CGRect(x: 0, y: 0, width: currentBounds.width, height: newHeight)
+        if isPiPActive {
+            // Video changed while PiP is active. AVKit sizes the PiP window from
+            // the format of the initially enqueued frames and doesn't resize it
+            // when frames with new dimensions arrive, leaving empty space around
+            // the new video. Flush stale frames, force a fresh format description
+            // so AVKit re-reads the new dimensions, and resize the PiP window to
+            // the new aspect ratio ourselves.
+            let ratioChange = abs(aspectRatio - previousAspectRatio) / previousAspectRatio
+            if ratioChange > 0.01 {
+                sampleBufferLayer.sampleBufferRenderer.flush()
+                currentFormatDescription = nil
+                resizePiPWindow(toAspectRatio: aspectRatio)
+                LoggingService.shared.debug("MPVPiPBridge: Aspect ratio changed during PiP \(previousAspectRatio) -> \(aspectRatio), flushed buffer and resized PiP window", category: .mpv)
+            }
+        } else {
+            // On macOS, update layer bounds to match aspect ratio
+            // This helps AVKit size the PiP window correctly
+            let currentBounds = sampleBufferLayer.bounds
+            let newHeight = currentBounds.width / aspectRatio
+            let newBounds = CGRect(x: 0, y: 0, width: currentBounds.width, height: newHeight)
 
-        CATransaction.begin()
-        CATransaction.setDisableActions(true)
-        sampleBufferLayer.bounds = newBounds
-        CATransaction.commit()
+            CATransaction.begin()
+            CATransaction.setDisableActions(true)
+            sampleBufferLayer.bounds = newBounds
+            CATransaction.commit()
 
-        LoggingService.shared.debug("MPVPiPBridge: Updated aspect ratio to \(aspectRatio), layer bounds: \(newBounds)", category: .mpv)
+            LoggingService.shared.debug("MPVPiPBridge: Updated aspect ratio to \(aspectRatio), layer bounds: \(newBounds)", category: .mpv)
+        }
         #else
         // On iOS, don't modify bounds when PiP is inactive - this causes frame misalignment
         // (negative Y offset) which breaks the system's PiP restore UI positioning.
@@ -855,6 +874,29 @@ extension MPVPiPBridge {
         }
 
         return nil
+    }
+
+    /// Resize the PiP window to match a new video aspect ratio, keeping the
+    /// current width and top edge. AVKit doesn't resize the window itself when
+    /// the enqueued frame dimensions change (e.g. switching videos during PiP).
+    func resizePiPWindow(toAspectRatio aspectRatio: CGFloat) {
+        guard aspectRatio > 0, let pipWindow = findPiPWindow() else {
+            LoggingService.shared.debug("MPVPiPBridge: resizePiPWindow - PiP window not found", category: .mpv)
+            return
+        }
+
+        let contentRect = pipWindow.contentRect(forFrameRect: pipWindow.frame)
+        guard contentRect.width > 0 else { return }
+        let newContentHeight = contentRect.width / aspectRatio
+        let heightDelta = newContentHeight - contentRect.height
+        guard abs(heightDelta) >= 1 else { return }
+
+        var frame = pipWindow.frame
+        frame.size.height += heightDelta
+        frame.origin.y -= heightDelta // keep the top edge in place
+        pipWindow.setFrame(frame, display: true, animate: false)
+
+        LoggingService.shared.debug("MPVPiPBridge: Resized PiP window for aspect \(aspectRatio): \(frame)", category: .mpv)
     }
 
     /// Recursively log view hierarchy for debugging
