@@ -2130,11 +2130,17 @@ final class PlayerService {
             // Configure PiP callbacks
             if let coordinator = navigationCoordinator {
                 mpvBackend.onRestoreFromPiP = { [weak coordinator] in
+                    #if os(macOS)
+                    // On macOS, always restore into the expanded player window —
+                    // the mini player is not a restore target there
+                    coordinator?.expandPlayer()
+                    #else
                     // If mini player video is disabled, expand player for restore
                     // Otherwise video continues in mini player
                     if MiniPlayerSettings.cached.showVideo == false {
                         coordinator?.expandPlayer()
                     }
+                    #endif
                 }
                 mpvBackend.onPiPDidStart = { [weak coordinator] in
                     guard let coordinator else {
