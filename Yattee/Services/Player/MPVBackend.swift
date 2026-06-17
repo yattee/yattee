@@ -1243,9 +1243,14 @@ final class MPVBackend: PlayerBackend {
 
         // Only proceed with actual setup if not already done and view is in window
         guard !isPiPSetUp, containerView.window != nil else {
-            // If already set up but playerState changed, update isPiPPossible
-            if isPiPSetUp, let playerState {
-                playerState.isPiPPossible = isPiPPossible
+            if isPiPSetUp {
+                // Re-wire bridge callbacks in case stop() cleared them since
+                // setup (the backend is reused across videos)
+                wirePiPBridgeCallbacks()
+                // If playerState changed, update isPiPPossible
+                if let playerState {
+                    playerState.isPiPPossible = isPiPPossible
+                }
             }
             return
         }
@@ -1277,6 +1282,20 @@ final class MPVBackend: PlayerBackend {
 
         // Set up the bridge with this backend and the container
         pipBridge.setup(backend: self, in: containerView)
+
+        wirePiPBridgeCallbacks()
+
+        // Manually notify current state now that callbacks are set up
+        pipBridge.notifyPiPPossibleState()
+    }
+
+    /// (Re)connect the PiP bridge callbacks. stop() clears them to prevent
+    /// crashes during window close, but the backend is reused across videos,
+    /// so they must be wired again before the next PiP session — otherwise
+    /// PiP starts without notifying PlayerService and the player window
+    /// stays visible alongside the PiP window.
+    private func wirePiPBridgeCallbacks() {
+        guard let pipBridge else { return }
 
         // Use the restore callback set by PlayerService
         pipBridge.onRestoreUserInterface = { [weak self] in
@@ -1331,9 +1350,6 @@ final class MPVBackend: PlayerBackend {
         pipBridge.onPiPRenderSizeChanged = { [weak self] size in
             self?._playerView?.updatePiPTargetSize(size)
         }
-
-        // Manually notify current state now that callbacks are set up
-        pipBridge.notifyPiPPossibleState()
     }
 
     /// Start Picture-in-Picture.
@@ -1342,6 +1358,10 @@ final class MPVBackend: PlayerBackend {
             LoggingService.shared.warning("MPV (macOS): Cannot start PiP - not set up", category: .mpv)
             return
         }
+
+        // Re-wire bridge callbacks in case stop() cleared them since setup
+        // (the backend is reused across videos)
+        wirePiPBridgeCallbacks()
 
         // Enable frame capture for PiP - start capturing BEFORE requesting PiP
         _playerView?.captureFramesForPiP = true
