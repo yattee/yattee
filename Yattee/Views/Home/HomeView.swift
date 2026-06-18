@@ -714,7 +714,7 @@ struct HomeView: View {
 
     private var mediaSourcesShortcutCard: some View {
         let mediaSourcesCount = appEnvironment?.mediaSourcesManager.enabledSources.count ?? 0
-        let instancesCount = appEnvironment?.instancesManager.instances.count ?? 0
+        let instancesCount = appEnvironment?.instancesManager.enabledInstances.count ?? 0
         let count = mediaSourcesCount + instancesCount
         return Button {
             appEnvironment?.navigationCoordinator.navigate(to: .mediaSources)
@@ -914,7 +914,7 @@ struct HomeView: View {
 
     private var mediaSourcesShortcutRow: some View {
         let mediaSourcesCount = appEnvironment?.mediaSourcesManager.enabledSources.count ?? 0
-        let instancesCount = appEnvironment?.instancesManager.instances.count ?? 0
+        let instancesCount = appEnvironment?.instancesManager.enabledInstances.count ?? 0
         let count = mediaSourcesCount + instancesCount
         return Button {
             appEnvironment?.navigationCoordinator.navigate(to: .mediaSources)
