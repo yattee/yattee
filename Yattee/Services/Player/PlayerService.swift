@@ -1287,11 +1287,24 @@ final class PlayerService {
         defer { isLoadingOnlineStreams = false }
 
         do {
-            let (_, streams, captions) = try await fetchVideoStreamsAndCaptions(for: video)
+            let (_, streams, captions, storyboards) = try await fetchVideoStreamsAndCaptionsAndStoryboards(for: video)
+
+            // Bail if the user moved on to another video while we were fetching
+            guard state.currentVideo?.id == video.id else { return }
+
             // Combine downloaded streams with online streams (downloaded first)
             let combined = downloadedStreams + streams
             availableStreams = combined
             availableCaptions = captions
+
+            // Queue items carry a pre-resolved stream, so play() skipped the
+            // full fetch that populates storyboards — fill them in here.
+            // Don't clobber a local storyboard loaded for downloaded playback.
+            if state.storyboards.isEmpty, !storyboards.isEmpty {
+                Task { await StoryboardService.shared.clearCache() }
+                state.storyboards = storyboards
+                LoggingService.shared.logPlayer("Loaded \(storyboards.count) storyboards (deferred), preferred: \(state.preferredStoryboard?.width ?? 0)x\(state.preferredStoryboard?.height ?? 0)")
+            }
 
             // The freshly fetched streams have new (signed) URLs that won't
             // match `state.currentStream`/`state.currentAudioStream` from the
