@@ -11,7 +11,7 @@ extension LayoutPreset {
     /// Bump this version whenever any built-in preset definition changes.
     /// On launch, the app compares this against the last-applied version
     /// and replaces stale built-in presets with fresh copies from code.
-    static let builtInPresetsVersion = 7
+    static let builtInPresetsVersion = 8
 
     // MARK: - Built-in Preset IDs
 
@@ -164,13 +164,13 @@ extension LayoutPreset {
         ]
 
         // On macOS center settings only drive seek amounts (keyboard arrows
-        // and default seek buttons); 5s preserves the historical arrow-key step.
+        // and default seek buttons).
         let centerSettings = CenterSectionSettings(
             showPlayPause: true,
             showSeekBackward: true,
             showSeekForward: true,
-            seekBackwardSeconds: 5,
-            seekForwardSeconds: 5,
+            seekBackwardSeconds: 10,
+            seekForwardSeconds: 10,
             leftSlider: .disabled,
             rightSlider: .disabled
         )
@@ -308,8 +308,8 @@ extension LayoutPreset {
             showPlayPause: true,
             showSeekBackward: true,
             showSeekForward: true,
-            seekBackwardSeconds: 5,
-            seekForwardSeconds: 5,
+            seekBackwardSeconds: 10,
+            seekForwardSeconds: 10,
             leftSlider: .disabled,
             rightSlider: .disabled
         )

@@ -17,6 +17,8 @@ struct CenterControlsSettingsView: View {
     @State private var showSeekForward: Bool = true
     @State private var seekBackwardSeconds: Double = 10
     @State private var seekForwardSeconds: Double = 10
+    @State private var secondarySeekBackwardSeconds: Double = 30
+    @State private var secondarySeekForwardSeconds: Double = 30
     @State private var leftSlider: SideSliderType = .disabled
     @State private var rightSlider: SideSliderType = .disabled
 
@@ -113,6 +115,39 @@ struct CenterControlsSettingsView: View {
                             .tint(Int(seekBackwardSeconds) == seconds ? .accentColor : .secondary)
                         }
                     }
+
+                    #if os(macOS)
+                    HStack {
+                        Text(String(
+                            localized: "settings.playerControls.center.secondarySeekBackwardTime",
+                            defaultValue: "Secondary Seek Time"
+                        ))
+                        Spacer()
+                        Text("\(Int(secondarySeekBackwardSeconds))s")
+                            .foregroundStyle(.secondary)
+                    }
+
+                    Slider(
+                        value: $secondarySeekBackwardSeconds,
+                        in: 1...90,
+                        step: 1
+                    )
+                    .onChange(of: secondarySeekBackwardSeconds) { _, newValue in
+                        viewModel.updateCenterSettingsSync { $0.secondarySeekBackwardSeconds = Int(newValue) }
+                    }
+
+                    // Quick presets
+                    HStack(spacing: 8) {
+                        ForEach([15, 30, 45, 60, 90], id: \.self) { seconds in
+                            Button("\(seconds)s") {
+                                secondarySeekBackwardSeconds = Double(seconds)
+                            }
+                            .buttonStyle(.bordered)
+                            .controlSize(.small)
+                            .tint(Int(secondarySeekBackwardSeconds) == seconds ? .accentColor : .secondary)
+                        }
+                    }
+                    #endif
                 }
             } header: {
                 Text(String(localized: "settings.playerControls.center.seekBackward"))
@@ -162,6 +197,39 @@ struct CenterControlsSettingsView: View {
                             .tint(Int(seekForwardSeconds) == seconds ? .accentColor : .secondary)
                         }
                     }
+
+                    #if os(macOS)
+                    HStack {
+                        Text(String(
+                            localized: "settings.playerControls.center.secondarySeekForwardTime",
+                            defaultValue: "Secondary Seek Time"
+                        ))
+                        Spacer()
+                        Text("\(Int(secondarySeekForwardSeconds))s")
+                            .foregroundStyle(.secondary)
+                    }
+
+                    Slider(
+                        value: $secondarySeekForwardSeconds,
+                        in: 1...90,
+                        step: 1
+                    )
+                    .onChange(of: secondarySeekForwardSeconds) { _, newValue in
+                        viewModel.updateCenterSettingsSync { $0.secondarySeekForwardSeconds = Int(newValue) }
+                    }
+
+                    // Quick presets
+                    HStack(spacing: 8) {
+                        ForEach([15, 30, 45, 60, 90], id: \.self) { seconds in
+                            Button("\(seconds)s") {
+                                secondarySeekForwardSeconds = Double(seconds)
+                            }
+                            .buttonStyle(.bordered)
+                            .controlSize(.small)
+                            .tint(Int(secondarySeekForwardSeconds) == seconds ? .accentColor : .secondary)
+                        }
+                    }
+                    #endif
                 }
             } header: {
                 Text(String(localized: "settings.playerControls.center.seekForward"))
@@ -169,7 +237,7 @@ struct CenterControlsSettingsView: View {
                 #if os(macOS)
                 Text(String(
                     localized: "settings.playerControls.center.seekDurationsFooter",
-                    defaultValue: "Seek durations are used by the ← and → keyboard shortcuts and by seek buttons added to the player."
+                    defaultValue: "Seek durations are used by the ← and → keyboard shortcuts and by seek buttons added to the player. Hold ⇧ Shift with ← or → to seek by the secondary durations."
                 ))
                 #endif
             }
@@ -231,6 +299,8 @@ struct CenterControlsSettingsView: View {
             showSeekForward: showSeekForward,
             seekBackwardSeconds: Int(seekBackwardSeconds),
             seekForwardSeconds: Int(seekForwardSeconds),
+            secondarySeekBackwardSeconds: Int(secondarySeekBackwardSeconds),
+            secondarySeekForwardSeconds: Int(secondarySeekForwardSeconds),
             leftSlider: leftSlider,
             rightSlider: rightSlider
         )
@@ -246,6 +316,8 @@ struct CenterControlsSettingsView: View {
         showSeekForward = settings.showSeekForward
         seekBackwardSeconds = Double(settings.seekBackwardSeconds)
         seekForwardSeconds = Double(settings.seekForwardSeconds)
+        secondarySeekBackwardSeconds = Double(settings.secondarySeekBackwardSeconds)
+        secondarySeekForwardSeconds = Double(settings.secondarySeekForwardSeconds)
         leftSlider = settings.leftSlider
         rightSlider = settings.rightSlider
     }

@@ -25,6 +25,12 @@ struct CenterSectionSettings: Codable, Hashable, Sendable {
     /// Number of seconds for the seek forward button.
     var seekForwardSeconds: Int
 
+    /// Number of seconds for the secondary seek backward shortcut (⇧ + seek).
+    var secondarySeekBackwardSeconds: Int
+
+    /// Number of seconds for the secondary seek forward shortcut (⇧ + seek).
+    var secondarySeekForwardSeconds: Int
+
     /// Type of slider to show on the left edge of the player (iOS only).
     var leftSlider: SideSliderType
 
@@ -40,6 +46,8 @@ struct CenterSectionSettings: Codable, Hashable, Sendable {
     ///   - showSeekForward: Show seek forward button. Defaults to true.
     ///   - seekBackwardSeconds: Seconds to seek backward. Defaults to 10.
     ///   - seekForwardSeconds: Seconds to seek forward. Defaults to 10.
+    ///   - secondarySeekBackwardSeconds: Seconds for the secondary (⇧) backward seek. Defaults to 30.
+    ///   - secondarySeekForwardSeconds: Seconds for the secondary (⇧) forward seek. Defaults to 30.
     ///   - leftSlider: Type of slider on left edge. Defaults to disabled.
     ///   - rightSlider: Type of slider on right edge. Defaults to disabled.
     init(
@@ -48,6 +56,8 @@ struct CenterSectionSettings: Codable, Hashable, Sendable {
         showSeekForward: Bool = true,
         seekBackwardSeconds: Int = 10,
         seekForwardSeconds: Int = 10,
+        secondarySeekBackwardSeconds: Int = 30,
+        secondarySeekForwardSeconds: Int = 30,
         leftSlider: SideSliderType = .disabled,
         rightSlider: SideSliderType = .disabled
     ) {
@@ -56,6 +66,8 @@ struct CenterSectionSettings: Codable, Hashable, Sendable {
         self.showSeekForward = showSeekForward
         self.seekBackwardSeconds = max(1, seekBackwardSeconds)
         self.seekForwardSeconds = max(1, seekForwardSeconds)
+        self.secondarySeekBackwardSeconds = max(1, secondarySeekBackwardSeconds)
+        self.secondarySeekForwardSeconds = max(1, secondarySeekForwardSeconds)
         self.leftSlider = leftSlider
         self.rightSlider = rightSlider
     }
@@ -68,6 +80,8 @@ struct CenterSectionSettings: Codable, Hashable, Sendable {
         case showSeekForward
         case seekBackwardSeconds
         case seekForwardSeconds
+        case secondarySeekBackwardSeconds
+        case secondarySeekForwardSeconds
         case leftSlider
         case rightSlider
     }
@@ -80,6 +94,8 @@ struct CenterSectionSettings: Codable, Hashable, Sendable {
         seekBackwardSeconds = try container.decode(Int.self, forKey: .seekBackwardSeconds)
         seekForwardSeconds = try container.decode(Int.self, forKey: .seekForwardSeconds)
         // New properties with defaults for backward compatibility
+        secondarySeekBackwardSeconds = try container.decodeIfPresent(Int.self, forKey: .secondarySeekBackwardSeconds) ?? 30
+        secondarySeekForwardSeconds = try container.decodeIfPresent(Int.self, forKey: .secondarySeekForwardSeconds) ?? 30
         leftSlider = try container.decodeIfPresent(SideSliderType.self, forKey: .leftSlider) ?? .disabled
         rightSlider = try container.decodeIfPresent(SideSliderType.self, forKey: .rightSlider) ?? .disabled
     }

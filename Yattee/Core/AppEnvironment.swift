@@ -56,6 +56,13 @@ final class AppEnvironment {
     let legacyMigrationService: LegacyDataMigrationService
     let sourcesSettings: SourcesSettings
 
+    /// Center-section settings of the active player controls preset, cached for
+    /// synchronous access. Menu bar commands read seek durations from here since
+    /// they cannot await the layout service actor.
+    private(set) var activeControlsCenterSettings: CenterSectionSettings = .default
+
+    @ObservationIgnored private var controlsSettingsObservers: [NSObjectProtocol] = []
+
     // MARK: - Shared Instance
 
     /// The single, process-wide app environment.
@@ -311,6 +318,18 @@ final class AppEnvironment {
         // Wire up player controls layout service to player service (for preset-based settings)
         player.setPlayerControlsLayoutService(layoutService)
 
+        // Cache active preset's center settings and keep them in sync
+        Task { await self.refreshActiveControlsSettings() }
+        for name: Notification.Name in [.playerControlsActivePresetDidChange, .playerControlsPresetsDidChange] {
+            controlsSettingsObservers.append(
+                NotificationCenter.default.addObserver(forName: name, object: nil, queue: .main) { [weak self] _ in
+                    Task { @MainActor in
+                        await self?.refreshActiveControlsSettings()
+                    }
+                }
+            )
+        }
+
         // Set up circular dependencies after all properties are initialized
         bgRefreshManager.setAppEnvironment(self)
 
@@ -349,6 +368,12 @@ final class AppEnvironment {
     }
 
     // MARK: - Configuration
+
+    /// Refreshes the cached center-section settings from the active player controls preset.
+    func refreshActiveControlsSettings() async {
+        let layout = await playerControlsLayoutService.activeLayout()
+        activeControlsCenterSettings = layout.centerSettings
+    }
 
     /// Updates the HTTP client's User-Agent configuration from current settings.
     /// Call this after changing User-Agent related settings.

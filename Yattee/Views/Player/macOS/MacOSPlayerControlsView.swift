@@ -325,6 +325,12 @@ struct MacOSPlayerControlsView: View {
                 }
             }
 
+            // Let ⌘-based key equivalents reach the menu bar (Playback menu shortcuts
+            // like ⌘←/⌘⇧← seek and ⌘⌥← previous video) instead of consuming them here.
+            if event.modifierFlags.contains(.command) { return event }
+
+            let isShiftHeld = event.modifierFlags.contains(.shift)
+
             // Handle keyboard shortcuts
             switch event.keyCode {
             case 49: // Space
@@ -332,12 +338,20 @@ struct MacOSPlayerControlsView: View {
                 return nil // Consume event
 
             case 123: // Left arrow
-                let seconds = TimeInterval(layout?.centerSettings.seekBackwardSeconds ?? 5)
+                let seconds = TimeInterval(
+                    isShiftHeld
+                        ? layout?.centerSettings.secondarySeekBackwardSeconds ?? 30
+                        : layout?.centerSettings.seekBackwardSeconds ?? 10
+                )
                 Task { await onSeekBackward(seconds) }
                 return nil
 
             case 124: // Right arrow
-                let seconds = TimeInterval(layout?.centerSettings.seekForwardSeconds ?? 5)
+                let seconds = TimeInterval(
+                    isShiftHeld
+                        ? layout?.centerSettings.secondarySeekForwardSeconds ?? 30
+                        : layout?.centerSettings.seekForwardSeconds ?? 10
+                )
                 Task { await onSeekForward(seconds) }
                 return nil
 

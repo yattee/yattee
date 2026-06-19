@@ -50,10 +50,10 @@ struct PlaybackCommands: Commands {
             Divider()
 
             // Seeking
-            seekBackward10Button
-            seekForward10Button
-            seekBackward30Button
-            seekForward30Button
+            seekBackwardButton
+            seekForwardButton
+            secondarySeekBackwardButton
+            secondarySeekForwardButton
 
             Divider()
 
@@ -121,41 +121,59 @@ struct PlaybackCommands: Commands {
 
     // MARK: - Seeking
 
-    private var seekBackward10Button: some View {
+    /// Seek durations follow the active player controls preset, matching the
+    /// in-player arrow key shortcuts.
+    private var seekBackwardSeconds: Int {
+        appEnvironment.activeControlsCenterSettings.seekBackwardSeconds
+    }
+
+    private var seekForwardSeconds: Int {
+        appEnvironment.activeControlsCenterSettings.seekForwardSeconds
+    }
+
+    private var seekBackwardButton: some View {
         Button {
-            playerService.seekBackward(by: 10)
+            playerService.seekBackward(by: TimeInterval(seekBackwardSeconds))
         } label: {
-            Text(String(localized: "menu.playback.seekBackward10"))
+            Text(String(localized: "menu.playback.seekBackward \(seekBackwardSeconds)"))
         }
         .keyboardShortcut(.leftArrow, modifiers: [.command])
         .disabled(!hasActiveVideo)
     }
 
-    private var seekForward10Button: some View {
+    private var seekForwardButton: some View {
         Button {
-            playerService.seekForward(by: 10)
+            playerService.seekForward(by: TimeInterval(seekForwardSeconds))
         } label: {
-            Text(String(localized: "menu.playback.seekForward10"))
+            Text(String(localized: "menu.playback.seekForward \(seekForwardSeconds)"))
         }
         .keyboardShortcut(.rightArrow, modifiers: [.command])
         .disabled(!hasActiveVideo)
     }
 
-    private var seekBackward30Button: some View {
+    private var secondarySeekBackwardSeconds: Int {
+        appEnvironment.activeControlsCenterSettings.secondarySeekBackwardSeconds
+    }
+
+    private var secondarySeekForwardSeconds: Int {
+        appEnvironment.activeControlsCenterSettings.secondarySeekForwardSeconds
+    }
+
+    private var secondarySeekBackwardButton: some View {
         Button {
-            playerService.seekBackward(by: 30)
+            playerService.seekBackward(by: TimeInterval(secondarySeekBackwardSeconds))
         } label: {
-            Text(String(localized: "menu.playback.seekBackward30"))
+            Text(String(localized: "menu.playback.seekBackward \(secondarySeekBackwardSeconds)"))
         }
         .keyboardShortcut(.leftArrow, modifiers: [.command, .shift])
         .disabled(!hasActiveVideo)
     }
 
-    private var seekForward30Button: some View {
+    private var secondarySeekForwardButton: some View {
         Button {
-            playerService.seekForward(by: 30)
+            playerService.seekForward(by: TimeInterval(secondarySeekForwardSeconds))
         } label: {
-            Text(String(localized: "menu.playback.seekForward30"))
+            Text(String(localized: "menu.playback.seekForward \(secondarySeekForwardSeconds)"))
         }
         .keyboardShortcut(.rightArrow, modifiers: [.command, .shift])
         .disabled(!hasActiveVideo)

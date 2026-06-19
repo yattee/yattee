@@ -5741,42 +5741,22 @@
         }
       }
     },
-    "menu.playback.seekBackward10" : {
+    "menu.playback.seekBackward %lld" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Seek Back 10s"
+            "value" : "Seek Back %llds"
           }
         }
       }
     },
-    "menu.playback.seekBackward30" : {
+    "menu.playback.seekForward %lld" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Seek Back 30s"
-          }
-        }
-      }
-    },
-    "menu.playback.seekForward10" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Seek Forward 10s"
-          }
-        }
-      }
-    },
-    "menu.playback.seekForward30" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Seek Forward 30s"
+            "value" : "Seek Forward %llds"
           }
         }
       }
@@ -13260,6 +13240,28 @@
         }
       }
     },
+    "settings.playerControls.center.secondarySeekBackwardTime" : {
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Secondary Seek Time"
+          }
+        }
+      }
+    },
+    "settings.playerControls.center.secondarySeekForwardTime" : {
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Secondary Seek Time"
+          }
+        }
+      }
+    },
     "settings.playerControls.center.seekBackward" : {
       "localizations" : {
         "en" : {
@@ -13286,7 +13288,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "Seek durations are used by the ← and → keyboard shortcuts and by seek buttons added to the player."
+            "value" : "Seek durations are used by the ← and → keyboard shortcuts and by seek buttons added to the player. Hold ⇧ Shift with ← or → to seek by the secondary durations."
           }
         }
       }
