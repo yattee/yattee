@@ -605,6 +605,7 @@
 				"INFOPLIST_FILE[sdk=appletvsimulator*]" = "Yattee/Info-tvOS.plist";
 				INFOPLIST_KEY_CFBundleDisplayName = Yattee;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.video";
+				INFOPLIST_KEY_NSHumanReadableCopyright = "© 2026 Arkadiusz Fal";
 				INFOPLIST_KEY_NSLocalNetworkUsageDescription = "Yattee uses local network to discover and control playback on other Yattee devices.";
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphoneos*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphonesimulator*]" = YES;
@@ -653,6 +654,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				AUTOMATION_APPLE_EVENTS = NO;
 				CODE_SIGN_ENTITLEMENTS = Yattee/Yattee.entitlements;
+				"CODE_SIGN_ENTITLEMENTS[sdk=macosx*]" = "Yattee/Yattee-macOS.entitlements";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 262;
 				DEAD_CODE_STRIPPING = YES;
@@ -687,6 +689,7 @@
 				"INFOPLIST_FILE[sdk=appletvsimulator*]" = "Yattee/Info-tvOS.plist";
 				INFOPLIST_KEY_CFBundleDisplayName = Yattee;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.video";
+				INFOPLIST_KEY_NSHumanReadableCopyright = "© 2026 Arkadiusz Fal";
 				INFOPLIST_KEY_NSLocalNetworkUsageDescription = "Yattee uses local network to discover and control playback on other Yattee devices.";
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphoneos*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphonesimulator*]" = YES;
@@ -795,6 +798,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				AUTOMATION_APPLE_EVENTS = NO;
 				CODE_SIGN_ENTITLEMENTS = Yattee/Yattee.entitlements;
+				"CODE_SIGN_ENTITLEMENTS[sdk=macosx*]" = "Yattee/Yattee-macOS-DeveloperID.entitlements";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 262;
 				DEAD_CODE_STRIPPING = YES;
@@ -829,6 +833,7 @@
 				"INFOPLIST_FILE[sdk=appletvsimulator*]" = "Yattee/Info-tvOS.plist";
 				INFOPLIST_KEY_CFBundleDisplayName = Yattee;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.video";
+				INFOPLIST_KEY_NSHumanReadableCopyright = "© 2026 Arkadiusz Fal";
 				INFOPLIST_KEY_NSLocalNetworkUsageDescription = "Yattee uses local network to discover and control playback on other Yattee devices.";
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphoneos*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphonesimulator*]" = YES;

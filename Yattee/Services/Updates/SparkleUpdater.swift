@@ -50,8 +50,11 @@ final class AppUpdater {
     private var observation: NSKeyValueObservation?
 
     private init() {
-        // Load persisted beta preference before constructing the delegate
-        let wantsBeta = UserDefaults.standard.bool(forKey: Self.wantsBetaKey)
+        // Load persisted beta preference before constructing the delegate.
+        // While only beta releases exist, default to the beta channel so
+        // testers receive updates without hunting for the Advanced toggle.
+        // Revisit this default once the first stable release ships.
+        let wantsBeta = UserDefaults.standard.object(forKey: Self.wantsBetaKey) as? Bool ?? true
         self.wantsBetaChannel = wantsBeta
         self.delegate.wantsBeta = wantsBeta
 
