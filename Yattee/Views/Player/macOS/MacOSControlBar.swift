@@ -82,35 +82,46 @@ struct MacOSControlBar: View {
         .frame(maxWidth: 500)
         .glassBackground(.regular, in: .rect(cornerRadius: 16), colorScheme: globalSettings.controlBarTheme.colorScheme)
         .shadow(color: .black.opacity(0.3), radius: 8, y: 4)
-        // Seek preview overlay - positioned above the control bar
+        // Seek preview overlay - positioned just above the progress bar (overlapping the bar)
         .overlay(alignment: .bottom) {
             if (isDragging || isHoveringProgress), !playerState.isLive {
                 GeometryReader { geometry in
                     let pos = seekPreviewPosition(geometry: geometry, previewWidth: playerState.preferredStoryboard != nil ? 176 : 80)
+                    // Position previews just above the progress bar so they overlap the control
+                    // bar (button row) rather than floating above the whole pill. Measured up from
+                    // the pill bottom, so it stays correct regardless of button-row height.
+                    // Bottom inset = pill bottom padding (10) + timeline row height (~20).
+                    let progressBarTop = geometry.size.height - 30
+                    let previewGap: CGFloat = 6
+                    let capsuleDelta: CGFloat = 26
 
                     if let storyboard = playerState.preferredStoryboard {
+                        let previewY = progressBarTop - 102 - previewGap // storyboard preview height ~102
+
                         seekPreviewView(storyboard: storyboard)
-                            .offset(x: pos.clampedX, y: -150)
+                            .offset(x: pos.clampedX, y: previewY)
 
                         if showChapters, let chapter = playerState.chapters.last(where: { $0.startTime <= pos.progress * playerState.duration }) {
                             ChapterCapsuleView(title: chapter.title, buttonBackground: .none)
                                 .positioned(xTarget: pos.centerX, availableWidth: geometry.size.width)
-                                .offset(y: -176)
+                                .offset(y: previewY - capsuleDelta)
                         }
                     } else {
+                        let previewY = progressBarTop - 32 - previewGap // time pill height ~32
+
                         SeekTimePreviewView(
                             seekTime: pos.progress * playerState.duration,
                             buttonBackground: .none,
                             theme: .dark
                         )
-                        .offset(x: pos.clampedX, y: -60)
+                        .offset(x: pos.clampedX, y: previewY)
                         .transition(.opacity.combined(with: .scale(scale: 0.9)))
                         .animation(.easeInOut(duration: 0.15), value: isDragging || isHoveringProgress)
 
                         if showChapters, let chapter = playerState.chapters.last(where: { $0.startTime <= pos.progress * playerState.duration }) {
                             ChapterCapsuleView(title: chapter.title, buttonBackground: .none)
                                 .positioned(xTarget: pos.centerX, availableWidth: geometry.size.width)
-                                .offset(y: -86)
+                                .offset(y: previewY - capsuleDelta)
                         }
                     }
                 }
