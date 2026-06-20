@@ -211,6 +211,9 @@ struct MacOSControlsSectionRenderer: View {
                 controlButton(systemImage: "list.bullet", help: config.buttonType.displayName) {
                     actions.onShowQueue?()
                 }
+                .overlay(alignment: .bottom) {
+                    queueBadge
+                }
                 .disabled(isLocked)
                 .opacity(isLocked ? 0.5 : 1.0)
             }
@@ -287,6 +290,23 @@ struct MacOSControlsSectionRenderer: View {
     /// Button style matching the rendering context.
     private var buttonStyleForContext: MacOSRendererButtonStyle {
         MacOSRendererButtonStyle(context: context)
+    }
+
+    /// Badge showing the number of items currently in the queue, mirroring the
+    /// iOS pill queue button. Hidden when the queue is empty.
+    @ViewBuilder
+    private var queueBadge: some View {
+        let count = actions.playerState.queue.count
+        if count > 0 {
+            Text("\(count)")
+                .font(.system(size: context == .bar ? 8 : 9, weight: .bold))
+                .foregroundStyle(.white)
+                .padding(.horizontal, 4)
+                .padding(.vertical, 1)
+                .background(Color.accentColor, in: Capsule())
+                .offset(y: 4)
+                .allowsHitTesting(false)
+        }
     }
 
     @ViewBuilder

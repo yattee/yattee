@@ -519,10 +519,25 @@ struct MiniPlayerView: View {
             incrementTapCount(for: config)
             navigationCoordinator?.isMiniPlayerQueueSheetPresented = true
         } label: {
-            Image(systemName: "list.bullet")
-                .font(isTabAccessory ? .title3 : .title2)
-                .frame(width: 32, height: 32)
-                .contentShape(Rectangle())
+            ZStack(alignment: .bottom) {
+                Image(systemName: "list.bullet")
+                    .font(isTabAccessory ? .title3 : .title2)
+                    .frame(width: 32, height: 32)
+
+                // Badge showing queue count
+                let queueCount = playerState?.queue.count ?? 0
+                if queueCount > 0 {
+                    Text("\(queueCount)")
+                        .font(.system(size: 9, weight: .bold))
+                        .foregroundStyle(.white)
+                        .padding(.horizontal, 4)
+                        .padding(.vertical, 1)
+                        .background(Color.accentColor, in: Capsule())
+                        .offset(y: 4)
+                        .allowsHitTesting(false)
+                }
+            }
+            .contentShape(Rectangle())
         }
         .buttonStyle(.plain)
     }
