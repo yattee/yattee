@@ -95,6 +95,34 @@ extension SettingsManager {
         }
     }
 
+    /// Normalized X offset of the macOS floating control bar from its default
+    /// bottom-center position, stored as a fraction of the player container width.
+    /// 0 = default docked position.
+    var macControlsBarOffsetX: Double {
+        get {
+            if let cached = _macControlsBarOffsetX { return cached }
+            return double(for: .macControlsBarOffsetX)
+        }
+        set {
+            _macControlsBarOffsetX = newValue
+            set(newValue, for: .macControlsBarOffsetX)
+        }
+    }
+
+    /// Normalized Y offset of the macOS floating control bar from its default
+    /// bottom-center position, stored as a fraction of the player container height.
+    /// 0 = default docked position.
+    var macControlsBarOffsetY: Double {
+        get {
+            if let cached = _macControlsBarOffsetY { return cached }
+            return double(for: .macControlsBarOffsetY)
+        }
+        set {
+            _macControlsBarOffsetY = newValue
+            set(newValue, for: .macControlsBarOffsetY)
+        }
+    }
+
     /// Whether the player sheet automatically resizes to match video aspect ratio.
     /// When enabled, the sheet window will resize when video loads or changes.
     /// Default is true.

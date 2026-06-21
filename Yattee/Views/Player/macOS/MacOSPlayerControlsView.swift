@@ -63,6 +63,28 @@ struct MacOSPlayerControlsView: View {
     /// Stays 0 when there is no overlap (inline sheet, side panel, fullscreen).
     @State private var trafficLightInset: CGFloat = 0
 
+    // MARK: - Control Bar Drag State
+
+    /// Committed offset of the control bar from its default bottom-center
+    /// position, as fractions of the container size so it survives window and
+    /// aspect-ratio driven resizes. Mirrors SettingsManager; (0, 0) = docked.
+    @State private var barOffsetFraction: CGSize = .zero
+    /// Live drag translation in points; nil when not dragging.
+    @State private var barDragTranslation: CGSize?
+    /// Pixel offset captured at drag start so the drag composes with the committed offset.
+    @State private var barDragBase: CGSize = .zero
+    /// Measured size of the visible glass capsule (narrower than its 650pt layout frame).
+    @State private var barSize = CGSize(width: 500, height: 90)
+    /// Measured height of the top bar (including its gradient padding) so the
+    /// dragged control bar can't overlap the top row of buttons.
+    @State private var topBarHeight: CGFloat = 0
+
+    private enum BarDrag {
+        static let edgeMargin: CGFloat = 12
+        static let snapDistance: CGFloat = 28
+        static let bottomPadding: CGFloat = 20
+    }
+
     // MARK: - Computed Properties
 
     /// Controls visibility - show when hovering, interacting, or paused
@@ -200,6 +222,7 @@ struct MacOSPlayerControlsView: View {
                 if let layout {
                     VStack(spacing: 0) {
                         topBar(layout: layout)
+                            .onGeometryChange(for: CGFloat.self) { $0.size.height } action: { topBarHeight = $0 }
 
                         Spacer()
 
@@ -222,8 +245,19 @@ struct MacOSPlayerControlsView: View {
                                 resetHideTimer()
                             }
                         )
+                        .onGeometryChange(for: CGSize.self) { $0.size } action: { barSize = $0 }
+                        // The player window is movable by background; without this,
+                        // AppKit claims drags on the glass capsule as window moves
+                        // and the reposition gesture never fires.
+                        .background(WindowDragBlockingView())
                         .frame(width: 650)
-                        .padding(.bottom, 20)
+                        .padding(.bottom, BarDrag.bottomPadding)
+                        .offset(barOffset(in: geometry.size))
+                        .gesture(barDragGesture(in: geometry.size))
+                        .animation(
+                            .spring(response: 0.3, dampingFraction: 0.75),
+                            value: barOffset(in: geometry.size) == .zero
+                        )
                     }
                     .opacity(shouldShowControls ? 1 : 0)
                     .allowsHitTesting(shouldShowControls)
@@ -274,6 +308,12 @@ struct MacOSPlayerControlsView: View {
         }
         .onAppear {
             setupKeyboardMonitor()
+            if let settings = appEnvironment?.settingsManager {
+                barOffsetFraction = CGSize(
+                    width: settings.macControlsBarOffsetX,
+                    height: settings.macControlsBarOffsetY
+                )
+            }
         }
         .onDisappear {
             removeKeyboardMonitor()
@@ -287,6 +327,81 @@ struct MacOSPlayerControlsView: View {
         .onReceive(NotificationCenter.default.publisher(for: .playerControlsPresetsDidChange)) { _ in
             Task { await loadLayout() }
         }
+    }
+
+    // MARK: - Control Bar Drag
+
+    /// Display offset of the control bar for the current container size:
+    /// live drag translation when dragging, otherwise the committed fraction,
+    /// clamped so the capsule stays visible, with magnetic snap to default.
+    private func barOffset(in container: CGSize) -> CGSize {
+        let raw: CGSize
+        if let drag = barDragTranslation {
+            raw = CGSize(
+                width: barDragBase.width + drag.width,
+                height: barDragBase.height + drag.height
+            )
+        } else {
+            raw = CGSize(
+                width: barOffsetFraction.width * container.width,
+                height: barOffsetFraction.height * container.height
+            )
+        }
+        let clamped = clampBarOffset(raw, in: container)
+        if hypot(clamped.width, clamped.height) < BarDrag.snapDistance {
+            return .zero
+        }
+        return clamped
+    }
+
+    /// Clamps an offset so the visible capsule (measured `barSize`, not the
+    /// wider layout frame) keeps at least `edgeMargin` from every container edge
+    /// and never overlaps the top bar's button row.
+    private func clampBarOffset(_ offset: CGSize, in container: CGSize) -> CGSize {
+        let maxDX = max(0, (container.width - barSize.width) / 2 - BarDrag.edgeMargin)
+        let topInset = max(topBarHeight, BarDrag.edgeMargin)
+        let travelUp = max(0, container.height - BarDrag.bottomPadding - barSize.height - topInset)
+        let travelDown = max(0, BarDrag.bottomPadding - BarDrag.edgeMargin)
+        return CGSize(
+            width: min(max(offset.width, -maxDX), maxDX),
+            height: min(max(offset.height, -travelUp), travelDown)
+        )
+    }
+
+    private func barDragGesture(in container: CGSize) -> some Gesture {
+        DragGesture(minimumDistance: 4, coordinateSpace: .global)
+            .onChanged { value in
+                guard !playerState.isControlsLocked else { return }
+                if barDragTranslation == nil {
+                    barDragBase = barOffset(in: container)
+                    isInteracting = true
+                    cancelHideTimer()
+                }
+                barDragTranslation = value.translation
+            }
+            .onEnded { value in
+                guard barDragTranslation != nil else { return }
+                let final = clampBarOffset(
+                    CGSize(
+                        width: barDragBase.width + value.translation.width,
+                        height: barDragBase.height + value.translation.height
+                    ),
+                    in: container
+                )
+                let docked = hypot(final.width, final.height) < BarDrag.snapDistance
+                let committed = docked ? .zero : final
+                barOffsetFraction = CGSize(
+                    width: committed.width / max(1, container.width),
+                    height: committed.height / max(1, container.height)
+                )
+                barDragTranslation = nil
+                isInteracting = false
+                resetHideTimer()
+                if let settings = appEnvironment?.settingsManager {
+                    settings.macControlsBarOffsetX = barOffsetFraction.width
+                    settings.macControlsBarOffsetY = barOffsetFraction.height
+                }
+            }
     }
 
     // MARK: - Layout Loading
@@ -427,6 +542,21 @@ struct MacOSPlayerControlsView: View {
         hideTimer?.invalidate()
         hideTimer = nil
     }
+}
+
+// MARK: - Window Drag Blocking View
+
+/// Blocks `isMovableByWindowBackground` window-dragging within its bounds so
+/// drags on the control bar reach the SwiftUI reposition gesture instead of
+/// moving the player window. Doesn't handle any events itself — unhandled
+/// mouse events continue up the responder chain to the hosting view.
+private struct WindowDragBlockingView: NSViewRepresentable {
+    final class BlockingNSView: NSView {
+        override var mouseDownCanMoveWindow: Bool { false }
+    }
+
+    func makeNSView(context: Context) -> BlockingNSView { BlockingNSView() }
+    func updateNSView(_ nsView: BlockingNSView, context: Context) {}
 }
 
 // MARK: - Host Window Reader

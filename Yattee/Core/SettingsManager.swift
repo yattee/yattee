@@ -74,6 +74,8 @@ final class SettingsManager {
     #if os(macOS)
     var _macPlayerSeparateWindow: Bool?
     var _macPlayerFloating: Bool?
+    var _macControlsBarOffsetX: Double?
+    var _macControlsBarOffsetY: Double?
     var _playerSheetAutoResize: Bool?
     #endif
 
@@ -460,6 +462,8 @@ final class SettingsManager {
         #if os(macOS)
         _macPlayerSeparateWindow = nil
         _macPlayerFloating = nil
+        _macControlsBarOffsetX = nil
+        _macControlsBarOffsetY = nil
         _playerSheetAutoResize = nil
         #endif
         // miniPlayerShowVideo and miniPlayerVideoTapAction moved to preset

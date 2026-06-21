@@ -47,6 +47,8 @@ enum SettingsKey: String, CaseIterable {
     // Platform-specific
     case macPlayerSeparateWindow
     case macPlayerFloating
+    case macControlsBarOffsetX // Normalized X offset of macOS control bar from default position
+    case macControlsBarOffsetY // Normalized Y offset of macOS control bar from default position
     case playerSheetAutoResize
     case listStyle
 
@@ -140,6 +142,7 @@ enum SettingsKey: String, CaseIterable {
         switch self {
         case .preferredQuality, .cellularQuality, .allowSoftwareDecodedFormats,
              .macPlayerSeparateWindow, .macPlayerFloating, .listStyle,
+             .macControlsBarOffsetX, .macControlsBarOffsetY,
              // Home layout — different UI paradigms per platform
              .homeShortcutOrder, .homeShortcutVisibility, .homeShortcutLayout, .homeShortcutCardStyle,
              .homeShortcutCardColor, .homeShortcutColorfulPalette, .homeShortcutCustomPaletteColors,
