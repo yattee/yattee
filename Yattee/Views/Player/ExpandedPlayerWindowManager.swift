@@ -36,6 +36,15 @@ final class ExpandedPlayerWindowManager: NSObject {
         playerWindow != nil
     }
 
+    /// The live player window managed by this instance (nil after hide()).
+    /// A window that exists here but isn't visible is mid-presentation or
+    /// hidden for PiP — both valid homes for the shared render view, unlike a
+    /// stale ordered-out window that is no longer tracked. Used by
+    /// MPVContainerNSView when picking a transfer target.
+    var currentPlayerWindow: NSWindow? {
+        playerWindow
+    }
+
     private override init() {
         super.init()
     }

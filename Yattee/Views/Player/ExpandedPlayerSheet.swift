@@ -303,7 +303,14 @@ struct ExpandedPlayerSheet: View {
                 Color.black.ignoresSafeArea(edges: .bottom)
 
                 #if os(iOS) || os(macOS)
-                if wideScreen {
+                if geometry.size.width <= 0 || geometry.size.height <= 0 {
+                    // Transient zero-size layout pass (e.g. the deferred macOS
+                    // player window before its first real layout). Don't mount
+                    // either layout branch — a branch mounted here would grab
+                    // the shared render view for one frame and immediately hand
+                    // it off when the real size picks the other branch.
+                    Color.black.ignoresSafeArea(.all)
+                } else if wideScreen {
                     if let video = playerState?.currentVideo {
                         // Widescreen layout with floating panel
                         // Must ignore safe area to get full screen geometry

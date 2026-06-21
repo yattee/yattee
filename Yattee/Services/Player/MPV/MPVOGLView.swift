@@ -272,6 +272,26 @@ final class MPVOGLView: NSView {
         videoLayer?.resetFirstFrameTracking()
     }
 
+    /// Thread-safe snapshot of the layer's render-health counters.
+    func renderHealthSnapshot() -> MPVRenderHealth? {
+        videoLayer?.renderHealthSnapshot()
+    }
+
+    /// Human-readable description of where this shared view is currently
+    /// attached, for render-health diagnostics. Main thread only.
+    var attachmentDescription: String {
+        let superviewDesc: String
+        if let container = superview as? MPVContainerNSView {
+            superviewDesc = "container=\(container.shortID)"
+        } else if let superview {
+            superviewDesc = "superview=\(type(of: superview))"
+        } else {
+            superviewDesc = "superview=nil"
+        }
+        let windowDesc = window.map { "window=#\($0.windowNumber) visible=\($0.isVisible)" } ?? "window=nil"
+        return "\(superviewDesc) \(windowDesc) bounds=\(Int(bounds.width))x\(Int(bounds.height))"
+    }
+
     /// Clear the view to black.
     func clearToBlack() {
         videoLayer?.clearToBlack()

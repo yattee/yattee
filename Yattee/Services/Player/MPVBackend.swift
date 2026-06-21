@@ -2048,15 +2048,64 @@ extension MPVBackend: MPVClientDelegate {
         guard playbackStatsTask == nil else { return }
 
         playbackStatsTask = Task { @MainActor [weak self] in
+            #if os(macOS)
+            var previousHealth: MPVRenderHealth?
+            var previousVoDrops: Int?
+            var watchdogFiredLastTick = false
+            #endif
             while !Task.isCancelled {
                 try? await Task.sleep(for: .seconds(10))
                 guard let self, !Task.isCancelled, let client = self.mpvClient else { return }
 
+                let props = await client.getDebugPropertiesAsync()
+
+                #if os(macOS)
+                // Render watchdog — runs every tick regardless of the verbose
+                // gate. Detects a stalled video output: playback advancing and
+                // frames being consumed (skip-render) or dropped by the VO,
+                // but not a single successful draw since the last tick. That
+                // is the "permanent black video" signature (shared render view
+                // parented in a non-visible window); attempt recovery by
+                // re-attaching the view to a visible container.
+                let health = self._playerView?.renderHealthSnapshot()
+                if let health {
+                    let drawsDelta = health.draws &- (previousHealth?.draws ?? health.draws)
+                    let skipsDelta = health.skips &- (previousHealth?.skips ?? health.skips)
+                    let voDrops = props.frameDropCount
+                    let voDropsDelta = (voDrops ?? 0) - (previousVoDrops ?? voDrops ?? 0)
+
+                    if watchdogFiredLastTick {
+                        let outcome = drawsDelta > 0 ? "succeeded" : "failed"
+                        LoggingService.shared.warning(
+                            "MPV render watchdog: recovery \(outcome) (draws=+\(drawsDelta), skips=+\(skipsDelta), attach: \(self._playerView?.attachmentDescription ?? "no view"))",
+                            category: .mpv
+                        )
+                        watchdogFiredLastTick = false
+                    }
+
+                    if self.isPlaying, !self.isPiPActive, previousHealth != nil,
+                       drawsDelta == 0, skipsDelta > 20 || voDropsDelta > 50 {
+                        LoggingService.shared.warning(
+                            "MPV render watchdog: video output stalled (draws=+0, skips=+\(skipsDelta), voDrops=+\(voDropsDelta), attach: \(self._playerView?.attachmentDescription ?? "no view")) - attempting recovery",
+                            category: .mpv
+                        )
+                        MPVContainerNSView.recoverSharedPlayerViewIfNeeded()
+                        self._playerView?.resumeRendering()
+                        watchdogFiredLastTick = true
+                    }
+
+                    previousVoDrops = voDrops ?? previousVoDrops
+                }
+                #endif
+
                 // Gate on the verbose setting each tick (not at task start) so
                 // toggling it mid-playback takes effect without a reload
-                guard MPVLogging.verboseEnabled else { continue }
-
-                let props = await client.getDebugPropertiesAsync()
+                guard MPVLogging.verboseEnabled else {
+                    #if os(macOS)
+                    previousHealth = health
+                    #endif
+                    continue
+                }
 
                 func megabytes(_ bytes: Int64) -> String {
                     String(format: "%.1fMiB", Double(bytes) / 1_048_576)
@@ -2080,6 +2129,19 @@ extension MPVBackend: MPVClientDelegate {
                     cache.append("eof=\(state.eofCached)")
                 }
                 if !cache.isEmpty { parts.append("cache(\(cache.joined(separator: " ")))") }
+
+                #if os(macOS)
+                if let health {
+                    let drawsDelta = health.draws &- (previousHealth?.draws ?? health.draws)
+                    let skipsDelta = health.skips &- (previousHealth?.skips ?? health.skips)
+                    let droppedDelta = health.droppedDraws &- (previousHealth?.droppedDraws ?? health.droppedDraws)
+                    parts.append("render(draws=+\(drawsDelta) skips=+\(skipsDelta) dropped=+\(droppedDelta))")
+                }
+                if let view = self._playerView {
+                    parts.append("attach(\(view.attachmentDescription))")
+                }
+                previousHealth = health
+                #endif
 
                 LoggingService.shared.info("MPV playback stats: \(parts.joined(separator: " "))", category: .mpv)
             }

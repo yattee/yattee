@@ -49,6 +49,19 @@ private let glFormatSoftware: [CGLPixelFormatAttribute] = [
     CGLPixelFormatAttribute(0)
 ]
 
+// MARK: - Render Health
+
+/// Cumulative render-health counters for the MPV OpenGL layer. `skips` counts
+/// frames consumed via the skip-render fallback (frame flag cleared without a
+/// real draw) — a climbing skip count with zero draws means the layer is not
+/// being composited and the video output is stalled.
+struct MPVRenderHealth {
+    var draws: UInt64
+    var skips: UInt64
+    var droppedDraws: UInt64
+    var lastDrawAge: TimeInterval?
+}
+
 // MARK: - MPVOpenGLLayer
 
 /// OpenGL layer for MPV rendering on macOS.
@@ -93,6 +106,16 @@ final class MPVOpenGLLayer: CAOpenGLLayer {
 
     /// True while a forced draw has been requested but not yet executed.
     var hasPendingForcedDraw: Bool { forceDrawLock.withLock { forceDraw } }
+
+    /// Render-health counters (see `MPVRenderHealth`). Touched on the render
+    /// queue in `draw`/`display`, read from the main actor by the playback
+    /// stats watchdog.
+    private var successfulDrawCount: UInt64 = 0
+    private var skipRenderCount: UInt64 = 0
+    private var droppedDrawCount: UInt64 = 0
+    private var lastSuccessfulDrawTime: CFTimeInterval?
+    private var skipsSinceLastDraw: UInt64 = 0
+    private let renderHealthLock = NSLock()
 
     /// Whether the layer has been set up with an MPV client.
     private var isSetup = false
@@ -345,6 +368,7 @@ final class MPVOpenGLLayer: CAOpenGLLayer {
                     category: .mpv
                 )
             }
+            renderHealthLock.withLock { droppedDrawCount += 1 }
             scheduleDroppedDrawRetry()
             return
         }
@@ -353,6 +377,11 @@ final class MPVOpenGLLayer: CAOpenGLLayer {
         needsFlipLock.withLock { needsFlip = false }
         forceDrawLock.withLock { forceDraw = false }
         droppedDrawRetryLock.withLock { droppedDrawRetries = 0 }
+        renderHealthLock.withLock {
+            successfulDrawCount += 1
+            skipsSinceLastDraw = 0
+            lastSuccessfulDrawTime = CACurrentMediaTime()
+        }
 
         // Clear the buffer
         glClear(GLbitfield(GL_COLOR_BUFFER_BIT))
@@ -436,6 +465,25 @@ final class MPVOpenGLLayer: CAOpenGLLayer {
         // Need to do a skip render to keep MPV's frame queue moving.
         guard let mpvClient, let renderContext = mpvClient.mpvRenderContext,
               mpvClient.shouldRenderUpdateFrame() else { return }
+
+        // A long uninterrupted run of skips means the layer is not being
+        // composited (e.g. the shared view is parented in a non-visible
+        // window) and playback is silently video-less. Log the first skip
+        // after a real draw, then every ~300 (~10s at 30fps).
+        let skips = renderHealthLock.withLock { () -> UInt64 in
+            skipRenderCount += 1
+            skipsSinceLastDraw += 1
+            return skipsSinceLastDraw
+        }
+        if skips == 1 || skips.isMultiple(of: 300) {
+            let boundsSize = bounds.size
+            Task { @MainActor in
+                LoggingService.shared.warning(
+                    "MPVOpenGLLayer: skip-render consumed frame without draw (skips=\(skips) since last draw, bounds=\(boundsSize))",
+                    category: .mpv
+                )
+            }
+        }
 
         // Must lock OpenGL context before calling mpv render functions
         mpvClient.lockAndSetOpenGLContext()
@@ -646,6 +694,18 @@ final class MPVOpenGLLayer: CAOpenGLLayer {
     /// Reset first frame tracking (call when loading new content).
     func resetFirstFrameTracking() {
         hasRenderedFirstFrame = false
+    }
+
+    /// Thread-safe snapshot of the render-health counters.
+    func renderHealthSnapshot() -> MPVRenderHealth {
+        renderHealthLock.withLock {
+            MPVRenderHealth(
+                draws: successfulDrawCount,
+                skips: skipRenderCount,
+                droppedDraws: droppedDrawCount,
+                lastDrawAge: lastSuccessfulDrawTime.map { CACurrentMediaTime() - $0 }
+            )
+        }
     }
 
     // MARK: - Pixel Format and Context Creation

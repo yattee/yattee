@@ -167,14 +167,24 @@ struct MPVRenderViewRepresentable: NSViewRepresentable {
     }
 }
 
-/// Container view that properly manages player view swapping on macOS
-private class MPVContainerNSView: NSView {
+/// Container view that properly manages player view swapping on macOS.
+/// Internal (not private) so MPVBackend's render watchdog can call
+/// `recoverSharedPlayerViewIfNeeded()`.
+final class MPVContainerNSView: NSView {
     private weak var currentPlayerView: NSView?
     private let containerID = UUID()
+
+    /// Short identifier used in logs.
+    var shortID: String { String(containerID.uuidString.prefix(8)) }
 
     /// Track all living containers so a container that releases the shared
     /// player view can hand it to another container instead of orphaning it.
     private static var livingContainers = NSHashTable<MPVContainerNSView>.weakObjects()
+
+    /// The single shared render view most recently attached to any container.
+    /// Lets a container that gains a window reclaim the view when it was
+    /// orphaned or left behind in a non-visible window.
+    private static weak var sharedPlayerView: NSView?
 
     /// Callback when view is added to a window
     var onDidMoveToWindow: (() -> Void)?
@@ -194,7 +204,28 @@ private class MPVContainerNSView: NSView {
         // Notify when we're added to a window (not removed)
         if window != nil {
             onDidMoveToWindow?()
+            reclaimSharedPlayerViewIfStranded()
         }
+    }
+
+    /// When this container gains a window, adopt the shared player view if it
+    /// is currently orphaned or parented in a container whose window is gone
+    /// or not visible. This is the recovery path for the expand race where the
+    /// mini capsule unmounts before any windowed container exists ("no
+    /// transfer target"), and for a view left behind in a stale ordered-out
+    /// player window.
+    private func reclaimSharedPlayerViewIfStranded() {
+        guard let sharedView = Self.sharedPlayerView, sharedView.superview !== self else { return }
+        let owner = sharedView.superview as? MPVContainerNSView
+        // Parented outside any container (e.g. mid-transfer) — leave it alone.
+        if sharedView.superview != nil, owner == nil { return }
+        let ownerWindowVisible = owner?.window?.isVisible == true
+        guard owner == nil || !ownerWindowVisible else { return }
+        LoggingService.shared.debug(
+            "MPVContainerNSView[\(shortID)]: reclaiming stranded player view on window attach (previous owner: \(owner?.shortID ?? "none"), ownerWindowVisible: \(ownerWindowVisible))",
+            category: .mpv
+        )
+        setPlayerView(sharedView)
     }
 
     override func viewWillMove(toSuperview newSuperview: NSView?) {
@@ -219,13 +250,16 @@ private class MPVContainerNSView: NSView {
                 // view can end up with no superview and the player renders only black.
                 if let target = MPVContainerNSView.findTransferTarget(excluding: self) {
                     LoggingService.shared.debug(
-                        "MPVContainerNSView[\(containerID.uuidString.prefix(8))]: unmounting - transferring player view to container \(target.containerID.uuidString.prefix(8)) (windowVisible: \(target.window?.isVisible == true))",
+                        "MPVContainerNSView[\(shortID)]: unmounting - transferring player view to container \(target.shortID) (windowVisible: \(target.window?.isVisible == true))",
                         category: .mpv
                     )
-                    target.setPlayerView(playerView)
+                    // The transfer is initiated by the current owner, so bypass
+                    // the steal guard (the target may legitimately be in a
+                    // not-yet-visible window, e.g. hidden for PiP).
+                    target.setPlayerView(playerView, bypassingStealGuard: true)
                 } else {
                     LoggingService.shared.debug(
-                        "MPVContainerNSView[\(containerID.uuidString.prefix(8))]: unmounting - no transfer target, removing player view",
+                        "MPVContainerNSView[\(shortID)]: unmounting - no transfer target, parking player view (reclaimed when a container gains a window)",
                         category: .mpv
                     )
                     playerView.removeFromSuperview()
@@ -236,15 +270,32 @@ private class MPVContainerNSView: NSView {
         }
     }
 
-    /// Another living container that can host the shared player view, preferring
-    /// one whose window is currently visible (a restoring window may not be
-    /// visible yet at transfer time, so a hidden window is still acceptable).
+    /// Another living container that can host the shared player view.
+    /// Ranking:
+    /// 1. A container whose window is currently visible.
+    /// 2. A container in the window still tracked by ExpandedPlayerWindowManager
+    ///    (mid-presentation or hidden for PiP — it will become visible).
+    /// 3. nil — park the view rather than parenting it in a stale ordered-out
+    ///    window that CoreAnimation never composites (permanent black video);
+    ///    `reclaimSharedPlayerViewIfStranded` re-adopts it when a container
+    ///    gains a window.
     private static func findTransferTarget(excluding source: MPVContainerNSView) -> MPVContainerNSView? {
         let candidates = livingContainers.allObjects.filter { $0 !== source && $0.window != nil }
-        return candidates.first { $0.window?.isVisible == true } ?? candidates.first
+        if let visible = candidates.first(where: { $0.window?.isVisible == true }) {
+            return visible
+        }
+        if let trackedWindow = ExpandedPlayerWindowManager.shared.currentPlayerWindow,
+           let tracked = candidates.first(where: { $0.window === trackedWindow }) {
+            LoggingService.shared.debug(
+                "MPVContainerNSView.findTransferTarget: no visible candidate, using container \(tracked.shortID) in tracked player window",
+                category: .mpv
+            )
+            return tracked
+        }
+        return nil
     }
 
-    func setPlayerView(_ playerView: NSView) {
+    func setPlayerView(_ playerView: NSView, bypassingStealGuard: Bool = false) {
         // Skip only if same view AND actually our subview. The weak ref can
         // point to a view that was stolen by another container — e.g. the mini
         // player preview takes the shared render view during PiP while the
@@ -254,9 +305,27 @@ private class MPVContainerNSView: NSView {
             return
         }
 
+        // Refuse to steal the shared view from a container in a visible window
+        // when this container's own window is missing or not visible. The
+        // player window ordered out on collapse keeps its SwiftUI hierarchy
+        // alive until it deallocates, and its updateNSView would otherwise
+        // re-parent the shared view into the dead window where CoreAnimation
+        // never composites it (permanent black video until app restart).
+        if !bypassingStealGuard,
+           let owner = playerView.superview as? MPVContainerNSView,
+           owner !== self,
+           owner.window?.isVisible == true,
+           window?.isVisible != true {
+            LoggingService.shared.debug(
+                "MPVContainerNSView[\(shortID)]: declined steal - view owned by visible container \(owner.shortID) (self window: \(window != nil), windowVisible: false)",
+                category: .mpv
+            )
+            return
+        }
+
         let previousSuperview = playerView.superview.map { String(describing: type(of: $0)) } ?? "nil"
         LoggingService.shared.debug(
-            "MPVContainerNSView[\(containerID.uuidString.prefix(8))].setPlayerView: attaching (reclaim: \(playerView === currentPlayerView), previousSuperview: \(previousSuperview), window: \(window != nil), windowVisible: \(window?.isVisible == true))",
+            "MPVContainerNSView[\(shortID)].setPlayerView: attaching (reclaim: \(playerView === currentPlayerView), previousSuperview: \(previousSuperview), window: \(window != nil), windowVisible: \(window?.isVisible == true))",
             category: .mpv
         )
 
@@ -276,6 +345,34 @@ private class MPVContainerNSView: NSView {
         ])
 
         currentPlayerView = playerView
+        MPVContainerNSView.sharedPlayerView = playerView
+    }
+
+    /// Re-attach the shared player view to a container in a visible window when
+    /// it is currently orphaned or parented somewhere non-visible. Called by
+    /// MPVBackend's render watchdog when video output stalls (frames consumed
+    /// without a single draw). Returns true when the view was re-parented.
+    @discardableResult
+    static func recoverSharedPlayerViewIfNeeded() -> Bool {
+        guard let sharedView = sharedPlayerView else { return false }
+        let owner = sharedView.superview as? MPVContainerNSView
+        // Healthy: owned by a container in a visible window.
+        if owner?.window?.isVisible == true { return false }
+        // Parented outside any container — not ours to manage.
+        if sharedView.superview != nil, owner == nil { return false }
+        guard let target = livingContainers.allObjects.first(where: { $0.window?.isVisible == true }) else {
+            LoggingService.shared.warning(
+                "MPVContainerNSView.recoverSharedPlayerViewIfNeeded: no visible container available (owner: \(owner?.shortID ?? "none"))",
+                category: .mpv
+            )
+            return false
+        }
+        LoggingService.shared.warning(
+            "MPVContainerNSView.recoverSharedPlayerViewIfNeeded: re-attaching player view from \(owner?.shortID ?? "orphaned") to container \(target.shortID)",
+            category: .mpv
+        )
+        target.setPlayerView(sharedView, bypassingStealGuard: true)
+        return sharedView.superview === target
     }
 }
 
