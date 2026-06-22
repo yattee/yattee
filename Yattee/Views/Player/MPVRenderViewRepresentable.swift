@@ -189,6 +189,15 @@ final class MPVContainerNSView: NSView {
     /// Callback when view is added to a window
     var onDidMoveToWindow: (() -> Void)?
 
+    /// Whether this container lives in the player window tracked by
+    /// ExpandedPlayerWindowManager. That window is the primary video surface:
+    /// its containers may always claim the shared view, and nothing outside it
+    /// may steal from it while it is visible.
+    private var isInTrackedPlayerWindow: Bool {
+        guard let window else { return false }
+        return window === ExpandedPlayerWindowManager.shared.currentPlayerWindow
+    }
+
     override init(frame frameRect: NSRect) {
         super.init(frame: frameRect)
         MPVContainerNSView.livingContainers.add(self)
@@ -220,12 +229,19 @@ final class MPVContainerNSView: NSView {
         // Parented outside any container (e.g. mid-transfer) — leave it alone.
         if sharedView.superview != nil, owner == nil { return }
         let ownerWindowVisible = owner?.window?.isVisible == true
-        guard owner == nil || !ownerWindowVisible else { return }
+        // A visible owner keeps the view — unless we are in the tracked player
+        // window (the primary surface takes it even from the mini capsule
+        // preview, which otherwise renders the video at thumbnail size while
+        // the player window stays black). Same-window owners are left alone;
+        // SwiftUI layout updates settle those.
+        if let owner, ownerWindowVisible {
+            guard isInTrackedPlayerWindow, owner.window !== window else { return }
+        }
         LoggingService.shared.debug(
-            "MPVContainerNSView[\(shortID)]: reclaiming stranded player view on window attach (previous owner: \(owner?.shortID ?? "none"), ownerWindowVisible: \(ownerWindowVisible))",
+            "MPVContainerNSView[\(shortID)]: reclaiming stranded player view on window attach (previous owner: \(owner?.shortID ?? "none"), ownerWindowVisible: \(ownerWindowVisible), trackedWindow: \(isInTrackedPlayerWindow))",
             category: .mpv
         )
-        setPlayerView(sharedView)
+        setPlayerView(sharedView, bypassingStealGuard: true)
     }
 
     override func viewWillMove(toSuperview newSuperview: NSView?) {
@@ -305,27 +321,43 @@ final class MPVContainerNSView: NSView {
             return
         }
 
-        // Refuse to steal the shared view from a container in a visible window
-        // when this container's own window is missing or not visible. The
-        // player window ordered out on collapse keeps its SwiftUI hierarchy
-        // alive until it deallocates, and its updateNSView would otherwise
-        // re-parent the shared view into the dead window where CoreAnimation
-        // never composites it (permanent black video until app restart).
         if !bypassingStealGuard,
            let owner = playerView.superview as? MPVContainerNSView,
            owner !== self,
-           owner.window?.isVisible == true,
-           window?.isVisible != true {
-            LoggingService.shared.debug(
-                "MPVContainerNSView[\(shortID)]: declined steal - view owned by visible container \(owner.shortID) (self window: \(window != nil), windowVisible: false)",
-                category: .mpv
-            )
-            return
+           let ownerWindow = owner.window,
+           ownerWindow.isVisible,
+           ownerWindow !== window {
+            // Refuse to steal from a container in a visible window when this
+            // container's own window is missing or not visible. The player
+            // window ordered out on collapse keeps its SwiftUI hierarchy alive
+            // until it deallocates, and its updateNSView would otherwise
+            // re-parent the shared view into the dead window where
+            // CoreAnimation never composites it (permanent black video until
+            // app restart). Exemption: containers in the tracked player window
+            // may claim the view before their window is visible — it is the
+            // primary surface and is about to be shown.
+            if window?.isVisible != true, !isInTrackedPlayerWindow {
+                LoggingService.shared.debug(
+                    "MPVContainerNSView[\(shortID)]: declined steal - view owned by visible container \(owner.shortID) (self window: \(window != nil), windowVisible: false, bounds: \(Int(bounds.width))x\(Int(bounds.height)))",
+                    category: .mpv
+                )
+                return
+            }
+            // Conversely, never steal from the visible tracked player window:
+            // the mini capsule preview (mounted alongside it in separate-window
+            // mode) must not take the video out of the player window.
+            if ownerWindow === ExpandedPlayerWindowManager.shared.currentPlayerWindow {
+                LoggingService.shared.debug(
+                    "MPVContainerNSView[\(shortID)]: declined steal - view owned by visible player window container \(owner.shortID) (self bounds: \(Int(bounds.width))x\(Int(bounds.height)))",
+                    category: .mpv
+                )
+                return
+            }
         }
 
         let previousSuperview = playerView.superview.map { String(describing: type(of: $0)) } ?? "nil"
         LoggingService.shared.debug(
-            "MPVContainerNSView[\(shortID)].setPlayerView: attaching (reclaim: \(playerView === currentPlayerView), previousSuperview: \(previousSuperview), window: \(window != nil), windowVisible: \(window?.isVisible == true))",
+            "MPVContainerNSView[\(shortID)].setPlayerView: attaching (reclaim: \(playerView === currentPlayerView), previousSuperview: \(previousSuperview), window: \(window != nil), windowVisible: \(window?.isVisible == true), bounds: \(Int(bounds.width))x\(Int(bounds.height)), trackedWindow: \(isInTrackedPlayerWindow))",
             category: .mpv
         )
 
@@ -356,19 +388,43 @@ final class MPVContainerNSView: NSView {
     static func recoverSharedPlayerViewIfNeeded() -> Bool {
         guard let sharedView = sharedPlayerView else { return false }
         let owner = sharedView.superview as? MPVContainerNSView
-        // Healthy: owned by a container in a visible window.
-        if owner?.window?.isVisible == true { return false }
         // Parented outside any container — not ours to manage.
         if sharedView.superview != nil, owner == nil { return false }
-        guard let target = livingContainers.allObjects.first(where: { $0.window?.isVisible == true }) else {
+
+        let trackedWindow = ExpandedPlayerWindowManager.shared.currentPlayerWindow
+        let trackedWindowVisible = trackedWindow?.isVisible == true
+
+        // Healthy when owned by a container in a visible window — unless the
+        // tracked player window is on screen and the view sits outside it
+        // (e.g. the mini capsule rendering the video at thumbnail size while
+        // the player window shows black).
+        if owner?.window?.isVisible == true,
+           !trackedWindowVisible || owner?.window === trackedWindow {
+            return false
+        }
+
+        // Prefer the largest container in the tracked player window (skips
+        // thumbnail-sized surfaces that may share the window), then the
+        // largest in any visible window.
+        let candidates = livingContainers.allObjects
+        func area(_ container: MPVContainerNSView) -> CGFloat {
+            container.bounds.width * container.bounds.height
+        }
+        let target = candidates
+            .filter { trackedWindowVisible && $0.window === trackedWindow }
+            .max(by: { area($0) < area($1) })
+            ?? candidates
+            .filter { $0.window?.isVisible == true }
+            .max(by: { area($0) < area($1) })
+        guard let target, target !== owner else {
             LoggingService.shared.warning(
-                "MPVContainerNSView.recoverSharedPlayerViewIfNeeded: no visible container available (owner: \(owner?.shortID ?? "none"))",
+                "MPVContainerNSView.recoverSharedPlayerViewIfNeeded: no suitable container (owner: \(owner?.shortID ?? "none"), trackedWindowVisible: \(trackedWindowVisible))",
                 category: .mpv
             )
             return false
         }
         LoggingService.shared.warning(
-            "MPVContainerNSView.recoverSharedPlayerViewIfNeeded: re-attaching player view from \(owner?.shortID ?? "orphaned") to container \(target.shortID)",
+            "MPVContainerNSView.recoverSharedPlayerViewIfNeeded: re-attaching player view from \(owner?.shortID ?? "orphaned") to container \(target.shortID) (bounds: \(Int(target.bounds.width))x\(Int(target.bounds.height)), trackedWindow: \(target.window === trackedWindow))",
             category: .mpv
         )
         target.setPlayerView(sharedView, bypassingStealGuard: true)

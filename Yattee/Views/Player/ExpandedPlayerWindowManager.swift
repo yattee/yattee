@@ -524,8 +524,17 @@ extension ExpandedPlayerWindowManager: NSWindowDelegate {
 
             // Update navigation state
             // Set collapsing first so mini player shows video immediately
-            appEnvironment?.navigationCoordinator.isPlayerCollapsing = true
-            appEnvironment?.navigationCoordinator.isPlayerExpanded = false
+            let navigationCoordinator = appEnvironment?.navigationCoordinator
+            navigationCoordinator?.isPlayerCollapsing = true
+            navigationCoordinator?.isPlayerExpanded = false
+
+            // Unlike hide(), this path has no animation completion to reset the
+            // flag. Left stuck true, the mini capsule mounts its video container
+            // forever and hijacks the shared render view on the next expand
+            // (player window stays black while the capsule renders the video).
+            Task { @MainActor in
+                navigationCoordinator?.isPlayerCollapsing = false
+            }
         }
         // Return false - we've already hidden the window with orderOut
         return false

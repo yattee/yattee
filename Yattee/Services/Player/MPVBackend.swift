@@ -2096,6 +2096,23 @@ extension MPVBackend: MPVClientDelegate {
 
                     previousVoDrops = voDrops ?? previousVoDrops
                 }
+
+                // Misplaced-view check: the player window is on screen but the
+                // shared render view lives in a different window (e.g. the mini
+                // capsule preview grabbed it during an expand race). Draws look
+                // healthy, yet the player window shows black.
+                if !self.isPiPActive,
+                   let playerWindow = ExpandedPlayerWindowManager.shared.currentPlayerWindow,
+                   playerWindow.isVisible,
+                   let view = self._playerView, view.window !== playerWindow {
+                    LoggingService.shared.warning(
+                        "MPV render watchdog: player view outside visible player window (attach: \(view.attachmentDescription)) - re-attaching",
+                        category: .mpv
+                    )
+                    if MPVContainerNSView.recoverSharedPlayerViewIfNeeded() {
+                        self.resumeRendering()
+                    }
+                }
                 #endif
 
                 // Gate on the verbose setting each tick (not at task start) so
