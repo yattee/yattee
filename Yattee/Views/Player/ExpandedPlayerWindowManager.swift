@@ -201,7 +201,8 @@ final class ExpandedPlayerWindowManager: NSObject {
 
         // Check if PiP is active - if so, just hide the window without destroying content
         // The AVSampleBufferDisplayLayer needs to stay alive while PiP is active
-        let isPiPActive = (appEnvironment?.playerService.currentBackend as? MPVBackend)?.isPiPActive ?? false
+        let mpvBackend = appEnvironment?.playerService.currentBackend as? MPVBackend
+        let isPiPActive = mpvBackend?.isPiPActive ?? false
 
         LoggingService.shared.debug("ExpandedPlayerWindowManager: hide() called, isPiPActive=\(isPiPActive)", category: .player)
 
@@ -240,6 +241,14 @@ final class ExpandedPlayerWindowManager: NSObject {
                     // Don't set contentViewController to nil or call close() - just order out
                     // This lets SwiftUI views deallocate naturally rather than being forcibly torn down
                     window.orderOut(nil)
+                    // The mini capsule's claim on the shared render view was
+                    // declined while this window was still visible during the
+                    // fade-out, and nothing retries after orderOut - hand the
+                    // view over now instead of leaving the capsule black until
+                    // the render watchdog recovers it.
+                    if MPVContainerNSView.recoverSharedPlayerViewIfNeeded() {
+                        mpvBackend?.resumeRendering()
+                    }
                     completion?()
                 }
             }
