@@ -192,6 +192,12 @@ final class ExpandedPlayerWindowManager: NSObject {
     ///   - completion: Called after the window is hidden
     func hide(animated: Bool = true, completion: (() -> Void)? = nil) {
         guard let window = playerWindow else {
+            // No window means sheet mode (or the window is already gone).
+            // A dismissed sheet's hierarchy stays alive holding the shared
+            // render view inside a now-invisible window with no container
+            // lifecycle event to react to - watch for the dismissal to finish
+            // and re-home the view to the mini capsule.
+            MPVContainerNSView.scheduleSharedViewAdoptionRetry()
             completion?()
             return
         }

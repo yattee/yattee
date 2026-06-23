@@ -279,6 +279,7 @@ final class MPVContainerNSView: NSView {
                         category: .mpv
                     )
                     playerView.removeFromSuperview()
+                    MPVContainerNSView.scheduleSharedViewAdoptionRetry()
                 }
             }
             currentPlayerView = nil
@@ -380,12 +381,53 @@ final class MPVContainerNSView: NSView {
         MPVContainerNSView.sharedPlayerView = playerView
     }
 
+    /// True while an adoption retry loop is running - avoids stacking loops
+    /// when several triggers fire in quick succession.
+    private static var adoptionRetryActive = false
+
+    /// Watch the shared player view for ~1s and re-home it as soon as it
+    /// needs it (parked with no owner, or owned by a container whose window
+    /// lost visibility). This covers transitions with no container lifecycle
+    /// hook to react to:
+    /// - parking while the next host's window exists but is not yet visible
+    ///   (sheet mid-presentation: viewDidMoveToWindow already fired and
+    ///   findTransferTarget rejects non-visible windows)
+    /// - sheet dismissal, where the dismissed sheet's hierarchy stays alive
+    ///   holding the view inside a now-invisible window
+    /// Without this the video stays black until the render watchdog (~10s).
+    static func scheduleSharedViewAdoptionRetry() {
+        guard !adoptionRetryActive else { return }
+        adoptionRetryActive = true
+        adoptionRetryTick(attempt: 0)
+    }
+
+    private static func adoptionRetryTick(attempt: Int) {
+        guard attempt < 20 else {
+            adoptionRetryActive = false
+            return
+        }
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.05) {
+            guard sharedPlayerView != nil else {
+                adoptionRetryActive = false
+                return
+            }
+            // quiet: while playback is tearing down there legitimately is no
+            // container to adopt the view - not worth a warning per tick.
+            if recoverSharedPlayerViewIfNeeded(quiet: true) {
+                adoptionRetryActive = false
+                (sharedPlayerView as? MPVOGLView)?.resumeRendering()
+            } else {
+                adoptionRetryTick(attempt: attempt + 1)
+            }
+        }
+    }
+
     /// Re-attach the shared player view to a container in a visible window when
     /// it is currently orphaned or parented somewhere non-visible. Called by
     /// MPVBackend's render watchdog when video output stalls (frames consumed
     /// without a single draw). Returns true when the view was re-parented.
     @discardableResult
-    static func recoverSharedPlayerViewIfNeeded() -> Bool {
+    static func recoverSharedPlayerViewIfNeeded(quiet: Bool = false) -> Bool {
         guard let sharedView = sharedPlayerView else { return false }
         let owner = sharedView.superview as? MPVContainerNSView
         // Parented outside any container — not ours to manage.
@@ -417,10 +459,12 @@ final class MPVContainerNSView: NSView {
             .filter { $0.window?.isVisible == true }
             .max(by: { area($0) < area($1) })
         guard let target, target !== owner else {
-            LoggingService.shared.warning(
-                "MPVContainerNSView.recoverSharedPlayerViewIfNeeded: no suitable container (owner: \(owner?.shortID ?? "none"), trackedWindowVisible: \(trackedWindowVisible))",
-                category: .mpv
-            )
+            if !quiet {
+                LoggingService.shared.warning(
+                    "MPVContainerNSView.recoverSharedPlayerViewIfNeeded: no suitable container (owner: \(owner?.shortID ?? "none"), trackedWindowVisible: \(trackedWindowVisible))",
+                    category: .mpv
+                )
+            }
             return false
         }
         LoggingService.shared.warning(
