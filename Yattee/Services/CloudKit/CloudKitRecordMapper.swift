@@ -22,7 +22,8 @@ final class CloudKitRecordMapper {
 
     /// Current schema version for CloudKit records.
     /// Increment this when record structure changes.
-    private let currentSchemaVersion: Int64 = 2
+    static let currentSchemaVersion: Int64 = 2
+    private var currentSchemaVersion: Int64 { Self.currentSchemaVersion }
 
     init(zone: CKRecordZone) {
         self.zone = zone

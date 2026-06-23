@@ -123,6 +123,9 @@ final class CloudKitSyncEngine: @unchecked Sendable {
     
     /// UserDefaults key for CloudKit sync state.
     private let syncStateKey = "cloudKitSyncState"
+
+    /// UserDefaults key for the record schema version this app last synced with.
+    private let lastSchemaVersionKey = "cloudKitLastSchemaVersion"
     
     /// UserDefaults key for persisting pending save record names (crash recovery).
     private let pendingSaveRecordNamesKey = "cloudKitPendingSaveRecordNames"
@@ -329,14 +332,23 @@ final class CloudKitSyncEngine: @unchecked Sendable {
             let zone = await zoneManager.getZone()
             self.recordMapper = CloudKitRecordMapper(zone: zone)
             
-            // Initialize CKSyncEngine with nil state to always do a fresh fetch on launch.
-            // This ensures we never miss changes due to stale tokens, at the cost of ~2s for typical record counts.
-            // Sync state is still saved (see stateUpdate handler) so CKSyncEngine can use it within a session.
-            LoggingService.shared.logCloudKit("Creating CKSyncEngine with fresh state (nil) for reliable sync")
+            // Records written by a newer app version fail to parse and are only
+            // re-delivered on a full fetch, so a schema upgrade must invalidate the
+            // persisted state once to pick them up.
+            invalidateSyncStateAfterSchemaUpgradeIfNeeded()
+
+            // Resume from persisted sync state so launches fetch only changes since
+            // the last session instead of replaying the entire zone change history.
+            // Starts with nil (full fetch) on first sync, account change, manual
+            // refresh, or schema upgrade.
+            let savedState = loadSyncState()
+            LoggingService.shared.logCloudKit(savedState != nil
+                ? "Creating CKSyncEngine with persisted state (incremental fetch)"
+                : "Creating CKSyncEngine with fresh state (full fetch)")
 
             let config = CKSyncEngine.Configuration(
                 database: database,
-                stateSerialization: nil,
+                stateSerialization: savedState,
                 delegate: self
             )
 
@@ -431,6 +443,22 @@ final class CloudKitSyncEngine: @unchecked Sendable {
         LoggingService.shared.logCloudKit("Cleared sync state for account change")
     }
     
+    /// Clears persisted sync state after an app update that raised the record
+    /// schema version. Records from newer schema versions are rejected by the
+    /// mapper and are not re-delivered by an incremental fetch, so the first
+    /// launch that understands them must do one full re-fetch.
+    private func invalidateSyncStateAfterSchemaUpgradeIfNeeded() {
+        let storedVersion = Int64(UserDefaults.standard.integer(forKey: lastSchemaVersionKey))
+        let currentVersion = CloudKitRecordMapper.currentSchemaVersion
+        guard storedVersion < currentVersion else { return }
+
+        if UserDefaults.standard.data(forKey: syncStateKey) != nil {
+            UserDefaults.standard.removeObject(forKey: syncStateKey)
+            LoggingService.shared.logCloudKit("Schema version upgraded (\(storedVersion) -> \(currentVersion)), cleared sync state for full re-fetch")
+        }
+        UserDefaults.standard.set(Int(currentVersion), forKey: lastSchemaVersionKey)
+    }
+
     /// Loads persisted sync state from disk.
     private func loadSyncState() -> CKSyncEngine.State.Serialization? {
         guard let data = UserDefaults.standard.data(forKey: syncStateKey) else {
@@ -1570,7 +1598,8 @@ final class CloudKitSyncEngine: @unchecked Sendable {
         retryCount.removeAll()
         syncEngine = nil
 
-        // Reinitialize with nil state serialization (forces fresh fetch)
+        // Reinitialize - with the persisted state cleared above, setup starts
+        // from nil state serialization (forces full fetch)
         await setupSyncEngine()
 
         LoggingService.shared.logCloudKit("Refresh sync completed")
@@ -1778,6 +1807,9 @@ extension CloudKitSyncEngine: CKSyncEngineDelegate {
             }
             await handlePartialFailures(changes)
 
+        case .fetchedDatabaseChanges(let changes):
+            await handleFetchedDatabaseChanges(changes)
+
         default:
             await MainActor.run {
                 switch event {
@@ -1792,9 +1824,6 @@ extension CloudKitSyncEngine: CKSyncEngineDelegate {
                     Task.detached { [weak self] in
                         await self?.setupSyncEngine()
                     }
-
-                case .fetchedDatabaseChanges:
-                    LoggingService.shared.logCloudKit("Fetched database changes")
 
                 case .willFetchChanges:
                     LoggingService.shared.logCloudKit("CKSyncEngine will fetch changes (auto-triggered)")
@@ -1990,6 +2019,29 @@ extension CloudKitSyncEngine: CKSyncEngineDelegate {
         retryCount.removeValue(forKey: recordName)
     }
     
+    /// Handle fetched database-level changes (zone creations/deletions).
+    /// Now that the engine resumes from persisted state, a remote deletion of our
+    /// zone (reset from another device, iCloud data purge, encrypted data reset)
+    /// would leave sync silently dead - recreate the zone and re-seed it from
+    /// local data.
+    private func handleFetchedDatabaseChanges(_ changes: CKSyncEngine.Event.FetchedDatabaseChanges) async {
+        LoggingService.shared.logCloudKit("Fetched database changes")
+
+        guard changes.deletions.contains(where: { $0.zoneID.zoneName == RecordType.zoneName }) else {
+            return
+        }
+
+        LoggingService.shared.logCloudKit("Zone '\(RecordType.zoneName)' was deleted remotely - recreating and re-uploading local data")
+        UserDefaults.standard.removeObject(forKey: syncStateKey)
+
+        do {
+            try await zoneManager.createZoneIfNeeded()
+            await performInitialUpload()
+        } catch {
+            LoggingService.shared.logCloudKitError("Failed to recreate zone after remote deletion", error: error)
+        }
+    }
+
     /// Handle fetched changes from CloudKit.
     private func handleFetchedChanges(_ changes: CKSyncEngine.Event.FetchedRecordZoneChanges) async {
         guard let dataManager else { return }
