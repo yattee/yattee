@@ -289,9 +289,12 @@ jobs:
           echo "sign_update=$SIGN" >> "$GITHUB_OUTPUT"
       - name: Checkout gh-pages (create if missing)
         run: |
-          git fetch origin gh-pages || true
-          if git rev-parse --verify origin/gh-pages >/dev/null 2>&1; then
-            git worktree add gh-pages origin/gh-pages
+          # Fetch into a local branch: actions/checkout configures a narrow
+          # refspec, so a plain `git fetch origin gh-pages` never creates
+          # origin/gh-pages, and a detached worktree has no local branch for
+          # `git push origin gh-pages` to resolve.
+          if git fetch origin +refs/heads/gh-pages:refs/heads/gh-pages; then
+            git worktree add gh-pages gh-pages
           else
             # First run — create orphan gh-pages with only appcast scaffolding.
             git worktree add --detach gh-pages HEAD
@@ -341,5 +344,10 @@ jobs:
           fi
 
   update_altstore:
+    # Only when an iOS IPA was actually built and released — a mac/tvOS-only
+    # release has no IPA and would corrupt the AltStore source.
+    if: ${{ inputs.build_ios && success() }}
     needs: [release]
     uses: ./.github/workflows/update-altstore.yml
+    with:
+      tag: ${{ needs.release.outputs.tag }}
