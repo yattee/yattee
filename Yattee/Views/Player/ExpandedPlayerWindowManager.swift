@@ -401,8 +401,9 @@ final class ExpandedPlayerWindowManager: NSObject {
 
     // MARK: - Private Helpers
 
-    /// Sets `contentAspectRatio` and a ratio-consistent `minSize` on the window
-    /// so that interactive resize couples width and height proportionally.
+    /// Sets `contentAspectRatio` and a ratio-consistent minimum content size on
+    /// the window so that interactive resize couples width and height
+    /// proportionally and can't shrink below a usable minimum.
     /// Static so the inline-sheet path (`SheetWindowResizer`) can lock the sheet's
     /// backing window to the same ratio the standalone window uses.
     static func applyAspectRatioConstraint(_ aspectRatio: Double, to window: NSWindow) {
@@ -415,7 +416,14 @@ final class ExpandedPlayerWindowManager: NSObject {
         // doesn't force the window off-ratio (which would re-introduce bars).
         // Anchor on minHeight and scale width by aspect.
         let derivedMinWidth = max(Self.minHeight * CGFloat(aspectRatio), 320)
-        window.minSize = NSSize(width: derivedMinWidth, height: Self.minHeight)
+        let minContentSize = NSSize(width: derivedMinWidth, height: Self.minHeight)
+
+        // Best-effort minimum. NSHostingController resets these to zero at runtime,
+        // so the real resize floor is enforced in the window delegate's
+        // `windowWillResize(_:to:)`; these are kept for any code path that reads
+        // the window's stored minimum before the reset happens.
+        window.contentMinSize = minContentSize
+        window.minSize = minContentSize
     }
 
     private func configureWindowLevel(_ window: NSWindow, floating: Bool) {
@@ -517,6 +525,43 @@ final class ExpandedPlayerWindowManager: NSObject {
 // MARK: - NSWindowDelegate
 
 extension ExpandedPlayerWindowManager: NSWindowDelegate {
+    /// Clamp interactive resize to a usable minimum size.
+    ///
+    /// Once `contentAspectRatio` is set, AppKit's aspect-ratio resize handler
+    /// takes over and stops enforcing `minSize`/`contentMinSize` during live
+    /// drags; NSHostingController also zeroes those stored minimums at runtime.
+    /// So the floor is computed here from constants and applied to the proposed
+    /// (already aspect-correct) frame, growing any under-sized proposal back up
+    /// while preserving its ratio.
+    nonisolated func windowWillResize(_: NSWindow, to frameSize: NSSize) -> NSSize {
+        MainActor.assumeIsolated {
+            // Enforce the floor from constants here rather than from
+            // `window.minSize`/`contentMinSize`: NSHostingController resets those
+            // to zero at runtime (even with `sizingOptions = []`), so the window's
+            // stored minimum can't be trusted. AppKit already applies
+            // `contentAspectRatio` to `frameSize`, so we only need to grow an
+            // under-sized proposal back up to the minimum while preserving its
+            // (already correct) aspect ratio.
+            let aspect = frameSize.height > 0
+                ? frameSize.width / frameSize.height
+                : CGFloat(Self.defaultAspectRatio)
+
+            var height = max(frameSize.height, Self.minHeight)
+            var width = height * aspect
+
+            // Guard the width floor too (for narrow/portrait videos where the
+            // height minimum alone would leave the window too thin), then rederive
+            // height so the result stays on the proposed aspect ratio.
+            let minWidthFloor = max(Self.minHeight * aspect, 320)
+            if width < minWidthFloor {
+                width = minWidthFloor
+                height = aspect > 0 ? width / aspect : height
+            }
+
+            return NSSize(width: width, height: height)
+        }
+    }
+
     nonisolated func windowShouldClose(_ sender: NSWindow) -> Bool {
         // Handle close ourselves to avoid deallocation race conditions
         MainActor.assumeIsolated {
