@@ -19,6 +19,15 @@ final class ExpandedPlayerWindowManager: NSObject {
     private var playerWindow: NSWindow?
     private weak var appEnvironment: AppEnvironment?
 
+    /// Main app window native-fullscreened for the inline player overlay, the
+    /// observer watching for it to exit fullscreen (Esc, green button, menu),
+    /// and the toolbar visibility to restore afterwards (the toolbar is hidden
+    /// during overlay fullscreen — NSWindow keeps it as a visible strip above
+    /// the content otherwise).
+    private weak var overlayFullScreenParent: NSWindow?
+    private var overlayFullScreenExitObserver: NSObjectProtocol?
+    private var overlayFullScreenToolbarWasVisible: Bool?
+
     /// Whether the window has performed its first size application since being
     /// shown. The first resize after each open snaps (no animation) so the player
     /// appears at its final fixed layout; later resizes (e.g. switching to a
@@ -284,8 +293,9 @@ final class ExpandedPlayerWindowManager: NSObject {
     /// Toggles native fullscreen on the player window.
     func toggleFullScreen() {
         guard let window = playerWindow else {
-            // Inline-sheet presentation: fullscreen the main app window
-            NSApp.keyWindow?.toggleFullScreen(nil)
+            // Inline-sheet presentation: swap the sheet for an in-window
+            // overlay and native-fullscreen the main window.
+            toggleSheetFullScreen()
             return
         }
         // A floating (pinned) window carries .fullScreenAuxiliary, which AppKit
@@ -295,6 +305,133 @@ final class ExpandedPlayerWindowManager: NSObject {
             configureWindowLevel(window, floating: false)
         }
         window.toggleFullScreen(nil)
+    }
+
+    // MARK: - Inline-Sheet Fullscreen
+
+    /// Toggles fullscreen for the inline-sheet player via the overlay strategy.
+    ///
+    /// Two dead ends were verified before this design (see git history):
+    /// AppKit silently refuses native fullscreen while a sheet is attached
+    /// (on the sheet AND on its parent), and directly resizing the sheet's
+    /// backing window to screen size NaN-asserts inside AppKit's sheet
+    /// positioning, even unanimated. So instead: dismiss the sheet (the
+    /// `isMacPlayerFullScreenOverlay` flag flips the presentation binding),
+    /// show the player as a plain overlay inside the main window (ContentView),
+    /// and native-fullscreen the now sheet-free main window.
+    private func toggleSheetFullScreen() {
+        let coordinator = AppEnvironment.shared.navigationCoordinator
+
+        if coordinator.isMacPlayerFullScreenOverlay {
+            // Exit native fullscreen; the didExitFullScreen observer restores
+            // the sheet presentation.
+            if let parent = overlayFullScreenParent, parent.styleMask.contains(.fullScreen) {
+                parent.toggleFullScreen(nil)
+            } else {
+                endOverlayFullScreen(exitParentFullScreen: false)
+            }
+            return
+        }
+
+        // The click comes from inside the sheet, so the key window is the
+        // sheet's backing window and its sheetParent is the main app window.
+        guard let sheetWindow = NSApp.keyWindow, let parent = sheetWindow.sheetParent else {
+            LoggingService.shared.debug(
+                "ExpandedPlayerWindowManager: toggleSheetFullScreen found no attached sheet (keyWindow=\(NSApp.keyWindow.map { String(describing: type(of: $0)) } ?? "nil"))",
+                category: .player
+            )
+            return
+        }
+
+        LoggingService.shared.debug("ExpandedPlayerWindowManager: entering overlay fullscreen", category: .player)
+        coordinator.isMacPlayerFullScreenOverlay = true // dismisses sheet, mounts overlay
+        overlayFullScreenParent = parent
+        observeOverlayFullScreenExit(of: parent)
+
+        // The overlay's render container mounts while the sheet is still
+        // visibly dismissing, so its claim on the shared render view is
+        // declined ("declined steal") and no later lifecycle event re-triggers
+        // it — the view stays parked in the dismissed sheet's invisible window
+        // and the overlay shows black. Watch the dismissal and re-home the
+        // view the moment the sheet window loses visibility.
+        MPVContainerNSView.scheduleSharedViewAdoptionRetry()
+
+        Task { @MainActor in
+            // Fullscreen is refused while ANY sheet is attached, so wait for
+            // the dismissal to fully detach the sheet first.
+            try? await Task.sleep(for: .milliseconds(350))
+            guard coordinator.isMacPlayerFullScreenOverlay else { return }
+            LoggingService.shared.debug(
+                "ExpandedPlayerWindowManager: overlay fullscreen toggling parent (attachedSheet=\(parent.attachedSheet != nil))",
+                category: .player
+            )
+            parent.toggleFullScreen(nil)
+
+            // Hide the window toolbar or it stays as a strip above the overlay
+            // in fullscreen (NSWindow keeps toolbars visible there). Done after
+            // the toggle so the windowed layout never visibly loses it.
+            overlayFullScreenToolbarWasVisible = parent.toolbar?.isVisible
+            parent.toolbar?.isVisible = false
+
+            // Debug: verify AppKit accepted the transition; restore the sheet
+            // presentation if it refused.
+            try? await Task.sleep(for: .seconds(1))
+            let entered = parent.styleMask.contains(.fullScreen)
+            LoggingService.shared.debug(
+                "ExpandedPlayerWindowManager: overlay fullscreen post-toggle entered=\(entered)",
+                category: .player
+            )
+            if !entered {
+                endOverlayFullScreen(exitParentFullScreen: false)
+            }
+        }
+    }
+
+    /// Ends overlay fullscreen: clearing the flag unmounts the overlay and
+    /// re-presents the sheet. Pass `exitParentFullScreen: true` when the player
+    /// closes while fullscreen, so the main window doesn't stay fullscreen for
+    /// no reason.
+    func endOverlayFullScreen(exitParentFullScreen: Bool) {
+        let coordinator = AppEnvironment.shared.navigationCoordinator
+        guard coordinator.isMacPlayerFullScreenOverlay else { return }
+
+        LoggingService.shared.debug(
+            "ExpandedPlayerWindowManager: ending overlay fullscreen (exitParent=\(exitParentFullScreen))",
+            category: .player
+        )
+        coordinator.isMacPlayerFullScreenOverlay = false
+        if let observer = overlayFullScreenExitObserver {
+            NotificationCenter.default.removeObserver(observer)
+            overlayFullScreenExitObserver = nil
+        }
+        if exitParentFullScreen,
+           let parent = overlayFullScreenParent,
+           parent.styleMask.contains(.fullScreen) {
+            parent.toggleFullScreen(nil)
+        }
+        if let wasVisible = overlayFullScreenToolbarWasVisible {
+            overlayFullScreenParent?.toolbar?.isVisible = wasVisible
+            overlayFullScreenToolbarWasVisible = nil
+        }
+        overlayFullScreenParent = nil
+    }
+
+    /// Restores the sheet when the main window leaves fullscreen through any
+    /// path the player's button doesn't see (Esc, hover-revealed green button,
+    /// Window menu, Mission Control).
+    private func observeOverlayFullScreenExit(of parent: NSWindow) {
+        if let observer = overlayFullScreenExitObserver {
+            NotificationCenter.default.removeObserver(observer)
+        }
+        overlayFullScreenExitObserver = NotificationCenter.default.addObserver(
+            forName: NSWindow.didExitFullScreenNotification,
+            object: parent,
+            queue: .main
+        ) { _ in
+            Task { @MainActor in
+                ExpandedPlayerWindowManager.shared.endOverlayFullScreen(exitParentFullScreen: false)
+            }
+        }
     }
 
     /// Restores a window that was hidden for PiP mode.

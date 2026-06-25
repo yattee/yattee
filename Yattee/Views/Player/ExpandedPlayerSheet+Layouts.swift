@@ -1575,7 +1575,12 @@ extension ExpandedPlayerSheet {
                         // config first so a pinned window can enter fullscreen)
                         ExpandedPlayerWindowManager.shared.toggleFullScreen()
                     },
-                    isFullscreen: NSApp.keyWindow?.styleMask.contains(.fullScreen) == true,
+                    // The coordinator flag covers overlay fullscreen (where the
+                    // main window is the fullscreen one) and, being @Observable,
+                    // refreshes the button icon on toggle; the keyWindow check
+                    // covers the separate-window presentation.
+                    isFullscreen: navigationCoordinator?.isMacPlayerFullScreenOverlay == true
+                        || NSApp.keyWindow?.styleMask.contains(.fullScreen) == true,
                     onClose: { [self] in
                         closeVideo()
                     },

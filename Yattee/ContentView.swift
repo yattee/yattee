@@ -57,6 +57,17 @@ struct ContentView: View {
             // Mini player overlay (macOS only)
             #if os(macOS)
             miniPlayerOverlay(appEnvironment: appEnvironment)
+
+            // Fullscreen overlay player: replaces the sheet while the main
+            // window is native-fullscreen (a window with an attached sheet
+            // can't fullscreen, so the sheet is swapped for this overlay).
+            if appEnvironment.navigationCoordinator.isMacPlayerFullScreenOverlay {
+                ZStack {
+                    Color.black
+                    ExpandedPlayerSheet()
+                }
+                .ignoresSafeArea()
+            }
             #endif
         }
         #if os(macOS)
@@ -67,6 +78,9 @@ struct ContentView: View {
         }
         .onChange(of: appEnvironment.navigationCoordinator.isPlayerExpanded) { _, isExpanded in
             if !isExpanded {
+                // Closing the player while in overlay fullscreen also exits
+                // the main window's fullscreen (it was entered for the video).
+                ExpandedPlayerWindowManager.shared.endOverlayFullScreen(exitParentFullScreen: true)
                 ExpandedPlayerWindowManager.shared.hide()
             }
         }
@@ -96,9 +110,17 @@ struct ContentView: View {
         .sheet(isPresented: Binding(
             get: {
                 appEnvironment.navigationCoordinator.isPlayerExpanded &&
-                !appEnvironment.settingsManager.macPlayerSeparateWindow
+                !appEnvironment.settingsManager.macPlayerSeparateWindow &&
+                !appEnvironment.navigationCoordinator.isMacPlayerFullScreenOverlay
             },
-            set: { appEnvironment.navigationCoordinator.isPlayerExpanded = $0 }
+            set: { newValue in
+                // Ignore the dismissal write-back when the sheet is swapped for
+                // the fullscreen overlay — the player stays expanded there.
+                if !newValue, appEnvironment.navigationCoordinator.isMacPlayerFullScreenOverlay {
+                    return
+                }
+                appEnvironment.navigationCoordinator.isPlayerExpanded = newValue
+            }
         )) {
             let size = expandedSheetSize(appEnvironment: appEnvironment)
             let lockAspect = sheetLockAspectRatio(appEnvironment: appEnvironment)
