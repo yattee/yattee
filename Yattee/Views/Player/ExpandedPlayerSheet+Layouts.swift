@@ -796,7 +796,7 @@ extension ExpandedPlayerSheet {
                         closeVideo()
                     },
                     onTogglePiP: {
-                        if let mpvBackend = backend as? MPVBackend {
+                        if let mpvBackend = playerService.currentBackend as? MPVBackend {
                             mpvBackend.togglePiP()
                         }
                     },
@@ -873,9 +873,9 @@ extension ExpandedPlayerSheet {
                 .offset(y: controlsVerticalOffset)
             }
             #elseif os(macOS)
-            if let backend = playerService?.currentBackend,
-               backend.backendType == .mpv,
-               let playerState,
+            // No backend gate: the backend is created only after the video
+            // details fetch, and controls should be visible while loading.
+            if let playerState,
                let playerService,
                playerState.pipState != .active && !playerState.showDebugOverlay {
                 MacOSPlayerControlsView(
@@ -897,7 +897,7 @@ extension ExpandedPlayerSheet {
                         closeVideo()
                     },
                     onTogglePiP: {
-                        if let mpvBackend = backend as? MPVBackend {
+                        if let mpvBackend = playerService.currentBackend as? MPVBackend {
                             mpvBackend.togglePiP()
                         }
                     },
@@ -1142,9 +1142,9 @@ extension ExpandedPlayerSheet {
             .frame(width: controlsWidth, height: controlsHeight)
         }
         #elseif os(macOS)
-        if let backend = playerService?.currentBackend,
-           backend.backendType == .mpv,
-           let playerState,
+        // No backend gate: the backend is created only after the video
+        // details fetch, and controls should be visible while loading.
+        if let playerState,
            let playerService,
            playerState.pipState != .active && !playerState.showDebugOverlay {
             MacOSPlayerControlsView(
@@ -1166,7 +1166,7 @@ extension ExpandedPlayerSheet {
                     closeVideo()
                 },
                 onTogglePiP: {
-                    if let mpvBackend = backend as? MPVBackend {
+                    if let mpvBackend = playerService.currentBackend as? MPVBackend {
                         mpvBackend.togglePiP()
                     }
                 },
@@ -1447,7 +1447,7 @@ extension ExpandedPlayerSheet {
                         closeVideo()
                     },
                     onTogglePiP: {
-                        if let mpvBackend = backend as? MPVBackend {
+                        if let mpvBackend = playerService.currentBackend as? MPVBackend {
                             mpvBackend.togglePiP()
                         }
                     },
@@ -1551,9 +1551,9 @@ extension ExpandedPlayerSheet {
                 }
             }
             #elseif os(macOS)
-            if let backend = playerService?.currentBackend,
-               backend.backendType == .mpv,
-               let playerState,
+            // No backend gate: the backend is created only after the video
+            // details fetch, and controls should be visible while loading.
+            if let playerState,
                let playerService,
                playerState.pipState != .active && !playerState.showDebugOverlay {
                 MacOSPlayerControlsView(
@@ -1585,7 +1585,7 @@ extension ExpandedPlayerSheet {
                         closeVideo()
                     },
                     onTogglePiP: {
-                        if let mpvBackend = backend as? MPVBackend {
+                        if let mpvBackend = playerService.currentBackend as? MPVBackend {
                             mpvBackend.togglePiP()
                         }
                     },

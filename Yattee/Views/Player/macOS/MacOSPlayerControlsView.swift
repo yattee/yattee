@@ -89,6 +89,11 @@ struct MacOSPlayerControlsView: View {
 
     /// Controls visibility - show when hovering, interacting, or paused
     private var shouldShowControls: Bool {
+        // Ended/failed overlays take over the surface; controls stay hidden
+        // regardless of hover or manual toggles.
+        if playerState.playbackState == .ended || playerState.isFailed {
+            return false
+        }
         if let showControls {
             return showControls
         }
@@ -96,11 +101,9 @@ struct MacOSPlayerControlsView: View {
         if isHovering || isInteracting {
             return true
         }
-        // Show when paused, loading, or failed
+        // Show when paused or loading
         return playerState.playbackState == .paused ||
-               playerState.playbackState == .loading ||
-               playerState.playbackState == .ended ||
-               playerState.isFailed
+               playerState.playbackState == .loading
     }
 
     /// Yattee Server URL used by `ChannelAvatarView` for avatar fallback.
@@ -295,14 +298,13 @@ struct MacOSPlayerControlsView: View {
             if newState == .playing && shouldShowControls {
                 startHideTimer()
             }
-            // Hide controls when video ends (ended overlay takes over)
-            if newState == .ended {
-                showControls = false
-                cancelHideTimer()
+            // A new load resets any manual show/hide override (e.g. hidden
+            // after ended/failed) so controls are visible while loading.
+            if newState == .loading {
+                showControls = nil
             }
-            // Hide controls when video fails
-            if case .failed = newState {
-                showControls = false
+            // Ended/failed hide via shouldShowControls; just stop the timer.
+            if newState == .ended || playerState.isFailed {
                 cancelHideTimer()
             }
         }
