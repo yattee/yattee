@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import UniformTypeIdentifiers
 
 struct LogViewerView: View {
     @State private var loggingService = LoggingService.shared
@@ -32,7 +33,7 @@ struct LogViewerView: View {
                 .help(String(localized: "settings.advanced.logs.filter"))
 
                 Button {
-                    showingExportSheet = true
+                    showMacOSSavePanel()
                 } label: {
                     Label(String(localized: "settings.advanced.logs.export"), systemImage: "square.and.arrow.up")
                         .labelStyle(.iconOnly)
@@ -69,7 +70,11 @@ struct LogViewerView: View {
                     }
 
                     Button {
+                        #if os(macOS)
+                        showMacOSSavePanel()
+                        #else
                         showingExportSheet = true
+                        #endif
                     } label: {
                         Label(String(localized: "settings.advanced.logs.export"), systemImage: "square.and.arrow.up")
                     }
@@ -93,7 +98,7 @@ struct LogViewerView: View {
         .sheet(isPresented: $showingExportSheet) {
             LogExportOverlayView(server: logExportServer)
         }
-        #else
+        #elseif os(iOS)
         .sheet(isPresented: $showingExportSheet) {
             ShareSheet(items: [loggingService.exportLogs()])
         }
@@ -102,6 +107,22 @@ struct LogViewerView: View {
             LogEntryDetailView(entry: entry)
         }
     }
+
+    #if os(macOS)
+    private func showMacOSSavePanel() {
+        let panel = NSSavePanel()
+        panel.nameFieldStringValue = "Yattee Logs \(Date.now.formatted(.iso8601.year().month().day())).txt"
+        panel.allowedContentTypes = [.plainText]
+
+        if panel.runModal() == .OK, let url = panel.url {
+            do {
+                try Data(loggingService.exportLogs().utf8).write(to: url)
+            } catch {
+                loggingService.log(level: .error, category: .general, message: "Failed to save logs export", details: error.localizedDescription)
+            }
+        }
+    }
+    #endif
 
     private var searchBar: some View {
         HStack {
