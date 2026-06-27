@@ -277,6 +277,13 @@ struct MacOSPlayerControlsView: View {
             switch phase {
             case .active:
                 isHovering = true
+                // Mouse activity clears a hide override (e.g. left by the
+                // auto-hide timer after the pointer exited the window) so
+                // hovering shows controls again. Not while the details panel
+                // is open — that state keeps controls hidden on purpose.
+                if showControls == false && !isDetailsPanelVisible {
+                    showControls = nil
+                }
                 resetHideTimer()
             case .ended:
                 isHovering = false
