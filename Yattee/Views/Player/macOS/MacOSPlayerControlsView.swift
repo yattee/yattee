@@ -300,6 +300,27 @@ struct MacOSPlayerControlsView: View {
                 showControls = nil
             }
         }
+        .onChange(of: shouldShowControls) { _, visible in
+            setTrafficLightsVisible(visible)
+        }
+        .onChange(of: hostWindow) { oldWindow, _ in
+            // Restore the old window's chrome when re-parented (sheet <->
+            // floating window), then sync the new window to the current state.
+            if let oldWindow { applyTrafficLightAlpha(1, to: oldWindow, animated: false) }
+            setTrafficLightsVisible(shouldShowControls, animated: false)
+        }
+        .onReceive(NotificationCenter.default.publisher(for: NSWindow.willEnterFullScreenNotification)) { note in
+            // In fullscreen the system owns titlebar visibility (hover at the
+            // top edge reveals it) — hand the buttons back at full alpha.
+            if let window = note.object as? NSWindow, window === hostWindow {
+                applyTrafficLightAlpha(1, to: window, animated: false)
+            }
+        }
+        .onReceive(NotificationCenter.default.publisher(for: NSWindow.didExitFullScreenNotification)) { note in
+            if let window = note.object as? NSWindow, window === hostWindow {
+                setTrafficLightsVisible(shouldShowControls, animated: false)
+            }
+        }
         .onChange(of: playerState.playbackState) { oldState, newState in
             // When playback starts, start hide timer
             if newState == .playing && shouldShowControls {
@@ -326,6 +347,9 @@ struct MacOSPlayerControlsView: View {
         }
         .onDisappear {
             removeKeyboardMonitor()
+            // The controls unmount while the window stays up (PiP, debug
+            // overlay) — don't leave the window without its close button.
+            if let hostWindow { applyTrafficLightAlpha(1, to: hostWindow, animated: false) }
         }
         .task {
             await loadLayout()
@@ -411,6 +435,34 @@ struct MacOSPlayerControlsView: View {
                     settings.macControlsBarOffsetY = barOffsetFraction.height
                 }
             }
+    }
+
+    // MARK: - Traffic Lights
+
+    /// Fades the hosting window's traffic-light buttons together with the
+    /// controls overlay, QuickTime-style. Only applies to the dedicated
+    /// separate player window — the inline sheet's parent window keeps its own
+    /// chrome — and never in fullscreen, where the system owns the titlebar.
+    private func setTrafficLightsVisible(_ visible: Bool, animated: Bool = true) {
+        guard let window = hostWindow,
+              window === ExpandedPlayerWindowManager.shared.currentPlayerWindow,
+              !window.styleMask.contains(.fullScreen) else { return }
+        applyTrafficLightAlpha(visible ? 1 : 0, to: window, animated: animated)
+    }
+
+    private func applyTrafficLightAlpha(_ alpha: CGFloat, to window: NSWindow, animated: Bool) {
+        let buttons: [NSWindow.ButtonType] = [.closeButton, .miniaturizeButton, .zoomButton]
+        let views = buttons.compactMap { window.standardWindowButton($0) }
+        guard !views.isEmpty else { return }
+        if animated {
+            NSAnimationContext.runAnimationGroup { context in
+                context.duration = 0.2
+                context.timingFunction = CAMediaTimingFunction(name: .easeInEaseOut)
+                views.forEach { $0.animator().alphaValue = alpha }
+            }
+        } else {
+            views.forEach { $0.alphaValue = alpha }
+        }
     }
 
     // MARK: - Layout Loading
