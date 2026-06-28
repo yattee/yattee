@@ -39,6 +39,10 @@ struct ToastCardView: View {
                 }
             }
 
+            #if os(macOS)
+            Spacer(minLength: 0)
+            #endif
+
             // Action button (if present)
             if let action = toast.action {
                 actionButton(action)
