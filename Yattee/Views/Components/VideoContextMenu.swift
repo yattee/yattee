@@ -636,6 +636,12 @@ struct VideoContextMenuView: View {
         }
         .id(refreshID)
         .menuIndicator(.hidden)
+        #if os(macOS)
+        // The default macOS menu style renders as a bordered pull-down that
+        // stretches to fill available width on macOS 15 (Sequoia).
+        .menuStyle(.borderlessButton)
+        .fixedSize()
+        #endif
         .sheet(isPresented: $showingPlaylistSheet) {
             PlaylistSelectorSheet(video: video)
         }

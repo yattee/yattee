@@ -456,6 +456,13 @@ struct UnifiedPlaylistDetailView: View {
                     .frame(width: 44, height: 44)
                     .background(.regularMaterial, in: Circle())
             }
+            .menuIndicator(.hidden)
+            #if os(macOS)
+            // The default macOS menu style renders as a bordered pull-down that
+            // stretches to fill available width on macOS 15 (Sequoia).
+            .menuStyle(.borderlessButton)
+            .fixedSize()
+            #endif
         }
         .padding(.top, 8)
     }
