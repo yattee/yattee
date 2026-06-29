@@ -860,7 +860,10 @@ private extension View {
         #if os(tvOS)
         self
         #else
+        // On macOS Sequoia the borderlessButton menu stretches to fill the
+        // available width unless it is pinned to its intrinsic size.
         self.menuStyle(.borderlessButton)
+            .fixedSize()
         #endif
     }
 }
