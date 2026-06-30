@@ -155,7 +155,7 @@ module UITest
     # Type text
     # @param text [String] Text to type
     def type(text)
-      output, status = Open3.capture2e('axe', 'type', '--stdin', '--udid', @udid, stdin_data: text)
+      output, status = Open3.capture2e(self.class.axe_env, 'axe', 'type', '--stdin', '--udid', @udid, stdin_data: text)
       output = output.dup.force_encoding('UTF-8') if output.is_a?(String)
       raise AxeError, "type failed: #{output}" unless status.success?
     end
@@ -202,9 +202,51 @@ module UITest
     private
 
     def run_axe(*)
-      output, status = Open3.capture2e('axe', *, '--udid', @udid)
+      output, status = Open3.capture2e(self.class.axe_env, 'axe', *, '--udid', @udid)
       output = output.dup.force_encoding('UTF-8') if output.is_a?(String)
       [output, status]
+    end
+
+    class << self
+      # Environment overrides for every `axe` invocation.
+      #
+      # AXe loads Xcode's private SimulatorKit.framework at runtime. Some Xcode
+      # betas ship without it (e.g. Xcode 27 beta), which makes every `axe`
+      # command fail with "Failed to load essential private frameworks". When
+      # the active Xcode is missing SimulatorKit, fall back to any installed
+      # Xcode that has it by overriding DEVELOPER_DIR for the axe subprocess.
+      # @return [Hash] Environment hash to pass to Open3
+      def axe_env
+        return @axe_env if defined?(@axe_env)
+
+        @axe_env = simulatorkit?(active_developer_dir) ? {} : fallback_env
+      end
+
+      private
+
+      def fallback_env
+        dir = usable_developer_dir
+        dir ? { 'DEVELOPER_DIR' => dir } : {}
+      end
+
+      # Path to the active Xcode's Developer directory (xcode-select -p)
+      def active_developer_dir
+        @active_developer_dir ||= `xcode-select -p 2>/dev/null`.strip
+      end
+
+      # First installed Xcode Developer directory that ships SimulatorKit
+      def usable_developer_dir
+        Dir.glob('/Applications/Xcode*.app/Contents/Developer').find do |dir|
+          simulatorkit?(dir)
+        end
+      end
+
+      # Whether a Developer directory ships the SimulatorKit private framework
+      def simulatorkit?(developer_dir)
+        return false if developer_dir.nil? || developer_dir.empty?
+
+        File.exist?(File.join(developer_dir, 'Library', 'PrivateFrameworks', 'SimulatorKit.framework'))
+      end
     end
 
     # Wait for a file to exist and have non-zero size
