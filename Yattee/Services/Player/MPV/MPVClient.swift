@@ -461,7 +461,13 @@ final class MPVClient: @unchecked Sendable {
         #elseif os(iOS)
         setOptionSync("ao", "audiounit")
         #elseif os(macOS)
-        setOptionSync("ao", "coreaudio")
+        // coreaudio is the native macOS AO, but on macOS 27 beta it fails to
+        // initialize ("unable to set the input channel layout on the audio
+        // unit … -50"), leaving playback silent. Add avfoundation
+        // (AVSampleBufferAudioRenderer) as a fallback so mpv self-heals: older
+        // macOS keeps using coreaudio, and where coreaudio can't open the
+        // device mpv drops to avfoundation instead of playing no sound.
+        setOptionSync("ao", "coreaudio,avfoundation")
         #endif
 
         // Cache settings for network streams
