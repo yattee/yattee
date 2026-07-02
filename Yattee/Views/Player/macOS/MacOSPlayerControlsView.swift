@@ -116,6 +116,14 @@ struct MacOSPlayerControlsView: View {
                playerState.playbackState == .loading
     }
 
+    /// Traffic-light visibility. Follows the controls, except on the
+    /// ended/failed overlays: those hide the controls entirely (no hover
+    /// brings them back), so the window buttons must stay up or the error /
+    /// replay screen can't be closed.
+    private var shouldShowTrafficLights: Bool {
+        shouldShowControls || playerState.playbackState == .ended || playerState.isFailed
+    }
+
     /// Whether the hosting window is in native fullscreen. The `isFullscreen`
     /// parameter covers the sheet-overlay flow, but its key-window half isn't
     /// reactive — check the tracked host window directly as well.
@@ -341,7 +349,6 @@ struct MacOSPlayerControlsView: View {
             }
         }
         .onChange(of: shouldShowControls) { _, visible in
-            setTrafficLightsVisible(visible)
             // Hidden bars stop hit-testing, so their `onHover(false)` may
             // never arrive — clear the flags or they'd stay stuck true and
             // block every future idle-hide.
@@ -350,11 +357,14 @@ struct MacOSPlayerControlsView: View {
                 isHoveringBottomBar = false
             }
         }
+        .onChange(of: shouldShowTrafficLights) { _, visible in
+            setTrafficLightsVisible(visible)
+        }
         .onChange(of: hostWindow) { oldWindow, _ in
             // Restore the old window's chrome when re-parented (sheet <->
             // floating window), then sync the new window to the current state.
             if let oldWindow { applyTrafficLightAlpha(1, to: oldWindow, animated: false) }
-            setTrafficLightsVisible(shouldShowControls, animated: false)
+            setTrafficLightsVisible(shouldShowTrafficLights, animated: false)
         }
         .onReceive(NotificationCenter.default.publisher(for: NSWindow.willEnterFullScreenNotification)) { note in
             // In fullscreen the system owns titlebar visibility (hover at the
@@ -365,7 +375,7 @@ struct MacOSPlayerControlsView: View {
         }
         .onReceive(NotificationCenter.default.publisher(for: NSWindow.didExitFullScreenNotification)) { note in
             if let window = note.object as? NSWindow, window === hostWindow {
-                setTrafficLightsVisible(shouldShowControls, animated: false)
+                setTrafficLightsVisible(shouldShowTrafficLights, animated: false)
                 // Pointer hiding is a fullscreen-only behavior; make sure it's
                 // back even before the next mouse move.
                 NSCursor.setHiddenUntilMouseMoves(false)
@@ -410,6 +420,13 @@ struct MacOSPlayerControlsView: View {
         .onReceive(NotificationCenter.default.publisher(for: .playerControlsPresetsDidChange)) { _ in
             Task { await loadLayout() }
         }
+        // The ended/failed overlays own the surface — their replay/retry/next
+        // buttons live in the layer BELOW this view. The inner layers already
+        // opt out of hit-testing in those states, but on macOS 15 the hover
+        // tracking on this view makes its full frame participate in click
+        // hit-testing anyway, silently swallowing every click aimed at those
+        // buttons. Drop the whole view out of hit-testing while they're up.
+        .allowsHitTesting(playerState.playbackState != .ended && !playerState.isFailed)
     }
 
     // MARK: - Control Bar Drag
