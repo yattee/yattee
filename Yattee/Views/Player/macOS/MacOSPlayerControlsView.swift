@@ -48,6 +48,16 @@ struct MacOSPlayerControlsView: View {
     @State private var isInteracting = false
     @State private var showControls: Bool?
     @State private var keyboardMonitor: Any?
+    /// Last pointer location from `.onContinuousHover`, used to tell real mouse
+    /// movement apart from re-emitted hover events (e.g. after the view resizes
+    /// when entering fullscreen).
+    @State private var lastHoverLocation: CGPoint?
+    /// Pointer rests on the top bar / bottom control bar — the idle timer must
+    /// not hide the controls out from under it. Two flags because moving
+    /// between the bars fires one bar's exit and the other's entry in
+    /// unspecified order.
+    @State private var isHoveringTopBar = false
+    @State private var isHoveringBottomBar = false
 
     /// Window hosting these controls; keyboard shortcuts only apply to events
     /// destined for this window (not e.g. the Settings window).
@@ -104,6 +114,13 @@ struct MacOSPlayerControlsView: View {
         // Show when paused or loading
         return playerState.playbackState == .paused ||
                playerState.playbackState == .loading
+    }
+
+    /// Whether the hosting window is in native fullscreen. The `isFullscreen`
+    /// parameter covers the sheet-overlay flow, but its key-window half isn't
+    /// reactive — check the tracked host window directly as well.
+    private var isInNativeFullscreen: Bool {
+        isFullscreen || hostWindow?.styleMask.contains(.fullScreen) == true
     }
 
     /// Yattee Server URL used by `ChannelAvatarView` for avatar fallback.
@@ -226,6 +243,10 @@ struct MacOSPlayerControlsView: View {
                     VStack(spacing: 0) {
                         topBar(layout: layout)
                             .onGeometryChange(for: CGFloat.self) { $0.size.height } action: { topBarHeight = $0 }
+                            .onHover { hovering in
+                                isHoveringTopBar = hovering
+                                if !hovering { startHideTimer() }
+                            }
 
                         Spacer()
 
@@ -249,6 +270,10 @@ struct MacOSPlayerControlsView: View {
                             }
                         )
                         .onGeometryChange(for: CGSize.self) { $0.size } action: { barSize = $0 }
+                        .onHover { hovering in
+                            isHoveringBottomBar = hovering
+                            if !hovering { startHideTimer() }
+                        }
                         // The player window is movable by background; without this,
                         // AppKit claims drags on the glass capsule as window moves
                         // and the reposition gesture never fires.
@@ -275,20 +300,35 @@ struct MacOSPlayerControlsView: View {
         .animation(.easeInOut(duration: 0.2), value: shouldShowControls)
         .onContinuousHover { phase in
             switch phase {
-            case .active:
+            case .active(let location):
                 isHovering = true
-                // Mouse activity clears a hide override (e.g. left by the
-                // auto-hide timer after the pointer exited the window) so
-                // hovering shows controls again. Not while the details panel
-                // is open — that state keeps controls hidden on purpose.
+                // Only genuine movement counts: the first event after a gap
+                // (pointer entry, fullscreen resize re-emission) is a baseline,
+                // so entering fullscreen doesn't itself pop the controls up.
+                let moved = lastHoverLocation.map {
+                    hypot($0.x - location.x, $0.y - location.y) > 1
+                } ?? false
+                lastHoverLocation = location
+                guard moved else { break }
+                // Mouse movement clears a hide override (left by the idle
+                // timer or a manual toggle) so controls show again. Not while
+                // the details panel is open — that state keeps controls
+                // hidden on purpose.
                 if showControls == false && !isDetailsPanelVisible {
                     showControls = nil
                 }
                 resetHideTimer()
             case .ended:
                 isHovering = false
+                lastHoverLocation = nil
                 startHideTimer()
             }
+        }
+        .onChange(of: isFullscreen) { _, _ in
+            // The fullscreen transition resizes the view and re-emits hover
+            // with jumped coordinates — rebaseline so that doesn't read as
+            // mouse movement.
+            lastHoverLocation = nil
         }
         .onChange(of: isDetailsPanelVisible) { _, isVisible in
             if isVisible {
@@ -302,6 +342,13 @@ struct MacOSPlayerControlsView: View {
         }
         .onChange(of: shouldShowControls) { _, visible in
             setTrafficLightsVisible(visible)
+            // Hidden bars stop hit-testing, so their `onHover(false)` may
+            // never arrive — clear the flags or they'd stay stuck true and
+            // block every future idle-hide.
+            if !visible {
+                isHoveringTopBar = false
+                isHoveringBottomBar = false
+            }
         }
         .onChange(of: hostWindow) { oldWindow, _ in
             // Restore the old window's chrome when re-parented (sheet <->
@@ -319,6 +366,9 @@ struct MacOSPlayerControlsView: View {
         .onReceive(NotificationCenter.default.publisher(for: NSWindow.didExitFullScreenNotification)) { note in
             if let window = note.object as? NSWindow, window === hostWindow {
                 setTrafficLightsVisible(shouldShowControls, animated: false)
+                // Pointer hiding is a fullscreen-only behavior; make sure it's
+                // back even before the next mouse move.
+                NSCursor.setHiddenUntilMouseMoves(false)
             }
         }
         .onChange(of: playerState.playbackState) { oldState, newState in
@@ -581,6 +631,8 @@ struct MacOSPlayerControlsView: View {
         showControls = !shouldShowControls
         if shouldShowControls {
             startHideTimer()
+        } else if isInNativeFullscreen {
+            NSCursor.setHiddenUntilMouseMoves(true)
         }
     }
 
@@ -588,8 +640,15 @@ struct MacOSPlayerControlsView: View {
         cancelHideTimer()
         hideTimer = Timer.scheduledTimer(withTimeInterval: 3.0, repeats: false) { _ in
             Task { @MainActor in
-                if playerState.playbackState == .playing && !isInteracting && !isHovering {
+                // Idle-based hide: the pointer resting over the video doesn't
+                // keep controls up (it never leaves the view in fullscreen) —
+                // only resting on one of the bars does.
+                if playerState.playbackState == .playing && !isInteracting
+                    && !isHoveringTopBar && !isHoveringBottomBar {
                     showControls = false
+                    if isInNativeFullscreen {
+                        NSCursor.setHiddenUntilMouseMoves(true)
+                    }
                 }
             }
         }
