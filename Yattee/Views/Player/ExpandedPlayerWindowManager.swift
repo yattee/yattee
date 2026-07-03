@@ -19,14 +19,30 @@ final class ExpandedPlayerWindowManager: NSObject {
     private var playerWindow: NSWindow?
     private weak var appEnvironment: AppEnvironment?
 
-    /// Main app window native-fullscreened for the inline player overlay, the
-    /// observer watching for it to exit fullscreen (Esc, green button, menu),
-    /// and the toolbar visibility to restore afterwards (the toolbar is hidden
-    /// during overlay fullscreen — NSWindow keeps it as a visible strip above
-    /// the content otherwise).
-    private weak var overlayFullScreenParent: NSWindow?
-    private var overlayFullScreenExitObserver: NSObjectProtocol?
-    private var overlayFullScreenToolbarWasVisible: Bool?
+    /// Main app window hosting the inline player overlay, the observers that
+    /// mirror its fullscreen transitions into the coordinator flag (Esc, green
+    /// button, menu, Mission Control all bypass the player's own button), the
+    /// toolbar visibility to restore when the overlay ends (the toolbar is
+    /// hidden while the overlay is up so it doesn't sit above the video), and
+    /// whether the window was already fullscreen before the overlay began (so
+    /// collapsing doesn't exit a fullscreen the user had independently).
+    private weak var overlayParent: NSWindow?
+    private var overlayFullScreenObservers: [NSObjectProtocol] = []
+    private var overlayToolbarWasVisible: Bool?
+    private var overlayWasFullScreenAtBegin = false
+
+    /// Window hosting ContentView, registered by `MainContentWindowReader`.
+    /// `beginInlineOverlay` must not guess via mainWindow/keyWindow: when the
+    /// separate-window setting is toggled during playback, the key window is
+    /// the Settings window (and the separate player window can be "main"), so
+    /// guessing hides/restores the toolbar on the wrong window.
+    private weak var mainContentWindow: NSWindow?
+
+    /// Registers the window hosting the app's main content view.
+    func registerMainContentWindow(_ window: NSWindow?) {
+        guard let window else { return }
+        mainContentWindow = window
+    }
 
     /// Whether the window has performed its first size application since being
     /// shown. The first resize after each open snaps (no animation) so the player
@@ -201,11 +217,10 @@ final class ExpandedPlayerWindowManager: NSObject {
     ///   - completion: Called after the window is hidden
     func hide(animated: Bool = true, completion: (() -> Void)? = nil) {
         guard let window = playerWindow else {
-            // No window means sheet mode (or the window is already gone).
-            // A dismissed sheet's hierarchy stays alive holding the shared
-            // render view inside a now-invisible window with no container
-            // lifecycle event to react to - watch for the dismissal to finish
-            // and re-home the view to the mini capsule.
+            // No window means inline overlay mode (or the window is already
+            // gone). The overlay's container may unmount without handing the
+            // shared render view to the mini capsule in the same pass - watch
+            // for the teardown to finish and re-home the view.
             MPVContainerNSView.scheduleSharedViewAdoptionRetry()
             completion?()
             return
@@ -293,9 +308,10 @@ final class ExpandedPlayerWindowManager: NSObject {
     /// Toggles native fullscreen on the player window.
     func toggleFullScreen() {
         guard let window = playerWindow else {
-            // Inline-sheet presentation: swap the sheet for an in-window
-            // overlay and native-fullscreen the main window.
-            toggleSheetFullScreen()
+            // Inline overlay presentation: the player already fills the main
+            // window, so fullscreen is just the window's native toggle. The
+            // fullscreen observers keep the coordinator flag in sync.
+            overlayParent?.toggleFullScreen(nil)
             return
         }
         // A floating (pinned) window carries .fullScreenAuxiliary, which AppKit
@@ -307,131 +323,94 @@ final class ExpandedPlayerWindowManager: NSObject {
         window.toggleFullScreen(nil)
     }
 
-    // MARK: - Inline-Sheet Fullscreen
+    // MARK: - Inline Overlay Presentation
 
-    /// Toggles fullscreen for the inline-sheet player via the overlay strategy.
-    ///
-    /// Two dead ends were verified before this design (see git history):
-    /// AppKit silently refuses native fullscreen while a sheet is attached
-    /// (on the sheet AND on its parent), and directly resizing the sheet's
-    /// backing window to screen size NaN-asserts inside AppKit's sheet
-    /// positioning, even unanimated. So instead: dismiss the sheet (the
-    /// `isMacPlayerFullScreenOverlay` flag flips the presentation binding),
-    /// show the player as a plain overlay inside the main window (ContentView),
-    /// and native-fullscreen the now sheet-free main window.
-    private func toggleSheetFullScreen() {
-        let coordinator = AppEnvironment.shared.navigationCoordinator
-
-        if coordinator.isMacPlayerFullScreenOverlay {
-            // Exit native fullscreen; the didExitFullScreen observer restores
-            // the sheet presentation.
-            if let parent = overlayFullScreenParent, parent.styleMask.contains(.fullScreen) {
-                parent.toggleFullScreen(nil)
-            } else {
-                endOverlayFullScreen(exitParentFullScreen: false)
-            }
-            return
-        }
-
-        // The click comes from inside the sheet, so the key window is the
-        // sheet's backing window and its sheetParent is the main app window.
-        guard let sheetWindow = NSApp.keyWindow, let parent = sheetWindow.sheetParent else {
+    /// Called when the inline player overlay mounts in the main window
+    /// (separate-window mode off, player expanded). Hides the main window's
+    /// toolbar for the overlay's lifetime and starts mirroring the window's
+    /// fullscreen state into `isMacInlinePlayerFullScreen`.
+    func beginInlineOverlay() {
+        guard overlayParent == nil else { return }
+        guard let parent = mainContentWindow ?? NSApp.mainWindow ?? NSApp.keyWindow else {
             LoggingService.shared.debug(
-                "ExpandedPlayerWindowManager: toggleSheetFullScreen found no attached sheet (keyWindow=\(NSApp.keyWindow.map { String(describing: type(of: $0)) } ?? "nil"))",
+                "ExpandedPlayerWindowManager: beginInlineOverlay found no main window",
                 category: .player
             )
             return
         }
 
-        LoggingService.shared.debug("ExpandedPlayerWindowManager: entering overlay fullscreen", category: .player)
-        coordinator.isMacPlayerFullScreenOverlay = true // dismisses sheet, mounts overlay
-        overlayFullScreenParent = parent
-        observeOverlayFullScreenExit(of: parent)
+        LoggingService.shared.debug("ExpandedPlayerWindowManager: beginning inline overlay", category: .player)
+        overlayParent = parent
+        overlayToolbarWasVisible = parent.toolbar?.isVisible
+        parent.toolbar?.isVisible = false
+        overlayWasFullScreenAtBegin = parent.styleMask.contains(.fullScreen)
 
-        // The overlay's render container mounts while the sheet is still
-        // visibly dismissing, so its claim on the shared render view is
-        // declined ("declined steal") and no later lifecycle event re-triggers
-        // it — the view stays parked in the dismissed sheet's invisible window
-        // and the overlay shows black. Watch the dismissal and re-home the
-        // view the moment the sheet window loses visibility.
+        let coordinator = AppEnvironment.shared.navigationCoordinator
+        coordinator.isMacInlinePlayerFullScreen = overlayWasFullScreenAtBegin
+        observeOverlayFullScreenTransitions(of: parent)
+
+        // The overlay's render container may mount while the mini capsule is
+        // still tearing down, leaving the shared render view parked with no
+        // later lifecycle event to re-trigger adoption — retry until it lands.
         MPVContainerNSView.scheduleSharedViewAdoptionRetry()
-
-        Task { @MainActor in
-            // Fullscreen is refused while ANY sheet is attached, so wait for
-            // the dismissal to fully detach the sheet first.
-            try? await Task.sleep(for: .milliseconds(350))
-            guard coordinator.isMacPlayerFullScreenOverlay else { return }
-            LoggingService.shared.debug(
-                "ExpandedPlayerWindowManager: overlay fullscreen toggling parent (attachedSheet=\(parent.attachedSheet != nil))",
-                category: .player
-            )
-            parent.toggleFullScreen(nil)
-
-            // Hide the window toolbar or it stays as a strip above the overlay
-            // in fullscreen (NSWindow keeps toolbars visible there). Done after
-            // the toggle so the windowed layout never visibly loses it.
-            overlayFullScreenToolbarWasVisible = parent.toolbar?.isVisible
-            parent.toolbar?.isVisible = false
-
-            // Debug: verify AppKit accepted the transition; restore the sheet
-            // presentation if it refused.
-            try? await Task.sleep(for: .seconds(1))
-            let entered = parent.styleMask.contains(.fullScreen)
-            LoggingService.shared.debug(
-                "ExpandedPlayerWindowManager: overlay fullscreen post-toggle entered=\(entered)",
-                category: .player
-            )
-            if !entered {
-                endOverlayFullScreen(exitParentFullScreen: false)
-            }
-        }
     }
 
-    /// Ends overlay fullscreen: clearing the flag unmounts the overlay and
-    /// re-presents the sheet. Pass `exitParentFullScreen: true` when the player
-    /// closes while fullscreen, so the main window doesn't stay fullscreen for
-    /// no reason.
-    func endOverlayFullScreen(exitParentFullScreen: Bool) {
-        let coordinator = AppEnvironment.shared.navigationCoordinator
-        guard coordinator.isMacPlayerFullScreenOverlay else { return }
+    /// Called when the inline player overlay unmounts (collapse, close, or
+    /// switch to separate-window mode). Restores the main window's toolbar and,
+    /// if fullscreen was entered for the video, exits it.
+    func endInlineOverlay() {
+        guard let parent = overlayParent else { return }
 
-        LoggingService.shared.debug(
-            "ExpandedPlayerWindowManager: ending overlay fullscreen (exitParent=\(exitParentFullScreen))",
-            category: .player
-        )
-        coordinator.isMacPlayerFullScreenOverlay = false
-        if let observer = overlayFullScreenExitObserver {
+        LoggingService.shared.debug("ExpandedPlayerWindowManager: ending inline overlay", category: .player)
+        for observer in overlayFullScreenObservers {
             NotificationCenter.default.removeObserver(observer)
-            overlayFullScreenExitObserver = nil
         }
-        if exitParentFullScreen,
-           let parent = overlayFullScreenParent,
-           parent.styleMask.contains(.fullScreen) {
+        overlayFullScreenObservers = []
+
+        // Leave the window fullscreen if the user was fullscreen before the
+        // overlay began; only exit a fullscreen entered for the video.
+        if parent.styleMask.contains(.fullScreen), !overlayWasFullScreenAtBegin {
             parent.toggleFullScreen(nil)
         }
-        if let wasVisible = overlayFullScreenToolbarWasVisible {
-            overlayFullScreenParent?.toolbar?.isVisible = wasVisible
-            overlayFullScreenToolbarWasVisible = nil
+        if let wasVisible = overlayToolbarWasVisible {
+            parent.toolbar?.isVisible = wasVisible
         }
-        overlayFullScreenParent = nil
+
+        AppEnvironment.shared.navigationCoordinator.isMacInlinePlayerFullScreen = false
+        overlayToolbarWasVisible = nil
+        overlayWasFullScreenAtBegin = false
+        overlayParent = nil
     }
 
-    /// Restores the sheet when the main window leaves fullscreen through any
-    /// path the player's button doesn't see (Esc, hover-revealed green button,
-    /// Window menu, Mission Control).
-    private func observeOverlayFullScreenExit(of parent: NSWindow) {
-        if let observer = overlayFullScreenExitObserver {
+    /// Mirrors the parent window's fullscreen transitions into the coordinator
+    /// flag so the player controls stay in sync with exits the player's button
+    /// doesn't see (Esc, hover-revealed green button, Window menu, Mission
+    /// Control).
+    private func observeOverlayFullScreenTransitions(of parent: NSWindow) {
+        for observer in overlayFullScreenObservers {
             NotificationCenter.default.removeObserver(observer)
         }
-        overlayFullScreenExitObserver = NotificationCenter.default.addObserver(
-            forName: NSWindow.didExitFullScreenNotification,
-            object: parent,
-            queue: .main
-        ) { _ in
-            Task { @MainActor in
-                ExpandedPlayerWindowManager.shared.endOverlayFullScreen(exitParentFullScreen: false)
-            }
-        }
+        let center = NotificationCenter.default
+        overlayFullScreenObservers = [
+            center.addObserver(
+                forName: NSWindow.didEnterFullScreenNotification,
+                object: parent,
+                queue: .main
+            ) { _ in
+                Task { @MainActor in
+                    AppEnvironment.shared.navigationCoordinator.isMacInlinePlayerFullScreen = true
+                }
+            },
+            center.addObserver(
+                forName: NSWindow.didExitFullScreenNotification,
+                object: parent,
+                queue: .main
+            ) { _ in
+                Task { @MainActor in
+                    AppEnvironment.shared.navigationCoordinator.isMacInlinePlayerFullScreen = false
+                }
+            },
+        ]
     }
 
     /// Restores a window that was hidden for PiP mode.
@@ -541,8 +520,6 @@ final class ExpandedPlayerWindowManager: NSObject {
     /// Sets `contentAspectRatio` and a ratio-consistent minimum content size on
     /// the window so that interactive resize couples width and height
     /// proportionally and can't shrink below a usable minimum.
-    /// Static so the inline-sheet path (`SheetWindowResizer`) can lock the sheet's
-    /// backing window to the same ratio the standalone window uses.
     static func applyAspectRatioConstraint(_ aspectRatio: Double, to window: NSWindow) {
         guard aspectRatio > 0 else { return }
 
@@ -591,7 +568,7 @@ final class ExpandedPlayerWindowManager: NSObject {
         Self.fittedPlayerSize(for: aspectRatio, screenFrame: screenFrame)
     }
 
-    /// Shared sizing math for both the standalone-window path and the sheet path.
+    /// Sizing math for the standalone-window path.
     /// Anchors on `targetVideoHeight`, derives width from the aspect ratio, then
     /// clamps to `maxScreenRatio` of the screen and the minimum size.
     static func fittedPlayerSize(for aspectRatio: Double, screenFrame: NSRect) -> NSSize {
@@ -622,15 +599,6 @@ final class ExpandedPlayerWindowManager: NSObject {
         height = max(height, minHeight)
 
         return NSSize(width: width, height: height)
-    }
-
-    /// Fitted sheet content size for a given aspect ratio, resolving the screen
-    /// internally so callers (e.g. `ContentView`) don't need AppKit. Returns a
-    /// plain `CGSize` (`NSSize == CGSize` on macOS).
-    static func fittedSheetSize(for aspectRatio: Double) -> CGSize {
-        let screenFrame = (NSScreen.main ?? NSScreen.screens.first)?.visibleFrame
-            ?? NSRect(x: 0, y: 0, width: 1280, height: 800)
-        return fittedPlayerSize(for: aspectRatio, screenFrame: screenFrame)
     }
 
     private func constrainToScreen(_ frame: NSRect, screen: NSScreen) -> NSRect {
@@ -784,86 +752,28 @@ private struct ExpandedPlayerWindowRoot: View {
     }
 }
 
-// MARK: - Sheet Window Resizer
+// MARK: - Main Content Window Reader
 
-/// Resizes the hosting sheet's `NSWindow` to `targetSize` whenever it changes.
-///
-/// `.presentationSizing(.fitted)` only fits the sheet to its content once, at
-/// presentation time — it does not re-fit when the content's ideal size changes
-/// later (e.g. when the video aspect ratio is decoded). This reaches the sheet's
-/// backing window directly and resizes it, mirroring how the standalone window
-/// path drives `setFrame` in `resizeToFitAspectRatio`. It keeps the window
-/// horizontally centered and top-anchored so the sheet grows/shrinks the way an
-/// attached sheet naturally sits.
-struct SheetWindowResizer: NSViewRepresentable {
-    let targetSize: CGSize
-    /// Real video aspect ratio (width / height) to lock interactive resize to, or
-    /// `0` when unknown. Mirrors the standalone window's `contentAspectRatio` lock
-    /// so dragging the sheet edge keeps the video's ratio instead of adding bars.
-    let aspectRatio: Double
-
-    func makeCoordinator() -> Coordinator { Coordinator() }
-
-    final class Coordinator {
-        var hasApplied = false
+/// Invisible background view that registers ContentView's hosting window with
+/// `ExpandedPlayerWindowManager`, so the inline overlay always targets the real
+/// main content window (mainWindow/keyWindow point elsewhere when e.g. the
+/// Settings window has focus).
+struct MainContentWindowReader: NSViewRepresentable {
+    func makeNSView(context _: Context) -> ReaderView {
+        ReaderView()
     }
 
-    func makeNSView(context _: Context) -> NSView {
-        NSView(frame: .zero)
-    }
+    func updateNSView(_: ReaderView, context _: Context) {}
 
-    func updateNSView(_ nsView: NSView, context: Context) {
-        let target = targetSize
-        let aspect = aspectRatio
-        let coordinator = context.coordinator
-        // The window isn't attached during the same runloop tick as the SwiftUI
-        // update, so defer the resize until the view is in a window.
-        DispatchQueue.main.async {
-            guard target.width > 0, target.height > 0 else { return }
-            guard let window = nsView.window else { return }
-
-            // Paint the window/content black so that if the content ever lags the
-            // window frame mid-resize, the exposed area is black (matching the
-            // player background) rather than the system's light window color.
-            if window.backgroundColor != .black {
-                window.backgroundColor = .black
-                window.isOpaque = true
+    final class ReaderView: NSView {
+        override func viewDidMoveToWindow() {
+            super.viewDidMoveToWindow()
+            guard let window else { return }
+            Task { @MainActor in
+                ExpandedPlayerWindowManager.shared.registerMainContentWindow(window)
             }
-
-            // Lock interactive resize to the video ratio so dragging the sheet's
-            // edge keeps the aspect (no black bars), matching the standalone
-            // window. Applied every pass so it tracks aspect-ratio changes.
-            if aspect > 0 {
-                ExpandedPlayerWindowManager.applyAspectRatioConstraint(aspect, to: window)
-            }
-
-            let current = window.frame
-            guard abs(current.width - target.width) > 1
-                || abs(current.height - target.height) > 1 else { return }
-
-            // Snap to the correct size the first time (no animation) so the sheet
-            // opens at the right aspect; animate later aspect-ratio changes.
-            let shouldAnimate = coordinator.hasApplied
-            coordinator.hasApplied = true
-
-            // Keep horizontally centered; anchor the top edge so the sheet grows
-            // downward (AppKit y-origin is bottom-left, so hold `maxY`).
-            let newOrigin = NSPoint(
-                x: current.midX - target.width / 2,
-                y: current.maxY - target.height
-            )
-            let newFrame = NSRect(origin: newOrigin, size: target)
-            window.setFrame(newFrame, display: true, animate: shouldAnimate)
         }
     }
 }
 
-extension View {
-    /// Resizes the hosting sheet window to `size` when it changes and locks its
-    /// interactive resize to `aspectRatio` (macOS sheets). Pass `aspectRatio == 0`
-    /// to leave resize unconstrained.
-    func sheetWindowSize(_ size: CGSize, aspectRatio: Double) -> some View {
-        background(SheetWindowResizer(targetSize: size, aspectRatio: aspectRatio))
-    }
-}
 #endif

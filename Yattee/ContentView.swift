@@ -58,19 +58,31 @@ struct ContentView: View {
             #if os(macOS)
             miniPlayerOverlay(appEnvironment: appEnvironment)
 
-            // Fullscreen overlay player: replaces the sheet while the main
-            // window is native-fullscreen (a window with an attached sheet
-            // can't fullscreen, so the sheet is swapped for this overlay).
-            if appEnvironment.navigationCoordinator.isMacPlayerFullScreenOverlay {
+            // Inline expanded player: presented as a full-window overlay
+            // (no native sheet — a window with an attached sheet can't go
+            // fullscreen, so fullscreen is just the window's native toggle).
+            if isInlinePlayerOverlayActive(appEnvironment: appEnvironment) {
                 ZStack {
                     Color.black
                     ExpandedPlayerSheet()
                 }
                 .ignoresSafeArea()
+                .transition(.opacity)
             }
             #endif
         }
         #if os(macOS)
+        // Registers the hosting window so the inline overlay targets the real
+        // main window even when another window (e.g. Settings) has focus.
+        .background(MainContentWindowReader())
+        .animation(.easeInOut(duration: 0.2), value: isInlinePlayerOverlayActive(appEnvironment: appEnvironment))
+        .onChange(of: isInlinePlayerOverlayActive(appEnvironment: appEnvironment)) { _, active in
+            if active {
+                ExpandedPlayerWindowManager.shared.beginInlineOverlay()
+            } else {
+                ExpandedPlayerWindowManager.shared.endInlineOverlay()
+            }
+        }
         .onChange(of: appEnvironment.navigationCoordinator.playerExpandTrigger) { _, _ in
             if appEnvironment.settingsManager.macPlayerSeparateWindow {
                 presentExpandedPlayerWindow(appEnvironment: appEnvironment)
@@ -78,9 +90,6 @@ struct ContentView: View {
         }
         .onChange(of: appEnvironment.navigationCoordinator.isPlayerExpanded) { _, isExpanded in
             if !isExpanded {
-                // Closing the player while in overlay fullscreen also exits
-                // the main window's fullscreen (it was entered for the video).
-                ExpandedPlayerWindowManager.shared.endOverlayFullScreen(exitParentFullScreen: true)
                 ExpandedPlayerWindowManager.shared.hide()
             }
         }
@@ -88,16 +97,11 @@ struct ContentView: View {
             guard appEnvironment.navigationCoordinator.isPlayerExpanded else { return }
 
             if separateWindow {
-                // Inline sheet → separate window: let the sheet dismiss first, then
-                // present the window (mirrors the previous inline→window transition).
-                Task { @MainActor in
-                    try? await Task.sleep(for: .milliseconds(300))
-                    if appEnvironment.navigationCoordinator.isPlayerExpanded {
-                        presentExpandedPlayerWindow(appEnvironment: appEnvironment)
-                    }
-                }
+                // Inline overlay → separate window: the overlay unmounts via the
+                // presentation condition; present the window directly.
+                presentExpandedPlayerWindow(appEnvironment: appEnvironment)
             } else {
-                // Separate window → inline sheet: hide the window so the sheet binding
+                // Separate window → inline overlay: hide the window so the overlay
                 // (isPlayerExpanded && !separateWindow) takes over.
                 ExpandedPlayerWindowManager.shared.hide(animated: false)
             }
@@ -106,42 +110,6 @@ struct ContentView: View {
             guard appEnvironment.navigationCoordinator.isPlayerExpanded,
                   appEnvironment.settingsManager.macPlayerSeparateWindow else { return }
             ExpandedPlayerWindowManager.shared.updateWindowLevel(floating: floating)
-        }
-        .sheet(isPresented: Binding(
-            get: {
-                appEnvironment.navigationCoordinator.isPlayerExpanded &&
-                !appEnvironment.settingsManager.macPlayerSeparateWindow &&
-                !appEnvironment.navigationCoordinator.isMacPlayerFullScreenOverlay
-            },
-            set: { newValue in
-                // Ignore the dismissal write-back when the sheet is swapped for
-                // the fullscreen overlay — the player stays expanded there.
-                if !newValue, appEnvironment.navigationCoordinator.isMacPlayerFullScreenOverlay {
-                    return
-                }
-                appEnvironment.navigationCoordinator.isPlayerExpanded = newValue
-            }
-        )) {
-            let size = expandedSheetSize(appEnvironment: appEnvironment)
-            let lockAspect = sheetLockAspectRatio(appEnvironment: appEnvironment)
-            ExpandedPlayerSheet()
-                // Floor keeps the content flexible so it tracks the window's
-                // animated resize with no gap — do NOT pin an exact (max) size:
-                // a fixed frame snaps instantly while the window animates,
-                // exposing the window background as bars. The ideal size makes
-                // `.presentationSizing(.fitted)` open the sheet at the correct
-                // aspect immediately when the video size is already known (e.g.
-                // re-opening while playing), avoiding a small-then-resize flash.
-                .frame(
-                    minWidth: 640, idealWidth: size.width,
-                    minHeight: 360, idealHeight: size.height
-                )
-                .presentationSizing(.fitted)
-                // `.presentationSizing(.fitted)` only fits the sheet once, at
-                // presentation. Resize the backing window directly when the
-                // aspect-ratio-derived size changes so the sheet tracks the video,
-                // and lock interactive resize to the video ratio (no black bars).
-                .sheetWindowSize(size, aspectRatio: lockAspect)
         }
         .sheet(isPresented: Binding(
             get: { appEnvironment.navigationCoordinator.isMiniPlayerQueueSheetPresented },
@@ -172,30 +140,12 @@ struct ContentView: View {
         ExpandedPlayerWindowManager.shared.show(with: appEnvironment, animated: true)
     }
 
-    /// Size for the expanded-player sheet, derived from the current video aspect
-    /// ratio (when auto-resize is enabled) so the sheet re-fits like window mode.
-    /// Reading `videoAspectRatio` / `playerSheetAutoResize` here registers the
-    /// @Observable dependency that drives the re-fit.
-    private func expandedSheetSize(appEnvironment: AppEnvironment) -> CGSize {
-        let settings = appEnvironment.settingsManager
-        let aspect: Double
-        if settings.playerSheetAutoResize,
-           let ratio = appEnvironment.playerService.state.videoAspectRatio, ratio > 0 {
-            aspect = ratio
-        } else {
-            aspect = 16.0 / 9.0 // fixed default when auto-resize is off / not yet known
-        }
-        return ExpandedPlayerWindowManager.fittedSheetSize(for: aspect)
-    }
-
-    /// Real video aspect ratio to lock the sheet's interactive resize to, or `0`
-    /// when unknown. Unlike the sheet *size* (which honors `playerSheetAutoResize`),
-    /// the resize lock always follows the actual video ratio — mirroring the
-    /// standalone window, which locks unconditionally. Reading `videoAspectRatio`
-    /// here registers the @Observable dependency that keeps the lock in sync.
-    private func sheetLockAspectRatio(appEnvironment: AppEnvironment) -> Double {
-        let ratio = appEnvironment.playerService.state.videoAspectRatio ?? 0
-        return ratio > 0 ? ratio : 0
+    /// Whether the inline (non-separate-window) expanded player overlay should
+    /// be presented. Shared by the overlay mount and the begin/end onChange so
+    /// the two can't drift apart.
+    private func isInlinePlayerOverlayActive(appEnvironment: AppEnvironment) -> Bool {
+        appEnvironment.navigationCoordinator.isPlayerExpanded &&
+            !appEnvironment.settingsManager.macPlayerSeparateWindow
     }
     #endif
 
@@ -206,7 +156,7 @@ struct ContentView: View {
         let hasActiveVideo = playerState.currentVideo != nil
         let isExpanded = appEnvironment.navigationCoordinator.isPlayerExpanded
         // The expanded player is a separate window in window mode, so keep the capsule
-        // visible alongside it. In sheet mode the sheet covers the window, so hide it.
+        // visible alongside it. The inline overlay covers the window, so hide it there.
         let usesWindow = appEnvironment.settingsManager.macPlayerSeparateWindow
 
         if hasActiveVideo && (!isExpanded || usesWindow) {

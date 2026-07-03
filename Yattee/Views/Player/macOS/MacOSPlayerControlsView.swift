@@ -24,6 +24,9 @@ struct MacOSPlayerControlsView: View {
     let onSeekBackward: (TimeInterval) async -> Void
     var onToggleFullscreen: (() -> Void)? = nil
     var isFullscreen: Bool = false
+    /// Collapses the expanded player (Esc in the inline overlay presentation).
+    /// When nil, Esc outside fullscreen passes through to the responder chain.
+    var onCollapse: (() -> Void)? = nil
     var onClose: (() -> Void)? = nil
     var onTogglePiP: (() -> Void)? = nil
     var onPlayNext: (() async -> Void)? = nil
@@ -70,7 +73,7 @@ struct MacOSPlayerControlsView: View {
     /// Extra top inset for the top bar so its content drops below the window's
     /// traffic-light buttons in the separate/floating window presentation, while
     /// keeping the avatar/title aligned to the leading edge.
-    /// Stays 0 when there is no overlap (inline sheet, side panel, fullscreen).
+    /// Stays 0 when there is no overlap (inline overlay, side panel, fullscreen).
     @State private var trafficLightInset: CGFloat = 0
 
     // MARK: - Control Bar Drag State
@@ -125,7 +128,7 @@ struct MacOSPlayerControlsView: View {
     }
 
     /// Whether the hosting window is in native fullscreen. The `isFullscreen`
-    /// parameter covers the sheet-overlay flow, but its key-window half isn't
+    /// parameter covers the inline overlay flow, but its key-window half isn't
     /// reactive — check the tracked host window directly as well.
     private var isInNativeFullscreen: Bool {
         isFullscreen || hostWindow?.styleMask.contains(.fullScreen) == true
@@ -625,6 +628,12 @@ struct MacOSPlayerControlsView: View {
             case 53: // Escape
                 if isFullscreen {
                     onToggleFullscreen?()
+                    return nil
+                }
+                if let onCollapse {
+                    // Inline overlay presentation: Esc collapses to the mini bar
+                    // (the sheet's default Esc-dismiss is gone with the sheet).
+                    onCollapse()
                     return nil
                 }
                 return event // Pass through if not fullscreen
