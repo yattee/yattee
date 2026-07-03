@@ -20,38 +20,7 @@ struct LogViewerView: View {
 
     var body: some View {
         VStack(spacing: 0) {
-            #if os(macOS)
-            HStack(spacing: 8) {
-                searchBar
-
-                Button {
-                    showingFilters = true
-                } label: {
-                    Label(String(localized: "settings.advanced.logs.filter"), systemImage: "line.3.horizontal.decrease.circle")
-                        .labelStyle(.iconOnly)
-                }
-                .help(String(localized: "settings.advanced.logs.filter"))
-
-                Button {
-                    showMacOSSavePanel()
-                } label: {
-                    Label(String(localized: "settings.advanced.logs.export"), systemImage: "square.and.arrow.up")
-                        .labelStyle(.iconOnly)
-                }
-                .help(String(localized: "settings.advanced.logs.export"))
-
-                Button(role: .destructive) {
-                    loggingService.clearLogs()
-                } label: {
-                    Label(String(localized: "settings.advanced.logs.clear"), systemImage: "trash")
-                        .labelStyle(.iconOnly)
-                }
-                .help(String(localized: "settings.advanced.logs.clear"))
-            }
-            .padding(.trailing)
-            #else
             searchBar
-            #endif
 
             // Log list
             logList
@@ -61,6 +30,34 @@ struct LogViewerView: View {
         .navigationBarTitleDisplayMode(.inline)
         #endif
         .toolbar {
+            #if os(macOS)
+            ToolbarItem(placement: .primaryAction) {
+                Button {
+                    showingFilters = true
+                } label: {
+                    Label(String(localized: "settings.advanced.logs.filter"), systemImage: "line.3.horizontal.decrease.circle")
+                }
+                .help(String(localized: "settings.advanced.logs.filter"))
+            }
+
+            ToolbarItem(placement: .primaryAction) {
+                Button {
+                    showMacOSSavePanel()
+                } label: {
+                    Label(String(localized: "settings.advanced.logs.export"), systemImage: "square.and.arrow.up")
+                }
+                .help(String(localized: "settings.advanced.logs.export"))
+            }
+
+            ToolbarItem(placement: .primaryAction) {
+                Button(role: .destructive) {
+                    loggingService.clearLogs()
+                } label: {
+                    Label(String(localized: "settings.advanced.logs.clear"), systemImage: "trash")
+                }
+                .help(String(localized: "settings.advanced.logs.clear"))
+            }
+            #else
             ToolbarItem(placement: .primaryAction) {
                 Menu {
                     Button {
@@ -70,11 +67,7 @@ struct LogViewerView: View {
                     }
 
                     Button {
-                        #if os(macOS)
-                        showMacOSSavePanel()
-                        #else
                         showingExportSheet = true
-                        #endif
                     } label: {
                         Label(String(localized: "settings.advanced.logs.export"), systemImage: "square.and.arrow.up")
                     }
@@ -90,6 +83,7 @@ struct LogViewerView: View {
                     Image(systemName: "ellipsis.circle")
                 }
             }
+            #endif
         }
         .sheet(isPresented: $showingFilters) {
             LogFiltersSheet(loggingService: loggingService)
