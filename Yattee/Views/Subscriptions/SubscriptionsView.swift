@@ -38,6 +38,9 @@ struct SubscriptionsView: View {
     @AppStorage("subscriptionsHideWatched") private var hideWatched = false
     @AppStorage("subscriptionsChannelStripSize") private var channelStripSize: ChannelStripSize = .normal
     @AppStorage("subscriptionsShowSidebar") private var showSidebar = true
+    /// Whether the last completed load produced enough channels for the sidebar,
+    /// so its space can be reserved before the next load finishes.
+    @AppStorage("subscriptionsSidebarExpected") private var sidebarExpected = false
     #if os(macOS)
     @AppStorage("subscriptionsMacOSSidebarWidth") private var macOSSidebarWidth = 240.0
     @State private var macOSSidebarDragStartWidth: Double?
@@ -365,6 +368,11 @@ struct SubscriptionsView: View {
                                 .frame(width: clampedMacOSSidebarWidth)
 
                             macOSSidebarResizeHandle
+                        } else if showSidebar && !subscriptionsLoaded && sidebarExpected {
+                            macOSSidebarPlaceholder
+                                .frame(width: clampedMacOSSidebarWidth)
+
+                            macOSSidebarResizeHandle
                         }
 
                         Group {
@@ -476,6 +484,11 @@ struct SubscriptionsView: View {
                         .liquidGlassSheetContent(sourceID: "subscriptionsViewOptions", in: sheetTransition)
                     }
                     #endif
+                    .onAppear {
+                        // Synchronous load for local accounts so the sidebar is
+                        // present in the first layout pass (avoids layout jump).
+                        loadSubscriptions()
+                    }
                     .task {
                         await loadSubscriptionsAsync()
                         loadWatchEntries()
@@ -934,6 +947,12 @@ struct SubscriptionsView: View {
         .scrollContentBackground(.hidden)
     }
 
+    private var macOSSidebarPlaceholder: some View {
+        ProgressView()
+            .controlSize(.small)
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
+    }
+
     private var macOSSidebarResizeHandle: some View {
         ZStack {
             Rectangle()
@@ -1299,6 +1318,7 @@ struct SubscriptionsView: View {
         if appEnvironment?.settingsManager.subscriptionAccount.type == .local {
             subscriptions = dataManager?.subscriptions() ?? []
             subscriptionsLoaded = true
+            sidebarExpected = subscriptions.count > 1
         }
 
         if let selectedID = selectedChannelID,
@@ -1316,6 +1336,7 @@ struct SubscriptionsView: View {
         if appEnvironment.settingsManager.subscriptionAccount.type == .local {
             subscriptions = dataManager?.subscriptions() ?? []
             subscriptionsLoaded = true
+            sidebarExpected = subscriptions.count > 1
             return
         }
 
@@ -1325,6 +1346,7 @@ struct SubscriptionsView: View {
             // Convert channels to Subscription objects for UI (not persisted)
             subscriptions = channels.map { Subscription.from(channel: $0) }
             subscriptionsLoaded = true
+            sidebarExpected = subscriptions.count > 1
         } catch {
             LoggingService.shared.error(
                 "Failed to load subscriptions: \(error.localizedDescription)",
@@ -1332,6 +1354,7 @@ struct SubscriptionsView: View {
             )
             subscriptions = []
             subscriptionsLoaded = true
+            sidebarExpected = false
         }
     }
 
