@@ -47,7 +47,7 @@ struct FloatingDetailsPanel: View {
     @State private var isDragHandleActive: Bool = false
 
     private var settingsManager: SettingsManager? { appEnvironment?.settingsManager }
-    private var accentColor: Color { settingsManager?.accentColor.color ?? .accentColor }
+    private var accentColor: Color { settingsManager?.resolvedAccentColor ?? .accentColor }
     private var playerService: PlayerService? { appEnvironment?.playerService }
     private var playerState: PlayerState? { playerService?.state }
 

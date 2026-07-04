@@ -102,7 +102,7 @@ struct ExpandedPlayerSheet: View {
     var playerState: PlayerState? { playerService?.state }
     var downloadManager: DownloadManager? { appEnvironment?.downloadManager }
     var navigationCoordinator: NavigationCoordinator? { appEnvironment?.navigationCoordinator }
-    var accentColor: Color { appEnvironment?.settingsManager.accentColor.color ?? .accentColor }
+    var accentColor: Color { appEnvironment?.settingsManager.resolvedAccentColor ?? .accentColor }
 
     #if os(iOS)
     var inAppOrientationLock: Bool { appEnvironment?.settingsManager.inAppOrientationLock ?? false }

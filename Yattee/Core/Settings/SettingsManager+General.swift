@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import SwiftUI
 #if os(iOS)
 import UIKit
 #elseif os(macOS)
@@ -35,6 +36,23 @@ extension SettingsManager {
             _accentColor = newValue
             set(newValue.rawValue, for: .accentColor)
         }
+    }
+
+    var customAccentColor: Color {
+        get {
+            let hex = _customAccentColor ?? string(for: .customAccentColor) ?? ""
+            return Color(hex: hex) ?? AccentColor.default.color
+        }
+        set {
+            let hex = newValue.toHexString()
+            _customAccentColor = hex
+            set(hex, for: .customAccentColor)
+        }
+    }
+
+    /// The effective accent color, resolving `.custom` to the user-picked value.
+    var resolvedAccentColor: Color {
+        accentColor == .custom ? customAccentColor : accentColor.color
     }
 
     // MARK: - App Icon Settings

@@ -65,6 +65,20 @@ struct AccentColorTests {
             #expect(color == decoded)
         }
     }
+
+    @Test("Presets exclude custom and retired indigo")
+    func presetsExcludeHiddenCases() {
+        #expect(!AccentColor.presets.contains(.custom))
+        #expect(!AccentColor.presets.contains(.indigo))
+        #expect(AccentColor.presets.count == AccentColor.allCases.count - 2)
+    }
+
+    @Test("Retired indigo still decodes and resolves")
+    func retiredIndigoStillWorks() throws {
+        let decoded = try JSONDecoder().decode(AccentColor.self, from: Data("\"indigo\"".utf8))
+        #expect(decoded == .indigo)
+        #expect(AccentColor(rawValue: "indigo") == .indigo)
+    }
 }
 
 // MARK: - VideoQuality Tests

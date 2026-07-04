@@ -17,7 +17,7 @@ struct HomeShortcutCardView<StatusIndicator: View>: View {
     #endif
 
     private var accentColor: Color {
-        appEnvironment?.settingsManager.accentColor.color ?? .accentColor
+        appEnvironment?.settingsManager.resolvedAccentColor ?? .accentColor
     }
 
     let icon: String

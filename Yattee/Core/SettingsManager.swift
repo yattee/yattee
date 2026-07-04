@@ -28,6 +28,7 @@ final class SettingsManager {
     // Theme
     var _theme: AppTheme?
     var _accentColor: AccentColor?
+    var _customAccentColor: String?
     var _showWatchedCheckmark: Bool?
 
     // Playback
@@ -417,6 +418,7 @@ final class SettingsManager {
     func clearCache() {
         _theme = nil
         _accentColor = nil
+        _customAccentColor = nil
         _showWatchedCheckmark = nil
         _preferredQuality = nil
         _cellularQuality = nil

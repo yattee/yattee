@@ -364,7 +364,7 @@ private struct CompletedDownloadsSectionContentView: View {
     let isGroupedMode: Bool
 
     private var accentColor: Color {
-        appEnvironment?.settingsManager.accentColor.color ?? .accentColor
+        appEnvironment?.settingsManager.resolvedAccentColor ?? .accentColor
     }
 
     private var completedFiltered: [Download] {

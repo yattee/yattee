@@ -15,7 +15,7 @@ struct BookmarkTagsView: View {
     var maxVisible: Int = 3
     
     private var accentColor: Color {
-        appEnvironment?.settingsManager.accentColor.color ?? .accentColor
+        appEnvironment?.settingsManager.resolvedAccentColor ?? .accentColor
     }
     
     private var visibleTags: [String] {

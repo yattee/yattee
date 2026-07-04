@@ -24,7 +24,7 @@ struct CommentView: View {
     private var contentService: ContentService? { appEnvironment?.contentService }
     private var instancesManager: InstancesManager? { appEnvironment?.instancesManager }
     private var navigationCoordinator: NavigationCoordinator? { appEnvironment?.navigationCoordinator }
-    private var accentColor: Color { appEnvironment?.settingsManager.accentColor.color ?? .accentColor }
+    private var accentColor: Color { appEnvironment?.settingsManager.resolvedAccentColor ?? .accentColor }
 
     init(comment: Comment, videoID: String? = nil, source: ContentSource? = nil, isReply: Bool = false) {
         self.comment = comment

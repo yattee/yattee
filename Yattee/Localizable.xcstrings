@@ -10353,6 +10353,16 @@
         }
       }
     },
+    "settings.appearance.accentColor.custom" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Custom"
+          }
+        }
+      }
+    },
     "settings.appearance.accentColor.default" : {
       "localizations" : {
         "en" : {

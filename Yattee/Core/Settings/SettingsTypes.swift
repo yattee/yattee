@@ -35,10 +35,20 @@ enum AccentColor: String, CaseIterable, Codable {
     case blue
     case purple
     case indigo
+    case custom
 
+    /// Fixed swatches shown in the settings grid; `.custom` is rendered
+    /// separately as a color picker, and `.indigo` is retired from the grid
+    /// but still resolves for users who selected it before it was removed.
+    static var presets: [AccentColor] {
+        allCases.filter { $0 != .custom && $0 != .indigo }
+    }
+
+    /// The color for `.custom` lives in settings storage — resolve through
+    /// `SettingsManager.resolvedAccentColor` instead of this property.
     var color: Color {
         switch self {
-        case .default: return .blue  // System default accent color
+        case .default, .custom: return .blue  // System default accent color
         case .red: return .red
         case .pink: return .pink
         case .orange: return .orange

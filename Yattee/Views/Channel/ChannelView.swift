@@ -113,7 +113,7 @@ struct ChannelView: View {
     }
 
     private var accentColor: Color {
-        appEnvironment?.settingsManager.accentColor.color ?? .accentColor
+        appEnvironment?.settingsManager.resolvedAccentColor ?? .accentColor
     }
 
     // Grid layout configuration

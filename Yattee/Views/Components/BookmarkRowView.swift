@@ -28,7 +28,7 @@ struct BookmarkRowView: View {
     var loadMoreVideos: LoadMoreVideosCallback? = nil
 
     private var accentColor: Color {
-        appEnvironment?.settingsManager.accentColor.color ?? .accentColor
+        appEnvironment?.settingsManager.resolvedAccentColor ?? .accentColor
     }
 
     private var isBookmarkValid: Bool {

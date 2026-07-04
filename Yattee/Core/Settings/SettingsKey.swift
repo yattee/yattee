@@ -13,6 +13,7 @@ enum SettingsKey: String, CaseIterable {
     // General
     case theme
     case accentColor
+    case customAccentColor
     case showWatchedCheckmark
 
     // Playback

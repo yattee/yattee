@@ -171,7 +171,7 @@ struct SubscriptionsView: View {
 
     private var dataManager: DataManager? { appEnvironment?.dataManager }
     private var subscriptionService: SubscriptionService? { appEnvironment?.subscriptionService }
-    private var accentColor: Color { appEnvironment?.settingsManager.accentColor.color ?? .accentColor }
+    private var accentColor: Color { appEnvironment?.settingsManager.resolvedAccentColor ?? .accentColor }
     private var yatteeServer: Instance? {
         appEnvironment?.instancesManager.enabledYatteeServerInstances.first
     }

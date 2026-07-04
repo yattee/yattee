@@ -34,7 +34,7 @@ struct HomeView: View {
     private var settingsManager: SettingsManager? { appEnvironment?.settingsManager }
 
     private var accentColor: Color {
-        appEnvironment?.settingsManager.accentColor.color ?? .accentColor
+        appEnvironment?.settingsManager.resolvedAccentColor ?? .accentColor
     }
 
     #if !os(tvOS)
@@ -408,7 +408,7 @@ struct HomeView: View {
     private func colorfulColor(atPosition position: Int) -> Color {
         let palette = settingsManager?.homeShortcutColorfulPalette ?? .accent
         let customHex = settingsManager?.homeShortcutCustomPaletteColors ?? []
-        let accentColor = settingsManager?.accentColor.color ?? .accentColor
+        let accentColor = settingsManager?.resolvedAccentColor ?? .accentColor
         return HomeShortcutColorfulPalette.color(forPosition: position, palette: palette, customHex: customHex, accentColor: accentColor)
     }
 

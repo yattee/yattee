@@ -71,7 +71,7 @@ struct YatteeApp: App {
                 .appEnvironment(appEnvironment)
                 #if !os(tvOS)
                 .preferredColorScheme(appEnvironment.settingsManager.theme.colorScheme)
-                .tint(appEnvironment.settingsManager.accentColor.color)
+                .tint(appEnvironment.settingsManager.resolvedAccentColor)
                 #endif
                 #if os(macOS)
                 .frame(minWidth: 800, minHeight: 500)

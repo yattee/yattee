@@ -18,7 +18,7 @@ struct BookmarkCardView: View {
     var isCompact: Bool = false
 
     private var accentColor: Color {
-        appEnvironment?.settingsManager.accentColor.color ?? .accentColor
+        appEnvironment?.settingsManager.resolvedAccentColor ?? .accentColor
     }
     
     private var video: Video {

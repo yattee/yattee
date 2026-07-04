@@ -19,7 +19,7 @@ struct HomeShortcutStyleView: View {
 
     /// The user's accent color, used by the Accent palette (uniform fill).
     private var accentColor: Color {
-        appEnvironment?.settingsManager.accentColor.color ?? .accentColor
+        appEnvironment?.settingsManager.resolvedAccentColor ?? .accentColor
     }
 
     /// Called after any value changes so the owner persists immediately. The

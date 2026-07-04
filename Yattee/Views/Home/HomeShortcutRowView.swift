@@ -16,7 +16,7 @@ struct HomeShortcutRowView<StatusIndicator: View>: View {
     var statusIndicator: StatusIndicator?
 
     private var accentColor: Color {
-        appEnvironment?.settingsManager.accentColor.color ?? .accentColor
+        appEnvironment?.settingsManager.resolvedAccentColor ?? .accentColor
     }
 
     init(

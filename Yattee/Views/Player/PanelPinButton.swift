@@ -25,7 +25,7 @@ struct PanelPinButton: View {
     private static let buttonSize: CGFloat = 36
 
     private var accentColor: Color {
-        appEnvironment?.settingsManager.accentColor.color ?? .accentColor
+        appEnvironment?.settingsManager.resolvedAccentColor ?? .accentColor
     }
 
     var body: some View {
