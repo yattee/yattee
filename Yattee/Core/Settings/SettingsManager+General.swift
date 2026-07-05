@@ -7,9 +7,9 @@
 
 import Foundation
 import SwiftUI
-#if os(iOS)
+#if canImport(UIKit)
 import UIKit
-#elseif os(macOS)
+#elseif canImport(AppKit)
 import AppKit
 #endif
 
@@ -50,9 +50,76 @@ extension SettingsManager {
         }
     }
 
-    /// The effective accent color, resolving `.custom` to the user-picked value.
-    var resolvedAccentColor: Color {
+    /// Whether the user picked a separate accent color for dark mode.
+    var useSeparateDarkAccentColor: Bool {
+        get {
+            if let cached = _useSeparateDarkAccentColor { return cached }
+            return bool(for: .useSeparateDarkAccentColor, default: false)
+        }
+        set {
+            _useSeparateDarkAccentColor = newValue
+            set(newValue, for: .useSeparateDarkAccentColor)
+        }
+    }
+
+    /// Accent color choice for dark mode. Falls back to the light selection until explicitly set.
+    var accentColorDark: AccentColor {
+        get {
+            if let cached = _accentColorDark { return cached }
+            if let raw = string(for: .accentColorDark), let value = AccentColor(rawValue: raw) {
+                return value
+            }
+            return accentColor
+        }
+        set {
+            _accentColorDark = newValue
+            set(newValue.rawValue, for: .accentColorDark)
+        }
+    }
+
+    /// Custom accent color for dark mode. Falls back to the light custom color until explicitly set.
+    var customAccentColorDark: Color {
+        get {
+            if let hex = _customAccentColorDark ?? string(for: .customAccentColorDark),
+               let color = Color(hex: hex) {
+                return color
+            }
+            return customAccentColor
+        }
+        set {
+            let hex = newValue.toHexString()
+            _customAccentColorDark = hex
+            set(hex, for: .customAccentColorDark)
+        }
+    }
+
+    /// Light (or shared) accent color, resolving `.custom` to the user-picked value.
+    private var resolvedLightAccentColor: Color {
         accentColor == .custom ? customAccentColor : accentColor.color
+    }
+
+    /// Dark accent color, resolving `.custom` to the user-picked value.
+    private var resolvedDarkAccentColor: Color {
+        accentColorDark == .custom ? customAccentColorDark : accentColorDark.color
+    }
+
+    /// The effective accent color. When a separate dark color is enabled this is a
+    /// dynamic platform color that resolves per trait environment, so all consumers
+    /// (root tint and direct readers) adapt to light/dark automatically.
+    var resolvedAccentColor: Color {
+        let light = resolvedLightAccentColor
+        guard useSeparateDarkAccentColor else { return light }
+        let dark = resolvedDarkAccentColor
+        #if os(macOS)
+        return Color(nsColor: NSColor(name: nil, dynamicProvider: { appearance in
+            let isDark = appearance.bestMatch(from: [.aqua, .darkAqua]) == .darkAqua
+            return NSColor(isDark ? dark : light)
+        }))
+        #else
+        return Color(uiColor: UIColor { traits in
+            UIColor(traits.userInterfaceStyle == .dark ? dark : light)
+        })
+        #endif
     }
 
     // MARK: - App Icon Settings

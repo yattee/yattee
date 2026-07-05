@@ -29,6 +29,9 @@ final class SettingsManager {
     var _theme: AppTheme?
     var _accentColor: AccentColor?
     var _customAccentColor: String?
+    var _accentColorDark: AccentColor?
+    var _customAccentColorDark: String?
+    var _useSeparateDarkAccentColor: Bool?
     var _showWatchedCheckmark: Bool?
 
     // Playback
@@ -419,6 +422,9 @@ final class SettingsManager {
         _theme = nil
         _accentColor = nil
         _customAccentColor = nil
+        _accentColorDark = nil
+        _customAccentColorDark = nil
+        _useSeparateDarkAccentColor = nil
         _showWatchedCheckmark = nil
         _preferredQuality = nil
         _cellularQuality = nil

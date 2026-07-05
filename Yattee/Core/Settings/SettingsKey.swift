@@ -14,6 +14,9 @@ enum SettingsKey: String, CaseIterable {
     case theme
     case accentColor
     case customAccentColor
+    case accentColorDark
+    case customAccentColorDark
+    case useSeparateDarkAccentColor
     case showWatchedCheckmark
 
     // Playback

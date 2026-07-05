@@ -81,6 +81,82 @@ struct AccentColorTests {
     }
 }
 
+// MARK: - Dark Accent Color Tests
+
+@Suite("Dark Accent Color Tests", .serialized)
+@MainActor
+struct DarkAccentColorTests {
+
+    private static let touchedKeys = [
+        SettingsKey.accentColor,
+        .customAccentColor,
+        .accentColorDark,
+        .customAccentColorDark,
+        .useSeparateDarkAccentColor,
+    ]
+
+    private func withCleanDefaults(_ body: (SettingsManager) throws -> Void) rethrows {
+        let removeAll = {
+            for key in Self.touchedKeys {
+                UserDefaults.standard.removeObject(forKey: key.rawValue)
+            }
+        }
+        removeAll()
+        defer { removeAll() }
+        try body(SettingsManager())
+    }
+
+    @Test("New keys are part of the settings key set and sync globally")
+    func keysSyncContract() {
+        for key in [SettingsKey.accentColorDark, .customAccentColorDark, .useSeparateDarkAccentColor] {
+            #expect(SettingsKey.allCases.contains(key))
+            #expect(!key.isLocalOnly)
+            #expect(!key.isPlatformSpecific)
+        }
+    }
+
+    @Test("Separate dark accent color is disabled by default")
+    func separateDarkDisabledByDefault() {
+        withCleanDefaults { settings in
+            #expect(settings.useSeparateDarkAccentColor == false)
+        }
+    }
+
+    @Test("Dark accent color falls back to light selection until set")
+    func darkFallsBackToLight() {
+        withCleanDefaults { settings in
+            settings.accentColor = .green
+            #expect(settings.accentColorDark == .green)
+
+            settings.accentColorDark = .purple
+            #expect(settings.accentColorDark == .purple)
+            #expect(settings.accentColor == .green)
+        }
+    }
+
+    @Test("Custom dark accent color falls back to light custom color until set")
+    func customDarkFallsBackToLight() {
+        withCleanDefaults { settings in
+            settings.customAccentColor = Color(hex: "#336699")!
+            #expect(settings.customAccentColorDark.toHexString() == "#336699")
+
+            settings.customAccentColorDark = Color(hex: "#993366")!
+            #expect(settings.customAccentColorDark.toHexString() == "#993366")
+            #expect(settings.customAccentColor.toHexString() == "#336699")
+        }
+    }
+
+    @Test("Resolved accent color equals light resolution when toggle is off")
+    func resolvedMatchesLightWhenToggleOff() {
+        withCleanDefaults { settings in
+            settings.accentColor = .teal
+            settings.accentColorDark = .red
+            settings.useSeparateDarkAccentColor = false
+            #expect(settings.resolvedAccentColor == AccentColor.teal.color)
+        }
+    }
+}
+
 // MARK: - VideoQuality Tests
 
 @Suite("VideoQuality Tests")

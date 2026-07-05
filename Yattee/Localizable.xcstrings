@@ -10363,6 +10363,16 @@
         }
       }
     },
+    "settings.appearance.accentColor.dark" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dark"
+          }
+        }
+      }
+    },
     "settings.appearance.accentColor.default" : {
       "localizations" : {
         "en" : {
@@ -10395,6 +10405,16 @@
     },
     "settings.appearance.accentColor.indigo" : {
 
+    },
+    "settings.appearance.accentColor.light" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Light"
+          }
+        }
+      }
     },
     "settings.appearance.accentColor.orange" : {
       "localizations" : {
@@ -10432,6 +10452,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Red"
+          }
+        }
+      }
+    },
+    "settings.appearance.accentColor.separateColors" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Use separate light & dark colors"
           }
         }
       }

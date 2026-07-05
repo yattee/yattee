@@ -143,26 +143,65 @@ private struct AppIconPickerView: View {
 
 // MARK: - Accent Color Section
 
+private enum AccentColorTarget {
+    case light, dark
+}
+
 private struct AccentColorSection: View {
     @Bindable var settings: SettingsManager
 
     var body: some View {
         SettingsFormSection("settings.appearance.accentColor.header") {
-            LazyVGrid(columns: [GridItem(.adaptive(minimum: 50))], spacing: 16) {
-                ForEach(AccentColor.presets, id: \.self) { accentColor in
-                    AccentColorButton(
-                        accentColor: accentColor,
-                        isSelected: settings.accentColor == accentColor,
-                        onSelect: { settings.accentColor = accentColor }
-                    )
-                }
-
-                #if !os(tvOS)
-                CustomAccentColorButton(settings: settings)
-                #endif
+            #if !os(tvOS)
+            Toggle(isOn: $settings.useSeparateDarkAccentColor) {
+                Text(String(localized: "settings.appearance.accentColor.separateColors"))
             }
-            .padding(.vertical, 8)
+            #endif
+
+            if settings.useSeparateDarkAccentColor {
+                Text(String(localized: "settings.appearance.accentColor.light"))
+                    .font(.subheadline)
+                    .foregroundStyle(.secondary)
+                AccentColorGrid(settings: settings, target: .light)
+
+                Text(String(localized: "settings.appearance.accentColor.dark"))
+                    .font(.subheadline)
+                    .foregroundStyle(.secondary)
+                AccentColorGrid(settings: settings, target: .dark)
+            } else {
+                AccentColorGrid(settings: settings, target: .light)
+            }
         }
+    }
+}
+
+private struct AccentColorGrid: View {
+    @Bindable var settings: SettingsManager
+    let target: AccentColorTarget
+
+    private var selection: Binding<AccentColor> {
+        target == .light ? $settings.accentColor : $settings.accentColorDark
+    }
+
+    private var customColor: Binding<Color> {
+        target == .light ? $settings.customAccentColor : $settings.customAccentColorDark
+    }
+
+    var body: some View {
+        LazyVGrid(columns: [GridItem(.adaptive(minimum: 50))], spacing: 16) {
+            ForEach(AccentColor.presets, id: \.self) { accentColor in
+                AccentColorButton(
+                    accentColor: accentColor,
+                    isSelected: selection.wrappedValue == accentColor,
+                    onSelect: { selection.wrappedValue = accentColor }
+                )
+            }
+
+            #if !os(tvOS)
+            CustomAccentColorButton(selection: selection, customColor: customColor)
+            #endif
+        }
+        .padding(.vertical, 8)
     }
 }
 
@@ -233,17 +272,18 @@ private struct AccentColorButton: View {
 
 #if !os(tvOS)
 private struct CustomAccentColorButton: View {
-    @Bindable var settings: SettingsManager
+    @Binding var selection: AccentColor
+    @Binding var customColor: Color
 
-    private var isSelected: Bool { settings.accentColor == .custom }
+    private var isSelected: Bool { selection == .custom }
 
     #if os(macOS)
     var body: some View {
         Button {
-            settings.accentColor = .custom
-            ColorPanelBridge.shared.open(with: NSColor(settings.customAccentColor)) { nsColor in
-                settings.customAccentColor = Color(nsColor: nsColor)
-                settings.accentColor = .custom
+            selection = .custom
+            ColorPanelBridge.shared.open(with: NSColor(customColor)) { nsColor in
+                customColor = Color(nsColor: nsColor)
+                selection = .custom
             }
         } label: {
             ZStack {
@@ -258,7 +298,7 @@ private struct CustomAccentColorButton: View {
                     .frame(width: 40, height: 40)
 
                 Circle()
-                    .fill(settings.customAccentColor)
+                    .fill(customColor)
                     .frame(width: 28, height: 28)
 
                 if isSelected {
@@ -274,10 +314,10 @@ private struct CustomAccentColorButton: View {
     #else
     private var pickedColor: Binding<Color> {
         Binding(
-            get: { settings.customAccentColor },
+            get: { customColor },
             set: { newColor in
-                settings.customAccentColor = newColor
-                settings.accentColor = .custom
+                customColor = newColor
+                selection = .custom
             }
         )
     }
@@ -285,7 +325,7 @@ private struct CustomAccentColorButton: View {
     var body: some View {
         ZStack {
             Circle()
-                .fill(settings.customAccentColor)
+                .fill(customColor)
                 .frame(width: 40, height: 40)
                 .opacity(isSelected ? 1 : 0)
 
