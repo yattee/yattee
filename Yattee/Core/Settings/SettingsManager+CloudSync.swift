@@ -389,6 +389,10 @@ extension SettingsManager {
 
         clearCache()
         updateLastSyncTime()
+
+        #if !os(tvOS)
+        Self.applyTheme(theme)
+        #endif
     }
 
     /// Refreshes settings from iCloud by copying iCloud values to local storage.
@@ -445,5 +449,11 @@ extension SettingsManager {
 
         // Clear caches to force re-read from local storage
         clearCache()
+
+        // Re-apply the theme in case it was among the synced changes —
+        // it is enforced at the window level, not via SwiftUI state.
+        #if !os(tvOS)
+        Self.applyTheme(theme)
+        #endif
     }
 }

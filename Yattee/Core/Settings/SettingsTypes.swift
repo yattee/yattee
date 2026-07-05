@@ -7,6 +7,11 @@
 
 import Foundation
 import SwiftUI
+#if canImport(UIKit)
+import UIKit
+#elseif canImport(AppKit)
+import AppKit
+#endif
 
 // MARK: - Theme & Appearance
 
@@ -22,6 +27,24 @@ enum AppTheme: String, CaseIterable, Codable {
         case .dark: return .dark
         }
     }
+
+    #if canImport(UIKit)
+    var userInterfaceStyle: UIUserInterfaceStyle {
+        switch self {
+        case .system: return .unspecified
+        case .light: return .light
+        case .dark: return .dark
+        }
+    }
+    #elseif canImport(AppKit)
+    var appearance: NSAppearance? {
+        switch self {
+        case .system: return nil
+        case .light: return NSAppearance(named: .aqua)
+        case .dark: return NSAppearance(named: .darkAqua)
+        }
+    }
+    #endif
 }
 
 enum AccentColor: String, CaseIterable, Codable {

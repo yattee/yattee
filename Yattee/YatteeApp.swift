@@ -70,7 +70,6 @@ struct YatteeApp: App {
             ContentView()
                 .appEnvironment(appEnvironment)
                 #if !os(tvOS)
-                .preferredColorScheme(appEnvironment.settingsManager.theme.colorScheme)
                 .tint(appEnvironment.settingsManager.resolvedAccentColor)
                 #endif
                 #if os(macOS)
@@ -85,6 +84,9 @@ struct YatteeApp: App {
                     handleContinuedActivity(activity)
                 }
                 .onAppear {
+                    #if !os(tvOS)
+                    SettingsManager.applyTheme(appEnvironment.settingsManager.theme)
+                    #endif
                     registerBackgroundTasksIfNeeded()
                     #if os(tvOS)
                     TopShelfSnapshotWriter.startObserving(dataManager: appEnvironment.dataManager)

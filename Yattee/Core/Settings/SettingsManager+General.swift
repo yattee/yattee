@@ -24,7 +24,26 @@ extension SettingsManager {
         set {
             _theme = newValue
             set(newValue.rawValue, for: .theme)
+            Self.applyTheme(newValue)
         }
+    }
+
+    /// Forces the theme onto the platform windows directly. SwiftUI's
+    /// `.preferredColorScheme` fails to revert from dark back to light/system
+    /// while a sheet is presented, and on macOS it never covered secondary
+    /// window scenes (Settings), so the override is applied at the
+    /// UIKit/AppKit level instead.
+    static func applyTheme(_ theme: AppTheme) {
+        #if os(iOS)
+        for scene in UIApplication.shared.connectedScenes {
+            guard let windowScene = scene as? UIWindowScene else { continue }
+            for window in windowScene.windows {
+                window.overrideUserInterfaceStyle = theme.userInterfaceStyle
+            }
+        }
+        #elseif os(macOS)
+        NSApp.appearance = theme.appearance
+        #endif
     }
 
     var accentColor: AccentColor {
