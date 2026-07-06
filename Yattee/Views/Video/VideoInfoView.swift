@@ -259,6 +259,9 @@ struct VideoInfoView: View {
                 videoContent
             }
         }
+        // Opaque background so the header gradient (which fades to windowBackgroundColor)
+        // blends seamlessly even when presented outside a navigation stack.
+        .opaqueWindowBackground()
         .task {
             await loadInitialVideoIfNeeded()
         }

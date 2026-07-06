@@ -184,13 +184,17 @@ private struct MediaSourceByIDView: View {
 struct NavigationDestinationHandlerModifier: ViewModifier {
     func body(content: Content) -> some View {
         content
+            .opaqueWindowBackground()
             .navigationDestination(for: NavigationDestination.self) { destination in
-                if let transitionID = destination.transitionID {
-                    destination.view()
-                        .zoomTransitionDestination(id: transitionID)
-                } else {
-                    destination.view()
+                Group {
+                    if let transitionID = destination.transitionID {
+                        destination.view()
+                            .zoomTransitionDestination(id: transitionID)
+                    } else {
+                        destination.view()
+                    }
                 }
+                .opaqueWindowBackground()
             }
     }
 }
