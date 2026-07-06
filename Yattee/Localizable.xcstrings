@@ -2287,6 +2287,17 @@
         }
       }
     },
+    "downloads.cancel" : {
+      "comment" : "Cancel in-progress download context menu item",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cancel Download"
+          }
+        }
+      }
+    },
     "downloads.delete" : {
       "localizations" : {
         "en" : {
@@ -2341,6 +2352,17 @@
         }
       }
     },
+    "downloads.pause" : {
+      "comment" : "Pause download context menu item",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pause"
+          }
+        }
+      }
+    },
     "downloads.retry" : {
       "comment" : "Retry failed download button",
       "localizations" : {
@@ -2348,6 +2370,17 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Retry"
+          }
+        }
+      }
+    },
+    "downloads.resume" : {
+      "comment" : "Resume paused download context menu item",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Resume"
           }
         }
       }

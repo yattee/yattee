@@ -1315,11 +1315,6 @@ struct HomeView: View {
                         DownloadRowView(
                             download: download,
                             isActive: false,
-                            onDelete: {
-                                Task {
-                                    await downloadManager?.delete(download)
-                                }
-                            },
                             queueSource: .manual,
                             sourceLabel: String(localized: "queue.source.downloads"),
                             videoList: videoList,

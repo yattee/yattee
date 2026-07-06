@@ -17,7 +17,6 @@ struct DownloadRowView: View {
 
     let download: Download
     let isActive: Bool
-    var onDelete: (() -> Void)? = nil
 
     // Queue context (optional, enables auto-play when provided)
     var queueSource: QueueSource? = nil
@@ -82,19 +81,8 @@ struct DownloadRowView: View {
         if isActive {
             // Active downloads: custom row with progress indicators, no tap actions
             activeDownloadContent
-                .if(onDelete != nil) { view in
-                    view.videoContextMenu(
-                        video: video,
-                        customActions: [
-                            VideoContextAction(
-                                String(localized: "downloads.delete"),
-                                systemImage: "trash",
-                                role: .destructive,
-                                action: { onDelete?() }
-                            )
-                        ],
-                        context: .downloads
-                    )
+                .contextMenu {
+                    activeDownloadMenuItems
                 }
         } else {
             // Completed downloads: use VideoRowView with tap zones (thumbnail plays, text opens info)
@@ -120,7 +108,9 @@ struct DownloadRowView: View {
                         String(localized: "downloads.delete"),
                         systemImage: "trash",
                         role: .destructive,
-                        action: { onDelete?() }
+                        action: {
+                            Task { await appEnvironment?.downloadManager.delete(download) }
+                        }
                     )
                 ],
                 context: .downloads
@@ -128,6 +118,44 @@ struct DownloadRowView: View {
             .onAppear {
                 loadWatchDataIfNeeded()
             }
+        }
+    }
+
+    /// Menu items for an in-progress download: pause/resume/retry plus cancel.
+    /// The `.downloads` video context menu hides the built-in cancel item, and swipe
+    /// actions are iOS-only, so this is the only cancel affordance on macOS.
+    @ViewBuilder
+    private var activeDownloadMenuItems: some View {
+        switch download.status {
+        case .queued, .downloading:
+            Button {
+                Task { await appEnvironment?.downloadManager.pause(download) }
+            } label: {
+                Label(String(localized: "downloads.pause"), systemImage: "pause.fill")
+            }
+
+        case .paused:
+            Button {
+                Task { await appEnvironment?.downloadManager.resume(download) }
+            } label: {
+                Label(String(localized: "downloads.resume"), systemImage: "play.fill")
+            }
+
+        case .failed:
+            Button {
+                Task { await appEnvironment?.downloadManager.resume(download) }
+            } label: {
+                Label(String(localized: "downloads.retry"), systemImage: "arrow.clockwise")
+            }
+
+        case .completed:
+            EmptyView()
+        }
+
+        Button(role: .destructive) {
+            Task { await appEnvironment?.downloadManager.cancel(download) }
+        } label: {
+            Label(String(localized: "downloads.cancel"), systemImage: "xmark.circle")
         }
     }
 
