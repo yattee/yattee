@@ -29,10 +29,27 @@ struct SettingsFormContainer<Content: View>: View {
             .padding(.vertical, 8)
             .frame(maxWidth: .infinity, alignment: .leading)
         }
+        .opaqueWindowBackground()
         #else
         Form {
             content()
         }
+        #endif
+    }
+}
+
+extension View {
+    /// Unified background for settings pages whose root is a `Form` or `List`.
+    ///
+    /// On macOS those containers draw their own translucent scroll background
+    /// (wallpaper-tinted) on top of any background placed behind them, so it
+    /// has to be hidden before the opaque window background can show through.
+    /// No-op on iOS/tvOS.
+    func opaqueSettingsFormBackground() -> some View {
+        #if os(macOS)
+        return scrollContentBackground(.hidden).opaqueWindowBackground()
+        #else
+        return self
         #endif
     }
 }

@@ -28,6 +28,7 @@ struct PlayerPillEditorView: View {
         #if os(iOS)
         .navigationBarTitleDisplayMode(.inline)
         #endif
+        .opaqueSettingsFormBackground()
         .onAppear {
             syncLocalState()
         }

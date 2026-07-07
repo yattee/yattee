@@ -100,6 +100,7 @@ private struct PlayerControlsSettingsContent: View {
         #if os(macOS)
         .formStyle(.grouped)
         #endif
+        .opaqueSettingsFormBackground()
         .id(refreshID)
         .alert(
             String(localized: "settings.playerControls.error"),

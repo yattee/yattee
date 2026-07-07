@@ -32,6 +32,7 @@ struct ProgressBarSettingsView: View {
         #elseif os(macOS)
         .formStyle(.grouped)
         #endif
+        .opaqueSettingsFormBackground()
         .onAppear {
             loadSettings()
         }

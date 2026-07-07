@@ -328,6 +328,7 @@ private struct EditRemoteServerContent: View {
         #if os(macOS)
         .formStyle(.grouped)
         #endif
+        .opaqueSettingsFormBackground()
         .confirmationDialog(
             String(localized: "sources.delete.confirmation.single \(instance.displayName)"),
             isPresented: $showingDeleteConfirmation,
@@ -696,6 +697,7 @@ private struct EditFileSourceContent: View {
         #if os(macOS)
         .formStyle(.grouped)
         #endif
+        .opaqueSettingsFormBackground()
         .confirmationDialog(
             String(localized: "sources.delete.confirmation.single \(source.name)"),
             isPresented: $showingDeleteConfirmation,

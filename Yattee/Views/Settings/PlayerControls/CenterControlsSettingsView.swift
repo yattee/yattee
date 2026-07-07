@@ -281,6 +281,7 @@ struct CenterControlsSettingsView: View {
         #else
         .navigationTitle(String(localized: "settings.playerControls.centerControls"))
         #endif
+        .opaqueSettingsFormBackground()
         #if os(iOS)
         .navigationBarTitleDisplayMode(.inline)
         #endif

@@ -79,6 +79,9 @@ struct SettingsView: View {
                         }
                     }
                 }
+                // Covers all section pages and their pushed sub-pages, which
+                // otherwise sit on the translucent wallpaper-tinted material.
+                .opaqueWindowBackground()
             }
         }
     }

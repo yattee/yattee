@@ -33,6 +33,7 @@ struct MiniPlayerEditorView: View {
         #elseif os(macOS)
         .formStyle(.grouped)
         #endif
+        .opaqueSettingsFormBackground()
         .onAppear {
             syncLocalState()
         }
@@ -293,6 +294,7 @@ struct MiniPlayerButtonConfigurationView: View {
             #elseif os(macOS)
             .formStyle(.grouped)
             #endif
+            .opaqueSettingsFormBackground()
             .onAppear {
                 syncFromConfiguration(config)
             }

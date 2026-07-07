@@ -133,6 +133,7 @@ struct ImportSubscriptionsView: View {
                     .accessibilityIdentifier(AccessibilityID.row(channel.id.channelID))
             }
         }
+        .opaqueSettingsFormBackground()
         .accessibilityIdentifier(AccessibilityID.list)
     }
 

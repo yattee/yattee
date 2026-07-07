@@ -33,6 +33,7 @@ struct PillButtonConfigurationView: View {
             #if os(iOS)
             .navigationBarTitleDisplayMode(.inline)
             #endif
+            .opaqueSettingsFormBackground()
             .onAppear {
                 syncFromConfiguration(config)
             }

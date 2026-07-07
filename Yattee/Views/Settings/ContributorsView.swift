@@ -18,6 +18,7 @@ struct ContributorsView: View {
 
     var body: some View {
         content
+            .opaqueWindowBackground()
             .navigationTitle(String(localized: "settings.contributors.title"))
             #if os(iOS)
             .navigationBarTitleDisplayMode(.inline)

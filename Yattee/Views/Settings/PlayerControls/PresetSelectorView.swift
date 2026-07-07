@@ -63,6 +63,7 @@ struct PresetSelectorView: View {
 
     var body: some View {
         presetList
+            .opaqueSettingsFormBackground()
             .navigationTitle(String(localized: "settings.playerControls.presets"))
             #if os(iOS)
             .navigationBarTitleDisplayMode(.inline)

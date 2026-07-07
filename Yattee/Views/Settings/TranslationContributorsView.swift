@@ -13,6 +13,7 @@ struct TranslationContributorsView: View {
 
     var body: some View {
         content
+            .opaqueWindowBackground()
             .navigationTitle(String(localized: "settings.translators.title"))
             #if os(iOS)
             .navigationBarTitleDisplayMode(.inline)

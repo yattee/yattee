@@ -146,6 +146,7 @@ struct SectionEditorView: View {
         #if os(iOS)
         .navigationBarTitleDisplayMode(.inline)
         #endif
+        .opaqueSettingsFormBackground()
         .toolbar {
             #if os(iOS)
             EditButton()

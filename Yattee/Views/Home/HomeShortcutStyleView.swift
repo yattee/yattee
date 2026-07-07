@@ -110,6 +110,7 @@ struct HomeShortcutStyleView: View {
         #if os(macOS)
         .listStyle(.inset)
         #endif
+        .opaqueSettingsFormBackground()
         .navigationTitle(String(localized: "home.settings.shortcuts.style"))
         #if os(iOS)
         .navigationBarTitleDisplayMode(.inline)

@@ -148,6 +148,7 @@ struct SidebarSettingsView: View {
         #if os(macOS)
         .listStyle(.inset)
         #endif
+        .opaqueSettingsFormBackground()
         #if !os(tvOS)
         .navigationTitle(String(localized: "settings.sidebar.title"))
         #endif

@@ -46,6 +46,7 @@ struct LegacyAccountsImportView: View {
         #if os(iOS)
         .navigationBarTitleDisplayMode(.inline)
         #endif
+        .opaqueSettingsFormBackground()
         .toolbar {
             #if !os(tvOS)
             if showsDoneButton {

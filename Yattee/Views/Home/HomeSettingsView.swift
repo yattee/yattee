@@ -70,6 +70,7 @@ struct HomeSettingsView: View {
             )
         }
         #endif
+        .opaqueSettingsFormBackground()
         #if !os(tvOS)
         .navigationTitle(String(localized: "home.settings.title"))
         #endif

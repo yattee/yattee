@@ -25,6 +25,7 @@ struct LogViewerView: View {
             // Log list
             logList
         }
+        .opaqueSettingsFormBackground()
         .navigationTitle(String(localized: "settings.advanced.logs.title"))
         #if os(iOS)
         .navigationBarTitleDisplayMode(.inline)

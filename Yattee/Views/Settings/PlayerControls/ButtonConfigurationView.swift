@@ -77,6 +77,7 @@ struct ButtonConfigurationView: View {
             #elseif os(macOS)
             .formStyle(.grouped)
             #endif
+            .opaqueSettingsFormBackground()
             .onAppear {
                 syncFromConfiguration(config)
             }

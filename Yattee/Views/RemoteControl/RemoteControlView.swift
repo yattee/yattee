@@ -163,6 +163,7 @@ struct RemoteControlView: View {
         #if os(tvOS)
         .safeAreaInset(edge: .leading) { tvOSSidebar }
         #else
+        .opaqueWindowBackground()
         .navigationTitle(device.name)
         #endif
         #if os(iOS)

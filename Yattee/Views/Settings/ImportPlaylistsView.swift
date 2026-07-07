@@ -163,6 +163,7 @@ struct ImportPlaylistsView: View {
                     .accessibilityIdentifier(AccessibilityID.row(playlist.id.playlistID))
             }
         }
+        .opaqueSettingsFormBackground()
         .accessibilityIdentifier(AccessibilityID.list)
     }
 
