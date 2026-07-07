@@ -123,7 +123,11 @@ private struct DefaultOptionsSection: View {
         #if os(iOS) || os(tvOS)
         options.append(("ao", "audiounit"))
         #else
-        options.append(("ao", "coreaudio,avfoundation"))
+        if ProcessInfo.processInfo.operatingSystemVersion.majorVersion >= 27 {
+            options.append(("ao", "avfoundation,coreaudio"))
+        } else {
+            options.append(("ao", "coreaudio,avfoundation"))
+        }
         #endif
 
         options.append(("cache", "yes"))

@@ -463,11 +463,18 @@ final class MPVClient: @unchecked Sendable {
         #elseif os(macOS)
         // coreaudio is the native macOS AO, but on macOS 27 beta it fails to
         // initialize ("unable to set the input channel layout on the audio
-        // unit … -50"), leaving playback silent. Add avfoundation
-        // (AVSampleBufferAudioRenderer) as a fallback so mpv self-heals: older
-        // macOS keeps using coreaudio, and where coreaudio can't open the
-        // device mpv drops to avfoundation instead of playing no sound.
-        setOptionSync("ao", "coreaudio,avfoundation")
+        // unit … -50"), leaving playback silent. Worse, mpv's coreaudio AO
+        // registers a HAL hotplug listener before the step that fails and its
+        // init-failure path never unregisters it, so every failed init leaves
+        // a dangling listener that crashes (use-after-free) on the next audio
+        // device change. On macOS 27+ put avfoundation first so the failing
+        // coreaudio init never runs; older macOS keeps native coreaudio with
+        // avfoundation as fallback.
+        if ProcessInfo.processInfo.operatingSystemVersion.majorVersion >= 27 {
+            setOptionSync("ao", "avfoundation,coreaudio")
+        } else {
+            setOptionSync("ao", "coreaudio,avfoundation")
+        }
         #endif
 
         // Cache settings for network streams
