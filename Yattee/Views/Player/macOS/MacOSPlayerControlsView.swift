@@ -155,16 +155,39 @@ struct MacOSPlayerControlsView: View {
         .padding(.bottom, 24)
         .frame(maxWidth: .infinity, alignment: .leading)
         .background(
-            LinearGradient(
-                colors: [.black.opacity(0.55), .clear],
-                startPoint: .top, endPoint: .bottom
-            )
-            .allowsHitTesting(false)
+            topBarScrim
+                // Extend the scrim past the bar's bottom edge so the fade has
+                // more room and doesn't end right under the title text.
+                .padding(.bottom, -24)
+                .allowsHitTesting(false)
         )
         .background(
             TrafficLightInsetReader(inset: $trafficLightInset)
                 .allowsHitTesting(false)
         )
+    }
+
+    /// Alpha ramp shared by both scrim variants: multi-stop eased fade so the
+    /// scrim has no visible hard edge where it ends.
+    private func scrimGradient(maxOpacity: Double) -> LinearGradient {
+        LinearGradient(
+            stops: [
+                .init(color: .black.opacity(maxOpacity), location: 0),
+                .init(color: .black.opacity(maxOpacity * 0.8), location: 0.35),
+                .init(color: .black.opacity(maxOpacity * 0.45), location: 0.65),
+                .init(color: .black.opacity(maxOpacity * 0.15), location: 0.85),
+                .init(color: .clear, location: 1),
+            ],
+            startPoint: .top, endPoint: .bottom
+        )
+    }
+
+    /// Background behind the top bar keeping the title/author legible over the
+    /// video. A gradient-masked Liquid Glass strip was tried on macOS 26 but
+    /// rendered poorly over the video layer, so the dimming gradient is used
+    /// on all versions.
+    private var topBarScrim: some View {
+        scrimGradient(maxOpacity: 0.75)
     }
 
     // MARK: - Actions
