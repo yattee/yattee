@@ -236,13 +236,7 @@ struct MiniPlayerView: View {
                     foregroundStyle: .primary
                 )
 
-                if let authorName = currentVideo?.author.name, !authorName.isEmpty {
-                    MarqueeText(
-                        text: authorName,
-                        font: .caption,
-                        foregroundStyle: .secondary
-                    )
-                }
+                authorLine(font: .caption)
             }
             .contentShape(Rectangle())
             .onTapGesture {
@@ -265,12 +259,7 @@ struct MiniPlayerView: View {
         .padding(.vertical, 8)
         .background(.ultraThinMaterial)
         .overlay(alignment: .bottom) {
-            GeometryReader { geo in
-                Rectangle()
-                    .fill(.red)
-                    .frame(width: geo.size.width * (playerState?.progress ?? 0), height: 2)
-            }
-            .frame(height: 2)
+            progressLine
         }
     }
 
@@ -299,13 +288,7 @@ struct MiniPlayerView: View {
                     foregroundStyle: .primary
                 )
 
-                if let authorName = currentVideo?.author.name, !authorName.isEmpty {
-                    MarqueeText(
-                        text: authorName,
-                        font: .caption,
-                        foregroundStyle: .secondary
-                    )
-                }
+                authorLine(font: .caption)
             }
             .contentShape(Rectangle())
             .onTapGesture {
@@ -320,12 +303,7 @@ struct MiniPlayerView: View {
         .frame(maxWidth: 420)
         .glassBackground(.regular, in: .capsule, fallback: .regularMaterial)
         .overlay(alignment: .bottom) {
-            GeometryReader { geo in
-                Rectangle()
-                    .fill(.red)
-                    .frame(width: geo.size.width * (playerState?.progress ?? 0), height: 2)
-            }
-            .frame(height: 2)
+            progressLine
         }
         .clipShape(Capsule())
         .shadow(color: .black.opacity(0.25), radius: 8, y: 4)
@@ -333,6 +311,54 @@ struct MiniPlayerView: View {
     #endif
 
     // MARK: - Shared Components
+
+    /// Author line with a red LIVE indicator for live streams.
+    /// MarqueeText draws its text at the top of a fixed-height frame, so the badge
+    /// is top-aligned with it (dot stays centered against the LIVE text only).
+    @ViewBuilder
+    private func authorLine(font: Font) -> some View {
+        let authorName = currentVideo?.author.name ?? ""
+        if playerState?.isLive == true {
+            HStack(alignment: .top, spacing: 4) {
+                HStack(spacing: 4) {
+                    Circle()
+                        .fill(.red)
+                        .frame(width: 6, height: 6)
+                    Text(String(localized: "player.live"))
+                        .font(font.weight(.semibold))
+                        .foregroundStyle(.red)
+                }
+                .fixedSize()
+
+                if !authorName.isEmpty {
+                    MarqueeText(
+                        text: authorName,
+                        font: font,
+                        foregroundStyle: .secondary
+                    )
+                }
+            }
+        } else if !authorName.isEmpty {
+            MarqueeText(
+                text: authorName,
+                font: font,
+                foregroundStyle: .secondary
+            )
+        }
+    }
+
+    /// Bottom progress line; hidden for live streams where progress is meaningless.
+    @ViewBuilder
+    private var progressLine: some View {
+        if playerState?.isLive != true {
+            GeometryReader { geo in
+                Rectangle()
+                    .fill(.red)
+                    .frame(width: geo.size.width * (playerState?.progress ?? 0), height: 2)
+            }
+            .frame(height: 2)
+        }
+    }
 
     /// Video preview that shows live video when available, or thumbnail as fallback.
     @ViewBuilder
