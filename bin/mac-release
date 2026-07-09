@@ -1,0 +1,141 @@
+#!/bin/bash
+# Build, sign (Developer ID), notarize and package the macOS app for
+# distribution outside the App Store — produces a .zip and .dmg you can
+# send to other Macs.
+#
+# Usage: bin/mac-release [--skip-build] [--skip-notarize]
+#   --skip-build     reuse the existing archive from a previous run
+#   --skip-notarize  stop after signing (app won't pass Gatekeeper on other Macs)
+#
+# Requirements:
+#   - "Developer ID Application" certificate in the login keychain
+#   - "match Direct stream.yattee.app macos" provisioning profile installed
+#     (run `fastlane match developer_id --platform macos --readonly` if missing)
+#   - fastlane/.env with DEVELOPER_KEY_ID / DEVELOPER_KEY_ISSUER_ID /
+#     DEVELOPER_KEY_CONTENT (base64-encoded .p8) for notarization
+set -euo pipefail
+
+cd "$(dirname "$0")/.."
+
+APP_NAME=Yattee
+BUNDLE_ID=stream.yattee.app
+TEAM_ID=78Z5H3M6RJ
+PROFILE="match Direct ${BUNDLE_ID} macos"
+
+SKIP_BUILD=0
+SKIP_NOTARIZE=0
+for arg in "$@"; do
+  case "$arg" in
+    --skip-build) SKIP_BUILD=1 ;;
+    --skip-notarize) SKIP_NOTARIZE=1 ;;
+    *) echo "Unknown option: $arg"; exit 1 ;;
+  esac
+done
+
+# Marketing version is a build setting (no Info.plist entry), so agvtool
+# can't read it — take it from the pbxproj.
+VERSION=$(sed -n 's/.*MARKETING_VERSION = \([^;]*\);.*/\1/p' "${APP_NAME}.xcodeproj/project.pbxproj" | head -1)
+BUILD=$(xcrun agvtool what-version -terse)
+[ -n "$VERSION" ] && [ -n "$BUILD" ] || { echo "Could not determine version/build"; exit 1; }
+
+OUT_DIR="fastlane/builds/${VERSION}-${BUILD}/macOS"
+ARCHIVE="${OUT_DIR}/${APP_NAME}.xcarchive"
+APP="${OUT_DIR}/${APP_NAME}.app"
+ZIP="${OUT_DIR}/${APP_NAME}-${VERSION}-macOS.zip"
+DMG="${OUT_DIR}/${APP_NAME}-${VERSION}-macOS.dmg"
+LOG="${OUT_DIR}/xcodebuild.log"
+mkdir -p "$OUT_DIR"
+
+TMP=$(mktemp -d)
+trap 'rm -rf "$TMP"' EXIT
+
+echo "==> ${APP_NAME} ${VERSION} (${BUILD}) → ${OUT_DIR}"
+
+if [ "$SKIP_BUILD" = 1 ] && [ -d "$ARCHIVE" ]; then
+  echo "==> Skipping build, reusing ${ARCHIVE}"
+else
+  echo "==> Archiving (Release-DeveloperID)… log: ${LOG}"
+  xcodebuild archive \
+    -project "${APP_NAME}.xcodeproj" \
+    -scheme "$APP_NAME" \
+    -configuration Release-DeveloperID \
+    -destination 'generic/platform=macOS' \
+    -archivePath "$ARCHIVE" \
+    CODE_SIGN_STYLE=Manual \
+    CODE_SIGN_IDENTITY="Developer ID Application" \
+    DEVELOPMENT_TEAM="$TEAM_ID" \
+    PROVISIONING_PROFILE_SPECIFIER="$PROFILE" \
+    > "$LOG" 2>&1 || { tail -50 "$LOG"; echo "Archive failed — full log: ${LOG}"; exit 1; }
+fi
+
+echo "==> Exporting with Developer ID…"
+cat > "$TMP/export.plist" <<PLIST
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+  <key>method</key><string>developer-id</string>
+  <key>signingStyle</key><string>manual</string>
+  <key>teamID</key><string>${TEAM_ID}</string>
+  <key>provisioningProfiles</key>
+  <dict>
+    <key>${BUNDLE_ID}</key><string>${PROFILE}</string>
+  </dict>
+</dict>
+</plist>
+PLIST
+rm -rf "$APP"
+xcodebuild -exportArchive \
+  -archivePath "$ARCHIVE" \
+  -exportPath "$OUT_DIR" \
+  -exportOptionsPlist "$TMP/export.plist" \
+  >> "$LOG" 2>&1 || { tail -50 "$LOG"; echo "Export failed — full log: ${LOG}"; exit 1; }
+
+if [ "$SKIP_NOTARIZE" = 0 ]; then
+  # Notarization credentials come from the same ASC API key fastlane uses.
+  set -a; source fastlane/.env; set +a
+  : "${DEVELOPER_KEY_ID:?missing in fastlane/.env}"
+  : "${DEVELOPER_KEY_ISSUER_ID:?missing in fastlane/.env}"
+  : "${DEVELOPER_KEY_CONTENT:?missing in fastlane/.env}"
+  KEY_FILE="$TMP/AuthKey_${DEVELOPER_KEY_ID}.p8"
+  echo "$DEVELOPER_KEY_CONTENT" | base64 -d > "$KEY_FILE"
+
+  echo "==> Submitting for notarization (this can take a few minutes)…"
+  ditto -c -k --keepParent "$APP" "$TMP/notarize.zip"
+  NOTARY_OUT=$(xcrun notarytool submit "$TMP/notarize.zip" \
+    --key "$KEY_FILE" \
+    --key-id "$DEVELOPER_KEY_ID" \
+    --issuer "$DEVELOPER_KEY_ISSUER_ID" \
+    --wait --timeout 30m 2>&1 | tee /dev/stderr) || true
+
+  if ! grep -q "status: Accepted" <<< "$NOTARY_OUT"; then
+    SUBMISSION_ID=$(grep -m1 -o 'id: [0-9a-f-]*' <<< "$NOTARY_OUT" | head -1 | cut -d' ' -f2)
+    echo "Notarization failed."
+    if [ -n "$SUBMISSION_ID" ]; then
+      echo "==> Fetching notarization log for ${SUBMISSION_ID}…"
+      xcrun notarytool log "$SUBMISSION_ID" \
+        --key "$KEY_FILE" --key-id "$DEVELOPER_KEY_ID" --issuer "$DEVELOPER_KEY_ISSUER_ID"
+    fi
+    exit 1
+  fi
+
+  echo "==> Stapling notarization ticket…"
+  xcrun stapler staple "$APP"
+fi
+
+echo "==> Packaging…"
+rm -f "$ZIP" "$DMG"
+ditto -c -k --keepParent "$APP" "$ZIP"
+hdiutil create -volname "${APP_NAME} ${VERSION}" -srcfolder "$APP" -ov -format UDZO "$DMG" > /dev/null
+
+echo "==> Verifying…"
+codesign --verify --deep --strict "$APP"
+if [ "$SKIP_NOTARIZE" = 0 ]; then
+  xcrun stapler validate "$APP"
+  spctl --assess --type exec -vv "$APP" 2>&1 | tail -2
+fi
+
+echo
+echo "Done:"
+echo "  ${ZIP}"
+echo "  ${DMG}"
