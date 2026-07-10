@@ -114,11 +114,17 @@ struct RemoteControlContentView: View {
                 statusRow
             }
         } footer: {
-            if isIncognito {
-                Text(String(localized: "remoteControl.enableFooter.incognito"))
-            } else {
-                Text(String(localized: "remoteControl.enableFooter"))
+            Group {
+                if isIncognito {
+                    Text(String(localized: "remoteControl.enableFooter.incognito"))
+                } else {
+                    Text(String(localized: "remoteControl.enableFooter"))
+                }
             }
+            .lineLimit(nil)
+            .multilineTextAlignment(.leading)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .fixedSize(horizontal: false, vertical: true)
         }
     }
 
@@ -190,6 +196,10 @@ struct RemoteControlContentView: View {
         } footer: {
             if remoteControl?.isEnabled == true, remoteControl?.discoveredDevices.isEmpty == true {
                 Text(String(localized: "remoteControl.noDevicesFooter"))
+                    .lineLimit(nil)
+                    .multilineTextAlignment(.leading)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .fixedSize(horizontal: false, vertical: true)
             }
         }
     }
