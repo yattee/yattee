@@ -23,7 +23,11 @@ struct ManageChannelsView: View {
     // View options (persisted)
     @AppStorage("manageChannelsLayout") private var layout: VideoListLayout = .grid
     @AppStorage("manageChannelsRowStyle") private var rowStyle: VideoRowStyle = .regular
+    #if os(macOS) || os(tvOS)
+    @AppStorage("manageChannelsGridColumns") private var gridColumns = 5
+    #else
     @AppStorage("manageChannelsGridColumns") private var gridColumns = 3
+    #endif
     @AppStorage("manageChannelsSortOrder") private var sortOrder: SidebarChannelSort = .alphabetical
 
     @State private var subscriptionMetadata: [String: Subscription] = [:]
