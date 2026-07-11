@@ -887,14 +887,13 @@ struct SearchView: View {
                             showingClearAllRecentsConfirmation = true
                         } label: {
                             HStack(spacing: 6) {
-                                Spacer()
                                 Image(systemName: "trash")
                                 Text(String(localized: "search.clearAllRecents"))
                                     .fontWeight(.semibold)
-                                Spacer()
                             }
                         }
                         .foregroundStyle(.secondary)
+                        .frame(maxWidth: .infinity)
                         .padding(.top, 16)
                         .padding(.bottom, 32)
                     }
