@@ -307,6 +307,14 @@ struct ChannelView: View {
                                 .id("channelTop")
 
                             // Content based on instance type
+                            // On macOS the content type picker lives in the toolbar instead.
+                            #if os(macOS)
+                            // Breathing room between the banner and the content below.
+                            Color.clear.frame(height: 16)
+                            if !supportsChannelTabs {
+                                channelDescription(channel)
+                            }
+                            #else
                             if supportsChannelTabs {
                                 // Pill-style content type switcher
                                 contentTypePicker
@@ -316,6 +324,7 @@ struct ChannelView: View {
                                 // Non-tab instances: show description
                                 channelDescription(channel)
                             }
+                            #endif
                         }
 
                         // Tab content or search results
@@ -366,8 +375,11 @@ struct ChannelView: View {
         ))
         .toolbar {
             #if os(macOS)
-            ToolbarItem(placement: .principal) {
-                collapsedToolbarTitle(name: channel.name, thumbnailURL: channel.thumbnailURL)
+            if supportsChannelTabs && !(isSearchActive && hasSearched) {
+                ToolbarItem(placement: .principal) {
+                    contentTypePicker
+                        .fixedSize()
+                }
             }
             #else
             ToolbarItem(placement: .principal) {
@@ -409,6 +421,22 @@ struct ChannelView: View {
                 }
                 #endif
             }
+
+            // macOS: channel avatar + name sit on the leading edge, next to view
+            // options. Excluded from the shared glass background so the view
+            // options button keeps its own capsule and the title renders plain.
+            #if os(macOS)
+            if #available(macOS 26, *) {
+                ToolbarItem(placement: .navigation) {
+                    collapsedToolbarTitle(name: channel.name, thumbnailURL: channel.thumbnailURL)
+                }
+                .sharedBackgroundVisibility(.hidden)
+            } else {
+                ToolbarItem(placement: .navigation) {
+                    collapsedToolbarTitle(name: channel.name, thumbnailURL: channel.thumbnailURL)
+                }
+            }
+            #endif
 
             // iOS keeps a fixed gap between the trailing view options and channel
             // menu buttons; on macOS view options moves to the leading edge, so no
@@ -471,11 +499,16 @@ struct ChannelView: View {
                         .id("channelTop")
 
                     // Show tab picker during loading (doesn't depend on channel)
+                    // On macOS the content type picker lives in the toolbar instead.
+                    #if os(macOS)
+                    Color.clear.frame(height: 16)
+                    #else
                     if supportsChannelTabs {
                         contentTypePicker
                             .padding(.horizontal)
                             .padding(.vertical, 8)
                     }
+                    #endif
 
                     // Centered spinner for content area below tabs
                     ProgressView()
@@ -491,8 +524,11 @@ struct ChannelView: View {
         .ignoresSafeArea(edges: .top)
         .toolbar {
             #if os(macOS)
-            ToolbarItem(placement: .principal) {
-                collapsedToolbarTitle(name: cached.name, thumbnailURL: cached.thumbnailURL)
+            if supportsChannelTabs {
+                ToolbarItem(placement: .principal) {
+                    contentTypePicker
+                        .fixedSize()
+                }
             }
             #else
             ToolbarItem(placement: .principal) {
@@ -534,6 +570,22 @@ struct ChannelView: View {
                 }
                 #endif
             }
+
+            // macOS: channel avatar + name sit on the leading edge, next to view
+            // options. Excluded from the shared glass background so the view
+            // options button keeps its own capsule and the title renders plain.
+            #if os(macOS)
+            if #available(macOS 26, *) {
+                ToolbarItem(placement: .navigation) {
+                    collapsedToolbarTitle(name: cached.name, thumbnailURL: cached.thumbnailURL)
+                }
+                .sharedBackgroundVisibility(.hidden)
+            } else {
+                ToolbarItem(placement: .navigation) {
+                    collapsedToolbarTitle(name: cached.name, thumbnailURL: cached.thumbnailURL)
+                }
+            }
+            #endif
 
             // iOS keeps a fixed gap between the trailing view options and channel
             // menu buttons; on macOS view options moves to the leading edge, so no
@@ -865,8 +917,9 @@ struct ChannelView: View {
     // MARK: - Header
 
     #if os(macOS)
+    @ViewBuilder
     private func collapsedToolbarTitle(name: String, thumbnailURL: URL?) -> some View {
-        HStack(spacing: 8) {
+        let label = HStack(spacing: 8) {
             LazyImage(url: thumbnailURL) { state in
                 if let image = state.image {
                     image
@@ -885,6 +938,16 @@ struct ChannelView: View {
                 .lineLimit(1)
         }
         .padding(.horizontal, 10)
+
+        // Own glass capsule; the toolbar item opts out of the shared background
+        // so this doesn't merge with the view options button.
+        if #available(macOS 26, *) {
+            label
+                .padding(.vertical, 5)
+                .glassEffect()
+        } else {
+            label
+        }
     }
     #endif
 
