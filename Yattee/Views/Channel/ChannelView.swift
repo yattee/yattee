@@ -368,6 +368,11 @@ struct ChannelView: View {
         }
         .background(viewBackgroundColor)
         .ignoresSafeArea(edges: .top)
+        #if os(macOS)
+        .overlay(alignment: .top) {
+            legacyToolbarScrim
+        }
+        #endif
         .animation(.easeInOut(duration: 0.25), value: isSearchActive)
         .modifier(ChannelScrollOffsetModifier(
             scrollOffset: $scrollOffset,
@@ -522,6 +527,11 @@ struct ChannelView: View {
         }
         .background(viewBackgroundColor)
         .ignoresSafeArea(edges: .top)
+        #if os(macOS)
+        .overlay(alignment: .top) {
+            legacyToolbarScrim
+        }
+        #endif
         .toolbar {
             #if os(macOS)
             if supportsChannelTabs {
@@ -917,6 +927,28 @@ struct ChannelView: View {
     // MARK: - Header
 
     #if os(macOS)
+    /// Pre-macOS 26 has no Liquid Glass toolbar capsules, so toolbar items sit
+    /// directly on the banner/scrolled content. A fixed window-background scrim
+    /// at the top keeps them legible in both appearances.
+    @ViewBuilder
+    private var legacyToolbarScrim: some View {
+        if #unavailable(macOS 26) {
+            LinearGradient(
+                stops: [
+                    .init(color: Color(nsColor: .windowBackgroundColor).opacity(0.9), location: 0),
+                    .init(color: Color(nsColor: .windowBackgroundColor).opacity(0.75), location: 0.5),
+                    .init(color: .clear, location: 1)
+                ],
+                startPoint: .top,
+                endPoint: .bottom
+            )
+            .frame(height: 100)
+            .frame(maxWidth: .infinity)
+            .allowsHitTesting(false)
+            .ignoresSafeArea(edges: .top)
+        }
+    }
+
     @ViewBuilder
     private func collapsedToolbarTitle(name: String, thumbnailURL: URL?) -> some View {
         let label = HStack(spacing: 8) {
