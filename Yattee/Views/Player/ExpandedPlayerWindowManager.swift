@@ -250,14 +250,18 @@ final class ExpandedPlayerWindowManager: NSObject {
                 }
             }
 
-            if animated {
-                NSAnimationContext.runAnimationGroup({ context in
-                    context.duration = 0.2
-                    context.timingFunction = CAMediaTimingFunction(name: .easeIn)
-                    window.animator().alphaValue = 0
-                }, completionHandler: hideWindow)
-            } else {
-                hideWindow()
+            exitFullScreenIfNeeded(window) {
+                Task { @MainActor in
+                    if animated {
+                        NSAnimationContext.runAnimationGroup({ context in
+                            context.duration = 0.2
+                            context.timingFunction = CAMediaTimingFunction(name: .easeIn)
+                            window.animator().alphaValue = 0
+                        }, completionHandler: hideWindow)
+                    } else {
+                        hideWindow()
+                    }
+                }
             }
         } else {
             // PiP is not active - fully clean up the window
@@ -283,16 +287,46 @@ final class ExpandedPlayerWindowManager: NSObject {
                 }
             }
 
-            if animated {
-                NSAnimationContext.runAnimationGroup({ context in
-                    context.duration = 0.2
-                    context.timingFunction = CAMediaTimingFunction(name: .easeIn)
-                    window.animator().alphaValue = 0
-                }, completionHandler: cleanup)
-            } else {
-                cleanup()
+            exitFullScreenIfNeeded(window) {
+                Task { @MainActor in
+                    if animated {
+                        NSAnimationContext.runAnimationGroup({ context in
+                            context.duration = 0.2
+                            context.timingFunction = CAMediaTimingFunction(name: .easeIn)
+                            window.animator().alphaValue = 0
+                        }, completionHandler: cleanup)
+                    } else {
+                        cleanup()
+                    }
+                }
             }
         }
+    }
+
+    /// Runs `completion` once `window` is out of native fullscreen. Ordering
+    /// out a fullscreen window skips the exit transition and strands its (now
+    /// empty, black) fullscreen space on screen, so every dismissal path must
+    /// leave fullscreen before hiding the window.
+    private func exitFullScreenIfNeeded(_ window: NSWindow, completion: @escaping @Sendable () -> Void) {
+        guard window.styleMask.contains(.fullScreen) else {
+            completion()
+            return
+        }
+
+        let waiter = FullScreenExitWaiter()
+        waiter.observer = NotificationCenter.default.addObserver(
+            forName: NSWindow.didExitFullScreenNotification,
+            object: window,
+            queue: .main
+        ) { _ in
+            waiter.finish(completion)
+        }
+        // Fallback: if AppKit refuses the exit (e.g. mid-transition), don't
+        // leave the window stranded on screen forever.
+        DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
+            waiter.finish(completion)
+        }
+        window.toggleFullScreen(nil)
     }
 
     /// Updates the window level based on floating preference.
@@ -627,6 +661,24 @@ final class ExpandedPlayerWindowManager: NSObject {
     }
 }
 
+/// One-shot gate shared by the fullscreen-exit notification and its timeout
+/// fallback: whichever fires first runs the completion, the other is a no-op.
+/// Both fire on the main thread.
+private final class FullScreenExitWaiter: @unchecked Sendable {
+    var observer: NSObjectProtocol?
+    private var completed = false
+
+    func finish(_ completion: @Sendable () -> Void) {
+        guard !completed else { return }
+        completed = true
+        if let observer {
+            NotificationCenter.default.removeObserver(observer)
+            self.observer = nil
+        }
+        completion()
+    }
+}
+
 // MARK: - NSWindowDelegate
 
 extension ExpandedPlayerWindowManager: NSWindowDelegate {
@@ -682,23 +734,26 @@ extension ExpandedPlayerWindowManager: NSWindowDelegate {
             // proper cleanup of render resources
             appEnvironment?.playerService.stop()
 
-            // Clean up window
-            sender.delegate = nil
-            sender.contentViewController = nil
-            sender.orderOut(nil)
-
             // Update navigation state
             // Set collapsing first so mini player shows video immediately
             let navigationCoordinator = appEnvironment?.navigationCoordinator
             navigationCoordinator?.isPlayerCollapsing = true
             navigationCoordinator?.isPlayerExpanded = false
 
-            // Unlike hide(), this path has no animation completion to reset the
-            // flag. Left stuck true, the mini capsule mounts its video container
-            // forever and hijacks the shared render view on the next expand
-            // (player window stays black while the capsule renders the video).
-            Task { @MainActor in
-                navigationCoordinator?.isPlayerCollapsing = false
+            // Clean up window, leaving native fullscreen first (orderOut on a
+            // fullscreen window strands its black fullscreen space on screen)
+            exitFullScreenIfNeeded(sender) {
+                Task { @MainActor in
+                    sender.delegate = nil
+                    sender.contentViewController = nil
+                    sender.orderOut(nil)
+
+                    // Unlike hide(), this path has no animation completion to reset the
+                    // flag. Left stuck true, the mini capsule mounts its video container
+                    // forever and hijacks the shared render view on the next expand
+                    // (player window stays black while the capsule renders the video).
+                    navigationCoordinator?.isPlayerCollapsing = false
+                }
             }
         }
         // Return false - we've already hidden the window with orderOut
