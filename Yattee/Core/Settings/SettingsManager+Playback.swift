@@ -81,6 +81,19 @@ extension SettingsManager {
         }
     }
 
+    /// Audio-only ("music") mode: when enabled, only the audio track is loaded
+    /// for every video until turned off. Persisted per platform.
+    var audioOnlyModeEnabled: Bool {
+        get {
+            if let cached = _audioOnlyModeEnabled { return cached }
+            return bool(for: .audioOnlyMode, default: false)
+        }
+        set {
+            _audioOnlyModeEnabled = newValue
+            set(newValue, for: .audioOnlyMode)
+        }
+    }
+
     /// Preferred audio language code (e.g., "en", "de", "ja").
     /// When set, audio streams in this language will be auto-selected and shown first.
     /// nil means no preference (use original/default audio).

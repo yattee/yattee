@@ -1389,6 +1389,16 @@
         }
       }
     },
+    "controls.button.audioMode" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Audio Mode"
+          }
+        }
+      }
+    },
     "controls.button.autoPlayNext" : {
       "localizations" : {
         "en" : {
@@ -7683,6 +7693,17 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "From video"
+          }
+        }
+      }
+    },
+    "player.quality.audioMode" : {
+      "comment" : "Audio-only (music) mode toggle in the player settings sheet",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Audio Mode"
           }
         }
       }

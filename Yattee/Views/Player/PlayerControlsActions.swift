@@ -87,6 +87,9 @@ struct PlayerControlsActions {
     /// Whether auto-play next is enabled
     let isAutoPlayNextEnabled: Bool
 
+    /// Whether audio-only (music) mode is enabled
+    var isAudioModeEnabled: Bool = false
+
     /// Yattee Server URL for channel avatar fallback
     let yatteeServerURL: URL?
 
@@ -125,6 +128,9 @@ struct PlayerControlsActions {
 
     /// Toggle auto-play next in queue
     var onToggleAutoPlayNext: (() -> Void)?
+
+    /// Toggle audio-only (music) mode
+    var onToggleAudioMode: (() -> Void)?
 
     /// Show settings sheet
     var onShowSettings: (() -> Void)?
@@ -304,9 +310,11 @@ struct PlayerControlsActions {
     }
     #endif
 
-    /// Whether PiP button should be enabled
+    /// Whether PiP button should be enabled.
+    /// No video track in audio-only playback - `isPiPPossible` may lag behind
+    /// a video-to-audio reload on a reused backend, so gate explicitly.
     var isPiPAvailable: Bool {
-        playerState.isPiPPossible
+        playerState.isPiPPossible && playerState.currentStream?.isAudioOnly != true
     }
 
     /// Whether play next button should be enabled

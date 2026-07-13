@@ -39,6 +39,11 @@ struct QualitySelectorView: View {
     /// Callback when lock state changes
     var onLockToggled: ((Bool) -> Void)?
 
+    /// Whether audio-only (music) mode is enabled
+    var isAudioMode: Bool = false
+    /// Callback when audio mode is toggled
+    var onAudioModeToggled: ((Bool) -> Void)?
+
     /// Initial tab to show when view appears
     var initialTab: QualitySelectorTab = .video
     /// Whether to show the segmented tab picker (false for focused single-tab mode)
@@ -160,6 +165,7 @@ struct QualitySelectorView: View {
         localCaptionURL: URL? = nil,
         currentRate: PlaybackRate = .x1,
         isControlsLocked: Bool = false,
+        isAudioMode: Bool = false,
         initialTab: QualitySelectorTab = .video,
         showTabPicker: Bool = true,
         onStreamSelected: @escaping (Stream, Stream?) -> Void,
@@ -168,6 +174,7 @@ struct QualitySelectorView: View {
         onSwitchToOnlineStream: @escaping (Stream, Stream?) -> Void = { _, _ in },
         onRateChanged: ((PlaybackRate) -> Void)? = nil,
         onLockToggled: ((Bool) -> Void)? = nil,
+        onAudioModeToggled: ((Bool) -> Void)? = nil,
         onDismiss: (() -> Void)? = nil
     ) {
         self.streams = streams
@@ -183,12 +190,14 @@ struct QualitySelectorView: View {
         self.showTabPicker = showTabPicker
         self.currentRate = currentRate
         self.isControlsLocked = isControlsLocked
+        self.isAudioMode = isAudioMode
         self.onStreamSelected = onStreamSelected
         self.onCaptionSelected = onCaptionSelected
         self.onLoadOnlineStreams = onLoadOnlineStreams
         self.onSwitchToOnlineStream = onSwitchToOnlineStream
         self.onRateChanged = onRateChanged
         self.onLockToggled = onLockToggled
+        self.onAudioModeToggled = onAudioModeToggled
         self.onDismiss = onDismiss
     }
 
@@ -291,7 +300,10 @@ struct QualitySelectorView: View {
         }
         .onAppear {
             selectedVideoStream = currentStream
-            selectedAudioStream = currentAudioStream ?? defaultAudioStream
+            // In audio mode the audio track IS the main stream
+            selectedAudioStream = currentStream?.isAudioOnly == true
+                ? currentStream
+                : (currentAudioStream ?? defaultAudioStream)
             #if os(tvOS)
             // Defer until after the slide-in transition so the focus engine
             // has finished routing focus away from the (now hidden) player

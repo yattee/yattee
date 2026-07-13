@@ -458,6 +458,8 @@ struct MiniPlayerView: View {
             pipButton(config: config)
         case .playbackSpeed:
             playbackSpeedButton(config: config)
+        case .audioMode:
+            audioModeButton(config: config)
         default:
             EmptyView()
         }
@@ -652,6 +654,21 @@ struct MiniPlayerView: View {
         }
         .menuIndicator(.hidden)
         .tint(.primary)
+    }
+
+    private func audioModeButton(config: ControlButtonConfiguration) -> some View {
+        let isAudioMode = appEnvironment?.settingsManager.audioOnlyModeEnabled ?? false
+        return Button {
+            incrementTapCount(for: config)
+            Task { await playerService?.setAudioMode(!isAudioMode) }
+        } label: {
+            Image(systemName: "music.note")
+                .font(isTabAccessory ? .title3 : .title2)
+                .frame(width: 32, height: 32)
+                .contentShape(Rectangle())
+                .foregroundStyle(isAudioMode ? AnyShapeStyle(Color.red) : AnyShapeStyle(.primary))
+        }
+        .buttonStyle(.plain)
     }
 
     // MARK: - Helpers

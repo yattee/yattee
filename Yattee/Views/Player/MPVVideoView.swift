@@ -258,10 +258,8 @@ struct MPVVideoView: View {
                 playerService.loadCaption(caption)
             },
             onStreamSelected: { stream, audioStream in
-                guard let video = playerState.currentVideo else { return }
-                let currentTime = playerState.currentTime
                 Task {
-                    await playerService.play(video: video, stream: stream, audioStream: audioStream, startTime: currentTime)
+                    await playerService.selectStreamManually(stream, audioStream: audioStream)
                 }
             }
         )

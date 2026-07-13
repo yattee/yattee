@@ -323,11 +323,19 @@ extension QualitySelectorView {
     @ViewBuilder
     var generalSectionContent: some View {
         #if os(tvOS)
-        // tvOS only has the speed row here; style it to match the Settings rows.
-        playbackSpeedRow
+        // tvOS rows are styled individually to match the Settings rows.
+        VStack(spacing: 8) {
+            playbackSpeedRow
+
+            audioModeRow
+        }
         #else
         VStack(spacing: 0) {
             playbackSpeedRow
+
+            Divider()
+
+            audioModeRow
 
             Divider()
 
@@ -403,6 +411,45 @@ extension QualitySelectorView {
                 .fill(Color.white.opacity(0.08))
         )
         #else
+        .padding(.vertical, 12)
+        .padding(.horizontal, 12)
+        #endif
+    }
+
+    @ViewBuilder
+    private var audioModeRow: some View {
+        #if os(tvOS)
+        Button {
+            onAudioModeToggled?(!isAudioMode)
+        } label: {
+            HStack {
+                Label(String(localized: "player.quality.audioMode"), systemImage: "music.note")
+                    .font(.headline)
+
+                Spacer()
+
+                Text(isAudioMode ? String(localized: "common.on") : String(localized: "common.off"))
+                    .foregroundStyle(.secondary)
+            }
+            .padding(.vertical, 14)
+            .padding(.horizontal, 20)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .contentShape(Rectangle())
+        }
+        .buttonStyle(TVSettingsRowButtonStyle())
+        #else
+        HStack {
+            Label(String(localized: "player.quality.audioMode"), systemImage: "music.note")
+                .font(.headline)
+
+            Spacer()
+
+            Toggle("", isOn: Binding(
+                get: { isAudioMode },
+                set: { onAudioModeToggled?($0) }
+            ))
+            .labelsHidden()
+        }
         .padding(.vertical, 12)
         .padding(.horizontal, 12)
         #endif
@@ -751,7 +798,11 @@ extension QualitySelectorView {
 
     private func handleAudioStreamTap(_ stream: Stream) {
         selectedAudioStream = stream
-        if let video = selectedVideoStream, video.isVideoOnly {
+        if currentStream?.isAudioOnly == true {
+            // Audio mode / audio-only content: the tapped track IS the main stream
+            onStreamSelected(stream, nil)
+            performDismiss()
+        } else if let video = selectedVideoStream, video.isVideoOnly {
             onStreamSelected(video, stream)
             performDismiss()
         }

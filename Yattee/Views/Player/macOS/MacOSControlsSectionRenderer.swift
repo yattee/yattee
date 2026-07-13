@@ -271,6 +271,19 @@ struct MacOSControlsSectionRenderer: View {
                 .opacity(isLocked ? 0.5 : 1.0)
             }
 
+        case .audioMode:
+            if actions.onToggleAudioMode != nil {
+                controlButton(
+                    systemImage: "music.note",
+                    tint: actions.isAudioModeEnabled ? .red : tint,
+                    help: config.buttonType.displayName
+                ) {
+                    actions.onToggleAudioMode?()
+                }
+                .disabled(isLocked)
+                .opacity(isLocked ? 0.5 : 1.0)
+            }
+
         case .seek:
             if let settings = config.seekSettings {
                 seekButton(settings: settings, config: config)

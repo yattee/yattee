@@ -306,7 +306,7 @@ struct PlaybackCommands: Commands {
             Text(String(localized: "menu.playback.pip"))
         }
         .keyboardShortcut("i", modifiers: [.command, .shift])
-        .disabled(!hasActiveVideo || !state.isPiPPossible)
+        .disabled(!hasActiveVideo || !state.isPiPPossible || state.currentStream?.isAudioOnly == true)
     }
     
     // MARK: - Close video button

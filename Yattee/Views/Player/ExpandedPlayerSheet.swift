@@ -696,6 +696,7 @@ private struct PlayerSheetsModifier: ViewModifier {
                 },
                 currentRate: playerState?.rate ?? .x1,
                 isControlsLocked: playerState?.isControlsLocked ?? false,
+                isAudioMode: appEnvironment?.settingsManager.audioOnlyModeEnabled ?? false,
                 onStreamSelected: { stream, audioStream in
                     onStreamSelected(stream, audioStream)
                 },
@@ -718,6 +719,11 @@ private struct PlayerSheetsModifier: ViewModifier {
                 },
                 onLockToggled: { locked in
                     playerState?.isControlsLocked = locked
+                },
+                onAudioModeToggled: { enabled in
+                    Task {
+                        await playerService.setAudioMode(enabled)
+                    }
                 }
             )
         }

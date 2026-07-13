@@ -39,6 +39,7 @@ enum ControlButtonType: String, Codable, Hashable, Sendable, CaseIterable {
     case titleAuthor
     case panscan
     case autoPlayNext
+    case audioMode
     case seek
     case keepOnTop
 
@@ -116,6 +117,8 @@ enum ControlButtonType: String, Codable, Hashable, Sendable, CaseIterable {
             return String(localized: "controls.button.panscan")
         case .autoPlayNext:
             return String(localized: "controls.button.autoPlayNext")
+        case .audioMode:
+            return String(localized: "controls.button.audioMode")
         case .seek:
             return String(localized: "controls.button.seek")
         case .keepOnTop:
@@ -186,6 +189,8 @@ enum ControlButtonType: String, Codable, Hashable, Sendable, CaseIterable {
             return "arrow.left.and.right.square"
         case .autoPlayNext:
             return "play.square.stack.fill"
+        case .audioMode:
+            return "music.note"
         case .seek:
             return "goforward.10" // Default icon, actual icon is determined by settings
         case .keepOnTop:
@@ -250,6 +255,7 @@ enum ControlButtonType: String, Codable, Hashable, Sendable, CaseIterable {
             .share,
             .contextMenu,
             .autoPlayNext,
+            .audioMode,
             .mpvDebug
         ]
         #else
@@ -281,6 +287,7 @@ enum ControlButtonType: String, Codable, Hashable, Sendable, CaseIterable {
             .panelToggle,
             .panscan,
             .autoPlayNext,
+            .audioMode,
             .airplay,
             .mpvDebug
         ]
@@ -332,7 +339,8 @@ enum ControlButtonType: String, Codable, Hashable, Sendable, CaseIterable {
             .addToPlaylist,
             .pictureInPicture,
             // Utility
-            .playbackSpeed
+            .playbackSpeed,
+            .audioMode
         ]
         #else
         [
@@ -350,7 +358,8 @@ enum ControlButtonType: String, Codable, Hashable, Sendable, CaseIterable {
             .airplay,
             .pictureInPicture,
             // Utility
-            .playbackSpeed
+            .playbackSpeed,
+            .audioMode
         ]
         #endif
     }

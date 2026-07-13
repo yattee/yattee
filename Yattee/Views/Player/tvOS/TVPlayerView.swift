@@ -166,6 +166,7 @@ struct TVPlayerView: View {
                     return appEnvironment?.downloadManager.downloadsDirectory().appendingPathComponent(path)
                 },
                 currentRate: playerState?.rate ?? .x1,
+                isAudioMode: appEnvironment?.settingsManager.audioOnlyModeEnabled ?? false,
                 onStreamSelected: { stream, audioStream in
                     switchToStream(stream, audioStream: audioStream)
                 },
@@ -185,6 +186,11 @@ struct TVPlayerView: View {
                 onRateChanged: { rate in
                     playerState?.rate = rate
                     playerService.currentBackend?.rate = Float(rate.rawValue)
+                },
+                onAudioModeToggled: { enabled in
+                    Task {
+                        await playerService.setAudioMode(enabled)
+                    }
                 },
                 onDismiss: { hideQualitySheet() }
             )
@@ -606,18 +612,27 @@ struct TVPlayerView: View {
 
     @ViewBuilder
     private var videoLayer: some View {
-        if let playerService,
-           let backend = playerService.currentBackend as? MPVBackend,
-           let playerState {
-            MPVRenderViewRepresentable(
-                backend: backend,
-                playerState: playerState
-            )
-            .ignoresSafeArea()
-            .allowsHitTesting(false)
-        } else {
-            // Fallback/loading state - show thumbnail
-            if let video = playerState?.currentVideo,
+        let isAudioOnly = playerState?.currentStream?.isAudioOnly == true
+        let hasBackend = playerService?.currentBackend is MPVBackend
+
+        ZStack {
+            if let playerService,
+               let backend = playerService.currentBackend as? MPVBackend,
+               let playerState {
+                MPVRenderViewRepresentable(
+                    backend: backend,
+                    playerState: playerState
+                )
+                .ignoresSafeArea()
+                .allowsHitTesting(false)
+                // Keep the render view alive but hidden for audio-only
+                // playback so toggling audio mode doesn't tear down GL state
+                .opacity(isAudioOnly ? 0 : 1)
+            }
+
+            // Thumbnail for audio-only playback and the pre-backend loading state
+            if isAudioOnly || !hasBackend,
+               let video = playerState?.currentVideo,
                let thumbnailURL = video.bestThumbnail?.url {
                 AsyncImage(url: thumbnailURL) { image in
                     image
@@ -735,12 +750,8 @@ struct TVPlayerView: View {
     }
 
     private func switchToStream(_ stream: Stream, audioStream: Stream? = nil) {
-        guard let video = playerState?.currentVideo else { return }
-
-        let currentTime = playerState?.currentTime
-
         Task {
-            await playerService?.play(video: video, stream: stream, audioStream: audioStream, startTime: currentTime)
+            await playerService?.selectStreamManually(stream, audioStream: audioStream)
         }
     }
 

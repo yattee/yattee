@@ -810,7 +810,15 @@ final class PlayerService {
 
         if !playedFromDownload {
             currentDownload = nil
-            await play(video: queuedVideo.video, stream: queuedVideo.stream, audioStream: queuedVideo.audioStream, startTime: 0)
+            var stream = queuedVideo.stream
+            var audioStream = queuedVideo.audioStream
+            if let preResolved = stream, !preResolved.url.isFileURL,
+               preResolved.isAudioOnly != (settingsManager?.audioOnlyModeEnabled == true) {
+                // Pre-resolved before an audio-mode toggle - discard so selection re-runs
+                stream = nil
+                audioStream = nil
+            }
+            await play(video: queuedVideo.video, stream: stream, audioStream: audioStream, startTime: 0)
             // Load captions if available
             if !queuedVideo.captions.isEmpty {
                 self.availableCaptions = queuedVideo.captions
@@ -1083,8 +1091,17 @@ final class PlayerService {
                 state.insertNext(currentVideo, stream: state.currentStream, audioStream: state.currentAudioStream)
             }
 
+            var stream = previous.stream
+            var audioStream = previous.audioStream
+            if let preResolved = stream, !preResolved.url.isFileURL,
+               preResolved.isAudioOnly != (settingsManager?.audioOnlyModeEnabled == true) {
+                // Resolved before an audio-mode toggle - discard so selection re-runs
+                stream = nil
+                audioStream = nil
+            }
+
             // Play the previous video, resuming from saved position
-            await play(video: previous.video, stream: previous.stream, audioStream: previous.audioStream, startTime: previous.startTime)
+            await play(video: previous.video, stream: stream, audioStream: audioStream, startTime: previous.startTime)
         } else {
             // No history, just restart current video
             await seek(to: 0)
@@ -1144,14 +1161,21 @@ final class PlayerService {
             self.availableCaptions = captions
 
             // Find matching stream or best alternative
-            let newStream = findMatchingStream(in: streams, preferring: state.currentStream)
+            let newStream: Stream
             let newAudioStream: Stream?
 
-            if newStream.isVideoOnly {
-                // Find matching audio stream
-                newAudioStream = findMatchingAudioStream(in: streams, preferring: state.currentAudioStream)
-            } else {
+            if state.currentStream?.isAudioOnly == true || settingsManager?.audioOnlyModeEnabled == true,
+               let refreshedAudio = findMatchingAudioStream(in: streams, preferring: state.currentStream)
+            {
+                // Preserve audio-only playback (audio mode or audio-only content);
+                // `findMatchingAudioStream` matches the current track's language
+                newStream = refreshedAudio
                 newAudioStream = nil
+            } else {
+                newStream = findMatchingStream(in: streams, preferring: state.currentStream)
+                newAudioStream = newStream.isVideoOnly
+                    ? findMatchingAudioStream(in: streams, preferring: state.currentAudioStream)
+                    : nil
             }
 
             LoggingService.shared.logPlayer("Resuming with stream: \(newStream.qualityLabel) at \(resumeTime ?? 0)s")
@@ -1337,6 +1361,13 @@ final class PlayerService {
     func switchToOnlineStream(_ stream: Stream, audioStream: Stream? = nil) async {
         guard let video = state.currentVideo else { return }
 
+        // Picking a video stream while audio mode is on turns the mode off
+        // so the explicit choice sticks (same rule as selectStreamManually)
+        if !stream.isAudioOnly, settingsManager?.audioOnlyModeEnabled == true {
+            settingsManager?.audioOnlyModeEnabled = false
+            LoggingService.shared.logPlayer("Audio mode disabled by explicit quality selection")
+        }
+
         // Clear the download flag since we're now playing online
         currentDownload = nil
 
@@ -1344,6 +1375,55 @@ final class PlayerService {
         let currentTime = state.currentTime
 
         // Play the new stream from the current position
+        await play(video: video, stream: stream, audioStream: audioStream, startTime: currentTime)
+    }
+
+    /// Toggles global audio-only ("music") mode. If an online video is playing,
+    /// reloads it at the current position (same mechanism as a quality switch).
+    func setAudioMode(_ enabled: Bool) async {
+        guard settingsManager?.audioOnlyModeEnabled != enabled else { return }
+        settingsManager?.audioOnlyModeEnabled = enabled
+        LoggingService.shared.logPlayer("Audio mode \(enabled ? "enabled" : "disabled")")
+
+        // Nothing playing, no stream list to reselect from (e.g. still loading),
+        // or playing a downloaded/local file: just persist the setting.
+        guard let video = state.currentVideo,
+              currentDownload == nil,
+              !availableStreams.isEmpty else { return }
+
+        let currentTime = state.currentTime
+
+        if enabled {
+            // Already audio-only (e.g. audio-only content) - nothing to reload
+            guard state.currentStream?.isAudioOnly != true else { return }
+            guard let bestAudio = bestAudioStream(from: availableStreams.filter { $0.isAudioOnly }) else {
+                LoggingService.shared.logPlayer("Audio mode: no audio-only streams for current video, keeping current stream")
+                return
+            }
+            await play(video: video, stream: bestAudio, audioStream: nil, startTime: currentTime)
+        } else {
+            // Re-run normal selection with the mode now off
+            let selection = selectStreamAndBackend(from: availableStreams)
+            guard let stream = selection.stream else { return }
+            // Audio-only content still selects audio - no reload needed
+            if stream.isAudioOnly, state.currentStream?.isAudioOnly == true { return }
+            await play(video: video, stream: stream, audioStream: selection.audioStream, startTime: currentTime)
+        }
+    }
+
+    /// Handles an explicit stream pick from the quality selector, switching at
+    /// the current playback position. Picking a video stream while audio mode
+    /// is on turns audio mode off so the choice sticks.
+    func selectStreamManually(_ stream: Stream, audioStream: Stream?) async {
+        guard let video = state.currentVideo else { return }
+
+        if !stream.isAudioOnly, settingsManager?.audioOnlyModeEnabled == true {
+            settingsManager?.audioOnlyModeEnabled = false
+            LoggingService.shared.logPlayer("Audio mode disabled by explicit quality selection")
+        }
+
+        let currentTime = state.currentTime
+        LoggingService.shared.logPlayer("Manual stream switch to \(stream.qualityLabel) at \(currentTime)s")
         await play(video: video, stream: stream, audioStream: audioStream, startTime: currentTime)
     }
 
@@ -1953,6 +2033,15 @@ final class PlayerService {
 
         let audioStreams = streams.filter { $0.isAudioOnly }
 
+        // Audio-only ("music") mode: skip the video track entirely
+        if settingsManager?.audioOnlyModeEnabled == true {
+            if let bestAudio = bestAudioStream(from: audioStreams) {
+                LoggingService.shared.debug("Stream selection: Audio mode enabled, selecting audio-only stream", category: .player)
+                return (bestAudio, nil)
+            }
+            LoggingService.shared.warning("Stream selection: Audio mode enabled but no audio-only streams available, falling back to normal selection", category: .player)
+        }
+
         // Check for audio-only content (no real video streams available)
         // This handles cases like SoundCloud where HLS is audio-only but not marked as such
         let hasRealVideoStreams = !videoOnlyStreams.isEmpty || muxedStreams.contains { stream in
@@ -1965,10 +2054,8 @@ final class PlayerService {
             return true
         }
 
-        if !hasRealVideoStreams && !audioStreams.isEmpty {
+        if !hasRealVideoStreams, let bestAudio = bestAudioStream(from: audioStreams) {
             LoggingService.shared.debug("Stream selection: Audio-only content detected, using best audio stream", category: .player)
-            // Select best audio stream by bitrate
-            let bestAudio = audioStreams.sorted { ($0.bitrate ?? 0) > ($1.bitrate ?? 0) }.first!
             return (bestAudio, nil)
         }
 
@@ -2027,41 +2114,8 @@ final class PlayerService {
                 return videoCodecPriority(s1.videoCodec) > videoCodecPriority(s2.videoCodec)
             }
 
-            if let bestVideo = sortedVideo.first {
-                // Select best audio stream based on preferred language, codec, and bitrate
-                let preferredAudioLanguage = settingsManager?.preferredAudioLanguage
-                let bestAudio = audioStreams
-                    .sorted { stream1, stream2 in
-                        // First priority: preferred language or original audio
-                        if let preferred = preferredAudioLanguage {
-                            // User selected a specific language
-                            let lang1 = stream1.audioLanguage ?? ""
-                            let lang2 = stream2.audioLanguage ?? ""
-                            let matches1 = lang1.hasPrefix(preferred)
-                            let matches2 = lang2.hasPrefix(preferred)
-                            if matches1 != matches2 { return matches1 }
-                        } else {
-                            // No preference set - prefer original audio track
-                            if stream1.isOriginalAudio != stream2.isOriginalAudio {
-                                return stream1.isOriginalAudio
-                            }
-                        }
-
-                        // Second priority: prefer Opus > AAC for MPV (better quality/compression)
-                        let codecPriority1 = audioCodecPriority(stream1.audioCodec)
-                        let codecPriority2 = audioCodecPriority(stream2.audioCodec)
-                        if codecPriority1 != codecPriority2 {
-                            return codecPriority1 > codecPriority2
-                        }
-
-                        // Third priority: higher bitrate
-                        return (stream1.bitrate ?? 0) > (stream2.bitrate ?? 0)
-                    }
-                    .first
-
-                if let audio = bestAudio {
-                    return (bestVideo, audio)
-                }
+            if let bestVideo = sortedVideo.first, let audio = bestAudioStream(from: audioStreams) {
+                return (bestVideo, audio)
             }
         }
 
@@ -2114,6 +2168,35 @@ final class PlayerService {
     /// Prefers hardware-decodable codecs for battery efficiency.
     private func videoCodecPriority(_ codec: String?) -> Int {
         HardwareCapabilities.shared.codecPriority(for: codec)
+    }
+
+    /// Selects the best audio-only stream: preferred language (or original audio
+    /// when no preference is set), then codec priority, then bitrate.
+    private func bestAudioStream(from audioStreams: [Stream]) -> Stream? {
+        let preferredAudioLanguage = settingsManager?.preferredAudioLanguage
+        return audioStreams
+            .sorted { stream1, stream2 in
+                if let preferred = preferredAudioLanguage {
+                    // User selected a specific language
+                    let matches1 = (stream1.audioLanguage ?? "").hasPrefix(preferred)
+                    let matches2 = (stream2.audioLanguage ?? "").hasPrefix(preferred)
+                    if matches1 != matches2 { return matches1 }
+                } else {
+                    // No preference set - prefer original audio track
+                    if stream1.isOriginalAudio != stream2.isOriginalAudio {
+                        return stream1.isOriginalAudio
+                    }
+                }
+
+                let codecPriority1 = audioCodecPriority(stream1.audioCodec)
+                let codecPriority2 = audioCodecPriority(stream2.audioCodec)
+                if codecPriority1 != codecPriority2 {
+                    return codecPriority1 > codecPriority2
+                }
+
+                return (stream1.bitrate ?? 0) > (stream2.bitrate ?? 0)
+            }
+            .first
     }
 
     /// Returns codec priority for audio streams.

@@ -275,6 +275,11 @@ struct ControlsSectionRenderer: View {
                 .disabled(isLocked)
                 .opacity(isLocked ? 0.5 : 1.0)
 
+        case .audioMode:
+            audioModeButton
+                .disabled(isLocked)
+                .opacity(isLocked ? 0.5 : 1.0)
+
         case .seekBackward, .seekForward:
             // These are center section only buttons, not rendered here
             EmptyView()
@@ -1018,6 +1023,20 @@ struct ControlsSectionRenderer: View {
                 tint: actions.isAutoPlayNextEnabled ? .red : .white
             ) {
                 actions.onToggleAutoPlayNext?()
+            }
+        }
+    }
+
+    // MARK: - Audio Mode Button
+
+    @ViewBuilder
+    private var audioModeButton: some View {
+        if actions.onToggleAudioMode != nil {
+            controlButton(
+                systemImage: "music.note",
+                tint: actions.isAudioModeEnabled ? .red : .white
+            ) {
+                actions.onToggleAudioMode?()
             }
         }
     }

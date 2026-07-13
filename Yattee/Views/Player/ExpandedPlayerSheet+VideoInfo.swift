@@ -258,17 +258,8 @@ extension ExpandedPlayerSheet {
 
     /// Switches to a different stream.
     func switchToStream(_ stream: Stream, audioStream: Stream? = nil) {
-        guard let video = playerState?.currentVideo else { return }
-
-        // Capture current playback position before switching streams
-        let currentTime = playerState?.currentTime
-        // Also get time directly from backend as backup
-        let backendTime = playerService?.currentBackend?.currentTime
-
-        LoggingService.shared.logPlayer("switchToStream: stateTime=\(currentTime ?? -1), backendTime=\(backendTime ?? -1), switching to \(stream.qualityLabel)")
-
         Task {
-            await playerService?.play(video: video, stream: stream, audioStream: audioStream, startTime: currentTime)
+            await playerService?.selectStreamManually(stream, audioStream: audioStream)
         }
     }
 }

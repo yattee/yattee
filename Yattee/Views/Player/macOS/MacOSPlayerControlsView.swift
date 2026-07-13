@@ -211,6 +211,7 @@ struct MacOSPlayerControlsView: View {
             currentStream: nil,
             currentAudioStream: nil,
             isAutoPlayNextEnabled: appEnvironment?.settingsManager.queueAutoPlayNext ?? true,
+            isAudioModeEnabled: appEnvironment?.settingsManager.audioOnlyModeEnabled ?? false,
             yatteeServerURL: yatteeServerURL,
             deArrowBrandingProvider: appEnvironment?.deArrowBrandingProvider,
             onClose: onClose,
@@ -224,6 +225,11 @@ struct MacOSPlayerControlsView: View {
             onToggleDetailsVisibility: onTitleTap,
             onToggleAutoPlayNext: { [weak appEnvironment] in
                 appEnvironment?.settingsManager.queueAutoPlayNext.toggle()
+            },
+            onToggleAudioMode: { [weak appEnvironment] in
+                guard let appEnvironment else { return }
+                let enabled = !appEnvironment.settingsManager.audioOnlyModeEnabled
+                Task { await appEnvironment.playerService.setAudioMode(enabled) }
             },
             onShowSettings: onShowSettings,
             onPlayNext: onPlayNext,

@@ -382,6 +382,7 @@ struct PlayerControlsView: View {
             panscanValue: panscanValue,
             isPanscanAllowed: isPanscanAllowed,
             isAutoPlayNextEnabled: appEnvironment?.settingsManager.queueAutoPlayNext ?? true,
+            isAudioModeEnabled: appEnvironment?.settingsManager.audioOnlyModeEnabled ?? false,
             yatteeServerURL: appEnvironment?.instancesManager.yatteeServerInstances.first { $0.isEnabled }?.url,
             deArrowBrandingProvider: appEnvironment?.deArrowBrandingProvider,
             onClose: onClose,
@@ -394,6 +395,11 @@ struct PlayerControlsView: View {
             onTogglePanscan: onTogglePanscan,
             onToggleAutoPlayNext: {
                 appEnvironment?.settingsManager.queueAutoPlayNext.toggle()
+            },
+            onToggleAudioMode: { [weak appEnvironment] in
+                guard let appEnvironment else { return }
+                let enabled = !appEnvironment.settingsManager.audioOnlyModeEnabled
+                Task { await appEnvironment.playerService.setAudioMode(enabled) }
             },
             onShowSettings: onShowSettings,
             onPlayNext: onPlayNext,
