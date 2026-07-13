@@ -83,12 +83,18 @@ final class CloudKitSyncEngine: @unchecked Sendable {
     /// Current sync error, if any.
     var syncError: Error?
     
-    /// Records pending upload to CloudKit.
-    private var pendingSaves: [CKRecord] = []
-    
-    /// Record IDs pending deletion from CloudKit.
-    private var pendingDeletes: [CKRecord.ID] = []
-    
+    /// Pending changes queued before the sync engine is ready; flushed into
+    /// the engine state as soon as it is created.
+    private var pendingChangesBuffer: [CKSyncEngine.PendingRecordZoneChange] = []
+
+    /// Conflict-resolved records awaiting upload, keyed by record name.
+    /// These carry the server change tag from the conflict error and take
+    /// precedence over freshly materialized records at send time.
+    private var conflictResolvedRecords: [String: CKRecord] = [:]
+
+    /// The CloudKit zone all records live in (constant name, never changes).
+    private let zone = RecordType.createZone()
+
     /// Debounce timer for batching changes.
     private var debounceTimer: Timer?
 
@@ -107,14 +113,8 @@ final class CloudKitSyncEngine: @unchecked Sendable {
     /// Retry tracking: recordName -> retry count
     private var retryCount: [String: Int] = [:]
     
-    /// Maximum delay between retries (5 minutes).
-    private let maxRetryDelay: TimeInterval = 300.0
-
     /// Maximum number of retry attempts for conflict resolution.
     private let maxRetryAttempts = 5
-
-    /// CloudKit batch size limit. CloudKit allows max 400 per request, use 350 for safety margin.
-    private let cloudKitBatchSize = 350
 
     // MARK: - Account Identity Tracking
     
@@ -127,10 +127,12 @@ final class CloudKitSyncEngine: @unchecked Sendable {
     /// UserDefaults key for the record schema version this app last synced with.
     private let lastSchemaVersionKey = "cloudKitLastSchemaVersion"
     
-    /// UserDefaults key for persisting pending save record names (crash recovery).
+    /// Legacy UserDefaults key for pending save record names (pre state-driven
+    /// engine). Only read once for migration, then removed.
     private let pendingSaveRecordNamesKey = "cloudKitPendingSaveRecordNames"
-    
-    /// UserDefaults key for persisting pending delete record names (crash recovery).
+
+    /// Legacy UserDefaults key for pending delete record names (pre state-driven
+    /// engine). Only read once for migration, then removed.
     private let pendingDeleteRecordNamesKey = "cloudKitPendingDeleteRecordNames"
 
     // MARK: - Deferred Playlist Item Management
@@ -163,16 +165,14 @@ final class CloudKitSyncEngine: @unchecked Sendable {
         if isSyncing {
             return .syncing
         }
-        if pendingSaves.isEmpty && pendingDeletes.isEmpty {
+        if pendingChangesCount == 0 {
             return .upToDate
         }
-        return .pending(count: pendingSaves.count + pendingDeletes.count)
+        return .pending(count: pendingChangesCount)
     }
-    
-    /// Pending changes count
-    var pendingChangesCount: Int {
-        pendingSaves.count + pendingDeletes.count
-    }
+
+    /// Pending changes count (mirrors the sync engine state so the UI can observe it).
+    private(set) var pendingChangesCount = 0
     
     /// User-friendly sync status text
     var syncStatusText: String {
@@ -281,11 +281,12 @@ final class CloudKitSyncEngine: @unchecked Sendable {
         debounceTimer = nil
         foregroundPollTimer?.invalidate()
         foregroundPollTimer = nil
-        pendingSaves.removeAll()
-        pendingDeletes.removeAll()
+        pendingChangesBuffer.removeAll()
+        conflictResolvedRecords.removeAll()
         retryCount.removeAll()
         deferredPlaylistItems.removeAll()
         syncEngine = nil
+        updatePendingCount()
         isSyncing = false
         isReceivingChanges = false
         syncError = nil
@@ -352,16 +353,27 @@ final class CloudKitSyncEngine: @unchecked Sendable {
                 delegate: self
             )
 
-            self.syncEngine = CKSyncEngine(config)
+            let engine = CKSyncEngine(config)
+            self.syncEngine = engine
             LoggingService.shared.logCloudKit("CKSyncEngine created")
-            
+
+            // Flush changes queued while the engine was not ready
+            if !pendingChangesBuffer.isEmpty {
+                engine.state.add(pendingRecordZoneChanges: pendingChangesBuffer)
+                pendingChangesBuffer.removeAll()
+            }
+
             if accountChanged {
                 LoggingService.shared.logCloudKit("CloudKit sync engine initialized with new account (fresh sync state)")
             } else {
                 LoggingService.shared.logCloudKit("CloudKit sync engine initialized successfully")
-                // Check for pending changes from a previous session that was terminated during debounce
-                recoverPersistedPendingChanges()
+                // One-time migration of pending changes persisted by the old
+                // array-based queue (pre state-driven engine)
+                migrateLegacyPendingChanges(into: engine)
             }
+
+            loadDeferredItems()
+            updatePendingCount()
             
             // Perform initial sync
             await sync()
@@ -427,8 +439,8 @@ final class CloudKitSyncEngine: @unchecked Sendable {
         UserDefaults.standard.removeObject(forKey: syncStateKey)
 
         // Clear pending changes (they belong to the old account context)
-        pendingSaves.removeAll()
-        pendingDeletes.removeAll()
+        pendingChangesBuffer.removeAll()
+        conflictResolvedRecords.removeAll()
         retryCount.removeAll()
 
         // Clear deferred playlist items (they belong to the old account context)
@@ -436,6 +448,7 @@ final class CloudKitSyncEngine: @unchecked Sendable {
 
         // Clear any existing sync engine
         syncEngine = nil
+        updatePendingCount()
 
         // Reset newer schema warning
         hasNewerSchemaRecords = false
@@ -538,20 +551,18 @@ final class CloudKitSyncEngine: @unchecked Sendable {
             // Fetch remote changes first
             LoggingService.shared.logCloudKit("Fetching remote changes...")
             try await syncEngine.fetchChanges()
-            LoggingService.shared.logCloudKit("fetchChanges() completed (pending: \(pendingSaves.count) saves, \(pendingDeletes.count) deletes)")
+            let pendingCount = syncEngine.state.pendingRecordZoneChanges.count
+            LoggingService.shared.logCloudKit("fetchChanges() completed (\(pendingCount) pending changes)")
 
             // Then send local changes
-            if !pendingSaves.isEmpty || !pendingDeletes.isEmpty {
-                LoggingService.shared.logCloudKit("Sending \(pendingSaves.count) saves, \(pendingDeletes.count) deletes...")
+            if pendingCount > 0 {
+                LoggingService.shared.logCloudKit("Sending \(pendingCount) pending changes...")
                 try await syncEngine.sendChanges()
             }
-            
+
             lastSyncDate = Date()
             settingsManager?.updateLastSyncTime()
-            
-            // Clear persisted pending changes after successful sync
-            clearPersistedPendingRecordNames()
-            
+
             LoggingService.shared.logCloudKit("Sync completed successfully")
             
         } catch {
@@ -567,51 +578,27 @@ final class CloudKitSyncEngine: @unchecked Sendable {
             
             handleSyncError(error)
         }
-        
+
+        updatePendingCount()
         isSyncing = false
     }
-    
+
     /// Queue a subscription for sync (debounced).
     func queueSubscriptionSave(_ subscription: Subscription) {
         guard canSyncSubscriptions else { return }
-        
-        Task {
-            let record = recordMapper.toCKRecord(subscription: subscription)
-            
-            // Remove from deletes if it was queued for deletion
-            pendingDeletes.removeAll { $0.recordName == record.recordID.recordName }
-            
-            // Add/update in saves
-            pendingSaves.removeAll { $0.recordID.recordName == record.recordID.recordName }
-            pendingSaves.append(record)
-            
-            LoggingService.shared.logCloudKit("Queued subscription save: \(subscription.channelID)")
-            
-            scheduleDebounceSync()
-        }
+
+        let recordID = recordMapper.toCKRecord(subscription: subscription).recordID
+        addPendingChanges([.saveRecord(recordID)])
+        LoggingService.shared.logCloudKit("Queued subscription save: \(subscription.channelID)")
     }
-    
+
     /// Queue a subscription deletion for sync (debounced).
     func queueSubscriptionDelete(channelID: String, scope: SourceScope) {
         guard canSyncSubscriptions else { return }
 
-        Task {
-            let zone = await zoneManager.getZone()
-            let recordType = SyncableRecordType.subscription(channelID: channelID, scope: scope)
-            let recordID = recordType.recordID(in: zone)
-            
-            // Remove from saves if it was queued
-            pendingSaves.removeAll { $0.recordID.recordName == recordID.recordName }
-            
-            // Add to deletes
-            if !pendingDeletes.contains(where: { $0.recordName == recordID.recordName }) {
-                pendingDeletes.append(recordID)
-            }
-            
-            LoggingService.shared.logCloudKit("Queued subscription delete: \(channelID)")
-            
-            scheduleDebounceSync()
-        }
+        let recordID = SyncableRecordType.subscription(channelID: channelID, scope: scope).recordID(in: zone)
+        addPendingChanges([.deleteRecord(recordID)])
+        LoggingService.shared.logCloudKit("Queued subscription delete: \(channelID)")
     }
     
     /// Upload all existing local subscriptions to CloudKit (for initial sync).
@@ -637,17 +624,14 @@ final class CloudKitSyncEngine: @unchecked Sendable {
         
         // Track total operations
         uploadProgress?.totalOperations += subscriptions.count
-        
-        // Convert all to CKRecords and add to pending queue
-        for subscription in subscriptions {
-            let record = recordMapper.toCKRecord(subscription: subscription)
-            
-            // Check if already queued
-            if !pendingSaves.contains(where: { $0.recordID.recordName == record.recordID.recordName }) {
-                pendingSaves.append(record)
-            }
+
+        // Register all record IDs with the sync engine; records are
+        // materialized from local data at send time.
+        let changes = subscriptions.map { subscription in
+            CKSyncEngine.PendingRecordZoneChange.saveRecord(recordMapper.toCKRecord(subscription: subscription).recordID)
         }
-        
+        addPendingChanges(changes, debounce: false)
+
         LoggingService.shared.logCloudKit("Queued \(subscriptions.count) existing subscriptions for initial upload")
         
         // Trigger immediate sync (no debounce for initial upload)
@@ -675,43 +659,18 @@ final class CloudKitSyncEngine: @unchecked Sendable {
             return
         }
 
-        Task {
-            let record = recordMapper.toCKRecord(watchEntry: watchEntry)
-            
-            // Remove from deletes if it was queued for deletion
-            pendingDeletes.removeAll { $0.recordName == record.recordID.recordName }
-            
-            // Add/update in saves
-            pendingSaves.removeAll { $0.recordID.recordName == record.recordID.recordName }
-            pendingSaves.append(record)
-            
-            LoggingService.shared.logCloudKit("Queued watch entry save: \(watchEntry.videoID)")
-            
-            scheduleDebounceSync()
-        }
+        let recordID = recordMapper.toCKRecord(watchEntry: watchEntry).recordID
+        addPendingChanges([.saveRecord(recordID)])
+        LoggingService.shared.logCloudKit("Queued watch entry save: \(watchEntry.videoID)")
     }
-    
+
     /// Queue a watch entry deletion for sync (debounced).
     func queueWatchEntryDelete(videoID: String, scope: SourceScope) {
         guard canSyncPlaybackHistory else { return }
 
-        Task {
-            let zone = await zoneManager.getZone()
-            let recordType = SyncableRecordType.watchEntry(videoID: videoID, scope: scope)
-            let recordID = recordType.recordID(in: zone)
-            
-            // Remove from saves if it was queued
-            pendingSaves.removeAll { $0.recordID.recordName == recordID.recordName }
-            
-            // Add to deletes
-            if !pendingDeletes.contains(where: { $0.recordName == recordID.recordName }) {
-                pendingDeletes.append(recordID)
-            }
-            
-            LoggingService.shared.logCloudKit("Queued watch entry delete: \(videoID)")
-            
-            scheduleDebounceSync()
-        }
+        let recordID = SyncableRecordType.watchEntry(videoID: videoID, scope: scope).recordID(in: zone)
+        addPendingChanges([.deleteRecord(recordID)])
+        LoggingService.shared.logCloudKit("Queued watch entry delete: \(videoID)")
     }
     
     /// Upload all existing local watch history to CloudKit (for initial sync).
@@ -738,17 +697,12 @@ final class CloudKitSyncEngine: @unchecked Sendable {
         
         // Track total operations
         uploadProgress?.totalOperations += watchHistory.count
-        
-        // Convert all to CKRecords and add to pending queue
-        for entry in watchHistory {
-            let record = recordMapper.toCKRecord(watchEntry: entry)
-            
-            // Check if already queued
-            if !pendingSaves.contains(where: { $0.recordID.recordName == record.recordID.recordName }) {
-                pendingSaves.append(record)
-            }
+
+        let changes = watchHistory.map { entry in
+            CKSyncEngine.PendingRecordZoneChange.saveRecord(recordMapper.toCKRecord(watchEntry: entry).recordID)
         }
-        
+        addPendingChanges(changes, debounce: false)
+
         LoggingService.shared.logCloudKit("Queued \(watchHistory.count) existing watch entries for initial upload")
         
         // Trigger immediate sync (no debounce for initial upload)
@@ -760,44 +714,19 @@ final class CloudKitSyncEngine: @unchecked Sendable {
     /// Queue a bookmark for sync (debounced).
     func queueBookmarkSave(_ bookmark: Bookmark) {
         guard canSyncBookmarks else { return }
-        
-        Task {
-            let record = recordMapper.toCKRecord(bookmark: bookmark)
-            
-            // Remove from deletes if it was queued for deletion
-            pendingDeletes.removeAll { $0.recordName == record.recordID.recordName }
-            
-            // Add/update in saves
-            pendingSaves.removeAll { $0.recordID.recordName == record.recordID.recordName }
-            pendingSaves.append(record)
-            
-            LoggingService.shared.logCloudKit("Queued bookmark save: \(bookmark.videoID)")
-            
-            scheduleDebounceSync()
-        }
+
+        let recordID = recordMapper.toCKRecord(bookmark: bookmark).recordID
+        addPendingChanges([.saveRecord(recordID)])
+        LoggingService.shared.logCloudKit("Queued bookmark save: \(bookmark.videoID)")
     }
-    
+
     /// Queue a bookmark deletion for sync (debounced).
     func queueBookmarkDelete(videoID: String, scope: SourceScope) {
         guard canSyncBookmarks else { return }
 
-        Task {
-            let zone = await zoneManager.getZone()
-            let recordType = SyncableRecordType.bookmark(videoID: videoID, scope: scope)
-            let recordID = recordType.recordID(in: zone)
-            
-            // Remove from saves if it was queued
-            pendingSaves.removeAll { $0.recordID.recordName == recordID.recordName }
-            
-            // Add to deletes
-            if !pendingDeletes.contains(where: { $0.recordName == recordID.recordName }) {
-                pendingDeletes.append(recordID)
-            }
-            
-            LoggingService.shared.logCloudKit("Queued bookmark delete: \(videoID)")
-            
-            scheduleDebounceSync()
-        }
+        let recordID = SyncableRecordType.bookmark(videoID: videoID, scope: scope).recordID(in: zone)
+        addPendingChanges([.deleteRecord(recordID)])
+        LoggingService.shared.logCloudKit("Queued bookmark delete: \(videoID)")
     }
     
     /// Upload all existing local bookmarks to CloudKit (for initial sync).
@@ -823,17 +752,12 @@ final class CloudKitSyncEngine: @unchecked Sendable {
         
         // Track total operations
         uploadProgress?.totalOperations += bookmarks.count
-        
-        // Convert all to CKRecords and add to pending queue
-        for bookmark in bookmarks {
-            let record = recordMapper.toCKRecord(bookmark: bookmark)
-            
-            // Check if already queued
-            if !pendingSaves.contains(where: { $0.recordID.recordName == record.recordID.recordName }) {
-                pendingSaves.append(record)
-            }
+
+        let changes = bookmarks.map { bookmark in
+            CKSyncEngine.PendingRecordZoneChange.saveRecord(recordMapper.toCKRecord(bookmark: bookmark).recordID)
         }
-        
+        addPendingChanges(changes, debounce: false)
+
         LoggingService.shared.logCloudKit("Queued \(bookmarks.count) existing bookmarks for initial upload")
         
         // Trigger immediate sync (no debounce for initial upload)
@@ -845,59 +769,36 @@ final class CloudKitSyncEngine: @unchecked Sendable {
     /// Queue a playlist for sync (debounced).
     func queuePlaylistSave(_ playlist: LocalPlaylist) {
         guard canSyncPlaylists else { return }
-        
-        Task {
-            let record = recordMapper.toCKRecord(playlist: playlist)
-            pendingSaves.removeAll { $0.recordID.recordName == record.recordID.recordName }
-            pendingSaves.append(record)
-            
-            // Also queue all items
-            for item in playlist.items ?? [] {
-                let itemRecord = recordMapper.toCKRecord(playlistItem: item)
-                pendingSaves.removeAll { $0.recordID.recordName == itemRecord.recordID.recordName }
-                pendingSaves.append(itemRecord)
-            }
-            
-            LoggingService.shared.logCloudKit("Queued playlist save: \(playlist.title)")
-            scheduleDebounceSync()
+
+        var changes: [CKSyncEngine.PendingRecordZoneChange] = [
+            .saveRecord(SyncableRecordType.localPlaylist(id: playlist.id).recordID(in: zone))
+        ]
+
+        // Also queue all items
+        for item in playlist.items ?? [] {
+            changes.append(.saveRecord(SyncableRecordType.localPlaylistItem(id: item.id).recordID(in: zone)))
         }
+
+        addPendingChanges(changes)
+        LoggingService.shared.logCloudKit("Queued playlist save: \(playlist.title)")
     }
-    
+
     /// Queue a playlist deletion for sync (debounced).
     func queuePlaylistDelete(playlistID: UUID) {
         guard canSyncPlaylists else { return }
-        
-        Task {
-            let zone = await zoneManager.getZone()
-            let recordID = SyncableRecordType.localPlaylist(id: playlistID).recordID(in: zone)
-            
-            pendingSaves.removeAll { $0.recordID.recordName == recordID.recordName }
-            if !pendingDeletes.contains(where: { $0.recordName == recordID.recordName }) {
-                pendingDeletes.append(recordID)
-            }
-            
-            LoggingService.shared.logCloudKit("Queued playlist delete: \(playlistID)")
-            scheduleDebounceSync()
-        }
+
+        let recordID = SyncableRecordType.localPlaylist(id: playlistID).recordID(in: zone)
+        addPendingChanges([.deleteRecord(recordID)])
+        LoggingService.shared.logCloudKit("Queued playlist delete: \(playlistID)")
     }
-    
+
     /// Queue a playlist item deletion for sync (debounced).
     func queuePlaylistItemDelete(itemID: UUID) {
         guard canSyncPlaylists else { return }
-        
-        Task {
-            let zone = await zoneManager.getZone()
-            let recordType = SyncableRecordType.localPlaylistItem(id: itemID)
-            let recordID = recordType.recordID(in: zone)
-            
-            pendingSaves.removeAll { $0.recordID.recordName == recordID.recordName }
-            if !pendingDeletes.contains(where: { $0.recordName == recordID.recordName }) {
-                pendingDeletes.append(recordID)
-            }
-            
-            LoggingService.shared.logCloudKit("Queued playlist item delete: \(itemID)")
-            scheduleDebounceSync()
-        }
+
+        let recordID = SyncableRecordType.localPlaylistItem(id: itemID).recordID(in: zone)
+        addPendingChanges([.deleteRecord(recordID)])
+        LoggingService.shared.logCloudKit("Queued playlist item delete: \(itemID)")
     }
     
     /// Upload all existing local playlists to CloudKit (for initial sync).
@@ -918,22 +819,18 @@ final class CloudKitSyncEngine: @unchecked Sendable {
             return
         }
         
-        // Convert all playlists and their items to CKRecords
+        // Register all playlists and their items with the sync engine
+        var changes: [CKSyncEngine.PendingRecordZoneChange] = []
         for playlist in playlists {
-            let record = recordMapper.toCKRecord(playlist: playlist)
-            if !pendingSaves.contains(where: { $0.recordID.recordName == record.recordID.recordName }) {
-                pendingSaves.append(record)
-            }
-            
+            changes.append(.saveRecord(SyncableRecordType.localPlaylist(id: playlist.id).recordID(in: zone)))
+
             // Add all items
             for item in playlist.items ?? [] {
-                let itemRecord = recordMapper.toCKRecord(playlistItem: item)
-                if !pendingSaves.contains(where: { $0.recordID.recordName == itemRecord.recordID.recordName }) {
-                    pendingSaves.append(itemRecord)
-                }
+                changes.append(.saveRecord(SyncableRecordType.localPlaylistItem(id: item.id).recordID(in: zone)))
             }
         }
-        
+        addPendingChanges(changes, debounce: false)
+
         // Track total operations (playlists + items)
         let totalItems = playlists.reduce(0) { $0 + ($1.items?.count ?? 0) }
         uploadProgress?.totalOperations += playlists.count + totalItems
@@ -947,35 +844,19 @@ final class CloudKitSyncEngine: @unchecked Sendable {
     /// Queue a search history entry for sync (debounced).
     func queueSearchHistorySave(_ searchHistory: SearchHistory) {
         guard canSyncSearchHistory else { return }
-        
-        Task {
-            let record = recordMapper.toCKRecord(searchHistory: searchHistory)
-            
-            pendingDeletes.removeAll { $0.recordName == record.recordID.recordName }
-            pendingSaves.removeAll { $0.recordID.recordName == record.recordID.recordName }
-            pendingSaves.append(record)
-            
-            LoggingService.shared.logCloudKit("Queued search history save: \(searchHistory.query)")
-            scheduleDebounceSync()
-        }
+
+        let recordID = SyncableRecordType.searchHistory(id: searchHistory.id).recordID(in: zone)
+        addPendingChanges([.saveRecord(recordID)])
+        LoggingService.shared.logCloudKit("Queued search history save: \(searchHistory.query)")
     }
-    
+
     /// Queue a search history entry deletion for sync (debounced).
     func queueSearchHistoryDelete(id: UUID) {
         guard canSyncSearchHistory else { return }
-        
-        Task {
-            let zone = await zoneManager.getZone()
-            let recordID = SyncableRecordType.searchHistory(id: id).recordID(in: zone)
-            
-            pendingSaves.removeAll { $0.recordID.recordName == recordID.recordName }
-            if !pendingDeletes.contains(where: { $0.recordName == recordID.recordName }) {
-                pendingDeletes.append(recordID)
-            }
-            
-            LoggingService.shared.logCloudKit("Queued search history delete: \(id)")
-            scheduleDebounceSync()
-        }
+
+        let recordID = SyncableRecordType.searchHistory(id: id).recordID(in: zone)
+        addPendingChanges([.deleteRecord(recordID)])
+        LoggingService.shared.logCloudKit("Queued search history delete: \(id)")
     }
     
     /// Upload all existing local search history to CloudKit (for initial sync).
@@ -998,14 +879,12 @@ final class CloudKitSyncEngine: @unchecked Sendable {
         
         // Track total operations
         uploadProgress?.totalOperations += searchHistory.count
-        
-        for entry in searchHistory {
-            let record = recordMapper.toCKRecord(searchHistory: entry)
-            if !pendingSaves.contains(where: { $0.recordID.recordName == record.recordID.recordName }) {
-                pendingSaves.append(record)
-            }
+
+        let changes = searchHistory.map { entry in
+            CKSyncEngine.PendingRecordZoneChange.saveRecord(SyncableRecordType.searchHistory(id: entry.id).recordID(in: zone))
         }
-        
+        addPendingChanges(changes, debounce: false)
+
         LoggingService.shared.logCloudKit("Queued \(searchHistory.count) search history entries for initial upload")
         await sync()
     }
@@ -1015,35 +894,19 @@ final class CloudKitSyncEngine: @unchecked Sendable {
     /// Queue a recent channel for sync (debounced).
     func queueRecentChannelSave(_ recentChannel: RecentChannel) {
         guard canSyncSearchHistory else { return }
-        
-        Task {
-            let record = recordMapper.toCKRecord(recentChannel: recentChannel)
-            
-            pendingDeletes.removeAll { $0.recordName == record.recordID.recordName }
-            pendingSaves.removeAll { $0.recordID.recordName == record.recordID.recordName }
-            pendingSaves.append(record)
-            
-            LoggingService.shared.logCloudKit("Queued recent channel save: \(recentChannel.channelID)")
-            scheduleDebounceSync()
-        }
+
+        let recordID = recordMapper.toCKRecord(recentChannel: recentChannel).recordID
+        addPendingChanges([.saveRecord(recordID)])
+        LoggingService.shared.logCloudKit("Queued recent channel save: \(recentChannel.channelID)")
     }
-    
+
     /// Queue a recent channel deletion for sync (debounced).
     func queueRecentChannelDelete(channelID: String, scope: SourceScope) {
         guard canSyncSearchHistory else { return }
 
-        Task {
-            let zone = await zoneManager.getZone()
-            let recordID = SyncableRecordType.recentChannel(channelID: channelID, scope: scope).recordID(in: zone)
-            
-            pendingSaves.removeAll { $0.recordID.recordName == recordID.recordName }
-            if !pendingDeletes.contains(where: { $0.recordName == recordID.recordName }) {
-                pendingDeletes.append(recordID)
-            }
-            
-            LoggingService.shared.logCloudKit("Queued recent channel delete: \(channelID)")
-            scheduleDebounceSync()
-        }
+        let recordID = SyncableRecordType.recentChannel(channelID: channelID, scope: scope).recordID(in: zone)
+        addPendingChanges([.deleteRecord(recordID)])
+        LoggingService.shared.logCloudKit("Queued recent channel delete: \(channelID)")
     }
     
     /// Upload all existing recent channels to CloudKit (for initial sync).
@@ -1066,14 +929,12 @@ final class CloudKitSyncEngine: @unchecked Sendable {
         
         // Track total operations
         uploadProgress?.totalOperations += recentChannels.count
-        
-        for channel in recentChannels {
-            let record = recordMapper.toCKRecord(recentChannel: channel)
-            if !pendingSaves.contains(where: { $0.recordID.recordName == record.recordID.recordName }) {
-                pendingSaves.append(record)
-            }
+
+        let changes = recentChannels.map { channel in
+            CKSyncEngine.PendingRecordZoneChange.saveRecord(recordMapper.toCKRecord(recentChannel: channel).recordID)
         }
-        
+        addPendingChanges(changes, debounce: false)
+
         LoggingService.shared.logCloudKit("Queued \(recentChannels.count) recent channels for initial upload")
         await sync()
     }
@@ -1083,35 +944,19 @@ final class CloudKitSyncEngine: @unchecked Sendable {
     /// Queue a recent playlist for sync (debounced).
     func queueRecentPlaylistSave(_ recentPlaylist: RecentPlaylist) {
         guard canSyncSearchHistory else { return }
-        
-        Task {
-            let record = recordMapper.toCKRecord(recentPlaylist: recentPlaylist)
-            
-            pendingDeletes.removeAll { $0.recordName == record.recordID.recordName }
-            pendingSaves.removeAll { $0.recordID.recordName == record.recordID.recordName }
-            pendingSaves.append(record)
-            
-            LoggingService.shared.logCloudKit("Queued recent playlist save: \(recentPlaylist.playlistID)")
-            scheduleDebounceSync()
-        }
+
+        let recordID = recordMapper.toCKRecord(recentPlaylist: recentPlaylist).recordID
+        addPendingChanges([.saveRecord(recordID)])
+        LoggingService.shared.logCloudKit("Queued recent playlist save: \(recentPlaylist.playlistID)")
     }
-    
+
     /// Queue a recent playlist deletion for sync (debounced).
     func queueRecentPlaylistDelete(playlistID: String, scope: SourceScope) {
         guard canSyncSearchHistory else { return }
 
-        Task {
-            let zone = await zoneManager.getZone()
-            let recordID = SyncableRecordType.recentPlaylist(playlistID: playlistID, scope: scope).recordID(in: zone)
-            
-            pendingSaves.removeAll { $0.recordID.recordName == recordID.recordName }
-            if !pendingDeletes.contains(where: { $0.recordName == recordID.recordName }) {
-                pendingDeletes.append(recordID)
-            }
-            
-            LoggingService.shared.logCloudKit("Queued recent playlist delete: \(playlistID)")
-            scheduleDebounceSync()
-        }
+        let recordID = SyncableRecordType.recentPlaylist(playlistID: playlistID, scope: scope).recordID(in: zone)
+        addPendingChanges([.deleteRecord(recordID)])
+        LoggingService.shared.logCloudKit("Queued recent playlist delete: \(playlistID)")
     }
     
     /// Upload all existing recent playlists to CloudKit (for initial sync).
@@ -1134,14 +979,12 @@ final class CloudKitSyncEngine: @unchecked Sendable {
         
         // Track total operations
         uploadProgress?.totalOperations += recentPlaylists.count
-        
-        for playlist in recentPlaylists {
-            let record = recordMapper.toCKRecord(recentPlaylist: playlist)
-            if !pendingSaves.contains(where: { $0.recordID.recordName == record.recordID.recordName }) {
-                pendingSaves.append(record)
-            }
+
+        let changes = recentPlaylists.map { playlist in
+            CKSyncEngine.PendingRecordZoneChange.saveRecord(recordMapper.toCKRecord(recentPlaylist: playlist).recordID)
         }
-        
+        addPendingChanges(changes, debounce: false)
+
         LoggingService.shared.logCloudKit("Queued \(recentPlaylists.count) recent playlists for initial upload")
         await sync()
     }
@@ -1151,44 +994,19 @@ final class CloudKitSyncEngine: @unchecked Sendable {
     /// Queue channel notification settings for sync (debounced).
     func queueChannelNotificationSettingsSave(_ settings: ChannelNotificationSettings) {
         guard canSyncSubscriptions else { return }
-        
-        Task {
-            let record = recordMapper.toCKRecord(channelNotificationSettings: settings)
-            
-            // Remove from deletes if it was queued for deletion
-            pendingDeletes.removeAll { $0.recordName == record.recordID.recordName }
-            
-            // Add/update in saves
-            pendingSaves.removeAll { $0.recordID.recordName == record.recordID.recordName }
-            pendingSaves.append(record)
-            
-            LoggingService.shared.logCloudKit("Queued channel notification settings save: \(settings.channelID)")
-            
-            scheduleDebounceSync()
-        }
+
+        let recordID = recordMapper.toCKRecord(channelNotificationSettings: settings).recordID
+        addPendingChanges([.saveRecord(recordID)])
+        LoggingService.shared.logCloudKit("Queued channel notification settings save: \(settings.channelID)")
     }
-    
+
     /// Queue channel notification settings deletion for sync (debounced).
     func queueChannelNotificationSettingsDelete(channelID: String, scope: SourceScope) {
         guard canSyncSubscriptions else { return }
 
-        Task {
-            let zone = await zoneManager.getZone()
-            let recordType = SyncableRecordType.channelNotificationSettings(channelID: channelID, scope: scope)
-            let recordID = recordType.recordID(in: zone)
-            
-            // Remove from saves if it was queued
-            pendingSaves.removeAll { $0.recordID.recordName == recordID.recordName }
-            
-            // Add to deletes
-            if !pendingDeletes.contains(where: { $0.recordName == recordID.recordName }) {
-                pendingDeletes.append(recordID)
-            }
-            
-            LoggingService.shared.logCloudKit("Queued channel notification settings delete: \(channelID)")
-            
-            scheduleDebounceSync()
-        }
+        let recordID = SyncableRecordType.channelNotificationSettings(channelID: channelID, scope: scope).recordID(in: zone)
+        addPendingChanges([.deleteRecord(recordID)])
+        LoggingService.shared.logCloudKit("Queued channel notification settings delete: \(channelID)")
     }
     
     /// Upload all existing channel notification settings to CloudKit (for initial sync).
@@ -1211,14 +1029,12 @@ final class CloudKitSyncEngine: @unchecked Sendable {
         
         // Track total operations
         uploadProgress?.totalOperations += allSettings.count
-        
-        for settings in allSettings {
-            let record = recordMapper.toCKRecord(channelNotificationSettings: settings)
-            if !pendingSaves.contains(where: { $0.recordID.recordName == record.recordID.recordName }) {
-                pendingSaves.append(record)
-            }
+
+        let changes = allSettings.map { settings in
+            CKSyncEngine.PendingRecordZoneChange.saveRecord(recordMapper.toCKRecord(channelNotificationSettings: settings).recordID)
         }
-        
+        addPendingChanges(changes, debounce: false)
+
         LoggingService.shared.logCloudKit("Queued \(allSettings.count) channel notification settings for initial upload")
         await sync()
     }
@@ -1236,29 +1052,23 @@ final class CloudKitSyncEngine: @unchecked Sendable {
         uploadProgress?.currentCategory = "Controls Presets"
         
         LoggingService.shared.logCloudKit("Starting upload of local controls presets...")
-        
-        let layoutService = PlayerControlsLayoutService()
+
+        let layoutService = playerControlsLayoutService ?? PlayerControlsLayoutService()
         let presets = await layoutService.presetsForSync()
-        
+
         guard !presets.isEmpty else {
             LoggingService.shared.logCloudKit("No controls presets to upload")
             return
         }
-        
+
         // Track total operations
         uploadProgress?.totalOperations += presets.count
-        
-        for preset in presets {
-            do {
-                let record = try recordMapper.toCKRecord(preset: preset)
-                if !pendingSaves.contains(where: { $0.recordID.recordName == record.recordID.recordName }) {
-                    pendingSaves.append(record)
-                }
-            } catch {
-                LoggingService.shared.logCloudKitError("Failed to encode preset for upload: \(preset.name)", error: error)
-            }
+
+        let changes = presets.map { preset in
+            CKSyncEngine.PendingRecordZoneChange.saveRecord(SyncableRecordType.controlsPreset(id: preset.id).recordID(in: zone))
         }
-        
+        addPendingChanges(changes, debounce: false)
+
         LoggingService.shared.logCloudKit("Queued \(presets.count) controls presets for upload")
         await sync()
     }
@@ -1266,49 +1076,74 @@ final class CloudKitSyncEngine: @unchecked Sendable {
     /// Queue a controls preset for sync (debounced).
     func queueControlsPresetSave(_ preset: LayoutPreset) {
         guard canSyncControlsPresets else { return }
-        
+
         // Only sync non-built-in presets for current device class
         guard !preset.isBuiltIn, preset.deviceClass == .current else { return }
-        
-        Task {
-            do {
-                let record = try recordMapper.toCKRecord(preset: preset)
-                
-                pendingDeletes.removeAll { $0.recordName == record.recordID.recordName }
-                pendingSaves.removeAll { $0.recordID.recordName == record.recordID.recordName }
-                pendingSaves.append(record)
-                
-                LoggingService.shared.logCloudKit("Queued controls preset save: \(preset.name)")
-                scheduleDebounceSync()
-            } catch {
-                LoggingService.shared.logCloudKitError("Failed to encode controls preset for sync", error: error)
-            }
-        }
+
+        let recordID = SyncableRecordType.controlsPreset(id: preset.id).recordID(in: zone)
+        addPendingChanges([.saveRecord(recordID)])
+        LoggingService.shared.logCloudKit("Queued controls preset save: \(preset.name)")
     }
-    
+
     /// Queue a controls preset deletion for sync (debounced).
     func queueControlsPresetDelete(id: UUID) {
         guard canSyncControlsPresets else { return }
-        
-        Task {
-            let zone = await zoneManager.getZone()
-            let recordID = SyncableRecordType.controlsPreset(id: id).recordID(in: zone)
-            
-            pendingSaves.removeAll { $0.recordID.recordName == recordID.recordName }
-            if !pendingDeletes.contains(where: { $0.recordName == recordID.recordName }) {
-                pendingDeletes.append(recordID)
+
+        let recordID = SyncableRecordType.controlsPreset(id: id).recordID(in: zone)
+        addPendingChanges([.deleteRecord(recordID)])
+        LoggingService.shared.logCloudKit("Queued controls preset delete: \(id)")
+    }
+    
+    /// Registers pending changes with the sync engine state (or buffers them
+    /// until the engine is ready) and schedules a debounced send. The engine
+    /// state is persisted via `.stateUpdate` events, so registered changes
+    /// survive app termination; records are materialized from local data at
+    /// send time in `nextRecordZoneChangeBatch`.
+    private func addPendingChanges(_ changes: [CKSyncEngine.PendingRecordZoneChange], debounce: Bool = true) {
+        guard !changes.isEmpty else { return }
+
+        for change in changes {
+            switch change {
+            case .saveRecord(let recordID), .deleteRecord(let recordID):
+                // A fresh local change supersedes any conflict-resolved record
+                // awaiting upload; drop it so the next send uses current data.
+                conflictResolvedRecords.removeValue(forKey: recordID.recordName)
+            @unknown default:
+                break
             }
-            
-            LoggingService.shared.logCloudKit("Queued controls preset delete: \(id)")
+        }
+
+        if let syncEngine {
+            syncEngine.state.add(pendingRecordZoneChanges: changes)
+        } else {
+            pendingChangesBuffer.append(contentsOf: changes)
+        }
+        updatePendingCount()
+
+        if debounce {
             scheduleDebounceSync()
         }
     }
-    
+
+    /// Whether a delete for the given record name is pending upload.
+    private func hasPendingDelete(recordName: String) -> Bool {
+        let matches: (CKSyncEngine.PendingRecordZoneChange) -> Bool = { change in
+            if case .deleteRecord(let recordID) = change {
+                return recordID.recordName == recordName
+            }
+            return false
+        }
+        if pendingChangesBuffer.contains(where: matches) { return true }
+        return syncEngine?.state.pendingRecordZoneChanges.contains(where: matches) ?? false
+    }
+
+    /// Refreshes the observable pending count from the engine state.
+    private func updatePendingCount() {
+        pendingChangesCount = (syncEngine?.state.pendingRecordZoneChanges.count ?? 0) + pendingChangesBuffer.count
+    }
+
     /// Schedule a debounced sync after changes.
     private func scheduleDebounceSync() {
-        // Persist pending record names for crash recovery
-        persistPendingRecordNames()
-        
         debounceTimer?.invalidate()
         debounceTimer = Timer.scheduledTimer(withTimeInterval: debounceDelay, repeats: false) { [weak self] _ in
             Task { @MainActor [weak self] in
@@ -1324,10 +1159,11 @@ final class CloudKitSyncEngine: @unchecked Sendable {
     func flushPendingChanges() async {
         debounceTimer?.invalidate()
         debounceTimer = nil
-        
-        guard !pendingSaves.isEmpty || !pendingDeletes.isEmpty else { return }
-        
-        LoggingService.shared.logCloudKit("Flushing \(pendingSaves.count) saves, \(pendingDeletes.count) deletes before background")
+
+        updatePendingCount()
+        guard pendingChangesCount > 0 else { return }
+
+        LoggingService.shared.logCloudKit("Flushing \(pendingChangesCount) pending changes before background")
         await sync()
     }
 
@@ -1388,19 +1224,27 @@ final class CloudKitSyncEngine: @unchecked Sendable {
         LoggingService.shared.logCloudKit("Stopped foreground polling")
     }
 
-    /// Persist pending record names to UserDefaults for crash recovery.
-    /// Called after queuing changes so they survive app termination.
-    private func persistPendingRecordNames() {
-        let saveNames = pendingSaves.map { $0.recordID.recordName }
-        let deleteNames = pendingDeletes.map { $0.recordName }
-        UserDefaults.standard.set(saveNames, forKey: pendingSaveRecordNamesKey)
-        UserDefaults.standard.set(deleteNames, forKey: pendingDeleteRecordNamesKey)
-    }
-    
-    /// Clear persisted pending record names after successful sync.
-    private func clearPersistedPendingRecordNames() {
-        UserDefaults.standard.removeObject(forKey: pendingSaveRecordNamesKey)
-        UserDefaults.standard.removeObject(forKey: pendingDeleteRecordNamesKey)
+    /// One-time migration of pending changes persisted by the previous
+    /// array-based queue. Both saves and deletes are recovered by record
+    /// name — save records are materialized from local data at send time.
+    private func migrateLegacyPendingChanges(into engine: CKSyncEngine) {
+        let defaults = UserDefaults.standard
+        let saveNames = defaults.stringArray(forKey: pendingSaveRecordNamesKey) ?? []
+        let deleteNames = defaults.stringArray(forKey: pendingDeleteRecordNamesKey) ?? []
+        guard !saveNames.isEmpty || !deleteNames.isEmpty else { return }
+
+        var changes: [CKSyncEngine.PendingRecordZoneChange] = []
+        for name in saveNames {
+            changes.append(.saveRecord(CKRecord.ID(recordName: name, zoneID: zone.zoneID)))
+        }
+        for name in deleteNames {
+            changes.append(.deleteRecord(CKRecord.ID(recordName: name, zoneID: zone.zoneID)))
+        }
+        engine.state.add(pendingRecordZoneChanges: changes)
+
+        defaults.removeObject(forKey: pendingSaveRecordNamesKey)
+        defaults.removeObject(forKey: pendingDeleteRecordNamesKey)
+        LoggingService.shared.logCloudKit("Migrated \(saveNames.count) legacy pending saves, \(deleteNames.count) legacy pending deletes")
     }
 
     // MARK: - Deferred Playlist Item Management
@@ -1458,7 +1302,7 @@ final class CloudKitSyncEngine: @unchecked Sendable {
         for var deferredItem in deferredPlaylistItems {
             // Drop items whose parent playlist is pending deletion
             let playlistRecordName = "playlist-\(deferredItem.playlistID)"
-            if pendingDeletes.contains(where: { $0.recordName == playlistRecordName }) {
+            if hasPendingDelete(recordName: playlistRecordName) {
                 LoggingService.shared.logCloudKit("Dropping deferred item (parent playlist pending delete): \(deferredItem.itemID)")
                 continue
             }
@@ -1546,35 +1390,6 @@ final class CloudKitSyncEngine: @unchecked Sendable {
         }
     }
 
-    /// Check for persisted pending changes from a previous session and trigger sync if needed.
-    /// Call this during setup to recover from app termination during debounce period.
-    private func recoverPersistedPendingChanges() {
-        let saveNames = UserDefaults.standard.stringArray(forKey: pendingSaveRecordNamesKey) ?? []
-        let deleteNames = UserDefaults.standard.stringArray(forKey: pendingDeleteRecordNamesKey) ?? []
-
-        // Reconstruct pending deletes from persisted record names
-        if !deleteNames.isEmpty {
-            let zone = CKRecordZone(zoneName: RecordType.zoneName)
-            for name in deleteNames {
-                let recordID = CKRecord.ID(recordName: name, zoneID: zone.zoneID)
-                if !pendingDeletes.contains(where: { $0.recordName == name }) {
-                    pendingDeletes.append(recordID)
-                }
-            }
-        }
-
-        // Also check for deferred playlist items
-        loadDeferredItems()
-        let hasDeferredItems = !deferredPlaylistItems.isEmpty
-
-        if !saveNames.isEmpty || !deleteNames.isEmpty || hasDeferredItems {
-            LoggingService.shared.logCloudKit("Recovered \(saveNames.count) pending saves, \(deleteNames.count) pending deletes, \(deferredPlaylistItems.count) deferred items from previous session")
-            Task {
-                await sync()
-            }
-        }
-    }
-    
     /// Refreshes sync by clearing local sync state (tokens) without deleting the CloudKit zone.
     /// This forces CKSyncEngine to re-fetch all changes from scratch on next sync.
     /// Unlike `resetSync()`, this preserves all CloudKit records.
@@ -1588,15 +1403,15 @@ final class CloudKitSyncEngine: @unchecked Sendable {
 
         // Clear local sync state so CKSyncEngine fetches everything fresh
         UserDefaults.standard.removeObject(forKey: syncStateKey)
-        clearPersistedPendingRecordNames()
 
         // Tear down existing engine
         debounceTimer?.invalidate()
         debounceTimer = nil
-        pendingSaves.removeAll()
-        pendingDeletes.removeAll()
+        pendingChangesBuffer.removeAll()
+        conflictResolvedRecords.removeAll()
         retryCount.removeAll()
         syncEngine = nil
+        updatePendingCount()
 
         // Reinitialize - with the persisted state cleared above, setup starts
         // from nil state serialization (forces full fetch)
@@ -1611,12 +1426,14 @@ final class CloudKitSyncEngine: @unchecked Sendable {
         try await zoneManager.deleteZone()
 
         // Clear pending changes
-        pendingSaves.removeAll()
-        pendingDeletes.removeAll()
+        pendingChangesBuffer.removeAll()
+        conflictResolvedRecords.removeAll()
+        retryCount.removeAll()
+        syncEngine = nil
+        updatePendingCount()
 
         // Clear sync state
         UserDefaults.standard.removeObject(forKey: syncStateKey)
-        clearPersistedPendingRecordNames()
         clearDeferredItems()
         
         // Recreate zone
@@ -1801,11 +1618,7 @@ extension CloudKitSyncEngine: CKSyncEngineDelegate {
             await handleFetchedChanges(changes)
 
         case .sentRecordZoneChanges(let changes):
-            await MainActor.run {
-                LoggingService.shared.logCloudKit("Sent \(changes.savedRecords.count) saves, \(changes.deletedRecordIDs.count) deletions")
-                clearSentRecords(changes)
-            }
-            await handlePartialFailures(changes)
+            await handleSentRecordZoneChanges(changes)
 
         case .fetchedDatabaseChanges(let changes):
             await handleFetchedDatabaseChanges(changes)
@@ -1818,6 +1631,7 @@ extension CloudKitSyncEngine: CKSyncEngineDelegate {
                     let stateSize = (try? encoder.encode(update.stateSerialization))?.count ?? 0
                     LoggingService.shared.logCloudKit("Sync state updated and saved (\(stateSize) bytes)")
                     saveSyncState(update.stateSerialization)
+                    updatePendingCount()
 
                 case .accountChange:
                     LoggingService.shared.logCloudKit("iCloud account change event received - reinitializing sync engine")
@@ -1847,176 +1661,251 @@ extension CloudKitSyncEngine: CKSyncEngineDelegate {
         _ context: CKSyncEngine.SendChangesContext,
         syncEngine: CKSyncEngine
     ) async -> CKSyncEngine.RecordZoneChangeBatch? {
+        let scope = context.options.scope
+        let pendingChanges = syncEngine.state.pendingRecordZoneChanges.filter { scope.contains($0) }
+        guard !pendingChanges.isEmpty else { return nil }
+
         await MainActor.run {
-            guard !pendingSaves.isEmpty || !pendingDeletes.isEmpty else {
-                return nil
-            }
+            LoggingService.shared.logCloudKit("Preparing batch from \(pendingChanges.count) pending changes")
+        }
 
-            // Batch size limit - CloudKit allows max 400 per request, we use 350 for safety.
-            // CKSyncEngine will call this method repeatedly until we return nil.
-            let savesToSend = Array(pendingSaves.prefix(cloudKitBatchSize))
-            let deletesToSend = Array(pendingDeletes.prefix(cloudKitBatchSize - savesToSend.count))
-
-            let remainingSaves = pendingSaves.count - savesToSend.count
-            let remainingDeletes = pendingDeletes.count - deletesToSend.count
-            LoggingService.shared.logCloudKit("Preparing batch: \(savesToSend.count) saves, \(deletesToSend.count) deletes (remaining: \(remainingSaves) saves, \(remainingDeletes) deletes)")
-
-            return CKSyncEngine.RecordZoneChangeBatch(
-                recordsToSave: savesToSend,
-                recordIDsToDelete: deletesToSend,
-                atomicByZone: false
-            )
+        return await CKSyncEngine.RecordZoneChangeBatch(pendingChanges: pendingChanges) { [weak self] recordID in
+            await self?.recordToSave(for: recordID, engine: syncEngine)
         }
     }
-    
-    /// Clear successfully sent records from pending queues.
-    private func clearSentRecords(_ changes: CKSyncEngine.Event.SentRecordZoneChanges) {
-        let savedIDs = Set(changes.savedRecords.map { $0.recordID.recordName })
-        let deletedIDs = Set(changes.deletedRecordIDs.map { $0.recordName })
-        
-        pendingSaves.removeAll { savedIDs.contains($0.recordID.recordName) }
-        pendingDeletes.removeAll { deletedIDs.contains($0.recordName) }
-        
-        LoggingService.shared.logCloudKit("Cleared \(savedIDs.count) saves and \(deletedIDs.count) deletes from pending queue")
-    }
-    
-    /// Handle partial failures from CloudKit sync.
-    /// Applies conflict resolution and retries with exponential backoff.
-    private func handlePartialFailures(_ changes: CKSyncEngine.Event.SentRecordZoneChanges) async {
-        guard let dataManager else { return }
-        
-        // Check for failed saves
-        for failedSave in changes.failedRecordSaves {
-            let recordID = failedSave.record.recordID
-            let recordName = recordID.recordName
-            let saveError = failedSave.error as NSError
-            
-            LoggingService.shared.logCloudKitError("Failed to save record \(recordName)", error: saveError)
-            
-            // Check if this is a conflict error (serverRecordChanged = 14)
-            if saveError.code == CKError.serverRecordChanged.rawValue {
-                await handleConflict(recordID: recordID, error: saveError, dataManager: dataManager)
-            } else if saveError.code == CKError.batchRequestFailed.rawValue {
-                // Batch failed - check partial errors
-                if let partialErrors = saveError.userInfo[CKPartialErrorsByItemIDKey] as? [AnyHashable: Error] {
-                    for (_, partialError) in partialErrors {
-                        let partialCKError = partialError as NSError
-                        if partialCKError.code == CKError.serverRecordChanged.rawValue {
-                            await handleConflict(recordID: recordID, error: partialCKError, dataManager: dataManager)
-                        } else {
-                            // Other errors - remove from queue and log
-                            removeFromPendingQueue(recordName: recordName)
-                            LoggingService.shared.logCloudKitError("Unrecoverable error for \(recordName), removed from queue", error: partialError)
-                        }
-                    }
-                }
-            } else {
-                // Other errors - remove from queue and log
-                removeFromPendingQueue(recordName: recordName)
-                LoggingService.shared.logCloudKitError("Unrecoverable error for \(recordName), removed from queue", error: saveError)
-            }
-        }
-    }
-    
-    /// Handle a conflict error by fetching server record, resolving, and retrying.
-    private func handleConflict(recordID: CKRecord.ID, error: NSError, dataManager: DataManager) async {
+
+    /// Provides the record for a pending save at send time, materialized from
+    /// current local data. Returns nil (and removes the pending change) when
+    /// the entity no longer exists locally or is no longer syncable.
+    private func recordToSave(for recordID: CKRecord.ID, engine: CKSyncEngine) async -> CKRecord? {
         let recordName = recordID.recordName
-        
-        // Extract server record from error
-        guard let serverRecord = error.userInfo[CKRecordChangedErrorServerRecordKey] as? CKRecord else {
-            LoggingService.shared.logCloudKitError("No server record in conflict error for \(recordName)", error: error)
-            removeFromPendingQueue(recordName: recordName)
-            return
+
+        // A conflict-resolved record (carrying the server change tag) takes precedence
+        if let resolved = conflictResolvedRecords[recordName] {
+            return resolved
         }
-        
-        LoggingService.shared.logCloudKit("Resolving conflict for \(recordName)")
-        
-        // Find our local pending record
-        guard let localRecord = pendingSaves.first(where: { $0.recordID.recordName == recordName }) else {
-            LoggingService.shared.logCloudKit("Local record not found in pending queue for \(recordName)")
-            return
+
+        if let record = await materializeRecord(named: recordName) {
+            return record
         }
-        
-        // Apply conflict resolution based on record type
-        let resolved: CKRecord
-        
-        switch serverRecord.recordType {
+
+        engine.state.remove(pendingRecordZoneChanges: [.saveRecord(recordID)])
+        LoggingService.shared.logCloudKit("Skipping save for \(recordName) — no matching local data")
+        return nil
+    }
+
+    /// Builds a CKRecord for the given record name from current local data.
+    /// The record name prefix identifies the entity type; the mapper re-derives
+    /// the scoped record name, which must match the requested one (a mismatch
+    /// means the local entity belongs to a different source scope).
+    private func materializeRecord(named recordName: String) async -> CKRecord? {
+        guard let dataManager else { return nil }
+
+        func scopedMatch(_ record: CKRecord) -> CKRecord? {
+            record.recordID.recordName == recordName ? record : nil
+        }
+
+        if recordName.hasPrefix("sub-") {
+            guard canSyncSubscriptions else { return nil }
+            let channelID = SyncableRecordType.extractBareID(from: String(recordName.dropFirst(4)))
+            guard let subscription = dataManager.subscription(for: channelID) else { return nil }
+            return scopedMatch(recordMapper.toCKRecord(subscription: subscription))
+        }
+        if recordName.hasPrefix("watch-") {
+            guard canSyncPlaybackHistory else { return nil }
+            let videoID = SyncableRecordType.extractBareID(from: String(recordName.dropFirst(6)))
+            guard let entry = dataManager.watchEntry(for: videoID), shouldSyncWatchEntry(entry) else { return nil }
+            return scopedMatch(recordMapper.toCKRecord(watchEntry: entry))
+        }
+        if recordName.hasPrefix("bookmark-") {
+            guard canSyncBookmarks else { return nil }
+            let videoID = SyncableRecordType.extractBareID(from: String(recordName.dropFirst(9)))
+            guard let bookmark = dataManager.bookmark(for: videoID) else { return nil }
+            return scopedMatch(recordMapper.toCKRecord(bookmark: bookmark))
+        }
+        if recordName.hasPrefix("recent-channel-") {
+            guard canSyncSearchHistory else { return nil }
+            let channelID = SyncableRecordType.extractBareID(from: String(recordName.dropFirst(15)))
+            guard let recentChannel = dataManager.recentChannelEntry(forChannelID: channelID) else { return nil }
+            return scopedMatch(recordMapper.toCKRecord(recentChannel: recentChannel))
+        }
+        if recordName.hasPrefix("recent-playlist-") {
+            guard canSyncSearchHistory else { return nil }
+            let playlistID = SyncableRecordType.extractBareID(from: String(recordName.dropFirst(16)))
+            guard let recentPlaylist = dataManager.recentPlaylistEntry(forPlaylistID: playlistID) else { return nil }
+            return scopedMatch(recordMapper.toCKRecord(recentPlaylist: recentPlaylist))
+        }
+        if recordName.hasPrefix("channel-notif-") {
+            guard canSyncSubscriptions else { return nil }
+            let channelID = SyncableRecordType.extractBareID(from: String(recordName.dropFirst(14)))
+            guard let settings = dataManager.channelNotificationSettings(for: channelID) else { return nil }
+            return scopedMatch(recordMapper.toCKRecord(channelNotificationSettings: settings))
+        }
+        if recordName.hasPrefix("playlist-") {
+            guard canSyncPlaylists,
+                  let id = UUID(uuidString: String(recordName.dropFirst(9))),
+                  let playlist = dataManager.playlist(forID: id),
+                  !playlist.isPlaceholder else { return nil }
+            return recordMapper.toCKRecord(playlist: playlist)
+        }
+        if recordName.hasPrefix("item-") {
+            guard canSyncPlaylists,
+                  let id = UUID(uuidString: String(recordName.dropFirst(5))),
+                  let item = dataManager.playlistItem(forID: id) else { return nil }
+            return recordMapper.toCKRecord(playlistItem: item)
+        }
+        if recordName.hasPrefix("search-") {
+            guard canSyncSearchHistory,
+                  let id = UUID(uuidString: String(recordName.dropFirst(7))),
+                  let entry = dataManager.searchHistoryEntry(forID: id) else { return nil }
+            return recordMapper.toCKRecord(searchHistory: entry)
+        }
+        if recordName.hasPrefix("controls-") {
+            guard canSyncControlsPresets,
+                  let id = UUID(uuidString: String(recordName.dropFirst(9))) else { return nil }
+            let layoutService = playerControlsLayoutService ?? PlayerControlsLayoutService()
+            let presets = await layoutService.presetsForSync()
+            guard let preset = presets.first(where: { $0.id == id }) else { return nil }
+            return try? recordMapper.toCKRecord(preset: preset)
+        }
+
+        LoggingService.shared.logCloudKit("Cannot materialize record with unknown prefix: \(recordName)")
+        return nil
+    }
+
+    /// Handle the result of a sent batch: clean up bookkeeping for successes
+    /// and decide per-record how to handle failures.
+    private func handleSentRecordZoneChanges(_ changes: CKSyncEngine.Event.SentRecordZoneChanges) async {
+        LoggingService.shared.logCloudKit("Sent \(changes.savedRecords.count) saves, \(changes.deletedRecordIDs.count) deletions (\(changes.failedRecordSaves.count) failed saves, \(changes.failedRecordDeletes.count) failed deletes)")
+
+        for record in changes.savedRecords {
+            let recordName = record.recordID.recordName
+            conflictResolvedRecords.removeValue(forKey: recordName)
+            retryCount.removeValue(forKey: recordName)
+        }
+
+        for failedSave in changes.failedRecordSaves {
+            await handleFailedRecordSave(failedSave)
+        }
+
+        for (recordID, error) in changes.failedRecordDeletes {
+            handleFailedRecordDelete(recordID: recordID, error: error)
+        }
+
+        updatePendingCount()
+    }
+
+    /// Handle a failed record save. Retryable failures are re-registered with
+    /// the engine state (the engine schedules the retry with proper backoff),
+    /// conflicts are merged and re-sent; only genuinely fatal errors drop the
+    /// change.
+    private func handleFailedRecordSave(_ failedSave: CKSyncEngine.Event.SentRecordZoneChanges.FailedRecordSave) async {
+        let record = failedSave.record
+        let error = failedSave.error
+        let recordID = record.recordID
+        let recordName = recordID.recordName
+
+        switch error.code {
+        case .serverRecordChanged:
+            guard let serverRecord = error.serverRecord else {
+                LoggingService.shared.logCloudKitError("No server record in conflict error for \(recordName)", error: error)
+                conflictResolvedRecords.removeValue(forKey: recordName)
+                return
+            }
+
+            let attempts = retryCount[recordName] ?? 0
+            guard attempts < maxRetryAttempts else {
+                LoggingService.shared.logCloudKitError(
+                    "Record \(recordName) failed after \(maxRetryAttempts) conflict resolution attempts, giving up",
+                    error: error
+                )
+                conflictResolvedRecords.removeValue(forKey: recordName)
+                retryCount.removeValue(forKey: recordName)
+                return
+            }
+            retryCount[recordName] = attempts + 1
+
+            // Merge the record we tried to send with the server's version.
+            // The resolved record keeps the server change tag, so the retry
+            // is accepted as an update.
+            let resolved = await resolveConflict(local: record, server: serverRecord)
+            conflictResolvedRecords[recordName] = resolved
+            syncEngine?.state.add(pendingRecordZoneChanges: [.saveRecord(recordID)])
+            LoggingService.shared.logCloudKit("Resolved \(serverRecord.recordType) conflict for \(recordName), retrying (attempt \(attempts + 1))")
+
+        case .unknownItem:
+            // Record vanished server-side while we held its change tag —
+            // drop the cached record and retry as a fresh insert.
+            conflictResolvedRecords.removeValue(forKey: recordName)
+            syncEngine?.state.add(pendingRecordZoneChanges: [.saveRecord(recordID)])
+            LoggingService.shared.logCloudKit("Record \(recordName) missing on server, retrying as insert")
+
+        case .zoneNotFound:
+            // Zone was deleted — recreate it and retry the save
+            syncEngine?.state.add(pendingRecordZoneChanges: [.saveRecord(recordID)])
+            Task {
+                try? await zoneManager.createZoneIfNeeded()
+            }
+            LoggingService.shared.logCloudKit("Zone missing for \(recordName), recreating and retrying")
+
+        case .zoneBusy, .serviceUnavailable, .requestRateLimited, .networkFailure, .networkUnavailable,
+             .notAuthenticated, .accountTemporarilyUnavailable, .batchRequestFailed, .limitExceeded:
+            // Transient — keep the change pending; the engine retries with backoff
+            syncEngine?.state.add(pendingRecordZoneChanges: [.saveRecord(recordID)])
+            LoggingService.shared.logCloudKit("Transient error (\(error.code.rawValue)) for \(recordName), will retry")
+
+        default:
+            conflictResolvedRecords.removeValue(forKey: recordName)
+            retryCount.removeValue(forKey: recordName)
+            LoggingService.shared.logCloudKitError("Unrecoverable error for \(recordName), dropping change", error: error)
+        }
+    }
+
+    /// Handle a failed record deletion. Retryable failures are re-registered
+    /// with the engine state; a record already missing on the server is done.
+    private func handleFailedRecordDelete(recordID: CKRecord.ID, error: CKError) {
+        switch error.code {
+        case .unknownItem, .zoneNotFound:
+            // Already gone on the server — nothing to do
+            break
+
+        case .zoneBusy, .serviceUnavailable, .requestRateLimited, .networkFailure, .networkUnavailable,
+             .notAuthenticated, .accountTemporarilyUnavailable, .batchRequestFailed, .limitExceeded:
+            syncEngine?.state.add(pendingRecordZoneChanges: [.deleteRecord(recordID)])
+            LoggingService.shared.logCloudKit("Transient error (\(error.code.rawValue)) deleting \(recordID.recordName), will retry")
+
+        default:
+            LoggingService.shared.logCloudKitError("Unrecoverable error deleting \(recordID.recordName), dropping change", error: error)
+        }
+    }
+
+    /// Applies type-specific conflict resolution between the record we tried
+    /// to send and the server's current version.
+    private func resolveConflict(local: CKRecord, server: CKRecord) async -> CKRecord {
+        switch server.recordType {
         case RecordType.subscription:
-            resolved = await conflictResolver.resolveSubscriptionConflict(local: localRecord, server: serverRecord)
-            LoggingService.shared.logCloudKit("Resolved subscription conflict for \(recordName)")
-            
+            return await conflictResolver.resolveSubscriptionConflict(local: local, server: server)
         case RecordType.watchEntry:
-            resolved = await conflictResolver.resolveWatchEntryConflict(local: localRecord, server: serverRecord)
-            LoggingService.shared.logCloudKit("Resolved watch entry conflict for \(recordName)")
-            
+            return await conflictResolver.resolveWatchEntryConflict(local: local, server: server)
         case RecordType.bookmark:
-            resolved = await conflictResolver.resolveBookmarkConflict(local: localRecord, server: serverRecord)
-            LoggingService.shared.logCloudKit("Resolved bookmark conflict for \(recordName)")
-            
+            return await conflictResolver.resolveBookmarkConflict(local: local, server: server)
         case RecordType.localPlaylist:
-            resolved = await conflictResolver.resolveLocalPlaylistConflict(local: localRecord, server: serverRecord)
-            LoggingService.shared.logCloudKit("Resolved playlist conflict for \(recordName)")
-            
+            return await conflictResolver.resolveLocalPlaylistConflict(local: local, server: server)
         case RecordType.localPlaylistItem:
-            resolved = await conflictResolver.resolveLocalPlaylistItemConflict(local: localRecord, server: serverRecord)
-            LoggingService.shared.logCloudKit("Resolved playlist item conflict for \(recordName)")
-            
+            return await conflictResolver.resolveLocalPlaylistItemConflict(local: local, server: server)
         case RecordType.searchHistory:
-            resolved = await conflictResolver.resolveSearchHistoryConflict(local: localRecord, server: serverRecord)
-            LoggingService.shared.logCloudKit("Resolved search history conflict for \(recordName)")
-            
+            return await conflictResolver.resolveSearchHistoryConflict(local: local, server: server)
         case RecordType.recentChannel:
-            resolved = await conflictResolver.resolveRecentChannelConflict(local: localRecord, server: serverRecord)
-            LoggingService.shared.logCloudKit("Resolved recent channel conflict for \(recordName)")
-            
+            return await conflictResolver.resolveRecentChannelConflict(local: local, server: server)
         case RecordType.recentPlaylist:
-            resolved = await conflictResolver.resolveRecentPlaylistConflict(local: localRecord, server: serverRecord)
-            LoggingService.shared.logCloudKit("Resolved recent playlist conflict for \(recordName)")
-            
+            return await conflictResolver.resolveRecentPlaylistConflict(local: local, server: server)
         case RecordType.controlsPreset:
-            resolved = await conflictResolver.resolveLayoutPresetConflict(local: localRecord, server: serverRecord)
-            LoggingService.shared.logCloudKit("Resolved controls preset conflict for \(recordName)")
-            
+            return await conflictResolver.resolveLayoutPresetConflict(local: local, server: server)
         default:
             // Unknown type - use server version (safe fallback)
-            LoggingService.shared.logCloudKit("Unknown record type \(serverRecord.recordType), using server version")
-            resolved = serverRecord
+            LoggingService.shared.logCloudKit("Unknown record type \(server.recordType), using server version")
+            return server
         }
-        
-        // Update pending queue with resolved record
-        pendingSaves.removeAll { $0.recordID.recordName == recordName }
-        pendingSaves.append(resolved)
-        
-        // Track retry and schedule with exponential backoff
-        let currentRetries = retryCount[recordName] ?? 0
-
-        // Check if we've exceeded max retries
-        if currentRetries >= maxRetryAttempts {
-            LoggingService.shared.logCloudKitError(
-                "Record \(recordName) failed after \(maxRetryAttempts) conflict resolution attempts, giving up",
-                error: error
-            )
-            removeFromPendingQueue(recordName: recordName)
-            return
-        }
-
-        retryCount[recordName] = currentRetries + 1
-        
-        let delay = min(pow(2.0, Double(currentRetries)) * debounceDelay, maxRetryDelay)
-        LoggingService.shared.logCloudKit("Scheduling retry for \(recordName) in \(delay)s (attempt \(currentRetries + 1))")
-        
-        // Use detached task to avoid calling back into CKSyncEngine from delegate
-        Task.detached { [weak self] in
-            try? await Task.sleep(for: .seconds(delay))
-            await self?.sync()
-        }
-    }
-    
-    /// Remove a record from pending queue by record name.
-    private func removeFromPendingQueue(recordName: String) {
-        pendingSaves.removeAll { $0.recordID.recordName == recordName }
-        pendingDeletes.removeAll { $0.recordName == recordName }
-        retryCount.removeValue(forKey: recordName)
     }
     
     /// Handle fetched database-level changes (zone creations/deletions).
@@ -2033,6 +1922,10 @@ extension CloudKitSyncEngine: CKSyncEngineDelegate {
 
         LoggingService.shared.logCloudKit("Zone '\(RecordType.zoneName)' was deleted remotely - recreating and re-uploading local data")
         UserDefaults.standard.removeObject(forKey: syncStateKey)
+
+        // Cached conflict records hold change tags from the deleted zone
+        conflictResolvedRecords.removeAll()
+        retryCount.removeAll()
 
         do {
             try await zoneManager.createZoneIfNeeded()
@@ -2081,7 +1974,7 @@ extension CloudKitSyncEngine: CKSyncEngineDelegate {
         let allPlaylists = dataManager.playlists()
         for playlist in allPlaylists where playlist.isPlaceholder {
             let playlistRecordName = "playlist-\(playlist.id.uuidString)"
-            if pendingDeletes.contains(where: { $0.recordName == playlistRecordName }) {
+            if hasPendingDelete(recordName: playlistRecordName) {
                 dataManager.deletePlaylist(playlist)
                 LoggingService.shared.logCloudKit("Cleaned up placeholder for deleted playlist: \(playlist.id)")
             }
@@ -2105,7 +1998,7 @@ extension CloudKitSyncEngine: CKSyncEngineDelegate {
     @discardableResult
     private func applyRemoteRecord(_ record: CKRecord, to dataManager: DataManager) async -> ApplyRecordResult {
         // Skip records that are pending local deletion
-        if pendingDeletes.contains(where: { $0.recordName == record.recordID.recordName }) {
+        if hasPendingDelete(recordName: record.recordID.recordName) {
             LoggingService.shared.logCloudKit("Skipping incoming record (pending local delete): \(record.recordID.recordName)")
             return .success
         }
@@ -2114,7 +2007,7 @@ extension CloudKitSyncEngine: CKSyncEngineDelegate {
         if record.recordType == RecordType.localPlaylistItem,
            let playlistIDString = record["playlistID"] as? String {
             let playlistRecordName = "playlist-\(playlistIDString)"
-            if pendingDeletes.contains(where: { $0.recordName == playlistRecordName }) {
+            if hasPendingDelete(recordName: playlistRecordName) {
                 LoggingService.shared.logCloudKit("Skipping playlist item (parent playlist pending delete): \(record.recordID.recordName)")
                 return .success
             }
