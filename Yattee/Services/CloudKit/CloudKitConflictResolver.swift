@@ -16,7 +16,6 @@ actor CloudKitConflictResolver {
     ///
     /// Strategy:
     /// - Keep record with most recent `lastUpdatedAt`
-    /// - EXCEPT: always preserve local `notificationsEnabled` preference
     func resolveSubscriptionConflict(
         local: CKRecord,
         server: CKRecord
@@ -39,13 +38,7 @@ actor CloudKitConflictResolver {
             resolved["lastUpdatedAt"] = local["lastUpdatedAt"]
             resolved["providerName"] = local["providerName"]
         }
-        
-        // But always preserve local notification preference
-        // (user's device-specific setting should not be overwritten by other devices)
-        if let localNotifications = local["notificationsEnabled"] {
-            resolved["notificationsEnabled"] = localNotifications
-        }
-        
+
         return resolved
     }
     
@@ -273,8 +266,9 @@ actor CloudKitConflictResolver {
         // If local is newer, copy its fields to server record
         if localVisited > serverVisited {
             resolved["name"] = local["name"]
-            resolved["avatarURLString"] = local["avatarURLString"]
-            resolved["providerName"] = local["providerName"]
+            resolved["thumbnailURLString"] = local["thumbnailURLString"]
+            resolved["subscriberCount"] = local["subscriberCount"]
+            resolved["isVerified"] = local["isVerified"]
             resolved["visitedAt"] = local["visitedAt"]
         }
         
@@ -302,10 +296,8 @@ actor CloudKitConflictResolver {
         if localVisited > serverVisited {
             resolved["title"] = local["title"]
             resolved["authorName"] = local["authorName"]
-            resolved["authorID"] = local["authorID"]
-            resolved["thumbnailURLString"] = local["thumbnailURLString"]
             resolved["videoCount"] = local["videoCount"]
-            resolved["providerName"] = local["providerName"]
+            resolved["thumbnailURLString"] = local["thumbnailURLString"]
             resolved["visitedAt"] = local["visitedAt"]
         }
         
