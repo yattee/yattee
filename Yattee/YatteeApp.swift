@@ -282,6 +282,8 @@ struct YatteeApp: App {
             // Flush pending CloudKit changes when entering background
             if newPhase == .background {
                 appEnvironment.cloudKitSync.stopForegroundPolling()
+                // Queue current watch progress so the position reaches other devices
+                appEnvironment.playerService.syncWatchProgress()
                 Task {
                     await appEnvironment.cloudKitSync.flushPendingChanges()
                 }
@@ -330,6 +332,8 @@ struct YatteeApp: App {
             // Flush pending CloudKit changes when entering background
             if newPhase == .background {
                 appEnvironment.cloudKitSync.stopForegroundPolling()
+                // Queue current watch progress so the position reaches other devices
+                appEnvironment.playerService.syncWatchProgress()
 
                 #if os(iOS)
                 // Persist pending SwiftData changes and run the CloudKit flush

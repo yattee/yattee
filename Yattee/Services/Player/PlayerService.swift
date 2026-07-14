@@ -2563,8 +2563,10 @@ final class PlayerService {
         let completedDuration = video.duration > 0 ? video.duration : state.duration
         guard completedDuration > 0 else { return }
 
-        // Save the full duration as watched time when video completes
-        dataManager.updateWatchProgressLocal(for: video, seconds: completedDuration, duration: completedDuration)
+        // Save the full duration as watched time and queue for iCloud sync.
+        // This is the only save for a naturally finished video — play() skips
+        // saveProgressAndSync() when videoEndedNaturally is set.
+        dataManager.updateWatchProgress(for: video, seconds: completedDuration, duration: completedDuration)
 
         // Update Handoff activity with completed time
         handoffManager?.updatePlaybackTime(completedDuration)
@@ -2582,6 +2584,12 @@ final class PlayerService {
         // Save and queue for iCloud sync (used when video closes/switches)
         dataManager.updateWatchProgress(for: video, seconds: state.currentTime, duration: state.duration)
         NotificationCenter.default.post(name: .watchHistoryDidChange, object: nil)
+    }
+
+    /// Saves current progress and queues it for iCloud sync without ending playback.
+    /// Called when the app enters background so the position reaches other devices.
+    func syncWatchProgress() {
+        saveProgressAndSync()
     }
 
     private func checkSponsorBlockSegments(at time: Double) {
