@@ -335,6 +335,11 @@ extension SettingsManager {
 
         // Copy all local settings to iCloud
         for key in SettingsKey.allCases {
+            // Skip local-only keys (device-specific settings that shouldn't sync)
+            if key.isLocalOnly {
+                continue
+            }
+
             let pKey = platformKey(key)
             if let value = localDefaults.object(forKey: pKey) {
                 ubiquitousStore.set(value, forKey: pKey)
@@ -362,6 +367,11 @@ extension SettingsManager {
 
         // Copy all iCloud settings to local defaults
         for key in SettingsKey.allCases {
+            // Skip local-only keys (device-specific settings that shouldn't sync)
+            if key.isLocalOnly {
+                continue
+            }
+
             // Skip protected keys that should preserve local values
             if keysToPreserve.contains(key) {
                 continue
