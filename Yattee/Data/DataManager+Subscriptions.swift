@@ -200,6 +200,16 @@ extension DataManager {
         }
     }
 
+    /// Gets all subscriptions matching a channel ID. The same ID can exist
+    /// under multiple source scopes; callers that care about a specific
+    /// source must pick the matching entity themselves.
+    func subscriptions(forChannelID channelID: String) -> [Subscription] {
+        let descriptor = FetchDescriptor<Subscription>(
+            predicate: #Predicate { $0.channelID == channelID }
+        )
+        return (try? modelContext.fetch(descriptor)) ?? []
+    }
+
     /// Gets all subscriptions.
     func subscriptions() -> [Subscription] {
         let descriptor = FetchDescriptor<Subscription>(
@@ -219,15 +229,17 @@ extension DataManager {
     /// Inserts a subscription into the database.
     /// Used by SubscriptionService for caching server subscriptions locally.
     func insertSubscription(_ subscription: Subscription) {
-        // Check for duplicates
+        // Check for duplicates within the same source scope - the same
+        // channel ID can legitimately exist under different sources
         let channelID = subscription.channelID
         let descriptor = FetchDescriptor<Subscription>(
             predicate: #Predicate { $0.channelID == channelID }
         )
+        let scopeSuffix = subscription.sourceScopeSuffix
 
         do {
             let existing = try modelContext.fetch(descriptor)
-            if existing.isEmpty {
+            if !existing.contains(where: { $0.sourceScopeSuffix == scopeSuffix }) {
                 modelContext.insert(subscription)
                 save()
             }
@@ -392,5 +404,19 @@ extension DataManager {
         } catch {
             LoggingService.shared.logCloudKitError("Failed to update subscription", error: error)
         }
+    }
+}
+
+// MARK: - Source Scope
+
+private extension Subscription {
+    /// Record-name scope suffix used to distinguish same-ID entities across sources.
+    var sourceScopeSuffix: String {
+        SourceScope.from(
+            sourceRawValue: sourceRawValue,
+            globalProvider: providerName,
+            instanceURLString: instanceURLString,
+            externalExtractor: nil
+        ).recordNameSuffix
     }
 }

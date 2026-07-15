@@ -115,6 +115,22 @@ extension DataManager {
         }
     }
 
+    /// Gets all notification settings matching a channel ID. The same ID can
+    /// exist under multiple source scopes.
+    func allChannelNotificationSettings(forChannelID channelID: String) -> [ChannelNotificationSettings] {
+        let descriptor = FetchDescriptor<ChannelNotificationSettings>(
+            predicate: #Predicate { $0.channelID == channelID }
+        )
+        return (try? modelContext.fetch(descriptor)) ?? []
+    }
+
+    /// Deletes a single notification settings record without queueing a
+    /// CloudKit deletion. Used by CloudKitSyncEngine when applying remote deletions.
+    func deleteChannelNotificationSettings(_ settings: ChannelNotificationSettings) {
+        modelContext.delete(settings)
+        save()
+    }
+
     /// Deletes notification settings for a channel.
     /// - Parameter channelID: The channel ID to delete settings for.
     func deleteNotificationSettings(for channelID: String) {

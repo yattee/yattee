@@ -128,19 +128,39 @@ extension DataManager {
         )
         return try? modelContext.fetch(descriptor).first
     }
-    
+
+    /// Gets all watch entries matching a video ID. The same ID can exist
+    /// under multiple source scopes; callers that care about a specific
+    /// source must pick the matching entity themselves.
+    func watchEntries(forVideoID videoID: String) -> [WatchEntry] {
+        let descriptor = FetchDescriptor<WatchEntry>(
+            predicate: #Predicate { $0.videoID == videoID }
+        )
+        return (try? modelContext.fetch(descriptor)) ?? []
+    }
+
+    /// Deletes a single watch entry without queueing a CloudKit deletion.
+    /// Used by CloudKitSyncEngine when applying remote deletions.
+    func deleteWatchEntry(_ entry: WatchEntry) {
+        modelContext.delete(entry)
+        save()
+        TopShelfSnapshotWriter.writeContinueWatching(dataManager: self)
+    }
+
     /// Inserts a watch entry into the database.
     /// Used by CloudKitSyncEngine for applying remote watch history.
     func insertWatchEntry(_ watchEntry: WatchEntry) {
-        // Check for duplicates
+        // Check for duplicates within the same source scope - the same
+        // video ID can legitimately exist under different sources
         let videoID = watchEntry.videoID
         let descriptor = FetchDescriptor<WatchEntry>(
             predicate: #Predicate { $0.videoID == videoID }
         )
-        
+        let scopeSuffix = watchEntry.sourceScopeSuffix
+
         do {
             let existing = try modelContext.fetch(descriptor)
-            if existing.isEmpty {
+            if !existing.contains(where: { $0.sourceScopeSuffix == scopeSuffix }) {
                 modelContext.insert(watchEntry)
                 save()
             }
@@ -374,5 +394,19 @@ extension DataManager {
         } catch {
             LoggingService.shared.logCloudKitError("Failed to clear in-progress history", error: error)
         }
+    }
+}
+
+// MARK: - Source Scope
+
+private extension WatchEntry {
+    /// Record-name scope suffix used to distinguish same-ID entities across sources.
+    var sourceScopeSuffix: String {
+        SourceScope.from(
+            sourceRawValue: sourceRawValue,
+            globalProvider: globalProvider,
+            instanceURLString: instanceURLString,
+            externalExtractor: externalExtractor
+        ).recordNameSuffix
     }
 }

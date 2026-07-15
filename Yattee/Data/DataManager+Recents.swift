@@ -300,14 +300,34 @@ extension DataManager {
         let descriptor = FetchDescriptor<RecentChannel>(
             predicate: #Predicate { $0.channelID == channelID }
         )
-        
+
         return try? modelContext.fetch(descriptor).first
     }
-    
+
+    /// Gets all recent channels matching a channel ID. The same ID can exist
+    /// under multiple source scopes.
+    func recentChannelEntries(forChannelID channelID: String) -> [RecentChannel] {
+        let descriptor = FetchDescriptor<RecentChannel>(
+            predicate: #Predicate { $0.channelID == channelID }
+        )
+        return (try? modelContext.fetch(descriptor)) ?? []
+    }
+
+    /// Deletes a recent channel without queueing a CloudKit deletion.
+    /// Used by CloudKitSyncEngine when applying remote deletions.
+    func deleteRecentChannelEntry(_ channel: RecentChannel) {
+        modelContext.delete(channel)
+        save()
+        NotificationCenter.default.post(name: .recentChannelsDidChange, object: nil)
+    }
+
     /// Inserts a recent channel (for CloudKit sync).
     func insertRecentChannel(_ recentChannel: RecentChannel) {
-        // Check for duplicates by channelID
-        if recentChannelEntry(forChannelID: recentChannel.channelID) == nil {
+        // Check for duplicates within the same source scope - the same
+        // channel ID can legitimately exist under different sources
+        let scopeSuffix = recentChannel.sourceScopeSuffix
+        let existing = recentChannelEntries(forChannelID: recentChannel.channelID)
+        if !existing.contains(where: { $0.sourceScopeSuffix == scopeSuffix }) {
             modelContext.insert(recentChannel)
             save()
         }
@@ -467,16 +487,62 @@ extension DataManager {
         let descriptor = FetchDescriptor<RecentPlaylist>(
             predicate: #Predicate { $0.playlistID == playlistID }
         )
-        
+
         return try? modelContext.fetch(descriptor).first
     }
-    
+
+    /// Gets all recent playlists matching a playlist ID. The same ID can
+    /// exist under multiple source scopes.
+    func recentPlaylistEntries(forPlaylistID playlistID: String) -> [RecentPlaylist] {
+        let descriptor = FetchDescriptor<RecentPlaylist>(
+            predicate: #Predicate { $0.playlistID == playlistID }
+        )
+        return (try? modelContext.fetch(descriptor)) ?? []
+    }
+
+    /// Deletes a recent playlist without queueing a CloudKit deletion.
+    /// Used by CloudKitSyncEngine when applying remote deletions.
+    func deleteRecentPlaylistEntry(_ playlist: RecentPlaylist) {
+        modelContext.delete(playlist)
+        save()
+        NotificationCenter.default.post(name: .recentPlaylistsDidChange, object: nil)
+    }
+
     /// Inserts a recent playlist (for CloudKit sync).
     func insertRecentPlaylist(_ recentPlaylist: RecentPlaylist) {
-        // Check for duplicates by playlistID
-        if recentPlaylistEntry(forPlaylistID: recentPlaylist.playlistID) == nil {
+        // Check for duplicates within the same source scope - the same
+        // playlist ID can legitimately exist under different sources
+        let scopeSuffix = recentPlaylist.sourceScopeSuffix
+        let existing = recentPlaylistEntries(forPlaylistID: recentPlaylist.playlistID)
+        if !existing.contains(where: { $0.sourceScopeSuffix == scopeSuffix }) {
             modelContext.insert(recentPlaylist)
             save()
         }
+    }
+}
+
+// MARK: - Source Scope
+
+private extension RecentChannel {
+    /// Record-name scope suffix used to distinguish same-ID entities across sources.
+    var sourceScopeSuffix: String {
+        SourceScope.from(
+            sourceRawValue: sourceRawValue,
+            globalProvider: nil,
+            instanceURLString: instanceURLString,
+            externalExtractor: nil
+        ).recordNameSuffix
+    }
+}
+
+private extension RecentPlaylist {
+    /// Record-name scope suffix used to distinguish same-ID entities across sources.
+    var sourceScopeSuffix: String {
+        SourceScope.from(
+            sourceRawValue: sourceRawValue,
+            globalProvider: nil,
+            instanceURLString: instanceURLString,
+            externalExtractor: nil
+        ).recordNameSuffix
     }
 }

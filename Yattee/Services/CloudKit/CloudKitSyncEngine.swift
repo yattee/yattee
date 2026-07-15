@@ -1694,52 +1694,90 @@ extension CloudKitSyncEngine: CKSyncEngineDelegate {
         return nil
     }
 
+    // MARK: - Scope-Aware Local Lookups
+
+    /// Bare-ID lookups can return an entity from a different source scope when
+    /// IDs collide across sources; these helpers match on the mapper-derived
+    /// record name so the right entity is merged, materialized, or deleted.
+    private func localSubscription(matching recordName: String, channelID: String, in dataManager: DataManager) -> Subscription? {
+        dataManager.subscriptions(forChannelID: channelID).first {
+            recordMapper.toCKRecord(subscription: $0).recordID.recordName == recordName
+        }
+    }
+
+    private func localWatchEntry(matching recordName: String, videoID: String, in dataManager: DataManager) -> WatchEntry? {
+        dataManager.watchEntries(forVideoID: videoID).first {
+            recordMapper.toCKRecord(watchEntry: $0).recordID.recordName == recordName
+        }
+    }
+
+    private func localBookmark(matching recordName: String, videoID: String, in dataManager: DataManager) -> Bookmark? {
+        dataManager.bookmarks(forVideoID: videoID).first {
+            recordMapper.toCKRecord(bookmark: $0).recordID.recordName == recordName
+        }
+    }
+
+    private func localRecentChannel(matching recordName: String, channelID: String, in dataManager: DataManager) -> RecentChannel? {
+        dataManager.recentChannelEntries(forChannelID: channelID).first {
+            recordMapper.toCKRecord(recentChannel: $0).recordID.recordName == recordName
+        }
+    }
+
+    private func localRecentPlaylist(matching recordName: String, playlistID: String, in dataManager: DataManager) -> RecentPlaylist? {
+        dataManager.recentPlaylistEntries(forPlaylistID: playlistID).first {
+            recordMapper.toCKRecord(recentPlaylist: $0).recordID.recordName == recordName
+        }
+    }
+
+    private func localChannelNotificationSettings(matching recordName: String, channelID: String, in dataManager: DataManager) -> ChannelNotificationSettings? {
+        dataManager.allChannelNotificationSettings(forChannelID: channelID).first {
+            recordMapper.toCKRecord(channelNotificationSettings: $0).recordID.recordName == recordName
+        }
+    }
+
     /// Builds a CKRecord for the given record name from current local data.
-    /// The record name prefix identifies the entity type; the mapper re-derives
-    /// the scoped record name, which must match the requested one (a mismatch
-    /// means the local entity belongs to a different source scope).
+    /// The record name prefix identifies the entity type; the local entity is
+    /// matched on the full scoped record name (a mismatch means it belongs to
+    /// a different source scope).
     private func materializeRecord(named recordName: String) async -> CKRecord? {
         guard let dataManager else { return nil }
-
-        func scopedMatch(_ record: CKRecord) -> CKRecord? {
-            record.recordID.recordName == recordName ? record : nil
-        }
 
         if recordName.hasPrefix("sub-") {
             guard canSyncSubscriptions else { return nil }
             let channelID = SyncableRecordType.extractBareID(from: String(recordName.dropFirst(4)))
-            guard let subscription = dataManager.subscription(for: channelID) else { return nil }
-            return scopedMatch(recordMapper.toCKRecord(subscription: subscription))
+            guard let subscription = localSubscription(matching: recordName, channelID: channelID, in: dataManager) else { return nil }
+            return recordMapper.toCKRecord(subscription: subscription)
         }
         if recordName.hasPrefix("watch-") {
             guard canSyncPlaybackHistory else { return nil }
             let videoID = SyncableRecordType.extractBareID(from: String(recordName.dropFirst(6)))
-            guard let entry = dataManager.watchEntry(for: videoID), shouldSyncWatchEntry(entry) else { return nil }
-            return scopedMatch(recordMapper.toCKRecord(watchEntry: entry))
+            guard let entry = localWatchEntry(matching: recordName, videoID: videoID, in: dataManager),
+                  shouldSyncWatchEntry(entry) else { return nil }
+            return recordMapper.toCKRecord(watchEntry: entry)
         }
         if recordName.hasPrefix("bookmark-") {
             guard canSyncBookmarks else { return nil }
             let videoID = SyncableRecordType.extractBareID(from: String(recordName.dropFirst(9)))
-            guard let bookmark = dataManager.bookmark(for: videoID) else { return nil }
-            return scopedMatch(recordMapper.toCKRecord(bookmark: bookmark))
+            guard let bookmark = localBookmark(matching: recordName, videoID: videoID, in: dataManager) else { return nil }
+            return recordMapper.toCKRecord(bookmark: bookmark)
         }
         if recordName.hasPrefix("recent-channel-") {
             guard canSyncSearchHistory else { return nil }
             let channelID = SyncableRecordType.extractBareID(from: String(recordName.dropFirst(15)))
-            guard let recentChannel = dataManager.recentChannelEntry(forChannelID: channelID) else { return nil }
-            return scopedMatch(recordMapper.toCKRecord(recentChannel: recentChannel))
+            guard let recentChannel = localRecentChannel(matching: recordName, channelID: channelID, in: dataManager) else { return nil }
+            return recordMapper.toCKRecord(recentChannel: recentChannel)
         }
         if recordName.hasPrefix("recent-playlist-") {
             guard canSyncSearchHistory else { return nil }
             let playlistID = SyncableRecordType.extractBareID(from: String(recordName.dropFirst(16)))
-            guard let recentPlaylist = dataManager.recentPlaylistEntry(forPlaylistID: playlistID) else { return nil }
-            return scopedMatch(recordMapper.toCKRecord(recentPlaylist: recentPlaylist))
+            guard let recentPlaylist = localRecentPlaylist(matching: recordName, playlistID: playlistID, in: dataManager) else { return nil }
+            return recordMapper.toCKRecord(recentPlaylist: recentPlaylist)
         }
         if recordName.hasPrefix("channel-notif-") {
             guard canSyncSubscriptions else { return nil }
             let channelID = SyncableRecordType.extractBareID(from: String(recordName.dropFirst(14)))
-            guard let settings = dataManager.channelNotificationSettings(for: channelID) else { return nil }
-            return scopedMatch(recordMapper.toCKRecord(channelNotificationSettings: settings))
+            guard let settings = localChannelNotificationSettings(matching: recordName, channelID: channelID, in: dataManager) else { return nil }
+            return recordMapper.toCKRecord(channelNotificationSettings: settings)
         }
         if recordName.hasPrefix("playlist-") {
             guard canSyncPlaylists,
@@ -2019,8 +2057,10 @@ extension CloudKitSyncEngine: CKSyncEngineDelegate {
                 guard canSyncSubscriptions else { return .success }
                 let subscription = try recordMapper.toSubscription(from: record)
                 
-                // Check if exists locally
-                if let existing = dataManager.subscription(for: subscription.channelID) {
+                // Check if exists locally (same source scope only)
+                if let existing = localSubscription(matching: record.recordID.recordName, channelID: subscription.channelID, in: dataManager) {
+                    let localWasNewer = existing.lastUpdatedAt > subscription.lastUpdatedAt
+
                     // Conflict - resolve it
                     let localRecord = recordMapper.toCKRecord(subscription: existing)
                     let resolved = await conflictResolver.resolveSubscriptionConflict(local: localRecord, server: record)
@@ -2042,6 +2082,12 @@ extension CloudKitSyncEngine: CKSyncEngineDelegate {
                     NotificationCenter.default.post(name: .subscriptionsDidChange, object: nil)
                     
                     LoggingService.shared.logCloudKit("Merged subscription from iCloud (conflict resolved): \(subscription.channelID)")
+
+                    // Push the merge result back when local data won - the
+                    // server still has the older version
+                    if localWasNewer {
+                        addPendingChanges([.saveRecord(record.recordID)])
+                    }
                 } else {
                     // New subscription from iCloud
                     dataManager.insertSubscription(subscription)
@@ -2066,8 +2112,10 @@ extension CloudKitSyncEngine: CKSyncEngineDelegate {
                     return .success
                 }
 
-                // Check if exists locally
-                if let existing = dataManager.watchEntry(for: watchEntry.videoID) {
+                // Check if exists locally (same source scope only)
+                if let existing = localWatchEntry(matching: record.recordID.recordName, videoID: watchEntry.videoID, in: dataManager) {
+                    let localWasNewer = existing.updatedAt > watchEntry.updatedAt
+
                     // Conflict - resolve it
                     let localRecord = recordMapper.toCKRecord(watchEntry: existing)
                     let resolved = await conflictResolver.resolveWatchEntryConflict(local: localRecord, server: record)
@@ -2092,6 +2140,12 @@ extension CloudKitSyncEngine: CKSyncEngineDelegate {
                     NotificationCenter.default.post(name: .watchHistoryDidChange, object: nil)
                     
                     LoggingService.shared.logCloudKit("Merged watch entry from iCloud (conflict resolved): \(watchEntry.videoID)")
+
+                    // Push the merge result back when local data won - the
+                    // server still has the older version
+                    if localWasNewer {
+                        addPendingChanges([.saveRecord(record.recordID)])
+                    }
                 } else {
                     // New watch entry from iCloud
                     dataManager.insertWatchEntry(watchEntry)
@@ -2106,8 +2160,12 @@ extension CloudKitSyncEngine: CKSyncEngineDelegate {
                 guard canSyncBookmarks else { return .success }
                 let bookmark = try recordMapper.toBookmark(from: record)
                 
-                // Check if exists locally
-                if let existing = dataManager.bookmark(for: bookmark.videoID) {
+                // Check if exists locally (same source scope only)
+                if let existing = localBookmark(matching: record.recordID.recordName, videoID: bookmark.videoID, in: dataManager) {
+                    let localWasNewer = existing.createdAt > bookmark.createdAt
+                        || (existing.noteModifiedAt ?? .distantPast) > (bookmark.noteModifiedAt ?? .distantPast)
+                        || (existing.tagsModifiedAt ?? .distantPast) > (bookmark.tagsModifiedAt ?? .distantPast)
+
                     // Conflict - resolve it
                     let localRecord = recordMapper.toCKRecord(bookmark: existing)
                     let resolved = await conflictResolver.resolveBookmarkConflict(local: localRecord, server: record)
@@ -2136,6 +2194,12 @@ extension CloudKitSyncEngine: CKSyncEngineDelegate {
                     NotificationCenter.default.post(name: .bookmarksDidChange, object: nil)
                     
                     LoggingService.shared.logCloudKit("Merged bookmark from iCloud (conflict resolved): \(bookmark.videoID)")
+
+                    // Push the merge result back when local data won - the
+                    // server still has the older version
+                    if localWasNewer {
+                        addPendingChanges([.saveRecord(record.recordID)])
+                    }
                 } else {
                     // New bookmark from iCloud
                     dataManager.insertBookmark(bookmark)
@@ -2170,6 +2234,8 @@ extension CloudKitSyncEngine: CKSyncEngineDelegate {
 
                         LoggingService.shared.logCloudKit("Upgraded placeholder to real playlist: \(playlist.title)")
                     } else {
+                        let localWasNewer = existing.updatedAt > playlist.updatedAt
+
                         // Conflict - resolve it
                         let localRecord = recordMapper.toCKRecord(playlist: existing)
                         let resolved = await conflictResolver.resolveLocalPlaylistConflict(local: localRecord, server: record)
@@ -2186,6 +2252,12 @@ extension CloudKitSyncEngine: CKSyncEngineDelegate {
                         NotificationCenter.default.post(name: .playlistsDidChange, object: nil)
 
                         LoggingService.shared.logCloudKit("Merged playlist from iCloud (conflict resolved): \(playlist.title)")
+
+                        // Push the merge result back when local data won - the
+                        // server still has the older version
+                        if localWasNewer {
+                            addPendingChanges([.saveRecord(record.recordID)])
+                        }
                     }
                 } else {
                     // New playlist from iCloud
@@ -2203,6 +2275,8 @@ extension CloudKitSyncEngine: CKSyncEngineDelegate {
                 
                 // Check if exists locally
                 if let existing = dataManager.playlistItem(forID: item.id) {
+                    let localWasNewer = existing.addedAt > item.addedAt
+
                     // Conflict - resolve it
                     let localRecord = recordMapper.toCKRecord(playlistItem: existing)
                     let resolved = await conflictResolver.resolveLocalPlaylistItemConflict(local: localRecord, server: record)
@@ -2220,6 +2294,12 @@ extension CloudKitSyncEngine: CKSyncEngineDelegate {
                     dataManager.save()
                     
                     LoggingService.shared.logCloudKit("Merged playlist item from iCloud (conflict resolved): \(item.videoID)")
+
+                    // Push the merge result back when local data won - the
+                    // server still has the older version
+                    if localWasNewer {
+                        addPendingChanges([.saveRecord(record.recordID)])
+                    }
                 } else {
                     // New item from iCloud - need to find parent playlist
                     if let playlistID = playlistID,
@@ -2248,6 +2328,8 @@ extension CloudKitSyncEngine: CKSyncEngineDelegate {
                 
                 // Check if exists locally
                 if let existing = dataManager.searchHistoryEntry(forID: searchHistory.id) {
+                    let localWasNewer = existing.searchedAt > searchHistory.searchedAt
+
                     // Conflict - resolve it
                     let localRecord = recordMapper.toCKRecord(searchHistory: existing)
                     let resolved = await conflictResolver.resolveSearchHistoryConflict(local: localRecord, server: record)
@@ -2263,6 +2345,12 @@ extension CloudKitSyncEngine: CKSyncEngineDelegate {
                     NotificationCenter.default.post(name: .searchHistoryDidChange, object: nil)
                     
                     LoggingService.shared.logCloudKit("Merged search history from iCloud (conflict resolved): \(searchHistory.query)")
+
+                    // Push the merge result back when local data won - the
+                    // server still has the older version
+                    if localWasNewer {
+                        addPendingChanges([.saveRecord(record.recordID)])
+                    }
                 } else {
                     // New search history from iCloud
                     dataManager.insertSearchHistory(searchHistory)
@@ -2277,8 +2365,10 @@ extension CloudKitSyncEngine: CKSyncEngineDelegate {
                 guard canSyncSearchHistory else { return .success }
                 let recentChannel = try recordMapper.toRecentChannel(from: record)
                 
-                // Check if exists locally
-                if let existing = dataManager.recentChannelEntry(forChannelID: recentChannel.channelID) {
+                // Check if exists locally (same source scope only)
+                if let existing = localRecentChannel(matching: record.recordID.recordName, channelID: recentChannel.channelID, in: dataManager) {
+                    let localWasNewer = existing.visitedAt > recentChannel.visitedAt
+
                     // Conflict - resolve it
                     let localRecord = recordMapper.toCKRecord(recentChannel: existing)
                     let resolved = await conflictResolver.resolveRecentChannelConflict(local: localRecord, server: record)
@@ -2299,6 +2389,12 @@ extension CloudKitSyncEngine: CKSyncEngineDelegate {
                     NotificationCenter.default.post(name: .recentChannelsDidChange, object: nil)
                     
                     LoggingService.shared.logCloudKit("Merged recent channel from iCloud (conflict resolved): \(recentChannel.channelID)")
+
+                    // Push the merge result back when local data won - the
+                    // server still has the older version
+                    if localWasNewer {
+                        addPendingChanges([.saveRecord(record.recordID)])
+                    }
                 } else {
                     // New recent channel from iCloud
                     dataManager.insertRecentChannel(recentChannel)
@@ -2313,8 +2409,10 @@ extension CloudKitSyncEngine: CKSyncEngineDelegate {
                 guard canSyncSearchHistory else { return .success }
                 let recentPlaylist = try recordMapper.toRecentPlaylist(from: record)
                 
-                // Check if exists locally
-                if let existing = dataManager.recentPlaylistEntry(forPlaylistID: recentPlaylist.playlistID) {
+                // Check if exists locally (same source scope only)
+                if let existing = localRecentPlaylist(matching: record.recordID.recordName, playlistID: recentPlaylist.playlistID, in: dataManager) {
+                    let localWasNewer = existing.visitedAt > recentPlaylist.visitedAt
+
                     // Conflict - resolve it
                     let localRecord = recordMapper.toCKRecord(recentPlaylist: existing)
                     let resolved = await conflictResolver.resolveRecentPlaylistConflict(local: localRecord, server: record)
@@ -2335,6 +2433,12 @@ extension CloudKitSyncEngine: CKSyncEngineDelegate {
                     NotificationCenter.default.post(name: .recentPlaylistsDidChange, object: nil)
                     
                     LoggingService.shared.logCloudKit("Merged recent playlist from iCloud (conflict resolved): \(recentPlaylist.playlistID)")
+
+                    // Push the merge result back when local data won - the
+                    // server still has the older version
+                    if localWasNewer {
+                        addPendingChanges([.saveRecord(record.recordID)])
+                    }
                 } else {
                     // New recent playlist from iCloud
                     dataManager.insertRecentPlaylist(recentPlaylist)
@@ -2348,10 +2452,18 @@ extension CloudKitSyncEngine: CKSyncEngineDelegate {
             case RecordType.channelNotificationSettings:
                 guard canSyncSubscriptions else { return .success }
                 let settings = try recordMapper.toChannelNotificationSettings(from: record)
-                
-                // Use upsert which handles conflict resolution based on updatedAt
+
+                // Upsert keeps whichever side has the newer updatedAt
+                let existingSettings = dataManager.channelNotificationSettings(for: settings.channelID)
+                let localWasNewer = existingSettings.map { $0.updatedAt > settings.updatedAt } ?? false
                 dataManager.upsertChannelNotificationSettings(settings)
-                
+
+                // Push the local version back when it won - the server still
+                // has the older version
+                if localWasNewer {
+                    addPendingChanges([.saveRecord(record.recordID)])
+                }
+
                 LoggingService.shared.logCloudKit("Applied channel notification settings from iCloud: \(settings.channelID)")
                 
             case RecordType.controlsPreset:
@@ -2366,7 +2478,17 @@ extension CloudKitSyncEngine: CKSyncEngineDelegate {
 
                 // Use shared layout service if available, fallback to new instance
                 let layoutService = playerControlsLayoutService ?? PlayerControlsLayoutService()
+
+                // importPreset keeps whichever side has the newer updatedAt
+                let localPresets = await layoutService.presetsForSync()
+                let localPresetWasNewer = localPresets.first(where: { $0.id == preset.id }).map { $0.updatedAt > preset.updatedAt } ?? false
                 try await layoutService.importPreset(preset)
+
+                // Push the local version back when it won - the server still
+                // has the older version
+                if localPresetWasNewer {
+                    addPendingChanges([.saveRecord(record.recordID)])
+                }
 
                 LoggingService.shared.logCloudKit("Applied controls preset from iCloud: \(preset.name)")
 
@@ -2388,28 +2510,42 @@ extension CloudKitSyncEngine: CKSyncEngineDelegate {
     }
     
     /// Apply a remote deletion to local SwiftData.
+    /// Entities are matched on the full scoped record name, so a deletion in
+    /// one source scope cannot remove same-ID entities from other scopes, and
+    /// nothing is echoed back to CloudKit.
     private func applyRemoteDeletion(_ recordID: CKRecord.ID, to dataManager: DataManager) async {
         let recordName = recordID.recordName
 
-        // Parse record type from record name and strip scope suffix for bare ID lookup
         if recordName.hasPrefix("sub-") {
             guard canSyncSubscriptions else { return }
-            let rest = String(recordName.dropFirst(4))
-            let channelID = SyncableRecordType.extractBareID(from: rest)
-            dataManager.unsubscribe(from: channelID)
-            LoggingService.shared.logCloudKit("Deleted subscription from iCloud: \(channelID)")
+            let channelID = SyncableRecordType.extractBareID(from: String(recordName.dropFirst(4)))
+            if let subscription = localSubscription(matching: recordName, channelID: channelID, in: dataManager) {
+                dataManager.deleteSubscription(subscription)
+                dataManager.save()
+                let change = SubscriptionChange(addedSubscriptions: [], removedChannelIDs: [channelID])
+                NotificationCenter.default.post(
+                    name: .subscriptionsDidChange,
+                    object: nil,
+                    userInfo: [SubscriptionChange.userInfoKey: change]
+                )
+                LoggingService.shared.logCloudKit("Deleted subscription from iCloud: \(channelID)")
+            }
         } else if recordName.hasPrefix("watch-") {
             guard canSyncPlaybackHistory else { return }
-            let rest = String(recordName.dropFirst(6))
-            let videoID = SyncableRecordType.extractBareID(from: rest)
-            dataManager.removeFromHistory(videoID: videoID)
-            LoggingService.shared.logCloudKit("Deleted watch entry from iCloud: \(videoID)")
+            let videoID = SyncableRecordType.extractBareID(from: String(recordName.dropFirst(6)))
+            if let entry = localWatchEntry(matching: recordName, videoID: videoID, in: dataManager) {
+                dataManager.deleteWatchEntry(entry)
+                NotificationCenter.default.post(name: .watchHistoryDidChange, object: nil)
+                LoggingService.shared.logCloudKit("Deleted watch entry from iCloud: \(videoID)")
+            }
         } else if recordName.hasPrefix("bookmark-") {
             guard canSyncBookmarks else { return }
-            let rest = String(recordName.dropFirst(9))
-            let videoID = SyncableRecordType.extractBareID(from: rest)
-            dataManager.removeBookmark(for: videoID)
-            LoggingService.shared.logCloudKit("Deleted bookmark from iCloud: \(videoID)")
+            let videoID = SyncableRecordType.extractBareID(from: String(recordName.dropFirst(9)))
+            if let bookmark = localBookmark(matching: recordName, videoID: videoID, in: dataManager) {
+                dataManager.deleteBookmark(bookmark)
+                NotificationCenter.default.post(name: .bookmarksDidChange, object: nil)
+                LoggingService.shared.logCloudKit("Deleted bookmark from iCloud: \(videoID)")
+            }
         } else if recordName.hasPrefix("playlist-") {
             guard canSyncPlaylists else { return }
             let playlistIDString = String(recordName.dropFirst(9))
@@ -2436,26 +2572,25 @@ extension CloudKitSyncEngine: CKSyncEngineDelegate {
             }
         } else if recordName.hasPrefix("recent-channel-") {
             guard canSyncSearchHistory else { return }
-            let rest = String(recordName.dropFirst(15))
-            let channelID = SyncableRecordType.extractBareID(from: rest)
-            if let recentChannel = dataManager.recentChannelEntry(forChannelID: channelID) {
-                dataManager.deleteRecentChannel(recentChannel)
+            let channelID = SyncableRecordType.extractBareID(from: String(recordName.dropFirst(15)))
+            if let recentChannel = localRecentChannel(matching: recordName, channelID: channelID, in: dataManager) {
+                dataManager.deleteRecentChannelEntry(recentChannel)
                 LoggingService.shared.logCloudKit("Deleted recent channel from iCloud: \(channelID)")
             }
         } else if recordName.hasPrefix("recent-playlist-") {
             guard canSyncSearchHistory else { return }
-            let rest = String(recordName.dropFirst(16))
-            let playlistID = SyncableRecordType.extractBareID(from: rest)
-            if let recentPlaylist = dataManager.recentPlaylistEntry(forPlaylistID: playlistID) {
-                dataManager.deleteRecentPlaylist(recentPlaylist)
+            let playlistID = SyncableRecordType.extractBareID(from: String(recordName.dropFirst(16)))
+            if let recentPlaylist = localRecentPlaylist(matching: recordName, playlistID: playlistID, in: dataManager) {
+                dataManager.deleteRecentPlaylistEntry(recentPlaylist)
                 LoggingService.shared.logCloudKit("Deleted recent playlist from iCloud: \(playlistID)")
             }
         } else if recordName.hasPrefix("channel-notif-") {
             guard canSyncSubscriptions else { return }
-            let rest = String(recordName.dropFirst(14))
-            let channelID = SyncableRecordType.extractBareID(from: rest)
-            dataManager.deleteNotificationSettings(for: channelID)
-            LoggingService.shared.logCloudKit("Deleted channel notification settings from iCloud: \(channelID)")
+            let channelID = SyncableRecordType.extractBareID(from: String(recordName.dropFirst(14)))
+            if let settings = localChannelNotificationSettings(matching: recordName, channelID: channelID, in: dataManager) {
+                dataManager.deleteChannelNotificationSettings(settings)
+                LoggingService.shared.logCloudKit("Deleted channel notification settings from iCloud: \(channelID)")
+            }
         } else if recordName.hasPrefix("controls-") {
             guard canSyncControlsPresets else { return }
             let presetIDString = String(recordName.dropFirst(9)) // Remove "controls-" prefix

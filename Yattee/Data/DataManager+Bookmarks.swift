@@ -119,26 +119,55 @@ extension DataManager {
         )
         return try? modelContext.fetch(descriptor).first
     }
-    
+
+    /// Gets all bookmarks matching a video ID. The same ID can exist
+    /// under multiple source scopes; callers that care about a specific
+    /// source must pick the matching entity themselves.
+    func bookmarks(forVideoID videoID: String) -> [Bookmark] {
+        let descriptor = FetchDescriptor<Bookmark>(
+            predicate: #Predicate { $0.videoID == videoID }
+        )
+        return (try? modelContext.fetch(descriptor)) ?? []
+    }
+
+    /// Deletes a single bookmark without queueing a CloudKit deletion.
+    /// Used by CloudKitSyncEngine when applying remote deletions.
+    func deleteBookmark(_ bookmark: Bookmark) {
+        let videoID = bookmark.videoID
+        modelContext.delete(bookmark)
+        save()
+
+        // Keep the fast-lookup cache accurate; another scope may still
+        // have a bookmark with this video ID
+        if self.bookmark(for: videoID) == nil {
+            cachedBookmarkedVideoIDs.remove(videoID)
+        }
+        TopShelfSnapshotWriter.writeBookmarks(dataManager: self)
+    }
+
     /// Inserts a bookmark into the database.
     /// Used by CloudKitSyncEngine for applying remote bookmarks.
     func insertBookmark(_ bookmark: Bookmark) {
-        // Check for duplicates
+        // Check for duplicates within the same source scope - the same
+        // video ID can legitimately exist under different sources
         let videoID = bookmark.videoID
         let descriptor = FetchDescriptor<Bookmark>(
             predicate: #Predicate { $0.videoID == videoID }
         )
-        
+        let scopeSuffix = bookmark.sourceScopeSuffix
+
         do {
             let existing = try modelContext.fetch(descriptor)
-            if existing.isEmpty {
+            if !existing.contains(where: { $0.sourceScopeSuffix == scopeSuffix }) {
                 modelContext.insert(bookmark)
                 save()
+                cachedBookmarkedVideoIDs.insert(videoID)
             }
         } catch {
             // Insert anyway if we can't check
             modelContext.insert(bookmark)
             save()
+            cachedBookmarkedVideoIDs.insert(videoID)
         }
         TopShelfSnapshotWriter.writeBookmarks(dataManager: self)
     }
@@ -178,5 +207,19 @@ extension DataManager {
         } catch {
             LoggingService.shared.logCloudKitError("Failed to update bookmark", error: error)
         }
+    }
+}
+
+// MARK: - Source Scope
+
+private extension Bookmark {
+    /// Record-name scope suffix used to distinguish same-ID entities across sources.
+    var sourceScopeSuffix: String {
+        SourceScope.from(
+            sourceRawValue: sourceRawValue,
+            globalProvider: globalProvider,
+            instanceURLString: instanceURLString,
+            externalExtractor: externalExtractor
+        ).recordNameSuffix
     }
 }
