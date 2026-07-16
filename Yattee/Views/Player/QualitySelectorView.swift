@@ -237,7 +237,10 @@ struct QualitySelectorView: View {
             stackRoot
         }
         #if os(iOS)
-        .presentationDetents([.medium, .large])
+        // Rest at a taller-than-medium detent so the general section (playback
+        // speed / audio mode / lock) at the bottom of the scroll view is
+        // visible without dragging the sheet up to `.large`.
+        .presentationDetents([.fraction(0.6), .large])
         #endif
         #if os(macOS)
         .frame(minWidth: 450, minHeight: 500)
