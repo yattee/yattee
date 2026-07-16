@@ -380,10 +380,16 @@ struct ChannelView: View {
         ))
         .toolbar {
             #if os(macOS)
-            if supportsChannelTabs && !(isSearchActive && hasSearched) {
+            // Keep the content picker in the center `.principal` slot even while
+            // searching. Its presence is what pins the trailing `.searchable`
+            // field to the right edge — dropping it (or making it zero-width)
+            // lets the search field re-center. During search it's disabled so the
+            // user can't switch tabs while the content area shows search results.
+            if supportsChannelTabs {
                 ToolbarItem(placement: .principal) {
                     contentTypePicker
                         .fixedSize()
+                        .disabled(isSearchActive && hasSearched)
                 }
             }
             #else
