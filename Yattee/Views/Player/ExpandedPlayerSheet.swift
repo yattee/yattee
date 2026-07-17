@@ -964,11 +964,21 @@ private struct PlayerMacOSEventHandlersModifier: ViewModifier {
     }
 
     private func handleAspectRatioChange(oldValue: Double?, newValue: Double?) {
-        guard let newValue, newValue > 0 else { return }
+        // nil while a video is loaded means audio-only playback (no video
+        // track reports a size) — fall back to the standard 16:9 instead of
+        // keeping the previous video's ratio.
+        let ratio: Double
+        if let newValue, newValue > 0 {
+            ratio = newValue
+        } else if playerState?.currentVideo != nil {
+            ratio = 16.0 / 9.0
+        } else {
+            return
+        }
 
         // Always keep the manual-resize aspect lock in sync, regardless of the
         // auto-resize setting — the user always wants resize to be ratio-locked.
-        ExpandedPlayerWindowManager.shared.lockAspectRatio(newValue)
+        ExpandedPlayerWindowManager.shared.lockAspectRatio(ratio)
 
         guard appEnvironment?.settingsManager.playerSheetAutoResize == true else { return }
 
@@ -977,7 +987,7 @@ private struct PlayerMacOSEventHandlersModifier: ViewModifier {
         Task { @MainActor in
             try? await Task.sleep(for: .milliseconds(100))
             ExpandedPlayerWindowManager.shared.resizeToFitAspectRatio(
-                newValue,
+                ratio,
                 animated: shouldAnimate
             )
         }

@@ -347,6 +347,13 @@ final class PlayerService {
                 }
             }
 
+            // Audio-only streams never report a video size, so the previous
+            // video's aspect ratio would stick to the player area forever.
+            // Reset it so the UI falls back to the standard 16:9.
+            if selectedStream.isAudioOnly {
+                state.videoAspectRatio = nil
+            }
+
             // Check for cancellation before loading stream
             try Task.checkCancellation()
 
