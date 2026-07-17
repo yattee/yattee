@@ -621,11 +621,22 @@ final class MPVClient: @unchecked Sendable {
     ///   - audioURL: Optional separate audio track URL (for video-only streams)
     ///   - httpHeaders: Optional HTTP headers for streaming (cookies, referer, etc.)
     ///   - useEDL: If true and audioURL is provided, combine streams using EDL for unified caching
+    ///   - disableVideoTrack: If true, load with the video track disabled (audio mode for muxed files)
     ///   - options: Additional MPV options
-    func loadFile(_ url: URL, audioURL: URL? = nil, httpHeaders: [String: String]? = nil, useEDL: Bool = true, options: [String] = []) throws {
+    func loadFile(_ url: URL, audioURL: URL? = nil, httpHeaders: [String: String]? = nil, useEDL: Bool = true, disableVideoTrack: Bool = false, options: [String] = []) throws {
         try mpvQueue.sync {
             guard mpv != nil, !isDestroyed else {
                 throw MPVError.commandFailed("loadfile")
+            }
+
+            // Video track selection for the upcoming file. Set as a property
+            // before the loadfile command (per-file loadfile options moved to
+            // the 4th argument in mpv 0.38+, so they can't be relied on here).
+            // Only ever changed between loads, never live - live `vid` toggling
+            // causes A/V desync (see handlePlayerSheetVisibility).
+            setPropertyUnsafe("vid", disableVideoTrack ? "no" : "auto")
+            if disableVideoTrack {
+                logDebug("Video track disabled for this load (audio mode)")
             }
 
             // Set HTTP headers as a property before loading (if provided)

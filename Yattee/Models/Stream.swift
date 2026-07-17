@@ -189,6 +189,38 @@ struct StreamResolution: Codable, Hashable, Sendable, Comparable, CustomStringCo
     }
 }
 
+// MARK: - Audio-Only Variant
+
+extension Stream {
+    /// Whether the backend must disable the video track when loading this stream:
+    /// a muxed file being played as audio-only (see `audioOnlyVariant()`).
+    var requiresVideoTrackDisabled: Bool {
+        isAudioOnly && videoCodec != nil
+    }
+
+    /// Creates an audio-only copy of this stream keeping the same URL.
+    /// Used for muxed local files in audio mode: `videoCodec` stays set so
+    /// `requiresVideoTrackDisabled` tells the backend to skip the video track.
+    func audioOnlyVariant() -> Stream {
+        Stream(
+            url: url,
+            resolution: nil,
+            format: format,
+            videoCodec: videoCodec,
+            audioCodec: audioCodec,
+            bitrate: bitrate,
+            fileSize: fileSize,
+            isAudioOnly: true,
+            isLive: isLive,
+            mimeType: mimeType,
+            audioLanguage: audioLanguage,
+            audioTrackName: audioTrackName,
+            isOriginalAudio: isOriginalAudio,
+            httpHeaders: httpHeaders
+        )
+    }
+}
+
 // MARK: - URL Rewriting
 
 extension Stream {

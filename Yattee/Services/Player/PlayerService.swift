@@ -203,6 +203,14 @@ final class PlayerService {
     ///   - audioStream: Optional separate audio stream (for video-only streams)
     ///   - startTime: Optional start time in seconds
     func play(video: Video, stream: Stream? = nil, audioStream: Stream? = nil, startTime: TimeInterval? = nil) async {
+        // Downloaded/local files bypass stream selection (they arrive here as
+        // ready-made file:// streams), so audio mode is applied at this choke
+        // point instead of in selectStreams.
+        var stream = stream
+        var audioStream = audioStream
+        if let provided = stream {
+            (stream, audioStream) = applyingAudioModeToLocalStreams(video: video, stream: provided, audioStream: audioStream)
+        }
 
         // Set up audio session when playback actually starts (not at app launch)
         setupAudioSession()
@@ -1378,6 +1386,37 @@ final class PlayerService {
         await play(video: video, stream: stream, audioStream: audioStream, startTime: currentTime)
     }
 
+    /// Applies audio-only mode to local (downloaded) streams. Online streams
+    /// are handled by stream selection; local files reach `play()` pre-resolved,
+    /// so the swap happens here instead.
+    private func applyingAudioModeToLocalStreams(video: Video, stream: Stream, audioStream: Stream?) -> (Stream, Stream?) {
+        guard stream.url.isFileURL else { return (stream, audioStream) }
+
+        if settingsManager?.audioOnlyModeEnabled == true {
+            guard !stream.isAudioOnly else { return (stream, audioStream) }
+            if let audioStream, audioStream.url.isFileURL {
+                // Separate downloaded audio track - play it on its own
+                LoggingService.shared.logPlayer("Audio mode: using downloaded audio track for \(video.id.id)")
+                return (audioStream, nil)
+            }
+            // Muxed file - same URL with the video track disabled at load time
+            LoggingService.shared.logPlayer("Audio mode: playing muxed local file without video track for \(video.id.id)")
+            return (stream.audioOnlyVariant(), nil)
+        }
+
+        // Mode is off but an audio-only stream was stored for a downloaded
+        // video (e.g. queue/history item created while audio mode was on) -
+        // restore the full local streams from the download record.
+        if stream.isAudioOnly,
+           let downloadManager,
+           let download = downloadManager.download(for: video.id),
+           download.status == .completed,
+           let (_, videoStream, downloadAudio, _, _) = downloadManager.videoAndStream(for: download) {
+            return (videoStream, downloadAudio)
+        }
+        return (stream, audioStream)
+    }
+
     /// Toggles global audio-only ("music") mode. If an online video is playing,
     /// reloads it at the current position (same mechanism as a quality switch).
     func setAudioMode(_ enabled: Bool) async {
@@ -1385,11 +1424,27 @@ final class PlayerService {
         settingsManager?.audioOnlyModeEnabled = enabled
         LoggingService.shared.logPlayer("Audio mode \(enabled ? "enabled" : "disabled")")
 
-        // Nothing playing, no stream list to reselect from (e.g. still loading),
-        // or playing a downloaded/local file: just persist the setting.
-        guard let video = state.currentVideo,
-              currentDownload == nil,
-              !availableStreams.isEmpty else { return }
+        // Nothing playing: just persist the setting.
+        guard state.currentVideo != nil else { return }
+
+        // Downloaded content: re-derive the local streams from the download
+        // record and reload; play() applies the mode swap for local files
+        // (separate audio track, or same file with the video track disabled).
+        if let currentDownload {
+            guard (state.currentStream?.isAudioOnly == true) != enabled,
+                  let downloadManager,
+                  let (downloadedVideo, localStream, localAudio, captionURL, _) = downloadManager.videoAndStream(for: currentDownload)
+            else { return }
+            let currentTime = state.currentTime
+            await play(video: downloadedVideo, stream: localStream, audioStream: localAudio, startTime: currentTime)
+            if let captionURL {
+                loadLocalCaption(url: captionURL)
+            }
+            return
+        }
+
+        // No stream list to reselect from (e.g. still loading): just persist.
+        guard let video = state.currentVideo, !availableStreams.isEmpty else { return }
 
         let currentTime = state.currentTime
 

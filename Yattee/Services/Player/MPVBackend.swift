@@ -495,7 +495,13 @@ final class MPVBackend: PlayerBackend {
 
         // Load the stream
         do {
-            try mpvClient?.loadFile(stream.url, audioURL: audioStream?.url, httpHeaders: stream.httpHeaders, useEDL: useEDL)
+            try mpvClient?.loadFile(
+                stream.url,
+                audioURL: audioStream?.url,
+                httpHeaders: stream.httpHeaders,
+                useEDL: useEDL,
+                disableVideoTrack: stream.requiresVideoTrackDisabled
+            )
             
             // Give MPV a moment to process the loadfile command
             try await Task.sleep(for: .milliseconds(100))
