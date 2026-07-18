@@ -20,6 +20,15 @@
       "versions": [
         {
           "version": "2.0.0",
+          "buildVersion": "264",
+          "date": "2026-07-18T16:39:59+00:00",
+          "localizedDescription": "",
+          "downloadURL": "https://github.com/yattee/yattee/releases/download/2.0.0-beta.264/Yattee-2.0.0-iOS.ipa",
+          "size": 34324249,
+          "minOSVersion": "18.0"
+        },
+        {
+          "version": "2.0.0",
           "buildVersion": "250",
           "date": "2026-02-09T00:00:00-00:00",
           "localizedDescription": "Yattee v2 rewrite",
