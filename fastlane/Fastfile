@@ -350,10 +350,12 @@ platform :mac do
 
     # Staple the notarization ticket so Gatekeeper doesn't need to phone home
     # when the user first launches from Sparkle/DMG.
-    sh "xcrun stapler staple 'fastlane/builds/#{version}-#{build}/macOS/#{APP_NAME}.app'"
+    # NOTE: sh runs from the fastlane/ directory, so paths here are relative
+    # to it (no fastlane/ prefix), unlike action arguments above.
+    sh "xcrun stapler staple 'builds/#{version}-#{build}/macOS/#{APP_NAME}.app'"
 
     # Package the stapled .app into a .zip (Sparkle) and .dmg (Homebrew / direct).
-    dir = "fastlane/builds/#{version}-#{build}/macOS"
+    dir = "builds/#{version}-#{build}/macOS"
     app = "#{dir}/#{APP_NAME}.app"
     zip = "#{dir}/#{APP_NAME}-#{version}-macOS.zip"
     dmg = "#{dir}/#{APP_NAME}-#{version}-macOS.dmg"
