@@ -140,6 +140,18 @@ final class MPVClient: @unchecked Sendable {
     private var mpv: OpaquePointer?
     private var renderContext: OpaquePointer?
     private let mpvQueue = DispatchQueue(label: "stream.yattee.mpv.client", qos: .userInteractive)
+
+    /// Protects `renderContext` lifecycle vs use. Render-context calls are
+    /// thread-safe relative to the client API per libmpv docs, so they must NOT
+    /// serialize through `mpvQueue`: any slow queue work (e.g. a batched debug
+    /// property fetch) would block `render()` and visibly stall playback
+    /// (~190ms hitch every 10s on tvOS, build 264 regression).
+    private let renderContextLock = NSLock()
+
+    /// Serial queue for render-update callback dispatch. Deliberately separate
+    /// from `mpvQueue` so frame-ready notifications are never delayed behind
+    /// property/command work.
+    private let renderEventQueue = DispatchQueue(label: "stream.yattee.mpv.render-events", qos: .userInteractive)
     private var isDestroyed = false
 
     #if os(macOS)
@@ -1780,7 +1792,9 @@ final class MPVClient: @unchecked Sendable {
                 return false
             }
 
+            renderContextLock.lock()
             renderContext = ctx
+            renderContextLock.unlock()
             log("Render context created successfully")
             MPVLogging.log("createRenderContext: success")
 
@@ -1800,10 +1814,16 @@ final class MPVClient: @unchecked Sendable {
                     #else
                     // On iOS/tvOS, check if this update includes an actual video frame.
                     // This is needed for PiP frame capture which relies on onVideoFrameReady.
-                    client.mpvQueue.async {
-                        guard let renderCtx = client.renderContext else { return }
-                        let flags = mpv_render_context_update(renderCtx)
-                        let hasVideoFrame = flags & UInt64(MPV_RENDER_UPDATE_FRAME.rawValue) != 0
+                    // Dispatched on renderEventQueue (NOT mpvQueue) so frame notifications
+                    // are never delayed behind slow property/command work.
+                    client.renderEventQueue.async {
+                        client.renderContextLock.lock()
+                        var hasVideoFrame = false
+                        if let renderCtx = client.renderContext, !client.isDestroyed {
+                            let flags = mpv_render_context_update(renderCtx)
+                            hasVideoFrame = flags & UInt64(MPV_RENDER_UPDATE_FRAME.rawValue) != 0
+                        }
+                        client.renderContextLock.unlock()
 
                         // Always notify for general redraw
                         client.onRenderUpdate?()
@@ -1829,34 +1849,35 @@ final class MPVClient: @unchecked Sendable {
     /// - Note: This may trigger a priority inversion warning because MPV's internal
     ///   threads run at default QoS. This is unavoidable when using mpv_render_context_render.
     func render(fbo: Int32, width: Int32, height: Int32) {
-        mpvQueue.sync {
-            guard let renderContext, !isDestroyed else {
-                // Log when render is skipped to help diagnose black screen issues
-                MPVLogging.warn("render: skipped",
-                    details: "ctx:\(renderContext != nil) destroyed:\(isDestroyed)")
-                return
-            }
+        renderContextLock.lock()
+        defer { renderContextLock.unlock() }
 
-            // GL_RGBA8 = 0x8058
-            var fboData = mpv_opengl_fbo(
-                fbo: fbo,
-                w: width,
-                h: height,
-                internal_format: 0x8058
-            )
+        guard let renderContext, !isDestroyed else {
+            // Log when render is skipped to help diagnose black screen issues
+            MPVLogging.warn("render: skipped",
+                details: "ctx:\(renderContext != nil) destroyed:\(isDestroyed)")
+            return
+        }
 
-            var flipY: Int32 = 1
+        // GL_RGBA8 = 0x8058
+        var fboData = mpv_opengl_fbo(
+            fbo: fbo,
+            w: width,
+            h: height,
+            internal_format: 0x8058
+        )
 
-            withUnsafeMutablePointer(to: &fboData) { fboPtr in
-                withUnsafeMutablePointer(to: &flipY) { flipPtr in
-                    var params: [mpv_render_param] = [
-                        mpv_render_param(type: MPV_RENDER_PARAM_OPENGL_FBO, data: fboPtr),
-                        mpv_render_param(type: MPV_RENDER_PARAM_FLIP_Y, data: flipPtr),
-                        mpv_render_param(type: MPV_RENDER_PARAM_INVALID, data: nil)
-                    ]
-                    _ = params.withUnsafeMutableBufferPointer { paramsPtr in
-                        mpv_render_context_render(renderContext, paramsPtr.baseAddress)
-                    }
+        var flipY: Int32 = 1
+
+        withUnsafeMutablePointer(to: &fboData) { fboPtr in
+            withUnsafeMutablePointer(to: &flipY) { flipPtr in
+                var params: [mpv_render_param] = [
+                    mpv_render_param(type: MPV_RENDER_PARAM_OPENGL_FBO, data: fboPtr),
+                    mpv_render_param(type: MPV_RENDER_PARAM_FLIP_Y, data: flipPtr),
+                    mpv_render_param(type: MPV_RENDER_PARAM_INVALID, data: nil)
+                ]
+                _ = params.withUnsafeMutableBufferPointer { paramsPtr in
+                    mpv_render_context_render(renderContext, paramsPtr.baseAddress)
                 }
             }
         }
@@ -1897,7 +1918,9 @@ final class MPVClient: @unchecked Sendable {
                 return false
             }
 
+            renderContextLock.lock()
             renderContext = ctx
+            renderContextLock.unlock()
             log("Software render context created successfully")
             MPVLogging.log("createSoftwareRenderContext: success")
 
@@ -1910,10 +1933,14 @@ final class MPVClient: @unchecked Sendable {
                     let client = Unmanaged<MPVClient>.fromOpaque(clientPtr).takeUnretainedValue()
 
                     // Check if this update includes an actual video frame
-                    client.mpvQueue.async {
-                        guard let renderCtx = client.renderContext else { return }
-                        let flags = mpv_render_context_update(renderCtx)
-                        let hasVideoFrame = flags & UInt64(MPV_RENDER_UPDATE_FRAME.rawValue) != 0
+                    client.renderEventQueue.async {
+                        client.renderContextLock.lock()
+                        var hasVideoFrame = false
+                        if let renderCtx = client.renderContext, !client.isDestroyed {
+                            let flags = mpv_render_context_update(renderCtx)
+                            hasVideoFrame = flags & UInt64(MPV_RENDER_UPDATE_FRAME.rawValue) != 0
+                        }
+                        client.renderContextLock.unlock()
 
                         // Always notify for general redraw
                         client.onRenderUpdate?()
@@ -1939,7 +1966,9 @@ final class MPVClient: @unchecked Sendable {
     /// - Returns: true if a frame was rendered, false otherwise
     @discardableResult
     func renderSoftware(buffer: UnsafeMutableRawPointer, width: Int32, height: Int32, stride: Int) -> Bool {
-        mpvQueue.sync {
+        renderContextLock.lock()
+        defer { renderContextLock.unlock() }
+        return {
             guard let renderContext, !isDestroyed else {
                 return false
             }
@@ -1990,17 +2019,23 @@ final class MPVClient: @unchecked Sendable {
                 MPVLogging.log("renderSoftware: FAILED - error=\(result) (\(errorStr))")
                 return false
             }
-            
+
             return true
-        }
+        }()
     }
 
     /// Report that the next frame should be rendered.
     func reportRenderUpdate() {
-        mpvQueue.async { [weak self] in
-            guard let self, let renderContext = self.renderContext, !self.isDestroyed else { return }
-            let flags = mpv_render_context_update(renderContext)
-            if flags & UInt64(MPV_RENDER_UPDATE_FRAME.rawValue) != 0 {
+        renderEventQueue.async { [weak self] in
+            guard let self else { return }
+            self.renderContextLock.lock()
+            var hasFrame = false
+            if let renderContext = self.renderContext, !self.isDestroyed {
+                let flags = mpv_render_context_update(renderContext)
+                hasFrame = flags & UInt64(MPV_RENDER_UPDATE_FRAME.rawValue) != 0
+            }
+            self.renderContextLock.unlock()
+            if hasFrame {
                 self.onRenderUpdate?()
             }
         }
@@ -2008,7 +2043,11 @@ final class MPVClient: @unchecked Sendable {
 
     /// Destroy the render context.
     func destroyRenderContext() {
+        // mpvQueue serializes against create; renderContextLock excludes
+        // in-flight render/update calls while the context is freed.
         mpvQueue.sync {
+            renderContextLock.lock()
+            defer { renderContextLock.unlock() }
             guard let ctx = renderContext else {
                 MPVLogging.log("destroyRenderContext: no context to destroy")
                 return
@@ -2022,7 +2061,9 @@ final class MPVClient: @unchecked Sendable {
 
     /// Whether the render context is initialized.
     var hasRenderContext: Bool {
-        mpvQueue.sync { renderContext != nil }
+        renderContextLock.lock()
+        defer { renderContextLock.unlock() }
+        return renderContext != nil
     }
 
     // MARK: - macOS OpenGL Context Management
@@ -2052,18 +2093,21 @@ final class MPVClient: @unchecked Sendable {
     // MARK: - Frame Timing
 
     /// Report that a frame was swapped/presented (for vsync timing).
+    /// Called synchronously from the render thread right after present - direct
+    /// call (no queue hop) keeps the swap timestamp accurate for mpv's vsync
+    /// estimation and avoids any queue-contention delay.
     func reportSwap() {
-        mpvQueue.async { [weak self] in
-            guard let ctx = self?.renderContext else { return }
-            mpv_render_context_report_swap(ctx)
-        }
+        renderContextLock.lock()
+        defer { renderContextLock.unlock() }
+        guard let ctx = renderContext, !isDestroyed else { return }
+        mpv_render_context_report_swap(ctx)
     }
 
     /// Check if MPV has a frame ready to render (non-blocking).
     /// This is safe to call from any thread - mpv's render context API is thread-safe.
     func shouldRenderUpdateFrame() -> Bool {
-        // Don't use mpvQueue.sync here - it can cause deadlocks when called from render queue
-        // mpv_render_context_update is documented as thread-safe
+        renderContextLock.lock()
+        defer { renderContextLock.unlock() }
         guard let ctx = renderContext, !isDestroyed else { return false }
         let flags = mpv_render_context_update(ctx)
         return flags & UInt64(MPV_RENDER_UPDATE_FRAME.rawValue) != 0
@@ -2071,7 +2115,9 @@ final class MPVClient: @unchecked Sendable {
 
     /// Get the render context directly (for thread-safe mpv render operations).
     var mpvRenderContext: OpaquePointer? {
-        renderContext
+        renderContextLock.lock()
+        defer { renderContextLock.unlock() }
+        return renderContext
     }
 
     // MARK: - Rendering with Depth
@@ -2083,36 +2129,37 @@ final class MPVClient: @unchecked Sendable {
     ///   - height: Render height in pixels
     ///   - depth: Color depth (8 or 16 for 10-bit)
     func renderWithDepth(fbo: Int32, width: Int32, height: Int32, depth: Int32) {
-        mpvQueue.sync {
-            guard let renderContext, !isDestroyed else {
-                MPVLogging.warn("renderWithDepth: skipped",
-                    details: "ctx:\(renderContext != nil) destroyed:\(isDestroyed)")
-                return
-            }
+        renderContextLock.lock()
+        defer { renderContextLock.unlock() }
 
-            // GL_RGBA8 = 0x8058
-            var fboData = mpv_opengl_fbo(
-                fbo: fbo,
-                w: width,
-                h: height,
-                internal_format: 0x8058
-            )
+        guard let renderContext, !isDestroyed else {
+            MPVLogging.warn("renderWithDepth: skipped",
+                details: "ctx:\(renderContext != nil) destroyed:\(isDestroyed)")
+            return
+        }
 
-            var flipY: Int32 = 1
-            var bufferDepth = depth
+        // GL_RGBA8 = 0x8058
+        var fboData = mpv_opengl_fbo(
+            fbo: fbo,
+            w: width,
+            h: height,
+            internal_format: 0x8058
+        )
 
-            withUnsafeMutablePointer(to: &fboData) { fboPtr in
-                withUnsafeMutablePointer(to: &flipY) { flipPtr in
-                    withUnsafeMutablePointer(to: &bufferDepth) { depthPtr in
-                        var params: [mpv_render_param] = [
-                            mpv_render_param(type: MPV_RENDER_PARAM_OPENGL_FBO, data: fboPtr),
-                            mpv_render_param(type: MPV_RENDER_PARAM_FLIP_Y, data: flipPtr),
-                            mpv_render_param(type: MPV_RENDER_PARAM_DEPTH, data: depthPtr),
-                            mpv_render_param(type: MPV_RENDER_PARAM_INVALID, data: nil)
-                        ]
-                        _ = params.withUnsafeMutableBufferPointer { paramsPtr in
-                            mpv_render_context_render(renderContext, paramsPtr.baseAddress)
-                        }
+        var flipY: Int32 = 1
+        var bufferDepth = depth
+
+        withUnsafeMutablePointer(to: &fboData) { fboPtr in
+            withUnsafeMutablePointer(to: &flipY) { flipPtr in
+                withUnsafeMutablePointer(to: &bufferDepth) { depthPtr in
+                    var params: [mpv_render_param] = [
+                        mpv_render_param(type: MPV_RENDER_PARAM_OPENGL_FBO, data: fboPtr),
+                        mpv_render_param(type: MPV_RENDER_PARAM_FLIP_Y, data: flipPtr),
+                        mpv_render_param(type: MPV_RENDER_PARAM_DEPTH, data: depthPtr),
+                        mpv_render_param(type: MPV_RENDER_PARAM_INVALID, data: nil)
+                    ]
+                    _ = params.withUnsafeMutableBufferPointer { paramsPtr in
+                        mpv_render_context_render(renderContext, paramsPtr.baseAddress)
                     }
                 }
             }

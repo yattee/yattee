@@ -836,9 +836,23 @@ final class MPVRenderView: UIView {
     private var slowFrameCount: UInt64 = 0
     private var lastSlowFrameWarning: Date = .distantPast
 
+    /// Debug: start time of the previous performRender, to spot gaps where mpv
+    /// stopped delivering frames (core-side stall vs. GL-side slow frame).
+    private var lastRenderStartMediaTime: CFTimeInterval = 0
+    private var lastGapWarning: Date = .distantPast
+
     private func performRender() {
         defer { isRendering = false }
         let frameStart = Date()
+        let tFrameStart = CACurrentMediaTime()
+        let gapSincePrevFrame = lastRenderStartMediaTime > 0 ? tFrameStart - lastRenderStartMediaTime : 0
+        lastRenderStartMediaTime = tFrameStart
+        if hasRenderedFirstFrame, gapSincePrevFrame > 0.25,
+           Date().timeIntervalSince(lastGapWarning) > 2 {
+            lastGapWarning = Date()
+            MPVLogging.warn("performRender: frame delivery gap",
+                details: "gap=\(Int(gapSincePrevFrame * 1000))ms since previous frame")
+        }
 
         guard let eaglContext, let mpvClient, framebuffer != 0 else {
             // Log when render is skipped due to missing resources (rare but important)
@@ -894,6 +908,8 @@ final class MPVRenderView: UIView {
             mpvClient.render(fbo: GLint(framebuffer), width: renderWidth, height: renderHeight)
         }
 
+        let tRenderEnd = CACurrentMediaTime()
+
         // Present the renderbuffer (skip when PiP is active - main view is hidden anyway)
         if !isPiPActive {
             glBindRenderbuffer(GLenum(GL_RENDERBUFFER), colorRenderbuffer)
@@ -922,8 +938,10 @@ final class MPVRenderView: UIView {
             slowFrameCount += 1
             if Date().timeIntervalSince(lastSlowFrameWarning) > 5 {
                 lastSlowFrameWarning = Date()
+                let renderMs = Int((tRenderEnd - tFrameStart) * 1000)
+                let presentMs = Int((CACurrentMediaTime() - tRenderEnd) * 1000)
                 MPVLogging.warn("performRender: slow frame",
-                    details: "duration=\(Int(frameDuration * 1000))ms slowFramesSinceLastWarning=\(slowFrameCount) size=\(renderWidth)x\(renderHeight)")
+                    details: "duration=\(Int(frameDuration * 1000))ms render=\(renderMs)ms present+swap=\(presentMs)ms gapBefore=\(Int(gapSincePrevFrame * 1000))ms slowFramesSinceLastWarning=\(slowFrameCount) size=\(renderWidth)x\(renderHeight)")
                 slowFrameCount = 0
             }
         }

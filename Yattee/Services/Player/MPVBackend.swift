@@ -2063,6 +2063,15 @@ extension MPVBackend: MPVClientDelegate {
                 try? await Task.sleep(for: .seconds(10))
                 guard let self, !Task.isCancelled, let client = self.mpvClient else { return }
 
+                #if !os(macOS)
+                // Only macOS needs the property fetch every tick (render
+                // watchdog below). Elsewhere the batched mpv_get_property
+                // calls contend with the playback core and caused a visible
+                // stutter every 10s on tvOS, so skip the fetch entirely
+                // unless verbose logging wants the stats line.
+                guard MPVLogging.verboseEnabled else { continue }
+                #endif
+
                 let props = await client.getDebugPropertiesAsync()
 
                 #if os(macOS)
