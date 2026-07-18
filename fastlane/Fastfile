@@ -328,6 +328,8 @@ platform :mac do
 
     build_mac_app(
       scheme: SCHEME,
+      sdk: "macosx",
+      destination: "generic/platform=macOS",
       configuration: "Release-DeveloperID",
       output_directory: "fastlane/builds/#{version}-#{build}/macOS",
       output_name: APP_NAME,
