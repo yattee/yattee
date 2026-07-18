@@ -349,5 +349,6 @@ jobs:
     if: ${{ inputs.build_ios && success() }}
     needs: [release]
     uses: ./.github/workflows/update-altstore.yml
+    secrets: inherit
     with:
       tag: ${{ needs.release.outputs.tag }}
