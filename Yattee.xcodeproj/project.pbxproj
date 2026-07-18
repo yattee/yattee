@@ -570,7 +570,7 @@
 				AUTOMATION_APPLE_EVENTS = NO;
 				CODE_SIGN_ENTITLEMENTS = Yattee/Yattee.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 262;
+				CURRENT_PROJECT_VERSION = 264;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_TEAM = 78Z5H3M6RJ;
 				ENABLE_APP_SANDBOX = YES;
@@ -656,7 +656,7 @@
 				CODE_SIGN_ENTITLEMENTS = Yattee/Yattee.entitlements;
 				"CODE_SIGN_ENTITLEMENTS[sdk=macosx*]" = "Yattee/Yattee-macOS.entitlements";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 262;
+				CURRENT_PROJECT_VERSION = 264;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_TEAM = 78Z5H3M6RJ;
 				ENABLE_APP_SANDBOX = YES;
@@ -800,7 +800,7 @@
 				CODE_SIGN_ENTITLEMENTS = Yattee/Yattee.entitlements;
 				"CODE_SIGN_ENTITLEMENTS[sdk=macosx*]" = "Yattee/Yattee-macOS-DeveloperID.entitlements";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 262;
+				CURRENT_PROJECT_VERSION = 264;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_TEAM = 78Z5H3M6RJ;
 				ENABLE_APP_SANDBOX = YES;
@@ -881,7 +881,7 @@
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 262;
+				CURRENT_PROJECT_VERSION = 264;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_TEAM = 78Z5H3M6RJ;
 				GENERATE_INFOPLIST_FILE = YES;
@@ -910,7 +910,7 @@
 			buildSettings = {
 				CODE_SIGN_ENTITLEMENTS = YatteeShareExtension/YatteeShareExtension.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 262;
+				CURRENT_PROJECT_VERSION = 264;
 				DEVELOPMENT_TEAM = 78Z5H3M6RJ;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = YatteeShareExtension/Info.plist;
@@ -942,7 +942,7 @@
 			buildSettings = {
 				CODE_SIGN_ENTITLEMENTS = YatteeTopShelf/YatteeTopShelf.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 262;
+				CURRENT_PROJECT_VERSION = 264;
 				DEVELOPMENT_TEAM = 78Z5H3M6RJ;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = YatteeTopShelf/Info.plist;
@@ -977,7 +977,7 @@
 			buildSettings = {
 				CODE_SIGN_ENTITLEMENTS = YatteeShareExtension/YatteeShareExtension.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 262;
+				CURRENT_PROJECT_VERSION = 264;
 				DEVELOPMENT_TEAM = 78Z5H3M6RJ;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = YatteeShareExtension/Info.plist;
@@ -1008,7 +1008,7 @@
 			buildSettings = {
 				CODE_SIGN_ENTITLEMENTS = YatteeShareExtension/YatteeShareExtension.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 262;
+				CURRENT_PROJECT_VERSION = 264;
 				DEVELOPMENT_TEAM = 78Z5H3M6RJ;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = YatteeShareExtension/Info.plist;
@@ -1040,7 +1040,7 @@
 			buildSettings = {
 				CODE_SIGN_ENTITLEMENTS = YatteeTopShelf/YatteeTopShelf.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 262;
+				CURRENT_PROJECT_VERSION = 264;
 				DEVELOPMENT_TEAM = 78Z5H3M6RJ;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = YatteeTopShelf/Info.plist;
@@ -1074,7 +1074,7 @@
 			buildSettings = {
 				CODE_SIGN_ENTITLEMENTS = YatteeTopShelf/YatteeTopShelf.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 262;
+				CURRENT_PROJECT_VERSION = 264;
 				DEVELOPMENT_TEAM = 78Z5H3M6RJ;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = YatteeTopShelf/Info.plist;
@@ -1109,7 +1109,7 @@
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 262;
+				CURRENT_PROJECT_VERSION = 264;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_TEAM = 78Z5H3M6RJ;
 				GENERATE_INFOPLIST_FILE = YES;
@@ -1138,7 +1138,7 @@
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 262;
+				CURRENT_PROJECT_VERSION = 264;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_TEAM = 78Z5H3M6RJ;
 				GENERATE_INFOPLIST_FILE = YES;
