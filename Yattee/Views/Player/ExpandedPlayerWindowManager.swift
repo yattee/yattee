@@ -56,6 +56,7 @@ final class ExpandedPlayerWindowManager: NSObject {
     private static let maxScreenRatio: CGFloat = 0.7
     private static let targetVideoHeight: CGFloat = 720
     private static let defaultAspectRatio: Double = 16.0 / 9.0
+    private static let frameAutosaveName = "ExpandedPlayerWindow"
 
     var isPresented: Bool {
         playerWindow != nil
@@ -184,6 +185,17 @@ final class ExpandedPlayerWindowManager: NSObject {
 
         // Center window on screen
         window.center()
+
+        // With auto-resize off, the window must reopen exactly as the user last
+        // left it — no fitting, no centering. Restore the persisted frame over
+        // the computed default (no-op when nothing was saved yet, e.g. first
+        // open). With auto-resize on, sizing is owned by resizeToFitAspectRatio.
+        if !appEnvironment.settingsManager.playerSheetAutoResize {
+            window.setFrameUsingName(Self.frameAutosaveName)
+        }
+        // Persist every later frame change (manual resize/move, auto-fit) so the
+        // next open — with auto-resize off — can restore it.
+        _ = window.setFrameAutosaveName(Self.frameAutosaveName)
 
         // Store reference
         self.playerWindow = window
