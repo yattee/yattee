@@ -545,6 +545,7 @@ struct VideoInfoView: View {
                 #if !os(tvOS)
                 .scrollDismissesKeyboard(.interactively)
                 #endif
+                .softTopScrollEdgeEffect()
                 .modifier(VideoInfoScrollOffsetModifier(scrollOffset: $scrollOffset))
 
                 #if os(macOS)

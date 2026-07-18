@@ -368,6 +368,7 @@ struct ChannelView: View {
         }
         .background(viewBackgroundColor)
         .ignoresSafeArea(edges: .top)
+        .softTopScrollEdgeEffect()
         #if os(macOS)
         .overlay(alignment: .top) {
             legacyToolbarScrim
@@ -533,6 +534,7 @@ struct ChannelView: View {
         }
         .background(viewBackgroundColor)
         .ignoresSafeArea(edges: .top)
+        .softTopScrollEdgeEffect()
         #if os(macOS)
         .overlay(alignment: .top) {
             legacyToolbarScrim
