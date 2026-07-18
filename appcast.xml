@@ -3,7 +3,19 @@
   <channel>
     <title>Yattee</title>
     <link>https://dl.yattee.stream/appcast.xml</link>
-    <description>Most recent changes with links to updates for Yattee (macOS Developer ID build).</description>
+    <description>
+      Most recent changes with links to updates for Yattee (macOS Developer ID
+      build).
+    </description>
     <language>en</language>
+    <item>
+      <title>Version 2.0.0 (264)</title>
+      <pubDate>Sat, 18 Jul 2026 16:37:02 -0000</pubDate>
+      <sparkle:version>264</sparkle:version>
+      <sparkle:shortVersionString>2.0.0</sparkle:shortVersionString>
+      <sparkle:minimumSystemVersion>15.0</sparkle:minimumSystemVersion>
+      <sparkle:channel>beta</sparkle:channel>
+      <enclosure url='https://github.com/yattee/yattee/releases/download/2.0.0-beta.264/Yattee-2.0.0-macOS.zip' type='application/octet-stream' sparkle:edSignature='IbofAt6SanptW2UrSWVgMbDQUKD8OhLgzrtPk8E1nRykemMmhYbcCe64CYQ0wyAYd1/kRwgLpUQIkG9FLCsKCg==' length='50760458'/>
+    </item>
   </channel>
 </rss>
