@@ -92,8 +92,10 @@ final class LocalNetworkService {
     }
 
     /// Log debug-level message. Only logs if verbose remote control logging is enabled.
+    /// The master "Enable Logging" toggle takes precedence over the verbose flag.
     private func rcDebug(_ operation: String, _ message: String) {
-        guard UserDefaults.standard.bool(forKey: "verboseRemoteControlLogging") else { return }
+        guard UserDefaults.standard.bool(forKey: "loggingEnabled"),
+              UserDefaults.standard.bool(forKey: "verboseRemoteControlLogging") else { return }
         let fullMessage = "[RemoteControl] \(operation) - \(message)"
         LoggingService.shared.logRemoteControlDebug(fullMessage)
     }

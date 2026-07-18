@@ -37,8 +37,11 @@ enum MPVLogging {
         if now - _lastCheckTime > cacheDurationNanos {
             _lastCheckTime = now
             // Read from UserDefaults directly for thread safety
-            // (SettingsManager is @MainActor)
-            _cachedIsEnabled = UserDefaults.standard.bool(forKey: "verboseMPVLogging")
+            // (SettingsManager is @MainActor).
+            // The master "Enable Logging" switch takes precedence: with it off,
+            // verbose MPV logging is off no matter what the verbose flag says.
+            _cachedIsEnabled = UserDefaults.standard.bool(forKey: "loggingEnabled")
+                && UserDefaults.standard.bool(forKey: "verboseMPVLogging")
         }
 
         return _cachedIsEnabled

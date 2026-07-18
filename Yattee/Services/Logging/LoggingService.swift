@@ -192,18 +192,23 @@ final class LoggingService: Sendable {
     /// OSLog output is synchronous; in-app storage is dispatched to MainActor.
     nonisolated func log(level: LogLevel, category: LogCategory, message: String, details: String? = nil) {
         // Log to OSLog in DEBUG builds for Xcode console visibility
-        // OSLog/Logger is thread-safe, so this can be called from any thread
+        // OSLog/Logger is thread-safe, so this can be called from any thread.
+        // The master "Enable Logging" toggle gates this too - it takes
+        // precedence over everything, so logging off means a silent console.
+        // (Read UserDefaults directly: this runs off the MainActor.)
         #if DEBUG
-        let fullMessage = details.map { "\(message) - \($0)" } ?? message
-        switch level {
-        case .debug:
-            osLogger.debug("[\(category.rawValue)] \(fullMessage)")
-        case .info:
-            osLogger.info("[\(category.rawValue)] \(fullMessage)")
-        case .warning:
-            osLogger.warning("[\(category.rawValue)] \(fullMessage)")
-        case .error:
-            osLogger.error("[\(category.rawValue)] \(fullMessage)")
+        if UserDefaults.standard.bool(forKey: "loggingEnabled") {
+            let fullMessage = details.map { "\(message) - \($0)" } ?? message
+            switch level {
+            case .debug:
+                osLogger.debug("[\(category.rawValue)] \(fullMessage)")
+            case .info:
+                osLogger.info("[\(category.rawValue)] \(fullMessage)")
+            case .warning:
+                osLogger.warning("[\(category.rawValue)] \(fullMessage)")
+            case .error:
+                osLogger.error("[\(category.rawValue)] \(fullMessage)")
+            }
         }
         #endif
 
