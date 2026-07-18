@@ -63,8 +63,12 @@ struct LegacyAccountsImportView: View {
         }
         .confirmationDialog(
             pendingRemoval?.confirmationTitle ?? "",
-            item: $pendingRemoval,
-            titleVisibility: .visible
+            isPresented: Binding(
+                get: { pendingRemoval != nil },
+                set: { if !$0 { pendingRemoval = nil } }
+            ),
+            titleVisibility: .visible,
+            presenting: pendingRemoval
         ) { removal in
             Button(String(localized: "migration.accounts.remove.confirm"), role: .destructive) {
                 confirmRemoval(removal)
