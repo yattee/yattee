@@ -237,7 +237,9 @@ jobs:
           fi
       - uses: ncipollo/release-action@v1
         with:
-          artifacts: artifacts/**/*.ipa,artifacts/**/*.zip,artifacts/**/*.pkg,artifacts/**/*.dmg
+          # No .pkg here on purpose: the mac TestFlight pkg is App Store-signed
+          # (no Sparkle, not notarized) and would not run if installed directly.
+          artifacts: artifacts/**/*.ipa,artifacts/**/*.zip,artifacts/**/*.dmg
           commit: ${{ github.ref_name }}
           tag: ${{ steps.compute_tag.outputs.tag }}
           prerelease: ${{ steps.compute_tag.outputs.prerelease }}
