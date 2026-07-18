@@ -1,0 +1,16 @@
+# Slather Code Coverage Configuration
+# https://github.com/SlatherOrg/slather
+
+proj: Yattee.xcodeproj
+scheme: Yattee
+build-directory: DerivedData
+output-directory: coverage
+
+# Coverage format (options: html, cobertura, llvm-cov, json, sonarqube, gutter-json)
+coverage_service: html
+
+# Ignore patterns - adjust as needed
+ignore:
+  - "**/YatteeTests/**"
+  - "**/Vendor/**"
+  - "**/*.generated.swift"

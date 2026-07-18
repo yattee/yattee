@@ -1,0 +1,52 @@
+#!/usr/bin/env ruby
+# frozen_string_literal: true
+
+#
+# Clean Weblate Credits JSON
+#
+# Strips sensitive data (emails, date_joined) from weblate-credits.json
+# and replaces emails with pre-computed Gravatar MD5 hashes.
+#
+# Usage:
+#   ./bin/clean-weblate-credits
+#
+
+require 'json'
+require 'digest'
+
+# Change to project directory
+Dir.chdir(File.expand_path('..', __dir__))
+
+CREDITS_FILE = 'Yattee/weblate-credits.json'
+
+unless File.exist?(CREDITS_FILE)
+  warn "Error: #{CREDITS_FILE} not found"
+  exit 1
+end
+
+# Read and parse the JSON
+data = JSON.parse(File.read(CREDITS_FILE))
+
+# Process each language entry
+cleaned_data = data.map do |language_entry|
+  language_entry.transform_values do |contributors|
+    contributors.map do |contributor|
+      email = contributor['email'].to_s.strip.downcase
+      gravatar_hash = Digest::MD5.hexdigest(email)
+
+      {
+        'gravatar_hash' => gravatar_hash,
+        'username' => contributor['username'],
+        'full_name' => contributor['full_name'],
+        'change_count' => contributor['change_count']
+      }
+    end
+  end
+end
+
+# Write back to file with pretty formatting
+File.write(CREDITS_FILE, JSON.pretty_generate(cleaned_data))
+
+puts "Cleaned #{CREDITS_FILE}"
+puts "  - Removed email addresses (replaced with gravatar_hash)"
+puts "  - Removed date_joined fields"

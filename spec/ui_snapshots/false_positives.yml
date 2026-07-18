@@ -1,0 +1,18 @@
+# False positives for visual regression tests
+#
+# When a screenshot difference is expected (e.g., dynamic content like timestamps,
+# video counts, or subscription feeds), add an entry here to mark it as acceptable.
+#
+# Format:
+#   screenshot_name:
+#     reason: "Why this diff is acceptable"
+#     added: "YYYY-MM-DD"
+#
+# Example:
+#   app-launch-library:
+#     reason: "Dynamic video counts in library cards"
+#     added: "2024-01-15"
+#
+# To add a false positive from command line:
+#   ./bin/ui-test --mark-false-positive screenshot_name "reason"
+#

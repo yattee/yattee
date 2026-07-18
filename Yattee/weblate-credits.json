@@ -1,0 +1,944 @@
+[
+  {
+    "Arabic": [
+      {
+        "gravatar_hash": "64261b049f700f5893c1d83867281c0d",
+        "username": "OneiMoment",
+        "full_name": "Mohammed Al Otaibi",
+        "change_count": 486
+      },
+      {
+        "gravatar_hash": "1a5137b46180090d03150a62893e84c9",
+        "username": "ahnedee",
+        "full_name": "Ahmed Eissa",
+        "change_count": 420
+      },
+      {
+        "gravatar_hash": "2845e3b7997a9be63ce293942da82c37",
+        "username": "arekf",
+        "full_name": "Arkadiusz Fal",
+        "change_count": 128
+      },
+      {
+        "gravatar_hash": "93c550e4216fd3e76484c162d51a4853",
+        "username": "jonnysemon",
+        "full_name": "jonnysemon",
+        "change_count": 39
+      },
+      {
+        "gravatar_hash": "5c964dbff6592889df3088489056f691",
+        "username": "mostafaabdelfattah184",
+        "full_name": "Mostafa Abd El-Fattah",
+        "change_count": 36
+      },
+      {
+        "gravatar_hash": "5f4b0d2c04da435ea79eeb1b38937a56",
+        "username": "rexcsk",
+        "full_name": "rexcsk",
+        "change_count": 4
+      },
+      {
+        "gravatar_hash": "1f40bfe13f21e3cbdd5c75e992ca5045",
+        "username": "boffire",
+        "full_name": "ButterflyOfFire",
+        "change_count": 2
+      }
+    ]
+  },
+  {
+    "Arabic (Najdi)": [
+      {
+        "gravatar_hash": "2845e3b7997a9be63ce293942da82c37",
+        "username": "arekf",
+        "full_name": "Arkadiusz Fal",
+        "change_count": 29
+      },
+      {
+        "gravatar_hash": "5f4b0d2c04da435ea79eeb1b38937a56",
+        "username": "rexcsk",
+        "full_name": "rexcsk",
+        "change_count": 4
+      },
+      {
+        "gravatar_hash": "af0cd3a85172a5b93d62109520021caa",
+        "username": "Sloom128",
+        "full_name": "Sloom",
+        "change_count": 2
+      }
+    ]
+  },
+  {
+    "Azerbaijani": [
+      {
+        "gravatar_hash": "f68fb130317724f8b03a1f463d083183",
+        "username": "Femino",
+        "full_name": "Femini",
+        "change_count": 539
+      },
+      {
+        "gravatar_hash": "2845e3b7997a9be63ce293942da82c37",
+        "username": "arekf",
+        "full_name": "Arkadiusz Fal",
+        "change_count": 199
+      },
+      {
+        "gravatar_hash": "5f4b0d2c04da435ea79eeb1b38937a56",
+        "username": "rexcsk",
+        "full_name": "rexcsk",
+        "change_count": 4
+      }
+    ]
+  },
+  {
+    "Catalan": [
+      {
+        "gravatar_hash": "6222c7ba0db5ce4e1ca3653c4ddd96ed",
+        "username": "austrapede",
+        "full_name": "Austrapede",
+        "change_count": 434
+      },
+      {
+        "gravatar_hash": "2845e3b7997a9be63ce293942da82c37",
+        "username": "arekf",
+        "full_name": "Arkadiusz Fal",
+        "change_count": 128
+      },
+      {
+        "gravatar_hash": "aea8e0da9d165eb3197b2a562c7f8d67",
+        "username": "Fito",
+        "full_name": "Adolfo Jayme Barrientos",
+        "change_count": 15
+      },
+      {
+        "gravatar_hash": "5f4b0d2c04da435ea79eeb1b38937a56",
+        "username": "rexcsk",
+        "full_name": "rexcsk",
+        "change_count": 4
+      }
+    ]
+  },
+  {
+    "Chinese (Simplified Han script)": [
+      {
+        "gravatar_hash": "df5b894017f8e9eed8958706a2692511",
+        "username": "wifi_left",
+        "full_name": "Gamom Yang",
+        "change_count": 570
+      },
+      {
+        "gravatar_hash": "2845e3b7997a9be63ce293942da82c37",
+        "username": "arekf",
+        "full_name": "Arkadiusz Fal",
+        "change_count": 198
+      },
+      {
+        "gravatar_hash": "1f128d217ed844b46cb709cb523922f1",
+        "username": "Sketch6580",
+        "full_name": "Sketch6580",
+        "change_count": 132
+      },
+      {
+        "gravatar_hash": "5f4b0d2c04da435ea79eeb1b38937a56",
+        "username": "rexcsk",
+        "full_name": "rexcsk",
+        "change_count": 5
+      }
+    ]
+  },
+  {
+    "Chinese (Traditional Han script)": [
+      {
+        "gravatar_hash": "5f4b0d2c04da435ea79eeb1b38937a56",
+        "username": "rexcsk",
+        "full_name": "rexcsk",
+        "change_count": 635
+      }
+    ]
+  },
+  {
+    "Czech": [
+      {
+        "gravatar_hash": "bb4f07ee690c74ee5d194e3cdf9a7737",
+        "username": "lachtan999",
+        "full_name": "Lachtan",
+        "change_count": 512
+      },
+      {
+        "gravatar_hash": "2845e3b7997a9be63ce293942da82c37",
+        "username": "arekf",
+        "full_name": "Arkadiusz Fal",
+        "change_count": 199
+      },
+      {
+        "gravatar_hash": "5c2c4d6f9ff84f7d6018f4220f8d33ae",
+        "username": "MacCZ",
+        "full_name": "MacCZ",
+        "change_count": 45
+      },
+      {
+        "gravatar_hash": "5f4b0d2c04da435ea79eeb1b38937a56",
+        "username": "rexcsk",
+        "full_name": "rexcsk",
+        "change_count": 4
+      }
+    ]
+  },
+  {
+    "Dutch": [
+      {
+        "gravatar_hash": "669f790c9617c95b37a29d578adc1a21",
+        "username": "piejanssens",
+        "full_name": "Pieter Janssens",
+        "change_count": 214
+      },
+      {
+        "gravatar_hash": "b1d82fd3d20d96e21384b6561d38492f",
+        "username": "kvklink",
+        "full_name": "Karel van Klink",
+        "change_count": 174
+      },
+      {
+        "gravatar_hash": "375e7b70e95d2d47c584a39fffe31eb4",
+        "username": "milankuster2006",
+        "full_name": "M K",
+        "change_count": 55
+      },
+      {
+        "gravatar_hash": "be5d9434ae55f5b110dc1062235e0816",
+        "username": "floenele",
+        "full_name": "floe nele",
+        "change_count": 29
+      },
+      {
+        "gravatar_hash": "2845e3b7997a9be63ce293942da82c37",
+        "username": "arekf",
+        "full_name": "Arkadiusz Fal",
+        "change_count": 27
+      },
+      {
+        "gravatar_hash": "05df323ae17e750a730496610c7c3928",
+        "username": "Aardappel",
+        "full_name": "Sander",
+        "change_count": 5
+      },
+      {
+        "gravatar_hash": "5f4b0d2c04da435ea79eeb1b38937a56",
+        "username": "rexcsk",
+        "full_name": "rexcsk",
+        "change_count": 4
+      }
+    ]
+  },
+  {
+    "English": [
+      {
+        "gravatar_hash": "2845e3b7997a9be63ce293942da82c37",
+        "username": "arekf",
+        "full_name": "Arkadiusz Fal",
+        "change_count": 253
+      },
+      {
+        "gravatar_hash": "5f4b0d2c04da435ea79eeb1b38937a56",
+        "username": "rexcsk",
+        "full_name": "rexcsk",
+        "change_count": 4
+      },
+      {
+        "gravatar_hash": "bef8689ec36137189b2d2bb0d51301f7",
+        "username": "deleted-33337",
+        "full_name": "Deleted User",
+        "change_count": 2
+      },
+      {
+        "gravatar_hash": "df5b894017f8e9eed8958706a2692511",
+        "username": "wifi_left",
+        "full_name": "Gamom Yang",
+        "change_count": 2
+      }
+    ]
+  },
+  {
+    "Finnish": [
+      {
+        "gravatar_hash": "699800eecdd539cd1692cfa6b7a5c78f",
+        "username": "saukki",
+        "full_name": "Saukki",
+        "change_count": 583
+      }
+    ]
+  },
+  {
+    "French": [
+      {
+        "gravatar_hash": "2845e3b7997a9be63ce293942da82c37",
+        "username": "arekf",
+        "full_name": "Arkadiusz Fal",
+        "change_count": 253
+      },
+      {
+        "gravatar_hash": "ac8ae5ee6a2dbd87c3e89601fe539429",
+        "username": "Ophiushi",
+        "full_name": "Ophiushi",
+        "change_count": 205
+      },
+      {
+        "gravatar_hash": "6d12c5ff9a8fb6b0860a101bd8551c28",
+        "username": "Edanas",
+        "full_name": "J. Lavoie",
+        "change_count": 200
+      },
+      {
+        "gravatar_hash": "789ee0bdcccf1724714305b14d73cd55",
+        "username": "Arthegor",
+        "full_name": "Arthegor",
+        "change_count": 154
+      },
+      {
+        "gravatar_hash": "07634745ac26e028b0b967461c542efd",
+        "username": "LionelVallet",
+        "full_name": "Lionel Vallet",
+        "change_count": 137
+      },
+      {
+        "gravatar_hash": "3a253e5a60b9fde503600ae55791c55a",
+        "username": "Atomhic",
+        "full_name": "Léo L",
+        "change_count": 52
+      },
+      {
+        "gravatar_hash": "f299ec11cc293566cfb1fc28fa4922cd",
+        "username": "Ericr",
+        "full_name": "Eric Rudz",
+        "change_count": 30
+      },
+      {
+        "gravatar_hash": "b1ba41cc4ce456ff17fce8dd98dcfcf3",
+        "username": "yopox",
+        "full_name": "Louis Vignier",
+        "change_count": 22
+      },
+      {
+        "gravatar_hash": "5f4b0d2c04da435ea79eeb1b38937a56",
+        "username": "rexcsk",
+        "full_name": "rexcsk",
+        "change_count": 4
+      },
+      {
+        "gravatar_hash": "9fee19de15cb26dfda613eb9f7e8d0c4",
+        "username": "tototof",
+        "full_name": "tototof",
+        "change_count": 3
+      },
+      {
+        "gravatar_hash": "948babdfcc7e8c8e70e2c93456f7fa57",
+        "username": "trilame",
+        "full_name": "trilame",
+        "change_count": 1
+      }
+    ]
+  },
+  {
+    "German": [
+      {
+        "gravatar_hash": "eb711e62ccea1e9b2afe5981955411a8",
+        "username": "bachig26",
+        "full_name": "Bharathi",
+        "change_count": 498
+      },
+      {
+        "gravatar_hash": "2845e3b7997a9be63ce293942da82c37",
+        "username": "arekf",
+        "full_name": "Arkadiusz Fal",
+        "change_count": 355
+      },
+      {
+        "gravatar_hash": "2e60d7828b829eda193dea7b71d843ae",
+        "username": "robertkleinschuster",
+        "full_name": "Robert Kleinschuster",
+        "change_count": 47
+      },
+      {
+        "gravatar_hash": "f2dd638d5c06077cab0119e768df6cca",
+        "username": "stonerl",
+        "full_name": "Toni Förster",
+        "change_count": 29
+      },
+      {
+        "gravatar_hash": "58dd6b37cf8d1986d69d5718d62ebd01",
+        "username": "diewaldnicolas515",
+        "full_name": "NicoATC",
+        "change_count": 15
+      },
+      {
+        "gravatar_hash": "f9f8ae4b4e466ecc78cd67a6cc3c93f2",
+        "username": "userx.uberspace",
+        "full_name": "Userx Uberspace",
+        "change_count": 8
+      },
+      {
+        "gravatar_hash": "6c0f5e7a10418f44061e2995dcf088a8",
+        "username": "am9zZWY",
+        "full_name": "Josef Müller",
+        "change_count": 7
+      },
+      {
+        "gravatar_hash": "5f4b0d2c04da435ea79eeb1b38937a56",
+        "username": "rexcsk",
+        "full_name": "rexcsk",
+        "change_count": 4
+      },
+      {
+        "gravatar_hash": "6d12c5ff9a8fb6b0860a101bd8551c28",
+        "username": "Edanas",
+        "full_name": "J. Lavoie",
+        "change_count": 1
+      },
+      {
+        "gravatar_hash": "b5e685163352c73b2a199b9b1827896f",
+        "username": "finncyr",
+        "full_name": "Finn",
+        "change_count": 1
+      }
+    ]
+  },
+  {
+    "Hindi": [
+      {
+        "gravatar_hash": "845b2629e859fc40bb163e0c20918ba8",
+        "username": "chadify",
+        "full_name": "chadify",
+        "change_count": 357
+      },
+      {
+        "gravatar_hash": "2845e3b7997a9be63ce293942da82c37",
+        "username": "arekf",
+        "full_name": "Arkadiusz Fal",
+        "change_count": 241
+      },
+      {
+        "gravatar_hash": "0dc3b0419ff06d059d46cd79f25549bf",
+        "username": "indianets",
+        "full_name": "Vijay",
+        "change_count": 50
+      },
+      {
+        "gravatar_hash": "5f4b0d2c04da435ea79eeb1b38937a56",
+        "username": "rexcsk",
+        "full_name": "rexcsk",
+        "change_count": 4
+      }
+    ]
+  },
+  {
+    "Hungarian": [
+      {
+        "gravatar_hash": "b6bf8b4a218378691cfb93a1618f7215",
+        "username": "kratos",
+        "full_name": "Ghost of Sparta",
+        "change_count": 684
+      },
+      {
+        "gravatar_hash": "a8f36cd63220f12f07954d0941a9e2bd",
+        "username": "itanczos",
+        "full_name": "Istvan Tanczos",
+        "change_count": 6
+      }
+    ]
+  },
+  {
+    "Indonesian": [
+      {
+        "gravatar_hash": "2ce711a56ffb221b77a6b595ad0ebd67",
+        "username": "neotrouz",
+        "full_name": "Willy Anjaya",
+        "change_count": 673
+      }
+    ]
+  },
+  {
+    "Italian": [
+      {
+        "gravatar_hash": "ab7f79b2482bb4be99a76609cfdb81f0",
+        "username": "bordam",
+        "full_name": "Mattia Borda",
+        "change_count": 475
+      },
+      {
+        "gravatar_hash": "a074c6b894c4aafd54ec0567de25507f",
+        "username": "fracl",
+        "full_name": "Francesco",
+        "change_count": 230
+      },
+      {
+        "gravatar_hash": "2845e3b7997a9be63ce293942da82c37",
+        "username": "arekf",
+        "full_name": "Arkadiusz Fal",
+        "change_count": 224
+      },
+      {
+        "gravatar_hash": "cafc1e32c718a0c7a9fcc8b01d3fa7c6",
+        "username": "leonardonzio",
+        "full_name": "Leonardo Barone",
+        "change_count": 34
+      },
+      {
+        "gravatar_hash": "5f4b0d2c04da435ea79eeb1b38937a56",
+        "username": "rexcsk",
+        "full_name": "rexcsk",
+        "change_count": 4
+      }
+    ]
+  },
+  {
+    "Japanese": [
+      {
+        "gravatar_hash": "8c17fb9b321f8f958626c3ef1d133130",
+        "username": "maboroshin",
+        "full_name": "maboroshin",
+        "change_count": 726
+      },
+      {
+        "gravatar_hash": "2845e3b7997a9be63ce293942da82c37",
+        "username": "arekf",
+        "full_name": "Arkadiusz Fal",
+        "change_count": 90
+      },
+      {
+        "gravatar_hash": "5f4b0d2c04da435ea79eeb1b38937a56",
+        "username": "rexcsk",
+        "full_name": "rexcsk",
+        "change_count": 4
+      }
+    ]
+  },
+  {
+    "Kabyle": [
+      {
+        "gravatar_hash": "1f40bfe13f21e3cbdd5c75e992ca5045",
+        "username": "boffire",
+        "full_name": "ButterflyOfFire",
+        "change_count": 101
+      }
+    ]
+  },
+  {
+    "Kannada": [
+      {
+        "gravatar_hash": "30ad6d276bfc9d83606ee8127d4d9e7f",
+        "username": "adityarbhat7",
+        "full_name": "Aditya Bhat",
+        "change_count": 11
+      }
+    ]
+  },
+  {
+    "Korean": [
+      {
+        "gravatar_hash": "5ed8667a0043f4134d166f251c98002e",
+        "username": "deleted-121527",
+        "full_name": "Deleted User",
+        "change_count": 650
+      },
+      {
+        "gravatar_hash": "c1f323efd53ff5b3f75864f0b8f15a09",
+        "username": "lidar",
+        "full_name": "lidar",
+        "change_count": 66
+      },
+      {
+        "gravatar_hash": "de1848dd1da5c44f67a1957a703b0594",
+        "username": "lola3639",
+        "full_name": "Sophia Park",
+        "change_count": 17
+      }
+    ]
+  },
+  {
+    "Norwegian Bokmål": [
+      {
+        "gravatar_hash": "803794a6d0afaaf739f84aa2620860bb",
+        "username": "kingu",
+        "full_name": "Allan Nordhøy",
+        "change_count": 402
+      },
+      {
+        "gravatar_hash": "2845e3b7997a9be63ce293942da82c37",
+        "username": "arekf",
+        "full_name": "Arkadiusz Fal",
+        "change_count": 234
+      },
+      {
+        "gravatar_hash": "5f4b0d2c04da435ea79eeb1b38937a56",
+        "username": "rexcsk",
+        "full_name": "rexcsk",
+        "change_count": 4
+      },
+      {
+        "gravatar_hash": "c93e4eddcc6eac67885ec5de93fe3e33",
+        "username": "Radiicall",
+        "full_name": "Radical",
+        "change_count": 1
+      }
+    ]
+  },
+  {
+    "Persian": [
+      {
+        "gravatar_hash": "86f36bc84538619f20142f1e96b23ed4",
+        "username": "kaambiz",
+        "full_name": "Kaambiz",
+        "change_count": 426
+      },
+      {
+        "gravatar_hash": "2845e3b7997a9be63ce293942da82c37",
+        "username": "arekf",
+        "full_name": "Arkadiusz Fal",
+        "change_count": 29
+      },
+      {
+        "gravatar_hash": "5f4b0d2c04da435ea79eeb1b38937a56",
+        "username": "rexcsk",
+        "full_name": "rexcsk",
+        "change_count": 4
+      }
+    ]
+  },
+  {
+    "Polish": [
+      {
+        "gravatar_hash": "2845e3b7997a9be63ce293942da82c37",
+        "username": "arekf",
+        "full_name": "Arkadiusz Fal",
+        "change_count": 530
+      },
+      {
+        "gravatar_hash": "5f4b0d2c04da435ea79eeb1b38937a56",
+        "username": "rexcsk",
+        "full_name": "rexcsk",
+        "change_count": 4
+      },
+      {
+        "gravatar_hash": "2c85feb5764754a533b1c98d91174568",
+        "username": "youthfulfox",
+        "full_name": "Wojciech Teichert",
+        "change_count": 1
+      }
+    ]
+  },
+  {
+    "Portuguese": [
+      {
+        "gravatar_hash": "a0545274f9e718f0415f66cfcbc4e59c",
+        "username": "ssantos",
+        "full_name": "ssantos",
+        "change_count": 537
+      },
+      {
+        "gravatar_hash": "2845e3b7997a9be63ce293942da82c37",
+        "username": "arekf",
+        "full_name": "Arkadiusz Fal",
+        "change_count": 128
+      },
+      {
+        "gravatar_hash": "93d182692558ccb506710af38769c3aa",
+        "username": "Nykold",
+        "full_name": "José Alves Amaro",
+        "change_count": 10
+      },
+      {
+        "gravatar_hash": "5f4b0d2c04da435ea79eeb1b38937a56",
+        "username": "rexcsk",
+        "full_name": "rexcsk",
+        "change_count": 4
+      }
+    ]
+  },
+  {
+    "Portuguese (Brazil)": [
+      {
+        "gravatar_hash": "b7c8ff7972638a420f9f0f6ca119bf12",
+        "username": "joaooliva",
+        "full_name": "joaooliva",
+        "change_count": 602
+      },
+      {
+        "gravatar_hash": "2845e3b7997a9be63ce293942da82c37",
+        "username": "arekf",
+        "full_name": "Arkadiusz Fal",
+        "change_count": 199
+      },
+      {
+        "gravatar_hash": "5f4b0d2c04da435ea79eeb1b38937a56",
+        "username": "rexcsk",
+        "full_name": "rexcsk",
+        "change_count": 4
+      }
+    ]
+  },
+  {
+    "Romanian": [
+      {
+        "gravatar_hash": "1717b96a0f8349bc6dc7e503c5dd82e0",
+        "username": "mere",
+        "full_name": "mere",
+        "change_count": 654
+      },
+      {
+        "gravatar_hash": "2845e3b7997a9be63ce293942da82c37",
+        "username": "arekf",
+        "full_name": "Arkadiusz Fal",
+        "change_count": 199
+      },
+      {
+        "gravatar_hash": "5f4b0d2c04da435ea79eeb1b38937a56",
+        "username": "rexcsk",
+        "full_name": "rexcsk",
+        "change_count": 4
+      }
+    ]
+  },
+  {
+    "Russian": [
+      {
+        "gravatar_hash": "d988ae24ea69b9c7a01b510a0b49fb92",
+        "username": "mrtag-oss",
+        "full_name": "mrtag-oss",
+        "change_count": 576
+      },
+      {
+        "gravatar_hash": "1c33a8cdef337ddad8d5fd1734d8fcc0",
+        "username": "Limonov",
+        "full_name": "Limonov",
+        "change_count": 252
+      },
+      {
+        "gravatar_hash": "2845e3b7997a9be63ce293942da82c37",
+        "username": "arekf",
+        "full_name": "Arkadiusz Fal",
+        "change_count": 34
+      },
+      {
+        "gravatar_hash": "5f4b0d2c04da435ea79eeb1b38937a56",
+        "username": "rexcsk",
+        "full_name": "rexcsk",
+        "change_count": 4
+      },
+      {
+        "gravatar_hash": "38a321dd4e674a0042110a738c8d0ee9",
+        "username": "berry",
+        "full_name": "Blueberry",
+        "change_count": 1
+      }
+    ]
+  },
+  {
+    "Slovak": [
+      {
+        "gravatar_hash": "3cd50d5975786165a79446ec705af4f3",
+        "username": "jaroslav.kardos",
+        "full_name": "Jaroslav Kardoš",
+        "change_count": 195
+      }
+    ]
+  },
+  {
+    "Spanish": [
+      {
+        "gravatar_hash": "2845e3b7997a9be63ce293942da82c37",
+        "username": "arekf",
+        "full_name": "Arkadiusz Fal",
+        "change_count": 199
+      },
+      {
+        "gravatar_hash": "f345299770a1cf35b367213b15d21518",
+        "username": "deleted-48943",
+        "full_name": "Deleted User",
+        "change_count": 128
+      },
+      {
+        "gravatar_hash": "bd0ec4185576eefef7a1922658c95ff0",
+        "username": "decisoft",
+        "full_name": "Mario",
+        "change_count": 104
+      },
+      {
+        "gravatar_hash": "b87916391d8b9c73cc4c3ab44312d85e",
+        "username": "ooosssay",
+        "full_name": "ooosssay",
+        "change_count": 38
+      },
+      {
+        "gravatar_hash": "aea8e0da9d165eb3197b2a562c7f8d67",
+        "username": "Fito",
+        "full_name": "Adolfo Jayme Barrientos",
+        "change_count": 30
+      },
+      {
+        "gravatar_hash": "eb87095538af7501570c47cb36bbcff4",
+        "username": "jtorresleon",
+        "full_name": "Jorge Torres",
+        "change_count": 11
+      },
+      {
+        "gravatar_hash": "e4e2e35133d87deac7f98e030e722dc9",
+        "username": "IngrownMink4",
+        "full_name": "Sergio Varela",
+        "change_count": 10
+      },
+      {
+        "gravatar_hash": "5f4b0d2c04da435ea79eeb1b38937a56",
+        "username": "rexcsk",
+        "full_name": "rexcsk",
+        "change_count": 4
+      },
+      {
+        "gravatar_hash": "3af38fb72c93101cf30b95368a7cccab",
+        "username": "deleted-52698",
+        "full_name": "Deleted User",
+        "change_count": 3
+      }
+    ]
+  },
+  {
+    "Swedish": [
+      {
+        "gravatar_hash": "2845e3b7997a9be63ce293942da82c37",
+        "username": "arekf",
+        "full_name": "Arkadiusz Fal",
+        "change_count": 128
+      },
+      {
+        "gravatar_hash": "509fb93c4fd4c434a67868750095319f",
+        "username": "deleted-56839",
+        "full_name": "Deleted User",
+        "change_count": 110
+      },
+      {
+        "gravatar_hash": "5f4b0d2c04da435ea79eeb1b38937a56",
+        "username": "rexcsk",
+        "full_name": "rexcsk",
+        "change_count": 4
+      }
+    ]
+  },
+  {
+    "Tamil": [
+      {
+        "gravatar_hash": "d7f1b803e7675da5f87dbb88009edafd",
+        "username": "TamilNeram",
+        "full_name": "தமிழ்நேரம்",
+        "change_count": 571
+      }
+    ]
+  },
+  {
+    "Turkish": [
+      {
+        "gravatar_hash": "ea20981821144991b27ac007677cb7e1",
+        "username": "Twig6943",
+        "full_name": "Twig",
+        "change_count": 231
+      },
+      {
+        "gravatar_hash": "bef8689ec36137189b2d2bb0d51301f7",
+        "username": "deleted-33337",
+        "full_name": "Deleted User",
+        "change_count": 200
+      },
+      {
+        "gravatar_hash": "2845e3b7997a9be63ce293942da82c37",
+        "username": "arekf",
+        "full_name": "Arkadiusz Fal",
+        "change_count": 198
+      },
+      {
+        "gravatar_hash": "a441687021d057bd4b4d455ce6ddd13a",
+        "username": "cdguy",
+        "full_name": "cdguy",
+        "change_count": 71
+      },
+      {
+        "gravatar_hash": "ab6e8616eb03edca3c62afd857bc26f3",
+        "username": "kisewa",
+        "full_name": "Jesus H. Christ",
+        "change_count": 38
+      },
+      {
+        "gravatar_hash": "fd1fa8785734ab11de87662803a8c8ed",
+        "username": "alperzengintas",
+        "full_name": "Alper Zengintaş",
+        "change_count": 30
+      },
+      {
+        "gravatar_hash": "16eb6386a583322fdfad14fb41b7ee98",
+        "username": "azazaazur",
+        "full_name": "azazaazur",
+        "change_count": 8
+      },
+      {
+        "gravatar_hash": "f68fb130317724f8b03a1f463d083183",
+        "username": "Femino",
+        "full_name": "Femini",
+        "change_count": 7
+      },
+      {
+        "gravatar_hash": "b9a9ef837655fc99b93bb978e976583a",
+        "username": "oguska",
+        "full_name": "oguska",
+        "change_count": 7
+      },
+      {
+        "gravatar_hash": "5f4b0d2c04da435ea79eeb1b38937a56",
+        "username": "rexcsk",
+        "full_name": "rexcsk",
+        "change_count": 4
+      }
+    ]
+  },
+  {
+    "Ukrainian": [
+      {
+        "gravatar_hash": "f537d4ad21f5e64f61469696df9c68ef",
+        "username": "AMD-NICK",
+        "full_name": "_AMD_",
+        "change_count": 263
+      },
+      {
+        "gravatar_hash": "2845e3b7997a9be63ce293942da82c37",
+        "username": "arekf",
+        "full_name": "Arkadiusz Fal",
+        "change_count": 198
+      },
+      {
+        "gravatar_hash": "1c33a8cdef337ddad8d5fd1734d8fcc0",
+        "username": "Limonov",
+        "full_name": "Limonov",
+        "change_count": 194
+      },
+      {
+        "gravatar_hash": "58d068a908ebf9656f8f877a104b7feb",
+        "username": "Karlend",
+        "full_name": "Dmytro",
+        "change_count": 193
+      },
+      {
+        "gravatar_hash": "d673b09d4a96f05e4bcb6e593281364e",
+        "username": "kefir2105",
+        "full_name": "Dan",
+        "change_count": 13
+      },
+      {
+        "gravatar_hash": "0fc9e7d51cbfcfa04e86f1f5dbdc362d",
+        "username": "filalex77",
+        "full_name": "Oleksii Filonenko",
+        "change_count": 6
+      },
+      {
+        "gravatar_hash": "5f4b0d2c04da435ea79eeb1b38937a56",
+        "username": "rexcsk",
+        "full_name": "rexcsk",
+        "change_count": 4
+      }
+    ]
+  }
+]

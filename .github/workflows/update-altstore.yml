@@ -1,0 +1,75 @@
+name: Update AltStore source
+on:
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Release tag to publish (defaults to the latest release)'
+        type: string
+        required: false
+  workflow_call:
+    inputs:
+      tag:
+        type: string
+        required: false
+
+jobs:
+  update_altstore:
+    name: Update AltStore source
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+      - name: Get version info from release
+        run: |
+          TAG="${{ inputs.tag }}"
+          if [ -z "$TAG" ]; then
+            TAG=$(gh release view --json tagName --jq '.tagName')
+          fi
+          # Tags are <version>-<build> (stable) or <version>-beta.<build> (beta),
+          # e.g. 2.0.0-263 or 2.0.0-beta.263.
+          echo "TAG=${TAG}" >> $GITHUB_ENV
+          echo "VERSION_NUMBER=${TAG%%-*}" >> $GITHUB_ENV
+          echo "BUILD_NUMBER=${TAG##*[-.]}" >> $GITHUB_ENV
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Get IPA size from release
+        run: |
+          IPA_NAME="Yattee-${{ env.VERSION_NUMBER }}-iOS.ipa"
+          SIZE=$(gh release view "${{ env.TAG }}" --json assets --jq ".assets[] | select(.name == \"$IPA_NAME\") | .size")
+          if [ -z "$SIZE" ]; then
+            echo "::error::Release ${{ env.TAG }} has no asset named $IPA_NAME — refusing to publish a broken AltStore entry"
+            exit 1
+          fi
+          echo "IPA_NAME=${IPA_NAME}" >> $GITHUB_ENV
+          echo "IPA_SIZE=${SIZE}" >> $GITHUB_ENV
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Update altstore-source.json
+        run: |
+          DATE=$(date -u +"%Y-%m-%dT%H:%M:%S+00:00")
+          jq --arg version "${{ env.VERSION_NUMBER }}" \
+             --arg build "${{ env.BUILD_NUMBER }}" \
+             --arg date "$DATE" \
+             --arg url "https://github.com/yattee/yattee/releases/download/${{ env.TAG }}/${{ env.IPA_NAME }}" \
+             --argjson size "${{ env.IPA_SIZE }}" \
+             '.apps[0].versions = [{
+               version: $version,
+               buildVersion: $build,
+               date: $date,
+               localizedDescription: "",
+               downloadURL: $url,
+               size: $size,
+               minOSVersion: "18.0"
+             }] + [.apps[0].versions[] | select(.version != $version or .buildVersion != $build)]' \
+             altstore-source.json > altstore-source.tmp && mv altstore-source.tmp altstore-source.json
+      - name: Commit and push
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add altstore-source.json
+          git diff --cached --quiet && echo "No changes to commit" && exit 0
+          git commit -m "Update AltStore source for ${{ env.VERSION_NUMBER }} (${{ env.BUILD_NUMBER }})"
+          git push

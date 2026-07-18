@@ -1,17 +1,17 @@
 <div align="center">
-  <img src="https://r.yattee.stream/icons/yattee-150.png" width="150" height="150" alt="Yattee logo">
+  <img src="assets/yattee-logo.png" width="128" height="128" alt="Yattee logo" />
   <h1>Yattee</h1>
   <p>Privacy oriented video player for iOS, tvOS and macOS<br /></p>
 
 [![AGPL v3](https://shields.io/badge/License-AGPL%20v3-blue.svg)](https://www.gnu.org/licenses/agpl-3.0.en.html)
 [![GitHub issues](https://img.shields.io/github/issues/yattee/yattee)](https://github.com/yattee/yattee/issues)
 [![GitHub pull requests](https://img.shields.io/github/issues-pr/yattee/yattee)](https://github.com/yattee/yattee/pulls)
-[![Matrix](https://img.shields.io/matrix/yattee:matrix.org)](https://matrix.to/#/#Yattee:matrix.org)
+
 
 [![Discord](https://invidget.switchblade.xyz/pSnNKhZHEG)](https://yattee.stream/discord)
 </div>
 
-> **Yattee 2 is in the works!** A new version of the app is being built with a refreshed experience for iOS, tvOS and soon for macOS.
+> **Yattee 2 is in the works!** A new version of the app is being built with a refreshed experience.
 > It pairs with the new [Yattee Server](https://github.com/yattee/yattee-server) — a self-hosted backend powered by yt-dlp that supports 1000+ sites.
 > Join the [TestFlight beta](https://yattee.stream/beta2) to try early builds, and check the new documentation site at [docs.yattee.stream](https://docs.yattee.stream) for guides, roadmap and changelog.
 

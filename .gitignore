@@ -101,3 +101,14 @@ Xcode-config/DEVELOPMENT_TEAM.xcconfig
 # Bundler
 .bundle/
 Vendor/bundle/
+
+# Code Coverage
+coverage/
+
+# UI Test Snapshots (keep baseline/, ignore generated files)
+spec/ui_snapshots/current/
+spec/ui_snapshots/diff/
+
+# Environment variables (contains secrets)
+.env
+.env.local

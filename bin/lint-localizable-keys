@@ -1,0 +1,45 @@
+#!/usr/bin/env ruby
+# frozen_string_literal: true
+
+#
+# Lint Localizable Key Format
+#
+# Checks that all keys in Localizable.xcstrings follow the dotted format
+# (e.g., "group.subgroup.name"). Keys without dots are flagged for migration.
+#
+# Usage:
+#   ./bin/lint-localizable-keys
+#
+
+require 'json'
+
+# Change to project directory
+Dir.chdir(File.expand_path('..', __dir__))
+
+XCSTRINGS_FILE = 'Yattee/Localizable.xcstrings'
+
+unless File.exist?(XCSTRINGS_FILE)
+  warn "Error: #{XCSTRINGS_FILE} not found"
+  exit 1
+end
+
+data = JSON.parse(File.read(XCSTRINGS_FILE))
+keys = data.fetch('strings', {}).keys
+
+# Strip trailing format specifiers to get the base key
+def base_key(key)
+  key.gsub(/\s+%[@dlf]+(\.?\d*[dlf])?/, '').strip
+end
+
+violations = keys.select { |key| !base_key(key).include?('.') }
+                 .sort
+
+if violations.empty?
+  puts "All #{keys.size} keys use dotted format."
+  exit 0
+end
+
+puts "Keys missing dotted format (#{violations.size} of #{keys.size}):\n\n"
+violations.each { |key| puts "  #{key}" }
+puts "\n#{violations.size} key(s) need migration to dotted format."
+exit 1

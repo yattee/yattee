@@ -1,0 +1,120 @@
+# RuboCop configuration for Yattee UI tests
+# Relaxed configuration matching existing code style
+
+plugins:
+  - rubocop-rspec
+
+AllCops:
+  TargetRubyVersion: 3.4
+  NewCops: enable
+  Include:
+    - 'spec/**/*.rb'
+  Exclude:
+    - 'vendor/**/*'
+    - 'Gemfile'
+
+# ============================================
+# Metrics - Relaxed for UI test complexity
+# ============================================
+
+# RSpec blocks are naturally long
+Metrics/BlockLength:
+  Enabled: false
+
+# UI test methods can be longer
+Metrics/MethodLength:
+  Max: 120
+
+# Classes can be larger in test support code
+Metrics/ClassLength:
+  Max: 500
+
+# Allow higher complexity for UI test helpers
+Metrics/AbcSize:
+  Max: 100
+
+Metrics/CyclomaticComplexity:
+  Max: 40
+
+Metrics/PerceivedComplexity:
+  Max: 40
+
+# ============================================
+# Layout
+# ============================================
+
+# Relaxed line length for readability
+Layout/LineLength:
+  Max: 140
+
+# ============================================
+# Naming
+# ============================================
+
+# Allow methods like find_element, ensure_invidious without ? suffix
+Naming/PredicateMethod:
+  Enabled: false
+
+# Allow set_ prefix for methods like set_status_bar_overrides
+Naming/AccessorMethodName:
+  Enabled: false
+
+# ============================================
+# Lint
+# ============================================
+
+# Allow duplicate branches in case statements (UI state machines)
+Lint/DuplicateBranch:
+  Enabled: false
+
+# ============================================
+# Style
+# ============================================
+
+# Not needed for test files
+Style/Documentation:
+  Enabled: false
+
+# Allow multi-line block chains (common in RSpec)
+Style/MultilineBlockChain:
+  Enabled: false
+
+# Allow single-line if statements (don't force modifier style)
+Style/IfUnlessModifier:
+  Enabled: false
+
+# Allow short parameter names in UI test helpers
+Naming/MethodParameterName:
+  Enabled: false
+
+# ============================================
+# RSpec - Relaxed for UI testing patterns
+# ============================================
+
+# UI tests may need more steps
+RSpec/ExampleLength:
+  Max: 30
+
+# Allow before(:all) for simulator lifecycle management
+RSpec/BeforeAfterAll:
+  Enabled: false
+
+# Allow instance variables shared across examples (@axe, @udid)
+RSpec/InstanceVariable:
+  Enabled: false
+
+# UI tests often batch multiple checks
+RSpec/MultipleExpectations:
+  Enabled: false
+
+# Allow deeper nesting for describe/context blocks
+RSpec/NestedGroups:
+  Max: 5
+
+# Feature/smoke specs use string descriptions, not class names
+RSpec/DescribeClass:
+  Enabled: false
+
+# Allow expect in before hooks for setup verification
+RSpec/ExpectInHook:
+  Enabled: false

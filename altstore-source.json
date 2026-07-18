@@ -1,0 +1,42 @@
+{
+  "name": "Yattee",
+  "subtitle": "Privacy-focused video player",
+  "description": "Yattee is a privacy-focused video player for iPhone, iPad, Mac, and Apple TV. Watch YouTube via Invidious, Piped, or self-hosted Yattee Server. Supports PeerTube, local files, SMB shares, and WebDAV. Features include 4K playback, Picture in Picture, background audio, SponsorBlock, DeArrow, playback queue, subscriptions, bookmarks, downloads, and iCloud sync.",
+  "iconURL": "https://raw.githubusercontent.com/yattee/yattee/main/Assets/yattee-icon-512.png",
+  "headerURL": "",
+  "website": "https://github.com/yattee/yattee",
+  "tintColor": "#5B8DF5",
+  "apps": [
+    {
+      "name": "Yattee",
+      "bundleIdentifier": "stream.yattee.app",
+      "developerName": "Yattee",
+      "subtitle": "Privacy-focused video player",
+      "localizedDescription": "Yattee is a privacy-focused video player for iPhone, iPad, Mac, and Apple TV.\n\nPlayback\n- 4K video with custom MPV-based player (H.264, H.265, VP9, AV1)\n- Picture in Picture, background audio, fullscreen\n- Playback queue, history, resume from last position\n- Chapter navigation, playback speed, subtitles and captions\n- Gesture controls (seek, volume, brightness)\n- Seek preview with storyboards\n\nContent Sources\n- YouTube via Invidious, Piped, or self-hosted Yattee Server\n- PeerTube instances (federated video)\n- Local files, SMB network shares, WebDAV servers\n\nIntegrations\n- SponsorBlock (configurable skip categories)\n- DeArrow (crowdsourced titles and thumbnails)\n- Return YouTube Dislike\n\nLibrary\n- Subscriptions with per-channel notifications\n- Bookmarks with tags and notes, playlists, watch history\n- Unified search across all configured sources\n- Import/export subscriptions (JSON, CSV, OPML)\n\nDownloads & Sync\n- Offline video and audio downloads with quality selection\n- iCloud sync for bookmarks, subscriptions, history, and settings across devices\n- Handoff continuity between iPhone, iPad, Mac, and Apple TV\n\nApple Ecosystem\n- Customizable home layout, accent colors, player controls, and app icon\n- Clipboard URL detection and deep linking (yattee://)\n- Remote control between devices on your network",
+      "iconURL": "https://raw.githubusercontent.com/yattee/yattee/main/Assets/yattee-icon-512.png",
+      "tintColor": "#5B8DF5",
+      "category": "entertainment",
+      "screenshots": [],
+      "versions": [
+        {
+          "version": "2.0.0",
+          "buildVersion": "250",
+          "date": "2026-02-09T00:00:00-00:00",
+          "localizedDescription": "Yattee v2 rewrite",
+          "downloadURL": "https://github.com/yattee/yattee/releases/download/2.0.0-250/Yattee.ipa",
+          "size": 0,
+          "minOSVersion": "18.0"
+        }
+      ],
+      "appPermissions": {
+        "entitlements": [
+          "com.apple.developer.icloud-container-identifiers",
+          "com.apple.developer.icloud-services",
+          "com.apple.developer.ubiquity-kvstore-identifier",
+          "aps-environment"
+        ]
+      }
+    }
+  ],
+  "news": []
+}

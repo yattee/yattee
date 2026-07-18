@@ -1,85 +1,44 @@
-## Build 257 (v1.5.2)
-
-## What's Changed
-* Fixed Finnish, Indonesian, Korean, Dutch and Swedish translations
-
-### Dependencies
-* Update dependencies
-
-## Previous builds
-
-## Build 241
-
-### iOS Fixes
-* Fix menu text disappearing in navigation headers and playback settings
-* Fix fullscreen gesture collision with notification center by adding 60pt safe zone at top
-* Fix comments scrolling issue - comments at bottom of video details view are now fully accessible
-* Restrict orientation locking to iPhone only (hide on iPad)
-
-### tvOS Fixes
-* Improve controls overlay with single-press menus for quality, stream, captions, and audio track selection
-* Fix controls overlay button text legibility
-* Fix captions list always showing as unavailable in MPV
-
-### API & Backend Fixes
-* Fix Invidious search API parameters (sort_by→sort, upload_date→date, view_count→views)
-* Fix Invidious captions URL when companion is enabled
-* Fix YouTube share links incorrectly including port from Invidious instance
-
-### UI & Layout
-* Fix home view empty sections taking excessive vertical space
-
-### Advanced Settings
-* Add experimental setting to hide videos without duration in Invidious instance settings (can be used to filter shorts)
-* Add optional AVPlayer support for non-streamable MP4/AVC1 formats in advanced settings with warnings about slow loading
-
-## Build 210
-
 ## What's Changed
 
-* Trending and Hide Shorts was disabled due to changes in the video apps API
-* Fix iPad iOS 18 keyboard dismissal issue in search
-* Fix audio session interrupting other apps on launch
-* Fix thumbnail loading for video details
-* Fix thumbnail aspect ratio to prevent stretching and layout jumps
-* Fix keyboard shortcut conflict for Show Player command
+**macOS support** — Yattee 2 arrives on the Mac with its first public beta. It brings the full Yattee 2 experience to the desktop with a native interface: a dedicated player window with fullscreen and stay on top option, Picture in Picture, customizable and movable player controls, keyboard shortcuts, and other features present in the iOS app.
 
-## Previous builds
+The macOS app is available via [TestFlight](https://yattee.stream/beta2), or as a notarized direct download from [GitHub Releases](https://github.com/yattee/yattee/releases) that keeps itself up to date with built-in automatic updates.
 
-**Build 209:**
-* Fix Now Playing controls for both MPV and AVPlayer backends
-* Fix thumbnail sizing and aspect ratio issues in video cells (#896)
-* Adjust tvOS video cell dimensions for better layout
-* Fix playing videos from channel view in modal opened in video player
-* Fix audio track label showing "Original" instead of "Unknown"
-* Simplify fullscreen handling for iOS
-* Add macOS-specific entitlements for MPV backend
+### General
 
-**Build 208:**
-* Enable resizable windows on iPad
-* Improve iPad UI behavior and settings layout
-* Fix horizontal content extending behind sidebar on iPad
-* Add proper padding to player controls and video details in non-fullscreen iPad windows
-* Hide orientation lock controls on iPad (not applicable for iPad)
-* Fix video player overlay to respect window fullscreen state
-* Allow video player to extend into safe areas
-* Fix iOS Now Playing Info Center integration for AVPlayer backend
-* Fix button styling and safe area handling
-* Fix picker label visibility in settings
-* Improve video layer rendering
-* Add macOS 26 compatibility for search UI
-* Improve playback settings UI controls
-* Add retry mechanism for file load errors (both MPV and AVPlayer)
-* Fix MPV player vertical positioning in fullscreen mode
-* Improve player controls visibility and layout
-* Add nil safety checks for stream resolution and playback time handling
-* Refactor dirty region handling in MPV video rendering
-* Remove verbose logging from MPV rendering
-* Improve layout stability and reduce unwanted animations
-* Simplify stream description by removing instance info
-* Update default visible sections from trending to popular
-* Update MPVKit dependency
-* Update Ruby dependencies
-* Fix SwiftLint and SwiftFormat violations
-* Fix main actor isolation warnings
-* Update GitHub Actions to latest macOS and Xcode versions
+#### New Features
+
+* Add audio-only music mode, available in video player settings and player controls button
+* Add custom accent color setting with system color picker and separate light and dark mode colors
+* Redesign Home shortcut cards with layout, color, and palette options and a live style preview
+* Add Edit Shortcuts and Hide options to Home shortcut context menus
+* Add pause, resume, and cancel context menu to download rows
+* Add manual legacy account import and allow importing account-less legacy instances as sources
+
+#### Improvements
+
+* Rework iCloud sync engine for more reliable syncing; resume sync from saved state instead of re-fetching everything
+* Sync watch progress when a video plays to the end and when the app goes to the background
+* Fall back to lower-quality thumbnails when higher-resolution variants are unavailable
+* Apply the selected theme at the window level so it takes effect everywhere
+
+#### Bug Fixes
+
+* Fix disabling Background Playback having no effect
+* Fix downloads never finishing and a crash on download completion
+* Fix missing storyboards when advancing to the next queued video
+* Fix live videos shown in the mini player bar
+* Fix crash when opening the share sheet on iPad
+* Fix rare data loss when the app is suspended in the background
+* Fix iCloud sync conflicts for recent channels, playlists, and watch progress
+* Fix Sources home shortcut counting disabled instances
+
+### iOS
+
+* Use toolbar search placement on iPad channel view
+
+### tvOS
+
+* Add A/V sync diagnostics settings page
+* Default Channels grid to 5 columns
+* Fixes for some reported playback issues
