@@ -208,10 +208,16 @@ struct ChannelView: View {
         content()
             #if os(iOS)
             .if(supportsChannelSearch) { view in
+                // iPhone: search bar drawer in the navigation area (header reserves
+                // space for it). iPad: toolbar search button — the drawer would add
+                // a resting scroll position above the banner, letting the view
+                // scroll past the banner top.
                 view.searchable(
                     text: $searchText,
                     isPresented: $isSearchActive,
-                    placement: .navigationBarDrawer(displayMode: .automatic),
+                    placement: horizontalSizeClass == .compact
+                        ? .navigationBarDrawer(displayMode: .automatic)
+                        : .toolbar,
                     prompt: Text("channel.search.placeholder")
                 )
             }
