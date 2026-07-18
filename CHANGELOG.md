@@ -1,78 +1,44 @@
 ## What's Changed
 
+**macOS support** — Yattee 2 arrives on the Mac with its first public beta. It brings the full Yattee 2 experience to the desktop with a native interface: a dedicated player window with fullscreen and stay on top option, Picture in Picture, customizable and movable player controls, keyboard shortcuts, and other features present in the iOS app.
+
+The macOS app is available via [TestFlight](https://yattee.stream/beta2), or as a notarized direct download from [GitHub Releases](https://github.com/yattee/yattee/releases) that keeps itself up to date with built-in automatic updates.
+
 ### General
 
 #### New Features
 
-* Add Allow Software-Decoded Formats playback setting
-* Add Show Sidebar toggle to Subscriptions view options
-* Render clickable links and timestamps in comment text
-* Route YouTube links tapped in descriptions through in-app playback
-* Resolve URL shorteners and prompt for ambiguous description links
-* Rename YouTube Enhancements settings to Integrations and move above Advanced
-* Show watch progress bar on thumbnails in playlist, channel, and search views
-
-#### Bug Fixes
-
-* Resume and seek when reopening the currently-loaded video
-* Refresh track list when advancing to the next queued video
-* Suppress stale player error after switching videos mid-retry
-* Surface mpv error details on stream load failure
-* Fix local folder playback after app container UUID changes
-* Skip local-folder watches from iCloud sync
-
-#### Sources & Backends
-
-* Surface clearer error when adding a Piped frontend URL
-* Send Piped session token in the Authorization header again
-* Block HTTP Basic Auth proxy for Piped sources
-* Cache and prewarm Invidious proxy auto-detection
-* Route Yattee Server playback through `/proxy/relay` when "Proxy Videos" is on
+* Add audio-only music mode, available in video player settings and player controls button
+* Add custom accent color setting with system color picker and separate light and dark mode colors
+* Redesign Home shortcut cards with layout, color, and palette options and a live style preview
+* Add Edit Shortcuts and Hide options to Home shortcut context menus
+* Add pause, resume, and cancel context menu to download rows
+* Add manual legacy account import and allow importing account-less legacy instances as sources
 
 #### Improvements
 
-* Prefetch fresh video thumbnail before swapping it into the info view
-* Stabilize thumbnail cache across rotating URL tokens to avoid reloads
-* Tweak Subscriptions view options sheet layout
+* Rework iCloud sync engine for more reliable syncing; resume sync from saved state instead of re-fetching everything
+* Sync watch progress when a video plays to the end and when the app goes to the background
+* Fall back to lower-quality thumbnails when higher-resolution variants are unavailable
+* Apply the selected theme at the window level so it takes effect everywhere
+
+#### Bug Fixes
+
+* Fix disabling Background Playback having no effect
+* Fix downloads never finishing and a crash on download completion
+* Fix missing storyboards when advancing to the next queued video
+* Fix live videos shown in the mini player bar
+* Fix crash when opening the share sheet on iPad
+* Fix rare data loss when the app is suspended in the background
+* Fix iCloud sync conflicts for recent channels, playlists, and watch progress
+* Fix Sources home shortcut counting disabled instances
 
 ### iOS
 
-* Add channels sidebar to Subscriptions on iPad
-* Round player seek bar and show the scrubber only while dragging
-* Add interactive swipe-to-dismiss for toasts
+* Use toolbar search placement on iPad channel view
 
 ### tvOS
 
-#### New Features
-
-* Add press-and-hold continuous seek on the d-pad
-* Expose Background Playback toggle (default off)
-* Add Show Sidebar toggle to the Subscriptions view
-* Add display frame rate and dynamic range matching
-* Show cached channel header while the channel loads
-* Live-seek the scrubber and auto-commit on idle; pause playback on entering scrub mode
-* Keep player controls visible on pause via an on-screen button
-* Show playback failure overlay; dismiss player panels when playback fails
-
-#### Bug Fixes
-
-* Fix MPV startup playback stability
-* Fix MPV Options focus and Add/Edit sheet layout
-* Fix pickers
-* Fix soft-lock in import views when no rows are focusable
-* Unstick focus dead-ends in channel views
-* Make detail dismiss button opt-in and unstick more views
-* Dismiss sidebar detail pages when sidebar selection changes
-* Suppress Now Playing while an AirPlay/HomePod route is active
-* Hide feed channel filter strip
-* Enforce minimum 2 grid columns
-* Prevent focus shadow from clipping between Home sections
-
-#### Improvements
-
-* Convert settings and queue to half-screen panels; constrain details panel to the right half
-* Make the watched checkmark more prominent on thumbnails
-* Use light glass background for player control buttons; black icons on focused buttons for legibility
-* Match play button background to prev/next transport buttons
-* Remove the close button from the MPV debug stats overlay
-* Present instance login as a full-screen cover
+* Add A/V sync diagnostics settings page
+* Default Channels grid to 5 columns
+* Fixes for some reported playback issues
