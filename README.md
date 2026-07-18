@@ -1,4 +1,5 @@
 <div align="center">
+  <img src="assets/yattee-logo.png" width="128" height="128" alt="Yattee logo" />
   <h1>Yattee</h1>
   <p>Privacy oriented video player for iOS, tvOS and macOS<br /></p>
 
