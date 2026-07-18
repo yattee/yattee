@@ -249,11 +249,12 @@ protocol PlayerBackend: AnyObject {
     // MARK: - Background Playback
 
     /// Handle scene phase changes for background playback.
+    /// Backends should pause rendering while the app is in the background;
+    /// whether playback itself continues is decided by PlayerService.
     /// - Parameters:
     ///   - phase: The new scene phase
-    ///   - backgroundEnabled: Whether background playback is enabled in settings
     ///   - isPiPActive: Whether Picture-in-Picture is currently active
-    func handleScenePhase(_ phase: ScenePhase, backgroundEnabled: Bool, isPiPActive: Bool)
+    func handleScenePhase(_ phase: ScenePhase, isPiPActive: Bool)
 }
 
 // MARK: - Default Implementations
@@ -278,7 +279,7 @@ extension PlayerBackend {
     }
 
     /// Default implementation does nothing.
-    func handleScenePhase(_ phase: ScenePhase, backgroundEnabled: Bool, isPiPActive: Bool) {
+    func handleScenePhase(_ phase: ScenePhase, isPiPActive: Bool) {
         // No-op by default
     }
 }

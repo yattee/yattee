@@ -998,7 +998,7 @@ final class MPVBackend: PlayerBackend {
 
     // MARK: - Background Playback
 
-    func handleScenePhase(_ phase: ScenePhase, backgroundEnabled: Bool, isPiPActive: Bool) {
+    func handleScenePhase(_ phase: ScenePhase, isPiPActive: Bool) {
         #if os(iOS)
         let pipActive = self.isPiPActive || isPiPActive
         #else
@@ -1008,8 +1008,8 @@ final class MPVBackend: PlayerBackend {
         MPVLogging.logAppLifecycle("handleScenePhase(\(phase))",
             isPiPActive: pipActive, isRendering: nil)
 
-        guard backgroundEnabled, !pipActive else {
-            MPVLogging.log("handleScenePhase: skipping (bgEnabled:\(backgroundEnabled) pip:\(pipActive))")
+        guard !pipActive else {
+            MPVLogging.log("handleScenePhase: skipping (pip:\(pipActive))")
             return
         }
 

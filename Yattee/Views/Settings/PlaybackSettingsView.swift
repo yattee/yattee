@@ -270,10 +270,14 @@ private struct BehaviorSection: View {
                 }
             }
 
+            #if !os(macOS)
+            // macOS never suspends apps, so playback always continues in the
+            // background — the toggle would have no effect there
             Toggle(
                 String(localized: "settings.playback.backgroundPlayback"),
                 isOn: $settings.backgroundPlaybackEnabled
             )
+            #endif
 
             #if os(tvOS)
             Toggle(

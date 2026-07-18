@@ -146,7 +146,7 @@ struct MPVVideoView: View {
             #if os(iOS) || os(macOS)
             // Resume the MPV display link when the expanded video view appears.
             // MiniPlayerView pauses rendering when its video preview hides during expand;
-            // PlayerService.playerSheetDidAppear is gated behind background playback, so it
+            // PlayerService.playerSheetDidAppear skips resuming while PiP is active, so it
             // can't be relied on to resume. On macOS this also recovers the sheet re-open
             // black screen when the shared render view reappears without a window re-parent.
             backend.resumeRendering()

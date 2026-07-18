@@ -681,14 +681,23 @@ final class PlayerService {
         }
         #endif
 
-        let backgroundEnabled = settingsManager?.backgroundPlaybackEnabled ?? true
         #if os(iOS)
         let isPiPActive = (currentBackend as? MPVBackend)?.isPiPActive ?? false
         #else
         let isPiPActive = false
         #endif
 
-        #if os(tvOS)
+        // With background playback disabled, pause when the app leaves the
+        // foreground — the audio background mode would otherwise keep mpv
+        // playing. Not applicable on macOS, where apps are never suspended.
+        #if os(iOS)
+        let backgroundEnabled = settingsManager?.backgroundPlaybackEnabled ?? true
+        if phase == .background, !backgroundEnabled, !isPiPActive, state.playbackState == .playing {
+            LoggingService.shared.debug("PlayerService: pausing playback (phase=\(phase), backgroundPlaybackEnabled=false)", category: .player)
+            pause()
+        }
+        #elseif os(tvOS)
+        let backgroundEnabled = settingsManager?.backgroundPlaybackEnabled ?? true
         LoggingService.shared.debug("PlayerService[tvOS-bg]: phase=\(phase) bgEnabled=\(backgroundEnabled) playbackState=\(state.playbackState)", category: .player)
         if (phase == .background || phase == .inactive), !backgroundEnabled, state.playbackState == .playing {
             LoggingService.shared.debug("PlayerService[tvOS-bg]: pausing playback (phase=\(phase), backgroundPlaybackEnabled=false)", category: .player)
@@ -696,7 +705,7 @@ final class PlayerService {
         }
         #endif
 
-        currentBackend?.handleScenePhase(phase, backgroundEnabled: backgroundEnabled, isPiPActive: isPiPActive)
+        currentBackend?.handleScenePhase(phase, isPiPActive: isPiPActive)
     }
 
     /// Plays the next video in queue, respecting the current queue mode.
@@ -2483,12 +2492,11 @@ final class PlayerService {
         LoggingService.shared.debug("PlayerService: playerSheetDidAppear - backend=\(backendType), playbackState=\(playbackState)", category: .player)
 
         // Re-enable visual tracks and reattach layer when sheet appears
-        let backgroundEnabled = settingsManager?.backgroundPlaybackEnabled ?? true
         let isPiPActive = (currentBackend as? MPVBackend)?.isPiPActive ?? false
-        LoggingService.shared.debug("PlayerService: sheetDidAppear checks - backgroundEnabled=\(backgroundEnabled), isPiPActive=\(isPiPActive)", category: .player)
+        LoggingService.shared.debug("PlayerService: sheetDidAppear checks - isPiPActive=\(isPiPActive)", category: .player)
 
-        guard backgroundEnabled && !isPiPActive else {
-            LoggingService.shared.debug("PlayerService: skipping visibility handling (backgroundEnabled=\(backgroundEnabled), isPiPActive=\(isPiPActive))", category: .player)
+        guard !isPiPActive else {
+            LoggingService.shared.debug("PlayerService: skipping visibility handling (isPiPActive=\(isPiPActive))", category: .player)
             return
         }
 
@@ -2505,12 +2513,11 @@ final class PlayerService {
         LoggingService.shared.debug("PlayerService: playerSheetDidDisappear - backend=\(backendType), playbackState=\(playbackState)", category: .player)
 
         // Disable visual tracks and detach layer for background audio playback
-        let backgroundEnabled = settingsManager?.backgroundPlaybackEnabled ?? true
         let mpvPiPActive = (currentBackend as? MPVBackend)?.isPiPActive ?? false
-        LoggingService.shared.debug("PlayerService: sheetDidDisappear checks - backgroundEnabled=\(backgroundEnabled), mpvPiPActive=\(mpvPiPActive)", category: .player)
+        LoggingService.shared.debug("PlayerService: sheetDidDisappear checks - mpvPiPActive=\(mpvPiPActive)", category: .player)
 
-        guard backgroundEnabled && !mpvPiPActive else {
-            LoggingService.shared.debug("PlayerService: skipping visibility handling on disappear (backgroundEnabled=\(backgroundEnabled), mpvPiP=\(mpvPiPActive))", category: .player)
+        guard !mpvPiPActive else {
+            LoggingService.shared.debug("PlayerService: skipping visibility handling on disappear (mpvPiP=\(mpvPiPActive))", category: .player)
             return
         }
 
