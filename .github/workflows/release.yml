@@ -49,7 +49,6 @@ env:
   GIT_AUTHORIZATION: ${{ secrets.GIT_AUTHORIZATION }}
   MATCH_PASSWORD: ${{ secrets.MATCH_PASSWORD }}
   CERTIFICATES_GIT_URL: ${{ secrets.CERTIFICATES_GIT_URL }}
-  TESTFLIGHT_EXTERNAL_GROUPS: ${{ secrets.TESTFLIGHT_EXTERNAL_GROUPS }}
 
 jobs:
   determine_build_number:

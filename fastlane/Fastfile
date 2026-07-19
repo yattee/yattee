@@ -10,7 +10,6 @@ TEMP_KEYCHAIN_USER = ENV['TEMP_KEYCHAIN_USER']
 TEMP_KEYCHAIN_PASSWORD = ENV['TEMP_KEYCHAIN_PASSWORD']
 DEVELOPER_APP_IDENTIFIER = ENV['DEVELOPER_APP_IDENTIFIER']
 GIT_AUTHORIZATION = ENV['GIT_AUTHORIZATION']
-TESTFLIGHT_EXTERNAL_GROUPS = ENV['TESTFLIGHT_EXTERNAL_GROUPS']
 
 XCODEPROJ = "#{APP_NAME}.xcodeproj"
 SCHEME = APP_NAME
@@ -33,6 +32,18 @@ end
 def ensure_temp_keychain(name, password)
   delete_temp_keychain(name)
   create_temp_keychain(name, password)
+end
+
+# Beta groups are managed in App Store Connect; fetching them at upload time
+# means new groups get builds without touching CI config.
+def all_testflight_group_names(api_key)
+  Spaceship::ConnectAPI.token = Spaceship::ConnectAPI::Token.from(hash: api_key)
+  app = Spaceship::ConnectAPI::App.find(DEVELOPER_APP_IDENTIFIER)
+  UI.user_error!("App #{DEVELOPER_APP_IDENTIFIER} not found on App Store Connect") if app.nil?
+  groups = app.get_beta_groups.map(&:name)
+  UI.user_error!("No TestFlight beta groups found for #{DEVELOPER_APP_IDENTIFIER}") if groups.empty?
+  UI.message("Distributing build to TestFlight groups: #{groups.join(', ')}")
+  groups
 end
 
 add_extra_platforms(platforms: [:tvos])
@@ -148,7 +159,9 @@ platform :ios do
     upload_to_testflight(
       api_key: api_key,
       ipa: lane_context[SharedValues::IPA_OUTPUT_PATH],
-      changelog: changelog
+      changelog: changelog,
+      distribute_external: true,
+      groups: all_testflight_group_names(api_key)
     )
   end
 end
@@ -220,7 +233,9 @@ platform :tvos do
     upload_to_testflight(
       api_key: api_key,
       ipa: lane_context[SharedValues::IPA_OUTPUT_PATH],
-      changelog: changelog
+      changelog: changelog,
+      distribute_external: true,
+      groups: all_testflight_group_names(api_key)
     )
   end
 end
@@ -284,7 +299,9 @@ platform :mac do
     upload_to_testflight(
       api_key: api_key,
       pkg: lane_context[SharedValues::PKG_OUTPUT_PATH],
-      changelog: changelog
+      changelog: changelog,
+      distribute_external: true,
+      groups: all_testflight_group_names(api_key)
     )
   end
 
