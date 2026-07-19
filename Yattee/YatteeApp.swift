@@ -184,6 +184,22 @@ struct YatteeApp: App {
                         .appEnvironment(appEnvironment)
                 }
                 #endif
+                #if os(tvOS)
+                // tvOS sheets render as a small centered card that cannot fit
+                // the sidebar-detail layout — use a full screen cover instead.
+                .fullScreenCover(isPresented: $showingLegacyAccountsImport) {
+                    NavigationStack {
+                        TVSidebarDetailContainer(
+                            systemImage: "person.badge.key",
+                            title: String(localized: "migration.accounts.title")
+                        ) {
+                            LegacyAccountsImportView()
+                        }
+                        .appEnvironment(appEnvironment)
+                    }
+                    .background(Color.black.ignoresSafeArea())
+                }
+                #else
                 .sheet(isPresented: $showingLegacyAccountsImport) {
                     NavigationStack {
                         LegacyAccountsImportView()
@@ -193,6 +209,7 @@ struct YatteeApp: App {
                     .frame(minWidth: 560, minHeight: 560)
                     #endif
                 }
+                #endif
                 #if os(iOS)
                 .sheet(isPresented: $showingSettings) {
                     SettingsView()

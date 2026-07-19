@@ -42,7 +42,11 @@ struct LegacyAccountsImportView: View {
                 contentList
             }
         }
+        #if !os(tvOS)
+        // On tvOS the title comes from the TVSidebarDetailContainer sidebar;
+        // a navigationTitle would render as a giant ghost behind the form.
         .navigationTitle(String(localized: "migration.accounts.title"))
+        #endif
         #if os(iOS)
         .navigationBarTitleDisplayMode(.inline)
         #endif
@@ -255,30 +259,69 @@ private struct LegacyAccountImportRow: View {
         !state.username.isEmpty && !state.password.isEmpty && !state.isImporting
     }
 
-    var body: some View {
-        VStack(alignment: .leading, spacing: 12) {
-            HStack(alignment: .top, spacing: 12) {
-                Image(systemName: legacyInstanceIcon(for: item.instanceType))
-                    .font(.title2)
+    private var infoHeader: some View {
+        HStack(alignment: .top, spacing: 12) {
+            Image(systemName: legacyInstanceIcon(for: item.instanceType))
+                .font(.title2)
+                .foregroundStyle(.secondary)
+                .frame(width: legacyRowIconWidth)
+
+            VStack(alignment: .leading, spacing: 3) {
+                Text(item.displayName)
+                    .font(.headline)
+
+                Text(item.instanceDisplayName)
+                    .font(.subheadline)
                     .foregroundStyle(.secondary)
-                    .frame(width: 28)
 
-                VStack(alignment: .leading, spacing: 3) {
-                    Text(item.displayName)
-                        .font(.headline)
-
-                    Text(item.instanceDisplayName)
-                        .font(.subheadline)
-                        .foregroundStyle(.secondary)
-
-                    Text(item.url.host ?? item.url.absoluteString)
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
-                        .lineLimit(1)
-                }
-
-                Spacer()
+                Text(item.url.host ?? item.url.absoluteString)
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+                    .lineLimit(1)
             }
+
+            Spacer()
+        }
+    }
+
+    var body: some View {
+        #if os(tvOS)
+        // On tvOS a Form row is a single focusable unit, so packing the whole card
+        // into one row makes the first button (Remove) swallow every click.
+        // Emit each interactive element as its own row instead.
+        infoHeader
+            .padding(.vertical, 8)
+
+        credentialsFields
+
+        if let errorMessage = state.errorMessage {
+            Label(errorMessage, systemImage: "exclamationmark.triangle")
+                .font(.caption)
+                .foregroundStyle(.red)
+        }
+
+        Button(action: onImport) {
+            if state.isImporting {
+                HStack(spacing: 6) {
+                    ProgressView()
+                    Text(String(localized: "migration.importing"))
+                }
+            } else {
+                Text(String(localized: "migration.import"))
+            }
+        }
+        .buttonStyle(TVSettingsButtonStyle())
+        .disabled(!canImport)
+
+        Button(role: .destructive, action: onRemove) {
+            Text(String(localized: "common.remove"))
+                .foregroundStyle(.red)
+        }
+        .buttonStyle(TVSettingsButtonStyle())
+        .disabled(state.isImporting)
+        #else
+        VStack(alignment: .leading, spacing: 12) {
+            infoHeader
 
             credentialsFields
 
@@ -314,6 +357,7 @@ private struct LegacyAccountImportRow: View {
             }
         }
         .padding(.vertical, 8)
+        #endif
     }
 
     @ViewBuilder
@@ -351,26 +395,49 @@ private struct LegacyInstanceImportRow: View {
     let onImport: () -> Void
     let onRemove: () -> Void
 
-    var body: some View {
-        VStack(alignment: .leading, spacing: 12) {
-            HStack(alignment: .top, spacing: 12) {
-                Image(systemName: legacyInstanceIcon(for: item.instanceType))
-                    .font(.title2)
-                    .foregroundStyle(.secondary)
-                    .frame(width: 28)
+    private var infoHeader: some View {
+        HStack(alignment: .top, spacing: 12) {
+            Image(systemName: legacyInstanceIcon(for: item.instanceType))
+                .font(.title2)
+                .foregroundStyle(.secondary)
+                .frame(width: legacyRowIconWidth)
 
-                VStack(alignment: .leading, spacing: 3) {
-                    Text(item.instanceDisplayName)
-                        .font(.headline)
+            VStack(alignment: .leading, spacing: 3) {
+                Text(item.instanceDisplayName)
+                    .font(.headline)
 
-                    Text(item.url.host ?? item.url.absoluteString)
+                // instanceDisplayName falls back to the host for unnamed
+                // instances; skip the caption instead of repeating it.
+                if let host = item.url.host, host != item.instanceDisplayName {
+                    Text(host)
                         .font(.caption)
                         .foregroundStyle(.secondary)
                         .lineLimit(1)
                 }
-
-                Spacer()
             }
+
+            Spacer()
+        }
+    }
+
+    var body: some View {
+        #if os(tvOS)
+        infoHeader
+            .padding(.vertical, 8)
+
+        Button(action: onImport) {
+            Text(String(localized: "migration.import"))
+        }
+        .buttonStyle(TVSettingsButtonStyle())
+
+        Button(role: .destructive, action: onRemove) {
+            Text(String(localized: "common.remove"))
+                .foregroundStyle(.red)
+        }
+        .buttonStyle(TVSettingsButtonStyle())
+        #else
+        VStack(alignment: .leading, spacing: 12) {
+            infoHeader
 
             HStack {
                 Button(role: .destructive, action: onRemove) {
@@ -388,7 +455,17 @@ private struct LegacyInstanceImportRow: View {
             }
         }
         .padding(.vertical, 8)
+        #endif
     }
+}
+
+/// tvOS renders .title2 glyphs far larger than the 28pt frame used on other platforms.
+private var legacyRowIconWidth: CGFloat {
+    #if os(tvOS)
+    return 64
+    #else
+    return 28
+    #endif
 }
 
 private func legacyInstanceIcon(for type: InstanceType) -> String {

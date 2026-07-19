@@ -88,9 +88,11 @@ struct TVSettingsTextField: View {
 /// Button style for settings forms - subtle focus effect without glow
 struct TVSettingsButtonStyle: ButtonStyle {
     @Environment(\.isFocused) private var isFocused
+    @Environment(\.isEnabled) private var isEnabled
 
     func makeBody(configuration: Configuration) -> some View {
         configuration.label
+            .opacity(isEnabled ? 1 : 0.4)
             .padding(.horizontal, 20)
             .padding(.vertical, 12)
             .background(

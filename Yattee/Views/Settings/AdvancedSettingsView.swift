@@ -412,7 +412,12 @@ struct AdvancedSettingsView: View {
             if appEnvironment?.legacyMigrationService.hasLegacyDataToImport() == true {
                 #if os(tvOS)
                 NavigationLink {
-                    LegacyDataImportView()
+                    TVSidebarDetailContainer(
+                        systemImage: "person.badge.key",
+                        title: String(localized: "migration.accounts.title")
+                    ) {
+                        LegacyDataImportView()
+                    }
                 } label: {
                     Label(String(localized: "migration.accounts.title"), systemImage: "person.badge.key")
                 }
