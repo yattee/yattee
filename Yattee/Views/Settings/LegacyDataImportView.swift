@@ -128,6 +128,9 @@ struct LegacyAccountsImportView: View {
         #if os(iOS)
         .scrollDismissesKeyboard(.interactively)
         #endif
+        #if os(macOS)
+        .formStyle(.grouped)
+        #endif
     }
 
     private var emptyState: some View {
