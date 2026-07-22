@@ -250,6 +250,13 @@ final class PlayerService {
         // Mark that we're loading this video - time updates will be ignored until loading completes
         loadingVideoID = video.id
 
+        // Release the gate on any exit path (a newer play() claims it with its own
+        // id, so only clear our own). Prevents the time-update gate from leaking if
+        // the load flow exits early (issue #956).
+        defer {
+            if loadingVideoID == video.id { loadingVideoID = nil }
+        }
+
         state.setPlaybackState(.loading)
         state.isFirstFrameReady = false  // Reset until first frame of new video is rendered
         state.isBufferReady = false  // Reset until buffer is ready for smooth playback
@@ -2844,6 +2851,14 @@ extension PlayerService: PlayerBackendDelegate {
 
     func backend(_ backend: any PlayerBackend, didChangeState playbackState: PlaybackState) {
         LoggingService.shared.debug("Backend state changed to: \(playbackState)", category: .player)
+
+        // Clear the time-update gate once playback is ready/playing, in case the
+        // load flow exited before doing so (issue #956). Safe: stale updates from a
+        // previous video can only arrive before the new video's ready transition.
+        if playbackState == .ready || playbackState == .playing, loadingVideoID != nil {
+            loadingVideoID = nil
+        }
+
         state.setPlaybackState(playbackState)
         delegate?.playerService(self, didChangeState: playbackState)
     }

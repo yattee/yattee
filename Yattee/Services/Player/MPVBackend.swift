@@ -538,9 +538,9 @@ final class MPVBackend: PlayerBackend {
 
             LoggingService.shared.logMPV("MPV stream loaded successfully")
         } catch is CancellationError {
-            // Re-throw cancellation errors without retry
-            // Only reset isInitialLoading if we're still the active load operation
-            // A newer load may have already set isInitialLoading=true
+            // Re-throw cancellation errors without retry.
+            // Only reset isInitialLoading if we're still the active load operation.
+            LoggingService.shared.debug("MPV: loadWithRetry cancelled", category: .mpv)
             if currentLoadingID == loadingID {
                 isInitialLoading = false
             }

@@ -448,6 +448,14 @@ final class MPVRenderView: UIView {
         // Skip if framebuffer already matches
         guard framebufferMismatch else { return }
 
+        // Don't recreate the framebuffer for an orphaned (windowless) view: binding
+        // the CAEAGLLayer off-main would collide with the main-thread CoreAnimation
+        // commit and pin a CPU (issue #956).
+        guard window != nil else {
+            MPVLogging.warn("layoutSubviews: skipped framebuffer recreation (no window)")
+            return
+        }
+
         MPVLogging.logTransition("layoutSubviews - size mismatch",
             fromSize: CGSize(width: CGFloat(renderWidth), height: CGFloat(renderHeight)),
             toSize: CGSize(width: CGFloat(expectedFBWidth), height: CGFloat(expectedFBHeight)))
@@ -487,19 +495,23 @@ final class MPVRenderView: UIView {
         MPVLogging.log("setupAsync: creating EAGLContext on background thread")
         let glStartTime = Date()
         
-        let context = try await Task.detached(priority: .userInitiated) {
-            // This runs on background thread - doesn't block main thread!
-            if let ctx = EAGLContext(api: .openGLES3) {
-                MPVLogging.log("setupAsync: created OpenGL ES 3.0 context")
-                return ctx
-            } else if let ctx = EAGLContext(api: .openGLES2) {
-                MPVLogging.log("setupAsync: created OpenGL ES 2.0 context (ES3 unavailable)")
-                return ctx
-            } else {
-                MPVLogging.warn("setupAsync: failed to create EAGLContext")
-                throw MPVRenderError.openGLSetupFailed
+        // Bridge through GCD, not Task.detached: EAGLContext creation can block for
+        // seconds in the GL driver, and a detached task would tie up a Swift
+        // cooperative-pool thread the app needs elsewhere (issue #956).
+        let context: EAGLContext = try await withCheckedThrowingContinuation { continuation in
+            DispatchQueue.global(qos: .userInitiated).async {
+                if let ctx = EAGLContext(api: .openGLES3) {
+                    MPVLogging.log("setupAsync: created OpenGL ES 3.0 context")
+                    continuation.resume(returning: ctx)
+                } else if let ctx = EAGLContext(api: .openGLES2) {
+                    MPVLogging.log("setupAsync: created OpenGL ES 2.0 context (ES3 unavailable)")
+                    continuation.resume(returning: ctx)
+                } else {
+                    MPVLogging.warn("setupAsync: failed to create EAGLContext")
+                    continuation.resume(throwing: MPVRenderError.openGLSetupFailed)
+                }
             }
-        }.value
+        }
         
         let glCreateTime = Date().timeIntervalSince(glStartTime)
         MPVLogging.log("setupAsync: EAGLContext created", 
@@ -558,7 +570,7 @@ final class MPVRenderView: UIView {
             } else {
                 MPVLogging.log("setupAsync: deferring displayLink (framebuffer not ready)")
             }
-            
+
             isSetup = true
         }
         

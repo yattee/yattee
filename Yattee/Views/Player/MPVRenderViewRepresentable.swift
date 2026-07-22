@@ -86,6 +86,12 @@ private class MPVContainerView: UIView {
                 }
             }
             MPVLogging.warn("MPVContainerView deinit: no surviving container to transfer player view to!")
+
+            // Detach the shared view now instead of leaving it bound to this
+            // deallocating container: otherwise SwiftUI keeps reconciling a
+            // half-alive view and spins the main-thread trait update loop (100%
+            // CPU hang when opening a settings detail during playback, issue #956).
+            playerView.removeFromSuperview()
         }
     }
 

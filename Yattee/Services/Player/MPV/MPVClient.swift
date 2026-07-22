@@ -161,8 +161,9 @@ final class MPVClient: @unchecked Sendable {
 
     weak var delegate: MPVClientDelegate?
 
-    /// Event loop task
-    private var eventLoopTask: Task<Void, Never>?
+    /// Whether the dedicated event-loop thread has been started (mpvQueue-guarded).
+    /// The loop itself exits via `isDestroyed` + `mpv_wakeup` + `eventLoopExitSemaphore`.
+    private var eventLoopRunning = false
 
     /// Semaphore signaled when event loop exits
     private let eventLoopExitSemaphore = DispatchSemaphore(value: 0)
@@ -186,6 +187,22 @@ final class MPVClient: @unchecked Sendable {
     deinit {
         destroy()
     }
+
+    // MARK: - Device Detection
+
+    #if os(tvOS)
+    /// Apple TV HD (AppleTV5,3, A8): its GL driver deadlocks on the float
+    /// texture uploads mpv's renderer defaults to (issue #956).
+    static let hasFragileGLDriver: Bool = {
+        var systemInfo = utsname()
+        uname(&systemInfo)
+        let machine = withUnsafeBytes(of: systemInfo.machine) { rawPtr -> String in
+            guard let base = rawPtr.baseAddress else { return "" }
+            return String(cString: base.assumingMemoryBound(to: CChar.self))
+        }
+        return machine == "AppleTV5,3"
+    }()
+    #endif
 
     // MARK: - Logging Helpers
 
@@ -244,7 +261,14 @@ final class MPVClient: @unchecked Sendable {
         case "warn":
             Task { @MainActor in LoggingService.shared.logMPVWarning(formatted) }
         default:
-            Task { @MainActor in LoggingService.shared.logMPV(formatted) }
+            // Surface info always; verbose only for renderer/decoder subsystems
+            // so the persisted log stays readable when verbose capture is on.
+            let p = prefix.lowercased()
+            let rendererRelevant = p.hasPrefix("vo") || p.contains("gpu")
+                || p.contains("placebo") || p.hasPrefix("vd") || p.hasPrefix("ffmpeg")
+            if level == "info" || rendererRelevant {
+                Task { @MainActor in LoggingService.shared.logMPV(formatted) }
+            }
         }
     }
 
@@ -303,10 +327,10 @@ final class MPVClient: @unchecked Sendable {
 
             log("Initialized, setting up property observers...")
 
-            // Subscribe to mpv log messages so we can capture HTTP/demuxer/decoder errors
-            // and surface them when load fails. "warn" covers HTTP errors, demuxer/codec
-            // failures, and network issues without flooding on the happy path.
-            let logLevelResult = mpv_request_log_messages(mpv, "warn")
+            // Capture HTTP/demuxer/decoder errors to surface on load failure.
+            // Verbose logging (when enabled) also captures renderer init details.
+            let mpvLogLevel = MPVLogging.verboseEnabled ? "v" : "warn"
+            let logLevelResult = mpv_request_log_messages(mpv, mpvLogLevel)
             if logLevelResult < 0 {
                 logWarning("Failed to subscribe to mpv log messages: \(String(cString: mpv_error_string(logLevelResult)))")
             }
@@ -394,9 +418,8 @@ final class MPVClient: @unchecked Sendable {
                 mpv_wakeup(mpv)
             }
 
-            let hasTask = eventLoopTask != nil
-            eventLoopTask?.cancel()
-            eventLoopTask = nil
+            let hasTask = eventLoopRunning
+            eventLoopRunning = false
             return hasTask
         }
 
@@ -448,6 +471,19 @@ final class MPVClient: @unchecked Sendable {
         // Color management
         setOptionSync("target-prim", "bt.709")
         setOptionSync("target-trc", "srgb")
+
+        #if os(tvOS)
+        // Avoid the float texture uploads that hang the A8 GL driver (issue #956):
+        // dithering and LUT scalers (mpv 0.37+ defaults) and CPU frame uploads all
+        // deadlock. Zero-copy VideoToolbox uploads via IOSurface instead.
+        if Self.hasFragileGLDriver {
+            setOptionSync("dither-depth", "no")
+            setOptionSync("hwdec", "videotoolbox")
+            setOptionSync("scale", "bilinear")
+            setOptionSync("dscale", "bilinear")
+            setOptionSync("cscale", "bilinear")
+        }
+        #endif
 
         // Use display-vdrop: drops/repeats frames to match display timing
         // This is lighter weight than display-resample (no interpolation overhead)
@@ -1523,9 +1559,18 @@ final class MPVClient: @unchecked Sendable {
     // MARK: - Event Loop
 
     private func startEventLoop() {
-        eventLoopTask = Task.detached(priority: .high) { [weak self] in
+        // Dedicated OS thread, not the Swift cooperative pool: runEventLoop blocks
+        // in mpv_wait_event for the client's whole lifetime, and as a Task it would
+        // permanently occupy a pool thread. On a 2-core device the two live clients
+        // (active + pre-warmed) would hold both pool threads and starve every await
+        // in the app (issue #956).
+        eventLoopRunning = true
+        let thread = Thread { [weak self] in
             self?.runEventLoop()
         }
+        thread.name = "stream.yattee.mpv.events"
+        thread.qualityOfService = .userInitiated
+        thread.start()
     }
 
     private func runEventLoop() {
@@ -1534,7 +1579,7 @@ final class MPVClient: @unchecked Sendable {
             eventLoopExitSemaphore.signal()
         }
 
-        while !Task.isCancelled && !isDestroyed {
+        while !isDestroyed {
             guard let mpv else { break }
 
             // Wait for events with a short timeout
