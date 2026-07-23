@@ -182,6 +182,11 @@ struct YatteeApp: App {
                 .fullScreenCover(isPresented: $showingICloudProgress) {
                     ICloudSyncProgressView()
                         .appEnvironment(appEnvironment)
+                        #if os(tvOS)
+                        // tvOS full screen covers have a transparent background,
+                        // letting the view below leak through.
+                        .background(Color.black.ignoresSafeArea())
+                        #endif
                 }
                 #endif
                 #if os(tvOS)
