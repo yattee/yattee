@@ -333,6 +333,10 @@ final class AppEnvironment {
         // Set up circular dependencies after all properties are initialized
         bgRefreshManager.setAppEnvironment(self)
 
+        // Backfill credential flags for instances created before the flags
+        // existed, so existing setups publish them to iCloud without a re-login
+        backfillCredentialFlags()
+
         // Log device capabilities on startup for debugging
         HardwareCapabilities.shared.logCapabilities()
 
@@ -422,6 +426,47 @@ final class AppEnvironment {
         default:
             return nil
         }
+    }
+
+    /// Backfills `usesBasicAuth`/`usesAccountLogin` on instances that were created
+    /// before these flags existed, based on credentials currently in the Keychain.
+    /// Only ever sets the flags — a missing Keychain entry (e.g. right after a
+    /// reinstall) must not clear a previously recorded flag.
+    private func backfillCredentialFlags() {
+        for instance in instancesManager.instances {
+            if !instance.usesBasicAuth,
+               instance.supportsHTTPBasicAuthProxy,
+               basicAuthCredentialsManager.hasCredentials(for: instance) {
+                instancesManager.setUsesBasicAuth(true, for: instance)
+            }
+
+            if !instance.usesAccountLogin,
+               instance.supportsAuthentication,
+               let manager = credentialsManager(for: instance),
+               manager.isLoggedIn(for: instance) {
+                instancesManager.setUsesAccountLogin(true, for: instance)
+            }
+        }
+    }
+
+    /// Whether an instance is known to require credentials that are missing from
+    /// the Keychain (e.g. after reinstalling the app and importing sources from iCloud).
+    /// - Yattee Server always requires basic auth; other types require it when
+    ///   `usesBasicAuth` was recorded.
+    /// - Invidious/Piped account logins are checked when `usesAccountLogin` was recorded.
+    func needsCredentials(for instance: Instance) -> Bool {
+        if instance.type == .yatteeServer || instance.usesBasicAuth,
+           !basicAuthCredentialsManager.hasCredentials(for: instance) {
+            return true
+        }
+
+        if instance.usesAccountLogin,
+           let manager = credentialsManager(for: instance),
+           !manager.isLoggedIn(for: instance) {
+            return true
+        }
+
+        return false
     }
 
     // MARK: - Preview/Testing Support

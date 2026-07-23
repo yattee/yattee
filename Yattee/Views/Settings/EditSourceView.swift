@@ -345,6 +345,7 @@ private struct EditRemoteServerContent: View {
         .fullScreenCover(isPresented: $showLoginSheet) {
             InstanceLoginView(instance: instance) { credential in
                 appEnvironment?.credentialsManager(for: instance)?.setCredential(credential, for: instance)
+                appEnvironment?.instancesManager.setUsesAccountLogin(true, for: instance)
                 isLoggedIn = true
             }
         }
@@ -352,6 +353,7 @@ private struct EditRemoteServerContent: View {
         .sheet(isPresented: $showLoginSheet) {
             InstanceLoginView(instance: instance) { credential in
                 appEnvironment?.credentialsManager(for: instance)?.setCredential(credential, for: instance)
+                appEnvironment?.instancesManager.setUsesAccountLogin(true, for: instance)
                 isLoggedIn = true
             }
         }
@@ -409,6 +411,7 @@ private struct EditRemoteServerContent: View {
 
     private func logout() {
         appEnvironment?.credentialsManager(for: instance)?.deleteCredential(for: instance)
+        appEnvironment?.instancesManager.setUsesAccountLogin(false, for: instance)
         isLoggedIn = false
     }
 
@@ -445,7 +448,9 @@ private struct EditRemoteServerContent: View {
     }
 
     private func performSave() {
-        var updated = instance
+        // Start from the manager's latest copy so flags updated while this sheet
+        // was open (e.g. usesAccountLogin set by the login sheet) are preserved.
+        var updated = appEnvironment?.instancesManager.instances.first { $0.id == instance.id } ?? instance
         updated.name = name.isEmpty ? nil : name
         updated.isEnabled = isEnabled
         updated.allowInvalidCertificates = allowInvalidCertificates
@@ -458,14 +463,17 @@ private struct EditRemoteServerContent: View {
             if hadStoredBasicAuth {
                 appEnvironment?.basicAuthCredentialsManager.deleteCredentials(for: instance)
             }
+            updated.usesBasicAuth = false
         } else if !basicAuthUsername.isEmpty, !basicAuthPassword.isEmpty {
             appEnvironment?.basicAuthCredentialsManager.setCredentials(
                 username: basicAuthUsername,
                 password: basicAuthPassword,
                 for: instance
             )
+            updated.usesBasicAuth = true
         } else if hadStoredBasicAuth, instance.type != .yatteeServer {
             appEnvironment?.basicAuthCredentialsManager.deleteCredentials(for: instance)
+            updated.usesBasicAuth = false
         }
 
         appEnvironment?.instancesManager.update(updated)

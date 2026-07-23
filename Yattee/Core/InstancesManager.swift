@@ -174,6 +174,26 @@ final class InstancesManager {
         }
     }
 
+    /// Records whether an instance sits behind HTTP Basic Auth.
+    /// Persisted (and synced to iCloud) so missing Keychain credentials can be
+    /// detected after a reinstall.
+    func setUsesBasicAuth(_ value: Bool, for instance: Instance) {
+        guard let index = instances.firstIndex(where: { $0.id == instance.id }),
+              instances[index].usesBasicAuth != value else { return }
+        instances[index].usesBasicAuth = value
+        saveInstances()
+    }
+
+    /// Records whether the user has logged into an account on an instance.
+    /// Persisted (and synced to iCloud) so missing Keychain credentials can be
+    /// detected after a reinstall.
+    func setUsesAccountLogin(_ value: Bool, for instance: Instance) {
+        guard let index = instances.firstIndex(where: { $0.id == instance.id }),
+              instances[index].usesAccountLogin != value else { return }
+        instances[index].usesAccountLogin = value
+        saveInstances()
+    }
+
     /// Sets the given instance as the primary (first) instance.
     func setPrimary(_ instance: Instance) {
         LoggingService.shared.debug("[InstancesManager] setPrimary called for: \(instance.displayName)", category: .general)

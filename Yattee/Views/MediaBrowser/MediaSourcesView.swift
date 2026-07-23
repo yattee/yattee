@@ -40,6 +40,12 @@ struct MediaSourcesView: View {
         appEnvironment?.settingsManager.listStyle ?? .inset
     }
 
+    /// Whether a remote server instance requires credentials that are missing from
+    /// the Keychain (e.g. after reinstalling and importing sources from iCloud).
+    private func needsCredentials(_ instance: Instance) -> Bool {
+        appEnvironment?.needsCredentials(for: instance) ?? false
+    }
+
     var body: some View {
         Group {
             #if os(tvOS)
@@ -517,6 +523,12 @@ struct MediaSourcesView: View {
                 Text("\(instance.type.displayName) - \(instance.url.host ?? instance.url.absoluteString)")
                     .font(.caption)
                     .foregroundStyle(.secondary)
+
+                if needsCredentials(instance) {
+                    Label(String(localized: "sources.status.authRequired"), systemImage: "key.fill")
+                        .font(.caption2)
+                        .foregroundStyle(.orange)
+                }
             }
 
             Spacer()

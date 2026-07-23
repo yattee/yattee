@@ -221,13 +221,16 @@ final class LegacyDataMigrationService {
                     password: basicAuthCredentials.password,
                     for: instance
                 )
+                instancesManager.setUsesBasicAuth(true, for: instance)
             }
             invidiousCredentialsManager.setCredential(credential, for: instance)
+            instancesManager.setUsesAccountLogin(true, for: instance)
 
         case .piped:
             credential = try await pipedAPI.login(username: username, password: password, instance: instance)
             addInstanceIfNeeded(instance)
             pipedCredentialsManager.setCredential(credential, for: instance)
+            instancesManager.setUsesAccountLogin(true, for: instance)
 
         default:
             throw APIError.notSupported
@@ -264,6 +267,7 @@ final class LegacyDataMigrationService {
                 password: basicAuthCredentials.password,
                 for: instance
             )
+            instancesManager.setUsesBasicAuth(true, for: instance)
         }
 
         removeLegacyInstance(item)

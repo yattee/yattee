@@ -32,6 +32,13 @@ struct SourceRow: View {
         return status == .authFailed || status == .authRequired
     }
 
+    /// Whether a remote server instance requires credentials that are missing from
+    /// the Keychain (e.g. after reinstalling and importing sources from iCloud).
+    private var needsCredentials: Bool {
+        guard case .remoteServer(let instance) = source else { return false }
+        return appEnvironment?.needsCredentials(for: instance) ?? false
+    }
+
     var body: some View {
         #if os(tvOS)
         Button(action: onEdit) {
@@ -92,7 +99,7 @@ struct SourceRow: View {
 
     @ViewBuilder
     private var statusView: some View {
-        if needsPassword {
+        if needsPassword || needsCredentials {
             Label(String(localized: "sources.status.authRequired"), systemImage: "key.fill")
                 .font(.caption2)
                 .foregroundStyle(.orange)

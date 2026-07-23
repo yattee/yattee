@@ -403,9 +403,19 @@ struct SourcesListView: View {
         .contentShape(Rectangle())
     }
 
+    /// Whether a remote server instance requires credentials that are missing from
+    /// the Keychain (e.g. after reinstalling and importing sources from iCloud).
+    private func needsCredentials(_ instance: Instance) -> Bool {
+        appEnvironment?.needsCredentials(for: instance) ?? false
+    }
+
     @ViewBuilder
     private func instanceStatusView(for instance: Instance) -> some View {
-        if let status = instancesManager?.status(for: instance) {
+        if needsCredentials(instance) {
+            Label(String(localized: "sources.status.authRequired"), systemImage: "key.fill")
+                .font(.caption2)
+                .foregroundStyle(.orange)
+        } else if let status = instancesManager?.status(for: instance) {
             switch status {
             case .authFailed:
                 Label(String(localized: "sources.status.authFailed"), systemImage: "exclamationmark.triangle.fill")
