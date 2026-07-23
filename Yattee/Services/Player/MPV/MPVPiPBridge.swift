@@ -249,12 +249,14 @@ final class MPVPiPBridge: NSObject {
             let newHeight = currentBounds.width / aspectRatio
             let newBounds = CGRect(x: 0, y: 0, width: currentBounds.width, height: newHeight)
 
-            CATransaction.begin()
-            CATransaction.setDisableActions(true)
-            sampleBufferLayer.bounds = newBounds
-            CATransaction.commit()
+            if let newBounds = sanitizedGeometry(newBounds, from: "updateVideoAspectRatio") {
+                CATransaction.begin()
+                CATransaction.setDisableActions(true)
+                sampleBufferLayer.bounds = newBounds
+                CATransaction.commit()
 
-            LoggingService.shared.debug("MPVPiPBridge: Updated aspect ratio to \(aspectRatio), layer bounds: \(newBounds)", category: .mpv)
+                LoggingService.shared.debug("MPVPiPBridge: Updated aspect ratio to \(aspectRatio), layer bounds: \(newBounds)", category: .mpv)
+            }
         }
         #else
         // On iOS, don't modify bounds when PiP is inactive - this causes frame misalignment
@@ -371,9 +373,25 @@ final class MPVPiPBridge: NSObject {
     }
     #endif
 
+    /// Validate a rect before it reaches PiP geometry. AppKit traps the whole
+    /// app when AVKit's PiP host view derives a non-finite frame from our
+    /// layer/window geometry (build 264 crash), so reject NaN/infinite or
+    /// degenerate rects and log the site instead of storing poisoned values.
+    private func sanitizedGeometry(_ rect: CGRect, from site: String) -> CGRect? {
+        guard rect.origin.x.isFinite, rect.origin.y.isFinite,
+              rect.width.isFinite, rect.height.isFinite,
+              rect.width > 0, rect.height > 0
+        else {
+            LoggingService.shared.debug("MPVPiPBridge: rejected invalid geometry \(rect) from \(site)", category: .mpv)
+            return nil
+        }
+        return rect
+    }
+
     /// Update the layer frame when container bounds change.
     /// On macOS, the frame should be relative to the window's content view.
     func updateLayerFrame(_ frame: CGRect) {
+        guard let frame = sanitizedGeometry(frame, from: "updateLayerFrame(_:)") else { return }
         sampleBufferLayer.frame = frame
     }
 
@@ -381,7 +399,8 @@ final class MPVPiPBridge: NSObject {
     /// Update the layer frame based on container view's bounds.
     /// Call this on macOS when the container view's size changes.
     func updateLayerFrame(for containerView: NSView) {
-        sampleBufferLayer.frame = containerView.bounds
+        guard let frame = sanitizedGeometry(containerView.bounds, from: "updateLayerFrame(for:)") else { return }
+        sampleBufferLayer.frame = frame
     }
     #endif
 
@@ -390,7 +409,9 @@ final class MPVPiPBridge: NSObject {
     /// as the layer must be in a visible window hierarchy.
     func moveLayer(to containerView: PlatformView) {
         sampleBufferLayer.removeFromSuperlayer()
-        sampleBufferLayer.frame = containerView.bounds
+        if let frame = sanitizedGeometry(containerView.bounds, from: "moveLayer(to:)") {
+            sampleBufferLayer.frame = frame
+        }
         #if os(iOS)
         containerView.layer.addSublayer(sampleBufferLayer)
         #elseif os(macOS)
@@ -886,14 +907,19 @@ extension MPVPiPBridge {
         }
 
         let contentRect = pipWindow.contentRect(forFrameRect: pipWindow.frame)
-        guard contentRect.width > 0 else { return }
+        guard contentRect.width > 0, contentRect.width.isFinite else { return }
         let newContentHeight = contentRect.width / aspectRatio
+        guard newContentHeight.isFinite, newContentHeight > 0 else {
+            LoggingService.shared.debug("MPVPiPBridge: resizePiPWindow - rejected invalid content height \(newContentHeight) for aspect \(aspectRatio)", category: .mpv)
+            return
+        }
         let heightDelta = newContentHeight - contentRect.height
         guard abs(heightDelta) >= 1 else { return }
 
         var frame = pipWindow.frame
         frame.size.height += heightDelta
         frame.origin.y -= heightDelta // keep the top edge in place
+        guard let frame = sanitizedGeometry(frame, from: "resizePiPWindow") else { return }
         pipWindow.setFrame(frame, display: true, animate: false)
 
         LoggingService.shared.debug("MPVPiPBridge: Resized PiP window for aspect \(aspectRatio): \(frame)", category: .mpv)
@@ -1000,7 +1026,7 @@ extension MPVPiPBridge {
             // Fix mispositioned internal AVKit views that cause the black bar
             fixPiPLayerHostViewPosition(in: pipWindow)
 
-            let newFrame = CGRect(origin: .zero, size: windowSize)
+            guard let newFrame = sanitizedGeometry(CGRect(origin: .zero, size: windowSize), from: "updateLayerFrameToMatchPiPWindow") else { return }
 
             if sampleBufferLayer.frame.size != newFrame.size {
                 LoggingService.shared.debug("MPVPiPBridge: Resizing layer to match PiP window: \(sampleBufferLayer.frame) -> \(newFrame)", category: .mpv)
@@ -1012,7 +1038,7 @@ extension MPVPiPBridge {
         } else {
             // Fallback: try to match superlayer
             guard let superlayer = sampleBufferLayer.superlayer else { return }
-            let superBounds = superlayer.bounds
+            guard let superBounds = sanitizedGeometry(superlayer.bounds, from: "updateLayerFrameToMatchPiPWindow(superlayer)") else { return }
             if sampleBufferLayer.frame != superBounds {
                 LoggingService.shared.debug("MPVPiPBridge: Resizing layer to match superlayer: \(sampleBufferLayer.frame) -> \(superBounds)", category: .mpv)
                 CATransaction.begin()
