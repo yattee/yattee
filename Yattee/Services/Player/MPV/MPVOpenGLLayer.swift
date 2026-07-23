@@ -236,14 +236,11 @@ final class MPVOpenGLLayer: CAOpenGLLayer {
         self.bufferDepth = previousLayer.bufferDepth
         self.isSetup = previousLayer.isSetup
 
+        // super.init(layer:) already copies presentation values; re-invoking
+        // setters like `colorspace` on the shadow copy dereferences render
+        // state the copy doesn't own and crashes (macOS 27 beta routes
+        // contentsScale changes through this path on screen changes).
         super.init(layer: layer)
-
-        autoresizingMask = previousLayer.autoresizingMask
-        backgroundColor = previousLayer.backgroundColor
-        isOpaque = previousLayer.isOpaque
-        colorspace = previousLayer.colorspace
-        contentsFormat = previousLayer.contentsFormat
-        isAsynchronous = previousLayer.isAsynchronous
 
         Task { @MainActor in
             LoggingService.shared.debug("MPVOpenGLLayer: created shadow copy", category: .mpv)

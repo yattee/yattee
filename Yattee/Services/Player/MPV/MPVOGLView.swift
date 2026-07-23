@@ -12,6 +12,7 @@ import AppKit
 import CoreMedia
 import CoreVideo
 import Libmpv
+import QuartzCore
 
 // MARK: - MPVOGLView
 
@@ -168,8 +169,13 @@ final class MPVOGLView: NSView {
             stopDisplayLink()
             startDisplayLink()
 
-            // Update contents scale for new window
+            // Update contents scale for new window. Disable implicit actions so
+            // Core Animation never builds a presentation copy of the GL layer
+            // for this change (crashes on macOS 27 beta).
+            CATransaction.begin()
+            CATransaction.setDisableActions(true)
             videoLayer?.contentsScale = window.backingScaleFactor
+            CATransaction.commit()
 
             // Reattaching (e.g. macOS player sheet dismissed via ESC then re-expanded)
             // detaches this shared view without stopping playback. macOS drawing is
@@ -182,9 +188,14 @@ final class MPVOGLView: NSView {
     override func viewDidChangeBackingProperties() {
         super.viewDidChangeBackingProperties()
 
-        // Update contents scale when backing properties change
+        // Update contents scale when backing properties change. Disable implicit
+        // actions so Core Animation never builds a presentation copy of the GL
+        // layer for this change (crashes on macOS 27 beta).
         if let scale = window?.backingScaleFactor {
+            CATransaction.begin()
+            CATransaction.setDisableActions(true)
             videoLayer?.contentsScale = scale
+            CATransaction.commit()
         }
 
         // Update display refresh rate
