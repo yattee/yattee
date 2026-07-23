@@ -91,7 +91,11 @@ private class MPVContainerView: UIView {
             // deallocating container: otherwise SwiftUI keeps reconciling a
             // half-alive view and spins the main-thread trait update loop (100%
             // CPU hang when opening a settings detail during playback, issue #956).
-            playerView.removeFromSuperview()
+            // Guard by superview: currentPlayerView is a stale weak ref when another
+            // (not yet windowed) container has stolen the view — don't rip it out.
+            if playerView.superview === self {
+                playerView.removeFromSuperview()
+            }
         }
     }
 

@@ -2852,10 +2852,14 @@ extension PlayerService: PlayerBackendDelegate {
     func backend(_ backend: any PlayerBackend, didChangeState playbackState: PlaybackState) {
         LoggingService.shared.debug("Backend state changed to: \(playbackState)", category: .player)
 
-        // Clear the time-update gate once playback is ready/playing, in case the
-        // load flow exited before doing so (issue #956). Safe: stale updates from a
-        // previous video can only arrive before the new video's ready transition.
-        if playbackState == .ready || playbackState == .playing, loadingVideoID != nil {
+        // Clear the time-update gate once the new video is loaded, in case the load
+        // flow wedged before doing so (issue #956). Only .ready: it comes from mpv's
+        // file-loaded event, which only the new load can emit. The previous video
+        // (still playing on the reused backend during the details/streams fetch) can
+        // emit .playing via buffering recovery or unpause — healing on that would
+        // open the gate to stale time updates and break the stale-error check in
+        // play()'s catch, silently swallowing genuine load failures.
+        if playbackState == .ready, loadingVideoID != nil {
             loadingVideoID = nil
         }
 
