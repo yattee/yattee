@@ -7,6 +7,7 @@
 
 import Foundation
 import Libmpv
+import Metal
 
 #if os(macOS)
 import OpenGL.GL
@@ -191,16 +192,14 @@ final class MPVClient: @unchecked Sendable {
     // MARK: - Device Detection
 
     #if os(tvOS)
-    /// Apple TV HD (AppleTV5,3, A8): its GL driver deadlocks on the float
-    /// texture uploads mpv's renderer defaults to (issue #956).
+    /// A8-class (PowerVR Series6XT) and older GPUs: their GL driver deadlocks on
+    /// the float texture uploads mpv's renderer defaults to (issue #956).
+    /// Keyed on the Metal GPU family rather than the device model so every device
+    /// with this GPU generation is covered, e.g. Apple TV HD (AppleTV5,3, A8).
+    /// If an A10-class device ever shows the same hang, bump the check to .apple4.
     static let hasFragileGLDriver: Bool = {
-        var systemInfo = utsname()
-        uname(&systemInfo)
-        let machine = withUnsafeBytes(of: systemInfo.machine) { rawPtr -> String in
-            guard let base = rawPtr.baseAddress else { return "" }
-            return String(cString: base.assumingMemoryBound(to: CChar.self))
-        }
-        return machine == "AppleTV5,3"
+        guard let device = MTLCreateSystemDefaultDevice() else { return true }
+        return !device.supportsFamily(.apple3) // .apple2 = A8/A8X, .apple1 = A7
     }()
     #endif
 
