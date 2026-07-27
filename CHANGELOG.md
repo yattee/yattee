@@ -2,12 +2,16 @@
 
 ## What's Changed
 
+### New Features
+
+* Show missing-credentials indicator for remote server sources
+
 ### Bug Fixes
 
-* Fix macOS legacy import sheet missing grouped form style
-* Fix tvOS legacy import rows acting as a single Remove button
-* Fix periodic tvOS playback stutter from render stalls on mpvQueue
+* Fix black video, freezes, autoplay and clock on Apple TV HD (A8) - thanks @rswilem
+* Fix crash in CAOpenGLLayer shadow-copy init on macOS 27 beta
+* Fix transparent background of iCloud sync overlay on tvOS
 
 ### Other
 
-* Make Enable Logging the master switch over all verbose logging
+* Fix some reported crashes
