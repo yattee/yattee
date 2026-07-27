@@ -50,6 +50,16 @@ final class ExpandedPlayerWindowManager: NSObject {
     /// different-aspect video while the window stays open) animate normally.
     private var hasCompletedInitialSizing = false
 
+    /// Aspect ratio received while the window was in native fullscreen. Applying
+    /// `contentAspectRatio`/`setFrame` to a fullscreen window makes AppKit fit and
+    /// center the content inside the fullscreen space (black bars), so the ratio
+    /// is parked here and replayed in `windowDidExitFullScreen`.
+    private var pendingFullScreenAspectRatio: Double?
+
+    private var isPlayerWindowFullScreen: Bool {
+        playerWindow?.styleMask.contains(.fullScreen) ?? false
+    }
+
     // Configuration
     private static let minWidth: CGFloat = 640
     private static let minHeight: CGFloat = 360
@@ -203,6 +213,7 @@ final class ExpandedPlayerWindowManager: NSObject {
         // Fresh window: the next resize is the initial sizing and must snap
         // (no animation) so the player appears at its final fixed layout.
         hasCompletedInitialSizing = false
+        pendingFullScreenAspectRatio = nil
 
         // Show window
         if animated {
@@ -514,6 +525,18 @@ final class ExpandedPlayerWindowManager: NSObject {
         guard let window = playerWindow else { return }
         guard aspectRatio > 0 else { return }
 
+        // In native fullscreen the video must keep the whole screen; constraining
+        // or reframing the window here would letterbox the content inside the
+        // fullscreen space. Park the ratio and replay it on fullscreen exit.
+        if isPlayerWindowFullScreen {
+            pendingFullScreenAspectRatio = aspectRatio
+            LoggingService.shared.debug(
+                "resizeToFitAspectRatio deferred while fullscreen aspect=\(aspectRatio)",
+                category: .player
+            )
+            return
+        }
+
         // Always update the aspect-ratio lock, even if we end up not resizing here.
         Self.applyAspectRatioConstraint(aspectRatio, to: window)
 
@@ -558,6 +581,10 @@ final class ExpandedPlayerWindowManager: NSObject {
     func lockAspectRatio(_ aspectRatio: Double) {
         guard let window = playerWindow else { return }
         guard aspectRatio > 0 else { return }
+        if isPlayerWindowFullScreen {
+            pendingFullScreenAspectRatio = aspectRatio
+            return
+        }
         Self.applyAspectRatioConstraint(aspectRatio, to: window)
     }
 
@@ -779,6 +806,18 @@ extension ExpandedPlayerWindowManager: NSWindowDelegate {
             // dropped so the window could enter primary fullscreen.
             let floating = appEnvironment?.settingsManager.macPlayerFloating ?? false
             configureWindowLevel(window, floating: floating)
+
+            // Replay the aspect ratio that arrived while fullscreen (queue
+            // advanced to a different-aspect video): restore the manual-resize
+            // ratio lock, and auto-fit the window if that setting is on —
+            // exactly what the aspect-change handler would have done windowed.
+            if let ratio = pendingFullScreenAspectRatio {
+                pendingFullScreenAspectRatio = nil
+                Self.applyAspectRatioConstraint(ratio, to: window)
+                if appEnvironment?.settingsManager.playerSheetAutoResize == true {
+                    resizeToFitAspectRatio(ratio, animated: false)
+                }
+            }
         }
     }
 }
