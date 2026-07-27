@@ -40,7 +40,9 @@ def all_testflight_group_names(api_key)
   Spaceship::ConnectAPI.token = Spaceship::ConnectAPI::Token.from(hash: api_key)
   app = Spaceship::ConnectAPI::App.find(DEVELOPER_APP_IDENTIFIER)
   UI.user_error!("App #{DEVELOPER_APP_IDENTIFIER} not found on App Store Connect") if app.nil?
-  groups = app.get_beta_groups.map(&:name)
+  # Internal groups can't be assigned builds via the API (ASC rejects it);
+  # they get access to new builds automatically anyway.
+  groups = app.get_beta_groups.reject(&:is_internal_group).map(&:name)
   UI.user_error!("No TestFlight beta groups found for #{DEVELOPER_APP_IDENTIFIER}") if groups.empty?
   UI.message("Distributing build to TestFlight groups: #{groups.join(', ')}")
   groups
