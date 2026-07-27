@@ -64,9 +64,14 @@ final class CloudKitSyncEngine: @unchecked Sendable {
 
     // MARK: - State
 
-    private let container: CKContainer
-    private let database: CKDatabase
-    private let zoneManager: CloudKitZoneManager
+    /// Whether CloudKit is usable in this installation. False when the app was
+    /// re-signed without the iCloud container entitlement (sideloading); all
+    /// sync functionality is disabled then and the CloudKit objects stay nil.
+    let isCloudKitAvailable = CloudKitAvailability.isAvailable
+
+    private let container: CKContainer?
+    private let database: CKDatabase?
+    private let zoneManager: CloudKitZoneManager?
     private var recordMapper: CloudKitRecordMapper
     private var conflictResolver: CloudKitConflictResolver
     private var syncEngine: CKSyncEngine?
@@ -232,12 +237,21 @@ final class CloudKitSyncEngine: @unchecked Sendable {
         self.settingsManager = settingsManager
         self.instancesManager = instancesManager
         
-        // Initialize CloudKit
-        self.container = CKContainer(identifier: AppIdentifiers.iCloudContainer)
-        self.database = container.privateCloudDatabase
-        
-        // Initialize zone manager
-        self.zoneManager = CloudKitZoneManager(database: database)
+        // Initialize CloudKit. CKContainer(identifier:) fatally traps when the
+        // entitlement is missing (re-signed/sideloaded builds), so it must not
+        // be constructed at all in that case.
+        if CloudKitAvailability.isAvailable {
+            let container = CKContainer(identifier: AppIdentifiers.iCloudContainer)
+            let database = container.privateCloudDatabase
+            self.container = container
+            self.database = database
+            self.zoneManager = CloudKitZoneManager(database: database)
+        } else {
+            LoggingService.shared.logCloudKit("iCloud container entitlement missing (re-signed build) - CloudKit sync unavailable")
+            self.container = nil
+            self.database = nil
+            self.zoneManager = nil
+        }
         
         // Initialize with temporary zone (will be updated in setupSyncEngine)
         let tempZone = RecordType.createZone()
@@ -261,6 +275,10 @@ final class CloudKitSyncEngine: @unchecked Sendable {
 
     /// Enables CloudKit sync. Creates CKSyncEngine and starts syncing.
     func enable() async {
+        guard isCloudKitAvailable else {
+            LoggingService.shared.logCloudKit("CloudKit unavailable in this installation, cannot enable sync")
+            return
+        }
         guard syncEngine == nil else {
             LoggingService.shared.logCloudKit("Sync engine already enabled")
             return
@@ -309,6 +327,11 @@ final class CloudKitSyncEngine: @unchecked Sendable {
         // Guard: only setup if sync is enabled
         guard settingsManager?.iCloudSyncEnabled == true else {
             LoggingService.shared.logCloudKit("setupSyncEngine called but sync is disabled, skipping")
+            return
+        }
+
+        guard let container, let database, let zoneManager else {
+            LoggingService.shared.logCloudKit("CloudKit unavailable in this installation, skipping engine setup")
             return
         }
 
@@ -387,6 +410,7 @@ final class CloudKitSyncEngine: @unchecked Sendable {
     /// Checks if the iCloud account has changed and handles it by clearing sync state.
     /// - Returns: `true` if account changed and sync state was cleared, `false` otherwise.
     private func checkAndHandleAccountChange() async -> Bool {
+        guard let container else { return false }
         do {
             // Fetch the current user's record ID using async wrapper
             let currentUserRecordID = try await withCheckedThrowingContinuation { (continuation: CheckedContinuation<CKRecord.ID, Error>) in
@@ -1422,6 +1446,8 @@ final class CloudKitSyncEngine: @unchecked Sendable {
 
     /// Clear all sync state and reset. For testing/debugging only.
     func resetSync() async throws {
+        guard let zoneManager else { return }
+
         // Delete zone (and all records)
         try await zoneManager.deleteZone()
 
@@ -1449,6 +1475,7 @@ final class CloudKitSyncEngine: @unchecked Sendable {
     
     /// Refreshes the cached iCloud account status
     func refreshAccountStatus() async {
+        guard let container else { return }
         do {
             accountStatus = try await container.accountStatus()
         } catch {
@@ -1566,7 +1593,7 @@ final class CloudKitSyncEngine: @unchecked Sendable {
         case .zoneNotFound:
             LoggingService.shared.logCloudKit("Zone not found, recreating...")
             Task {
-                try? await zoneManager.createZoneIfNeeded()
+                try? await zoneManager?.createZoneIfNeeded()
                 await sync()
             }
             
@@ -1882,7 +1909,7 @@ extension CloudKitSyncEngine: CKSyncEngineDelegate {
             // Zone was deleted — recreate it and retry the save
             syncEngine?.state.add(pendingRecordZoneChanges: [.saveRecord(recordID)])
             Task {
-                try? await zoneManager.createZoneIfNeeded()
+                try? await zoneManager?.createZoneIfNeeded()
             }
             LoggingService.shared.logCloudKit("Zone missing for \(recordName), recreating and retrying")
 
@@ -1966,7 +1993,7 @@ extension CloudKitSyncEngine: CKSyncEngineDelegate {
         retryCount.removeAll()
 
         do {
-            try await zoneManager.createZoneIfNeeded()
+            try await zoneManager?.createZoneIfNeeded()
             await performInitialUpload()
         } catch {
             LoggingService.shared.logCloudKitError("Failed to recreate zone after remote deletion", error: error)

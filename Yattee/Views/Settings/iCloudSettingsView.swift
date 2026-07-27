@@ -58,24 +58,31 @@ struct iCloudSettingsView: View {
             }
             #endif
 
-            SettingsFormSection(footer: "settings.icloud.footer") {
-                Toggle(isOn: Binding(
-                    get: { settingsManager?.iCloudSyncEnabled ?? false },
-                    set: { newValue in
-                        if newValue {
-                            showingEnableConfirmation = true
-                        } else {
-                            showingDisableConfirmation = true
-                        }
-                    }
-                )) {
-                    Label(String(localized: "settings.icloud.enable"), systemImage: "icloud")
+            if cloudKitSync?.isCloudKitAvailable == false {
+                SettingsFormSection(footer: "settings.icloud.unavailable.footer") {
+                    Label(String(localized: "settings.icloud.unavailable"), systemImage: "icloud.slash")
+                        .foregroundStyle(.secondary)
                 }
-            }
+            } else {
+                SettingsFormSection(footer: "settings.icloud.footer") {
+                    Toggle(isOn: Binding(
+                        get: { settingsManager?.iCloudSyncEnabled ?? false },
+                        set: { newValue in
+                            if newValue {
+                                showingEnableConfirmation = true
+                            } else {
+                                showingDisableConfirmation = true
+                            }
+                        }
+                    )) {
+                        Label(String(localized: "settings.icloud.enable"), systemImage: "icloud")
+                    }
+                }
 
-            if settingsManager?.iCloudSyncEnabled == true {
-                syncCategoriesSection
-                syncStatusSection
+                if settingsManager?.iCloudSyncEnabled == true {
+                    syncCategoriesSection
+                    syncStatusSection
+                }
             }
         }
         #if !os(tvOS)

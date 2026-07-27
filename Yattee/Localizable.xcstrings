@@ -12147,6 +12147,28 @@
         }
       }
     },
+    "settings.icloud.unavailable" : {
+      "comment" : "Label shown instead of the iCloud sync toggle when the app installation lacks iCloud entitlements",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "iCloud Sync Unavailable"
+          }
+        }
+      }
+    },
+    "settings.icloud.unavailable.footer" : {
+      "comment" : "Footer explaining why iCloud sync is unavailable in sideloaded installations",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "This copy of Yattee was installed without iCloud access, so sync is not available. iCloud sync requires installing the app from the App Store or TestFlight."
+          }
+        }
+      }
+    },
     "settings.icloud.update.message" : {
       "comment" : "Message explaining that newer app version is needed for some synced data",
       "localizations" : {
