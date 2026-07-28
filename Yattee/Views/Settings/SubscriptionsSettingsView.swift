@@ -35,7 +35,13 @@ struct SubscriptionsSettingsView: View {
     // Export state
     @State private var selectedExportFormat: SubscriptionExportFormat = .json
     @State private var exportFile: ExportFile?
+    @State private var isExporting = false
 
+    // Account subscription count (provider-scoped, fetched for server accounts)
+    @State private var accountSubscriptionCount: Int?
+
+    // Local data deletion state
+    @State private var showingDeleteLocalConfirmation = false
 
     private var dataManager: DataManager? {
         appEnvironment?.dataManager
@@ -49,7 +55,17 @@ struct SubscriptionsSettingsView: View {
         appEnvironment?.subscriptionAccountValidator
     }
 
+    private var subscriptionService: SubscriptionService? {
+        appEnvironment?.subscriptionService
+    }
+
+    /// Subscription count of the active account (local store or server).
     private var subscriptionCount: Int {
+        accountSubscriptionCount ?? subscriptionService?.cachedSubscriptionCount ?? 0
+    }
+
+    /// Count of subscriptions in the local store, shown in the local-data section.
+    private var localSubscriptionCount: Int {
         dataManager?.subscriptionCount ?? 0
     }
 
@@ -63,7 +79,11 @@ struct SubscriptionsSettingsView: View {
             if validator?.hasAvailableAccounts == true {
                 importSection
                 exportSection
+                localDataSection
             }
+        }
+        .task(id: currentAccount) {
+            await refreshAccountSubscriptionCount()
         }
         .navigationTitle(String(localized: "settings.subscriptions.title"))
         #if os(iOS)
@@ -110,6 +130,17 @@ struct SubscriptionsSettingsView: View {
             }
         } message: {
             Text(String(localized: "settings.subscriptions.account.switch.message"))
+        }
+        .confirmationDialog(
+            String(localized: "settings.subscriptions.localData.delete.confirmation.title \(localSubscriptionCount)"),
+            isPresented: $showingDeleteLocalConfirmation,
+            titleVisibility: .visible
+        ) {
+            Button(String(localized: "settings.subscriptions.localData.delete.confirmation.action"), role: .destructive) {
+                deleteLocalSubscriptions()
+            }
+        } message: {
+            Text(String(localized: "settings.subscriptions.localData.delete.confirmation.message"))
         }
         .presentationCompactAdaptation(.sheet)
     }
@@ -225,13 +256,40 @@ struct SubscriptionsSettingsView: View {
             Button {
                 exportSubscriptions()
             } label: {
-                Label(String(localized: "settings.subscriptions.export.button"), systemImage: "square.and.arrow.up")
+                HStack {
+                    Label(String(localized: "settings.subscriptions.export.button"), systemImage: "square.and.arrow.up")
+                    Spacer()
+                    if isExporting {
+                        ProgressView()
+                    }
+                }
             }
-            .disabled(subscriptionCount == 0)
+            .disabled(subscriptionCount == 0 || isExporting)
         } header: {
             Text(String(localized: "settings.subscriptions.export.title"))
         } footer: {
             Text(String(localized: "settings.subscriptions.export.footer \(subscriptionCount)"))
+        }
+    }
+
+    // MARK: - Local Data Section
+
+    /// Lets the user delete locally stored subscriptions while a server account
+    /// is active. Hidden in local mode, where the account IS the local store.
+    @ViewBuilder
+    private var localDataSection: some View {
+        if currentAccount.type != .local && localSubscriptionCount > 0 {
+            Section {
+                Button(role: .destructive) {
+                    showingDeleteLocalConfirmation = true
+                } label: {
+                    Label(String(localized: "settings.subscriptions.localData.delete.button"), systemImage: "trash")
+                }
+            } header: {
+                Text(String(localized: "settings.subscriptions.localData.title"))
+            } footer: {
+                Text(String(localized: "settings.subscriptions.localData.footer \(localSubscriptionCount)"))
+            }
         }
     }
 
@@ -281,12 +339,12 @@ struct SubscriptionsSettingsView: View {
                 // Parse subscriptions
                 let parseResult = try SubscriptionImportExport.parseAuto(data)
 
-                // Import to database
-                guard let dataManager else {
+                // Import into the active account (local store or server)
+                guard let subscriptionService else {
                     throw SubscriptionImportError.invalidData
                 }
 
-                let importStats = dataManager.importSubscriptionsFromExternal(parseResult.channels)
+                let importStats = await subscriptionService.importSubscriptions(parseResult.channels)
 
                 await MainActor.run {
                     isImporting = false
@@ -294,6 +352,7 @@ struct SubscriptionsSettingsView: View {
                     showingImportResult = true
                     LoggingService.shared.logSubscriptions("Import completed: \(importStats.imported) imported, \(importStats.skipped) skipped")
                 }
+                await refreshAccountSubscriptionCount()
             } catch {
                 await MainActor.run {
                     isImporting = false
@@ -306,9 +365,36 @@ struct SubscriptionsSettingsView: View {
     }
 
     private func exportSubscriptions() {
-        guard let dataManager else { return }
+        isExporting = true
+        Task {
+            await performExport()
+            isExporting = false
+        }
+    }
 
-        let subscriptions = dataManager.allSubscriptions
+    /// Exports subscriptions of the active account: the local store in local
+    /// mode, or the server's list for Invidious/Piped accounts.
+    private func performExport() async {
+        let subscriptions: [Subscription]
+        if currentAccount.type == .local {
+            guard let dataManager else { return }
+            subscriptions = dataManager.allSubscriptions
+        } else {
+            guard let subscriptionService else { return }
+            do {
+                let channels = try await subscriptionService.fetchSubscriptions()
+                accountSubscriptionCount = channels.count
+                // Detached model instances used purely as export carriers
+                subscriptions = channels.map { Subscription.from(channel: $0) }
+            } catch {
+                LoggingService.shared.logSubscriptionsError("Failed to fetch account subscriptions for export", error: error)
+                appEnvironment?.toastManager.showError(
+                    String(localized: "settings.subscriptions.export.error.title"),
+                    subtitle: error.localizedDescription
+                )
+                return
+            }
+        }
 
         let data: Data?
         switch selectedExportFormat {
@@ -337,6 +423,28 @@ struct SubscriptionsSettingsView: View {
         #elseif os(macOS)
         showMacOSSavePanel(data: exportData, filename: filename)
         #endif
+    }
+
+    /// Refreshes the account-scoped subscription count shown in the export footer.
+    private func refreshAccountSubscriptionCount() async {
+        guard let subscriptionService else { return }
+
+        if let cached = subscriptionService.cachedSubscriptionCount {
+            accountSubscriptionCount = cached
+        }
+        if subscriptionService.currentAccountType != .local {
+            if let channels = try? await subscriptionService.fetchSubscriptions() {
+                accountSubscriptionCount = channels.count
+            }
+        }
+    }
+
+    private func deleteLocalSubscriptions() {
+        dataManager?.deleteAllSubscriptions()
+        appEnvironment?.toastManager.showSuccess(String(localized: "settings.subscriptions.localData.deleted.title"))
+        Task {
+            await refreshAccountSubscriptionCount()
+        }
     }
 
     #if os(macOS)

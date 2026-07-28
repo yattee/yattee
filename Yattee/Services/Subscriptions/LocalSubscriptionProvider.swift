@@ -63,4 +63,8 @@ final class LocalSubscriptionProvider: SubscriptionProvider {
     func refreshCache() async throws {
         // Local provider doesn't need cache refresh - data is already local
     }
+
+    var cachedSubscriptionCount: Int? {
+        dataManager.subscriptionCount
+    }
 }

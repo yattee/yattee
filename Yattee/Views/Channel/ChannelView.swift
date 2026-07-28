@@ -2097,9 +2097,13 @@ struct ChannelView: View {
         isLoading = true
         errorMessage = nil
 
-        // Load subscription state
+        // Load subscription state: optimistic from the local store, then
+        // corrected by the active provider (server accounts differ from local)
         subscription = appEnvironment.dataManager.subscription(for: channelID)
         isSubscribed = subscription != nil
+        Task {
+            isSubscribed = await appEnvironment.subscriptionService.isSubscribed(to: channelID)
+        }
 
         // Load cached header data for immediate display
         cachedHeader = CachedChannelData.load(for: channelID, using: appEnvironment.dataManager)
@@ -2212,6 +2216,9 @@ struct ChannelView: View {
                 // Check subscription status using extracted channel ID
                 subscription = appEnvironment.dataManager.subscription(for: fetchedChannel.id.channelID)
                 isSubscribed = subscription != nil
+                Task {
+                    isSubscribed = await appEnvironment.subscriptionService.isSubscribed(to: fetchedChannel.id.channelID)
+                }
             }
         } catch let error as APIError {
             await MainActor.run {
@@ -2247,6 +2254,11 @@ struct ChannelView: View {
         let effectiveChannelID = channel?.id.channelID ?? channelID
         subscription = appEnvironment?.dataManager.subscription(for: effectiveChannelID)
         isSubscribed = subscription != nil
+        Task {
+            if let service = appEnvironment?.subscriptionService {
+                isSubscribed = await service.isSubscribed(to: effectiveChannelID)
+            }
+        }
     }
 
     private func loadMoreVideos() async {

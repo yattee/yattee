@@ -114,6 +114,12 @@ final class SubscriptionService {
         settingsManager.subscriptionAccount.type
     }
 
+    /// Subscription count for the active account, when known without a network fetch.
+    /// Always available for local accounts; nil for server accounts until their cache is populated.
+    var cachedSubscriptionCount: Int? {
+        currentProvider?.cachedSubscriptionCount
+    }
+
     // MARK: - Subscribe
 
     /// Subscribes to a channel using the current provider.
@@ -129,6 +135,7 @@ final class SubscriptionService {
 
         do {
             try await provider.subscribe(to: channel)
+            postChangeNotificationForServerAccount()
             LoggingService.shared.info(
                 "Subscribed to \(channel.name) via \(provider.accountType)",
                 category: .general
@@ -174,6 +181,7 @@ final class SubscriptionService {
 
         do {
             try await provider.unsubscribe(from: channelID)
+            postChangeNotificationForServerAccount()
             LoggingService.shared.info(
                 "Unsubscribed from \(channelID) via \(provider.accountType)",
                 category: .general
@@ -262,27 +270,53 @@ final class SubscriptionService {
         }
     }
 
-    // MARK: - Synchronous Helpers (for backwards compatibility)
+    // MARK: - Import
 
-    /// Synchronously checks if subscribed to a channel.
-    /// Uses cached data from DataManager for instant response.
-    /// - Parameter channelID: The channel ID to check.
-    /// - Returns: `true` if subscribed (based on local cache), `false` otherwise.
-    func isSubscribedSync(to channelID: String) -> Bool {
-        dataManager.isSubscribed(to: channelID)
+    /// Imports parsed external subscriptions (YouTube CSV / OPML) into the active account.
+    /// Local accounts write to SwiftData; server accounts subscribe on the server,
+    /// one channel at a time. Channels that are already subscribed are skipped.
+    func importSubscriptions(_ channels: [(channelID: String, name: String)]) async -> (imported: Int, skipped: Int) {
+        guard currentAccountType != .local else {
+            return dataManager.importSubscriptionsFromExternal(channels)
+        }
+
+        guard let provider = currentProvider else { return (0, channels.count) }
+
+        // Populate the cache so already-subscribed channels can be skipped
+        try? await provider.refreshCache()
+
+        var imported = 0
+        var skipped = 0
+        for entry in channels {
+            if await provider.isSubscribed(to: entry.channelID) {
+                skipped += 1
+                continue
+            }
+            do {
+                try await provider.subscribe(to: Channel(id: .global(entry.channelID), name: entry.name))
+                imported += 1
+            } catch {
+                skipped += 1
+                LoggingService.shared.error(
+                    "Failed to import subscription \(entry.channelID): \(error.localizedDescription)",
+                    category: .general
+                )
+            }
+        }
+
+        if imported > 0 {
+            postChangeNotificationForServerAccount()
+        }
+
+        return (imported, skipped)
     }
 
-    /// Synchronously subscribes to a channel (local provider only).
-    /// For Invidious provider, this will only update local cache.
-    /// - Parameter channel: The channel to subscribe to.
-    func subscribeSync(to channel: Channel) {
-        dataManager.subscribe(to: channel)
-    }
+    // MARK: - Private Helpers
 
-    /// Synchronously unsubscribes from a channel (local provider only).
-    /// For Invidious provider, this will only update local cache.
-    /// - Parameter channelID: The channel ID to unsubscribe from.
-    func unsubscribeSync(from channelID: String) {
-        dataManager.unsubscribe(from: channelID)
+    /// Posts a subscriptions-changed notification for server accounts.
+    /// Local accounts already post it from DataManager with a change payload.
+    private func postChangeNotificationForServerAccount() {
+        guard currentAccountType != .local else { return }
+        NotificationCenter.default.post(name: .subscriptionsDidChange, object: nil)
     }
 }

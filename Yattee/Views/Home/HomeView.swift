@@ -1473,7 +1473,22 @@ struct HomeView: View {
     }
 
     private func loadChannelsData() {
-        channelsCount = dataManager?.subscriptions().count ?? 0
+        guard let service = appEnvironment?.subscriptionService else {
+            channelsCount = 0
+            return
+        }
+
+        // Local accounts always have a count; server accounts only after their
+        // in-memory cache is populated — fetch it once in the background otherwise.
+        if let cached = service.cachedSubscriptionCount {
+            channelsCount = cached
+        } else {
+            Task {
+                if let channels = try? await service.fetchSubscriptions() {
+                    channelsCount = channels.count
+                }
+            }
+        }
     }
 
     private func loadRemoteDevicesData() {

@@ -291,6 +291,45 @@ extension DataManager {
         }
     }
 
+    /// Deletes all locally stored subscriptions, including their iCloud copies.
+    /// Server-account subscriptions (Invidious/Piped) are unaffected.
+    func deleteAllSubscriptions() {
+        let allSubscriptions = subscriptions()
+        guard !allSubscriptions.isEmpty else { return }
+
+        var deleteInfo: [(channelID: String, scope: SourceScope)] = []
+        for subscription in allSubscriptions {
+            let scope = SourceScope.from(
+                sourceRawValue: subscription.sourceRawValue,
+                globalProvider: subscription.providerName,
+                instanceURLString: subscription.instanceURLString,
+                externalExtractor: nil
+            )
+            deleteInfo.append((subscription.channelID, scope))
+            modelContext.delete(subscription)
+        }
+
+        save()
+
+        for info in deleteInfo {
+            cloudKitSync?.queueSubscriptionDelete(channelID: info.channelID, scope: info.scope)
+        }
+
+        SubscriptionFeedCache.shared.invalidate()
+
+        let change = SubscriptionChange(
+            addedSubscriptions: [],
+            removedChannelIDs: deleteInfo.map(\.channelID)
+        )
+        NotificationCenter.default.post(
+            name: .subscriptionsDidChange,
+            object: nil,
+            userInfo: [SubscriptionChange.userInfoKey: change]
+        )
+
+        LoggingService.shared.info("Deleted all \(deleteInfo.count) local subscriptions", category: .general)
+    }
+
     /// Returns the total count of subscriptions.
     var subscriptionCount: Int {
         let descriptor = FetchDescriptor<Subscription>()

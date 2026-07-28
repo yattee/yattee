@@ -32,6 +32,10 @@ protocol SubscriptionProvider: Sendable {
     /// - Returns: `true` if subscribed, `false` otherwise.
     func isSubscribed(to channelID: String) async -> Bool
 
+    /// The subscription count known without a network fetch.
+    /// Returns nil when the provider hasn't populated its cache yet.
+    var cachedSubscriptionCount: Int? { get }
+
     /// Refreshes the local cache of subscriptions from the remote source.
     /// For local provider, this is a no-op.
     func refreshCache() async throws

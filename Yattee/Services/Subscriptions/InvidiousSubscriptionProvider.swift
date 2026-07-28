@@ -109,6 +109,10 @@ final class InvidiousSubscriptionProvider: SubscriptionProvider {
         _ = try await fetchSubscriptions()
     }
 
+    var cachedSubscriptionCount: Int? {
+        cachePopulated ? cachedChannels.count : nil
+    }
+
     // MARK: - Private Helpers
 
     /// Gets the authenticated Invidious instance and session ID from account settings.

@@ -14788,6 +14788,17 @@
         }
       }
     },
+    "settings.subscriptions.export.error.title" : {
+      "comment" : "Title for export error toast",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Export Failed"
+          }
+        }
+      }
+    },
     "settings.subscriptions.export.footer %lld" : {
       "comment" : "Footer showing subscription count for export",
       "localizations" : {
@@ -14894,6 +14905,83 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Import"
+          }
+        }
+      }
+    },
+    "settings.subscriptions.localData.delete.button" : {
+      "comment" : "Button to delete locally stored subscriptions",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Delete Local Subscription Data"
+          }
+        }
+      }
+    },
+    "settings.subscriptions.localData.delete.confirmation.action" : {
+      "comment" : "Confirmation action for deleting local subscriptions",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Delete"
+          }
+        }
+      }
+    },
+    "settings.subscriptions.localData.delete.confirmation.message" : {
+      "comment" : "Message explaining what deleting local subscriptions does",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Removes subscriptions stored on this device and synced with iCloud. Subscriptions on your Invidious or Piped account are not affected."
+          }
+        }
+      }
+    },
+    "settings.subscriptions.localData.delete.confirmation.title %lld" : {
+      "comment" : "Confirmation title for deleting local subscriptions",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Delete %lld local subscriptions?"
+          }
+        }
+      }
+    },
+    "settings.subscriptions.localData.deleted.title" : {
+      "comment" : "Toast shown after local subscriptions were deleted",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Local Subscriptions Deleted"
+          }
+        }
+      }
+    },
+    "settings.subscriptions.localData.footer %lld" : {
+      "comment" : "Footer showing how many subscriptions are stored locally",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld subscriptions are stored locally on this device. They are not used while a server account is selected."
+          }
+        }
+      }
+    },
+    "settings.subscriptions.localData.title" : {
+      "comment" : "Header for local subscription data section",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Local Data"
           }
         }
       }
