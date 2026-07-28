@@ -1218,6 +1218,14 @@
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
+		378CF2FF2EF21783002C1CD7 /* XCRemoteSwiftPackageReference "MPVKit" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/yattee/MPVKit.git";
+			requirement = {
+				kind = exactVersion;
+				version = 1.0.1;
+			};
+		};
 		370E71962F9A1A41000E04B2 /* XCRemoteSwiftPackageReference "Sparkle" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/sparkle-project/Sparkle";
@@ -1232,14 +1240,6 @@
 			requirement = {
 				kind = upToNextMajorVersion;
 				minimumVersion = 12.8.0;
-			};
-		};
-		378CF2FF2EF21783002C1CD7 /* XCRemoteSwiftPackageReference "MPVKit" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/mpvkit/MPVKit.git";
-			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = 1.0.0;
 			};
 		};
 /* End XCRemoteSwiftPackageReference section */
