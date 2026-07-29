@@ -85,6 +85,13 @@ final class PlayerService {
         embeddedSubtitleTracks.first(where: \.isSelected)?.trackID
     }
 
+    /// The video track mpv currently plays. Used to label local-file streams,
+    /// whose Stream carries no resolution/codec/fps metadata before demux.
+    var primaryEmbeddedVideoTrack: MPVTrack? {
+        let videoTracks = embeddedTracks.filter { $0.type == .video && !$0.isExternal && !$0.isAlbumArt }
+        return videoTracks.first(where: \.isSelected) ?? videoTracks.first
+    }
+
     /// Embedded-track picks that should survive same-video reloads
     /// (quality switch, audio-mode toggle, buffer-stall retry).
     private var desiredEmbeddedAudioTrackID: Int?

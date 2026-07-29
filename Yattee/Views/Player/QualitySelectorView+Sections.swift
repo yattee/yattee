@@ -184,7 +184,7 @@ extension QualitySelectorView {
         if format == .hls || format == .dash {
             return format == .hls ? "HLS" : "DASH"
         }
-        return stream.qualityLabel
+        return displayStream(for: stream).qualityLabel
     }
 
     private var currentAudioDisplayValue: String {
@@ -695,6 +695,35 @@ extension QualitySelectorView {
         }
     }
 
+    /// A local file's Stream carries no resolution/codec/fps metadata
+    /// (`MediaFile.toStream` cannot know them before demux), which would label
+    /// the row "Unknown". Once mpv reports the file's video track, fill those
+    /// fields for display. The enriched copy is display-only — selection and
+    /// tap handling keep using the original stream (compared by URL).
+    func displayStream(for stream: Stream) -> Stream {
+        guard stream.url.isFileURL,
+              stream.resolution == nil,
+              !stream.isAudioOnly,
+              let track = embeddedVideoTrack,
+              let width = track.width,
+              let height = track.height else {
+            return stream
+        }
+        return Stream(
+            url: stream.url,
+            resolution: StreamResolution(width: width, height: height),
+            format: stream.format,
+            videoCodec: track.codec ?? stream.videoCodec,
+            audioCodec: stream.audioCodec,
+            bitrate: stream.bitrate,
+            fileSize: stream.fileSize,
+            isLive: stream.isLive,
+            mimeType: stream.mimeType,
+            httpHeaders: stream.httpHeaders,
+            fps: track.fps.map { Int($0.rounded()) }
+        )
+    }
+
     @ViewBuilder
     private func videoStreamRow(_ stream: Stream) -> some View {
         let isDownloadedStream: Bool = stream.url.isFileURL
@@ -704,7 +733,7 @@ extension QualitySelectorView {
         let isPreferredQuality: Bool = stream.resolution == preferredQuality.maxResolution
 
         VideoStreamRowView(
-            stream: stream,
+            stream: displayStream(for: stream),
             isSelected: isSelected,
             isPreferredQuality: isPreferredQuality,
             isDownloaded: isDownloadedStream,

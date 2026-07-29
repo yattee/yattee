@@ -701,6 +701,7 @@ private struct PlayerSheetsModifier: ViewModifier {
                 embeddedSubtitleTracks: playerService.embeddedSubtitleTracks,
                 currentEmbeddedAudioTrackID: playerService.selectedEmbeddedAudioTrackID,
                 currentEmbeddedSubtitleTrackID: playerService.selectedEmbeddedSubtitleTrackID,
+                embeddedVideoTrack: playerService.primaryEmbeddedVideoTrack,
                 onStreamSelected: { stream, audioStream in
                     onStreamSelected(stream, audioStream)
                 },

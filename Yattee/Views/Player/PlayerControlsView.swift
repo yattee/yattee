@@ -96,6 +96,7 @@ struct PlayerControlsView: View {
     var embeddedSubtitleTracks: [MPVTrack] = []
     var currentEmbeddedAudioTrackID: Int? = nil
     var currentEmbeddedSubtitleTrackID: Int? = nil
+    var embeddedVideoTrack: MPVTrack? = nil
     /// Callback when an embedded audio track is selected
     var onEmbeddedAudioTrackSelected: ((Int) -> Void)? = nil
     /// Callback when an embedded subtitle track is selected (nil = off)
@@ -315,6 +316,7 @@ struct PlayerControlsView: View {
             currentAudioStream: currentAudioStream,
             initialTab: .video,
             showTabPicker: false,
+            embeddedVideoTrack: embeddedVideoTrack,
             onStreamSelected: { stream, audioStream in
                 onStreamSelected?(stream, audioStream)
             },

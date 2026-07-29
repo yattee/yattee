@@ -171,6 +171,7 @@ struct TVPlayerView: View {
                 embeddedSubtitleTracks: playerService.embeddedSubtitleTracks,
                 currentEmbeddedAudioTrackID: playerService.selectedEmbeddedAudioTrackID,
                 currentEmbeddedSubtitleTrackID: playerService.selectedEmbeddedSubtitleTrackID,
+                embeddedVideoTrack: playerService.primaryEmbeddedVideoTrack,
                 onStreamSelected: { stream, audioStream in
                     switchToStream(stream, audioStream: audioStream)
                 },

@@ -31,6 +31,9 @@ struct MPVTrack: Equatable, Sendable, Identifiable, Decodable {
     let codec: String?
     let channelCount: Int?
     let sampleRate: Int?
+    let width: Int?
+    let height: Int?
+    let fps: Double?
 
     /// Identifiable across types — mpv ids collide between audio/sub/video.
     var id: String { "\(type.rawValue):\(trackID)" }
@@ -48,6 +51,9 @@ struct MPVTrack: Equatable, Sendable, Identifiable, Decodable {
         case codec
         case channelCount = "demux-channel-count"
         case sampleRate = "demux-samplerate"
+        case width = "demux-w"
+        case height = "demux-h"
+        case fps = "demux-fps"
     }
 
     init(from decoder: Decoder) throws {
@@ -64,6 +70,9 @@ struct MPVTrack: Equatable, Sendable, Identifiable, Decodable {
         codec = try container.decodeIfPresent(String.self, forKey: .codec)
         channelCount = try container.decodeIfPresent(Int.self, forKey: .channelCount)
         sampleRate = try container.decodeIfPresent(Int.self, forKey: .sampleRate)
+        width = try container.decodeIfPresent(Int.self, forKey: .width)
+        height = try container.decodeIfPresent(Int.self, forKey: .height)
+        fps = try container.decodeIfPresent(Double.self, forKey: .fps)
     }
 
     init(
@@ -78,7 +87,10 @@ struct MPVTrack: Equatable, Sendable, Identifiable, Decodable {
         isAlbumArt: Bool = false,
         codec: String? = nil,
         channelCount: Int? = nil,
-        sampleRate: Int? = nil
+        sampleRate: Int? = nil,
+        width: Int? = nil,
+        height: Int? = nil,
+        fps: Double? = nil
     ) {
         self.trackID = trackID
         self.type = type
@@ -92,6 +104,9 @@ struct MPVTrack: Equatable, Sendable, Identifiable, Decodable {
         self.codec = codec
         self.channelCount = channelCount
         self.sampleRate = sampleRate
+        self.width = width
+        self.height = height
+        self.fps = fps
     }
 
     /// Base language code normalized to the 2-letter form when possible, so

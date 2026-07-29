@@ -34,6 +34,8 @@ struct QualitySelectorView: View {
     let embeddedSubtitleTracks: [MPVTrack]
     let currentEmbeddedAudioTrackID: Int?
     let currentEmbeddedSubtitleTrackID: Int?
+    /// The playing file's video track, used to label metadata-less local streams
+    let embeddedVideoTrack: MPVTrack?
     let onEmbeddedAudioTrackSelected: (Int) -> Void
     /// nil = subtitles off
     let onEmbeddedSubtitleTrackSelected: (Int?) -> Void
@@ -181,6 +183,7 @@ struct QualitySelectorView: View {
         embeddedSubtitleTracks: [MPVTrack] = [],
         currentEmbeddedAudioTrackID: Int? = nil,
         currentEmbeddedSubtitleTrackID: Int? = nil,
+        embeddedVideoTrack: MPVTrack? = nil,
         onStreamSelected: @escaping (Stream, Stream?) -> Void,
         onCaptionSelected: @escaping (Caption?) -> Void = { _ in },
         onLoadOnlineStreams: @escaping () -> Void = {},
@@ -210,6 +213,7 @@ struct QualitySelectorView: View {
         self.embeddedSubtitleTracks = embeddedSubtitleTracks
         self.currentEmbeddedAudioTrackID = currentEmbeddedAudioTrackID
         self.currentEmbeddedSubtitleTrackID = currentEmbeddedSubtitleTrackID
+        self.embeddedVideoTrack = embeddedVideoTrack
         self.onStreamSelected = onStreamSelected
         self.onCaptionSelected = onCaptionSelected
         self.onLoadOnlineStreams = onLoadOnlineStreams

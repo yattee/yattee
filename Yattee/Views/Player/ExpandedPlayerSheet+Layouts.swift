@@ -866,6 +866,7 @@ extension ExpandedPlayerSheet {
                     embeddedSubtitleTracks: playerService.embeddedSubtitleTracks,
                     currentEmbeddedAudioTrackID: playerService.selectedEmbeddedAudioTrackID,
                     currentEmbeddedSubtitleTrackID: playerService.selectedEmbeddedSubtitleTrackID,
+                    embeddedVideoTrack: playerService.primaryEmbeddedVideoTrack,
                     onEmbeddedAudioTrackSelected: { trackID in
                         playerService.selectEmbeddedAudioTrack(trackID)
                     },
@@ -1146,6 +1147,7 @@ extension ExpandedPlayerSheet {
                 embeddedSubtitleTracks: playerService.embeddedSubtitleTracks,
                 currentEmbeddedAudioTrackID: playerService.selectedEmbeddedAudioTrackID,
                 currentEmbeddedSubtitleTrackID: playerService.selectedEmbeddedSubtitleTrackID,
+                embeddedVideoTrack: playerService.primaryEmbeddedVideoTrack,
                 onEmbeddedAudioTrackSelected: { trackID in
                     playerService.selectEmbeddedAudioTrack(trackID)
                 },
@@ -1533,6 +1535,7 @@ extension ExpandedPlayerSheet {
                     embeddedSubtitleTracks: playerService.embeddedSubtitleTracks,
                     currentEmbeddedAudioTrackID: playerService.selectedEmbeddedAudioTrackID,
                     currentEmbeddedSubtitleTrackID: playerService.selectedEmbeddedSubtitleTrackID,
+                    embeddedVideoTrack: playerService.primaryEmbeddedVideoTrack,
                     onEmbeddedAudioTrackSelected: { trackID in
                         playerService.selectEmbeddedAudioTrack(trackID)
                     },

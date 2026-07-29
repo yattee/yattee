@@ -266,6 +266,7 @@ struct MPVVideoView: View {
             embeddedSubtitleTracks: playerService.embeddedSubtitleTracks,
             currentEmbeddedAudioTrackID: playerService.selectedEmbeddedAudioTrackID,
             currentEmbeddedSubtitleTrackID: playerService.selectedEmbeddedSubtitleTrackID,
+            embeddedVideoTrack: playerService.primaryEmbeddedVideoTrack,
             onEmbeddedAudioTrackSelected: { trackID in
                 playerService.selectEmbeddedAudioTrack(trackID)
             },

@@ -42,6 +42,9 @@ struct MPVTrackDecodingTests {
         #expect(video.trackID == 1)
         #expect(video.isDefault)
         #expect(video.isSelected)
+        #expect(video.width == 3840)
+        #expect(video.height == 1600)
+        #expect(video.fps == 23.976)
 
         let mainAudio = tracks[1]
         #expect(mainAudio.type == .audio)
