@@ -862,6 +862,16 @@ extension ExpandedPlayerSheet {
                     onStreamSelected: { [self] stream, audioStream in
                         switchToStream(stream, audioStream: audioStream)
                     },
+                    embeddedAudioTracks: playerService.embeddedAudioTracks,
+                    embeddedSubtitleTracks: playerService.embeddedSubtitleTracks,
+                    currentEmbeddedAudioTrackID: playerService.selectedEmbeddedAudioTrackID,
+                    currentEmbeddedSubtitleTrackID: playerService.selectedEmbeddedSubtitleTrackID,
+                    onEmbeddedAudioTrackSelected: { trackID in
+                        playerService.selectEmbeddedAudioTrack(trackID)
+                    },
+                    onEmbeddedSubtitleTrackSelected: { trackID in
+                        playerService.selectEmbeddedSubtitleTrack(trackID)
+                    },
                     panscanValue: navigationCoordinator?.pinchPanscan ?? 0.0,
                     isPanscanAllowed: !isPortraitPanelVisible,
                     onTogglePanscan: { [weak navigationCoordinator] in
@@ -1131,6 +1141,16 @@ extension ExpandedPlayerSheet {
                 },
                 onStreamSelected: { [self] stream, audioStream in
                     switchToStream(stream, audioStream: audioStream)
+                },
+                embeddedAudioTracks: playerService.embeddedAudioTracks,
+                embeddedSubtitleTracks: playerService.embeddedSubtitleTracks,
+                currentEmbeddedAudioTrackID: playerService.selectedEmbeddedAudioTrackID,
+                currentEmbeddedSubtitleTrackID: playerService.selectedEmbeddedSubtitleTrackID,
+                onEmbeddedAudioTrackSelected: { trackID in
+                    playerService.selectEmbeddedAudioTrack(trackID)
+                },
+                onEmbeddedSubtitleTrackSelected: { trackID in
+                    playerService.selectEmbeddedSubtitleTrack(trackID)
                 },
                 panscanValue: navigationCoordinator?.pinchPanscan ?? 0.0,
                 isPanscanAllowed: !isPortraitPanelVisible,
@@ -1508,6 +1528,16 @@ extension ExpandedPlayerSheet {
                     },
                     onStreamSelected: { [self] stream, audioStream in
                         switchToStream(stream, audioStream: audioStream)
+                    },
+                    embeddedAudioTracks: playerService.embeddedAudioTracks,
+                    embeddedSubtitleTracks: playerService.embeddedSubtitleTracks,
+                    currentEmbeddedAudioTrackID: playerService.selectedEmbeddedAudioTrackID,
+                    currentEmbeddedSubtitleTrackID: playerService.selectedEmbeddedSubtitleTrackID,
+                    onEmbeddedAudioTrackSelected: { trackID in
+                        playerService.selectEmbeddedAudioTrack(trackID)
+                    },
+                    onEmbeddedSubtitleTrackSelected: { trackID in
+                        playerService.selectEmbeddedSubtitleTrack(trackID)
                     },
                     panscanValue: navigationCoordinator?.pinchPanscan ?? 0.0,
                     isPanscanAllowed: !(isPanelPinned && isPanelVisible),

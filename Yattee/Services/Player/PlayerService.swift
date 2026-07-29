@@ -62,6 +62,37 @@ final class PlayerService {
     /// Currently loaded caption.
     private(set) var currentCaption: Caption?
 
+    /// Tracks reported by mpv for the currently loaded file (embedded and external).
+    private(set) var embeddedTracks: [MPVTrack] = []
+
+    /// Embedded (in-container) audio tracks of the current file.
+    var embeddedAudioTracks: [MPVTrack] {
+        embeddedTracks.filter { $0.type == .audio && !$0.isExternal }
+    }
+
+    /// Embedded (in-container) subtitle tracks of the current file.
+    var embeddedSubtitleTracks: [MPVTrack] {
+        embeddedTracks.filter { $0.type == .sub && !$0.isExternal }
+    }
+
+    /// The embedded audio track mpv currently plays, if any.
+    var selectedEmbeddedAudioTrackID: Int? {
+        embeddedAudioTracks.first(where: \.isSelected)?.trackID
+    }
+
+    /// The embedded subtitle track mpv currently shows, if any.
+    var selectedEmbeddedSubtitleTrackID: Int? {
+        embeddedSubtitleTracks.first(where: \.isSelected)?.trackID
+    }
+
+    /// Embedded-track picks that should survive same-video reloads
+    /// (quality switch, audio-mode toggle, buffer-stall retry).
+    private var desiredEmbeddedAudioTrackID: Int?
+    private var desiredEmbeddedSubtitleTrackID: Int?
+
+    /// Whether preferred-language auto-selection already ran for this load.
+    private var didAutoSelectEmbeddedTracks = false
+
     /// The current download being played, if any.
     private(set) var currentDownload: Download?
 
@@ -232,6 +263,15 @@ final class PlayerService {
         // full stream list kept around for the picker survives the switch.
         if isNewVideo {
             availableStreams = []
+        }
+
+        // Embedded-track state: the mpv-reported list always refreshes on load,
+        // but sticky user picks only reset when the video actually changes.
+        embeddedTracks = []
+        didAutoSelectEmbeddedTracks = false
+        if isNewVideo {
+            desiredEmbeddedAudioTrackID = nil
+            desiredEmbeddedSubtitleTrackID = nil
         }
 
         // Clear sponsor block state from previous video
@@ -619,6 +659,10 @@ final class PlayerService {
         preDownloadedSubtitleFolders.removeAll()
         cleanupAllTempSubtitles()
         currentCaption = nil
+        embeddedTracks = []
+        desiredEmbeddedAudioTrackID = nil
+        desiredEmbeddedSubtitleTrackID = nil
+        didAutoSelectEmbeddedTracks = false
         lastSkippedSegmentID = nil
         nowPlayingService.clearNowPlaying()
     }
@@ -1303,11 +1347,77 @@ final class PlayerService {
 
         mpvBackend.loadCaption(caption)
         currentCaption = caption
+        // An explicit external pick (or Off) overrides any embedded-subtitle intent
+        desiredEmbeddedSubtitleTrackID = nil
 
         if let caption {
             LoggingService.shared.logPlayer("Loaded caption: \(caption.displayName)")
         } else {
             LoggingService.shared.logPlayer("Disabled subtitles")
+        }
+    }
+
+    /// Selects an embedded audio track by mpv track id (live, no reload).
+    /// Only works with MPV backend.
+    func selectEmbeddedAudioTrack(_ trackID: Int) {
+        guard let mpvBackend = currentBackend as? MPVBackend else { return }
+
+        desiredEmbeddedAudioTrackID = trackID
+        mpvBackend.selectEmbeddedAudioTrack(trackID)
+        LoggingService.shared.logPlayer("Selected embedded audio track \(trackID)")
+    }
+
+    /// Selects an embedded subtitle track by mpv track id (nil = off).
+    /// Only works with MPV backend.
+    func selectEmbeddedSubtitleTrack(_ trackID: Int?) {
+        guard let mpvBackend = currentBackend as? MPVBackend else { return }
+
+        desiredEmbeddedSubtitleTrackID = trackID
+        currentCaption = nil
+        mpvBackend.selectEmbeddedSubtitleTrack(trackID)
+        LoggingService.shared.logPlayer("Selected embedded subtitle track \(trackID.map(String.init) ?? "off")")
+    }
+
+    /// Re-applies a sticky embedded-track pick after a reload, or auto-selects
+    /// preferred languages once per load. Called whenever mpv's track list changes.
+    private func reapplyOrAutoSelectEmbeddedTracks() {
+        guard let mpvBackend = currentBackend as? MPVBackend else { return }
+
+        // Re-apply sticky user picks. Loop-safe: selecting fires one more
+        // track-list update in which the track is already selected.
+        if let desired = desiredEmbeddedAudioTrackID,
+           let track = embeddedAudioTracks.first(where: { $0.trackID == desired }),
+           !track.isSelected {
+            mpvBackend.selectEmbeddedAudioTrack(desired)
+        }
+        if let desired = desiredEmbeddedSubtitleTrackID,
+           let track = embeddedSubtitleTracks.first(where: { $0.trackID == desired }),
+           !track.isSelected {
+            mpvBackend.selectEmbeddedSubtitleTrack(desired)
+        }
+
+        // Auto-select preferred languages once per load. Skipped while the
+        // list is empty so the reset delivered at load start doesn't consume
+        // the one-shot flag.
+        guard !didAutoSelectEmbeddedTracks, !embeddedTracks.isEmpty else { return }
+        didAutoSelectEmbeddedTracks = true
+
+        if desiredEmbeddedAudioTrackID == nil,
+           embeddedAudioTracks.count > 1,
+           let match = embeddedAudioTracks.first(where: { $0.matchesLanguage(settingsManager?.preferredAudioLanguage) }),
+           !match.isSelected {
+            mpvBackend.selectEmbeddedAudioTrack(match.trackID)
+            LoggingService.shared.logPlayer("Auto-selected embedded audio track \(match.trackID) (\(match.displayName))")
+        }
+
+        // External captions win: the preferred-caption flow sets currentCaption
+        // before mpv reports any tracks.
+        if desiredEmbeddedSubtitleTrackID == nil,
+           currentCaption == nil,
+           let match = embeddedSubtitleTracks.first(where: { !$0.isForced && $0.matchesLanguage(settingsManager?.preferredSubtitlesLanguage) }),
+           !match.isSelected {
+            mpvBackend.selectEmbeddedSubtitleTrack(match.trackID)
+            LoggingService.shared.logPlayer("Auto-selected embedded subtitle track \(match.trackID) (\(match.displayName))")
         }
     }
 
@@ -2900,6 +3010,11 @@ extension PlayerService: PlayerBackendDelegate {
             exhausted: exhausted
         )
         state.setRetryState(retryState)
+    }
+
+    func backend(_ backend: any PlayerBackend, didUpdateTracks tracks: [MPVTrack]) {
+        embeddedTracks = tracks
+        reapplyOrAutoSelectEmbeddedTracks()
     }
 
     func backend(_ backend: any PlayerBackend, didRequestStreamRefresh atTime: TimeInterval?) {

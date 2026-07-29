@@ -76,6 +76,12 @@ struct PlayerControlsActions {
     /// Current audio stream
     let currentAudioStream: Stream?
 
+    /// Embedded (in-container) tracks reported by mpv for the loaded file
+    var embeddedAudioTracks: [MPVTrack] = []
+    var embeddedSubtitleTracks: [MPVTrack] = []
+    var currentEmbeddedAudioTrackID: Int? = nil
+    var currentEmbeddedSubtitleTrackID: Int? = nil
+
     #if os(iOS)
     /// Current panscan value (0.0 = fit, 1.0 = fill)
     let panscanValue: Double
@@ -217,9 +223,9 @@ struct PlayerControlsActions {
         return !video.isFromLocalFolder
     }
 
-    /// Whether captions are available
+    /// Whether captions are available (external files or embedded tracks)
     var hasCaptions: Bool {
-        !availableCaptions.isEmpty
+        !availableCaptions.isEmpty || !embeddedSubtitleTracks.isEmpty
     }
 
     /// Whether chapters are available

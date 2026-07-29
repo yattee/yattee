@@ -99,6 +99,9 @@ final class MPVBackend: PlayerBackend {
     private var currentCaption: Caption?
     private var pendingAutoplay: Bool = false
 
+    /// Tracks reported by mpv for the loaded file (embedded and external).
+    private(set) var currentTracks: [MPVTrack] = []
+
     // Retry mechanism: 4 attempts with increasing timeouts and delays
     // Attempt 1: 3s timeout, 1s delay | Attempt 2: 3s timeout, 3s delay
     // Attempt 3: 10s timeout, 5s delay | Attempt 4: 10s timeout, fail
@@ -480,6 +483,10 @@ final class MPVBackend: PlayerBackend {
         // Clear any subtitles from previous video
         currentCaption = nil
         mpvClient?.removeAllSubtitlesAsync()
+
+        // Clear stale track info; the observer repopulates it once the new file loads
+        currentTracks = []
+        delegate?.backend(self, didUpdateTracks: [])
 
         // Reset first-frame tracking for new content
         renderView?.resetFirstFrameTracking()
@@ -908,6 +915,22 @@ final class MPVBackend: PlayerBackend {
     /// Get the currently loaded caption.
     func getCurrentCaption() -> Caption? {
         currentCaption
+    }
+
+    // MARK: - Embedded Tracks
+
+    /// Select an embedded audio track by mpv track id (live, no reload).
+    func selectEmbeddedAudioTrack(_ trackID: Int) {
+        mpvClient?.setAudioTrack(trackID)
+    }
+
+    /// Select an embedded subtitle track by mpv track id (nil = off).
+    /// Deliberately no `sub-remove`: external captions stay loaded so the user
+    /// can switch back without a re-download. Selection is no longer
+    /// represented by a Caption, so `currentCaption` is cleared.
+    func selectEmbeddedSubtitleTrack(_ trackID: Int?) {
+        currentCaption = nil
+        mpvClient?.setSubtitleTrack(trackID)
     }
 
     /// Update subtitle appearance settings on the active MPV instance.
@@ -1571,6 +1594,14 @@ extension MPVBackend: MPVClientDelegate {
 
     nonisolated func mpvClient(_ client: MPVClient, didUpdateCacheState cacheState: MPVCacheState) {
         // Cache state is used for buffer display on seek bar - no action needed here
+    }
+
+    nonisolated func mpvClient(_ client: MPVClient, didUpdateTrackList tracks: [MPVTrack]) {
+        Task { @MainActor [weak self] in
+            guard let self else { return }
+            self.currentTracks = tracks
+            self.delegate?.backend(self, didUpdateTracks: tracks)
+        }
     }
 
     nonisolated func mpvClientDidEndFile(_ client: MPVClient, reason: MPVEndFileReason, errorCode: Int32, errorString: String?) {

@@ -414,6 +414,83 @@ struct CaptionRowView: View {
     }
 }
 
+// MARK: - Embedded Track Row
+
+/// Row view for embedded (in-container) audio/subtitle tracks reported by mpv.
+struct EmbeddedTrackRowView: View {
+    let track: MPVTrack
+    let isSelected: Bool
+    let isPreferred: Bool
+    let showAdvancedDetails: Bool
+    let onTap: () -> Void
+
+    var body: some View {
+        Button(action: onTap) {
+            HStack {
+                VStack(alignment: .leading, spacing: 2) {
+                    titleRow
+                    if showAdvancedDetails, let detail = track.detailText {
+                        Text(detail)
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                    }
+                }
+
+                Spacer()
+
+                if isSelected {
+                    Image(systemName: "checkmark")
+                        .foregroundStyle(.tint)
+                }
+            }
+            .frame(minHeight: showAdvancedDetails ? nil : 36)
+            #if os(tvOS)
+            .padding(.vertical, tvRowVerticalPadding)
+            .padding(.horizontal, tvRowHorizontalPadding)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            #endif
+            .contentShape(Rectangle())
+        }
+        #if os(tvOS)
+        .buttonStyle(TVSettingsRowButtonStyle())
+        #else
+        .buttonStyle(.plain)
+        #endif
+    }
+
+    @ViewBuilder
+    private var titleRow: some View {
+        HStack(spacing: 6) {
+            if isPreferred {
+                Image(systemName: "star.fill")
+                    .font(.caption2)
+                    .foregroundStyle(.orange)
+            }
+
+            Text(track.displayName)
+                .font(.headline)
+
+            if track.isDefault {
+                badge(String(localized: "player.track.default"))
+            }
+
+            if track.isForced {
+                badge(String(localized: "player.track.forced"))
+            }
+        }
+    }
+
+    private func badge(_ text: String) -> some View {
+        Text(text)
+            .font(.caption2)
+            .padding(.horizontal, 6)
+            .padding(.vertical, 2)
+            .background(Color.gray.opacity(0.2))
+            .foregroundStyle(.secondary)
+            .clipShape(Capsule())
+    }
+}
+
 // MARK: - Previews
 
 #Preview("Adaptive Stream Row") {

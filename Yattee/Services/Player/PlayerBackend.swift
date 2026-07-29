@@ -152,6 +152,7 @@ protocol PlayerBackendDelegate: AnyObject {
     func backend(_ backend: any PlayerBackend, didUpdateVideoSize width: Int, height: Int)
     func backend(_ backend: any PlayerBackend, didUpdateRetryState currentRetry: Int, maxRetries: Int, isRetrying: Bool, exhausted: Bool)
     func backend(_ backend: any PlayerBackend, didRequestStreamRefresh atTime: TimeInterval?)
+    func backend(_ backend: any PlayerBackend, didUpdateTracks tracks: [MPVTrack])
     func backendDidBecomeReady(_ backend: any PlayerBackend)
     func backendDidFinishPlaying(_ backend: any PlayerBackend)
 }

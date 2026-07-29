@@ -697,6 +697,10 @@ private struct PlayerSheetsModifier: ViewModifier {
                 currentRate: playerState?.rate ?? .x1,
                 isControlsLocked: playerState?.isControlsLocked ?? false,
                 isAudioMode: appEnvironment?.settingsManager.audioOnlyModeEnabled ?? false,
+                embeddedAudioTracks: playerService.embeddedAudioTracks,
+                embeddedSubtitleTracks: playerService.embeddedSubtitleTracks,
+                currentEmbeddedAudioTrackID: playerService.selectedEmbeddedAudioTrackID,
+                currentEmbeddedSubtitleTrackID: playerService.selectedEmbeddedSubtitleTrackID,
                 onStreamSelected: { stream, audioStream in
                     onStreamSelected(stream, audioStream)
                 },
@@ -712,6 +716,12 @@ private struct PlayerSheetsModifier: ViewModifier {
                     Task {
                         await playerService.switchToOnlineStream(stream, audioStream: audioStream)
                     }
+                },
+                onEmbeddedAudioTrackSelected: { trackID in
+                    playerService.selectEmbeddedAudioTrack(trackID)
+                },
+                onEmbeddedSubtitleTrackSelected: { trackID in
+                    playerService.selectEmbeddedSubtitleTrack(trackID)
                 },
                 onRateChanged: { rate in
                     playerState?.rate = rate

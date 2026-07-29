@@ -188,6 +188,11 @@ extension QualitySelectorView {
     }
 
     private var currentAudioDisplayValue: String {
+        if embeddedAudioTracks.count > 1,
+           let trackID = currentEmbeddedAudioTrackID,
+           let track = embeddedAudioTracks.first(where: { $0.trackID == trackID }) {
+            return track.displayName
+        }
         if isCurrentStreamMuxed {
             return String(localized: "player.quality.audioFromVideo.short")
         }
@@ -198,7 +203,11 @@ extension QualitySelectorView {
     }
 
     private var currentSubtitlesDisplayValue: String {
-        currentCaption?.displayName ?? String(localized: "stream.subtitles.off")
+        if let trackID = currentEmbeddedSubtitleTrackID,
+           let track = embeddedSubtitleTracks.first(where: { $0.trackID == trackID }) {
+            return track.displayName
+        }
+        return currentCaption?.displayName ?? String(localized: "stream.subtitles.off")
     }
 
     // MARK: - Detail Content Views
@@ -741,7 +750,9 @@ extension QualitySelectorView {
 
     @ViewBuilder
     var audioSectionContent: some View {
-        if isCurrentStreamMuxed {
+        if embeddedAudioTracks.count > 1 {
+            embeddedAudioTracksContent
+        } else if isCurrentStreamMuxed {
             VStack(spacing: 0) {
                 HStack {
                     Image(systemName: "info.circle")
@@ -776,6 +787,44 @@ extension QualitySelectorView {
             .cardBackground()
             #endif
         }
+    }
+
+    /// Embedded (in-container) audio tracks, switched live via mpv `aid`.
+    @ViewBuilder
+    private var embeddedAudioTracksContent: some View {
+        #if os(tvOS)
+        VStack(spacing: 8) {
+            ForEach(embeddedAudioTracks) { track in
+                embeddedAudioTrackRow(track)
+            }
+        }
+        #else
+        VStack(spacing: 0) {
+            ForEach(Array(embeddedAudioTracks.enumerated()), id: \.element.id) { index, track in
+                if index > 0 {
+                    Divider()
+                }
+                embeddedAudioTrackRow(track)
+                    .padding(.vertical, 8)
+                    .padding(.horizontal, 12)
+            }
+        }
+        .cardBackground()
+        #endif
+    }
+
+    @ViewBuilder
+    private func embeddedAudioTrackRow(_ track: MPVTrack) -> some View {
+        EmbeddedTrackRowView(
+            track: track,
+            isSelected: track.trackID == currentEmbeddedAudioTrackID,
+            isPreferred: track.matchesLanguage(preferredAudioLanguage),
+            showAdvancedDetails: showAdvancedStreamDetails,
+            onTap: {
+                onEmbeddedAudioTrackSelected(track.trackID)
+                performDismiss()
+            }
+        )
     }
 
     @ViewBuilder
@@ -816,12 +865,16 @@ extension QualitySelectorView {
         VStack(spacing: 8) {
             CaptionRowView(
                 caption: nil,
-                isSelected: currentCaption == nil,
+                isSelected: currentCaption == nil && currentEmbeddedSubtitleTrackID == nil,
                 isPreferred: false,
                 onTap: {
                     handleCaptionTap(nil)
                 }
             )
+
+            ForEach(embeddedSubtitleTracks) { track in
+                embeddedSubtitleTrackRow(track)
+            }
 
             ForEach(sortedCaptions) { caption in
                 CaptionRowView(
@@ -838,7 +891,7 @@ extension QualitySelectorView {
         VStack(spacing: 0) {
             CaptionRowView(
                 caption: nil,
-                isSelected: currentCaption == nil,
+                isSelected: currentCaption == nil && currentEmbeddedSubtitleTrackID == nil,
                 isPreferred: false,
                 onTap: {
                     handleCaptionTap(nil)
@@ -846,6 +899,14 @@ extension QualitySelectorView {
             )
             .padding(.vertical, 8)
             .padding(.horizontal, 12)
+
+            ForEach(embeddedSubtitleTracks) { track in
+                Divider()
+
+                embeddedSubtitleTrackRow(track)
+                    .padding(.vertical, 8)
+                    .padding(.horizontal, 12)
+            }
 
             ForEach(sortedCaptions) { caption in
                 Divider()
@@ -866,12 +927,34 @@ extension QualitySelectorView {
         #endif
     }
 
+    @ViewBuilder
+    private func embeddedSubtitleTrackRow(_ track: MPVTrack) -> some View {
+        EmbeddedTrackRowView(
+            track: track,
+            isSelected: track.trackID == currentEmbeddedSubtitleTrackID,
+            isPreferred: track.matchesLanguage(preferredSubtitlesLanguage),
+            showAdvancedDetails: showAdvancedStreamDetails,
+            onTap: {
+                // Re-tapping the selected track turns subtitles off (parity
+                // with external caption rows)
+                if track.trackID == currentEmbeddedSubtitleTrackID {
+                    onEmbeddedSubtitleTrackSelected(nil)
+                } else {
+                    onEmbeddedSubtitleTrackSelected(track.trackID)
+                }
+                performDismiss()
+            }
+        )
+    }
+
     private func isCaptionPreferred(_ caption: Caption) -> Bool {
         guard let preferred = preferredSubtitlesLanguage else { return false }
         return caption.baseLanguageCode == preferred || caption.languageCode.hasPrefix(preferred)
     }
 
     private func handleCaptionTap(_ caption: Caption?) {
+        // Note: the Off row needs no embedded-track handling — caption "off"
+        // sets sid=no and clears the embedded intent in PlayerService.
         if caption?.id == currentCaption?.id && caption != nil {
             onCaptionSelected(nil)
         } else {

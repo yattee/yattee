@@ -29,6 +29,15 @@ struct QualitySelectorView: View {
     let onLoadOnlineStreams: () -> Void
     let onSwitchToOnlineStream: (Stream, Stream?) -> Void
 
+    /// Embedded (in-container) tracks reported by mpv for the loaded file.
+    let embeddedAudioTracks: [MPVTrack]
+    let embeddedSubtitleTracks: [MPVTrack]
+    let currentEmbeddedAudioTrackID: Int?
+    let currentEmbeddedSubtitleTrackID: Int?
+    let onEmbeddedAudioTrackSelected: (Int) -> Void
+    /// nil = subtitles off
+    let onEmbeddedSubtitleTrackSelected: (Int?) -> Void
+
     /// Current playback rate
     var currentRate: PlaybackRate = .x1
     /// Callback when playback rate changes
@@ -100,10 +109,10 @@ struct QualitySelectorView: View {
     /// Available tabs based on streams
     var availableTabs: [QualitySelectorTab] {
         var tabs: [QualitySelectorTab] = [.video]
-        if hasVideoOnlyStreams && !audioStreams.isEmpty {
+        if (hasVideoOnlyStreams && !audioStreams.isEmpty) || embeddedAudioTracks.count > 1 {
             tabs.append(.audio)
         }
-        if !captions.isEmpty {
+        if !captions.isEmpty || !embeddedSubtitleTracks.isEmpty {
             tabs.append(.subtitles)
         }
         return tabs
@@ -133,7 +142,7 @@ struct QualitySelectorView: View {
     /// Whether streams are empty (not loading, but no streams available)
     var hasNoStreams: Bool {
         if !showTabPicker && initialTab == .subtitles {
-            return !isLoading && captions.isEmpty && !isPlayingDownloadedContent
+            return !isLoading && captions.isEmpty && embeddedSubtitleTracks.isEmpty && !isPlayingDownloadedContent
         }
         return !isLoading && streams.isEmpty && !isPlayingDownloadedContent
     }
@@ -168,10 +177,16 @@ struct QualitySelectorView: View {
         isAudioMode: Bool = false,
         initialTab: QualitySelectorTab = .video,
         showTabPicker: Bool = true,
+        embeddedAudioTracks: [MPVTrack] = [],
+        embeddedSubtitleTracks: [MPVTrack] = [],
+        currentEmbeddedAudioTrackID: Int? = nil,
+        currentEmbeddedSubtitleTrackID: Int? = nil,
         onStreamSelected: @escaping (Stream, Stream?) -> Void,
         onCaptionSelected: @escaping (Caption?) -> Void = { _ in },
         onLoadOnlineStreams: @escaping () -> Void = {},
         onSwitchToOnlineStream: @escaping (Stream, Stream?) -> Void = { _, _ in },
+        onEmbeddedAudioTrackSelected: @escaping (Int) -> Void = { _ in },
+        onEmbeddedSubtitleTrackSelected: @escaping (Int?) -> Void = { _ in },
         onRateChanged: ((PlaybackRate) -> Void)? = nil,
         onLockToggled: ((Bool) -> Void)? = nil,
         onAudioModeToggled: ((Bool) -> Void)? = nil,
@@ -191,10 +206,16 @@ struct QualitySelectorView: View {
         self.currentRate = currentRate
         self.isControlsLocked = isControlsLocked
         self.isAudioMode = isAudioMode
+        self.embeddedAudioTracks = embeddedAudioTracks
+        self.embeddedSubtitleTracks = embeddedSubtitleTracks
+        self.currentEmbeddedAudioTrackID = currentEmbeddedAudioTrackID
+        self.currentEmbeddedSubtitleTrackID = currentEmbeddedSubtitleTrackID
         self.onStreamSelected = onStreamSelected
         self.onCaptionSelected = onCaptionSelected
         self.onLoadOnlineStreams = onLoadOnlineStreams
         self.onSwitchToOnlineStream = onSwitchToOnlineStream
+        self.onEmbeddedAudioTrackSelected = onEmbeddedAudioTrackSelected
+        self.onEmbeddedSubtitleTrackSelected = onEmbeddedSubtitleTrackSelected
         self.onRateChanged = onRateChanged
         self.onLockToggled = onLockToggled
         self.onAudioModeToggled = onAudioModeToggled

@@ -922,7 +922,8 @@ struct ControlsSectionRenderer: View {
     @ViewBuilder
     private var captionsButton: some View {
         if actions.hasCaptions, actions.onCaptionSelected != nil {
-            controlButton(systemImage: actions.currentCaption != nil ? "captions.bubble.fill" : "captions.bubble") {
+            let subtitlesActive = actions.currentCaption != nil || actions.currentEmbeddedSubtitleTrackID != nil
+            controlButton(systemImage: subtitlesActive ? "captions.bubble.fill" : "captions.bubble") {
                 actions.onShowCaptionsSelector?()
             }
         }

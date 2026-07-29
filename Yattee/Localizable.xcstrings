@@ -7886,6 +7886,39 @@
         }
       }
     },
+    "player.track.default" : {
+      "comment" : "Badge for the container's default embedded track",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "DEFAULT"
+          }
+        }
+      }
+    },
+    "player.track.forced" : {
+      "comment" : "Badge for forced embedded subtitle tracks",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "FORCED"
+          }
+        }
+      }
+    },
+    "player.track.number %lld" : {
+      "comment" : "Fallback name for an embedded track without title or language",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Track %lld"
+          }
+        }
+      }
+    },
     "player.tvos.volumeDown" : {
       "extractionState" : "stale",
       "localizations" : {

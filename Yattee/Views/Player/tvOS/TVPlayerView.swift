@@ -167,6 +167,10 @@ struct TVPlayerView: View {
                 },
                 currentRate: playerState?.rate ?? .x1,
                 isAudioMode: appEnvironment?.settingsManager.audioOnlyModeEnabled ?? false,
+                embeddedAudioTracks: playerService.embeddedAudioTracks,
+                embeddedSubtitleTracks: playerService.embeddedSubtitleTracks,
+                currentEmbeddedAudioTrackID: playerService.selectedEmbeddedAudioTrackID,
+                currentEmbeddedSubtitleTrackID: playerService.selectedEmbeddedSubtitleTrackID,
                 onStreamSelected: { stream, audioStream in
                     switchToStream(stream, audioStream: audioStream)
                 },
@@ -182,6 +186,12 @@ struct TVPlayerView: View {
                     Task {
                         await playerService.switchToOnlineStream(stream, audioStream: audioStream)
                     }
+                },
+                onEmbeddedAudioTrackSelected: { trackID in
+                    playerService.selectEmbeddedAudioTrack(trackID)
+                },
+                onEmbeddedSubtitleTrackSelected: { trackID in
+                    playerService.selectEmbeddedSubtitleTrack(trackID)
                 },
                 onRateChanged: { rate in
                     playerState?.rate = rate

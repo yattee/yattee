@@ -98,6 +98,7 @@ protocol MPVClientDelegate: AnyObject {
     func mpvClient(_ client: MPVClient, didUpdateProperty property: String, value: Any?)
     func mpvClient(_ client: MPVClient, didReceiveEvent event: mpv_event_id)
     func mpvClient(_ client: MPVClient, didUpdateCacheState cacheState: MPVCacheState)
+    func mpvClient(_ client: MPVClient, didUpdateTrackList tracks: [MPVTrack])
     func mpvClientDidEndFile(_ client: MPVClient, reason: MPVEndFileReason, errorCode: Int32, errorString: String?)
 }
 
@@ -165,6 +166,11 @@ final class MPVClient: @unchecked Sendable {
     /// Whether the dedicated event-loop thread has been started (mpvQueue-guarded).
     /// The loop itself exits via `isDestroyed` + `mpv_wakeup` + `eventLoopExitSemaphore`.
     private var eventLoopRunning = false
+
+    /// Whether a coalesced track-list refresh is pending (mpvQueue-guarded).
+    /// Load and sub-add fire bursts of track-list/aid/sid notifications;
+    /// they collapse into a single fetch.
+    private var trackListRefreshScheduled = false
 
     /// Semaphore signaled when event loop exits
     private let eventLoopExitSemaphore = DispatchSemaphore(value: 0)
@@ -648,6 +654,11 @@ final class MPVClient: @unchecked Sendable {
         observeProperty("hwdec-interop", format: MPV_FORMAT_STRING)
         // Color transfer for tvOS dynamic-range matching (SDR / HDR10 / HLG)
         observeProperty("video-params/gamma", format: MPV_FORMAT_STRING)
+        // Track roster and selection: change signals only — the values are
+        // ignored and a coalesced track-list fetch runs instead.
+        observeProperty("track-list", format: MPV_FORMAT_NONE)
+        observeProperty("aid", format: MPV_FORMAT_STRING)
+        observeProperty("sid", format: MPV_FORMAT_STRING)
     }
 
     // MARK: - Options
@@ -838,6 +849,66 @@ final class MPVClient: @unchecked Sendable {
     /// Remove all external subtitle tracks asynchronously.
     func removeAllSubtitlesAsync() {
         commandAsync(["sub-remove"])
+    }
+
+    // MARK: - Embedded Tracks
+
+    /// Select an audio track by mpv track id (live, no reload). nil disables audio.
+    func setAudioTrack(_ trackID: Int?) {
+        setProperty("aid", trackID.map(String.init) ?? "no")
+    }
+
+    /// Select a subtitle track by mpv track id (embedded or external). nil disables subtitles.
+    func setSubtitleTrack(_ trackID: Int?) {
+        setProperty("sid", trackID.map(String.init) ?? "no")
+    }
+
+    /// Schedule a coalesced fetch of `track-list`, delivered via
+    /// `mpvClient(_:didUpdateTrackList:)`. Safe to call from any thread.
+    private func scheduleTrackListRefresh() {
+        mpvQueue.async { [weak self] in
+            guard let self, !self.trackListRefreshScheduled, !self.isDestroyed else { return }
+            self.trackListRefreshScheduled = true
+            self.mpvQueue.asyncAfter(deadline: .now() + 0.08) { [weak self] in
+                guard let self else { return }
+                self.trackListRefreshScheduled = false
+                self.refreshTrackListUnsafe()
+            }
+        }
+    }
+
+    /// Read and deliver the current track list (must be called on mpvQueue).
+    private func refreshTrackListUnsafe() {
+        guard let mpv, !isDestroyed else { return }
+        guard let cString = mpv_get_property_string(mpv, "track-list") else { return }
+        let json = String(cString: cString)
+        mpv_free(cString)
+
+        let tracks = Self.parseTrackList(json: json)
+        if tracks.isEmpty, json.count > 2 {
+            logWarning("Failed to parse track-list", details: String(json.prefix(500)))
+        }
+        Task { @MainActor [weak self] in
+            guard let self else { return }
+            self.delegate?.mpvClient(self, didUpdateTrackList: tracks)
+        }
+    }
+
+    /// Decode mpv's JSON representation of `track-list`. Lenient: a single
+    /// undecodable entry is dropped instead of blanking the whole list.
+    static func parseTrackList(json: String) -> [MPVTrack] {
+        struct FailableTrack: Decodable {
+            let track: MPVTrack?
+            init(from decoder: Decoder) {
+                track = try? MPVTrack(from: decoder)
+            }
+        }
+
+        guard let data = json.data(using: .utf8),
+              let entries = try? JSONDecoder().decode([FailableTrack].self, from: data) else {
+            return []
+        }
+        return entries.compactMap(\.track)
     }
 
     // MARK: - Properties
@@ -1663,6 +1734,14 @@ final class MPVClient: @unchecked Sendable {
 
     private func handlePropertyChange(_ property: mpv_event_property) {
         let name = String(cString: property.name)
+
+        // Any change to the track roster or selection funnels into one
+        // coalesced track-list refresh; the raw property values are unused.
+        if name == "track-list" || name == "aid" || name == "sid" {
+            scheduleTrackListRefresh()
+            return
+        }
+
         var value: Any?
 
         switch property.format {
