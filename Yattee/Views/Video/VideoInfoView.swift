@@ -232,6 +232,7 @@ struct VideoInfoView: View {
     /// and resume setting is continueWatching or ask.
     private var playButtonLabel: String {
         guard let video = displayedVideo,
+              !video.isLive,
               let savedProgress = dataManager?.watchProgress(for: video.id.videoID),
               savedProgress >= 5,
               video.duration > 0,
@@ -2269,7 +2270,14 @@ struct VideoInfoView: View {
     /// Play the video, respecting the user's resume action setting for partially watched videos.
     private func playVideo() {
         guard let video = displayedVideo, let env = appEnvironment else { return }
-        
+
+        // Live streams have no fixed timeline, so a resume position is meaningless -
+        // never ask, always join at the live edge.
+        guard !video.isLive else {
+            playVideoWithStartTime(0)
+            return
+        }
+
         // Get saved watch progress from database
         let savedProgress = env.dataManager.watchProgress(for: video.id.videoID)
         let videoDuration = video.duration

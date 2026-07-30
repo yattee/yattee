@@ -54,7 +54,7 @@ enum TopShelfSnapshotWriter {
         guard let dataManager else { return }
         let history = dataManager.watchHistory(limit: 50)
         let items = history
-            .filter { !$0.isFinished && $0.watchedSeconds > 10 }
+            .filter { !$0.isFinished && !$0.isLive && $0.watchedSeconds > 10 }
             .prefix(TopShelfSnapshot.maxItems)
             .compactMap(Self.makeItem(from:))
         TopShelfSnapshot.write(Array(items), section: .continueWatching)

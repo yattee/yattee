@@ -51,6 +51,10 @@ final class WatchEntry {
     /// Thumbnail URL string.
     var thumbnailURLString: String?
 
+    /// Whether this entry was recorded for a live stream.
+    /// Live entries never carry a resume position - see `recordLiveWatch()`.
+    var isLive: Bool = false
+
     // MARK: - Watch Progress
 
     /// Last watched position in seconds.
@@ -86,7 +90,8 @@ final class WatchEntry {
         duration: TimeInterval,
         thumbnailURLString: String? = nil,
         watchedSeconds: TimeInterval = 0,
-        isFinished: Bool = false
+        isFinished: Bool = false,
+        isLive: Bool = false
     ) {
         self.videoID = videoID
         self.sourceRawValue = sourceRawValue
@@ -102,6 +107,7 @@ final class WatchEntry {
         self.thumbnailURLString = thumbnailURLString
         self.watchedSeconds = watchedSeconds
         self.isFinished = isFinished
+        self.isLive = isLive
         self.createdAt = Date()
         self.updatedAt = Date()
     }
@@ -136,8 +142,10 @@ final class WatchEntry {
     }
 
     /// Watch progress as a percentage (0.0 to 1.0).
+    /// Always 0 for live streams - their playback position is relative to the
+    /// live edge, so it does not describe progress through a fixed timeline.
     var progress: Double {
-        guard duration > 0 else { return 0 }
+        guard !isLive, duration > 0 else { return 0 }
         return min(watchedSeconds / duration, 1.0)
     }
 
@@ -188,6 +196,20 @@ final class WatchEntry {
         }
     }
 
+    /// Records a live-stream view without storing a resume position.
+    /// Live playback positions are relative to the live edge, so keeping them
+    /// would make the app offer to "continue" from a meaningless timestamp.
+    /// Also clears state a previous non-live save may have left behind, which
+    /// heals entries wrongly marked finished by a drifting HLS duration.
+    func recordLiveWatch() {
+        isLive = true
+        watchedSeconds = 0
+        duration = 0
+        isFinished = false
+        finishedAt = nil
+        updatedAt = Date()
+    }
+
     /// Marks the video as finished.
     func markAsFinished() {
         isFinished = true
@@ -220,7 +242,7 @@ extension WatchEntry {
             viewCount: nil,
             likeCount: nil,
             thumbnails: thumbnailURL.map { [Thumbnail(url: $0, quality: .medium)] } ?? [],
-            isLive: false,
+            isLive: isLive,
             isUpcoming: false,
             scheduledStartTime: nil
         )
@@ -260,8 +282,11 @@ extension WatchEntry {
             title: video.title,
             authorName: video.author.name,
             authorID: video.author.id,
-            duration: video.duration,
-            thumbnailURLString: video.bestThumbnail?.url.absoluteString
+            // Live videos report no usable duration - Invidious sends 0 and Piped
+            // uses -1 as its live sentinel, which must never reach storage.
+            duration: video.isLive ? 0 : max(0, video.duration),
+            thumbnailURLString: video.bestThumbnail?.url.absoluteString,
+            isLive: video.isLive
         )
     }
 }

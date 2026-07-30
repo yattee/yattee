@@ -82,10 +82,12 @@ actor CloudKitConflictResolver {
             resolved["watchedSeconds"] = localSeconds as CKRecordValue
             resolved["isFinished"] = (localFinished ? 1 : 0) as CKRecordValue
             resolved["finishedAt"] = local["finishedAt"]
+            resolved["isLive"] = local["isLive"]
         } else {
             resolved["watchedSeconds"] = serverSeconds as CKRecordValue
             resolved["isFinished"] = (serverFinished ? 1 : 0) as CKRecordValue
             resolved["finishedAt"] = server["finishedAt"]
+            resolved["isLive"] = server["isLive"]
         }
         
         // Use most recent updatedAt

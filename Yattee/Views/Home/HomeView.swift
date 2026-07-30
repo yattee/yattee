@@ -1463,7 +1463,7 @@ struct HomeView: View {
     private func loadContinueWatchingData() {
         let allHistory = dataManager?.watchHistory(limit: 100) ?? []
         // Filter to in-progress only (same logic as ContinueWatchingView)
-        recentContinueWatching = allHistory.filter { !$0.isFinished && $0.watchedSeconds > 10 }
+        recentContinueWatching = allHistory.filter { !$0.isFinished && !$0.isLive && $0.watchedSeconds > 10 }
         continueWatchingCount = recentContinueWatching.count
     }
 

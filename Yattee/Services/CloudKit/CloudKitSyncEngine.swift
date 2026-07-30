@@ -2152,6 +2152,7 @@ extension CloudKitSyncEngine: CKSyncEngineDelegate {
                     existing.watchedSeconds = resolvedEntry.watchedSeconds
                     existing.isFinished = resolvedEntry.isFinished
                     existing.finishedAt = resolvedEntry.finishedAt
+                    existing.isLive = resolvedEntry.isLive
                     existing.updatedAt = resolvedEntry.updatedAt
                     
                     // Update metadata if newer

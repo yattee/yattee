@@ -420,7 +420,11 @@ final class PlayerService {
             let savedProgress = dataManager.watchProgress(for: video.id.videoID)
             LoggingService.shared.logPlayer("Replay check: savedProgress=\(savedProgress ?? -1), startTime=\(startTime ?? -1), duration=\(video.duration), threshold=\(completionThreshold)")
 
-            if let startTime {
+            if video.isLive || selectedStream.isLive {
+                // Live playback positions are relative to the live edge, so a stored
+                // or passed position means nothing - always start at the live edge.
+                seekTime = 0
+            } else if let startTime {
                 // Explicit startTime provided - use it (0 means play from beginning, >0 means resume)
                 // For quality switching with startTime > 0, honor the time unless video was completed
                 if startTime > 0 && completionThreshold > 0 && startTime >= completionThreshold {
@@ -1028,6 +1032,9 @@ final class PlayerService {
     ///   - video: The video to open
     ///   - startTime: Optional start time in seconds (used for continue watching)
     func openVideo(_ video: Video, startTime: TimeInterval? = nil) {
+        // Live streams have no meaningful resume position - drop any passed one
+        // so callers with a stale watch entry cannot seek into the live window.
+        let startTime = video.isLive ? nil : startTime
 
         // Check if MPV PiP is active - if so, don't expand the player
         #if os(iOS) || os(macOS)
@@ -2797,8 +2804,9 @@ final class PlayerService {
         guard let video = state.currentVideo,
               state.currentTime > 0 else { return }
 
-        // Save locally only during playback - no iCloud sync overhead
-        dataManager.updateWatchProgressLocal(for: video, seconds: state.currentTime, duration: state.duration)
+        // Save locally only during playback - no iCloud sync overhead.
+        // Live streams still get a history entry, but no resume position.
+        dataManager.updateWatchProgressLocal(for: video, seconds: state.currentTime, duration: state.duration, isLive: state.isLive)
 
         // Update Handoff activity with current playback time
         handoffManager?.updatePlaybackTime(state.currentTime)
@@ -2810,6 +2818,10 @@ final class PlayerService {
         guard settingsManager?.incognitoModeEnabled != true,
               settingsManager?.saveWatchHistory != false,
               let video = state.currentVideo else { return }
+
+        // A live stream never "completes" - saveProgress() has already recorded
+        // its history entry, and writing a duration here would fabricate progress.
+        guard !state.isLive else { return }
 
         // Use video.duration (API-reported) to match WatchEntry.duration stored value.
         // This ensures 100% progress since WatchEntry.progress = watchedSeconds / WatchEntry.duration.
@@ -2836,7 +2848,7 @@ final class PlayerService {
               state.currentTime > 0 else { return }
 
         // Save and queue for iCloud sync (used when video closes/switches)
-        dataManager.updateWatchProgress(for: video, seconds: state.currentTime, duration: state.duration)
+        dataManager.updateWatchProgress(for: video, seconds: state.currentTime, duration: state.duration, isLive: state.isLive)
         NotificationCenter.default.post(name: .watchHistoryDidChange, object: nil)
     }
 

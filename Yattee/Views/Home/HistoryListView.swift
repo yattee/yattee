@@ -305,7 +305,7 @@ struct HistoryListView: View {
             video: video,
             style: rowStyle,
             watchProgress: watchProgress(for: entry),
-            customMetadata: entry.isFinished ? nil : String(localized: "home.history.remaining \(entry.remainingTime)")
+            customMetadata: entry.isFinished || entry.isLive ? nil : String(localized: "home.history.remaining \(entry.remainingTime)")
         )
         .tappableVideo(
             video,

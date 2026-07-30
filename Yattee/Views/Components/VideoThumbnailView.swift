@@ -105,7 +105,8 @@ struct VideoThumbnailView: View {
 
     @ViewBuilder
     private var watchProgressBar: some View {
-        if let progress = watchProgress, progress > 0 && progress < 1 {
+        // Live streams have no fixed timeline, so a progress bar is meaningless
+        if !isLive, let progress = watchProgress, progress > 0 && progress < 1 {
             GeometryReader { geo in
                 Rectangle()
                     .fill(.red)

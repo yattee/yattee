@@ -33,7 +33,7 @@ struct ContinueWatchingView: View {
 
     /// Filtered to only show in-progress videos.
     private var inProgressEntries: [WatchEntry] {
-        watchHistory.filter { !$0.isFinished && $0.watchedSeconds > 10 }
+        watchHistory.filter { !$0.isFinished && !$0.isLive && $0.watchedSeconds > 10 }
     }
 
     // Grid layout configuration
@@ -237,7 +237,7 @@ struct ContinueWatchingView: View {
             video: entry.toVideo(),
             style: rowStyle,
             watchProgress: entry.progress,
-            customMetadata: entry.isFinished ? nil : String(localized: "home.history.remaining \(entry.remainingTime)")
+            customMetadata: entry.isFinished || entry.isLive ? nil : String(localized: "home.history.remaining \(entry.remainingTime)")
         )
         .tappableVideo(
             entry.toVideo(),

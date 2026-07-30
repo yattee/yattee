@@ -710,6 +710,139 @@ struct DataTests {
             #expect(progress == 300)
         }
 
+        @Test("Live stream is recorded in history without a resume position")
+        @MainActor
+        func liveStreamStoresNoProgress() async throws {
+            let manager = try DataManager(inMemory: true)
+
+            let live = Video(
+                id: .global("liveStream1"),
+                title: "Live Stream",
+                description: nil,
+                author: Author(id: "ch1", name: "Channel"),
+                duration: 0,
+                publishedAt: nil,
+                publishedText: nil,
+                viewCount: nil,
+                likeCount: nil,
+                thumbnails: [],
+                isLive: true,
+                isUpcoming: false,
+                scheduledStartTime: nil
+            )
+
+            manager.updateWatchProgress(for: live, seconds: 1800, duration: 1800)
+
+            // The entry exists so the stream shows up in History...
+            let entry = try #require(manager.watchEntry(for: "liveStream1"))
+            #expect(entry.isLive)
+            // ...but carries nothing that could be offered as a resume point
+            #expect(entry.watchedSeconds == 0)
+            #expect(entry.duration == 0)
+            #expect(entry.progress == 0)
+            #expect(!entry.isFinished)
+            #expect(entry.toVideo().isLive)
+        }
+
+        @Test("Piped live sentinel duration never reaches storage")
+        @MainActor
+        func liveStreamNegativeDurationSentinel() async throws {
+            let manager = try DataManager(inMemory: true)
+
+            // Piped encodes "live" as duration == -1 and passes it straight into Video
+            let live = Video(
+                id: .global("liveStream2"),
+                title: "Piped Live",
+                description: nil,
+                author: Author(id: "ch1", name: "Channel"),
+                duration: -1,
+                publishedAt: nil,
+                publishedText: nil,
+                viewCount: nil,
+                likeCount: nil,
+                thumbnails: [],
+                isLive: true,
+                isUpcoming: false,
+                scheduledStartTime: nil
+            )
+
+            manager.updateWatchProgressLocal(for: live, seconds: 120, duration: 120)
+
+            let entry = try #require(manager.watchEntry(for: "liveStream2"))
+            #expect(entry.duration == 0)
+            #expect(entry.remainingTime == "0:00")
+        }
+
+        @Test("Entry heals once a former live stream becomes a VOD")
+        @MainActor
+        func liveEntryBecomesVOD() async throws {
+            let manager = try DataManager(inMemory: true)
+
+            let makeVideo: (Bool, TimeInterval) -> Video = { isLive, duration in
+                Video(
+                    id: .global("liveThenVOD"),
+                    title: "Stream",
+                    description: nil,
+                    author: Author(id: "ch1", name: "Channel"),
+                    duration: duration,
+                    publishedAt: nil,
+                    publishedText: nil,
+                    viewCount: nil,
+                    likeCount: nil,
+                    thumbnails: [],
+                    isLive: isLive,
+                    isUpcoming: false,
+                    scheduledStartTime: nil
+                )
+            }
+
+            manager.updateWatchProgress(for: makeVideo(true, 0), seconds: 900, duration: 900)
+            #expect(manager.watchProgress(for: "liveThenVOD") == 0)
+
+            // Same video watched later as a regular recording
+            manager.updateWatchProgress(for: makeVideo(false, 1200), seconds: 300, duration: 1200)
+
+            let entry = try #require(manager.watchEntry(for: "liveThenVOD"))
+            #expect(!entry.isLive)
+            #expect(entry.watchedSeconds == 300)
+            #expect(entry.duration == 1200)
+            #expect(entry.progress == 0.25)
+        }
+
+        @Test("Healing save past 90% marks a former live entry finished")
+        @MainActor
+        func liveEntryHealAutoFinishes() async throws {
+            let manager = try DataManager(inMemory: true)
+
+            let makeVideo: (Bool, TimeInterval) -> Video = { isLive, duration in
+                Video(
+                    id: .global("liveThenFinished"),
+                    title: "Stream",
+                    description: nil,
+                    author: Author(id: "ch1", name: "Channel"),
+                    duration: duration,
+                    publishedAt: nil,
+                    publishedText: nil,
+                    viewCount: nil,
+                    likeCount: nil,
+                    thumbnails: [],
+                    isLive: isLive,
+                    isUpcoming: false,
+                    scheduledStartTime: nil
+                )
+            }
+
+            manager.updateWatchProgress(for: makeVideo(true, 0), seconds: 900, duration: 900)
+
+            // First VOD save lands past the 90% threshold - the auto-finish check
+            // must see the cleared isLive flag, not the hard-0 live progress
+            manager.updateWatchProgress(for: makeVideo(false, 1000), seconds: 950, duration: 1000)
+
+            let entry = try #require(manager.watchEntry(for: "liveThenFinished"))
+            #expect(!entry.isLive)
+            #expect(entry.isFinished)
+        }
+
         @Test("Bookmark toggle")
         @MainActor
         func bookmarkToggle() async throws {

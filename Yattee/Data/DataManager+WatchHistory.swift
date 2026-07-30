@@ -13,8 +13,13 @@ extension DataManager {
 
     /// Records or updates watch progress locally without triggering iCloud sync.
     /// Use this for frequent updates during playback to avoid unnecessary sync overhead.
-    func updateWatchProgressLocal(for video: Video, seconds: TimeInterval, duration: TimeInterval? = nil) {
+    ///
+    /// - Parameter isLive: Set by the player when the active stream is live but the
+    ///   `Video` metadata does not say so (some sources hardcode `isLive: false`).
+    ///   Live views are still recorded in history, but without a resume position.
+    func updateWatchProgressLocal(for video: Video, seconds: TimeInterval, duration: TimeInterval? = nil, isLive: Bool = false) {
         let videoID = video.id.videoID
+        let isLiveContent = video.isLive || isLive
         let descriptor = FetchDescriptor<WatchEntry>(
             predicate: #Predicate { $0.videoID == videoID }
         )
@@ -22,13 +27,24 @@ extension DataManager {
         do {
             let existing = try modelContext.fetch(descriptor)
             if let existingEntry = existing.first {
-                existingEntry.updateProgress(seconds: seconds, duration: duration)
+                if isLiveContent {
+                    existingEntry.recordLiveWatch()
+                } else {
+                    // Clear the flag first - updateProgress's auto-finish check reads
+                    // `progress`, which is hard-0 while isLive is still set
+                    existingEntry.isLive = false
+                    existingEntry.updateProgress(seconds: seconds, duration: duration)
+                }
                 save()
             } else {
                 let newEntry = WatchEntry.from(video: video)
-                newEntry.watchedSeconds = seconds
-                if let duration, duration > 0, newEntry.duration == 0 {
-                    newEntry.duration = duration
+                if !isLiveContent {
+                    newEntry.watchedSeconds = seconds
+                    if let duration, duration > 0, newEntry.duration == 0 {
+                        newEntry.duration = duration
+                    }
+                } else {
+                    newEntry.isLive = true
                 }
                 modelContext.insert(newEntry)
                 save()
@@ -43,9 +59,10 @@ extension DataManager {
 
     /// Records or updates watch progress for a video and queues for iCloud sync.
     /// Use this when video closes or switches to sync the final progress.
-    func updateWatchProgress(for video: Video, seconds: TimeInterval, duration: TimeInterval? = nil) {
+    func updateWatchProgress(for video: Video, seconds: TimeInterval, duration: TimeInterval? = nil, isLive: Bool = false) {
         // Find existing entry or create new one
         let videoID = video.id.videoID
+        let isLiveContent = video.isLive || isLive
         let descriptor = FetchDescriptor<WatchEntry>(
             predicate: #Predicate { $0.videoID == videoID }
         )
@@ -54,13 +71,24 @@ extension DataManager {
             let existing = try modelContext.fetch(descriptor)
             let entry: WatchEntry
             if let existingEntry = existing.first {
-                existingEntry.updateProgress(seconds: seconds, duration: duration)
+                if isLiveContent {
+                    existingEntry.recordLiveWatch()
+                } else {
+                    // Clear the flag first - updateProgress's auto-finish check reads
+                    // `progress`, which is hard-0 while isLive is still set
+                    existingEntry.isLive = false
+                    existingEntry.updateProgress(seconds: seconds, duration: duration)
+                }
                 entry = existingEntry
             } else {
                 let newEntry = WatchEntry.from(video: video)
-                newEntry.watchedSeconds = seconds
-                if let duration, duration > 0, newEntry.duration == 0 {
-                    newEntry.duration = duration
+                if !isLiveContent {
+                    newEntry.watchedSeconds = seconds
+                    if let duration, duration > 0, newEntry.duration == 0 {
+                        newEntry.duration = duration
+                    }
+                } else {
+                    newEntry.isLive = true
                 }
                 modelContext.insert(newEntry)
                 entry = newEntry

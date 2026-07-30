@@ -51,8 +51,9 @@ struct ContinueWatchingGridCard: View {
         VideoCardView(
             video: video,
             watchProgress: entry.progress,
-            customMetadata: entry.isFinished ? nil : String(localized: "home.history.remaining \(entry.remainingTime)"),
-            customDuration: entry.remainingTime
+            customMetadata: entry.isFinished || entry.isLive ? nil : String(localized: "home.history.remaining \(entry.remainingTime)"),
+            // Live streams have no remaining time - fall back to the LIVE badge
+            customDuration: entry.isLive ? nil : entry.remainingTime
         )
     }
 }

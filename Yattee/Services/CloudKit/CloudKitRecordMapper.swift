@@ -153,6 +153,7 @@ final class CloudKitRecordMapper {
         record["watchedSeconds"] = watchEntry.watchedSeconds as CKRecordValue
         record["isFinished"] = (watchEntry.isFinished ? 1 : 0) as CKRecordValue
         record["finishedAt"] = watchEntry.finishedAt as CKRecordValue?
+        record["isLive"] = (watchEntry.isLive ? 1 : 0) as CKRecordValue
 
         // Timestamps
         record["createdAt"] = watchEntry.createdAt as CKRecordValue
@@ -228,6 +229,10 @@ final class CloudKitRecordMapper {
         watchEntry.createdAt = createdAt
         watchEntry.updatedAt = updatedAt
         watchEntry.finishedAt = record["finishedAt"] as? Date
+
+        // Optional field - records written before this field existed default to false,
+        // so it is read leniently rather than bumping the schema version.
+        watchEntry.isLive = (record["isLive"] as? Int64) == 1
 
         return watchEntry
     }
