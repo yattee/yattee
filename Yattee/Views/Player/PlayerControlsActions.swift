@@ -228,6 +228,16 @@ struct PlayerControlsActions {
         !availableCaptions.isEmpty || !embeddedSubtitleTracks.isEmpty
     }
 
+    /// Whether an external subtitle file can be loaded: media-source playback
+    /// (local folder/SMB/WebDAV) on platforms with a file picker.
+    var canLoadExternalSubtitles: Bool {
+        #if os(tvOS)
+        return false
+        #else
+        return currentVideo?.isFromMediaSource == true
+        #endif
+    }
+
     /// Whether chapters are available
     var hasChapters: Bool {
         !playerState.chapters.isEmpty

@@ -11,7 +11,7 @@ struct QualitySelectorView: View {
     // MARK: - Environment
 
     @Environment(\.dismiss) var dismiss
-    @Environment(\.appEnvironment) private var appEnvironment
+    @Environment(\.appEnvironment) var appEnvironment
 
     // MARK: - Properties
 
@@ -79,6 +79,9 @@ struct QualitySelectorView: View {
     @State var selectedTab: QualitySelectorTab = .video
     @State var selectedVideoStream: Stream?
     @State var selectedAudioStream: Stream?
+    #if os(iOS)
+    @State var showingSubtitleFilePicker = false
+    #endif
 
     // MARK: - Settings Access
 
@@ -114,10 +117,20 @@ struct QualitySelectorView: View {
         if (hasVideoOnlyStreams && !audioStreams.isEmpty) || embeddedAudioTracks.count > 1 {
             tabs.append(.audio)
         }
-        if !captions.isEmpty || !embeddedSubtitleTracks.isEmpty {
+        if !captions.isEmpty || !embeddedSubtitleTracks.isEmpty || canLoadExternalSubtitles {
             tabs.append(.subtitles)
         }
         return tabs
+    }
+
+    /// Whether the "Load subtitle from file…" row is available: media-source
+    /// playback (local folder/SMB/WebDAV) on platforms with a file picker.
+    var canLoadExternalSubtitles: Bool {
+        #if os(tvOS)
+        return false
+        #else
+        return appEnvironment?.playerService.state.currentVideo?.isFromMediaSource == true
+        #endif
     }
 
     /// Navigation title based on mode
@@ -144,7 +157,8 @@ struct QualitySelectorView: View {
     /// Whether streams are empty (not loading, but no streams available)
     var hasNoStreams: Bool {
         if !showTabPicker && initialTab == .subtitles {
-            return !isLoading && captions.isEmpty && embeddedSubtitleTracks.isEmpty && !isPlayingDownloadedContent
+            return !isLoading && captions.isEmpty && embeddedSubtitleTracks.isEmpty
+                && !isPlayingDownloadedContent && !canLoadExternalSubtitles
         }
         return !isLoading && streams.isEmpty && !isPlayingDownloadedContent
     }
@@ -326,6 +340,13 @@ struct QualitySelectorView: View {
                 subtitlesDetailContent
             }
         }
+        #if os(iOS)
+        .sheet(isPresented: $showingSubtitleFilePicker) {
+            SubtitleFilePickerView { url in
+                handlePickedSubtitleFile(url)
+            }
+        }
+        #endif
         .onAppear {
             selectedVideoStream = currentStream
             // In audio mode the audio track IS the main stream

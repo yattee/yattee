@@ -17435,6 +17435,26 @@
         }
       }
     },
+    "stream.subtitles.loadFromFile" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Load subtitle from file…"
+          }
+        }
+      }
+    },
+    "stream.subtitles.loadFromFile.message" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Choose a subtitle file"
+          }
+        }
+      }
+    },
     "stream.subtitles.none" : {
       "localizations" : {
         "en" : {

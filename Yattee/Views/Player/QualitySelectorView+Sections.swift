@@ -957,10 +957,50 @@ extension QualitySelectorView {
                 .padding(.vertical, 8)
                 .padding(.horizontal, 12)
             }
+
+            if canLoadExternalSubtitles {
+                Divider()
+
+                loadSubtitleFileRow
+                    .padding(.vertical, 8)
+                    .padding(.horizontal, 12)
+            }
         }
         .cardBackground()
         #endif
     }
+
+    #if !os(tvOS)
+    /// Row that opens a file picker to load an external subtitle file into
+    /// the current media-source playback.
+    private var loadSubtitleFileRow: some View {
+        Button {
+            #if os(iOS)
+            showingSubtitleFilePicker = true
+            #elseif os(macOS)
+            SubtitleFilePanel.present { url in
+                handlePickedSubtitleFile(url)
+            }
+            #endif
+        } label: {
+            HStack(spacing: 8) {
+                Image(systemName: "folder.badge.plus")
+                    .foregroundStyle(.secondary)
+                Text("stream.subtitles.loadFromFile")
+                    .font(.headline)
+                Spacer()
+            }
+            .frame(maxWidth: .infinity, minHeight: 36)
+            .contentShape(Rectangle())
+        }
+        .buttonStyle(.plain)
+    }
+
+    func handlePickedSubtitleFile(_ url: URL) {
+        appEnvironment?.playerService.loadExternalSubtitleFile(from: url)
+        performDismiss()
+    }
+    #endif
 
     @ViewBuilder
     private func embeddedSubtitleTrackRow(_ track: MPVTrack) -> some View {

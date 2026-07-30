@@ -1446,6 +1446,67 @@ final class PlayerService {
         loadCaption(caption)
     }
 
+    /// Loads a user-picked external subtitle file (iOS document picker / macOS open panel).
+    /// Copies the file into the per-video temp subtitle directory (so mpv can read it
+    /// after the picker's security scope expires), registers it as a selectable
+    /// Caption for the current video, and activates it.
+    /// - Parameter pickedURL: The URL returned by the file picker.
+    func loadExternalSubtitleFile(from pickedURL: URL) {
+        guard let video = state.currentVideo, video.isFromMediaSource else { return }
+
+        let fileName = pickedURL.lastPathComponent
+        let didStartAccessing = pickedURL.startAccessingSecurityScopedResource()
+        defer {
+            if didStartAccessing {
+                pickedURL.stopAccessingSecurityScopedResource()
+            }
+        }
+
+        // Same hash-based directory scheme as SMBClient's subtitle pre-download:
+        // media-source video IDs contain slashes, so they can't be path components.
+        let tempDir = FileManager.default.temporaryDirectory
+            .appendingPathComponent("yattee-subtitles", isDirectory: true)
+            .appendingPathComponent(String(video.id.id.hashValue), isDirectory: true)
+        let destinationURL = tempDir.appendingPathComponent("picked-\(fileName)")
+
+        do {
+            try FileManager.default.createDirectory(at: tempDir, withIntermediateDirectories: true)
+            if FileManager.default.fileExists(atPath: destinationURL.path) {
+                try FileManager.default.removeItem(at: destinationURL)
+            }
+            try FileManager.default.copyItem(at: pickedURL, to: destinationURL)
+        } catch {
+            LoggingService.shared.error(
+                "Failed to copy picked subtitle file \(fileName): \(error.localizedDescription)",
+                category: .player
+            )
+            return
+        }
+
+        // Detect language from a filename suffix like "Movie.en.srt" or "Movie_en.srt"
+        let baseName = pickedURL.deletingPathExtension().lastPathComponent
+        var languageCode = "und"
+        if let suffix = baseName.components(separatedBy: CharacterSet(charactersIn: "._")).last,
+           (2...3).contains(suffix.count),
+           Locale.current.localizedString(forLanguageCode: suffix) != nil {
+            languageCode = suffix.lowercased()
+        }
+
+        let caption = Caption(
+            label: baseName,
+            languageCode: languageCode,
+            url: destinationURL,
+            pickedFileName: fileName
+        )
+
+        // Re-picking the same file replaces its row instead of duplicating it
+        availableCaptions.removeAll { $0.id == caption.id }
+        availableCaptions.append(caption)
+
+        loadCaption(caption)
+        LoggingService.shared.logPlayer("Loaded external subtitle file: \(fileName)")
+    }
+
     /// Loads online streams for the current video (when playing downloaded content).
     /// After loading, the user can switch to an online stream from QualitySelectorView.
     /// The downloaded stream is preserved and mixed in with online streams.
