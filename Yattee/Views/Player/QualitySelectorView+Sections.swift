@@ -695,15 +695,17 @@ extension QualitySelectorView {
         }
     }
 
-    /// A local file's Stream carries no resolution/codec/fps metadata
-    /// (`MediaFile.toStream` cannot know them before demux), which would label
-    /// the row "Unknown". Once mpv reports the file's video track, fill those
-    /// fields for display. The enriched copy is display-only — selection and
-    /// tap handling keep using the original stream (compared by URL).
+    /// A media-source Stream (local folder, WebDAV, SMB) carries no
+    /// resolution/codec/fps metadata (`MediaFile.toStream` cannot know them
+    /// before demux), which would label the row "Unknown". Once mpv reports
+    /// the loaded file's video track, fill those fields for display. Gated to
+    /// local files and the currently playing stream — the track info describes
+    /// whatever mpv has loaded. The enriched copy is display-only — selection
+    /// and tap handling keep using the original stream (compared by URL).
     func displayStream(for stream: Stream) -> Stream {
-        guard stream.url.isFileURL,
-              stream.resolution == nil,
+        guard stream.resolution == nil,
               !stream.isAudioOnly,
+              stream.url.isFileURL || stream.url == currentStream?.url,
               let track = embeddedVideoTrack,
               let width = track.width,
               let height = track.height else {
@@ -731,14 +733,18 @@ extension QualitySelectorView {
             ? stream.url == currentStream?.url
             : stream.url == selectedVideoStream?.url
         let isPreferredQuality: Bool = stream.resolution == preferredQuality.maxResolution
+        // Metadata-less media-source streams get resolution/codec/fps filled
+        // from the mpv-reported video track for display; the warning must use
+        // the enriched codec too or a nil codec reads as software-decoded
+        let display: Stream = displayStream(for: stream)
 
         VideoStreamRowView(
-            stream: displayStream(for: stream),
+            stream: display,
             isSelected: isSelected,
             isPreferredQuality: isPreferredQuality,
             isDownloaded: isDownloadedStream,
             showAdvancedDetails: showAdvancedStreamDetails,
-            requiresSoftwareDecode: !stream.isMuxed && requiresSoftwareDecode(stream.videoCodec),
+            requiresSoftwareDecode: !display.isMuxed && display.videoCodec != nil && requiresSoftwareDecode(display.videoCodec),
             onTap: {
                 handleVideoStreamTap(stream, isDownloaded: isDownloadedStream)
             }

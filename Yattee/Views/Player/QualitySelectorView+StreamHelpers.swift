@@ -35,8 +35,17 @@ extension QualitySelectorView {
     var videoStreams: [Stream] {
         let maxRes: StreamResolution? = preferredQuality.maxResolution
 
-        // Separate downloaded streams (always include them, shown first)
-        let downloadedStreams: [Stream] = streams.filter { $0.url.isFileURL && !$0.isAudioOnly }
+        // Separate downloaded/media-source streams (always include them, shown
+        // first). Local files are file URLs; WebDAV/SMB media-source streams
+        // are remote URLs that carry no resolution metadata — nothing else
+        // produces a non-adaptive remote stream without resolution, so that
+        // combination identifies them.
+        let downloadedStreams: [Stream] = streams.filter { (stream: Stream) -> Bool in
+            guard !stream.isAudioOnly else { return false }
+            if stream.url.isFileURL { return true }
+            let format = StreamFormat.detect(from: stream)
+            return stream.resolution == nil && format != .hls && format != .dash
+        }
 
         // Online streams need resolution to be shown
         let onlineVideoStreams: [Stream] = streams
@@ -95,6 +104,9 @@ extension QualitySelectorView {
         let allowSoftware = allowSoftwareDecodedFormats
         return videoStreams.filter { (stream: Stream) -> Bool in
             if stream.url.isFileURL { return true }
+            // Media-source streams (no resolution metadata, nil codec) must
+            // not be misclassified as software-decoded and hidden
+            if stream.resolution == nil { return true }
             if stream.isMuxed { return true }
             if allowSoftware { return true }
             return !requiresSoftwareDecode(stream.videoCodec)
@@ -105,6 +117,7 @@ extension QualitySelectorView {
         if allowSoftwareDecodedFormats { return [] }
         return videoStreams.filter { (stream: Stream) -> Bool in
             if stream.url.isFileURL { return false }
+            if stream.resolution == nil { return false }
             if stream.isMuxed { return false }
             return requiresSoftwareDecode(stream.videoCodec)
         }
