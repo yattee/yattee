@@ -652,9 +652,9 @@ struct VideoInfoView: View {
     @ViewBuilder
     private func tvOSThumbnail(for video: Video) -> some View {
         let deArrowURL = appEnvironment?.deArrowBrandingProvider.thumbnailURL(for: video)
-        let thumbnailURL = deArrowURL ?? video.bestThumbnail?.url
+        let thumbnailURLs = [deArrowURL].compactMap { $0 } + video.thumbnailURLsByQuality
 
-        LazyImage(url: thumbnailURL) { state in
+        FallbackLazyImage(urls: thumbnailURLs) { state in
             if let image = state.image {
                 image
                     .resizable()
@@ -816,7 +816,7 @@ struct VideoInfoView: View {
     @ViewBuilder
     private var blurredThumbnailBackground: some View {
         BlurredImageBackground(
-            url: displayedVideo.flatMap { appEnvironment?.deArrowBrandingProvider.thumbnailURL(for: $0) } ?? displayedVideo?.bestThumbnail?.url,
+            url: displayedVideo.flatMap { appEnvironment?.deArrowBrandingProvider.thumbnailURL(for: $0) } ?? displayedVideo?.reliableThumbnailURL,
             videoID: displayedVideo?.id.videoID,
             blurRadius: BlurredImageBackground.platformBlurRadius,
             scale: 1.8,
@@ -949,12 +949,11 @@ struct VideoInfoView: View {
     private func videoCard(for video: Video, thumbnailFrom: Video? = nil, authorFrom: Video? = nil, isLoadingMore: Bool, showTitle: Bool, isCurrent: Bool) -> some View {
         let thumbnailSource = thumbnailFrom ?? video
         let deArrowURL = appEnvironment?.deArrowBrandingProvider.thumbnailURL(for: thumbnailSource)
-        let bestThumb = thumbnailSource.bestThumbnail
-        let thumbnailURL = deArrowURL ?? bestThumb?.url
+        let thumbnailURLs = [deArrowURL].compactMap { $0 } + thumbnailSource.thumbnailURLsByQuality
         return VStack(spacing: 12) {
             // Thumbnail with loading overlay
             ZStack {
-                LazyImage(url: thumbnailURL) { state in
+                FallbackLazyImage(urls: thumbnailURLs) { state in
                     if let image = state.image {
                         image
                             .resizable()

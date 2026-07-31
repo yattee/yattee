@@ -100,6 +100,16 @@ struct Video: Identifiable, Codable, Sendable {
         thumbnails.sorted { $0.quality > $1.quality }.map(\.url)
     }
 
+    /// Best thumbnail URL rewritten to the always-available `hqdefault` variant.
+    ///
+    /// For consumers that render or fetch a single URL with no way to fall back
+    /// through the quality chain (Now Playing artwork, Top Shelf, remote control,
+    /// navigation covers): the best advertised variant is often `maxresdefault`,
+    /// which 404s for many older videos.
+    var reliableThumbnailURL: URL? {
+        Thumbnail.reliableURL(for: bestThumbnail?.url)
+    }
+
     var formattedDuration: String {
         guard !isLive else { return "LIVE" }
         guard duration > 0 else { return "" }

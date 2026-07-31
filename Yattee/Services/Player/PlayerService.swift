@@ -522,8 +522,10 @@ final class PlayerService {
                    let localThumbnailPath = download.localThumbnailPath {
                     localThumbnailURL = downloadManager.downloadsDirectory().appendingPathComponent(localThumbnailPath)
                 }
+                // Reliable (hqdefault) variant: artwork is a single fetch with no
+                // fallback, and the best advertised variant often 404s.
                 await nowPlayingService.loadArtwork(
-                    from: videoForNowPlaying.bestThumbnail?.url,
+                    from: videoForNowPlaying.reliableThumbnailURL,
                     localPath: localThumbnailURL
                 )
             }

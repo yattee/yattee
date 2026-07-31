@@ -466,7 +466,7 @@ final class RemoteControlCoordinator {
         networkService.updateAdvertisement(
             videoTitle: state.currentVideo?.title,
             channelName: state.currentVideo?.author.name,
-            thumbnailURL: state.currentVideo?.bestThumbnail?.url,
+            thumbnailURL: state.currentVideo?.reliableThumbnailURL,
             isPlaying: state.playbackState == .playing
         )
     }
@@ -494,7 +494,7 @@ final class RemoteControlCoordinator {
             videoID: state.currentVideo?.id.videoID,
             videoTitle: state.currentVideo?.title,
             channelName: state.currentVideo?.author.name,
-            thumbnailURL: state.currentVideo?.bestThumbnail?.url,
+            thumbnailURL: state.currentVideo?.reliableThumbnailURL,
             currentTime: state.currentTime,
             duration: state.duration,
             isPlaying: state.playbackState == .playing,

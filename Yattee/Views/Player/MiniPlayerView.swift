@@ -67,12 +67,11 @@ struct MiniPlayerView: View {
         return currentVideo?.title ?? String(localized: "player.notPlaying")
     }
 
-    /// The thumbnail URL to display, preferring DeArrow thumbnail if available.
-    private var displayThumbnailURL: URL? {
-        if let video = currentVideo, let deArrowThumbnail = deArrowProvider?.thumbnailURL(for: video) {
-            return deArrowThumbnail
-        }
-        return currentVideo?.bestThumbnail?.url
+    /// Thumbnail URLs to try in order, preferring DeArrow, then the quality chain.
+    private var displayThumbnailURLs: [URL] {
+        guard let video = currentVideo else { return [] }
+        let deArrowThumbnail = deArrowProvider?.thumbnailURL(for: video)
+        return [deArrowThumbnail].compactMap { $0 } + video.thumbnailURLsByQuality
     }
 
     // MARK: - Actions
@@ -406,7 +405,7 @@ struct MiniPlayerView: View {
 
     @ViewBuilder
     private var thumbnailView: some View {
-        LazyImage(url: displayThumbnailURL) { state in
+        FallbackLazyImage(urls: displayThumbnailURLs) { state in
             if let image = state.image {
                 image
                     .resizable()

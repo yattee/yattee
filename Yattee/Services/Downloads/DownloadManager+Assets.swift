@@ -346,12 +346,17 @@ extension DownloadManager {
             var thumbnailPath: String?
             var channelThumbnailPath: String?
 
-            // Download video thumbnail (best quality) - best-effort, ignore failures
+            // Download video thumbnail - best-effort, ignore failures. The stored URL
+            // is the best advertised variant (often maxresdefault, which 404s for
+            // older videos), so walk the quality chain until one succeeds.
             if let thumbnailURL = download.thumbnailURL {
-                thumbnailPath = await downloadThumbnail(
-                    from: thumbnailURL,
-                    filename: "\(videoID)_thumbnail.jpg"
-                )
+                for candidate in Thumbnail.fallbackChain(for: thumbnailURL) {
+                    thumbnailPath = await downloadThumbnail(
+                        from: candidate.url,
+                        filename: "\(videoID)_thumbnail.jpg"
+                    )
+                    if thumbnailPath != nil { break }
+                }
             }
 
             // Download channel thumbnail - best-effort, ignore failures

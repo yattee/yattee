@@ -107,7 +107,9 @@ struct UnifiedPlaylistDetailView: View {
     }
 
     private var navigationThumbnailURL: URL? {
-        videos.first?.bestThumbnail?.url ?? thumbnailURL ?? cachedHeader?.thumbnailURL
+        // Rendered as a single URL without fallback, so rewrite to the
+        // always-available hqdefault variant.
+        Thumbnail.reliableURL(for: videos.first?.bestThumbnail?.url ?? thumbnailURL ?? cachedHeader?.thumbnailURL)
     }
 
     /// Summary text for the playlist (e.g., "5 videos · 1h 23m").
@@ -532,8 +534,9 @@ struct UnifiedPlaylistDetailView: View {
 
     @ViewBuilder
     private var tvOSPlaylistThumbnail: some View {
-        let url = videos.first?.bestThumbnail?.url ?? thumbnailURL
-        LazyImage(url: url) { state in
+        let urls = (videos.first?.thumbnailURLsByQuality ?? [])
+            + [Thumbnail.reliableURL(for: thumbnailURL)].compactMap { $0 }
+        FallbackLazyImage(urls: urls) { state in
             if let image = state.image {
                 image
                     .resizable()

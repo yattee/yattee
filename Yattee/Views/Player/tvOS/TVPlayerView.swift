@@ -6,6 +6,7 @@
 //
 
 #if os(tvOS)
+import NukeUI
 import SwiftUI
 
 /// Focus targets for tvOS player controls navigation.
@@ -644,13 +645,15 @@ struct TVPlayerView: View {
             // Thumbnail for audio-only playback and the pre-backend loading state
             if isAudioOnly || !hasBackend,
                let video = playerState?.currentVideo,
-               let thumbnailURL = video.bestThumbnail?.url {
-                AsyncImage(url: thumbnailURL) { image in
-                    image
-                        .resizable()
-                        .aspectRatio(contentMode: .fit)
-                } placeholder: {
-                    Color.black
+               !video.thumbnailURLsByQuality.isEmpty {
+                FallbackLazyImage(urls: video.thumbnailURLsByQuality) { state in
+                    if let image = state.image {
+                        image
+                            .resizable()
+                            .aspectRatio(contentMode: .fit)
+                    } else {
+                        Color.black
+                    }
                 }
                 .allowsHitTesting(false)
             }

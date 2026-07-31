@@ -62,7 +62,7 @@ struct TVAutoplayCountdownView: View {
     private var nextVideoCard: some View {
         HStack(spacing: 20) {
             // Thumbnail
-            LazyImage(url: nextVideo.video.bestThumbnail?.url) { state in
+            FallbackLazyImage(urls: nextVideo.video.thumbnailURLsByQuality) { state in
                 if let image = state.image {
                     image
                         .resizable()

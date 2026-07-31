@@ -44,8 +44,9 @@ extension ExpandedPlayerSheet {
 
         // Clear loaded image so next video gets fresh thumbnail
         displayedThumbnailImage = nil
-        // Immediately switch to next video's thumbnail to prevent old thumbnail flash
-        displayedThumbnailURL = nextQueuedVideo?.video.bestThumbnail?.url
+        // Immediately switch to next video's thumbnail to prevent old thumbnail flash.
+        // Reliable variant: the frozen URL is loaded without fallback.
+        displayedThumbnailURL = nextQueuedVideo?.video.reliableThumbnailURL
         isThumbnailFrozen = true
 
         Task {
@@ -200,7 +201,7 @@ extension ExpandedPlayerSheet {
     func videoPreviewCard(video: Video) -> some View {
         HStack(spacing: 12) {
             // Thumbnail
-            LazyImage(url: video.bestThumbnail?.url) { state in
+            FallbackLazyImage(urls: video.thumbnailURLsByQuality) { state in
                 if let image = state.image {
                     image
                         .resizable()

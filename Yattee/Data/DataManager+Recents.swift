@@ -358,7 +358,7 @@ extension DataManager {
             existing.title = playlist.title
             existing.authorName = playlist.authorName
             existing.videoCount = playlist.videoCount
-            existing.thumbnailURLString = RecentPlaylist.upgradedThumbnailURLString(playlist.thumbnailURL)
+            existing.thumbnailURLString = RecentPlaylist.reliableThumbnailURLString(playlist.thumbnailURL)
             savedEntry = existing
         } else {
             // Create new entry

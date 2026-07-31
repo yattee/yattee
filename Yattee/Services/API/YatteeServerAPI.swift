@@ -1363,7 +1363,7 @@ private struct YatteePlaylist: Decodable, Sendable {
             description: description,
             author: authorId.map { Author(id: $0, name: author ?? "") },
             videoCount: videoCount,
-            thumbnailURL: validVideos.first?.thumbnails.first?.url,
+            thumbnailURL: Thumbnail.reliableURL(for: validVideos.first?.thumbnails.first?.url),
             videos: validVideos
         )
     }
@@ -1440,7 +1440,7 @@ private struct YatteeSearchPlaylist: Decodable, Sendable {
             title: title,
             author: authorId.map { Author(id: $0, name: author ?? "") },
             videoCount: videoCount,
-            thumbnailURL: thumbnailURL,
+            thumbnailURL: Thumbnail.reliableURL(for: thumbnailURL),
             videos: videos?.map { $0.toVideo() } ?? []
         )
     }

@@ -840,8 +840,10 @@ private struct PlayerEventHandlersModifier: ViewModifier {
 
         // Clear loaded image so new video gets fresh thumbnail
         displayedThumbnailImage = nil
-        // Capture thumbnail URL immediately and freeze to prevent flash during details load
-        displayedThumbnailURL = playerState?.currentVideo?.bestThumbnail?.url
+        // Capture thumbnail URL immediately and freeze to prevent flash during details load.
+        // Use the reliable (hqdefault) variant: the frozen URL is loaded without fallback,
+        // and the best advertised variant often 404s for older videos.
+        displayedThumbnailURL = playerState?.currentVideo?.reliableThumbnailURL
         isThumbnailFrozen = true
     }
 

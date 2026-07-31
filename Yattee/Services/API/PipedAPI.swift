@@ -532,9 +532,7 @@ private struct PipedVideo: Decodable, Sendable {
             publishedText: uploadedDate,
             viewCount: views.map { Int($0) },
             likeCount: nil,
-            thumbnails: thumbnail.flatMap { URL(string: $0) }.map {
-                [Thumbnail(url: $0, quality: .high)]
-            } ?? [],
+            thumbnails: Thumbnail.fallbackChain(for: thumbnail.flatMap { URL(string: $0) }),
             isLive: duration == -1,
             isUpcoming: false,
             scheduledStartTime: nil
@@ -771,9 +769,7 @@ private struct PipedSearchItem: Decodable, Sendable {
             publishedText: uploadedDate,
             viewCount: views.map { Int($0) },
             likeCount: nil,
-            thumbnails: thumbnail.flatMap { URL(string: $0) }.map {
-                [Thumbnail(url: $0, quality: .high)]
-            } ?? [],
+            thumbnails: Thumbnail.fallbackChain(for: thumbnail.flatMap { URL(string: $0) }),
             isLive: duration == -1,
             isUpcoming: false,
             scheduledStartTime: nil

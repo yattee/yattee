@@ -8,6 +8,38 @@
 import SwiftUI
 import NukeUI
 
+/// A `LazyImage` that steps through candidate URLs, advancing to the next
+/// (lower-quality) one when a load fails.
+///
+/// YouTube's CDN (and the backends that wrap it) frequently advertise
+/// `maxresdefault`/`sddefault` thumbnails that don't exist for older or
+/// low-resolution uploads and return 404. Pass best-quality-first candidates
+/// (e.g. `video.thumbnailURLsByQuality`) so a valid thumbnail is always shown.
+struct FallbackLazyImage<Content: View>: View {
+    let urls: [URL]
+    @ViewBuilder let content: (LazyImageState) -> Content
+
+    /// Index into `urls` of the URL currently being attempted.
+    @State private var candidateIndex = 0
+
+    private var currentURL: URL? {
+        guard urls.indices.contains(candidateIndex) else { return urls.last }
+        return urls[candidateIndex]
+    }
+
+    var body: some View {
+        LazyImage(url: currentURL) { state in
+            content(state)
+        }
+        .onCompletion { result in
+            if case .failure = result, candidateIndex < urls.count - 1 {
+                candidateIndex += 1
+            }
+        }
+        .onChange(of: urls) { candidateIndex = 0 }
+    }
+}
+
 /// A reusable video thumbnail view with 16:9 aspect ratio.
 ///
 /// Supports optional overlays for:
@@ -38,23 +70,14 @@ struct VideoThumbnailView: View {
     var placeholderTitle: String? = nil
     var isWatched: Bool = false
 
-    /// Index into `candidates` of the URL currently being attempted.
-    @State private var candidateIndex = 0
-
     /// De-duplicated candidate URLs, best-quality first.
     private var candidates: [URL] {
         var seen = Set<URL>()
         return ([url] + fallbackURLs).compactMap { $0 }.filter { seen.insert($0).inserted }
     }
 
-    /// The URL currently being shown, advancing through `candidates` on failure.
-    private var currentURL: URL? {
-        guard candidates.indices.contains(candidateIndex) else { return candidates.last }
-        return candidates[candidateIndex]
-    }
-
     var body: some View {
-        LazyImage(url: currentURL) { state in
+        FallbackLazyImage(urls: candidates) { state in
             if let image = state.image {
                 image
                     .resizable()
@@ -75,13 +98,6 @@ struct VideoThumbnailView: View {
                     }
             }
         }
-        .onCompletion { result in
-            // On a failed load, fall back to the next (lower-quality) candidate.
-            if case .failure = result, candidateIndex < candidates.count - 1 {
-                candidateIndex += 1
-            }
-        }
-        .onChange(of: candidates) { candidateIndex = 0 }
         .aspectRatio(16/9, contentMode: .fit)
         .overlay(alignment: .bottom) {
             watchProgressBar
