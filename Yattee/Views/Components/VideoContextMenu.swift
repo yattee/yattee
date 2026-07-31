@@ -527,8 +527,9 @@ struct VideoContextMenuContent: View {
             await remoteControl.loadVideo(
                 videoID: video.id.videoID,
                 videoTitle: video.title,
+                videoSource: video.id.source,
                 instanceURL: instanceURL,
-                startTime: startTime,
+                startTime: video.isLive ? nil : startTime,
                 pauseLocalPlayback: false,
                 on: device
             )
@@ -556,11 +557,13 @@ struct VideoContextMenuContent: View {
 
             // Send load video command with current playback time
             // pauseLocalPlayback: true will pause local playback when remote device confirms it started playing
+            // Live streams have no shared timeline - the remote device joins the stream at the live edge
             await remoteControl.loadVideo(
                 videoID: video.id.videoID,
                 videoTitle: video.title,
+                videoSource: video.id.source,
                 instanceURL: instanceURL,
-                startTime: currentTime,
+                startTime: video.isLive ? nil : currentTime,
                 pauseLocalPlayback: true,
                 on: device
             )

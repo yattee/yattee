@@ -389,7 +389,7 @@ final class RemoteControlCoordinator {
     ///   - startTime: Optional start time to seek to after loading.
     ///   - pauseLocalPlayback: If true, pause local playback when remote device starts playing (for "Move to" feature).
     ///   - device: The device to load the video on.
-    func loadVideo(videoID: String, videoTitle: String? = nil, instanceURL: String?, startTime: TimeInterval? = nil, pauseLocalPlayback: Bool = false, on device: DiscoveredDevice) async {
+    func loadVideo(videoID: String, videoTitle: String? = nil, videoSource: ContentSource? = nil, instanceURL: String?, startTime: TimeInterval? = nil, pauseLocalPlayback: Bool = false, on device: DiscoveredDevice) async {
         rcLog("REMOTEPLAY", "[\(device.name)] Starting remote play", details: "videoID=\(videoID), instance=\(instanceURL ?? "default"), startTime=\(startTime ?? 0), pauseLocal=\(pauseLocalPlayback)")
 
         // Clear any stale pending state from previous timed-out operations
@@ -432,7 +432,7 @@ final class RemoteControlCoordinator {
 
         // For move operations, use handshake protocol: remote prepares but waits for play command
         let awaitPlayCommand = pauseLocalPlayback
-        await sendCommand(.loadVideo(videoID: videoID, instanceURL: instanceURL, startTime: startTime, awaitPlayCommand: awaitPlayCommand), to: device)
+        await sendCommand(.loadVideo(videoID: videoID, instanceURL: instanceURL, startTime: startTime, awaitPlayCommand: awaitPlayCommand, videoSource: videoSource, videoTitle: videoTitle), to: device)
         rcLog("REMOTEPLAY", "[\(device.name)] loadVideo command sent, waiting for state update...")
     }
 
@@ -620,8 +620,8 @@ final class RemoteControlCoordinator {
                 playerService?.state.rate = playbackRate
             }
 
-        case .loadVideo(let videoID, let instanceURLString, let startTime, let awaitPlayCommand):
-            rcLog("HANDLE", "[\(senderName)] Executing: loadVideo", details: "videoID=\(videoID), instance=\(instanceURLString ?? "default"), startTime=\(startTime ?? 0), awaitPlay=\(awaitPlayCommand ?? false)")
+        case .loadVideo(let videoID, let instanceURLString, let startTime, let awaitPlayCommand, let videoSource, let videoTitle):
+            rcLog("HANDLE", "[\(senderName)] Executing: loadVideo", details: "videoID=\(videoID), instance=\(instanceURLString ?? "default"), startTime=\(startTime ?? 0), awaitPlay=\(awaitPlayCommand ?? false), source=\(videoSource.map(String.init(describing:)) ?? "none")")
             // Show toast indicating remote video opening
             if let deviceName = controllingDevice?.name {
                 toastManager?.show(
@@ -633,7 +633,7 @@ final class RemoteControlCoordinator {
                     autoDismissDelay: 5.0
                 )
             }
-            await handleLoadVideo(videoID: videoID, instanceURLString: instanceURLString, startTime: startTime, awaitPlayCommand: awaitPlayCommand ?? false, senderDeviceID: message.senderDeviceID)
+            await handleLoadVideo(videoID: videoID, instanceURLString: instanceURLString, startTime: startTime, awaitPlayCommand: awaitPlayCommand ?? false, videoSource: videoSource, videoTitle: videoTitle, senderDeviceID: message.senderDeviceID)
 
         case .closeVideo:
             rcLog("HANDLE", "[\(senderName)] Executing: closeVideo")
@@ -766,8 +766,11 @@ final class RemoteControlCoordinator {
         }
     }
 
-    private func handleLoadVideo(videoID: String, instanceURLString: String?, startTime: TimeInterval? = nil, awaitPlayCommand: Bool = false, senderDeviceID: String? = nil) async {
+    private func handleLoadVideo(videoID: String, instanceURLString: String?, startTime: TimeInterval? = nil, awaitPlayCommand: Bool = false, videoSource: ContentSource? = nil, videoTitle: String? = nil, senderDeviceID: String? = nil) async {
         rcLog("LOADVIDEO", "Loading video: \(videoID)", details: "startTime=\(startTime ?? 0), awaitPlay=\(awaitPlayCommand)")
+        // Short standalone line so it can't be lost to log truncation - confirms this build
+        // understands videoSource and shows what was decoded from the wire
+        rcLog("LOADVIDEO", "Protocol v2: videoSource=\(videoSource?.id ?? "nil"), title=\(videoTitle ?? "nil")")
 
         // Check if we're already playing the same video - just seek instead of reloading
         if let currentVideoID = playerService?.state.currentVideo?.id.videoID,
@@ -801,6 +804,29 @@ final class RemoteControlCoordinator {
                 videoID: videoID,
                 path: String(components[1]),
                 source: source,
+                startTime: startTime,
+                awaitPlayCommand: awaitPlayCommand,
+                senderDeviceID: senderDeviceID
+            )
+            return
+        }
+
+        // Extracted videos (Twitch streams, other yt-dlp sites) can't be fetched from the
+        // /videos API - reconstruct the VideoID from the sender's ContentSource and let the
+        // player re-extract from the original URL. Media-source extractors (WebDAV/SMB/local)
+        // are excluded: they're handled by the UUID:path branch above and need a locally
+        // configured source, not extraction.
+        if let videoSource,
+           case .extracted(let extractor, let originalURL) = videoSource,
+           extractor != MediaFile.webdavProvider,
+           extractor != MediaFile.smbProvider,
+           extractor != MediaFile.localFolderProvider {
+            rcLog("LOADVIDEO", "Detected extracted video (\(extractor)), loading via original URL: \(originalURL.absoluteString)")
+            await handleLoadExtractedVideo(
+                videoID: videoID,
+                source: videoSource,
+                originalURL: originalURL,
+                title: videoTitle,
                 startTime: startTime,
                 awaitPlayCommand: awaitPlayCommand,
                 senderDeviceID: senderDeviceID
@@ -938,6 +964,53 @@ final class RemoteControlCoordinator {
             // Normal mode: start playing immediately
             playerService?.openVideo(video, startTime: startTime)
             rcLog("LOADVIDEO", "WebDAV video opened: \(title)", details: "startTime=\(startTime ?? 0)")
+        }
+    }
+
+    /// Loads an extracted video (Twitch stream, other yt-dlp sites) received from a remote device.
+    /// Builds a placeholder Video carrying the original ContentSource - the player re-extracts
+    /// streams and full metadata from the original URL when opening it.
+    private func handleLoadExtractedVideo(videoID: String, source: ContentSource, originalURL: URL, title: String?, startTime: TimeInterval? = nil, awaitPlayCommand: Bool = false, senderDeviceID: String? = nil) async {
+        let video = Video(
+            id: VideoID(source: source, videoID: videoID),
+            title: title ?? originalURL.absoluteString,
+            description: nil,
+            author: Author(id: "", name: originalURL.host ?? "", hasRealChannelInfo: false),
+            duration: 0,
+            publishedAt: nil,
+            publishedText: nil,
+            viewCount: nil,
+            likeCount: nil,
+            thumbnails: [],
+            isLive: false,
+            isUpcoming: false,
+            scheduledStartTime: nil
+        )
+
+        if awaitPlayCommand {
+            // Handshake protocol: load video, then pause and notify sender we're ready
+            rcLog("LOADVIDEO", "Handshake mode: loading extracted video, will pause when ready")
+            playerService?.openVideo(video, startTime: startTime)
+
+            // Wait for video to start playing, then pause
+            try? await Task.sleep(for: .milliseconds(1000))
+
+            // Pause playback - video is loaded and at correct position but not playing
+            playerService?.pause()
+            rcLog("LOADVIDEO", "Extracted video loaded and paused, ready for handoff")
+
+            // Send state update to let sender know we're ready (isPlaying will be false)
+            let state = currentRemoteState()
+            rcLog("LOADVIDEO", "Sending ready state to sender", details: "videoID=\(state.videoID ?? "nil"), playing=\(state.isPlaying)")
+            if let senderID = senderDeviceID {
+                try? await networkService.send(command: .stateUpdate(state), to: senderID)
+            } else {
+                await networkService.broadcast(command: .stateUpdate(state))
+            }
+        } else {
+            // Normal mode: start playing immediately
+            playerService?.openVideo(video, startTime: startTime)
+            rcLog("LOADVIDEO", "Extracted video opened: \(video.title)", details: "startTime=\(startTime ?? 0)")
         }
     }
 

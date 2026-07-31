@@ -52,7 +52,10 @@ enum RemoteControlCommand: Codable, Sendable {
     case setVolume(Float)
     case setMuted(Bool)
     case setRate(Float)
-    case loadVideo(videoID: String, instanceURL: String?, startTime: TimeInterval?, awaitPlayCommand: Bool?)
+    /// `videoSource` carries the full ContentSource so non-API videos (e.g. extracted
+    /// Twitch streams) can be reconstructed on the receiver. Optional for
+    /// backward compatibility with older app versions.
+    case loadVideo(videoID: String, instanceURL: String?, startTime: TimeInterval?, awaitPlayCommand: Bool?, videoSource: ContentSource?, videoTitle: String?)
     case closeVideo
     case toggleFullscreen
     case playNext
