@@ -960,7 +960,7 @@ final class DownloadManager: NSObject {
             publishedText: download.publishedText,
             viewCount: download.viewCount,
             likeCount: download.likeCount,
-            thumbnails: download.thumbnailURL.map { [Thumbnail(url: $0, quality: .medium)] } ?? [],
+            thumbnails: Thumbnail.fallbackChain(for: download.thumbnailURL),
             isLive: false,
             isUpcoming: false,
             scheduledStartTime: nil

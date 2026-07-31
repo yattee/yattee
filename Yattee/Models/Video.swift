@@ -311,6 +311,55 @@ struct Thumbnail: Codable, Hashable, Sendable {
         self.width = width
         self.height = height
     }
+
+    /// Expands a single stored YouTube-style thumbnail URL (`/vi/<id>/<variant>.jpg`)
+    /// into a best-first fallback chain. Persistence models (playlists, watch history,
+    /// bookmarks) store only the best advertised URL — usually `maxresdefault.jpg`,
+    /// which doesn't exist for many older videos and 404s. Reconstructing the
+    /// lower-quality variants lets thumbnail views fall back the same way they do
+    /// for live API results. Non-matching URLs get a single-entry chain.
+    /// Rewrites a YouTube-style thumbnail URL (`/vi/<id>/<variant>.jpg`) to the
+    /// `hqdefault.jpg` variant, which exists for effectively every video (unlike
+    /// `maxresdefault`/`sddefault`, which 404 for many older uploads). Use where a
+    /// single URL is displayed without fallback, e.g. playlist covers. Non-matching
+    /// URLs are returned unchanged.
+    static func reliableURL(for url: URL?) -> URL? {
+        guard let url else { return nil }
+        let variants = ["maxresdefault.jpg", "sddefault.jpg", "hqdefault.jpg", "mqdefault.jpg", "default.jpg"]
+        let path = url.path
+        guard path.range(of: #"/vi/[^/]+/"#, options: .regularExpression) != nil,
+              let match = variants.first(where: { path.hasSuffix($0) }),
+              var components = URLComponents(url: url, resolvingAgainstBaseURL: false) else {
+            return url
+        }
+        components.path = String(path.dropLast(match.count)) + "hqdefault.jpg"
+        return components.url ?? url
+    }
+
+    static func fallbackChain(for url: URL?) -> [Thumbnail] {
+        guard let url else { return [] }
+        let variants: [(suffix: String, quality: Quality)] = [
+            ("maxresdefault.jpg", .maxres),
+            ("sddefault.jpg", .standard),
+            ("hqdefault.jpg", .high),
+            ("mqdefault.jpg", .medium),
+            ("default.jpg", .default),
+        ]
+        let path = url.path
+        guard path.range(of: #"/vi/[^/]+/"#, options: .regularExpression) != nil,
+              let current = variants.first(where: { path.hasSuffix($0.suffix) }),
+              let components = URLComponents(url: url, resolvingAgainstBaseURL: false) else {
+            return [Thumbnail(url: url, quality: .medium)]
+        }
+        let basePath = String(path.dropLast(current.suffix.count))
+        return variants.compactMap { variant in
+            guard variant.quality <= current.quality else { return nil }
+            var variantComponents = components
+            variantComponents.path = basePath + variant.suffix
+            guard let variantURL = variantComponents.url else { return nil }
+            return Thumbnail(url: variantURL, quality: variant.quality)
+        }
+    }
 }
 
 // MARK: - Preview Support

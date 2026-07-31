@@ -75,10 +75,16 @@ final class LocalPlaylist {
     }
 
     /// The first video's thumbnail URL for display.
+    ///
+    /// Rewritten to the always-available `hqdefault` variant because the stored
+    /// URL is the best advertised quality (often `maxresdefault`), which 404s
+    /// for many older videos and would leave the cover blank.
     var thumbnailURL: URL? {
-        (items ?? []).sorted { $0.sortOrder < $1.sortOrder }
-            .first?
-            .thumbnailURL
+        Thumbnail.reliableURL(
+            for: (items ?? []).sorted { $0.sortOrder < $1.sortOrder }
+                .first?
+                .thumbnailURL
+        )
     }
 
     /// Sorted items by order.
@@ -249,7 +255,7 @@ extension LocalPlaylistItem {
             publishedText: nil,
             viewCount: nil,
             likeCount: nil,
-            thumbnails: thumbnailURL.map { [Thumbnail(url: $0, quality: .medium)] } ?? [],
+            thumbnails: Thumbnail.fallbackChain(for: thumbnailURL),
             isLive: isLive,
             isUpcoming: false,
             scheduledStartTime: nil

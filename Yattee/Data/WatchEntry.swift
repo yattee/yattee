@@ -241,7 +241,7 @@ extension WatchEntry {
             publishedText: nil,
             viewCount: nil,
             likeCount: nil,
-            thumbnails: thumbnailURL.map { [Thumbnail(url: $0, quality: .medium)] } ?? [],
+            thumbnails: Thumbnail.fallbackChain(for: thumbnailURL),
             isLive: isLive,
             isUpcoming: false,
             scheduledStartTime: nil

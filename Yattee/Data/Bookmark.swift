@@ -217,7 +217,7 @@ final class Bookmark {
             publishedText: publishedText,
             viewCount: viewCount,
             likeCount: nil,
-            thumbnails: thumbnailURL.map { [Thumbnail(url: $0, width: nil, height: nil)] } ?? [],
+            thumbnails: Thumbnail.fallbackChain(for: thumbnailURL),
             isLive: isLive,
             isUpcoming: false,
             scheduledStartTime: nil

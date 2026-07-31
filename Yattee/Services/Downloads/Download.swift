@@ -336,7 +336,7 @@ struct Download: Identifiable, Codable, Sendable, Equatable {
             publishedText: publishedText,
             viewCount: viewCount,
             likeCount: likeCount,
-            thumbnails: resolvedThumbnailURL.map { [Thumbnail(url: $0, quality: .medium)] } ?? [],
+            thumbnails: Thumbnail.fallbackChain(for: resolvedThumbnailURL),
             isLive: false,
             isUpcoming: false,
             scheduledStartTime: nil

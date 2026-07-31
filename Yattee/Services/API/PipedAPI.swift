@@ -590,7 +590,7 @@ private struct PipedStreamResponse: Decodable, Sendable {
         let thumbnails: [Thumbnail] = {
             if !resolvedVideoId.isEmpty,
                let url = URL(string: "https://i.ytimg.com/vi/\(resolvedVideoId)/maxresdefault.jpg") {
-                return [Thumbnail(url: url, quality: .maxres)]
+                return Thumbnail.fallbackChain(for: url)
             }
             // Fallback to proxy URL if video ID not available
             if let proxyURL = thumbnailUrl.flatMap({ URL(string: $0) }) {
