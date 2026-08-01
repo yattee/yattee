@@ -8240,6 +8240,16 @@
         }
       }
     },
+    "playlists.search.placeholder" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Search playlists"
+          }
+        }
+      }
+    },
     "playlists.title" : {
       "comment" : "Title for playlists tab in instance browse",
       "localizations" : {

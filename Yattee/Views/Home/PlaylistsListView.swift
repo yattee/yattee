@@ -10,6 +10,7 @@ import SwiftUI
 struct PlaylistsListView: View {
     @Environment(\.appEnvironment) private var appEnvironment
     @State private var playlists: [LocalPlaylist] = []
+    @State private var searchText = ""
     @State private var showingNewPlaylist = false
     @State private var playlistToEdit: LocalPlaylist?
     #if os(tvOS)
@@ -23,12 +24,22 @@ struct PlaylistsListView: View {
         appEnvironment?.settingsManager.listStyle ?? .inset
     }
 
+    /// Playlists filtered by search.
+    private var filteredPlaylists: [LocalPlaylist] {
+        guard !searchText.isEmpty else { return playlists }
+        let query = searchText.lowercased()
+        return playlists.filter { playlist in
+            playlist.title.lowercased().contains(query) ||
+            (playlist.playlistDescription?.lowercased().contains(query) ?? false)
+        }
+    }
+
     var body: some View {
         Group {
             #if os(tvOS)
             tvOSContent
             #else
-            if playlists.isEmpty {
+            if filteredPlaylists.isEmpty {
                 emptyView
             } else {
                 listContent
@@ -38,7 +49,15 @@ struct PlaylistsListView: View {
         #if !os(tvOS)
         .navigationTitle(String(localized: "home.playlists.title"))
         .toolbarTitleDisplayMode(.inlineLarge)
+        .searchable(text: $searchText, prompt: Text(String(localized: "playlists.search.placeholder")))
         .toolbar {
+            #if os(macOS)
+            // Pin the trailing group (search field + toolbar buttons) to the right edge,
+            // matching the global Search view.
+            if #available(macOS 26, *) {
+                ToolbarSpacer(.flexible, placement: .primaryAction)
+            }
+            #endif
             ToolbarItem(placement: .primaryAction) {
                 Button {
                     showingNewPlaylist = true
@@ -73,8 +92,10 @@ struct PlaylistsListView: View {
 
     private var tvOSContent: some View {
         VStack(spacing: 0) {
-            HStack {
-                Spacer()
+            HStack(spacing: 24) {
+                TextField(String(localized: "playlists.search.placeholder"), text: $searchText)
+                    .textFieldStyle(.plain)
+
                 Button {
                     showingNewPlaylist = true
                 } label: {
@@ -84,9 +105,10 @@ struct PlaylistsListView: View {
             .focusSection()
             .padding(.horizontal, 48)
             .padding(.top, 20)
+            .padding(.bottom, 20)
 
             Group {
-                if playlists.isEmpty {
+                if filteredPlaylists.isEmpty {
                     emptyView
                 } else {
                     listContent
@@ -106,7 +128,17 @@ struct PlaylistsListView: View {
 
     // MARK: - Empty View
 
+    @ViewBuilder
     private var emptyView: some View {
+        if !searchText.isEmpty {
+            ContentUnavailableView.search(text: searchText)
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+        } else {
+            noPlaylistsView
+        }
+    }
+
+    private var noPlaylistsView: some View {
         ContentUnavailableView {
             Label(String(localized: "home.playlists.title"), systemImage: "list.bullet.rectangle")
         } description: {
@@ -129,9 +161,9 @@ struct PlaylistsListView: View {
             Spacer()
                 .frame(height: 16)
         } content: {
-            ForEach(Array(playlists.enumerated()), id: \.element.id) { index, playlist in
+            ForEach(Array(filteredPlaylists.enumerated()), id: \.element.id) { index, playlist in
                 VideoListRow(
-                    isLast: index == playlists.count - 1,
+                    isLast: index == filteredPlaylists.count - 1,
                     rowStyle: .regular,
                     listStyle: listStyle,
                     contentWidth: 80  // PlaylistRowView thumbnail width
