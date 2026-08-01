@@ -9,6 +9,7 @@ import SwiftUI
 
 struct PlaylistsListView: View {
     @Environment(\.appEnvironment) private var appEnvironment
+    @Namespace private var sheetTransition
     @State private var playlists: [LocalPlaylist] = []
     @State private var searchText = ""
     @State private var showingNewPlaylist = false
@@ -17,11 +18,43 @@ struct PlaylistsListView: View {
     @FocusState private var focusedPlaylistID: UUID?
     #endif
 
+    // View options (persisted)
+    @AppStorage("playlists.layout") private var layout: VideoListLayout = .list
+    @AppStorage("playlists.rowStyle") private var rowStyle: VideoRowStyle = .regular
+    @AppStorage("playlists.gridColumns") private var gridColumns = 2
+
+    // UI state
+    @State private var showViewOptions = false
+    @State private var viewWidth: CGFloat = 0
+
+    // Grid layout configuration
+    private var gridConfig: GridLayoutConfiguration {
+        GridLayoutConfiguration(viewWidth: viewWidth, gridColumns: gridColumns)
+    }
+
     private var dataManager: DataManager? { appEnvironment?.dataManager }
 
     /// List style from centralized settings.
     private var listStyle: VideoListStyle {
         appEnvironment?.settingsManager.listStyle ?? .inset
+    }
+
+    private var viewOptionsSheetContent: some View {
+        ViewOptionsSheet(
+            layout: $layout,
+            rowStyle: $rowStyle,
+            gridColumns: $gridColumns,
+            maxGridColumns: gridConfig.maxColumns
+        )
+    }
+
+    /// View options button lives on the leading edge on macOS, trailing elsewhere.
+    private var viewOptionsPlacement: ToolbarItemPlacement {
+        #if os(macOS)
+        .navigation
+        #else
+        .primaryAction
+        #endif
     }
 
     /// Playlists filtered by search.
@@ -35,16 +68,26 @@ struct PlaylistsListView: View {
     }
 
     var body: some View {
-        Group {
-            #if os(tvOS)
-            tvOSContent
-            #else
-            if filteredPlaylists.isEmpty {
-                emptyView
-            } else {
-                listContent
+        GeometryReader { geometry in
+            Group {
+                #if os(tvOS)
+                tvOSContent
+                #else
+                if filteredPlaylists.isEmpty {
+                    emptyView
+                } else {
+                    switch layout {
+                    case .list:
+                        listContent
+                    case .grid:
+                        gridContent
+                    }
+                }
+                #endif
             }
-            #endif
+            .onChange(of: geometry.size.width, initial: true) { _, newWidth in
+                viewWidth = newWidth
+            }
         }
         #if !os(tvOS)
         .navigationTitle(String(localized: "home.playlists.title"))
@@ -58,6 +101,19 @@ struct PlaylistsListView: View {
                 ToolbarSpacer(.flexible, placement: .primaryAction)
             }
             #endif
+            ToolbarItem(placement: viewOptionsPlacement) {
+                Button {
+                    showViewOptions = true
+                } label: {
+                    Label(String(localized: "viewOptions.title"), systemImage: "slider.horizontal.3")
+                }
+                .liquidGlassTransitionSource(id: "playlistsViewOptions", in: sheetTransition)
+                #if os(macOS)
+                .popover(isPresented: $showViewOptions, arrowEdge: .bottom) {
+                    viewOptionsSheetContent
+                }
+                #endif
+            }
             ToolbarItem(placement: .primaryAction) {
                 Button {
                     showingNewPlaylist = true
@@ -65,6 +121,12 @@ struct PlaylistsListView: View {
                     Image(systemName: "plus")
                 }
             }
+        }
+        #endif
+        #if !os(macOS)
+        .sheet(isPresented: $showViewOptions) {
+            viewOptionsSheetContent
+                .liquidGlassSheetContent(sourceID: "playlistsViewOptions", in: sheetTransition)
         }
         #endif
         .sheet(isPresented: $showingNewPlaylist) {
@@ -101,6 +163,12 @@ struct PlaylistsListView: View {
                 } label: {
                     Label(String(localized: "home.playlists.new"), systemImage: "plus")
                 }
+
+                Button {
+                    showViewOptions = true
+                } label: {
+                    Label(String(localized: "viewOptions.title"), systemImage: "slider.horizontal.3")
+                }
             }
             .focusSection()
             .padding(.horizontal, 48)
@@ -111,7 +179,12 @@ struct PlaylistsListView: View {
                 if filteredPlaylists.isEmpty {
                     emptyView
                 } else {
-                    listContent
+                    switch layout {
+                    case .list:
+                        listContent
+                    case .grid:
+                        gridContent
+                    }
                 }
             }
             .focusSection()
@@ -157,16 +230,16 @@ struct PlaylistsListView: View {
     // MARK: - List Content
 
     private var listContent: some View {
-        VideoListContainer(listStyle: listStyle, rowStyle: .regular) {
+        VideoListContainer(listStyle: listStyle, rowStyle: rowStyle) {
             Spacer()
                 .frame(height: 16)
         } content: {
             ForEach(Array(filteredPlaylists.enumerated()), id: \.element.id) { index, playlist in
                 VideoListRow(
                     isLast: index == filteredPlaylists.count - 1,
-                    rowStyle: .regular,
+                    rowStyle: rowStyle,
                     listStyle: listStyle,
-                    contentWidth: 80  // PlaylistRowView thumbnail width
+                    contentWidth: rowStyle.thumbnailWidth
                 ) {
                     playlistRow(playlist: playlist)
                 }
@@ -195,13 +268,28 @@ struct PlaylistsListView: View {
         }
     }
 
+    // MARK: - Grid Layout
+
+    private var gridContent: some View {
+        ScrollView {
+            VideoGridContent(columns: gridConfig.effectiveColumns) {
+                ForEach(filteredPlaylists, id: \.id) { playlist in
+                    playlistCard(playlist: playlist)
+                }
+            }
+        }
+        #if os(tvOS)
+        .scrollClipDisabled()
+        #endif
+    }
+
     // MARK: - Helper Views
 
     @ViewBuilder
     private func playlistRow(playlist: LocalPlaylist) -> some View {
         #if os(tvOS)
         NavigationLink(value: NavigationDestination.playlist(.local(playlist.id, title: playlist.title))) {
-            PlaylistRowView(playlist: playlist)
+            PlaylistRowView(playlist: playlist, style: rowStyle)
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .contentShape(Rectangle())
         }
@@ -209,13 +297,46 @@ struct PlaylistsListView: View {
         .zoomTransitionSource(id: playlist.id)
         .focused($focusedPlaylistID, equals: playlist.id)
         #else
-        PlaylistRowView(playlist: playlist)
+        PlaylistRowView(playlist: playlist, style: rowStyle)
             .frame(maxWidth: .infinity, alignment: .leading)
             .contentShape(Rectangle())
             .onTapGesture {
                 appEnvironment?.navigationCoordinator.navigate(to: .playlist(.local(playlist.id, title: playlist.title)))
             }
             .zoomTransitionSource(id: playlist.id)
+        #endif
+    }
+
+    @ViewBuilder
+    private func playlistCard(playlist: LocalPlaylist) -> some View {
+        #if os(tvOS)
+        NavigationLink(value: NavigationDestination.playlist(.local(playlist.id, title: playlist.title))) {
+            LocalPlaylistCardView(playlist: playlist, isCompact: gridConfig.isCompactCards)
+                .frame(maxHeight: .infinity, alignment: .top)
+        }
+        .buttonStyle(.plain)
+        .zoomTransitionSource(id: playlist.id)
+        .focused($focusedPlaylistID, equals: playlist.id)
+        #else
+        LocalPlaylistCardView(playlist: playlist, isCompact: gridConfig.isCompactCards)
+            .frame(maxHeight: .infinity, alignment: .top)
+            .onTapGesture {
+                appEnvironment?.navigationCoordinator.navigate(to: .playlist(.local(playlist.id, title: playlist.title)))
+            }
+            .zoomTransitionSource(id: playlist.id)
+            .contextMenu {
+                Button {
+                    playlistToEdit = playlist
+                } label: {
+                    Label(String(localized: "playlist.edit"), systemImage: "pencil")
+                }
+                Button(role: .destructive) {
+                    dataManager?.deletePlaylist(playlist)
+                    loadPlaylists()
+                } label: {
+                    Label(String(localized: "playlist.delete"), systemImage: "trash")
+                }
+            }
         #endif
     }
 

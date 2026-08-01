@@ -10,6 +10,11 @@ import NukeUI
 
 struct PlaylistRowView: View {
     let playlist: LocalPlaylist
+    var style: VideoRowStyle = .regular
+
+    private var titleFont: Font {
+        style == .compact ? .subheadline : .headline
+    }
 
     var body: some View {
         HStack(spacing: 12) {
@@ -28,14 +33,14 @@ struct PlaylistRowView: View {
                         }
                 }
             }
-            .frame(width: 80, height: 45)
+            .frame(width: style.thumbnailWidth, height: style.thumbnailHeight)
             .clipShape(RoundedRectangle(cornerRadius: 6))
 
             // Info
             VStack(alignment: .leading, spacing: 4) {
                 Text(playlist.title)
-                    .font(.headline)
-                    .lineLimit(1)
+                    .font(titleFont)
+                    .lineLimit(style == .large ? 2 : 1)
 
                 Text("playlist.videoCountDuration \(playlist.videoCount) \(playlist.formattedTotalDuration)")
                     .font(.caption.monospacedDigit())

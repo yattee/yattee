@@ -1,0 +1,97 @@
+//
+//  LocalPlaylistCardView.swift
+//  Yattee
+//
+//  A local playlist card component for grid layouts.
+//
+
+import SwiftUI
+import NukeUI
+
+/// A local playlist card for grid layouts.
+///
+/// Displays thumbnail with video count badge, title, and count/duration line.
+struct LocalPlaylistCardView: View {
+    let playlist: LocalPlaylist
+    var isCompact: Bool = false
+
+    private var titleFont: Font { isCompact ? .caption : .subheadline }
+    private var metadataFont: Font { isCompact ? .caption2 : .caption }
+
+    private var metadataHeight: CGFloat {
+        #if os(tvOS)
+        isCompact ? 90 : 110
+        #else
+        isCompact ? 50 : 58
+        #endif
+    }
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: isCompact ? 4 : 8) {
+            // Thumbnail with video count badge - fixed 16:9 aspect ratio container
+            Color.clear
+                .aspectRatio(16/9, contentMode: .fit)
+                .overlay {
+                    LazyImage(url: playlist.thumbnailURL) { state in
+                        if let image = state.image {
+                            image
+                                .resizable()
+                                .aspectRatio(contentMode: .fill)
+                        } else {
+                            thumbnailPlaceholder
+                        }
+                    }
+                }
+                .clipped()
+                .clipShape(RoundedRectangle(cornerRadius: isCompact ? 6 : 8))
+                .overlay(alignment: .bottomTrailing) {
+                    if playlist.videoCount > 0 {
+                        HStack(spacing: 4) {
+                            Image(systemName: "play.square.stack")
+                                .font(.caption2)
+                            Text("\(playlist.videoCount)")
+                                .font(.caption2)
+                                .fontWeight(.medium)
+                        }
+                        .padding(.horizontal, 6)
+                        .padding(.vertical, 3)
+                        .background(.black.opacity(0.75))
+                        .foregroundStyle(.white)
+                        .clipShape(RoundedRectangle(cornerRadius: 4))
+                        .padding(6)
+                    }
+                }
+
+            // Metadata - fixed height to ensure consistent card sizes in grid
+            VStack(alignment: .leading, spacing: 2) {
+                Text(playlist.title)
+                    .font(titleFont)
+                    .fontWeight(.medium)
+                    .lineLimit(2)
+                    .multilineTextAlignment(.leading)
+                    .fixedSize(horizontal: false, vertical: true)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+
+                Text("playlist.videoCountDuration \(playlist.videoCount) \(playlist.formattedTotalDuration)")
+                    .font(metadataFont.monospacedDigit())
+                    .foregroundStyle(.secondary)
+                    .lineLimit(1)
+
+                Spacer(minLength: 0)
+            }
+            .frame(height: metadataHeight)
+        }
+        .contentShape(Rectangle())
+    }
+
+    private var thumbnailPlaceholder: some View {
+        RoundedRectangle(cornerRadius: isCompact ? 6 : 8)
+            .fill(.quaternary)
+            .aspectRatio(16/9, contentMode: .fill)
+            .overlay {
+                Image(systemName: "music.note.list")
+                    .font(.title2)
+                    .foregroundStyle(.secondary)
+            }
+    }
+}
