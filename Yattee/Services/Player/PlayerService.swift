@@ -533,7 +533,7 @@ final class PlayerService {
             // Start playback
             LoggingService.shared.logPlayer("Calling backend.play(), playbackState: \(state.playbackState)")
             loadingVideoID = nil  // Clear loading flag - time updates are now valid
-            sleepPreventionService.preventSleep()
+            updateSleepPrevention()
 
             // For MPV backend, wait for sufficient buffer before starting playback
             // This prevents the brief pause/stutter that occurs when MPV starts playing
@@ -606,6 +606,17 @@ final class PlayerService {
         }
     }
 
+    /// Reconciles sleep prevention with what is actually on screen: display sleep
+    /// is only prevented when a video track is rendered. Audio-only playback
+    /// lets the screen sleep normally.
+    private func updateSleepPrevention() {
+        if state.currentStream?.isAudioOnly == true {
+            sleepPreventionService.allowSleep()
+        } else {
+            sleepPreventionService.preventSleep()
+        }
+    }
+
     /// Pauses playback.
     /// - Parameter shouldSaveProgress: Whether to save watch progress. Set to `false` when video has
     ///   already ended (100% was saved in `backendDidFinishPlaying`).
@@ -621,7 +632,7 @@ final class PlayerService {
 
     /// Resumes playback.
     func resume() {
-        sleepPreventionService.preventSleep()
+        updateSleepPrevention()
         currentBackend?.play()
         state.setPlaybackState(.playing)
         nowPlayingService.updatePlaybackRate(isPlaying: true, currentTime: state.currentTime)
@@ -732,7 +743,7 @@ final class PlayerService {
         if phase == .background {
             sleepPreventionService.allowSleep()
         } else if phase == .active && state.playbackState == .playing {
-            sleepPreventionService.preventSleep()
+            updateSleepPrevention()
         }
 
         #if os(macOS)
