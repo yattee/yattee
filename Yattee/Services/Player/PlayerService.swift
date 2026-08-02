@@ -240,7 +240,9 @@ final class PlayerService {
     ///   - stream: Optional specific stream to use (if provided, skips fetching streams from API)
     ///   - audioStream: Optional separate audio stream (for video-only streams)
     ///   - startTime: Optional start time in seconds
-    func play(video: Video, stream: Stream? = nil, audioStream: Stream? = nil, startTime: TimeInterval? = nil) async {
+    ///   - forceStartTime: When true, startTime is an explicit user request (timed link,
+    ///     chapter tap) and is honored even past the completion threshold
+    func play(video: Video, stream: Stream? = nil, audioStream: Stream? = nil, startTime: TimeInterval? = nil, forceStartTime: Bool = false) async {
         // Downloaded/local files bypass stream selection (they arrive here as
         // ready-made file:// streams), so audio mode is applied at this choke
         // point instead of in selectStreams.
@@ -427,7 +429,11 @@ final class PlayerService {
             } else if let startTime {
                 // Explicit startTime provided - use it (0 means play from beginning, >0 means resume)
                 // For quality switching with startTime > 0, honor the time unless video was completed
-                if startTime > 0 && completionThreshold > 0 && startTime >= completionThreshold {
+                if forceStartTime {
+                    // User-requested timestamp (timed link, chapter tap) - always honor it,
+                    // clamped so an out-of-range value can't seek past the end.
+                    seekTime = effectiveDuration > 0 ? min(startTime, max(0, effectiveDuration - 1)) : startTime
+                } else if startTime > 0 && completionThreshold > 0 && startTime >= completionThreshold {
                     seekTime = 0  // Video was completed, start over
                 } else {
                     seekTime = startTime
@@ -951,7 +957,8 @@ final class PlayerService {
         video: Video,
         fallbackStream: Stream? = nil,
         fallbackAudioStream: Stream? = nil,
-        startTime: TimeInterval? = nil
+        startTime: TimeInterval? = nil,
+        forceStartTime: Bool = false
     ) async {
         // Check if this is a media source video needing on-demand resolution
         // Uses unified method that fetches folder contents dynamically - works from any playback source
@@ -959,7 +966,7 @@ final class PlayerService {
             do {
                 let (stream, captions) = try await resolveMediaSourceStream(for: video)
                 currentDownload = nil
-                await play(video: video, stream: stream, audioStream: nil, startTime: startTime)
+                await play(video: video, stream: stream, audioStream: nil, startTime: startTime, forceStartTime: forceStartTime)
 
                 // Set available captions and auto-select preferred
                 if !captions.isEmpty {
@@ -983,7 +990,7 @@ final class PlayerService {
             if let (downloadedVideo, localStream, audioStream, captionURL, dislikeCount) = downloadManager.videoAndStream(for: download) {
                 // Store the download info for later reference
                 currentDownload = download
-                await play(video: downloadedVideo, stream: localStream, audioStream: audioStream, startTime: startTime)
+                await play(video: downloadedVideo, stream: localStream, audioStream: audioStream, startTime: startTime, forceStartTime: forceStartTime)
                 // Restore dislike count from download (for offline playback)
                 if let dislikeCount {
                     state.dislikeCount = dislikeCount
@@ -1014,11 +1021,11 @@ final class PlayerService {
                     autoDismissDelay: 4.0
                 )
                 currentDownload = nil
-                await play(video: video, stream: fallbackStream, audioStream: fallbackAudioStream, startTime: startTime)
+                await play(video: video, stream: fallbackStream, audioStream: fallbackAudioStream, startTime: startTime, forceStartTime: forceStartTime)
             }
         } else {
             currentDownload = nil
-            await play(video: video, stream: fallbackStream, audioStream: fallbackAudioStream, startTime: startTime)
+            await play(video: video, stream: fallbackStream, audioStream: fallbackAudioStream, startTime: startTime, forceStartTime: forceStartTime)
         }
     }
 
@@ -1044,7 +1051,9 @@ final class PlayerService {
     /// - Parameters:
     ///   - video: The video to open
     ///   - startTime: Optional start time in seconds (used for continue watching)
-    func openVideo(_ video: Video, startTime: TimeInterval? = nil) {
+    ///   - forceStartTime: When true, startTime is an explicit user request (timed link,
+    ///     chapter tap) and is honored even past the completion threshold
+    func openVideo(_ video: Video, startTime: TimeInterval? = nil, forceStartTime: Bool = false) {
         // Live streams have no meaningful resume position - drop any passed one
         // so callers with a stale watch entry cannot seek into the live window.
         let startTime = video.isLive ? nil : startTime
@@ -1089,7 +1098,7 @@ final class PlayerService {
         }
 
         currentPlayTask = Task {
-            await playPreferringDownloaded(video: video, startTime: startTime)
+            await playPreferringDownloaded(video: video, startTime: startTime, forceStartTime: forceStartTime)
         }
     }
 

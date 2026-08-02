@@ -96,6 +96,32 @@ struct URLRouter: Sendable {
         return true
     }
 
+    // MARK: - Wrapper Unwrapping
+
+    /// Resolve a `yattee://open?url={encoded_url}` wrapper (share extension) to the inner URL.
+    /// Returns the input unchanged for any other URL. The wrapper's query holds the full
+    /// original link, so timestamp parsing must run against the unwrapped URL.
+    ///
+    /// The share extension encodes with `.urlQueryAllowed`, which leaves `?`, `&`, and `=`
+    /// intact - URLComponents would split the inner URL's own query into separate wrapper
+    /// items (losing e.g. `&t=120`), so take the raw remainder after `?url=` instead.
+    func unwrapped(_ url: URL) -> URL {
+        guard url.scheme?.lowercased() == "yattee", url.host == "open",
+              let range = url.absoluteString.range(of: "?url=") else {
+            return url
+        }
+        let raw = String(url.absoluteString[range.upperBound...])
+        guard let decoded = raw.removingPercentEncoding,
+              let innerURL = URL(string: decoded) else {
+            return url
+        }
+        // Unwrap once more in case the wrapper was itself wrapped
+        if innerURL.scheme?.lowercased() == "yattee", innerURL.host == "open", innerURL != url {
+            return unwrapped(innerURL)
+        }
+        return innerURL
+    }
+
     // MARK: - Timestamp Parsing
 
     /// Extract a timestamp (seconds) from a URL's query, supporting `t`, `time`, and `start`.

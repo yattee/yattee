@@ -682,7 +682,7 @@ struct OpenLinkFormView: View {
 
                 if !firstVideoPlayed {
                     // Play first video - this expands player
-                    playVideo(video, appEnvironment: appEnvironment)
+                    playVideo(video, sourceURL: url, appEnvironment: appEnvironment)
                     firstVideoPlayed = true
                 } else {
                     // Add to queue
@@ -767,11 +767,13 @@ struct OpenLinkFormView: View {
         }
     }
 
-    private func playVideo(_ video: Video, appEnvironment: AppEnvironment) {
+    private func playVideo(_ video: Video, sourceURL: URL, appEnvironment: AppEnvironment) {
         // Don't pass a specific stream - let the player's selectStreamAndBackend
         // choose the best video+audio combination. Using streams.first would
         // incorrectly select audio-only streams for sites like Bilibili.
-        appEnvironment.playerService.openVideo(video)
+        let router = URLRouter()
+        let startTime = router.parseTimestamp(router.unwrapped(sourceURL))
+        appEnvironment.playerService.openVideo(video, startTime: startTime, forceStartTime: startTime != nil)
     }
 
     // MARK: - Download Action
