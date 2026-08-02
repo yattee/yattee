@@ -3126,6 +3126,15 @@ extension PlayerService: PlayerBackendDelegate {
         saveProgressAsCompleted()
         delegate?.playerServiceDidFinishPlaying(self)
 
+        // Repeat one: restart immediately - no countdown, independent of queue contents
+        // and the auto-play-next setting (that setting governs advancing to the next video)
+        if state.queueMode == .repeatOne {
+            Task {
+                await playNext()
+            }
+            return
+        }
+
         // Auto-play immediately if player is not visible (no point showing countdown)
         // UI (ExpandedPlayerSheet) will handle countdown when player is visible
         let autoPlayEnabled = settingsManager?.queueAutoPlayNext ?? true

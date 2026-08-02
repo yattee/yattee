@@ -134,7 +134,8 @@ struct ExpandedPlayerSheet: View {
 
     var isAutoPlayEnabled: Bool {
         (appEnvironment?.settingsManager.queueEnabled ?? true) &&
-        (appEnvironment?.settingsManager.queueAutoPlayNext ?? true)
+        (appEnvironment?.settingsManager.queueAutoPlayNext ?? true) &&
+        playerState?.queueMode != .repeatOne
     }
 
     var autoPlayCountdownDuration: Int {

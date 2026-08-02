@@ -1046,6 +1046,11 @@ struct TVPlayerView: View {
             controlsVisible = false
         }
 
+        // Repeat one: PlayerService restarts the video itself - no countdown, no replay controls
+        if playerState?.queueMode == .repeatOne {
+            return
+        }
+
         // Check if autoplay is enabled and there's a next video
         let autoPlayEnabled = appEnvironment?.settingsManager.queueAutoPlayNext ?? true
         let hasNextVideo = playerState?.hasNext ?? false
