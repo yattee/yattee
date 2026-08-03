@@ -277,8 +277,28 @@ struct PlayerControlsActions {
         }
     }
 
+    /// Shared fullscreen-tap decision used by the fullscreen button and tap gestures.
+    /// Keep in sync with `willRotateOnFullscreenToggle` (icon mirror of this logic).
+    func performFullscreenTap() {
+        let isActualWidescreenLayout = isWideScreenLayout && onTogglePanel != nil
+
+        if isIPad {
+            // iPad: always toggle details visibility
+            onToggleDetailsVisibility?()
+        } else if isActualWidescreenLayout && isFullscreen && !isWidescreenVideo {
+            // iPhone in landscape with portrait video fullscreen: rotate back to portrait
+            onToggleFullscreen?()
+        } else if !isWidescreenVideo {
+            // iPhone portrait video in portrait layout: toggle details visibility
+            onToggleDetailsVisibility?()
+        } else {
+            // iPhone with widescreen video: rotate orientation
+            onToggleFullscreen?()
+        }
+    }
+
     /// Whether tapping fullscreen will cause device rotation.
-    /// Mirrors the logic in ControlsSectionRenderer.handleFullscreenTap()
+    /// Mirrors the logic in `performFullscreenTap()`
     var willRotateOnFullscreenToggle: Bool {
         // iPad never rotates via fullscreen button
         guard !isIPad else { return false }

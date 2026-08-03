@@ -1220,8 +1220,8 @@ struct PlayerControlsView: View {
                 }
 
             case .toggleFullscreen:
-                // Execute immediately
-                onToggleFullscreen?()
+                // Execute immediately, using the same decision logic as the fullscreen button
+                controlsActions.performFullscreenTap()
 
             case .togglePiP:
                 // Execute immediately
