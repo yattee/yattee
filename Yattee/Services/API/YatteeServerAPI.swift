@@ -349,18 +349,32 @@ actor YatteeServerAPI: InstanceAPI {
 
     // MARK: - Stateless Feed Endpoints
 
-    /// Fetches feed using stateless POST endpoint with channel list.
+    /// Maximum number of channels per stateless feed request. The server rejects larger channel
+    /// lists with HTTP 422 (`max_length=500` on its feed and feed-status request models).
+    static let maxChannelsPerFeedRequest = 500
+
+    /// Fetches feed using stateless POST endpoint with channel list. Channel lists above the
+    /// server's per-request limit are sent in chunks and the responses merged into one.
     func postFeed(channels: [StatelessChannelRequest], limit: Int, offset: Int, instance: Instance) async throws -> StatelessFeedResponse {
-        let body = StatelessFeedRequest(channels: channels, limit: limit, offset: offset)
-        let endpoint = GenericEndpoint.post("/api/v1/feed", body: body)
-        return try await httpClient.fetch(endpoint, baseURL: instance.url)
+        var responses: [StatelessFeedResponse] = []
+        for chunk in channels.chunked(into: Self.maxChannelsPerFeedRequest) {
+            let body = StatelessFeedRequest(channels: chunk, limit: limit, offset: offset)
+            let endpoint = GenericEndpoint.post("/api/v1/feed", body: body)
+            responses.append(try await httpClient.fetch(endpoint, baseURL: instance.url))
+        }
+        return StatelessFeedResponse.merged(responses, limit: limit)
     }
 
     /// Checks feed status for given channels (lightweight polling).
+    /// Chunked like `postFeed(channels:limit:offset:instance:)`.
     func postFeedStatus(channels: [StatelessChannelStatusRequest], instance: Instance) async throws -> StatelessFeedStatusResponse {
-        let body = StatelessFeedStatusRequest(channels: channels)
-        let endpoint = GenericEndpoint.post("/api/v1/feed/status", body: body)
-        return try await httpClient.fetch(endpoint, baseURL: instance.url)
+        var responses: [StatelessFeedStatusResponse] = []
+        for chunk in channels.chunked(into: Self.maxChannelsPerFeedRequest) {
+            let body = StatelessFeedStatusRequest(channels: chunk)
+            let endpoint = GenericEndpoint.post("/api/v1/feed/status", body: body)
+            responses.append(try await httpClient.fetch(endpoint, baseURL: instance.url))
+        }
+        return StatelessFeedStatusResponse.merged(responses)
     }
 
     // MARK: - Channel Metadata
@@ -497,6 +511,34 @@ struct StatelessFeedResponse: Decodable, Sendable {
     func toVideos() -> [Video] {
         videos.compactMap { $0.toVideo() }
     }
+
+    /// Merges chunked feed responses into a single response. A single response is returned
+    /// unchanged so requests within the server's per-request channel limit behave as before.
+    static func merged(_ responses: [StatelessFeedResponse], limit: Int) -> StatelessFeedResponse {
+        guard responses.count != 1 else { return responses[0] }
+
+        let videos = responses.flatMap(\.videos)
+            .sorted { ($0.published ?? 0) > ($1.published ?? 0) }
+        let limited = Array(videos.prefix(limit))
+
+        return StatelessFeedResponse(
+            status: responses.first(where: { !$0.isReady })?.status ?? "ready",
+            videos: limited,
+            total: responses.reduce(0) { $0 + $1.total },
+            hasMore: responses.contains(where: \.hasMore) || videos.count > limited.count,
+            readyCount: sumIfAnyPresent(responses.map(\.readyCount)),
+            pendingCount: sumIfAnyPresent(responses.map(\.pendingCount)),
+            errorCount: sumIfAnyPresent(responses.map(\.errorCount)),
+            etaSeconds: responses.compactMap(\.etaSeconds).max()
+        )
+    }
+
+    /// Sums optional counts, staying `nil` when no chunk reported a value (older server
+    /// versions omit the count fields entirely).
+    private static func sumIfAnyPresent(_ values: [Int?]) -> Int? {
+        let present = values.compactMap { $0 }
+        return present.isEmpty ? nil : present.reduce(0, +)
+    }
 }
 
 /// Response from stateless feed status endpoint.
@@ -522,6 +564,25 @@ struct StatelessFeedStatusResponse: Decodable, Sendable {
         case readyCount
         case pendingCount
         case errorCount
+    }
+
+    init(status: String, readyCount: Int, pendingCount: Int, errorCount: Int) {
+        self.status = status
+        self.readyCount = readyCount
+        self.pendingCount = pendingCount
+        self.errorCount = errorCount
+    }
+
+    /// Merges chunked status responses into a single response. A single response is returned unchanged.
+    static func merged(_ responses: [StatelessFeedStatusResponse]) -> StatelessFeedStatusResponse {
+        guard responses.count != 1 else { return responses[0] }
+
+        return StatelessFeedStatusResponse(
+            status: responses.first(where: { !$0.isReady })?.status ?? "ready",
+            readyCount: responses.reduce(0) { $0 + $1.readyCount },
+            pendingCount: responses.reduce(0) { $0 + $1.pendingCount },
+            errorCount: responses.reduce(0) { $0 + $1.errorCount }
+        )
     }
 }
 
