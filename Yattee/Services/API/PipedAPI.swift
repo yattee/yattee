@@ -672,12 +672,14 @@ private struct PipedVideoStream: Decodable, Sendable {
             resolution = nil
         }
 
+        let audioCodec: String? = (videoOnly ?? true) ? nil : "aac"
+
         return Stream(
             url: streamUrl,
             resolution: resolution,
             format: format ?? "unknown",
             videoCodec: codec,
-            audioCodec: nil,
+            audioCodec: audioCodec,
             bitrate: bitrate,
             fileSize: contentLength,
             isAudioOnly: false,
