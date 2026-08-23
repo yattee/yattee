@@ -343,6 +343,144 @@ struct LegacyCredentialAdoptionTests {
     }
 }
 
+@Suite("Credential identity scope resolution")
+@MainActor
+struct CredentialIdentityScopeTests {
+    private func makeDefaults() -> UserDefaults {
+        UserDefaults(suiteName: "yattee.tests.\(UUID().uuidString)")!
+    }
+
+    /// Mutable identity + resolver so a switch can be staged mid-resolution.
+    private final class Harness: @unchecked Sendable {
+        var fingerprint: String? = "identity-A"
+        var resultsByFingerprint: [String: String] = [:]
+        var failuresRemaining = 0
+        var onResolveStart: (() -> Void)?
+        var switchTask: Task<Void, Never>?
+
+        func resolve() async -> String? {
+            onResolveStart?()
+            if failuresRemaining > 0 {
+                failuresRemaining -= 1
+                return nil
+            }
+            guard let fingerprint else { return nil }
+            return resultsByFingerprint[fingerprint]
+        }
+    }
+
+    @Test("A transient failure is retried rather than disabling credentials forever")
+    func transientFailureIsRetried() async {
+        let harness = Harness()
+        harness.resultsByFingerprint = ["identity-A": "_recordA"]
+        harness.failuresRemaining = 2
+
+        let scope = CredentialIdentityScope(
+            defaults: makeDefaults(),
+            fingerprintProvider: { harness.fingerprint },
+            resolveUserRecordID: { await harness.resolve() },
+            retryDelay: { _ in }
+        )
+
+        #expect(scope.isResolved == false)
+        await scope.resolve()
+        #expect(scope.current == "_recordA")
+    }
+
+    @Test("Exhausted attempts are retried on foreground activation")
+    func exhaustedAttemptsRetryOnForeground() async {
+        let harness = Harness()
+        harness.resultsByFingerprint = ["identity-A": "_recordA"]
+        harness.failuresRemaining = 99 // every attempt fails
+
+        let scope = CredentialIdentityScope(
+            defaults: makeDefaults(),
+            fingerprintProvider: { harness.fingerprint },
+            resolveUserRecordID: { await harness.resolve() },
+            retryDelay: { _ in }
+        )
+
+        await scope.resolve()
+        #expect(scope.isResolved == false)
+
+        // Connectivity returns; the app comes back to the foreground.
+        harness.failuresRemaining = 0
+        await scope.resolveIfNeeded()
+        #expect(scope.current == "_recordA")
+    }
+
+    @Test("An identity switch mid-resolution resolves the new identity")
+    func switchDuringResolutionResolvesNewIdentity() async {
+        let harness = Harness()
+        harness.resultsByFingerprint = ["identity-A": "_recordA", "identity-B": "_recordB"]
+
+        let scope = CredentialIdentityScope(
+            defaults: makeDefaults(),
+            fingerprintProvider: { harness.fingerprint },
+            resolveUserRecordID: { await harness.resolve() },
+            retryDelay: { _ in }
+        )
+
+        // The Apple account switches while A's lookup is in flight — exactly
+        // what the notification observer does, only deterministically.
+        harness.onResolveStart = { [weak scope] in
+            harness.onResolveStart = nil
+            harness.fingerprint = "identity-B"
+            MainActor.assumeIsolated {
+                scope?.adoptCurrentIdentity()
+                harness.switchTask = Task { await scope?.resolve() }
+            }
+        }
+
+        await scope.resolve()
+        await harness.switchTask?.value
+
+        // A's result must be discarded, and B must not be left unresolved.
+        #expect(scope.current != "_recordA")
+        #expect(scope.current == "_recordB")
+    }
+
+    @Test("Signing out scopes to local without a lookup")
+    func signedOutUsesLocalScope() {
+        let harness = Harness()
+        harness.fingerprint = nil
+
+        let scope = CredentialIdentityScope(
+            defaults: makeDefaults(),
+            fingerprintProvider: { harness.fingerprint },
+            resolveUserRecordID: { await harness.resolve() },
+            retryDelay: { _ in }
+        )
+
+        #expect(scope.current == CredentialIdentityScope.localScope)
+    }
+
+    @Test("A known Apple account resolves synchronously on relaunch")
+    func cachedScopeResolvesSynchronously() async {
+        let defaults = makeDefaults()
+        let harness = Harness()
+        harness.resultsByFingerprint = ["identity-A": "_recordA"]
+
+        let first = CredentialIdentityScope(
+            defaults: defaults,
+            fingerprintProvider: { harness.fingerprint },
+            resolveUserRecordID: { await harness.resolve() },
+            retryDelay: { _ in }
+        )
+        await first.resolve()
+        #expect(first.current == "_recordA")
+
+        // Relaunch: no network involved this time.
+        let second = CredentialIdentityScope(
+            defaults: defaults,
+            fingerprintProvider: { harness.fingerprint },
+            resolveUserRecordID: { nil },
+            retryDelay: { _ in }
+        )
+        #expect(second.current == "_recordA")
+    }
+}
+
 @Suite("Migrated account identity")
 @MainActor
 struct MigratedAccountTests {

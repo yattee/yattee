@@ -58,6 +58,9 @@ final class CredentialIdentityScope {
 
     private let defaults: UserDefaults
     private let resolveUserRecordID: @Sendable () async -> String?
+    private let fingerprintProvider: @Sendable () -> String?
+    /// Backoff between attempts. Injectable so tests don't pay real seconds.
+    private let retryDelay: @Sendable (Int) async -> Void
     /// Written only on the main actor; read in `deinit`, which runs after the
     /// last reference is gone and so cannot race with it.
     private nonisolated(unsafe) var identityChangeObserver: NSObjectProtocol?
@@ -68,6 +71,10 @@ final class CredentialIdentityScope {
     /// whenever the identity changes.
     private var resolutionAttempts = 0
     private var isResolving = false
+    /// Set when a resolution is requested while one is already running — the
+    /// running one is for a now-stale identity and will bail on the fingerprint
+    /// check, so the request has to be replayed rather than dropped.
+    private var pendingResolve = false
     private static let maxResolutionAttempts = 4
 
     /// The resolved scope, or `nil` while unresolved.
@@ -80,10 +87,16 @@ final class CredentialIdentityScope {
 
     init(
         defaults: UserDefaults = .standard,
-        resolveUserRecordID: @escaping @Sendable () async -> String? = { await CloudKitIdentity.userRecordID() }
+        fingerprintProvider: @escaping @Sendable () -> String? = { CloudKitIdentity.ubiquityFingerprint },
+        resolveUserRecordID: @escaping @Sendable () async -> String? = { await CloudKitIdentity.userRecordID() },
+        retryDelay: @escaping @Sendable (Int) async -> Void = { attempt in
+            try? await Task.sleep(for: .seconds(pow(2.0, Double(attempt))))
+        }
     ) {
         self.defaults = defaults
+        self.fingerprintProvider = fingerprintProvider
         self.resolveUserRecordID = resolveUserRecordID
+        self.retryDelay = retryDelay
         adoptCurrentIdentity()
         observeIdentityChanges()
     }
@@ -122,7 +135,9 @@ final class CredentialIdentityScope {
     /// `nil` pins the unresolved state.
     init(fixedScope: String?, defaults: UserDefaults = .standard) {
         self.defaults = defaults
+        fingerprintProvider = { nil }
         resolveUserRecordID = { nil }
+        retryDelay = { _ in }
         fingerprint = nil
         state = fixedScope.map { State.resolved($0) } ?? .unresolved
     }
@@ -135,7 +150,7 @@ final class CredentialIdentityScope {
     /// Call again on `.accountChange`: a switch that happened while the app was
     /// closed shows up here, before any CloudKit request could report it.
     func adoptCurrentIdentity() {
-        let current = CloudKitIdentity.ubiquityFingerprint
+        let current = fingerprintProvider()
         if current != fingerprint {
             resolutionAttempts = 0
         }
@@ -170,11 +185,28 @@ final class CredentialIdentityScope {
     /// rather than "not signed in" — callers must not treat that as a missing
     /// credential.
     func resolve() async {
-        guard !isResolved, !isResolving else { return }
+        guard !isResolved else { return }
+
+        // A resolution already running is for whatever identity was current
+        // when it started. If that is no longer this one it will bail on its
+        // fingerprint check, so the request has to be replayed afterwards
+        // rather than dropped — otherwise a switch mid-flight leaves the new
+        // identity unresolved until a foreground transition or relaunch.
+        guard !isResolving else {
+            pendingResolve = true
+            return
+        }
 
         isResolving = true
         defer { isResolving = false }
 
+        repeat {
+            pendingResolve = false
+            await performResolution()
+        } while pendingResolve && !isResolved
+    }
+
+    private func performResolution() async {
         // Captured before the first await so a switch mid-flight can be
         // detected: a record ID fetched under account A must never be cached
         // for B.
@@ -184,7 +216,7 @@ final class CredentialIdentityScope {
             resolutionAttempts += 1
 
             if let recordID = await resolveUserRecordID() {
-                guard CloudKitIdentity.ubiquityFingerprint == requested, fingerprint == requested else {
+                guard fingerprintProvider() == requested, fingerprint == requested else {
                     LoggingService.shared.info(
                         "Discarding credential scope resolved for a previous Apple account",
                         category: .keychain
@@ -207,7 +239,7 @@ final class CredentialIdentityScope {
 
             guard resolutionAttempts < Self.maxResolutionAttempts else { break }
 
-            try? await Task.sleep(for: .seconds(pow(2.0, Double(resolutionAttempts))))
+            await retryDelay(resolutionAttempts)
             guard fingerprint == requested else { return }
         }
 

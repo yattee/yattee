@@ -219,13 +219,31 @@ final class AccountKeychainCredentials {
         // The marker is only written after the scoped copy reads back: a marker
         // for a credential that never landed would suppress the adoption offer
         // and strand the user with no way to sign in short of retyping.
-        guard store.value(forKey: key) == legacy else {
+        let readback = store.value(forKey: key)
+
+        guard readback == legacy else {
+            // A *different* readable value means iCloud Keychain delivered a
+            // credential for this key between the add and the read. It is newer
+            // than the legacy secret and belongs to a live login, so it is left
+            // strictly alone — deleting here would propagate through iCloud
+            // Keychain and revoke it on every device.
+            if readback != nil {
+                LoggingService.shared.info(
+                    "Legacy \(credentialNoun) adoption superseded by a credential that arrived mid-write",
+                    category: .keychain,
+                    details: "accountID=\(account.id)"
+                )
+                return false
+            }
+
+            // Nothing readable is there: the add reported success but produced
+            // no usable item, so rolling it back destroys nothing and lets the
+            // adoption offer be retried.
             LoggingService.shared.error(
                 "Legacy \(credentialNoun) adoption failed verification",
                 category: .keychain,
                 details: "accountID=\(account.id)"
             )
-            // Safe to remove: this write is the item that just landed.
             store.delete(key: key)
             return false
         }
