@@ -131,13 +131,26 @@ enum PlaybackRate: Double, CaseIterable, Identifiable, Sendable {
         if rawValue == 1.0 {
             return String(localized: "player.playbackRate.normal")
         }
-        return String(format: "%.2gx", rawValue)
+        return formattedRate
     }
 
     /// Compact display text that always shows numeric value (e.g., "1x", "1.5x").
     /// Use this in space-constrained UI like the player pill.
     var compactDisplayText: String {
-        String(format: "%.2gx", rawValue)
+        formattedRate
+    }
+
+    /// The rate with an `x` suffix rendered with a fixed two-decimal format and
+    /// the trailing `.0` stripped, so whole rates have no decimal
+    /// (2 → "2x", 1.5 → "1.5x", 1.25 → "1.25x"). Replaces `%.2g`, whose
+    /// significant-figure notation dropped meaningful digits (1.25 → "1.2") and
+    /// rounded others (1.75 → "1.8"). `String(format:)` keeps the period decimal
+    /// separator, matching the player's other speed labels.
+    private var formattedRate: String {
+        var value = String(format: "%.2f", rawValue)
+        while value.hasSuffix("0") { value.removeLast() }
+        if value.hasSuffix(".") { value.removeLast() }
+        return "\(value)x"
     }
 }
 
