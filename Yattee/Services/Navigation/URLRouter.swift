@@ -145,9 +145,11 @@ struct URLRouter: Sendable {
         let trimmed = raw.trimmingCharacters(in: .whitespaces)
         guard !trimmed.isEmpty else { return nil }
 
-        // Plain numeric value (e.g. "90", "90.5")
+        // Plain numeric value (e.g. "90", "90.5"). Reject non-finite values
+        // ("inf"/"infinity"/"nan") that `TimeInterval(_:)` accepts — a `?t=inf`
+        // link would otherwise seek the player to `Double.infinity`.
         if let value = TimeInterval(trimmed) {
-            return value >= 0 ? value : nil
+            return (value.isFinite && value >= 0) ? value : nil
         }
 
         // Compound form like "1h2m3s", "2m30s", "90s"

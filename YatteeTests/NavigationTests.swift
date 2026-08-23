@@ -123,6 +123,20 @@ struct URLRouterTests {
         #expect(URLRouter.parseTimestampValue("90.5") == 90.5)
     }
 
+    @Test("Reject non-finite and negative plain timestamp values")
+    func rejectInvalidPlainTimestampValues() {
+        // Plain numeric values that are accepted by TimeInterval(_:) but are not
+        // valid seek targets must return nil rather than poisoning the player.
+        #expect(URLRouter.parseTimestampValue("inf") == nil)
+        #expect(URLRouter.parseTimestampValue("infinity") == nil)
+        #expect(URLRouter.parseTimestampValue("nan") == nil)
+        #expect(URLRouter.parseTimestampValue("-5") == nil)
+        // Valid plain seconds still parse.
+        #expect(URLRouter.parseTimestampValue("0") == 0)
+        #expect(URLRouter.parseTimestampValue("90") == 90)
+        #expect(URLRouter.parseTimestampValue("90.5") == 90.5)
+    }
+
     // MARK: - Share Extension Wrapper Tests
 
     @Test("Unwrap yattee://open wrapper to inner URL with timestamp")
