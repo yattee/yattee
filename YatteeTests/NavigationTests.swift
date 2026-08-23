@@ -273,6 +273,26 @@ struct URLRouterTests {
         }
     }
 
+    // MARK: - External Host Exclusion Tests
+
+    @Test("www.duckduckgo.com is excluded from external video routing")
+    func wwwDuckDuckGoExcluded() {
+        let url = URL(string: "https://www.duckduckgo.com/?q=cat+videos")!
+        let destination = router.route(url)
+        if case .externalVideo = destination {
+            Issue.record("www.duckduckgo.com must not route to externalVideo; yt-dlp extraction should not run for a search engine")
+        }
+    }
+
+    @Test("duckduckgo.com bare host remains excluded from external video")
+    func duckDuckGoBareExcluded() {
+        let url = URL(string: "https://duckduckgo.com/?q=test")!
+        let destination = router.route(url)
+        if case .externalVideo = destination {
+            Issue.record("duckduckgo.com must not route to externalVideo; yt-dlp extraction should not run for a search engine")
+        }
+    }
+
     // MARK: - YouTube Channel URL Tests
 
     @Test("Parse YouTube channel URL")

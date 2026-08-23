@@ -84,7 +84,7 @@ struct URLRouter: Sendable {
         let excludedHosts = [
             "google.com", "www.google.com",
             "bing.com", "www.bing.com",
-            "duckduckgo.com",
+            "duckduckgo.com", "www.duckduckgo.com",
             "apple.com", "www.apple.com",
             "github.com", "www.github.com"
         ]
