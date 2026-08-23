@@ -70,7 +70,11 @@ enum KeychainProvenanceReportBuilder {
     ///   - label: free-form run label, e.g. "iPhone 15 — signed in as identity B".
     ///   - userRecordID: resolved asynchronously by the caller (network), `nil`
     ///     when unavailable.
-    static func build(label: String, userRecordID: String?) -> String {
+    static func build(
+        label: String,
+        userRecordID: String?,
+        accountAvailability: CloudKitIdentity.AccountAvailability
+    ) -> String {
         let results = KeychainProvenanceProbe.queryAll()
 
         var lines: [String] = []
@@ -82,7 +86,11 @@ enum KeychainProvenanceReportBuilder {
 
         lines.append("--- Identity ---")
         lines.append("CloudKit entitlement: \(CloudKitAvailability.isAvailable ? "available" : "missing (sideload)")")
-        lines.append("ubiquityIdentityToken: \(CloudKitIdentity.ubiquityFingerprint.map { "present, fp=\($0)" } ?? "none — no Apple account signed in")")
+        // A nil token does NOT mean signed out — Foundation also returns nil
+        // when iCloud Drive is off, so the report must not assert either way.
+        // CloudKit's account status is what disambiguates.
+        lines.append("ubiquityIdentityToken: \(CloudKitIdentity.ubiquityFingerprint.map { "present, fp=\($0)" } ?? "unavailable (signed out, or iCloud Drive off)")")
+        lines.append("CloudKit account:      \(describe(accountAvailability))")
         lines.append("CloudKit user record:  \(userRecordID ?? "unresolved")")
         lines.append("")
 
@@ -126,6 +134,14 @@ enum KeychainProvenanceReportBuilder {
 
     private static func format(_ accounts: Set<String>) -> String {
         accounts.isEmpty ? "none" : accounts.sorted().joined(separator: ", ")
+    }
+
+    private static func describe(_ availability: CloudKitIdentity.AccountAvailability) -> String {
+        switch availability {
+        case .noAccount: "no account signed in"
+        case .available: "signed in"
+        case .indeterminate: "could not be determined"
+        }
     }
 
     // MARK: - Environment

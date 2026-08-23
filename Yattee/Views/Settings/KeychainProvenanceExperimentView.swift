@@ -21,6 +21,7 @@ import UIKit
 struct KeychainProvenanceExperimentView: View {
     @State private var label = ""
     @State private var userRecordID: String?
+    @State private var accountAvailability: CloudKitIdentity.AccountAvailability = .indeterminate
     @State private var resolvingUserRecordID = true
     @State private var reports: [KeychainProvenanceReport] = KeychainProvenanceReportStore.load()
     @State private var latestStatus: String?
@@ -38,6 +39,7 @@ struct KeychainProvenanceExperimentView: View {
         .navigationBarTitleDisplayMode(.inline)
         #endif
         .task {
+            accountAvailability = await CloudKitIdentity.accountAvailability()
             userRecordID = await CloudKitIdentity.userRecordID()
             resolvingUserRecordID = false
         }
@@ -78,10 +80,13 @@ struct KeychainProvenanceExperimentView: View {
     private var identitySection: some View {
         SettingsFormSection(
             "Identity",
-            footer: "The fingerprint is an opaque hash of ubiquityIdentityToken. It must differ between accounts A and B — if it does not, the sign-out did not take effect."
+            footer: "The fingerprint is an opaque hash of ubiquityIdentityToken and must differ between accounts A and B — if it does not, the sign-out did not take effect. An unavailable token does not by itself mean signed out: it also goes missing when iCloud Drive is off, which is why the account status is shown separately."
         ) {
             row("CloudKit entitlement", CloudKitAvailability.isAvailable ? "available" : "missing")
-            row("Apple account", CloudKitIdentity.ubiquityFingerprint.map { "fp=\($0)" } ?? "signed out")
+            // A nil token is ambiguous — it also means iCloud Drive is off —
+            // so the account status is shown beside it rather than inferred.
+            row("Ubiquity token", CloudKitIdentity.ubiquityFingerprint.map { "fp=\($0)" } ?? "unavailable")
+            row("Apple account", accountStatusText)
             row("User record", resolvingUserRecordID ? "resolving…" : (userRecordID ?? "unresolved"))
         }
     }
@@ -179,7 +184,11 @@ struct KeychainProvenanceExperimentView: View {
     }
 
     private func capture() {
-        let text = KeychainProvenanceReportBuilder.build(label: label, userRecordID: userRecordID)
+        let text = KeychainProvenanceReportBuilder.build(
+            label: label,
+            userRecordID: userRecordID,
+            accountAvailability: accountAvailability
+        )
         reports = KeychainProvenanceReportStore.append(
             KeychainProvenanceReport(label: label, text: text)
         )
@@ -193,6 +202,15 @@ struct KeychainProvenanceExperimentView: View {
         )
 
         latestStatus = "Captured report \(reports.count)."
+    }
+
+    private var accountStatusText: String {
+        if resolvingUserRecordID { return "checking…" }
+        switch accountAvailability {
+        case .noAccount: return "no account signed in"
+        case .available: return "signed in"
+        case .indeterminate: return "could not be determined"
+        }
     }
 
     private func payloadText() -> String {

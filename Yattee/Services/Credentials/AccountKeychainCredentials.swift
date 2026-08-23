@@ -236,15 +236,20 @@ final class AccountKeychainCredentials {
                 return false
             }
 
-            // Nothing readable is there: the add reported success but produced
-            // no usable item, so rolling it back destroys nothing and lets the
-            // adoption offer be retried.
+            // Nothing readable is there. Tempting to roll the write back, but a
+            // delete cannot be conditioned on the value that was just read:
+            // `SecItemDelete` ignores `kSecValueData` (measured — a delete
+            // issued with a deliberately wrong value still removes the item),
+            // so the rollback would be a blind delete of whatever occupies the
+            // key by then, including a credential that arrived from another
+            // device in the gap — and it would propagate. Nothing is deleted;
+            // no marker is written, so the account simply stays signed out and
+            // an ordinary sign-in (a replacing write) recovers it.
             LoggingService.shared.error(
-                "Legacy \(credentialNoun) adoption failed verification",
+                "Legacy \(credentialNoun) adoption failed verification — sign-in required",
                 category: .keychain,
                 details: "accountID=\(account.id)"
             )
-            store.delete(key: key)
             return false
         }
 
@@ -283,6 +288,28 @@ final class AccountKeychainCredentials {
                 "Leaving the legacy \(credentialNoun) in place — not this account's to delete",
                 category: .keychain,
                 details: "instanceID=\(account.instanceID), accountID=\(account.id)"
+            )
+            return
+        }
+
+        // Re-read immediately before deleting. The Keychain offers no
+        // compare-and-delete — `SecItemDelete` ignores `kSecValueData`
+        // (measured) — so the fingerprint check above can only ever validate a
+        // snapshot. Re-reading here shrinks the window to a single call gap and
+        // catches a replacement that landed while the fingerprint was being
+        // computed.
+        //
+        // A residual race remains by construction: if another device running
+        // the previous release writes a new legacy value inside that gap, this
+        // deletes their fresh login and the deletion propagates. Accepted —
+        // closing it is not possible with these APIs, and the alternative
+        // (never deleting) leaves a credential the user explicitly removed
+        // sitting in their iCloud Keychain indefinitely.
+        guard store.value(forKey: legacyKey) == currentValue else {
+            LoggingService.shared.info(
+                "Legacy \(credentialNoun) changed while being retired — leaving it in place",
+                category: .keychain,
+                details: "instanceID=\(account.instanceID)"
             )
             return
         }
