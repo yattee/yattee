@@ -148,7 +148,24 @@ struct MPVTrack: Equatable, Sendable, Identifiable, Decodable {
         return preferred == baseLanguageCode
     }
 
-    /// Secondary detail line for advanced mode, e.g. "eac3 · 6ch · 48 kHz".
+    /// Format a sample rate in Hz as the conventional kHz label.
+    /// 48000 → "48 kHz", 44100 → "44.1 kHz", 88200 → "88.2 kHz",
+    /// 22050 → "22.05 kHz", 176400 → "176.4 kHz".
+    /// Whole-kHz rates drop the decimal; fractional rates keep their
+    /// meaningful digits (1–2 decimals, trailing zero stripped).
+    static func formatSampleRate(_ hz: Int) -> String {
+        let kHz = Double(hz) / 1000.0
+        if kHz == kHz.rounded() {
+            return "\(Int(kHz)) kHz"
+        }
+        var label = String(format: "%.2f", kHz)
+        if label.hasSuffix("0") {
+            label.removeLast()
+        }
+        return "\(label) kHz"
+    }
+
+    /// Secondary detail line for advanced mode, e.g. "aac · 2ch · 44.1 kHz".
     var detailText: String? {
         var parts: [String] = []
         if let codec, !codec.isEmpty {
@@ -158,7 +175,7 @@ struct MPVTrack: Equatable, Sendable, Identifiable, Decodable {
             parts.append("\(channelCount)ch")
         }
         if let sampleRate {
-            parts.append("\(sampleRate / 1000) kHz")
+            parts.append(Self.formatSampleRate(sampleRate))
         }
         return parts.isEmpty ? nil : parts.joined(separator: " · ")
     }
