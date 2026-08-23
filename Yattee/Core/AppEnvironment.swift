@@ -48,6 +48,9 @@ final class AppEnvironment {
     let invidiousCredentialsManager: InvidiousCredentialsManager
     let pipedCredentialsManager: PipedCredentialsManager
     let basicAuthCredentialsManager: BasicAuthCredentialsManager
+    /// Shared by both account credential managers so a single CloudKit lookup
+    /// resolves the scope for all of them.
+    let credentialIdentityScope: CredentialIdentityScope
     let homeInstanceCache: HomeInstanceCache
     let invidiousAPI: InvidiousAPI
     let pipedAPI: PipedAPI
@@ -130,13 +133,20 @@ final class AppEnvironment {
         }
         self.dataManager = dm
 
+        // Resolve which Apple account owns this device's credentials before the
+        // managers that key items by it are built. Cached scopes restore
+        // synchronously here; a first-ever resolution needs the network and is
+        // kicked off below.
+        let identityScope = CredentialIdentityScope()
+        self.credentialIdentityScope = identityScope
+
         // Initialize Invidious Credentials Manager (needed for SubscriptionService)
-        let invidiousCreds = InvidiousCredentialsManager()
+        let invidiousCreds = InvidiousCredentialsManager(identityScope: identityScope)
         invidiousCreds.settingsManager = settings
         self.invidiousCredentialsManager = invidiousCreds
 
         // Initialize Piped Credentials Manager
-        let pipedCreds = PipedCredentialsManager()
+        let pipedCreds = PipedCredentialsManager(identityScope: identityScope)
         pipedCreds.settingsManager = settings
         self.pipedCredentialsManager = pipedCreds
 
@@ -336,6 +346,11 @@ final class AppEnvironment {
         // Backfill credential flags for instances created before the flags
         // existed, so existing setups publish them to iCloud without a re-login
         backfillCredentialFlags()
+
+        // Resolve the credential identity scope if this Apple account has never
+        // been seen on this device. Until it lands, account credentials report
+        // "can't tell yet" rather than "signed out".
+        Task { await identityScope.resolve() }
 
         // Log device capabilities on startup for debugging
         HardwareCapabilities.shared.logCapabilities()

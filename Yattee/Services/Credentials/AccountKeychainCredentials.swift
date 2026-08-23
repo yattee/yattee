@@ -1,0 +1,257 @@
+//
+//  AccountKeychainCredentials.swift
+//  Yattee
+//
+//  Shared implementation of account-keyed, identity-scoped credential storage.
+//
+
+import Foundation
+
+/// The engine behind `AccountCredentialsManager`.
+///
+/// Both credential managers own one of these and forward to it, so the scoping
+/// rules and the legacy-adoption protocol exist in exactly one place.
+@MainActor
+@Observable
+final class AccountKeychainCredentials {
+    private let store: KeychainCredentialStore
+    private let identityScope: CredentialIdentityScope
+    private let markers: CredentialAdoptionMarkerStore
+
+    /// Name used in log lines ("SID", "token") so messages read naturally for
+    /// whichever backend owns this instance.
+    private let credentialNoun: String
+
+    /// Known logins, partitioned by the identity scope they were observed under.
+    ///
+    /// Keyed rather than invalidated: a switch of Apple account (or the first
+    /// resolution completing) must never let one identity's cache answer for
+    /// another, and clearing a shared cache would mean mutating observable
+    /// state from inside read methods a view body can call.
+    private var loginsByScope: [String: Set<UUID>] = [:]
+
+    /// Accounts holding a credential under the current identity.
+    var loggedInAccountIDs: Set<UUID> {
+        guard let scope = identityScope.current else { return [] }
+        return loginsByScope[scope] ?? []
+    }
+
+    weak var settingsManager: SettingsManager?
+
+    init(
+        service: String,
+        credentialNoun: String,
+        identityScope: CredentialIdentityScope,
+        markers: CredentialAdoptionMarkerStore? = nil
+    ) {
+        store = KeychainCredentialStore(service: service)
+        self.credentialNoun = credentialNoun
+        self.identityScope = identityScope
+        self.markers = markers ?? CredentialAdoptionMarkerStore()
+    }
+
+    var isScopeResolved: Bool { identityScope.isResolved }
+
+    /// Credentials sync to iCloud Keychain on the same toggle as the instances
+    /// they belong to.
+    private var shouldSyncToiCloud: Bool {
+        settingsManager?.iCloudSyncEnabled == true && settingsManager?.syncInstances == true
+    }
+
+    private func currentScope() -> String? {
+        identityScope.current
+    }
+
+    // MARK: - Credentials
+
+    func setCredential(_ credential: String, for account: Account) {
+        guard let scope = currentScope() else {
+            LoggingService.shared.error(
+                "Refusing to store \(credentialNoun) before the identity scope is resolved",
+                category: .keychain,
+                details: "accountID=\(account.id)"
+            )
+            return
+        }
+
+        let syncEnabled = shouldSyncToiCloud
+        let status = store.set(
+            credential,
+            forKey: KeychainCredentialStore.credentialKey(scope: scope, accountID: account.id),
+            synchronizable: syncEnabled
+        )
+
+        guard status == errSecSuccess else {
+            LoggingService.shared.error(
+                "Failed to store \(credentialNoun)",
+                category: .keychain,
+                details: "accountID=\(account.id), status=\(store.describe(status))"
+            )
+            return
+        }
+
+        loginsByScope[scope, default: []].insert(account.id)
+
+        LoggingService.shared.info(
+            "Stored \(credentialNoun)",
+            category: .keychain,
+            details: "accountID=\(account.id), iCloudSync=\(syncEnabled)"
+        )
+    }
+
+    func credential(for account: Account) -> String? {
+        guard let scope = currentScope() else { return nil }
+        return store.value(
+            forKey: KeychainCredentialStore.credentialKey(scope: scope, accountID: account.id)
+        )
+    }
+
+    func deleteCredential(for account: Account) {
+        guard let scope = currentScope() else { return }
+
+        store.delete(key: KeychainCredentialStore.credentialKey(scope: scope, accountID: account.id))
+        store.delete(key: KeychainCredentialStore.usernameKey(scope: scope, accountID: account.id))
+        loginsByScope[scope]?.remove(account.id)
+
+        LoggingService.shared.info(
+            "Deleted \(credentialNoun)",
+            category: .keychain,
+            details: "accountID=\(account.id)"
+        )
+
+        HomeInstanceCache.shared.clear(instanceID: account.instanceID, contentType: .feed)
+    }
+
+    // MARK: - Username
+
+    func setUsername(_ username: String, for account: Account) {
+        guard let scope = currentScope() else { return }
+        store.set(
+            username,
+            forKey: KeychainCredentialStore.usernameKey(scope: scope, accountID: account.id),
+            synchronizable: shouldSyncToiCloud
+        )
+    }
+
+    func username(for account: Account) -> String? {
+        guard let scope = currentScope() else { return nil }
+        return store.value(
+            forKey: KeychainCredentialStore.usernameKey(scope: scope, accountID: account.id)
+        )
+    }
+
+    // MARK: - Status
+
+    func isLoggedIn(for account: Account) -> Bool {
+        guard let scope = currentScope() else { return false }
+
+        if loginsByScope[scope]?.contains(account.id) == true {
+            return true
+        }
+
+        let hasCredential = credential(for: account) != nil
+        if hasCredential {
+            loginsByScope[scope, default: []].insert(account.id)
+        }
+        return hasCredential
+    }
+
+    func refreshLoginStatus(for account: Account) {
+        guard let scope = currentScope() else { return }
+
+        if credential(for: account) != nil {
+            loginsByScope[scope, default: []].insert(account.id)
+        } else {
+            loginsByScope[scope]?.remove(account.id)
+        }
+    }
+
+    // MARK: - Legacy adoption
+
+    func hasAdoptableLegacyCredential(for account: Account) -> Bool {
+        guard let scope = currentScope() else { return false }
+        guard !markers.hasAdopted(instanceID: account.instanceID, scope: scope) else { return false }
+        guard credential(for: account) == nil else { return false }
+
+        return legacyCredential(for: account) != nil
+    }
+
+    /// Copies the legacy item into this account's scoped key.
+    ///
+    /// Copies — never moves. Deleting a synchronizable item propagates to every
+    /// device signed in to the same Apple account, so removing the legacy item
+    /// here would log the user out of devices still running the previous
+    /// release, mid-rollout. It is retained until the account is really
+    /// deleted; general cleanup waits for a compatibility-breaking release.
+    @discardableResult
+    func adoptLegacyCredential(for account: Account) -> Bool {
+        guard let scope = currentScope() else { return false }
+        guard let legacy = legacyCredential(for: account) else { return false }
+
+        let key = KeychainCredentialStore.credentialKey(scope: scope, accountID: account.id)
+        let status = store.set(legacy, forKey: key, synchronizable: shouldSyncToiCloud)
+
+        // The marker is only written after the scoped copy reads back: a marker
+        // for a credential that never landed would suppress the adoption offer
+        // and strand the user with no way to sign in short of retyping.
+        guard status == errSecSuccess, store.value(forKey: key) == legacy else {
+            LoggingService.shared.error(
+                "Legacy \(credentialNoun) adoption failed verification",
+                category: .keychain,
+                details: "accountID=\(account.id), status=\(store.describe(status))"
+            )
+            store.delete(key: key)
+            return false
+        }
+
+        markers.record(
+            instanceID: account.instanceID,
+            accountID: account.id,
+            scope: scope,
+            secret: legacy
+        )
+        loginsByScope[scope, default: []].insert(account.id)
+
+        LoggingService.shared.info(
+            "Adopted legacy \(credentialNoun) into the identity-scoped key",
+            category: .keychain,
+            details: "accountID=\(account.id), instanceID=\(account.instanceID)"
+        )
+
+        return true
+    }
+
+    func deleteLegacyCredentialIfOwned(for account: Account) {
+        guard let scope = currentScope() else { return }
+
+        let legacyKey = KeychainCredentialStore.legacyKey(instanceID: account.instanceID)
+        let currentValue = store.value(forKey: legacyKey)
+
+        guard markers.canDeleteLegacyItem(
+            instanceID: account.instanceID,
+            scope: scope,
+            currentLegacyValue: currentValue
+        ) else {
+            LoggingService.shared.info(
+                "Leaving the legacy \(credentialNoun) in place — not this identity's to delete",
+                category: .keychain,
+                details: "instanceID=\(account.instanceID)"
+            )
+            return
+        }
+
+        store.delete(key: legacyKey)
+        markers.removeMarker(instanceID: account.instanceID, scope: scope)
+
+        LoggingService.shared.info(
+            "Deleted the legacy \(credentialNoun) alongside its account",
+            category: .keychain,
+            details: "instanceID=\(account.instanceID)"
+        )
+    }
+
+    /// Reads the unscoped, pre-revamp item. Only the adoption paths call this.
+    private func legacyCredential(for account: Account) -> String? {
+        store.value(forKey: KeychainCredentialStore.legacyKey(instanceID: account.instanceID))
+    }
+}

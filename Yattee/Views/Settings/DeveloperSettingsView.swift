@@ -28,6 +28,9 @@ struct DeveloperSettingsView: View {
             debugSection
             testingSection
             dataSection
+            #if DEBUG
+            experimentsSection
+            #endif
         }
         .navigationTitle(String(localized: "settings.developer.title"))
         #if os(iOS)
@@ -202,6 +205,29 @@ struct DeveloperSettingsView: View {
             }
         }
     }
+
+    #if DEBUG
+    @ViewBuilder
+    private var experimentsSection: some View {
+        SettingsFormSection("Experiments") {
+            #if os(tvOS)
+            NavigationLink {
+                KeychainProvenanceExperimentView()
+            } label: {
+                Label {
+                    Text(verbatim: "Keychain Provenance")
+                } icon: {
+                    Image(systemName: "key.viewfinder")
+                }
+            }
+            #else
+            SettingsNavigationRow("Keychain Provenance", systemImage: "key.viewfinder") {
+                KeychainProvenanceExperimentView()
+            }
+            #endif
+        }
+    }
+    #endif
 
     // MARK: - Data Actions
 

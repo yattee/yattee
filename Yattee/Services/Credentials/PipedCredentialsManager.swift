@@ -12,13 +12,30 @@ import Security
 @MainActor
 @Observable
 final class PipedCredentialsManager: InstanceCredentialsManager {
-    private let keychainServiceName = "com.yattee.piped"
+    private static let keychainServiceName = "com.yattee.piped"
 
     /// Tracks which instances have stored tokens (for reactive UI updates)
     private(set) var loggedInInstanceIDs: Set<UUID> = []
 
+    /// Account-keyed, identity-scoped storage — the multi-login path.
+    ///
+    /// The instance-keyed members below stay for call sites that still think in
+    /// instances; they read and write the unscoped legacy item unchanged, so an
+    /// upgrade never silently moves a credential.
+    let accountCredentials: AccountKeychainCredentials
+
     /// Reference to settings manager for iCloud sync decisions
-    weak var settingsManager: SettingsManager?
+    weak var settingsManager: SettingsManager? {
+        didSet { accountCredentials.settingsManager = settingsManager }
+    }
+
+    init(identityScope: CredentialIdentityScope? = nil) {
+        accountCredentials = AccountKeychainCredentials(
+            service: Self.keychainServiceName,
+            credentialNoun: "token",
+            identityScope: identityScope ?? CredentialIdentityScope()
+        )
+    }
 
     /// Whether credentials should sync to iCloud Keychain (when iCloud sync is enabled for instances).
     private var shouldSyncToiCloud: Bool {
@@ -44,7 +61,7 @@ final class PipedCredentialsManager: InstanceCredentialsManager {
         // First, delete any existing item (both synced and non-synced) to avoid duplicates
         let deleteQuery: [String: Any] = [
             kSecClass as String: kSecClassGenericPassword,
-            kSecAttrService as String: keychainServiceName,
+            kSecAttrService as String: Self.keychainServiceName,
             kSecAttrAccount as String: account,
             kSecAttrSynchronizable as String: kSecAttrSynchronizableAny
         ]
@@ -53,7 +70,7 @@ final class PipedCredentialsManager: InstanceCredentialsManager {
         // Create new item with current sync preference
         let addQuery: [String: Any] = [
             kSecClass as String: kSecClassGenericPassword,
-            kSecAttrService as String: keychainServiceName,
+            kSecAttrService as String: Self.keychainServiceName,
             kSecAttrAccount as String: account,
             kSecAttrSynchronizable as String: syncEnabled,
             kSecValueData as String: data
@@ -87,7 +104,7 @@ final class PipedCredentialsManager: InstanceCredentialsManager {
 
         let query: [String: Any] = [
             kSecClass as String: kSecClassGenericPassword,
-            kSecAttrService as String: keychainServiceName,
+            kSecAttrService as String: Self.keychainServiceName,
             kSecAttrAccount as String: account,
             kSecAttrSynchronizable as String: kSecAttrSynchronizableAny,
             kSecReturnData as String: true,
@@ -124,7 +141,7 @@ final class PipedCredentialsManager: InstanceCredentialsManager {
 
         let query: [String: Any] = [
             kSecClass as String: kSecClassGenericPassword,
-            kSecAttrService as String: keychainServiceName,
+            kSecAttrService as String: Self.keychainServiceName,
             kSecAttrAccount as String: account,
             kSecAttrSynchronizable as String: kSecAttrSynchronizableAny
         ]
@@ -176,5 +193,53 @@ final class PipedCredentialsManager: InstanceCredentialsManager {
         } else {
             loggedInInstanceIDs.remove(instance.id)
         }
+    }
+}
+
+// MARK: - AccountCredentialsManager
+
+extension PipedCredentialsManager: AccountCredentialsManager {
+    var loggedInAccountIDs: Set<UUID> { accountCredentials.loggedInAccountIDs }
+    var isScopeResolved: Bool { accountCredentials.isScopeResolved }
+
+    func setCredential(_ credential: String, for account: Account) {
+        accountCredentials.setCredential(credential, for: account)
+    }
+
+    func credential(for account: Account) -> String? {
+        accountCredentials.credential(for: account)
+    }
+
+    func deleteCredential(for account: Account) {
+        accountCredentials.deleteCredential(for: account)
+    }
+
+    func setUsername(_ username: String, for account: Account) {
+        accountCredentials.setUsername(username, for: account)
+    }
+
+    func username(for account: Account) -> String? {
+        accountCredentials.username(for: account)
+    }
+
+    func isLoggedIn(for account: Account) -> Bool {
+        accountCredentials.isLoggedIn(for: account)
+    }
+
+    func refreshLoginStatus(for account: Account) {
+        accountCredentials.refreshLoginStatus(for: account)
+    }
+
+    func hasAdoptableLegacyCredential(for account: Account) -> Bool {
+        accountCredentials.hasAdoptableLegacyCredential(for: account)
+    }
+
+    @discardableResult
+    func adoptLegacyCredential(for account: Account) -> Bool {
+        accountCredentials.adoptLegacyCredential(for: account)
+    }
+
+    func deleteLegacyCredentialIfOwned(for account: Account) {
+        accountCredentials.deleteLegacyCredentialIfOwned(for: account)
     }
 }
