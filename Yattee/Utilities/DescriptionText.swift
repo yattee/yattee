@@ -56,12 +56,13 @@ enum DescriptionText {
                 }
 
                 let timestampString = String(text[range])
-                let seconds = parseTimestamp(timestampString)
-
-                if let url = URL(string: "yattee-seek://\(seconds)") {
-                    attributedString[attributedRange].link = url
-                    attributedString[attributedRange].foregroundColor = linkColor
+                guard let seconds = parseTimestamp(timestampString),
+                      let url = URL(string: "yattee-seek://\(seconds)") else {
+                    continue
                 }
+
+                attributedString[attributedRange].link = url
+                attributedString[attributedRange].foregroundColor = linkColor
             }
         }
 
@@ -69,15 +70,24 @@ enum DescriptionText {
     }
 
     /// Parses a timestamp string (MM:SS or H:MM:SS) into total seconds.
-    static func parseTimestamp(_ timestamp: String) -> Int {
+    /// Returns nil when a component is out of its valid range (e.g. `1:99`,
+    /// `0:60`, `1:99:30`); those strings are matched by the link regex above
+    /// but are not valid clock positions, so they must not become seek links.
+    /// This mirrors the range validation in `ChapterParser`.
+    static func parseTimestamp(_ timestamp: String) -> Int? {
         let components = timestamp.split(separator: ":").compactMap { Int($0) }
         switch components.count {
         case 2: // MM:SS
-            return components[0] * 60 + components[1]
+            let seconds = components[1]
+            guard seconds < 60 else { return nil }
+            return components[0] * 60 + seconds
         case 3: // H:MM:SS
-            return components[0] * 3600 + components[1] * 60 + components[2]
+            let minutes = components[1]
+            let seconds = components[2]
+            guard minutes < 60, seconds < 60 else { return nil }
+            return components[0] * 3600 + minutes * 60 + seconds
         default:
-            return 0
+            return nil
         }
     }
 
