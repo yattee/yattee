@@ -288,6 +288,12 @@ struct YatteeApp: App {
                 // Refresh media source password status (Keychain state can change in background)
                 appEnvironment.mediaSourcesManager.refreshPasswordStoredStatus()
 
+                // Retry a credential identity scope that never resolved (e.g.
+                // launched offline) - account credentials stay unavailable until it does
+                Task {
+                    await appEnvironment.credentialIdentityScope.resolveIfNeeded()
+                }
+
                 // Validate subscription account (auto-correct if invalid)
                 appEnvironment.subscriptionAccountValidator.validateAndCorrectIfNeeded()
                 SubscriptionFeedCache.shared.warmIfNeeded(using: appEnvironment)
@@ -334,6 +340,12 @@ struct YatteeApp: App {
                 )
                 // Refresh media source password status (Keychain state can change in background)
                 appEnvironment.mediaSourcesManager.refreshPasswordStoredStatus()
+
+                // Retry a credential identity scope that never resolved (e.g.
+                // launched offline) - account credentials stay unavailable until it does
+                Task {
+                    await appEnvironment.credentialIdentityScope.resolveIfNeeded()
+                }
 
                 // Validate subscription account (auto-correct if invalid)
                 appEnvironment.subscriptionAccountValidator.validateAndCorrectIfNeeded()

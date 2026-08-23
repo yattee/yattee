@@ -253,6 +253,51 @@ struct LegacyCredentialAdoptionTests {
         identityA.deleteCredential(for: account)
     }
 
+    @Test("Deleting a sibling account leaves the adopter's legacy item alone")
+    func legacyDeletionRequiresAccountMatch() {
+        let service = makeService()
+        let markers = makeMarkers()
+        let instanceID = UUID()
+        let adopter = Account.migrated(from: instanceID)
+        // A second login on the same instance — a fresh UUID, not the migrated one.
+        let sibling = Account(instanceID: instanceID)
+        seedLegacyItem(service: service, instanceID: instanceID, value: "legacy-secret")
+
+        let credentials = makeCredentials(service: service, scope: "identity-A", markers: markers)
+        #expect(credentials.adoptLegacyCredential(for: adopter) == true)
+
+        // Removing the sibling must not retire the secret the migrated account
+        // adopted — old-release devices are still using it.
+        credentials.deleteLegacyCredentialIfOwned(for: sibling)
+        #expect(legacyValue(service: service, instanceID: instanceID) == "legacy-secret")
+
+        credentials.deleteLegacyCredentialIfOwned(for: adopter)
+        #expect(legacyValue(service: service, instanceID: instanceID) == nil)
+
+        credentials.deleteCredential(for: adopter)
+    }
+
+    @Test("Adoption does not overwrite a scoped credential that arrived first")
+    func adoptionDoesNotClobberArrivedCredential() {
+        let service = makeService()
+        let instanceID = UUID()
+        let account = Account.migrated(from: instanceID)
+        seedLegacyItem(service: service, instanceID: instanceID, value: "legacy-secret")
+
+        let credentials = makeCredentials(service: service, scope: "identity-A", markers: makeMarkers())
+        // iCloud Keychain delivers the real credential between the offer being
+        // rendered and the user tapping it.
+        credentials.setCredential("synced-secret", for: account)
+
+        #expect(credentials.hasAdoptableLegacyCredential(for: account) == false)
+        #expect(credentials.adoptLegacyCredential(for: account) == false)
+        #expect(credentials.credential(for: account) == "synced-secret")
+
+        credentials.deleteCredential(for: account)
+        KeychainCredentialStore(service: service)
+            .delete(key: KeychainCredentialStore.legacyKey(instanceID: instanceID))
+    }
+
     @Test("A legacy item replaced by another login survives the adopter's deletion")
     func legacyDeletionRequiresFingerprintMatch() {
         let service = makeService()

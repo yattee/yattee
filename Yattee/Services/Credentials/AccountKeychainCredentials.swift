@@ -186,20 +186,46 @@ final class AccountKeychainCredentials {
     @discardableResult
     func adoptLegacyCredential(for account: Account) -> Bool {
         guard let scope = currentScope() else { return false }
+        guard !markers.hasAdopted(instanceID: account.instanceID, scope: scope) else { return false }
         guard let legacy = legacyCredential(for: account) else { return false }
 
+        // Eligibility is re-checked here, not just when the offer was rendered:
+        // iCloud Keychain may have delivered the real credential in between, and
+        // replacing it with the older legacy secret would be a silent downgrade.
+        guard credential(for: account) == nil else {
+            LoggingService.shared.info(
+                "Skipping legacy \(credentialNoun) adoption — a scoped credential already arrived",
+                category: .keychain,
+                details: "accountID=\(account.id)"
+            )
+            return false
+        }
+
         let key = KeychainCredentialStore.credentialKey(scope: scope, accountID: account.id)
-        let status = store.set(legacy, forKey: key, synchronizable: shouldSyncToiCloud)
+        let status = store.addIfAbsent(legacy, forKey: key, synchronizable: shouldSyncToiCloud)
+
+        // A duplicate means a scoped credential landed between the check above
+        // and this write — leave it strictly alone, it is newer than the legacy
+        // secret.
+        guard status == errSecSuccess else {
+            LoggingService.shared.error(
+                "Legacy \(credentialNoun) adoption did not write",
+                category: .keychain,
+                details: "accountID=\(account.id), status=\(store.describe(status))"
+            )
+            return false
+        }
 
         // The marker is only written after the scoped copy reads back: a marker
         // for a credential that never landed would suppress the adoption offer
         // and strand the user with no way to sign in short of retyping.
-        guard status == errSecSuccess, store.value(forKey: key) == legacy else {
+        guard store.value(forKey: key) == legacy else {
             LoggingService.shared.error(
                 "Legacy \(credentialNoun) adoption failed verification",
                 category: .keychain,
-                details: "accountID=\(account.id), status=\(store.describe(status))"
+                details: "accountID=\(account.id)"
             )
+            // Safe to remove: this write is the item that just landed.
             store.delete(key: key)
             return false
         }
@@ -229,13 +255,14 @@ final class AccountKeychainCredentials {
 
         guard markers.canDeleteLegacyItem(
             instanceID: account.instanceID,
+            accountID: account.id,
             scope: scope,
             currentLegacyValue: currentValue
         ) else {
             LoggingService.shared.info(
-                "Leaving the legacy \(credentialNoun) in place — not this identity's to delete",
+                "Leaving the legacy \(credentialNoun) in place — not this account's to delete",
                 category: .keychain,
-                details: "instanceID=\(account.instanceID)"
+                details: "instanceID=\(account.instanceID), accountID=\(account.id)"
             )
             return
         }

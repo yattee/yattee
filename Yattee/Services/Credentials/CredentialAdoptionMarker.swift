@@ -87,23 +87,28 @@ final class CredentialAdoptionMarkerStore {
 
     // MARK: - Legacy deletion authority
 
-    /// Whether an account deletion may also delete the **unscoped** legacy item.
+    /// Whether deleting an account may also delete the **unscoped** legacy item.
     ///
-    /// Three conditions, all required:
+    /// Four conditions, all required:
     ///
     /// 1. This device has a marker for the instance — no marker means this
     ///    device never adopted anything, so the legacy item is not ours to touch.
     /// 2. The marker belongs to the current identity — Apple account A's marker
     ///    cannot authorize a deletion while B is signed in.
-    /// 3. The legacy item still holds the exact secret that was adopted — if it
-    ///    has since been replaced (B signed in again on an older release, and
-    ///    that release rewrote the unscoped key), it is someone else's live
-    ///    login and must survive.
+    /// 3. The marker belongs to the account being deleted. An instance can hold
+    ///    several accounts, and only the one that actually adopted the legacy
+    ///    secret may retire it — deleting a *sibling* account must leave it
+    ///    alone.
+    /// 4. The legacy item still holds the exact secret that was adopted — if it
+    ///    has since been replaced (someone signed in again on an older release,
+    ///    and that release rewrote the unscoped key), it is a live login of
+    ///    theirs and must survive.
     ///
     /// Deleting a synchronizable item propagates everywhere, so a wrong answer
     /// here logs other devices out.
     func canDeleteLegacyItem(
         instanceID: UUID,
+        accountID: UUID,
         scope: String,
         currentLegacyValue: String?
     ) -> Bool {
@@ -111,6 +116,7 @@ final class CredentialAdoptionMarkerStore {
             $0.instanceID == instanceID && $0.identityScope == scope
         }) else { return false }
 
+        guard marker.accountID == accountID else { return false }
         guard let currentLegacyValue else { return false }
 
         return fingerprint(of: currentLegacyValue) == marker.secretFingerprint

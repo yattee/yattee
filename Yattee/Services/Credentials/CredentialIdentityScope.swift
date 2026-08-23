@@ -58,8 +58,17 @@ final class CredentialIdentityScope {
 
     private let defaults: UserDefaults
     private let resolveUserRecordID: @Sendable () async -> String?
+    /// Written only on the main actor; read in `deinit`, which runs after the
+    /// last reference is gone and so cannot race with it.
+    private nonisolated(unsafe) var identityChangeObserver: NSObjectProtocol?
 
     private static let cacheKey = "credentialIdentityScopeCache"
+
+    /// Attempts made for the Apple account currently being resolved. Reset
+    /// whenever the identity changes.
+    private var resolutionAttempts = 0
+    private var isResolving = false
+    private static let maxResolutionAttempts = 4
 
     /// The resolved scope, or `nil` while unresolved.
     var current: String? {
@@ -76,6 +85,37 @@ final class CredentialIdentityScope {
         self.defaults = defaults
         self.resolveUserRecordID = resolveUserRecordID
         adoptCurrentIdentity()
+        observeIdentityChanges()
+    }
+
+    deinit {
+        if let identityChangeObserver {
+            NotificationCenter.default.removeObserver(identityChangeObserver)
+        }
+    }
+
+    /// Re-scopes as soon as the Apple account changes under a running app.
+    ///
+    /// Without this the scope would stay pinned to whichever account was
+    /// signed in at launch, and a sign-out or switch mid-session would let
+    /// reads and writes reach the previous account's retained credentials —
+    /// the exact leak scoping exists to prevent.
+    private func observeIdentityChanges() {
+        identityChangeObserver = NotificationCenter.default.addObserver(
+            forName: .NSUbiquityIdentityDidChange,
+            object: nil,
+            queue: .main
+        ) { [weak self] _ in
+            MainActor.assumeIsolated {
+                guard let self else { return }
+                LoggingService.shared.info(
+                    "Apple account changed — re-resolving the credential identity scope",
+                    category: .keychain
+                )
+                self.adoptCurrentIdentity()
+                Task { await self.resolve() }
+            }
+        }
     }
 
     /// Test seam: a scope pinned up front, never consulting CloudKit.
@@ -96,6 +136,9 @@ final class CredentialIdentityScope {
     /// closed shows up here, before any CloudKit request could report it.
     func adoptCurrentIdentity() {
         let current = CloudKitIdentity.ubiquityFingerprint
+        if current != fingerprint {
+            resolutionAttempts = 0
+        }
         fingerprint = current
 
         guard CloudKitAvailability.isAvailable else {
@@ -127,32 +170,65 @@ final class CredentialIdentityScope {
     /// rather than "not signed in" — callers must not treat that as a missing
     /// credential.
     func resolve() async {
-        guard !isResolved else { return }
+        guard !isResolved, !isResolving else { return }
 
-        // Captured before the await so a switch mid-flight can be detected:
-        // a record ID fetched under account A must never be cached for B.
+        isResolving = true
+        defer { isResolving = false }
+
+        // Captured before the first await so a switch mid-flight can be
+        // detected: a record ID fetched under account A must never be cached
+        // for B.
         let requested = fingerprint
 
-        guard let recordID = await resolveUserRecordID() else { return }
+        while resolutionAttempts < Self.maxResolutionAttempts {
+            resolutionAttempts += 1
 
-        guard CloudKitIdentity.ubiquityFingerprint == requested, fingerprint == requested else {
-            LoggingService.shared.info(
-                "Discarding credential scope resolved for a previous Apple account",
-                category: .keychain
-            )
-            return
+            if let recordID = await resolveUserRecordID() {
+                guard CloudKitIdentity.ubiquityFingerprint == requested, fingerprint == requested else {
+                    LoggingService.shared.info(
+                        "Discarding credential scope resolved for a previous Apple account",
+                        category: .keychain
+                    )
+                    return
+                }
+
+                if let requested {
+                    cache(recordID, for: requested)
+                }
+                state = .resolved(recordID)
+
+                LoggingService.shared.info(
+                    "Resolved credential identity scope",
+                    category: .keychain,
+                    details: "fingerprint=\(requested ?? "none"), attempt=\(resolutionAttempts)"
+                )
+                return
+            }
+
+            guard resolutionAttempts < Self.maxResolutionAttempts else { break }
+
+            try? await Task.sleep(for: .seconds(pow(2.0, Double(resolutionAttempts))))
+            guard fingerprint == requested else { return }
         }
 
-        if let requested {
-            cache(recordID, for: requested)
-        }
-        state = .resolved(recordID)
-
-        LoggingService.shared.info(
-            "Resolved credential identity scope",
-            category: .keychain,
-            details: "fingerprint=\(requested ?? "none")"
+        // Every credential read is disabled until this succeeds, so failing
+        // quietly would look exactly like "signed out". Foreground activation
+        // retries via resolveIfNeeded().
+        LoggingService.shared.warning(
+            "Could not resolve the credential identity scope — credentials stay unavailable until it does",
+            category: .keychain
         )
+    }
+
+    /// Retries a resolution that previously ran out of attempts.
+    ///
+    /// Called when the app returns to the foreground: a device that launched
+    /// offline would otherwise keep credentials unavailable for the entire
+    /// process lifetime, long after connectivity returned.
+    func resolveIfNeeded() async {
+        guard !isResolved else { return }
+        resolutionAttempts = 0
+        await resolve()
     }
 
     // MARK: - Cache

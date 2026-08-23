@@ -72,6 +72,25 @@ struct KeychainCredentialStore: Sendable {
         return value
     }
 
+    /// Writes a value **only if the key is currently empty**, returning
+    /// `errSecDuplicateItem` otherwise.
+    ///
+    /// Used by legacy adoption: between rendering the offer and the user
+    /// tapping it, iCloud Keychain may deliver the real scoped credential, and
+    /// a replacing write would silently overwrite it with the older secret.
+    @discardableResult
+    func addIfAbsent(_ value: String, forKey key: String, synchronizable: Bool) -> OSStatus {
+        let query: [String: Any] = [
+            kSecClass as String: kSecClassGenericPassword,
+            kSecAttrService as String: service,
+            kSecAttrAccount as String: key,
+            kSecAttrSynchronizable as String: synchronizable,
+            kSecValueData as String: Data(value.utf8)
+        ]
+
+        return SecItemAdd(query as CFDictionary, nil)
+    }
+
     /// Writes a value, replacing any existing item in either synchronizable form.
     @discardableResult
     func set(_ value: String, forKey key: String, synchronizable: Bool) -> OSStatus {
