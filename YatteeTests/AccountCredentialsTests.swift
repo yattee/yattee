@@ -321,6 +321,42 @@ struct LegacyCredentialAdoptionTests {
             .delete(key: KeychainCredentialStore.legacyKey(instanceID: instanceID))
     }
 
+    @Test("Adoption in one backend does not suppress the other's offer")
+    func markersAreNamespacedByService() {
+        // Both credential managers share one marker store, and an instance UUID
+        // can outlive a change of backend.
+        let invidiousService = makeService()
+        let pipedService = makeService()
+        let markers = makeMarkers()
+        let instanceID = UUID()
+        let account = Account.migrated(from: instanceID)
+
+        seedLegacyItem(service: invidiousService, instanceID: instanceID, value: "invidious-sid")
+        seedLegacyItem(service: pipedService, instanceID: instanceID, value: "piped-token")
+
+        let invidious = makeCredentials(service: invidiousService, scope: "identity-A", markers: markers)
+        let piped = makeCredentials(service: pipedService, scope: "identity-A", markers: markers)
+
+        #expect(invidious.adoptLegacyCredential(for: account) == true)
+
+        // Piped's own legacy item is untouched and still offered.
+        #expect(piped.hasAdoptableLegacyCredential(for: account) == true)
+        #expect(piped.adoptLegacyCredential(for: account) == true)
+        #expect(piped.credential(for: account) == "piped-token")
+        #expect(invidious.credential(for: account) == "invidious-sid")
+
+        // Each deletion consults its own marker and its own secret.
+        invidious.deleteLegacyCredentialIfOwned(for: account)
+        #expect(legacyValue(service: invidiousService, instanceID: instanceID) == nil)
+        #expect(legacyValue(service: pipedService, instanceID: instanceID) == "piped-token")
+
+        piped.deleteLegacyCredentialIfOwned(for: account)
+        #expect(legacyValue(service: pipedService, instanceID: instanceID) == nil)
+
+        invidious.deleteCredential(for: account)
+        piped.deleteCredential(for: account)
+    }
+
     @Test("Adoption is refused while the identity scope is unresolved")
     func adoptionRefusedWhenUnresolved() {
         let service = makeService()
@@ -355,6 +391,7 @@ struct CredentialIdentityScopeTests {
         var fingerprint: String? = "identity-A"
         var resultsByFingerprint: [String: String] = [:]
         var failuresRemaining = 0
+        var availability: CloudKitIdentity.AccountAvailability = .available
         var onResolveStart: (() -> Void)?
         var switchTask: Task<Void, Never>?
 
@@ -379,6 +416,7 @@ struct CredentialIdentityScopeTests {
             defaults: makeDefaults(),
             fingerprintProvider: { harness.fingerprint },
             resolveUserRecordID: { await harness.resolve() },
+            accountAvailabilityProvider: { harness.availability },
             retryDelay: { _ in }
         )
 
@@ -397,6 +435,7 @@ struct CredentialIdentityScopeTests {
             defaults: makeDefaults(),
             fingerprintProvider: { harness.fingerprint },
             resolveUserRecordID: { await harness.resolve() },
+            accountAvailabilityProvider: { harness.availability },
             retryDelay: { _ in }
         )
 
@@ -418,6 +457,7 @@ struct CredentialIdentityScopeTests {
             defaults: makeDefaults(),
             fingerprintProvider: { harness.fingerprint },
             resolveUserRecordID: { await harness.resolve() },
+            accountAvailabilityProvider: { harness.availability },
             retryDelay: { _ in }
         )
 
@@ -440,19 +480,67 @@ struct CredentialIdentityScopeTests {
         #expect(scope.current == "_recordB")
     }
 
-    @Test("Signing out scopes to local without a lookup")
-    func signedOutUsesLocalScope() {
+    @Test("A missing ubiquity token alone never scopes to local")
+    func missingTokenDoesNotImplySignedOut() async {
+        // iCloud Drive off while still signed in: Foundation returns no token,
+        // but the account is real. Scoping to local here would put two
+        // different Apple accounts in one namespace.
         let harness = Harness()
         harness.fingerprint = nil
+        harness.availability = .available
+        harness.resultsByFingerprint = [:]
+
+        let scope = CredentialIdentityScope(
+            defaults: makeDefaults(),
+            fingerprintProvider: { harness.fingerprint },
+            resolveUserRecordID: { "_recordA" },
+            accountAvailabilityProvider: { harness.availability },
+            retryDelay: { _ in }
+        )
+
+        #expect(scope.current == nil)
+        await scope.resolve()
+        #expect(scope.current == "_recordA")
+        #expect(scope.current != CredentialIdentityScope.localScope)
+    }
+
+    @Test("Signing out scopes to local, confirmed by CloudKit")
+    func signedOutUsesLocalScope() async {
+        let harness = Harness()
+        harness.fingerprint = nil
+        harness.availability = .noAccount
 
         let scope = CredentialIdentityScope(
             defaults: makeDefaults(),
             fingerprintProvider: { harness.fingerprint },
             resolveUserRecordID: { await harness.resolve() },
+            accountAvailabilityProvider: { harness.availability },
             retryDelay: { _ in }
         )
 
+        // Not assumed up front — only CloudKit can tell "signed out" from
+        // "token unavailable".
+        #expect(scope.current == nil)
+        await scope.resolve()
         #expect(scope.current == CredentialIdentityScope.localScope)
+    }
+
+    @Test("An undeterminable account status leaves the scope unresolved")
+    func indeterminateStatusStaysUnresolved() async {
+        let harness = Harness()
+        harness.fingerprint = nil
+        harness.availability = .indeterminate
+
+        let scope = CredentialIdentityScope(
+            defaults: makeDefaults(),
+            fingerprintProvider: { harness.fingerprint },
+            resolveUserRecordID: { "_shouldNotBeUsed" },
+            accountAvailabilityProvider: { harness.availability },
+            retryDelay: { _ in }
+        )
+
+        await scope.resolve()
+        #expect(scope.current == nil)
     }
 
     @Test("A known Apple account resolves synchronously on relaunch")
@@ -465,6 +553,7 @@ struct CredentialIdentityScopeTests {
             defaults: defaults,
             fingerprintProvider: { harness.fingerprint },
             resolveUserRecordID: { await harness.resolve() },
+            accountAvailabilityProvider: { harness.availability },
             retryDelay: { _ in }
         )
         await first.resolve()
@@ -475,6 +564,7 @@ struct CredentialIdentityScopeTests {
             defaults: defaults,
             fingerprintProvider: { harness.fingerprint },
             resolveUserRecordID: { nil },
+            accountAvailabilityProvider: { harness.availability },
             retryDelay: { _ in }
         )
         #expect(second.current == "_recordA")

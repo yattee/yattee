@@ -42,6 +42,44 @@ enum CloudKitIdentity {
         return shortDigest(of: data)
     }
 
+    /// Whether an Apple account is signed in, as distinct from unreachable.
+    ///
+    /// `ubiquityIdentityToken` alone cannot answer this: Foundation returns
+    /// `nil` both when the user is signed out *and* when iCloud Drive is
+    /// unavailable or switched off, and Yattee declares only the CloudKit
+    /// service (no ubiquity container), so the token's availability tracks
+    /// system iCloud Drive state rather than the account. Treating a nil token
+    /// as "signed out" would collapse two different Apple accounts into the
+    /// same `local` credential scope.
+    enum AccountAvailability {
+        /// No Apple account — the `local` scope is genuinely correct.
+        case noAccount
+        /// Signed in; the user record can be fetched.
+        case available
+        /// Unreachable, restricted, or undetermined. Never assume either way.
+        case indeterminate
+    }
+
+    static func accountAvailability() async -> AccountAvailability {
+        guard CloudKitAvailability.isAvailable else { return .noAccount }
+
+        do {
+            let container = CKContainer(identifier: AppIdentifiers.iCloudContainer)
+            switch try await container.accountStatus() {
+            case .noAccount: return .noAccount
+            case .available: return .available
+            default: return .indeterminate
+            }
+        } catch {
+            LoggingService.shared.debug(
+                "Could not determine CloudKit account status",
+                category: .cloudKit,
+                details: "\(error)"
+            )
+            return .indeterminate
+        }
+    }
+
     /// The CloudKit user record name for the current identity.
     ///
     /// Returns `nil` when CloudKit is unavailable (sideloaded build), when no

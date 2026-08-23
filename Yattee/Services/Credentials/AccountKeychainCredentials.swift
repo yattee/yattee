@@ -170,7 +170,7 @@ final class AccountKeychainCredentials {
 
     func hasAdoptableLegacyCredential(for account: Account) -> Bool {
         guard let scope = currentScope() else { return false }
-        guard !markers.hasAdopted(instanceID: account.instanceID, scope: scope) else { return false }
+        guard !markers.hasAdopted(service: store.service, instanceID: account.instanceID, scope: scope) else { return false }
         guard credential(for: account) == nil else { return false }
 
         return legacyCredential(for: account) != nil
@@ -186,7 +186,7 @@ final class AccountKeychainCredentials {
     @discardableResult
     func adoptLegacyCredential(for account: Account) -> Bool {
         guard let scope = currentScope() else { return false }
-        guard !markers.hasAdopted(instanceID: account.instanceID, scope: scope) else { return false }
+        guard !markers.hasAdopted(service: store.service, instanceID: account.instanceID, scope: scope) else { return false }
         guard let legacy = legacyCredential(for: account) else { return false }
 
         // Eligibility is re-checked here, not just when the offer was rendered:
@@ -249,6 +249,7 @@ final class AccountKeychainCredentials {
         }
 
         markers.record(
+            service: store.service,
             instanceID: account.instanceID,
             accountID: account.id,
             scope: scope,
@@ -272,6 +273,7 @@ final class AccountKeychainCredentials {
         let currentValue = store.value(forKey: legacyKey)
 
         guard markers.canDeleteLegacyItem(
+            service: store.service,
             instanceID: account.instanceID,
             accountID: account.id,
             scope: scope,
@@ -286,7 +288,7 @@ final class AccountKeychainCredentials {
         }
 
         store.delete(key: legacyKey)
-        markers.removeMarker(instanceID: account.instanceID, scope: scope)
+        markers.removeMarker(service: store.service, instanceID: account.instanceID, scope: scope)
 
         LoggingService.shared.info(
             "Deleted the legacy \(credentialNoun) alongside its account",

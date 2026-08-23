@@ -59,6 +59,7 @@ final class CredentialIdentityScope {
     private let defaults: UserDefaults
     private let resolveUserRecordID: @Sendable () async -> String?
     private let fingerprintProvider: @Sendable () -> String?
+    private let accountAvailabilityProvider: @Sendable () async -> CloudKitIdentity.AccountAvailability
     /// Backoff between attempts. Injectable so tests don't pay real seconds.
     private let retryDelay: @Sendable (Int) async -> Void
     /// Written only on the main actor; read in `deinit`, which runs after the
@@ -89,6 +90,9 @@ final class CredentialIdentityScope {
         defaults: UserDefaults = .standard,
         fingerprintProvider: @escaping @Sendable () -> String? = { CloudKitIdentity.ubiquityFingerprint },
         resolveUserRecordID: @escaping @Sendable () async -> String? = { await CloudKitIdentity.userRecordID() },
+        accountAvailabilityProvider: @escaping @Sendable () async -> CloudKitIdentity.AccountAvailability = {
+            await CloudKitIdentity.accountAvailability()
+        },
         retryDelay: @escaping @Sendable (Int) async -> Void = { attempt in
             try? await Task.sleep(for: .seconds(pow(2.0, Double(attempt))))
         }
@@ -96,6 +100,7 @@ final class CredentialIdentityScope {
         self.defaults = defaults
         self.fingerprintProvider = fingerprintProvider
         self.resolveUserRecordID = resolveUserRecordID
+        self.accountAvailabilityProvider = accountAvailabilityProvider
         self.retryDelay = retryDelay
         adoptCurrentIdentity()
         observeIdentityChanges()
@@ -137,6 +142,7 @@ final class CredentialIdentityScope {
         self.defaults = defaults
         fingerprintProvider = { nil }
         resolveUserRecordID = { nil }
+        accountAvailabilityProvider = { .indeterminate }
         retryDelay = { _ in }
         fingerprint = nil
         state = fixedScope.map { State.resolved($0) } ?? .unresolved
@@ -164,9 +170,13 @@ final class CredentialIdentityScope {
         }
 
         guard let current else {
-            // Signed out. Local scope is correct *and* isolating: items written
-            // here never collide with a signed-in account's keys.
-            state = .resolved(Self.localScope)
+            // A nil token does NOT establish sign-out — Foundation also returns
+            // nil when iCloud Drive is unavailable or switched off, and Yattee
+            // declares only the CloudKit service. Scoping to `local` here would
+            // collapse two different signed-in Apple accounts into one
+            // namespace, which is exactly the collision this class prevents.
+            // CloudKit's account status settles it during resolution.
+            state = .unresolved
             return
         }
 
@@ -212,8 +222,34 @@ final class CredentialIdentityScope {
         // for B.
         let requested = fingerprint
 
-        while resolutionAttempts < Self.maxResolutionAttempts {
+        // Labelled: an unqualified `break` inside the switch below would leave
+        // only the switch and fall through to the user-record lookup, which
+        // must not run when the account status is undetermined.
+        attempts: while resolutionAttempts < Self.maxResolutionAttempts {
             resolutionAttempts += 1
+
+            // With no ubiquity token, only CloudKit can distinguish "signed
+            // out" (where `local` is correct) from "signed in but iCloud Drive
+            // is off" (where `local` would be a cross-account collision).
+            if requested == nil {
+                switch await accountAvailabilityProvider() {
+                case .noAccount:
+                    guard fingerprintProvider() == nil, fingerprint == nil else { return }
+                    state = .resolved(Self.localScope)
+                    LoggingService.shared.info(
+                        "No Apple account — credentials scoped locally",
+                        category: .keychain
+                    )
+                    return
+                case .available:
+                    break // fall through to the user-record lookup below
+                case .indeterminate:
+                    guard resolutionAttempts < Self.maxResolutionAttempts else { break attempts }
+                    await retryDelay(resolutionAttempts)
+                    guard fingerprint == requested else { return }
+                    continue attempts
+                }
+            }
 
             if let recordID = await resolveUserRecordID() {
                 guard fingerprintProvider() == requested, fingerprint == requested else {
@@ -224,6 +260,9 @@ final class CredentialIdentityScope {
                     return
                 }
 
+                // Only cacheable against a token. Without one there is no key
+                // to cache under that could be trusted to mean this account,
+                // so this lookup repeats each launch.
                 if let requested {
                     cache(recordID, for: requested)
                 }
@@ -232,12 +271,12 @@ final class CredentialIdentityScope {
                 LoggingService.shared.info(
                     "Resolved credential identity scope",
                     category: .keychain,
-                    details: "fingerprint=\(requested ?? "none"), attempt=\(resolutionAttempts)"
+                    details: "fingerprint=\(requested ?? "none (no ubiquity token)"), attempt=\(resolutionAttempts)"
                 )
                 return
             }
 
-            guard resolutionAttempts < Self.maxResolutionAttempts else { break }
+            guard resolutionAttempts < Self.maxResolutionAttempts else { break attempts }
 
             await retryDelay(resolutionAttempts)
             guard fingerprint == requested else { return }

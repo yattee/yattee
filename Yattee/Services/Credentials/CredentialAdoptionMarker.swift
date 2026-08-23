@@ -20,6 +20,12 @@ struct CredentialAdoptionMarker: Codable, Hashable, Sendable {
     /// The identity scope that adopted the item. Apple account A's marker must
     /// never authorize anything under account B.
     let identityScope: String
+    /// Keychain service the adopted item lives in. The Invidious and Piped
+    /// managers keep separate services but share this store, and an instance
+    /// UUID can outlive a change of backend — without this, adopting one
+    /// backend's credential would suppress the other's offer and point
+    /// deletion at the wrong secret.
+    let service: String
     let instanceID: UUID
     let accountID: UUID
     /// Salted, truncated digest of the adopted credential — non-secret, and
@@ -56,22 +62,30 @@ final class CredentialAdoptionMarkerStore {
     ///
     /// Once true, the app stops offering adoption and stops reading the legacy
     /// key entirely for that account.
-    func hasAdopted(instanceID: UUID, scope: String) -> Bool {
-        markers().contains { $0.instanceID == instanceID && $0.identityScope == scope }
+    func hasAdopted(service: String, instanceID: UUID, scope: String) -> Bool {
+        marker(service: service, instanceID: instanceID, scope: scope) != nil
+    }
+
+    private func marker(service: String, instanceID: UUID, scope: String) -> CredentialAdoptionMarker? {
+        markers().first {
+            $0.service == service && $0.instanceID == instanceID && $0.identityScope == scope
+        }
     }
 
     func record(
+        service: String,
         instanceID: UUID,
         accountID: UUID,
         scope: String,
         secret: String
     ) {
         var all = markers().filter {
-            !($0.instanceID == instanceID && $0.identityScope == scope)
+            !($0.service == service && $0.instanceID == instanceID && $0.identityScope == scope)
         }
         all.append(
             CredentialAdoptionMarker(
                 identityScope: scope,
+                service: service,
                 instanceID: instanceID,
                 accountID: accountID,
                 secretFingerprint: fingerprint(of: secret),
@@ -81,8 +95,10 @@ final class CredentialAdoptionMarkerStore {
         save(all)
     }
 
-    func removeMarker(instanceID: UUID, scope: String) {
-        save(markers().filter { !($0.instanceID == instanceID && $0.identityScope == scope) })
+    func removeMarker(service: String, instanceID: UUID, scope: String) {
+        save(markers().filter {
+            !($0.service == service && $0.instanceID == instanceID && $0.identityScope == scope)
+        })
     }
 
     // MARK: - Legacy deletion authority
@@ -107,14 +123,15 @@ final class CredentialAdoptionMarkerStore {
     /// Deleting a synchronizable item propagates everywhere, so a wrong answer
     /// here logs other devices out.
     func canDeleteLegacyItem(
+        service: String,
         instanceID: UUID,
         accountID: UUID,
         scope: String,
         currentLegacyValue: String?
     ) -> Bool {
-        guard let marker = markers().first(where: {
-            $0.instanceID == instanceID && $0.identityScope == scope
-        }) else { return false }
+        guard let marker = marker(service: service, instanceID: instanceID, scope: scope) else {
+            return false
+        }
 
         guard marker.accountID == accountID else { return false }
         guard let currentLegacyValue else { return false }
