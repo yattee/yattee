@@ -392,6 +392,8 @@ struct CredentialIdentityScopeTests {
         var resultsByFingerprint: [String: String] = [:]
         var failuresRemaining = 0
         var availability: CloudKitIdentity.AccountAvailability = .available
+        /// User record returned when there is no ubiquity token to key on.
+        var tokenlessRecord: String?
         var onResolveStart: (() -> Void)?
         var switchTask: Task<Void, Never>?
 
@@ -523,6 +525,77 @@ struct CredentialIdentityScopeTests {
         #expect(scope.current == nil)
         await scope.resolve()
         #expect(scope.current == CredentialIdentityScope.localScope)
+    }
+
+    @Test("A tokenless scope is re-pointed when the account changes silently")
+    func tokenlessScopeIsRevalidated() async {
+        // iCloud Drive off: the token stays nil across the switch, so nothing
+        // local changes and no ubiquity notification fires.
+        let harness = Harness()
+        harness.fingerprint = nil
+        harness.availability = .available
+
+        harness.tokenlessRecord = "_recordA"
+        let scope = CredentialIdentityScope(
+            defaults: makeDefaults(),
+            fingerprintProvider: { harness.fingerprint },
+            resolveUserRecordID: { harness.tokenlessRecord },
+            accountAvailabilityProvider: { harness.availability },
+            retryDelay: { _ in }
+        )
+
+        await scope.resolve()
+        #expect(scope.current == "_recordA")
+
+        // The user switches to account B and returns to the app.
+        harness.tokenlessRecord = "_recordB"
+        await scope.resolveIfNeeded()
+        #expect(scope.current == "_recordB")
+    }
+
+    @Test("A tokenless scope falls back to local once the account is gone")
+    func tokenlessScopeFallsBackOnSignOut() async {
+        let harness = Harness()
+        harness.fingerprint = nil
+        harness.availability = .available
+
+        let scope = CredentialIdentityScope(
+            defaults: makeDefaults(),
+            fingerprintProvider: { harness.fingerprint },
+            resolveUserRecordID: { "_recordA" },
+            accountAvailabilityProvider: { harness.availability },
+            retryDelay: { _ in }
+        )
+
+        await scope.resolve()
+        #expect(scope.current == "_recordA")
+
+        harness.availability = .noAccount
+        await scope.resolveIfNeeded()
+        #expect(scope.current == CredentialIdentityScope.localScope)
+    }
+
+    @Test("A token-derived scope is not re-checked on every activation")
+    func tokenDerivedScopeIsStable() async {
+        let harness = Harness()
+        harness.resultsByFingerprint = ["identity-A": "_recordA"]
+
+        let scope = CredentialIdentityScope(
+            defaults: makeDefaults(),
+            fingerprintProvider: { harness.fingerprint },
+            resolveUserRecordID: { await harness.resolve() },
+            accountAvailabilityProvider: { harness.availability },
+            retryDelay: { _ in }
+        )
+
+        await scope.resolve()
+        #expect(scope.current == "_recordA")
+
+        // A token-backed scope changes only via the notification, so a
+        // foreground pass must leave it exactly as it was.
+        harness.resultsByFingerprint = ["identity-A": "_somethingElse"]
+        await scope.resolveIfNeeded()
+        #expect(scope.current == "_recordA")
     }
 
     @Test("An undeterminable account status leaves the scope unresolved")

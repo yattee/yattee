@@ -5,6 +5,7 @@
 //  Resolves the Apple-account scope that Keychain credentials are keyed by.
 //
 
+import CloudKit
 import Foundation
 
 /// Resolves the identity scope that account credentials are namespaced under.
@@ -65,6 +66,7 @@ final class CredentialIdentityScope {
     /// Written only on the main actor; read in `deinit`, which runs after the
     /// last reference is gone and so cannot race with it.
     private nonisolated(unsafe) var identityChangeObserver: NSObjectProtocol?
+    private nonisolated(unsafe) var cloudKitAccountObserver: NSObjectProtocol?
 
     private static let cacheKey = "credentialIdentityScopeCache"
 
@@ -76,6 +78,12 @@ final class CredentialIdentityScope {
     /// running one is for a now-stale identity and will bail on the fingerprint
     /// check, so the request has to be replayed rather than dropped.
     private var pendingResolve = false
+    /// Whether the current scope was resolved with no ubiquity token behind it.
+    ///
+    /// Such a scope has no fingerprint to compare against, so an Apple-account
+    /// switch produces no token change to observe — it has to be revalidated
+    /// against CloudKit instead.
+    private var resolvedWithoutToken = false
     private static let maxResolutionAttempts = 4
 
     /// The resolved scope, or `nil` while unresolved.
@@ -110,6 +118,9 @@ final class CredentialIdentityScope {
         if let identityChangeObserver {
             NotificationCenter.default.removeObserver(identityChangeObserver)
         }
+        if let cloudKitAccountObserver {
+            NotificationCenter.default.removeObserver(cloudKitAccountObserver)
+        }
     }
 
     /// Re-scopes as soon as the Apple account changes under a running app.
@@ -119,21 +130,44 @@ final class CredentialIdentityScope {
     /// reads and writes reach the previous account's retained credentials —
     /// the exact leak scoping exists to prevent.
     private func observeIdentityChanges() {
+        // Two signals, because neither covers the other. The ubiquity token
+        // changes only when iCloud Drive is available; with it switched off the
+        // token stays nil across a switch and only CloudKit notices.
         identityChangeObserver = NotificationCenter.default.addObserver(
             forName: .NSUbiquityIdentityDidChange,
             object: nil,
             queue: .main
         ) { [weak self] _ in
-            MainActor.assumeIsolated {
-                guard let self else { return }
-                LoggingService.shared.info(
-                    "Apple account changed — re-resolving the credential identity scope",
-                    category: .keychain
-                )
-                self.adoptCurrentIdentity()
-                Task { await self.resolve() }
-            }
+            MainActor.assumeIsolated { self?.identityDidChange(source: "ubiquity token") }
         }
+
+        cloudKitAccountObserver = NotificationCenter.default.addObserver(
+            forName: .CKAccountChanged,
+            object: nil,
+            queue: .main
+        ) { [weak self] _ in
+            MainActor.assumeIsolated { self?.identityDidChange(source: "CloudKit account") }
+        }
+    }
+
+    private func identityDidChange(source: String) {
+        LoggingService.shared.info(
+            "Apple account changed (\(source)) — re-resolving the credential identity scope",
+            category: .keychain
+        )
+
+        // A tokenless scope cannot be re-derived by `adoptCurrentIdentity()`
+        // (there is no fingerprint to compare), so drop it outright: continuing
+        // to serve it would hand the previous account's credentials to the new
+        // one.
+        if resolvedWithoutToken {
+            state = .unresolved
+            resolvedWithoutToken = false
+            resolutionAttempts = 0
+        }
+
+        adoptCurrentIdentity()
+        Task { await resolve() }
     }
 
     /// Test seam: a scope pinned up front, never consulting CloudKit.
@@ -165,6 +199,7 @@ final class CredentialIdentityScope {
         guard CloudKitAvailability.isAvailable else {
             // No iCloud entitlement: nothing can sync, and there is no ambient
             // identity for a retained credential to leak to.
+            resolvedWithoutToken = false
             state = .resolved(Self.localScope)
             return
         }
@@ -181,6 +216,7 @@ final class CredentialIdentityScope {
         }
 
         if let cached = cachedScope(for: current) {
+            resolvedWithoutToken = false
             state = .resolved(cached)
         } else {
             state = .unresolved
@@ -235,6 +271,7 @@ final class CredentialIdentityScope {
                 switch await accountAvailabilityProvider() {
                 case .noAccount:
                     guard fingerprintProvider() == nil, fingerprint == nil else { return }
+                    resolvedWithoutToken = true
                     state = .resolved(Self.localScope)
                     LoggingService.shared.info(
                         "No Apple account — credentials scoped locally",
@@ -266,6 +303,7 @@ final class CredentialIdentityScope {
                 if let requested {
                     cache(recordID, for: requested)
                 }
+                resolvedWithoutToken = requested == nil
                 state = .resolved(recordID)
 
                 LoggingService.shared.info(
@@ -297,9 +335,50 @@ final class CredentialIdentityScope {
     /// offline would otherwise keep credentials unavailable for the entire
     /// process lifetime, long after connectivity returned.
     func resolveIfNeeded() async {
-        guard !isResolved else { return }
+        guard !isResolved else {
+            await revalidateTokenlessScope()
+            return
+        }
         resolutionAttempts = 0
         await resolve()
+    }
+
+    /// Confirms that a tokenless scope still names the signed-in account.
+    ///
+    /// With iCloud Drive switched off the ubiquity token stays `nil` across an
+    /// Apple-account switch, so nothing local changes and the notification may
+    /// never arrive. Without this check the scope would keep pointing at the
+    /// previous account until relaunch — and its retained credentials with it.
+    ///
+    /// Revalidation compares before replacing rather than invalidating first,
+    /// so the common case (nothing changed) never blanks out credentials.
+    private func revalidateTokenlessScope() async {
+        guard resolvedWithoutToken, fingerprintProvider() == nil else { return }
+
+        switch await accountAvailabilityProvider() {
+        case .noAccount:
+            guard current != Self.localScope else { return }
+            LoggingService.shared.info(
+                "Apple account signed out — credential scope falling back to local",
+                category: .keychain
+            )
+            resolvedWithoutToken = true
+            state = .resolved(Self.localScope)
+
+        case .available:
+            guard let recordID = await resolveUserRecordID(), recordID != current else { return }
+            resolvedWithoutToken = true
+            LoggingService.shared.info(
+                "Apple account changed without a token change — credential scope re-pointed",
+                category: .keychain
+            )
+            state = .resolved(recordID)
+
+        case .indeterminate:
+            // Unreachable proves nothing, and invalidating on every transient
+            // network failure would make credentials flap. The scope stands.
+            break
+        }
     }
 
     // MARK: - Cache
