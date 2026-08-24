@@ -398,12 +398,15 @@ struct CredentialIdentityScopeTests {
         var switchTask: Task<Void, Never>?
 
         func resolve() async -> String? {
+            // Snapshotted before the hook runs, so a switch staged inside it
+            // yields a genuinely stale result rather than the new value.
+            let tokenless = tokenlessRecord
             onResolveStart?()
             if failuresRemaining > 0 {
                 failuresRemaining -= 1
                 return nil
             }
-            guard let fingerprint else { return nil }
+            guard let fingerprint else { return tokenless }
             return resultsByFingerprint[fingerprint]
         }
     }
@@ -596,6 +599,69 @@ struct CredentialIdentityScopeTests {
         harness.resultsByFingerprint = ["identity-A": "_somethingElse"]
         await scope.resolveIfNeeded()
         #expect(scope.current == "_recordA")
+    }
+
+    @Test("A tokenless scope is dropped, not served, while it is unconfirmed")
+    func tokenlessScopeIsNotServedWhileUnconfirmed() async {
+        let harness = Harness()
+        harness.fingerprint = nil
+        harness.availability = .available
+        harness.tokenlessRecord = "_recordA"
+
+        let scope = CredentialIdentityScope(
+            defaults: makeDefaults(),
+            fingerprintProvider: { harness.fingerprint },
+            resolveUserRecordID: { harness.tokenlessRecord },
+            accountAvailabilityProvider: { harness.availability },
+            retryDelay: { _ in }
+        )
+
+        await scope.resolve()
+        #expect(scope.current == "_recordA")
+
+        // Foregrounding with CloudKit unreachable must not keep serving A —
+        // the account may have changed while the app was suspended.
+        harness.availability = .indeterminate
+        await scope.resolveIfNeeded()
+        #expect(scope.current == nil)
+    }
+
+    @Test("A stale tokenless lookup is refused after an account change")
+    func staleTokenlessLookupIsRefused() async {
+        // Both before and after the switch the fingerprint is nil, so only a
+        // generation counter can tell the two lookups apart.
+        let harness = Harness()
+        harness.fingerprint = nil
+        harness.availability = .available
+        harness.tokenlessRecord = "_recordA"
+
+        let scope = CredentialIdentityScope(
+            defaults: makeDefaults(),
+            fingerprintProvider: { harness.fingerprint },
+            resolveUserRecordID: { await harness.resolve() },
+            accountAvailabilityProvider: { harness.availability },
+            retryDelay: { _ in }
+        )
+
+        // CKAccountChanged lands while A's lookup is in flight.
+        harness.onResolveStart = { [weak scope] in
+            harness.onResolveStart = nil
+            MainActor.assumeIsolated {
+                harness.tokenlessRecord = "_recordB"
+                scope?.identityDidChange(source: "test")
+            }
+        }
+
+        await scope.resolve()
+
+        // The decisive assertion: A's result must not be accepted just because
+        // nil == nil on both sides of the switch.
+        #expect(scope.current != "_recordA")
+
+        // Then the replay lands on B (driven here rather than awaiting the
+        // observer's detached task).
+        await scope.resolveIfNeeded()
+        #expect(scope.current == "_recordB")
     }
 
     @Test("An undeterminable account status leaves the scope unresolved")

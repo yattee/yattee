@@ -84,6 +84,13 @@ final class CredentialIdentityScope {
     /// switch produces no token change to observe — it has to be revalidated
     /// against CloudKit instead.
     private var resolvedWithoutToken = false
+    /// Bumped on every observed Apple-account change.
+    ///
+    /// The fingerprint alone cannot order async results: with no ubiquity token
+    /// it is `nil` before *and* after a switch, so comparing it would accept
+    /// the previous account's in-flight lookup as current. Every async
+    /// operation captures this and refuses to apply its result if it moved.
+    private var identityGeneration = 0
     private static let maxResolutionAttempts = 4
 
     /// The resolved scope, or `nil` while unresolved.
@@ -150,11 +157,17 @@ final class CredentialIdentityScope {
         }
     }
 
-    private func identityDidChange(source: String) {
+    /// Handles an observed Apple-account change. Internal so tests can drive it
+    /// deterministically instead of racing a notification.
+    func identityDidChange(source: String) {
         LoggingService.shared.info(
             "Apple account changed (\(source)) — re-resolving the credential identity scope",
             category: .keychain
         )
+
+        // Invalidates every in-flight lookup: results captured under the old
+        // generation are refused even when the fingerprint looks unchanged.
+        identityGeneration += 1
 
         // A tokenless scope cannot be re-derived by `adoptCurrentIdentity()`
         // (there is no fingerprint to compare), so drop it outright: continuing
@@ -193,6 +206,7 @@ final class CredentialIdentityScope {
         let current = fingerprintProvider()
         if current != fingerprint {
             resolutionAttempts = 0
+            identityGeneration += 1
         }
         fingerprint = current
 
@@ -257,6 +271,7 @@ final class CredentialIdentityScope {
         // detected: a record ID fetched under account A must never be cached
         // for B.
         let requested = fingerprint
+        let generation = identityGeneration
 
         // Labelled: an unqualified `break` inside the switch below would leave
         // only the switch and fall through to the user-record lookup, which
@@ -270,7 +285,8 @@ final class CredentialIdentityScope {
             if requested == nil {
                 switch await accountAvailabilityProvider() {
                 case .noAccount:
-                    guard fingerprintProvider() == nil, fingerprint == nil else { return }
+                    guard identityGeneration == generation,
+                          fingerprintProvider() == nil, fingerprint == nil else { return }
                     resolvedWithoutToken = true
                     state = .resolved(Self.localScope)
                     LoggingService.shared.info(
@@ -283,13 +299,14 @@ final class CredentialIdentityScope {
                 case .indeterminate:
                     guard resolutionAttempts < Self.maxResolutionAttempts else { break attempts }
                     await retryDelay(resolutionAttempts)
-                    guard fingerprint == requested else { return }
+                    guard identityGeneration == generation, fingerprint == requested else { return }
                     continue attempts
                 }
             }
 
             if let recordID = await resolveUserRecordID() {
-                guard fingerprintProvider() == requested, fingerprint == requested else {
+                guard identityGeneration == generation,
+                      fingerprintProvider() == requested, fingerprint == requested else {
                     LoggingService.shared.info(
                         "Discarding credential scope resolved for a previous Apple account",
                         category: .keychain
@@ -317,7 +334,7 @@ final class CredentialIdentityScope {
             guard resolutionAttempts < Self.maxResolutionAttempts else { break attempts }
 
             await retryDelay(resolutionAttempts)
-            guard fingerprint == requested else { return }
+            guard identityGeneration == generation, fingerprint == requested else { return }
         }
 
         // Every credential read is disabled until this succeeds, so failing
@@ -350,35 +367,24 @@ final class CredentialIdentityScope {
     /// never arrive. Without this check the scope would keep pointing at the
     /// previous account until relaunch — and its retained credentials with it.
     ///
-    /// Revalidation compares before replacing rather than invalidating first,
-    /// so the common case (nothing changed) never blanks out credentials.
+    /// The scope is dropped **before** the confirmation, not compared after it.
+    /// Holding it live across the awaits would serve the previous account's
+    /// credentials for the length of a CloudKit round trip — and indefinitely
+    /// when the account status comes back undetermined. The cost is that a
+    /// tokenless setup briefly reports "can't tell yet" on each activation,
+    /// which the tri-state UI already handles; the alternative trades a real
+    /// cross-account disclosure for that convenience.
     private func revalidateTokenlessScope() async {
         guard resolvedWithoutToken, fingerprintProvider() == nil else { return }
 
-        switch await accountAvailabilityProvider() {
-        case .noAccount:
-            guard current != Self.localScope else { return }
-            LoggingService.shared.info(
-                "Apple account signed out — credential scope falling back to local",
-                category: .keychain
-            )
-            resolvedWithoutToken = true
-            state = .resolved(Self.localScope)
+        state = .unresolved
+        resolvedWithoutToken = false
+        resolutionAttempts = 0
 
-        case .available:
-            guard let recordID = await resolveUserRecordID(), recordID != current else { return }
-            resolvedWithoutToken = true
-            LoggingService.shared.info(
-                "Apple account changed without a token change — credential scope re-pointed",
-                category: .keychain
-            )
-            state = .resolved(recordID)
-
-        case .indeterminate:
-            // Unreachable proves nothing, and invalidating on every transient
-            // network failure would make credentials flap. The scope stands.
-            break
-        }
+        // `resolve()` already encodes the whole decision: signed out scopes to
+        // local, signed in resolves the user record, undetermined stays
+        // unresolved and retries.
+        await resolve()
     }
 
     // MARK: - Cache
