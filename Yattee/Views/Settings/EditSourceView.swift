@@ -328,7 +328,7 @@ private struct EditRemoteServerContent: View {
         }
         #endif
         .onAppear {
-            isLoggedIn = appEnvironment?.credentialsManager(for: instance)?.isLoggedIn(for: instance) ?? false
+            isLoggedIn = appEnvironment?.isSignedIn(to: instance) ?? false
 
             // Load existing HTTP Basic Auth credentials (works for any instance type)
             if let credentials = appEnvironment?.basicAuthCredentialsManager.credentials(for: instance) {
@@ -386,12 +386,36 @@ private struct EditRemoteServerContent: View {
     private func storeLogin(credential: String, username: String, target: AccountLoginTarget) {
         guard let appEnvironment else { return }
 
+        // Credential storage refuses to write under an unresolved identity
+        // scope, so creating the account first would leave one with no
+        // credential — and in a namespace that is discarded the moment the real
+        // scope arrives. Fail visibly instead.
+        guard appEnvironment.credentialIdentityScope.isResolved else {
+            appEnvironment.toastManager.showError(
+                String(localized: "accounts.signIn.identityUnresolved")
+            )
+            return
+        }
+
         let account = target.account
             ?? appEnvironment.accountsManager.addAccount(instanceID: instance.id)
 
         guard let credentials = appEnvironment.accountCredentialsManager(for: account) else { return }
 
         credentials.setCredential(credential, for: account)
+
+        // Confirm the write landed before reporting success: a Keychain failure
+        // would otherwise leave an account that looks signed in but has nothing
+        // behind it.
+        guard credentials.credential(for: account) != nil else {
+            if target.account == nil {
+                appEnvironment.accountsManager.removeAccount(account.id)
+            }
+            appEnvironment.toastManager.showError(
+                String(localized: "accounts.signIn.storeFailed")
+            )
+            return
+        }
         if !username.isEmpty {
             credentials.setUsername(username, for: account)
         }

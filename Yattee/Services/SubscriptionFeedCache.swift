@@ -303,7 +303,7 @@ final class SubscriptionFeedCache {
             return nil
         }
         
-        guard let sid = appEnvironment.invidiousCredentialsManager.sid(for: instance) else {
+        guard let sid = appEnvironment.credential(forInstance: instance) else {
             LoggingService.shared.debug("No session ID found for Invidious instance: \(instance.id)", category: .general)
             return nil
         }
@@ -353,7 +353,7 @@ final class SubscriptionFeedCache {
 
         guard let instanceID = account.instanceID,
               let instance = appEnvironment.instancesManager.instances.first(where: { $0.id == instanceID }),
-              let authToken = appEnvironment.pipedCredentialsManager.credential(for: instance) else {
+              let authToken = appEnvironment.credential(forInstance: instance) else {
             LoggingService.shared.debug("No authenticated Piped instance found for subscription account", category: .general)
             return nil
         }

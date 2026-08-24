@@ -473,6 +473,36 @@ final class AppEnvironment {
         }
     }
 
+    /// The account whose credential should be used when talking to an instance.
+    ///
+    /// Prefers the account the user has selected as their context; otherwise any
+    /// signed-in account on that instance. Call sites that think in instances
+    /// rather than accounts — imports, feed fetches, browse — go through here
+    /// instead of the pre-revamp instance-keyed Keychain lookup, which a new
+    /// login no longer writes.
+    func account(forInstance instance: Instance) -> Account? {
+        if case let .account(id) = accountsManager.currentContext,
+           let account = accountsManager.account(id: id),
+           account.instanceID == instance.id {
+            return account
+        }
+
+        return accountsManager.accounts(forInstance: instance.id).first {
+            accountCredentialsManager(for: $0)?.isLoggedIn(for: $0) == true
+        }
+    }
+
+    /// The stored credential for an instance, resolved through its accounts.
+    func credential(forInstance instance: Instance) -> String? {
+        guard let account = account(forInstance: instance) else { return nil }
+        return accountCredentialsManager(for: account)?.credential(for: account)
+    }
+
+    /// Whether any account on this instance is signed in.
+    func isSignedIn(to instance: Instance) -> Bool {
+        credential(forInstance: instance) != nil
+    }
+
     /// Recomputes each account's status from the Keychain.
     ///
     /// Only ever reports `credentialMissing` versus `signedIn` — a rejected

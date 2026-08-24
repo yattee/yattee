@@ -153,6 +153,26 @@
         }
       }
     },
+    "accounts.signIn.identityUnresolved" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Waiting for iCloud. Try signing in again in a moment."
+          }
+        }
+      }
+    },
+    "accounts.signIn.storeFailed" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The login could not be saved to the Keychain."
+          }
+        }
+      }
+    },
     "accounts.signInOnThisDevice" : {
       "localizations" : {
         "en" : {

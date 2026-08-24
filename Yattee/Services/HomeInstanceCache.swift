@@ -118,7 +118,7 @@ final class HomeInstanceCache {
                 }
 
                 // Check if user is logged in
-                guard let credential = appEnvironment.credentialsManager(for: instance)?.credential(for: instance) else {
+                guard let credential = appEnvironment.credential(forInstance: instance) else {
                     LoggingService.shared.debug(
                         "HomeInstanceCache.refresh: No credential for \(instance.displayName), skipping feed",
                         category: .general

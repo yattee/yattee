@@ -214,7 +214,7 @@ struct ImportSubscriptionsView: View {
 
     private func loadSubscriptions() async {
         guard let appEnvironment,
-              let credential = appEnvironment.credentialsManager(for: instance)?.credential(for: instance) else {
+              let credential = appEnvironment.credential(forInstance: instance) else {
             error = ImportError.notLoggedIn
             isLoading = false
             return

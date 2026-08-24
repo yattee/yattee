@@ -262,7 +262,7 @@ struct ImportPlaylistsView: View {
 
     private func loadPlaylists() async {
         guard let appEnvironment,
-              let credential = appEnvironment.credentialsManager(for: instance)?.credential(for: instance) else {
+              let credential = appEnvironment.credential(forInstance: instance) else {
             error = ImportError.notLoggedIn
             isLoading = false
             return
@@ -326,7 +326,7 @@ struct ImportPlaylistsView: View {
 
     private func performImport(_ playlist: Playlist, into localPlaylist: LocalPlaylist) async {
         guard let appEnvironment,
-              let credential = appEnvironment.credentialsManager(for: instance)?.credential(for: instance) else {
+              let credential = appEnvironment.credential(forInstance: instance) else {
             return
         }
 

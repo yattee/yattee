@@ -99,6 +99,19 @@ final class CredentialIdentityScope {
         return nil
     }
 
+    /// Assigns `state` and announces a genuine change of scope.
+    ///
+    /// Everything namespaced by identity — the account list, its outbox, cached
+    /// per-account providers — has to be reloaded when this moves, or the
+    /// previous Apple Account's data stays on screen under the new one.
+    private func setState(_ newState: State) {
+        let previous = current
+        state = newState
+        guard current != previous else { return }
+
+        NotificationCenter.default.post(name: .credentialIdentityScopeDidChange, object: nil)
+    }
+
     var isResolved: Bool { current != nil }
 
     init(
@@ -180,7 +193,7 @@ final class CredentialIdentityScope {
         // to serve it would hand the previous account's credentials to the new
         // one.
         if resolvedWithoutToken {
-            state = .unresolved
+            setState(.unresolved)
             resolvedWithoutToken = false
         }
 
@@ -219,7 +232,7 @@ final class CredentialIdentityScope {
             // No iCloud entitlement: nothing can sync, and there is no ambient
             // identity for a retained credential to leak to.
             resolvedWithoutToken = false
-            state = .resolved(Self.localScope)
+            setState(.resolved(Self.localScope))
             return
         }
 
@@ -230,15 +243,15 @@ final class CredentialIdentityScope {
             // collapse two different signed-in Apple accounts into one
             // namespace, which is exactly the collision this class prevents.
             // CloudKit's account status settles it during resolution.
-            state = .unresolved
+            setState(.unresolved)
             return
         }
 
         if let cached = cachedScope(for: current) {
             resolvedWithoutToken = false
-            state = .resolved(cached)
+            setState(.resolved(cached))
         } else {
-            state = .unresolved
+            setState(.unresolved)
         }
     }
 
@@ -293,7 +306,7 @@ final class CredentialIdentityScope {
                     guard identityGeneration == generation,
                           fingerprintProvider() == nil, fingerprint == nil else { return }
                     resolvedWithoutToken = true
-                    state = .resolved(Self.localScope)
+                    setState(.resolved(Self.localScope))
                     LoggingService.shared.info(
                         "No Apple account — credentials scoped locally",
                         category: .keychain
@@ -326,7 +339,7 @@ final class CredentialIdentityScope {
                     cache(recordID, for: requested)
                 }
                 resolvedWithoutToken = requested == nil
-                state = .resolved(recordID)
+                setState(.resolved(recordID))
 
                 LoggingService.shared.info(
                     "Resolved credential identity scope",
@@ -382,7 +395,7 @@ final class CredentialIdentityScope {
     private func revalidateTokenlessScope() async {
         guard resolvedWithoutToken, fingerprintProvider() == nil else { return }
 
-        state = .unresolved
+        setState(.unresolved)
         resolvedWithoutToken = false
         resolutionAttempts = 0
 
@@ -403,4 +416,10 @@ final class CredentialIdentityScope {
         cache[fingerprint] = scope
         defaults.set(cache, forKey: Self.cacheKey)
     }
+}
+
+extension Notification.Name {
+    /// Posted when the resolved credential identity scope changes.
+    static let credentialIdentityScopeDidChange =
+        Notification.Name("stream.yattee.credentialIdentityScopeDidChange")
 }

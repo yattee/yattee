@@ -88,6 +88,16 @@ final class SubscriptionService {
 
     func setAccountsManager(_ manager: AccountsManager) {
         accountsManager = manager
+
+        // Providers cache another identity's subscriptions in memory, so they
+        // cannot outlive a change of Apple Account.
+        NotificationCenter.default.addObserver(
+            forName: .credentialIdentityScopeDidChange,
+            object: nil,
+            queue: .main
+        ) { [weak self] _ in
+            MainActor.assumeIsolated { self?.accountProviders.removeAll() }
+        }
     }
 
     // MARK: - Current Provider

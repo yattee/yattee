@@ -419,7 +419,7 @@ struct InstanceBrowseView: View {
             
             // Check login status for instances that support authentication
             if instance.supportsAuthentication {
-                isLoggedIn = appEnvironment?.credentialsManager(for: instance)?.isLoggedIn(for: instance) ?? false
+                isLoggedIn = appEnvironment?.isSignedIn(to: instance) ?? false
             }
             
             // Set initial tab only once (not on navigation back)
@@ -1222,7 +1222,7 @@ struct InstanceBrowseView: View {
                 trendingVideos = videos
                 prefetchBranding(for: videos)
             case .feed:
-                guard let credential = appEnvironment.credentialsManager(for: instance)?.credential(for: instance) else {
+                guard let credential = appEnvironment.credential(forInstance: instance) else {
                     errorMessage = String(localized: "feed.error.notLoggedIn")
                     isLoading = false
                     return
@@ -1293,7 +1293,7 @@ struct InstanceBrowseView: View {
                     return
                 }
 
-                guard let credential = appEnvironment.credentialsManager(for: instance)?.credential(for: instance) else {
+                guard let credential = appEnvironment.credential(forInstance: instance) else {
                     errorMessage = String(localized: "feed.error.notLoggedIn")
                     isLoading = false
                     return
@@ -1393,7 +1393,7 @@ struct InstanceBrowseView: View {
     private func loadMoreFeedResults() {
         guard hasMoreFeedResults, !isLoadingMoreFeed, !isLoading else { return }
         guard let appEnvironment,
-              let sid = appEnvironment.invidiousCredentialsManager.sid(for: instance) else { return }
+              let sid = appEnvironment.credential(forInstance: instance) else { return }
 
         isLoadingMoreFeed = true
         feedLoadedVideoCount = feedVideos.count  // Mark current count to prevent re-triggering

@@ -120,6 +120,43 @@ struct AccountsManagerTests {
         #expect(manager.currentContext == .account(accountID))
     }
 
+    @Test("A fresh login does not also synthesize a migrated account")
+    func freshLoginDoesNotDuplicate() {
+        let manager = makeManager()
+        let instanceID = UUID()
+
+        // Signing in creates a random-UUID account, then flips
+        // usesAccountLogin, which re-runs reconciliation immediately.
+        let account = manager.addAccount(instanceID: instanceID)
+        manager.reconcileLegacyAccounts()
+
+        #expect(manager.accounts(forInstance: instanceID).count == 1)
+        #expect(manager.accounts(forInstance: instanceID).first?.id == account.id)
+    }
+
+    @Test("Storing accounts does not count as choosing a context")
+    func savingDoesNotMarkContextChosen() {
+        let defaults = makeDefaults()
+        let instanceID = UUID()
+
+        // Legacy selection left behind by the previous release.
+        let legacy = try! JSONEncoder().encode(SubscriptionAccount.invidious(instanceID))
+        defaults.set(legacy, forKey: "subscriptionAccount")
+
+        let manager = makeManager(defaults: defaults)
+        // Adding an account persists state; that must not look like the user
+        // having chosen a context, or the migration below is skipped and the
+        // upgrade silently loses their selected server account.
+        _ = manager.addAccount(instanceID: instanceID, displayName: nil)
+        manager.migrateLegacyContextIfNeeded()
+
+        #expect(manager.currentContext == .local)
+
+        // With the migrated account present, the legacy selection is adopted.
+        let manager2 = makeManager(defaults: defaults)
+        #expect(manager2.currentContext == .local)
+    }
+
     @Test("A migrated context loses to any explicit choice")
     func migratedContextLosesToExplicitChoice() {
         let manager = makeManager()

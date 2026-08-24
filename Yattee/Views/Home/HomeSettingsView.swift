@@ -643,7 +643,7 @@ struct HomeSettingsView: View {
 
     private func isLoggedIn(_ instance: Instance) -> Bool {
         guard instance.supportsFeed else { return false }
-        return appEnvironment?.credentialsManager(for: instance)?.isLoggedIn(for: instance) ?? false
+        return appEnvironment?.isSignedIn(to: instance) ?? false
     }
 
     private func disabledReason(instance: Instance, contentType: InstanceContentType) -> String? {

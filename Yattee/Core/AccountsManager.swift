@@ -73,6 +73,16 @@ final class AccountsManager {
 
         load()
 
+        // A change of Apple Account changes which namespace this manager reads,
+        // so everything held in memory belongs to the previous one.
+        NotificationCenter.default.addObserver(
+            forName: .credentialIdentityScopeDidChange,
+            object: nil,
+            queue: .main
+        ) { [weak self] _ in
+            MainActor.assumeIsolated { self?.reloadForCurrentIdentity() }
+        }
+
         NotificationCenter.default.addObserver(
             forName: .instancesDidChange,
             object: nil,
@@ -139,6 +149,13 @@ final class AccountsManager {
         let account = Account(instanceID: instanceID, displayName: displayName)
         accounts.append(account)
         pendingUploads.insert(account.id)
+
+        // Signing in marks the instance migrated. Creating an account flips
+        // `usesAccountLogin`, which posts instancesDidChange and re-runs
+        // reconciliation immediately — without this the reconciliation would
+        // synthesize a second, credential-less account for the same instance.
+        migratedInstanceIDs.insert(instanceID)
+
         save()
         return account
     }
@@ -195,6 +212,7 @@ final class AccountsManager {
     /// Records an explicit user choice of context.
     func setContext(_ context: DataContext) {
         storedContext = StoredDataContext(context: context)
+        hasStoredContext = true
         save()
         NotificationCenter.default.post(name: .dataContextDidChange, object: nil)
     }
@@ -205,6 +223,7 @@ final class AccountsManager {
     func applySyncedContext(_ incoming: StoredDataContext) {
         guard incoming.changedAt > storedContext.changedAt else { return }
         storedContext = incoming
+        hasStoredContext = true
         save()
         NotificationCenter.default.post(name: .dataContextDidChange, object: nil)
     }
@@ -240,13 +259,18 @@ final class AccountsManager {
             guard instance.type.accountCapabilities.isSelectableContext else { continue }
             guard !migratedInstanceIDs.contains(instance.id) else { continue }
 
+            // Any account on this instance means its login is already
+            // represented — whether by an earlier migration or by a fresh
+            // sign-in. Synthesizing beside it would leave a credential-less
+            // duplicate.
+            guard accounts(forInstance: instance.id).isEmpty else {
+                migratedInstanceIDs.insert(instance.id)
+                didChange = true
+                continue
+            }
+
             migratedInstanceIDs.insert(instance.id)
             didChange = true
-
-            // Deterministic: the account reuses the instance UUID, so two
-            // devices migrating the same instance independently produce the
-            // identical record and merge instead of duplicating.
-            guard !accounts.contains(where: { $0.id == instance.id }) else { continue }
 
             let account = Account.migrated(from: instance.id, dateAdded: instance.dateAdded)
             accounts.append(account)
@@ -359,7 +383,6 @@ final class AccountsManager {
         }
         if let data = try? JSONEncoder().encode(storedContext) {
             defaults.set(data, forKey: key("context"))
-            hasStoredContext = true
         }
         defaults.set(migratedInstanceIDs.map(\.uuidString), forKey: key("migrated"))
         defaults.set(pendingUploads.map(\.uuidString), forKey: key("pendingUploads"))
