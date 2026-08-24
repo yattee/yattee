@@ -14,7 +14,7 @@ import Foundation
 final class LocalSubscriptionProvider: SubscriptionProvider {
     // MARK: - Properties
 
-    let accountType: SubscriptionAccountType = .local
+    let context: DataContext = .local
     private let dataManager: DataManager
 
     // MARK: - Initialization

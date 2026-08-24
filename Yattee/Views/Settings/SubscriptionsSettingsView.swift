@@ -201,7 +201,12 @@ struct SubscriptionsSettingsView: View {
     private func confirmAccountSwitch() {
         guard let newAccount = pendingAccountChange else { return }
 
+        // Both stores are written: the context is what the data layer reads,
+        // the legacy setting is kept in step until the Phase 3 switcher removes
+        // the last readers of it. Letting them diverge would show one account
+        // in the UI while serving another's data.
         settingsManager?.subscriptionAccount = newAccount
+        appEnvironment?.accountsManager.setContext(DataContext(legacy: newAccount))
         SubscriptionFeedCache.shared.handleAccountChange()
 
         // Trigger feed refresh in background
@@ -432,7 +437,7 @@ struct SubscriptionsSettingsView: View {
         if let cached = subscriptionService.cachedSubscriptionCount {
             accountSubscriptionCount = cached
         }
-        if subscriptionService.currentAccountType != .local {
+        if !subscriptionService.currentContext.isLocal {
             if let channels = try? await subscriptionService.fetchSubscriptions() {
                 accountSubscriptionCount = channels.count
             }

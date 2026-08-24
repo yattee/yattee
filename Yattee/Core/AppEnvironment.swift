@@ -175,6 +175,7 @@ final class AppEnvironment {
             invidiousAPI: invidiousAPI,
             pipedAPI: pipedAPI
         )
+        subscriptionService.setAccountsManager(accounts)
 
         // Initialize CloudKit Sync Engine
         let cloudKit = CloudKitSyncEngine(

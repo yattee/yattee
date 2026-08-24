@@ -15,11 +15,14 @@ import Foundation
 final class InvidiousSubscriptionProvider: SubscriptionProvider {
     // MARK: - Properties
 
-    let accountType: SubscriptionAccountType = .invidious
+    /// The account this provider is bound to. One provider per account, so two
+    /// logins on the same instance never share a subscription cache.
+    let account: Account
+    var context: DataContext { .account(account.id) }
 
     private let invidiousAPI: InvidiousAPI
     private let credentialsManager: InvidiousCredentialsManager
-    private let instancesManager: InstancesManager
+    private let accountsManager: AccountsManager
     private let settingsManager: SettingsManager
 
     /// In-memory cache of subscribed channel IDs for fast lookup.
@@ -34,14 +37,16 @@ final class InvidiousSubscriptionProvider: SubscriptionProvider {
     // MARK: - Initialization
 
     init(
+        account: Account,
         invidiousAPI: InvidiousAPI,
         credentialsManager: InvidiousCredentialsManager,
-        instancesManager: InstancesManager,
+        accountsManager: AccountsManager,
         settingsManager: SettingsManager
     ) {
+        self.account = account
         self.invidiousAPI = invidiousAPI
         self.credentialsManager = credentialsManager
-        self.instancesManager = instancesManager
+        self.accountsManager = accountsManager
         self.settingsManager = settingsManager
     }
 
@@ -117,24 +122,14 @@ final class InvidiousSubscriptionProvider: SubscriptionProvider {
 
     /// Gets the authenticated Invidious instance and session ID from account settings.
     private func getAuthenticatedInstance() async throws -> (Instance, String) {
-        // Get the instance ID from subscription account settings
-        let account = settingsManager.subscriptionAccount
-
-        let instance: Instance?
-        if let instanceID = account.instanceID {
-            // Use the specific instance from account settings
-            instance = instancesManager.instances.first { $0.id == instanceID && $0.isEnabled }
-        } else {
-            // Fallback to first enabled Invidious instance
-            instance = instancesManager.instances.first { $0.type == .invidious && $0.isEnabled }
-        }
-
-        guard let instance else {
+        // The account names its instance directly - no falling back to
+        // "some enabled Invidious instance", which could silently send one
+        // account's request to a server it has no credential for.
+        guard let instance = accountsManager.instance(for: account), instance.isEnabled else {
             throw SubscriptionProviderError.instanceNotConfigured
         }
 
-        // Get session ID
-        guard let sid = credentialsManager.sid(for: instance) else {
+        guard let sid = credentialsManager.credential(for: account) else {
             throw SubscriptionProviderError.notAuthenticated
         }
 

@@ -12,8 +12,12 @@ import Foundation
 /// Each provider implementation handles a specific subscription source.
 @MainActor
 protocol SubscriptionProvider: Sendable {
-    /// The type of subscription account this provider handles.
-    var accountType: SubscriptionAccountType { get }
+    /// The data context this provider serves.
+    ///
+    /// A context rather than a backend type: an instance can hold several
+    /// accounts, so "which Invidious" is no longer enough to identify a
+    /// provider — each account gets its own, with its own cache.
+    var context: DataContext { get }
 
     /// Fetches all subscriptions from the provider.
     /// - Returns: Array of channels the user is subscribed to.

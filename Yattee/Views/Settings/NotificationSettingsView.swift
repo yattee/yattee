@@ -258,7 +258,7 @@ struct ManageChannelNotificationsView: View {
         defer { isLoading = false }
 
         // For local account, load from DataManager
-        if appEnvironment.settingsManager.subscriptionAccount.type == .local {
+        if appEnvironment.accountsManager.currentContext.isLocal {
             subscriptions = appEnvironment.dataManager.subscriptions()
             return
         }

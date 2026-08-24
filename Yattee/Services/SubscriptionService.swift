@@ -47,8 +47,12 @@ final class SubscriptionService {
     // MARK: - Providers
 
     private var localProvider: LocalSubscriptionProvider?
-    private var invidiousProvider: InvidiousSubscriptionProvider?
-    private var pipedProvider: PipedSubscriptionProvider?
+
+    /// One provider per account, built on demand and kept so its in-memory
+    /// subscription cache survives context switches.
+    private var accountProviders: [UUID: any SubscriptionProvider] = [:]
+
+    private weak var accountsManager: AccountsManager?
 
     // MARK: - State
 
@@ -77,41 +81,77 @@ final class SubscriptionService {
         self.invidiousAPI = invidiousAPI
         self.pipedAPI = pipedAPI
 
-        // Initialize providers
+        // Account providers are built lazily: which accounts exist is not known
+        // until AccountsManager has loaded and iCloud has delivered instances.
         self.localProvider = LocalSubscriptionProvider(dataManager: dataManager)
-        self.invidiousProvider = InvidiousSubscriptionProvider(
-            invidiousAPI: invidiousAPI,
-            credentialsManager: invidiousCredentialsManager,
-            instancesManager: instancesManager,
-            settingsManager: settingsManager
-        )
-        self.pipedProvider = PipedSubscriptionProvider(
-            pipedAPI: pipedAPI,
-            credentialsManager: pipedCredentialsManager,
-            instancesManager: instancesManager,
-            settingsManager: settingsManager
-        )
+    }
+
+    func setAccountsManager(_ manager: AccountsManager) {
+        accountsManager = manager
     }
 
     // MARK: - Current Provider
 
-    /// Returns the current subscription provider based on the user's account setting.
-    var currentProvider: (any SubscriptionProvider)? {
-        let account = settingsManager.subscriptionAccount
-
-        switch account.type {
+    /// The provider for a context, built on first use.
+    ///
+    /// Returns nil for an account whose instance or backend cannot supply
+    /// subscriptions — a caller that gets nil must surface that rather than
+    /// quietly falling back to local data the user did not select.
+    func provider(for context: DataContext) -> (any SubscriptionProvider)? {
+        switch context {
         case .local:
             return localProvider
-        case .invidious:
-            return invidiousProvider
-        case .piped:
-            return pipedProvider
+
+        case let .account(id):
+            if let existing = accountProviders[id] { return existing }
+
+            guard let accountsManager,
+                  let account = accountsManager.account(id: id),
+                  let instance = accountsManager.instance(for: account),
+                  instance.type.accountCapabilities.supportsSubscriptions
+            else { return nil }
+
+            let provider: (any SubscriptionProvider)?
+            switch instance.type {
+            case .invidious:
+                provider = InvidiousSubscriptionProvider(
+                    account: account,
+                    invidiousAPI: invidiousAPI,
+                    credentialsManager: invidiousCredentialsManager,
+                    accountsManager: accountsManager,
+                    settingsManager: settingsManager
+                )
+            case .piped:
+                provider = PipedSubscriptionProvider(
+                    account: account,
+                    pipedAPI: pipedAPI,
+                    credentialsManager: pipedCredentialsManager,
+                    accountsManager: accountsManager,
+                    settingsManager: settingsManager
+                )
+            default:
+                provider = nil
+            }
+
+            accountProviders[id] = provider
+            return provider
         }
     }
 
-    /// The current subscription account type.
-    var currentAccountType: SubscriptionAccountType {
-        settingsManager.subscriptionAccount.type
+    /// Drops a removed account's provider so its cached subscriptions cannot be
+    /// served after the account is gone.
+    func discardProvider(for accountID: UUID) {
+        accountProviders[accountID] = nil
+    }
+
+    /// Returns the current subscription provider for the selected context.
+    var currentProvider: (any SubscriptionProvider)? {
+        provider(for: currentContext)
+    }
+
+    /// The selected context, or `.local` before accounts have loaded.
+    var currentContext: DataContext {
+        accountsManager?.currentContext ?? .local
     }
 
     /// Subscription count for the active account, when known without a network fetch.
@@ -137,7 +177,7 @@ final class SubscriptionService {
             try await provider.subscribe(to: channel)
             postChangeNotificationForServerAccount()
             LoggingService.shared.info(
-                "Subscribed to \(channel.name) via \(provider.accountType)",
+                "Subscribed to \(channel.name) via \(provider.context)",
                 category: .general
             )
         } catch {
@@ -183,7 +223,7 @@ final class SubscriptionService {
             try await provider.unsubscribe(from: channelID)
             postChangeNotificationForServerAccount()
             LoggingService.shared.info(
-                "Unsubscribed from \(channelID) via \(provider.accountType)",
+                "Unsubscribed from \(channelID) via \(provider.context)",
                 category: .general
             )
         } catch {
@@ -234,7 +274,7 @@ final class SubscriptionService {
     /// Synchronously fetches subscriptions for local provider.
     /// Returns nil if the current provider is not local (requires async fetch).
     func fetchSubscriptionsSync() -> [Channel]? {
-        guard currentAccountType == .local else {
+        guard currentContext.isLocal else {
             return nil
         }
 
@@ -276,7 +316,7 @@ final class SubscriptionService {
     /// Local accounts write to SwiftData; server accounts subscribe on the server,
     /// one channel at a time. Channels that are already subscribed are skipped.
     func importSubscriptions(_ channels: [(channelID: String, name: String)]) async -> (imported: Int, skipped: Int) {
-        guard currentAccountType != .local else {
+        guard !currentContext.isLocal else {
             return dataManager.importSubscriptionsFromExternal(channels)
         }
 
@@ -316,7 +356,7 @@ final class SubscriptionService {
     /// Posts a subscriptions-changed notification for server accounts.
     /// Local accounts already post it from DataManager with a change payload.
     private func postChangeNotificationForServerAccount() {
-        guard currentAccountType != .local else { return }
+        guard !currentContext.isLocal else { return }
         NotificationCenter.default.post(name: .subscriptionsDidChange, object: nil)
     }
 }

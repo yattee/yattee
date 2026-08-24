@@ -1315,7 +1315,7 @@ struct SubscriptionsView: View {
     private func loadSubscriptions() {
         // For local account, load from DataManager
         // For Invidious, subscriptions will be loaded async in loadSubscriptionsAsync
-        if appEnvironment?.settingsManager.subscriptionAccount.type == .local {
+        if appEnvironment?.accountsManager.currentContext.isLocal == true {
             subscriptions = dataManager?.subscriptions() ?? []
             subscriptionsLoaded = true
             sidebarExpected = subscriptions.count > 1
@@ -1333,7 +1333,7 @@ struct SubscriptionsView: View {
         guard let subscriptionService, let appEnvironment else { return }
 
         // For local account, just load from DataManager (fast)
-        if appEnvironment.settingsManager.subscriptionAccount.type == .local {
+        if appEnvironment.accountsManager.currentContext.isLocal {
             subscriptions = dataManager?.subscriptions() ?? []
             subscriptionsLoaded = true
             sidebarExpected = subscriptions.count > 1
