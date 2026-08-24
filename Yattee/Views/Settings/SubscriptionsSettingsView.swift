@@ -206,7 +206,9 @@ struct SubscriptionsSettingsView: View {
         // the last readers of it. Letting them diverge would show one account
         // in the UI while serving another's data.
         settingsManager?.subscriptionAccount = newAccount
-        appEnvironment?.accountsManager.setContext(DataContext(legacy: newAccount))
+        appEnvironment?.accountsManager.setContext(
+            appEnvironment?.accountsManager.context(forLegacyInstanceID: newAccount.instanceID) ?? .local
+        )
         SubscriptionFeedCache.shared.handleAccountChange()
 
         // Trigger feed refresh in background

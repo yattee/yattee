@@ -53,6 +53,7 @@ final class SubscriptionService {
     private var accountProviders: [UUID: any SubscriptionProvider] = [:]
 
     private weak var accountsManager: AccountsManager?
+    private weak var contextValidator: DataContextValidator?
 
     // MARK: - State
 
@@ -84,6 +85,10 @@ final class SubscriptionService {
         // Account providers are built lazily: which accounts exist is not known
         // until AccountsManager has loaded and iCloud has delivered instances.
         self.localProvider = LocalSubscriptionProvider(dataManager: dataManager)
+    }
+
+    func setContextValidator(_ validator: DataContextValidator) {
+        contextValidator = validator
     }
 
     func setAccountsManager(_ manager: AccountsManager) {
@@ -154,9 +159,23 @@ final class SubscriptionService {
         accountProviders[accountID] = nil
     }
 
-    /// Returns the current subscription provider for the selected context.
+    /// The provider for **writes**.
+    ///
+    /// Always the raw selected context, never the read fallback: a subscribe
+    /// must fail visibly when the account is unavailable rather than silently
+    /// landing in local data the user did not choose.
     var currentProvider: (any SubscriptionProvider)? {
         provider(for: currentContext)
+    }
+
+    /// The provider for **reads**.
+    ///
+    /// Uses the validator's effective context, which falls back to local while
+    /// the selected account is waiting on its instance or credential. The
+    /// fallback is not persisted, so the user's choice takes effect again on
+    /// its own once the account resolves.
+    var readProvider: (any SubscriptionProvider)? {
+        provider(for: contextValidator?.effectiveContext ?? currentContext)
     }
 
     /// The selected context, or `.local` before accounts have loaded.
@@ -167,7 +186,7 @@ final class SubscriptionService {
     /// Subscription count for the active account, when known without a network fetch.
     /// Always available for local accounts; nil for server accounts until their cache is populated.
     var cachedSubscriptionCount: Int? {
-        currentProvider?.cachedSubscriptionCount
+        readProvider?.cachedSubscriptionCount
     }
 
     // MARK: - Subscribe
@@ -254,7 +273,7 @@ final class SubscriptionService {
     /// - Parameter channelID: The channel ID to check.
     /// - Returns: `true` if subscribed, `false` otherwise.
     func isSubscribed(to channelID: String) async -> Bool {
-        guard let provider = currentProvider else {
+        guard let provider = readProvider else {
             return false
         }
         return await provider.isSubscribed(to: channelID)
@@ -263,7 +282,7 @@ final class SubscriptionService {
     /// Fetches all subscriptions from the current provider.
     /// - Returns: Array of subscribed channels.
     func fetchSubscriptions() async throws -> [Channel] {
-        guard let provider = currentProvider else {
+        guard let provider = readProvider else {
             throw SubscriptionError.providerNotAvailable
         }
 
@@ -284,7 +303,7 @@ final class SubscriptionService {
     /// Synchronously fetches subscriptions for local provider.
     /// Returns nil if the current provider is not local (requires async fetch).
     func fetchSubscriptionsSync() -> [Channel]? {
-        guard currentContext.isLocal else {
+        guard (contextValidator?.effectiveContext ?? currentContext).isLocal else {
             return nil
         }
 
@@ -303,7 +322,7 @@ final class SubscriptionService {
 
     /// Refreshes the subscription cache from the current provider.
     func refreshCache() async throws {
-        guard let provider = currentProvider else {
+        guard let provider = readProvider else {
             throw SubscriptionError.providerNotAvailable
         }
 

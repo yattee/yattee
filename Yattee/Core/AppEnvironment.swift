@@ -364,6 +364,24 @@ final class AppEnvironment {
         backfillCredentialFlags()
 
         dataContextValidator.setAppEnvironment(self)
+        subscriptionService.setContextValidator(dataContextValidator)
+
+        // Statuses are cleared whenever the identity namespace reloads, so they
+        // have to be recomputed once the new scope's Keychain is readable —
+        // otherwise a synced account shows "sign in required" until relaunch.
+        NotificationCenter.default.addObserver(
+            forName: .credentialIdentityScopeDidChange,
+            object: nil,
+            queue: .main
+        ) { [weak self] _ in
+            // Deferred rather than run inline: AccountsManager observes the same
+            // notification to reload its namespace and clear statuses, and
+            // relying on observer registration order to land after it would be
+            // silently fragile.
+            Task { @MainActor [weak self] in
+                self?.refreshAccountStatuses()
+            }
+        }
 
         // Turn any pre-revamp single-instance logins into accounts. Repeatable:
         // it runs again whenever instances arrive from iCloud.
@@ -490,6 +508,17 @@ final class AppEnvironment {
         return accountsManager.accounts(forInstance: instance.id).first {
             accountCredentialsManager(for: $0)?.isLoggedIn(for: $0) == true
         }
+    }
+
+    /// The selected context's account, when it lives on an instance of the
+    /// given type. Used by paths that still need to know which backend they are
+    /// talking to before they can build a request.
+    func account(forSelectedContext type: InstanceType) -> Account? {
+        guard case let .account(id) = accountsManager.currentContext,
+              let account = accountsManager.account(id: id),
+              accountsManager.instance(for: account)?.type == type
+        else { return nil }
+        return account
     }
 
     /// The stored credential for an instance, resolved through its accounts.

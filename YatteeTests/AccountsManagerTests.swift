@@ -157,6 +157,35 @@ struct AccountsManagerTests {
         #expect(manager2.currentContext == .local)
     }
 
+    @Test("A legacy instance selection resolves to a real account")
+    func legacySelectionResolvesToRealAccount() {
+        let manager = makeManager()
+        let instanceID = UUID()
+
+        // No account yet on that instance: nothing to select.
+        #expect(manager.context(forLegacyInstanceID: instanceID) == .local)
+
+        // A login created after the revamp has a random ID, so the legacy
+        // instance-ID-as-account-ID mapping would name something nonexistent.
+        let account = manager.addAccount(instanceID: instanceID)
+        #expect(account.id != instanceID)
+        #expect(manager.context(forLegacyInstanceID: instanceID) == .account(account.id))
+
+        #expect(manager.context(forLegacyInstanceID: nil) == .local)
+    }
+
+    @Test("A signed-in account is preferred when an instance holds several")
+    func legacySelectionPrefersSignedIn() {
+        let manager = makeManager()
+        let instanceID = UUID()
+
+        _ = manager.addAccount(instanceID: instanceID)
+        let second = manager.addAccount(instanceID: instanceID)
+        manager.setStatus(.signedIn, for: second.id)
+
+        #expect(manager.context(forLegacyInstanceID: instanceID) == .account(second.id))
+    }
+
     @Test("A migrated context loses to any explicit choice")
     func migratedContextLosesToExplicitChoice() {
         let manager = makeManager()

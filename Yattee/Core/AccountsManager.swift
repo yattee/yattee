@@ -209,6 +209,23 @@ final class AccountsManager {
 
     // MARK: - Context
 
+    /// Resolves a legacy instance-keyed selection onto a real account context.
+    ///
+    /// `DataContext(legacy:)` maps an instance UUID straight onto an account
+    /// UUID, which only holds for *migrated* accounts — those deliberately
+    /// reuse the instance UUID. A login created after the revamp has a random
+    /// ID, so the legacy mapping would name an account that does not exist.
+    func context(forLegacyInstanceID instanceID: UUID?) -> DataContext {
+        guard let instanceID else { return .local }
+
+        let candidates = accounts(forInstance: instanceID)
+        guard !candidates.isEmpty else { return .local }
+
+        // Prefer a signed-in account when the instance holds several.
+        let chosen = candidates.first { status(for: $0.id) == .signedIn } ?? candidates[0]
+        return .account(chosen.id)
+    }
+
     /// Records an explicit user choice of context.
     func setContext(_ context: DataContext) {
         storedContext = StoredDataContext(context: context)
