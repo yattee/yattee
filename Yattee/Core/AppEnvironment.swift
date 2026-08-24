@@ -51,10 +51,12 @@ final class AppEnvironment {
     /// Shared by both account credential managers so a single CloudKit lookup
     /// resolves the scope for all of them.
     let credentialIdentityScope: CredentialIdentityScope
+    let accountsManager: AccountsManager
     let homeInstanceCache: HomeInstanceCache
     let invidiousAPI: InvidiousAPI
     let pipedAPI: PipedAPI
     let subscriptionAccountValidator: SubscriptionAccountValidator
+    let dataContextValidator: DataContextValidator
     let playerControlsLayoutService: PlayerControlsLayoutService
     let legacyMigrationService: LegacyDataMigrationService
     let sourcesSettings: SourcesSettings
@@ -149,6 +151,11 @@ final class AppEnvironment {
         let pipedCreds = PipedCredentialsManager(identityScope: identityScope)
         pipedCreds.settingsManager = settings
         self.pipedCredentialsManager = pipedCreds
+
+        // Accounts share the credential identity namespace: the account list and
+        // the credentials it points at must always describe the same Apple account
+        let accounts = AccountsManager(identityScope: identityScope, instancesManager: instances)
+        self.accountsManager = accounts
 
         // Initialize Invidious API (used by SubscriptionService and SubscriptionFeedCache)
         let invidiousAPI = InvidiousAPI(httpClient: client)
@@ -302,6 +309,14 @@ final class AppEnvironment {
             feedCache: .shared
         )
 
+        // Validates the account-based data context. Unlike the validator above
+        // it never corrects a selection it merely cannot verify yet
+        self.dataContextValidator = DataContextValidator(
+            accountsManager: accounts,
+            instancesManager: instances,
+            toastManager: toast
+        )
+
         // Initialize Player Controls Layout Service
         let layoutService = PlayerControlsLayoutService()
         self.playerControlsLayoutService = layoutService
@@ -347,10 +362,29 @@ final class AppEnvironment {
         // existed, so existing setups publish them to iCloud without a re-login
         backfillCredentialFlags()
 
+        dataContextValidator.setAppEnvironment(self)
+
+        // Turn any pre-revamp single-instance logins into accounts. Repeatable:
+        // it runs again whenever instances arrive from iCloud.
+        accounts.reconcileLegacyAccounts()
+        accounts.migrateLegacyContextIfNeeded()
+        refreshAccountStatuses()
+
         // Resolve the credential identity scope if this Apple account has never
         // been seen on this device. Until it lands, account credentials report
         // "can't tell yet" rather than "signed out".
-        Task { await identityScope.resolve() }
+        Task {
+            let scopeBefore = identityScope.current
+            await identityScope.resolve()
+
+            // Accounts are stored per identity, so a scope that only just
+            // resolved (or moved) means the in-memory list is the wrong
+            // namespace's.
+            if identityScope.current != scopeBefore {
+                accounts.reloadForCurrentIdentity()
+            }
+            self.refreshAccountStatuses()
+        }
 
         // Log device capabilities on startup for debugging
         HardwareCapabilities.shared.logCapabilities()
@@ -423,6 +457,41 @@ final class AppEnvironment {
         }
 
         return false
+    }
+
+    // MARK: - Accounts
+
+    /// The account-keyed credentials manager for an account's instance.
+    /// `nil` when the instance is unknown or its type has no account concept.
+    func accountCredentialsManager(for account: Account) -> (any AccountCredentialsManager)? {
+        guard let instance = accountsManager.instance(for: account) else { return nil }
+        switch instance.type {
+        case .invidious: return invidiousCredentialsManager
+        case .piped: return pipedCredentialsManager
+        default: return nil
+        }
+    }
+
+    /// Recomputes each account's status from the Keychain.
+    ///
+    /// Only ever reports `credentialMissing` versus `signedIn` — a rejected
+    /// credential is something only the server can tell us, so that state is set
+    /// by the API layer when a request actually fails.
+    func refreshAccountStatuses() {
+        for account in accountsManager.accounts {
+            guard let credentials = accountCredentialsManager(for: account) else { continue }
+
+            // An unresolved identity scope means "cannot tell yet", not
+            // "signed out" — leave any known status alone rather than
+            // downgrading a working account to sign-in-required.
+            guard credentials.isScopeResolved else { continue }
+
+            credentials.refreshLoginStatus(for: account)
+            accountsManager.setStatus(
+                credentials.isLoggedIn(for: account) ? .signedIn : .credentialMissing,
+                for: account.id
+            )
+        }
     }
 
     // MARK: - Credentials Management

@@ -9,7 +9,13 @@ import SwiftUI
 
 struct InstanceLoginView: View {
     let instance: Instance
-    let onLoginSuccess: (String) -> Void
+    /// Receives the credential **and** the identifier the user signed in with.
+    ///
+    /// The identifier is handed back rather than stored here because it belongs
+    /// beside the credential in the Keychain, not in synced account metadata —
+    /// so only the caller, which knows which account this login is for, can
+    /// file it correctly.
+    let onLoginSuccess: (_ credential: String, _ username: String) -> Void
 
     @Environment(\.dismiss) private var dismiss
     @Environment(\.appEnvironment) private var appEnvironment
@@ -147,7 +153,7 @@ struct InstanceLoginView: View {
                 let credential = try await performLogin(appEnvironment: appEnvironment)
 
                 await MainActor.run {
-                    onLoginSuccess(credential)
+                    onLoginSuccess(credential, username)
                     dismiss()
                 }
             } catch APIError.unauthorized {
@@ -207,13 +213,13 @@ struct InstanceLoginView: View {
 #Preview("Invidious") {
     InstanceLoginView(
         instance: Instance(type: .invidious, url: URL(string: "https://invidious.example.com")!)
-    ) { _ in }
+    ) { _, _ in }
     .appEnvironment(.preview)
 }
 
 #Preview("Piped") {
     InstanceLoginView(
         instance: Instance(type: .piped, url: URL(string: "https://piped.example.com")!)
-    ) { _ in }
+    ) { _, _ in }
     .appEnvironment(.preview)
 }

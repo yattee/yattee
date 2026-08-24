@@ -143,6 +143,106 @@
     "1.2M subscribers" : {
 
     },
+    "accounts.addAccount" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Add Account"
+          }
+        }
+      }
+    },
+    "accounts.signInOnThisDevice" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sign In on This Device"
+          }
+        }
+      }
+    },
+    "accounts.status.credentialMissing" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sign in required"
+          }
+        }
+      }
+    },
+    "accounts.status.credentialRejected" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sign in again"
+          }
+        }
+      }
+    },
+    "accounts.status.instanceMissing" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Source missing"
+          }
+        }
+      }
+    },
+    "accounts.status.signedIn" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Signed in"
+          }
+        }
+      }
+    },
+    "accounts.status.unreachable" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Unreachable"
+          }
+        }
+      }
+    },
+    "accounts.useSavedLogin" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Use Saved Login From This Device"
+          }
+        }
+      }
+    },
+    "accounts.useSavedLogin.failed" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Could not use the saved login. Sign in again."
+          }
+        }
+      }
+    },
+    "accounts.useSavedLogin.footer" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "A login saved by an earlier version of Yattee is stored on this device. It cannot be confirmed to belong to the Apple Account currently signed in, so it is only used if you choose to."
+          }
+        }
+      }
+    },
     "alert.ambiguousLink.message %@" : {
       "localizations" : {
         "en" : {
@@ -5326,6 +5426,26 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Sign In"
+          }
+        }
+      }
+    },
+    "login.signInAgain" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sign In Again"
+          }
+        }
+      }
+    },
+    "login.signOutAndRemove" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sign Out & Remove"
           }
         }
       }

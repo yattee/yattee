@@ -44,8 +44,9 @@ private struct EditRemoteServerContent: View {
     /// "user cleared the fields" and delete the stored credentials on save.
     @State private var hadStoredBasicAuth: Bool = false
 
-    // Invidious login state
-    @State private var showLoginSheet = false
+    // Account login state. `loginTarget` is non-nil while the sheet is up and
+    // carries the account being signed into — nil inside it means "create one".
+    @State private var loginTarget: AccountLoginTarget?
     @State private var isLoggedIn = false
 
     // Yattee Server validation
@@ -196,35 +197,7 @@ private struct EditRemoteServerContent: View {
             }
 
             if instance.supportsAuthentication {
-                Section {
-                    if isLoggedIn {
-                        Button(role: .destructive) {
-                            logout()
-                        } label: {
-                            Label(String(localized: "login.logout"), systemImage: "rectangle.portrait.and.arrow.forward")
-                        }
-                        #if os(tvOS)
-                        .buttonStyle(TVSettingsButtonStyle())
-                        #endif
-                    } else {
-                        Button {
-                            showLoginSheet = true
-                        } label: {
-                            Label(String(localized: "login.loginToAccount"), systemImage: "person.badge.key")
-                        }
-                        #if os(tvOS)
-                        .buttonStyle(TVSettingsButtonStyle())
-                        #endif
-                    }
-                } header: {
-                    Text(String(localized: "login.header.account"))
-                } footer: {
-                    if isLoggedIn {
-                        Text(String(localized: "login.footer.loggedIn"))
-                    } else {
-                        Text(String(localized: "login.footer.loginBenefits"))
-                    }
-                }
+                InstanceAccountsSection(instance: instance, loginTarget: $loginTarget)
 
                 // Import section - show when logged in for Invidious and Piped instances
                 if isLoggedIn && (instance.type == .invidious || instance.type == .piped) {
@@ -342,19 +315,15 @@ private struct EditRemoteServerContent: View {
         }
         .presentationCompactAdaptation(.sheet)
         #if os(tvOS)
-        .fullScreenCover(isPresented: $showLoginSheet) {
-            InstanceLoginView(instance: instance) { credential in
-                appEnvironment?.credentialsManager(for: instance)?.setCredential(credential, for: instance)
-                appEnvironment?.instancesManager.setUsesAccountLogin(true, for: instance)
-                isLoggedIn = true
+        .fullScreenCover(item: $loginTarget) { target in
+            InstanceLoginView(instance: instance) { credential, username in
+                storeLogin(credential: credential, username: username, target: target)
             }
         }
         #else
-        .sheet(isPresented: $showLoginSheet) {
-            InstanceLoginView(instance: instance) { credential in
-                appEnvironment?.credentialsManager(for: instance)?.setCredential(credential, for: instance)
-                appEnvironment?.instancesManager.setUsesAccountLogin(true, for: instance)
-                isLoggedIn = true
+        .sheet(item: $loginTarget) { target in
+            InstanceLoginView(instance: instance) { credential, username in
+                storeLogin(credential: credential, username: username, target: target)
             }
         }
         #endif
@@ -409,10 +378,27 @@ private struct EditRemoteServerContent: View {
 
     // MARK: - Actions
 
-    private func logout() {
-        appEnvironment?.credentialsManager(for: instance)?.deleteCredential(for: instance)
-        appEnvironment?.instancesManager.setUsesAccountLogin(false, for: instance)
-        isLoggedIn = false
+    /// Files a successful login against an account, creating one if this was a
+    /// fresh sign-in.
+    ///
+    /// The identifier is stored beside the credential in the Keychain rather
+    /// than on the account record, so it never travels as synced metadata.
+    private func storeLogin(credential: String, username: String, target: AccountLoginTarget) {
+        guard let appEnvironment else { return }
+
+        let account = target.account
+            ?? appEnvironment.accountsManager.addAccount(instanceID: instance.id)
+
+        guard let credentials = appEnvironment.accountCredentialsManager(for: account) else { return }
+
+        credentials.setCredential(credential, for: account)
+        if !username.isEmpty {
+            credentials.setUsername(username, for: account)
+        }
+
+        appEnvironment.accountsManager.setStatus(.signedIn, for: account.id)
+        appEnvironment.instancesManager.setUsesAccountLogin(true, for: instance)
+        isLoggedIn = true
     }
 
     private func loadServerInfo() async {
