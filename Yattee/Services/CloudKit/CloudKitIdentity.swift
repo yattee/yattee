@@ -32,12 +32,22 @@ enum CloudKitIdentity {
     /// carries no account information — it only supports equality comparison
     /// against a previously persisted fingerprint.
     static var ubiquityFingerprint: String? {
-        guard let token = FileManager.default.ubiquityIdentityToken,
-              let data = try? NSKeyedArchiver.archivedData(
-                  withRootObject: token,
-                  requiringSecureCoding: true
-              )
-        else { return nil }
+        guard let token = FileManager.default.ubiquityIdentityToken else { return nil }
+
+        // The token is only guaranteed to be `NSCoding` — Foundation types it
+        // as `NSCoding & NSCopying & NSObjectProtocol`, with no
+        // `NSSecureCoding`. Archiving with `requiringSecureCoding: true` would
+        // therefore throw on a conforming implementation, and a `try?` there
+        // would silently yield nil: the scope would lose its cache, forcing a
+        // CloudKit lookup on every launch and leaving credentials unavailable
+        // offline. Secure coding buys nothing here regardless — the archive is
+        // only ever hashed, never decoded.
+        let archiver = NSKeyedArchiver(requiringSecureCoding: false)
+        archiver.encode(token, forKey: NSKeyedArchiveRootObjectKey)
+        archiver.finishEncoding()
+
+        let data = archiver.encodedData
+        guard !data.isEmpty else { return nil }
 
         return shortDigest(of: data)
     }

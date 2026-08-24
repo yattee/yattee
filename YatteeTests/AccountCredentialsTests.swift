@@ -664,6 +664,35 @@ struct CredentialIdentityScopeTests {
         #expect(scope.current == "_recordB")
     }
 
+    @Test("An account change restores the retry budget")
+    func identityChangeResetsAttemptBudget() async {
+        let harness = Harness()
+        harness.fingerprint = nil
+        harness.availability = .available
+        harness.tokenlessRecord = "_recordA"
+        harness.failuresRemaining = 99 // exhaust every attempt for this identity
+
+        let scope = CredentialIdentityScope(
+            defaults: makeDefaults(),
+            fingerprintProvider: { harness.fingerprint },
+            resolveUserRecordID: { await harness.resolve() },
+            accountAvailabilityProvider: { harness.availability },
+            retryDelay: { _ in }
+        )
+
+        await scope.resolve()
+        #expect(scope.current == nil)
+
+        // A different account signs in. Its lookup must not inherit an
+        // exhausted budget and give up without trying.
+        harness.failuresRemaining = 0
+        harness.tokenlessRecord = "_recordB"
+        scope.identityDidChange(source: "test")
+        await scope.resolve()
+
+        #expect(scope.current == "_recordB")
+    }
+
     @Test("An undeterminable account status leaves the scope unresolved")
     func indeterminateStatusStaysUnresolved() async {
         let harness = Harness()

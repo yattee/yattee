@@ -169,6 +169,12 @@ final class CredentialIdentityScope {
         // generation are refused even when the fingerprint looks unchanged.
         identityGeneration += 1
 
+        // The budget belongs to the identity being resolved, so it resets on
+        // every change — not only the tokenless branch below. A previous
+        // identity that exhausted its attempts would otherwise leave the new
+        // one with none, and its queued resolve() would do no work at all.
+        resolutionAttempts = 0
+
         // A tokenless scope cannot be re-derived by `adoptCurrentIdentity()`
         // (there is no fingerprint to compare), so drop it outright: continuing
         // to serve it would hand the previous account's credentials to the new
@@ -176,7 +182,6 @@ final class CredentialIdentityScope {
         if resolvedWithoutToken {
             state = .unresolved
             resolvedWithoutToken = false
-            resolutionAttempts = 0
         }
 
         adoptCurrentIdentity()
