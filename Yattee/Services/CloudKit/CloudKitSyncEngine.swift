@@ -1428,10 +1428,17 @@ final class CloudKitSyncEngine: @unchecked Sendable {
         // Clear local sync state so CKSyncEngine fetches everything fresh
         UserDefaults.standard.removeObject(forKey: syncStateKey)
 
+        // Keep queued local changes: Sync Now refreshes the fetch cursor, not
+        // the user's unsent edits.
+        let pendingChanges = Self.pendingChangesForRefresh(
+            engineChanges: syncEngine?.state.pendingRecordZoneChanges ?? [],
+            bufferedChanges: pendingChangesBuffer
+        )
+
         // Tear down existing engine
         debounceTimer?.invalidate()
         debounceTimer = nil
-        pendingChangesBuffer.removeAll()
+        pendingChangesBuffer = pendingChanges
         conflictResolvedRecords.removeAll()
         retryCount.removeAll()
         syncEngine = nil
@@ -1442,6 +1449,13 @@ final class CloudKitSyncEngine: @unchecked Sendable {
         await setupSyncEngine()
 
         LoggingService.shared.logCloudKit("Refresh sync completed")
+    }
+
+    static func pendingChangesForRefresh(
+        engineChanges: [CKSyncEngine.PendingRecordZoneChange],
+        bufferedChanges: [CKSyncEngine.PendingRecordZoneChange]
+    ) -> [CKSyncEngine.PendingRecordZoneChange] {
+        engineChanges + bufferedChanges
     }
 
     /// Clear all sync state and reset. For testing/debugging only.
