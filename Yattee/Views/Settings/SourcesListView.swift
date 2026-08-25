@@ -584,8 +584,8 @@ struct SourcesListView: View {
     // MARK: - Actions
 
     private func confirmDelete() {
-        if let instance = pendingDeleteInstance, let manager = instancesManager {
-            manager.remove(instance)
+        if let instance = pendingDeleteInstance {
+            appEnvironment?.removeInstance(instance)
             pendingDeleteInstance = nil
         }
 

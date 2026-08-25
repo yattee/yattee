@@ -779,7 +779,11 @@ struct UnifiedPlaylistDetailView: View {
             // Check if this is an Invidious user playlist (IVPL prefix) that requires authentication
             let isInvidiousUserPlaylist = playlistID.playlistID.hasPrefix("IVPL")
             let isInvidiousInstance = resolvedInstance.type == .invidious
-            let sid = appEnvironment.invidiousCredentialsManager.sid(for: resolvedInstance)
+            // Resolved through the account, not the instance: a login created
+            // after the revamp only ever writes an account-scoped credential,
+            // so the instance-keyed lookup would miss it and fall through to
+            // the public endpoint — which cannot see a private playlist.
+            let sid = appEnvironment.credential(forInstance: resolvedInstance)
 
             if isInvidiousUserPlaylist && isInvidiousInstance, let sid {
                 // Use authenticated endpoint for Invidious user playlists (including private ones)

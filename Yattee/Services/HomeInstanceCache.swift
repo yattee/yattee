@@ -176,6 +176,32 @@ final class HomeInstanceCache {
     }
 
     /// Clears all cached content for a specific instance.
+    /// Drops every cached feed, on every instance.
+    ///
+    /// Feeds are the one content type here that is private to a login, and the
+    /// cache key names only the instance — two accounts on the same instance,
+    /// or the same instance ID retained across a change of Apple account, would
+    /// otherwise be served each other's. Popular and trending are public and
+    /// stay.
+    func clearAllFeeds() {
+        let keysToRemove = cache.keys.filter { $0.hasSuffix("_\(InstanceContentType.feed.rawValue)") }
+        guard !keysToRemove.isEmpty else { return }
+
+        for key in keysToRemove {
+            cache.removeValue(forKey: key)
+            lastUpdated.removeValue(forKey: key)
+        }
+
+        LoggingService.shared.debug(
+            "HomeInstanceCache.clearAllFeeds: Cleared \(keysToRemove.count) cached feeds",
+            category: .general
+        )
+
+        Task {
+            await saveToDisk()
+        }
+    }
+
     func clearAllForInstance(_ instanceID: UUID) {
         let keysToRemove = cache.keys.filter { $0.hasPrefix(instanceID.uuidString) }
         for key in keysToRemove {

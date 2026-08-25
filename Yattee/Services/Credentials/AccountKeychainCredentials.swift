@@ -107,19 +107,22 @@ final class AccountKeychainCredentials {
     }
 
     func deleteCredential(for account: Account) {
+        deleteCredential(forAccountID: account.id)
+        HomeInstanceCache.shared.clear(instanceID: account.instanceID, contentType: .feed)
+    }
+
+    func deleteCredential(forAccountID accountID: UUID) {
         guard let scope = currentScope() else { return }
 
-        store.delete(key: KeychainCredentialStore.credentialKey(scope: scope, accountID: account.id))
-        store.delete(key: KeychainCredentialStore.usernameKey(scope: scope, accountID: account.id))
-        loginsByScope[scope]?.remove(account.id)
+        store.delete(key: KeychainCredentialStore.credentialKey(scope: scope, accountID: accountID))
+        store.delete(key: KeychainCredentialStore.usernameKey(scope: scope, accountID: accountID))
+        loginsByScope[scope]?.remove(accountID)
 
         LoggingService.shared.info(
             "Deleted \(credentialNoun)",
             category: .keychain,
-            details: "accountID=\(account.id)"
+            details: "accountID=\(accountID)"
         )
-
-        HomeInstanceCache.shared.clear(instanceID: account.instanceID, contentType: .feed)
     }
 
     // MARK: - Username

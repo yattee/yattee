@@ -32,6 +32,15 @@ protocol AccountCredentialsManager: AnyObject, Observable {
     func credential(for account: Account) -> String?
     func deleteCredential(for account: Account)
 
+    /// Deletes the credential and stored login identifier for an account this
+    /// device may know nothing else about.
+    ///
+    /// A deletion can reach this device before the account it deletes does —
+    /// the tombstone and the account are separate records, and iCloud Keychain
+    /// runs on its own timeline. The secret must go regardless, and the scoped
+    /// key needs only the account's ID.
+    func deleteCredential(forAccountID accountID: UUID)
+
     /// The login identifier the user typed. Kept in the Keychain beside the
     /// credential so it never enters synced metadata.
     func setUsername(_ username: String, for account: Account)

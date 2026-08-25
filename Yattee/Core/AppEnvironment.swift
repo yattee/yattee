@@ -70,6 +70,9 @@ final class AppEnvironment {
     @ObservationIgnored private var controlsSettingsObservers: [NSObjectProtocol] = []
     @ObservationIgnored private var contextMirrorObservers: [NSObjectProtocol] = []
 
+    /// The context the account-scoped caches currently hold data for.
+    @ObservationIgnored private var lastMirroredContext: DataContext = .local
+
     // MARK: - Shared Instance
 
     /// The single, process-wide app environment.
@@ -390,6 +393,10 @@ final class AppEnvironment {
         // naming an account that has not synced yet cannot be mapped onto the
         // legacy shape, and this is what restores the mapping once it can be
         // made rather than leaving that moment permanent.
+        // Seeded with what is on screen now, so launching does not look like a
+        // change and throw away caches that are still the right ones.
+        lastMirroredContext = accounts.currentContext
+
         for name: Notification.Name in [.dataContextDidChange, .accountsDidChange] {
             contextMirrorObservers.append(
                 NotificationCenter.default.addObserver(forName: name, object: nil, queue: .main) { [weak self] _ in
@@ -401,8 +408,21 @@ final class AppEnvironment {
         // A deletion that arrives from another device takes the credential with
         // it. Only a deletion does this — an account merely missing from a
         // fetch keeps everything, because a fetch is not an enumeration.
-        accountSync.onAccountDeleted = { [weak self] account in
+        accountSync.onAccountDeleted = { [weak self] accountID, account in
             guard let self else { return }
+
+            guard let account else {
+                // No metadata for this account here, so its backend is unknown
+                // and the right credential manager cannot be picked. The scoped
+                // key is the account ID either way, so both are asked to drop
+                // it; at most one of them holds anything. The unscoped legacy
+                // item is left alone — deleting it needs the instance, and its
+                // ownership check is bound to one.
+                self.invidiousCredentialsManager.deleteCredential(forAccountID: accountID)
+                self.pipedCredentialsManager.deleteCredential(forAccountID: accountID)
+                return
+            }
+
             let credentials = self.accountCredentialsManager(for: account)
             credentials?.deleteCredential(for: account)
             credentials?.deleteLegacyCredentialIfOwned(for: account)
@@ -424,11 +444,11 @@ final class AppEnvironment {
                 guard let self else { return }
                 self.refreshAccountStatuses()
 
-                // The feed cache is not keyed by account, so whatever it holds
-                // belongs to the Apple account that just went away. Cleared
-                // unconditionally: unlike a context change, there is no state
-                // here worth keeping across identities.
-                SubscriptionFeedCache.shared.handleAccountChange()
+                // Cleared unconditionally, because the identity moving means
+                // everything cached belongs to the Apple account that just went
+                // away — even when the new namespace happens to select the same
+                // context and the change comparison would find nothing.
+                self.clearAccountScopedCaches()
                 self.mirrorContextToLegacySelection(resetWhenUnresolvable: true)
             }
         }
@@ -544,9 +564,20 @@ final class AppEnvironment {
     ///   previous identity's selection is worse than losing a mapping, and the
     ///   correct value returns as soon as the new namespace's accounts arrive.
     private func mirrorContextToLegacySelection(resetWhenUnresolvable: Bool = false) {
+        let context = accountsManager.currentContext
+
+        // Cached data is invalidated on the *context*, not on the legacy value
+        // it maps to: two logins on the same instance collapse onto the same
+        // legacy selection, so comparing that would let one account's private
+        // feed stay on screen after switching to the other.
+        if context != lastMirroredContext {
+            lastMirroredContext = context
+            clearAccountScopedCaches()
+        }
+
         let legacy: SubscriptionAccount
 
-        switch accountsManager.currentContext {
+        switch context {
         case .local:
             legacy = .local
 
@@ -554,7 +585,8 @@ final class AppEnvironment {
             // An account whose instance has not arrived yet cannot be mapped
             // onto the legacy shape. Leaving the old value alone is right: the
             // context is preserved, and the validator reports it unavailable
-            // rather than pointing the UI at something else.
+            // rather than pointing the UI at something else. A later arrival
+            // runs this again and restores the mapping.
             guard let account = accountsManager.account(id: id),
                   let instance = accountsManager.instance(for: account) else {
                 if resetWhenUnresolvable, settingsManager.subscriptionAccount != .local {
@@ -573,12 +605,21 @@ final class AppEnvironment {
         guard settingsManager.subscriptionAccount != legacy else { return }
 
         settingsManager.subscriptionAccount = legacy
-        SubscriptionFeedCache.shared.handleAccountChange()
 
         LoggingService.shared.info(
-            "Data context changed — cleared the feed cache and updated the legacy selection",
+            "Data context changed — updated the legacy subscription selection",
             category: .general
         )
+    }
+
+    /// Drops everything cached for whichever account was being shown.
+    ///
+    /// Neither cache is keyed by account: the subscriptions feed is a single
+    /// global list, and home feeds are keyed by instance alone. Both would
+    /// otherwise keep serving one login's private videos to another.
+    private func clearAccountScopedCaches() {
+        SubscriptionFeedCache.shared.handleAccountChange()
+        HomeInstanceCache.shared.clearAllFeeds()
     }
 
     /// Deletes an instance together with the accounts that live on it.

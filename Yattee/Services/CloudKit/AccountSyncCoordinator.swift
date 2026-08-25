@@ -58,7 +58,13 @@ final class AccountSyncCoordinator {
 
     /// Called when an account is deleted anywhere, so its credential and stored
     /// login identifier go with it.
-    var onAccountDeleted: (@MainActor (Account) -> Void)?
+    ///
+    /// The account is `nil` when this device never had its metadata — a
+    /// tombstone and the account it kills are separate records, and a fresh
+    /// device can meet the tombstone first. The credential may still have
+    /// arrived on its own through iCloud Keychain, so the ID alone has to be
+    /// enough to remove it.
+    var onAccountDeleted: (@MainActor (UUID, Account?) -> Void)?
 
     // MARK: - Identity
 
@@ -372,8 +378,7 @@ final class AccountSyncCoordinator {
     }
 
     private func cleanUpCredentials(for account: Account?, accountID: UUID) {
-        guard let account else { return }
-        onAccountDeleted?(account)
+        onAccountDeleted?(accountID, account)
         LoggingService.shared.logCloudKit("Removed deleted account from iCloud: \(accountID)")
     }
 

@@ -285,6 +285,10 @@ extension InvidiousCredentialsManager: AccountCredentialsManager {
         accountCredentials.deleteCredential(for: account)
     }
 
+    func deleteCredential(forAccountID accountID: UUID) {
+        accountCredentials.deleteCredential(forAccountID: accountID)
+    }
+
     func setUsername(_ username: String, for account: Account) {
         accountCredentials.setUsername(username, for: account)
     }
