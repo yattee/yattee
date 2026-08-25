@@ -21,6 +21,10 @@ final class SubscriptionAccountValidator {
     private let pipedCredentialsManager: PipedCredentialsManager
     private let toastManager: ToastManager
     private let feedCache: SubscriptionFeedCache
+    /// Availability is decided by accounts now: a login created after the
+    /// revamp writes only an account-scoped Keychain key, so the instance-keyed
+    /// check this validator used would never see it.
+    private weak var accountsManager: AccountsManager?
 
     // MARK: - Observation State
 
@@ -44,6 +48,17 @@ final class SubscriptionAccountValidator {
         self.feedCache = feedCache
 
         startObserving()
+    }
+
+    func setAccountsManager(_ manager: AccountsManager) {
+        accountsManager = manager
+    }
+
+    /// Whether any account on this instance is usable.
+    private func hasSignedInAccount(for instance: Instance) -> Bool {
+        guard let accountsManager else { return false }
+        return accountsManager.accounts(forInstance: instance.id)
+            .contains { accountsManager.status(for: $0.id) == .signedIn }
     }
 
     /// Stops observation. Call before releasing the validator.
@@ -71,7 +86,7 @@ final class SubscriptionAccountValidator {
         for instance in instancesManager.instances {
             if instance.type == .invidious &&
                instance.isEnabled &&
-               invidiousCredentialsManager.isLoggedIn(for: instance) {
+               hasSignedInAccount(for: instance) {
                 accounts.append(.invidious(instance.id))
             }
         }
@@ -80,7 +95,7 @@ final class SubscriptionAccountValidator {
         for instance in instancesManager.instances {
             if instance.type == .piped &&
                instance.isEnabled &&
-               pipedCredentialsManager.isLoggedIn(for: instance) {
+               hasSignedInAccount(for: instance) {
                 accounts.append(.piped(instance.id))
             }
         }

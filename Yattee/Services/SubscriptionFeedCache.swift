@@ -229,8 +229,12 @@ final class SubscriptionFeedCache {
             return
         }
 
-        let accountType = appEnvironment.settingsManager.subscriptionAccount.type
-        LoggingService.shared.debug("Starting feed refresh for account type: \(accountType)", category: .general)
+        // The *effective* context, so an account still waiting on its instance
+        // or credential falls back to local rather than reporting
+        // notAuthenticated while the subscriptions list already shows local data.
+        let context = appEnvironment.dataContextValidator.effectiveContext
+        let backend = appEnvironment.feedBackend(for: context)
+        LoggingService.shared.debug("Starting feed refresh for \(backend)", category: .general)
 
         // Use a detached task to prevent SwiftUI from cancelling the request
         // when @State properties change during the refresh operation.
@@ -238,7 +242,7 @@ final class SubscriptionFeedCache {
         // before feedCache.refresh() completes, which can cause SwiftUI to
         // cancel the parent task.
         await Task.detached { @MainActor in
-            switch accountType {
+            switch backend {
             case .local:
                 await self.refreshLocalAccount(using: appEnvironment)
             case .invidious:
@@ -284,12 +288,18 @@ final class SubscriptionFeedCache {
 
     /// Gets the authenticated Invidious instance and session ID.
     private func getInvidiousAuth(using appEnvironment: AppEnvironment) -> (Instance, String)? {
-        // Get the instance ID from subscription account settings
-        let account = appEnvironment.settingsManager.subscriptionAccount
-        
+        // Resolve through the selected account so a second login on the same
+        // instance uses its own credential.
+        if let account = appEnvironment.account(forSelectedContext: .invidious),
+           let instance = appEnvironment.accountsManager.instance(for: account),
+           let sid = appEnvironment.accountCredentialsManager(for: account)?.credential(for: account) {
+            return (instance, sid)
+        }
+
+        let legacyAccount = appEnvironment.settingsManager.subscriptionAccount
+
         let instance: Instance?
-        if let instanceID = account.instanceID {
-            // Use the specific instance from account settings
+        if let instanceID = legacyAccount.instanceID {
             instance = appEnvironment.instancesManager.instances.first { $0.id == instanceID }
         } else {
             // Fall back to first enabled Invidious instance
@@ -349,9 +359,15 @@ final class SubscriptionFeedCache {
 
     /// Gets the authenticated Piped instance and auth token.
     private func getPipedAuth(using appEnvironment: AppEnvironment) -> (Instance, String)? {
-        let account = appEnvironment.settingsManager.subscriptionAccount
+        if let account = appEnvironment.account(forSelectedContext: .piped),
+           let instance = appEnvironment.accountsManager.instance(for: account),
+           let token = appEnvironment.accountCredentialsManager(for: account)?.credential(for: account) {
+            return (instance, token)
+        }
 
-        guard let instanceID = account.instanceID,
+        let legacyAccount = appEnvironment.settingsManager.subscriptionAccount
+
+        guard let instanceID = legacyAccount.instanceID,
               let instance = appEnvironment.instancesManager.instances.first(where: { $0.id == instanceID }),
               let authToken = appEnvironment.credential(forInstance: instance) else {
             LoggingService.shared.debug("No authenticated Piped instance found for subscription account", category: .general)
@@ -414,7 +430,8 @@ final class SubscriptionFeedCache {
     func loadMoreInvidiousFeed(using appEnvironment: AppEnvironment) async {
         guard !isLoading else { return }
         guard hasMorePages else { return }
-        guard appEnvironment.settingsManager.subscriptionAccount.type == .invidious else { return }
+        guard appEnvironment.feedBackend(for: appEnvironment.dataContextValidator.effectiveContext) == .invidious
+        else { return }
 
         guard let (instance, sid) = getInvidiousAuth(using: appEnvironment) else {
             return

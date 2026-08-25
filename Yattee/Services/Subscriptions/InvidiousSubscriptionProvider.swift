@@ -23,6 +23,26 @@ final class InvidiousSubscriptionProvider: SubscriptionProvider {
     private let invidiousAPI: InvidiousAPI
     private let credentialsManager: InvidiousCredentialsManager
     private let accountsManager: AccountsManager
+
+    /// Records the outcome of a server call against the account.
+    ///
+    /// Deliberately conservative: a raw 401 marks the credential rejected only
+    /// when no reverse-proxy basic auth is configured, because otherwise the
+    /// 401 may well have come from the proxy rather than the account. The
+    /// two-stage probe that disambiguates the remaining case is Phase 2 work;
+    /// until then an ambiguous failure leaves the status untouched rather than
+    /// wrongly telling the user to sign in again.
+    private func recordOutcome(_ error: Error?) {
+        guard let error else {
+            accountsManager.setStatus(.signedIn, for: account.id)
+            return
+        }
+
+        guard case APIError.unauthorized = error else { return }
+        guard accountsManager.instance(for: account)?.usesBasicAuth == false else { return }
+
+        accountsManager.setStatus(.credentialRejected, for: account.id)
+    }
     private let settingsManager: SettingsManager
 
     /// In-memory cache of subscribed channel IDs for fast lookup.
@@ -56,7 +76,9 @@ final class InvidiousSubscriptionProvider: SubscriptionProvider {
         let (instance, sid) = try await getAuthenticatedInstance()
         
         // Fetch subscriptions from Invidious
-        let subscriptions = try await invidiousAPI.subscriptions(instance: instance, sid: sid)
+        let subscriptions = try await tracking {
+            try await invidiousAPI.subscriptions(instance: instance, sid: sid)
+        }
         
         // Update in-memory cache
         cachedChannelIDs = Set(subscriptions.map(\.authorId))
@@ -72,7 +94,9 @@ final class InvidiousSubscriptionProvider: SubscriptionProvider {
         let (instance, sid) = try await getAuthenticatedInstance()
         
         // Subscribe on Invidious server
-        try await invidiousAPI.subscribe(to: channel.id.channelID, instance: instance, sid: sid)
+        try await tracking {
+            try await invidiousAPI.subscribe(to: channel.id.channelID, instance: instance, sid: sid)
+        }
         
         // Update in-memory cache only
         cachedChannelIDs.insert(channel.id.channelID)
@@ -121,6 +145,18 @@ final class InvidiousSubscriptionProvider: SubscriptionProvider {
     // MARK: - Private Helpers
 
     /// Gets the authenticated Invidious instance and session ID from account settings.
+    /// Runs a server call and records what it implies about the credential.
+    private func tracking<T>(_ operation: () async throws -> T) async rethrows -> T {
+        do {
+            let value = try await operation()
+            recordOutcome(nil)
+            return value
+        } catch {
+            recordOutcome(error)
+            throw error
+        }
+    }
+
     private func getAuthenticatedInstance() async throws -> (Instance, String) {
         // The account names its instance directly - no falling back to
         // "some enabled Invidious instance", which could silently send one

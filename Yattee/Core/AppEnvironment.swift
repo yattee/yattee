@@ -365,6 +365,7 @@ final class AppEnvironment {
 
         dataContextValidator.setAppEnvironment(self)
         subscriptionService.setContextValidator(dataContextValidator)
+        subscriptionAccountValidator.setAccountsManager(accounts)
 
         // Statuses are cleared whenever the identity namespace reloads, so they
         // have to be recomputed once the new scope's Keychain is readable —
@@ -507,6 +508,25 @@ final class AppEnvironment {
 
         return accountsManager.accounts(forInstance: instance.id).first {
             accountCredentialsManager(for: $0)?.isLoggedIn(for: $0) == true
+        }
+    }
+
+    /// Which feed implementation a context needs.
+    ///
+    /// `.local` covers both the local data set and any account whose instance
+    /// or type cannot supply a feed — those fall back rather than failing.
+    enum FeedBackend { case local, invidious, piped }
+
+    func feedBackend(for context: DataContext) -> FeedBackend {
+        guard case let .account(id) = context,
+              let account = accountsManager.account(id: id),
+              let instance = accountsManager.instance(for: account)
+        else { return .local }
+
+        switch instance.type {
+        case .invidious: return .invidious
+        case .piped: return .piped
+        default: return .local
         }
     }
 

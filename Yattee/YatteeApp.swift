@@ -292,6 +292,9 @@ struct YatteeApp: App {
                 // launched offline) - account credentials stay unavailable until it does
                 Task {
                     await appEnvironment.credentialIdentityScope.resolveIfNeeded()
+                    // A credential can arrive over iCloud Keychain without the
+                    // scope moving, so statuses are recomputed unconditionally.
+                    appEnvironment.refreshAccountStatuses()
                 }
 
                 // Validate subscription account (auto-correct if invalid)
@@ -345,6 +348,9 @@ struct YatteeApp: App {
                 // launched offline) - account credentials stay unavailable until it does
                 Task {
                     await appEnvironment.credentialIdentityScope.resolveIfNeeded()
+                    // A credential can arrive over iCloud Keychain without the
+                    // scope moving, so statuses are recomputed unconditionally.
+                    appEnvironment.refreshAccountStatuses()
                 }
 
                 // Validate subscription account (auto-correct if invalid)
