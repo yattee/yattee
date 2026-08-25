@@ -68,7 +68,7 @@ final class AppEnvironment {
     private(set) var activeControlsCenterSettings: CenterSectionSettings = .default
 
     @ObservationIgnored private var controlsSettingsObservers: [NSObjectProtocol] = []
-    @ObservationIgnored private var contextMirrorObserver: NSObjectProtocol?
+    @ObservationIgnored private var contextMirrorObservers: [NSObjectProtocol] = []
 
     // MARK: - Shared Instance
 
@@ -385,12 +385,17 @@ final class AppEnvironment {
         // setting several views still read has to follow it, and the feed cache
         // is global rather than account-keyed, so it would otherwise keep
         // serving the previous account's videos.
-        contextMirrorObserver = NotificationCenter.default.addObserver(
-            forName: .dataContextDidChange,
-            object: nil,
-            queue: .main
-        ) { [weak self] _ in
-            MainActor.assumeIsolated { self?.mirrorContextToLegacySelection() }
+        //
+        // Accounts arriving is a second trigger, not a redundant one: a context
+        // naming an account that has not synced yet cannot be mapped onto the
+        // legacy shape, and this is what restores the mapping once it can be
+        // made rather than leaving that moment permanent.
+        for name: Notification.Name in [.dataContextDidChange, .accountsDidChange] {
+            contextMirrorObservers.append(
+                NotificationCenter.default.addObserver(forName: name, object: nil, queue: .main) { [weak self] _ in
+                    MainActor.assumeIsolated { self?.mirrorContextToLegacySelection() }
+                }
+            )
         }
 
         // A deletion that arrives from another device takes the credential with
@@ -416,7 +421,15 @@ final class AppEnvironment {
             // relying on observer registration order to land after it would be
             // silently fragile.
             Task { @MainActor [weak self] in
-                self?.refreshAccountStatuses()
+                guard let self else { return }
+                self.refreshAccountStatuses()
+
+                // The feed cache is not keyed by account, so whatever it holds
+                // belongs to the Apple account that just went away. Cleared
+                // unconditionally: unlike a context change, there is no state
+                // here worth keeping across identities.
+                SubscriptionFeedCache.shared.handleAccountChange()
+                self.mirrorContextToLegacySelection(resetWhenUnresolvable: true)
             }
         }
 
@@ -525,7 +538,12 @@ final class AppEnvironment {
     /// selection synced from another device, or the selected account being
     /// deleted there. Phase 3's switcher removes the last readers of the legacy
     /// setting and this mirror with them.
-    private func mirrorContextToLegacySelection() {
+    /// - Parameter resetWhenUnresolvable: whether a context that cannot be
+    ///   mapped should fall back to `.local` instead of leaving the previous
+    ///   value in place. True only when the Apple account changed: keeping the
+    ///   previous identity's selection is worse than losing a mapping, and the
+    ///   correct value returns as soon as the new namespace's accounts arrive.
+    private func mirrorContextToLegacySelection(resetWhenUnresolvable: Bool = false) {
         let legacy: SubscriptionAccount
 
         switch accountsManager.currentContext {
@@ -538,7 +556,12 @@ final class AppEnvironment {
             // context is preserved, and the validator reports it unavailable
             // rather than pointing the UI at something else.
             guard let account = accountsManager.account(id: id),
-                  let instance = accountsManager.instance(for: account) else { return }
+                  let instance = accountsManager.instance(for: account) else {
+                if resetWhenUnresolvable, settingsManager.subscriptionAccount != .local {
+                    settingsManager.subscriptionAccount = .local
+                }
+                return
+            }
 
             switch instance.type {
             case .invidious: legacy = .invidious(instance.id)

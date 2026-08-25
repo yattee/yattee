@@ -127,6 +127,24 @@ final class SubscriptionAccountValidator {
             return
         }
 
+        // A selection whose account still exists is never corrected here. This
+        // validator predates account-scoped credentials and reads "not signed
+        // in" as "not available", which is now routinely temporary — an
+        // unresolved identity scope, or a credential iCloud Keychain has yet to
+        // deliver. Correcting on that would silently discard the user's choice
+        // and desynchronize this setting from the data context, which is
+        // preserved. Only a deletion removes an account, and that path corrects
+        // the context and this setting together.
+        if let instanceID = settingsManager.subscriptionAccount.instanceID,
+           let accountsManager,
+           !accountsManager.accounts(forInstance: instanceID).isEmpty {
+            LoggingService.shared.debug(
+                "Leaving the subscription account alone — its login has not been removed",
+                category: .general
+            )
+            return
+        }
+
         let previousAccount = settingsManager.subscriptionAccount
 
         // Find first available account to switch to

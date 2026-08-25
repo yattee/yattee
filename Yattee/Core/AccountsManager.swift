@@ -207,8 +207,11 @@ final class AccountsManager {
     func removeAccount(_ accountID: UUID) {
         guard account(id: accountID) != nil else { return }
 
-        forgetAccount(accountID)
+        // Queued before anything else can persist: a crash in between would
+        // otherwise leave the account deleted here with no tombstone owed to
+        // the server, and every other device would keep — or recreate — it.
         pendingDeletions.insert(accountID)
+        forgetAccount(accountID)
 
         save()
 
@@ -232,8 +235,22 @@ final class AccountsManager {
         // A deletion the app can point at is one of the few things allowed to
         // correct the context.
         if storedContext.context == .account(accountID) {
-            setContext(.local)
+            correctContextAfterDeletion()
         }
+    }
+
+    /// Repairs a context left pointing at an account that is gone.
+    ///
+    /// Deliberately not a new choice: it keeps the timestamp of the selection
+    /// it replaces and is never published. Stamping it "now" would let an
+    /// automatic fallback outrank a deliberate choice another device made
+    /// between the deletion and this device hearing about it — and publishing
+    /// it would push that fallback over their choice. Every device that sees
+    /// the deletion performs the same repair, so they converge without anyone
+    /// writing anything.
+    private func correctContextAfterDeletion() {
+        storedContext = StoredDataContext(context: .local, changedAt: storedContext.changedAt)
+        NotificationCenter.default.post(name: .dataContextDidChange, object: nil)
     }
 
     /// Marks a deletion as confirmed by the server. Until then it stays in the
@@ -366,8 +383,8 @@ final class AccountsManager {
     @discardableResult
     func applyRemoteAccountDeletionEvent(_ accountID: UUID) -> Account? {
         let removed = account(id: accountID)
-        forgetAccount(accountID)
         pendingDeletions.insert(accountID)
+        forgetAccount(accountID)
         save()
 
         NotificationCenter.default.post(name: .accountsDidChange, object: nil)
@@ -649,6 +666,10 @@ final class AccountsManager {
         reconcileLegacyAccounts()
 
         NotificationCenter.default.post(name: .accountsDidChange, object: nil)
+        // The context belongs to the namespace too, so this reload replaced it.
+        // Anything keyed to the selection — the legacy setting, the feed cache —
+        // would otherwise keep serving the previous Apple account's data.
+        NotificationCenter.default.post(name: .dataContextDidChange, object: nil)
     }
 }
 

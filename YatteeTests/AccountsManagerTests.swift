@@ -186,6 +186,50 @@ struct AccountsManagerTests {
         #expect(manager.context(forLegacyInstanceID: instanceID) == .account(second.id))
     }
 
+    @Test("Correcting away from a deleted account never outranks a real choice")
+    func deletionCorrectionIsNotAChoice() {
+        let manager = makeManager()
+        let account = manager.addAccount(instanceID: UUID())
+
+        manager.setContext(.account(account.id))
+        let chosenAt = manager.storedContext.changedAt
+        manager.confirmContextUpload(changedAt: chosenAt)
+
+        manager.removeAccount(account.id)
+        #expect(manager.currentContext == .local)
+
+        // Another device picked something else between the deletion and this
+        // device hearing about it. Timestamping the fallback "now" would sink
+        // that choice — and publishing it would push the fallback over it.
+        #expect(manager.storedContext.changedAt == chosenAt)
+        #expect(!manager.pendingContextUpload)
+
+        let elsewhere = StoredDataContext(
+            context: .account(UUID()),
+            changedAt: chosenAt.addingTimeInterval(1)
+        )
+        #expect(!manager.applySyncedContext(elsewhere))
+        #expect(manager.currentContext == elsewhere.context)
+    }
+
+    @Test("A deletion is queued before anything else can persist")
+    func deletionOutboxIsQueuedFirst() {
+        let defaults = makeDefaults()
+        let manager = makeManager(defaults: defaults)
+        let account = manager.addAccount(instanceID: UUID())
+        manager.setContext(.account(account.id))
+
+        manager.removeAccount(account.id)
+
+        // Deleting the *selected* account also corrects the context, and every
+        // step of that writes storage. A crash before the tombstone was owed
+        // would leave the account gone here and alive everywhere else.
+        let relaunched = makeManager(defaults: defaults)
+        #expect(relaunched.pendingDeletions.contains(account.id))
+        #expect(relaunched.isDeleted(account.id))
+        #expect(relaunched.currentContext == .local)
+    }
+
     @Test("A migrated context loses to any explicit choice")
     func migratedContextLosesToExplicitChoice() {
         let manager = makeManager()

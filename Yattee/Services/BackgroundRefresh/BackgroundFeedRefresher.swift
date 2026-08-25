@@ -41,10 +41,12 @@ final class BackgroundFeedRefresher {
             return
         }
 
-        // Route on the selected data context. An account context resolves its
-        // own instance, so a second login on the same instance refreshes the
-        // right user's feed.
-        switch appEnvironment.accountsManager.currentContext {
+        // Route on the *effective* context. An account context resolves its own
+        // instance, so a second login on the same instance refreshes the right
+        // user's feed — but an account whose instance is switched off or whose
+        // credential has not arrived falls back to local rather than sending
+        // background requests to a server the user is not currently using.
+        switch appEnvironment.dataContextValidator.effectiveContext {
         case .local:
             await performLocalAccountRefresh()
         case let .account(id):
