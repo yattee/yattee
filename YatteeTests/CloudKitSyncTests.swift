@@ -13,6 +13,29 @@ import Testing
 @Suite("CloudKit Sync")
 struct CloudKitSyncTests {
 
+    @Test("Sync refresh keeps pending record-zone changes")
+    @MainActor
+    func refreshPreservesPendingChanges() {
+        let zone = CKRecordZone(zoneName: RecordType.zoneName)
+        let recordID = CKRecord.ID(recordName: "watch-video@global:youtube", zoneID: zone.zoneID)
+        let changes = CloudKitSyncEngine.pendingChangesForRefresh(
+            engineChanges: [.saveRecord(recordID)],
+            bufferedChanges: [.deleteRecord(CKRecord.ID(recordName: "bookmark-video@global:youtube", zoneID: zone.zoneID))]
+        )
+
+        #expect(changes.count == 2)
+        if case .saveRecord(let restoredID) = changes[0] {
+            #expect(restoredID == recordID)
+        } else {
+            Issue.record("Expected the pending save to survive refresh")
+        }
+        if case .deleteRecord = changes[1] {
+            // Expected: startup-buffered deletions survive too.
+        } else {
+            Issue.record("Expected the buffered deletion to survive refresh")
+        }
+    }
+
     @MainActor
     private static func makeMapper() -> CloudKitRecordMapper {
         CloudKitRecordMapper(zone: CKRecordZone(zoneName: RecordType.zoneName))
