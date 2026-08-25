@@ -329,7 +329,74 @@ actor CloudKitConflictResolver {
             resolved["updatedAt"] = local["updatedAt"]
             resolved["layoutJSON"] = local["layoutJSON"]
         }
-        
+
         return resolved
+    }
+
+    // MARK: - Account Conflict Resolution
+
+    /// Resolves a conflict between local and server account records.
+    ///
+    /// Strategy:
+    /// - Last write wins on the app-managed `updatedAt`, never on CloudKit's
+    ///   modification date: an edit made offline has to stay orderable against
+    ///   a concurrent edit elsewhere, and a migrated account carries an
+    ///   epoch-old date precisely so any real edit outranks it.
+    /// - `instanceID` and `dateAdded` are immutable identity, taken from
+    ///   whichever side wins only so a malformed record cannot strip them.
+    func resolveAccountConflict(
+        local: CKRecord,
+        server: CKRecord
+    ) -> CKRecord {
+        let localUpdated = (local["updatedAt"] as? Date) ?? Date.distantPast
+        let serverUpdated = (server["updatedAt"] as? Date) ?? Date.distantPast
+
+        // IMPORTANT: Always start with server record to preserve recordChangeTag
+        let resolved = server
+
+        if localUpdated > serverUpdated {
+            resolved["displayName"] = local["displayName"]
+            resolved["updatedAt"] = local["updatedAt"]
+        }
+
+        return resolved
+    }
+
+    // MARK: - DataContext Conflict Resolution
+
+    /// Resolves a conflict between local and server data-context records.
+    ///
+    /// Strategy: last write wins on the app-managed `changedAt` — the moment
+    /// the user chose, not the moment a record happened to be written.
+    func resolveDataContextConflict(
+        local: CKRecord,
+        server: CKRecord
+    ) -> CKRecord {
+        let localChanged = (local["changedAt"] as? Date) ?? Date.distantPast
+        let serverChanged = (server["changedAt"] as? Date) ?? Date.distantPast
+
+        let resolved = server
+
+        if localChanged > serverChanged {
+            resolved["contextKind"] = local["contextKind"]
+            resolved["accountID"] = local["accountID"]
+            resolved["changedAt"] = local["changedAt"]
+        }
+
+        return resolved
+    }
+
+    // MARK: - Write-Once Conflict Resolution
+
+    /// Resolves a conflict on a record that only ever means "this happened":
+    /// the legacy-migration markers and the account deletion tombstones.
+    ///
+    /// There is no state to merge — both sides assert the same fact — so the
+    /// server's copy is kept, which also preserves its change tag.
+    func resolveWriteOnceConflict(
+        local _: CKRecord,
+        server: CKRecord
+    ) -> CKRecord {
+        server
     }
 }

@@ -225,6 +225,11 @@ final class CloudKitSyncEngine: @unchecked Sendable {
     /// Player controls layout service for importing/removing presets from CloudKit.
     /// Set after initialization to use shared instance instead of creating new ones.
     weak var playerControlsLayoutService: PlayerControlsLayoutService?
+
+    /// Drives the account category: accounts, migration markers, deletion
+    /// tombstones and the selected data context. Set after initialization, and
+    /// nil in tests that only exercise the SwiftData categories.
+    var accountSync: AccountSyncCoordinator?
     
     // MARK: - Initialization
     
@@ -303,6 +308,10 @@ final class CloudKitSyncEngine: @unchecked Sendable {
         conflictResolvedRecords.removeAll()
         retryCount.removeAll()
         deferredPlaylistItems.removeAll()
+        // The account outbox, staging and bootstrap flag are deliberately left
+        // alone: they are the durable record of what still has to happen, and
+        // re-enabling sync must resume rather than start over.
+        accountSync?.detach()
         syncEngine = nil
         updatePendingCount()
         isSyncing = false
@@ -385,6 +394,15 @@ final class CloudKitSyncEngine: @unchecked Sendable {
                 engine.state.add(pendingRecordZoneChanges: pendingChangesBuffer)
                 pendingChangesBuffer.removeAll()
             }
+
+            // Accounts activate before the first sync: the bootstrap fetch has
+            // to complete before anything is uploaded, or a device upgrading
+            // from the previous release would publish its unmerged local list
+            // over records it has not seen yet.
+            accountSync?.attach(database: database) { [weak self] changes in
+                self?.addPendingChanges(changes)
+            }
+            await accountSync?.activate()
 
             if accountChanged {
                 LoggingService.shared.logCloudKit("CloudKit sync engine initialized with new account (fresh sync state)")
@@ -559,6 +577,12 @@ final class CloudKitSyncEngine: @unchecked Sendable {
     /// Whether controls presets sync is enabled (master toggle + settings category toggle).
     private var canSyncControlsPresets: Bool {
         isSyncEnabled && (settingsManager?.syncSettings ?? true)
+    }
+
+    /// Whether account sync is enabled. Accounts ride the instances category:
+    /// they describe logins on those instances, and the two are useless apart.
+    var canSyncAccounts: Bool {
+        isSyncEnabled && (settingsManager?.syncInstances ?? true)
     }
     
     /// Manually trigger a full sync.
@@ -1534,7 +1558,20 @@ final class CloudKitSyncEngine: @unchecked Sendable {
     }
     
     // MARK: - Initial Upload Coordination
-    
+
+    /// Re-registers every account record for upload.
+    ///
+    /// Used when the zone is being seeded or reseeded — enabling sync, or
+    /// recreating the zone after it was deleted elsewhere. The account outbox
+    /// normally tracks only what changed, which is not enough when the server
+    /// has nothing at all.
+    func uploadAllAccounts() {
+        guard canSyncAccounts else { return }
+        uploadProgress?.currentCategory = "Accounts"
+        accountSync?.uploadEverything()
+    }
+
+
     /// Performs full initial upload of all local data with progress tracking
     func performInitialUpload() async {
         guard isSyncEnabled else { return }
@@ -1555,7 +1592,8 @@ final class CloudKitSyncEngine: @unchecked Sendable {
         await uploadAllRecentPlaylists()
         await uploadAllLocalChannelNotificationSettings()
         await uploadAllLocalControlsPresets()
-        
+        uploadAllAccounts()
+
         // Mark complete
         uploadProgress = UploadProgress(
             currentCategory: "Complete",
@@ -1650,6 +1688,12 @@ extension CloudKitSyncEngine: CKSyncEngineDelegate {
         case .fetchedDatabaseChanges(let changes):
             await handleFetchedDatabaseChanges(changes)
 
+        case .didFetchRecordZoneChanges(let changes):
+            // The zone's own result — not didFetchChanges, which carries only
+            // the fetch context and fires after failed zone fetches too — is
+            // what tells staged account records they may be applied.
+            await accountSync?.zoneFetchCompleted(zoneID: changes.zoneID, error: changes.error)
+
         default:
             await MainActor.run {
                 switch event {
@@ -1674,7 +1718,7 @@ extension CloudKitSyncEngine: CKSyncEngineDelegate {
                     LoggingService.shared.logCloudKit("CKSyncEngine finished fetching changes")
                     isReceivingChanges = false
 
-                case .willFetchRecordZoneChanges, .didFetchRecordZoneChanges, .willSendChanges, .didSendChanges, .sentDatabaseChanges:
+                case .willFetchRecordZoneChanges, .willSendChanges, .didSendChanges, .sentDatabaseChanges:
                     break
 
                 default:
@@ -1767,6 +1811,12 @@ extension CloudKitSyncEngine: CKSyncEngineDelegate {
     /// matched on the full scoped record name (a mismatch means it belongs to
     /// a different source scope).
     private func materializeRecord(named recordName: String) async -> CKRecord? {
+        // Accounts are not SwiftData models and are built from the accounts
+        // store, which also decides whether a record may be sent yet.
+        if AccountRecordName.isAccountCategory(recordName) {
+            return accountSync?.recordToSave(named: recordName)
+        }
+
         guard let dataManager else { return nil }
 
         if recordName.hasPrefix("sub-") {
@@ -1849,6 +1899,10 @@ extension CloudKitSyncEngine: CKSyncEngineDelegate {
             retryCount.removeValue(forKey: recordName)
         }
 
+        // Clears the account outbox and releases whatever its ordering held
+        // back. Only a confirmation does this — never the attempt.
+        accountSync?.didSave(records: changes.savedRecords)
+
         for failedSave in changes.failedRecordSaves {
             await handleFailedRecordSave(failedSave)
         }
@@ -1902,6 +1956,15 @@ extension CloudKitSyncEngine: CKSyncEngineDelegate {
             // Record vanished server-side while we held its change tag —
             // drop the cached record and retry as a fresh insert.
             conflictResolvedRecords.removeValue(forKey: recordName)
+
+            // Unless a deletion tombstone dominates it. Reinserting an account
+            // another device deleted is exactly how a queued offline edit
+            // resurrects it.
+            if let accountSync, !accountSync.shouldRetryAsInsert(recordName: recordName) {
+                LoggingService.shared.logCloudKit("Record \(recordName) is deleted, not reinserting")
+                return
+            }
+
             syncEngine?.state.add(pendingRecordZoneChanges: [.saveRecord(recordID)])
             LoggingService.shared.logCloudKit("Record \(recordName) missing on server, retrying as insert")
 
@@ -1966,6 +2029,10 @@ extension CloudKitSyncEngine: CKSyncEngineDelegate {
             return await conflictResolver.resolveRecentPlaylistConflict(local: local, server: server)
         case RecordType.controlsPreset:
             return await conflictResolver.resolveLayoutPresetConflict(local: local, server: server)
+        case RecordType.account, RecordType.dataContext,
+             RecordType.legacyAccountMigration, RecordType.accountDeletion:
+            guard let accountSync else { return server }
+            return await accountSync.resolveConflict(local: local, server: server)
         default:
             // Unknown type - use server version (safe fallback)
             LoggingService.shared.logCloudKit("Unknown record type \(server.recordType), using server version")
@@ -2002,6 +2069,15 @@ extension CloudKitSyncEngine: CKSyncEngineDelegate {
 
     /// Handle fetched changes from CloudKit.
     private func handleFetchedChanges(_ changes: CKSyncEngine.Event.FetchedRecordZoneChanges) async {
+        // Staged first, and before any early return: the engine may persist its
+        // change token after this event, so anything not written down here is
+        // gone for good. Account records are never applied inline — they are
+        // applied as a set, tombstones first, once the zone fetch succeeds.
+        accountSync?.stageFetched(
+            records: changes.modifications.map(\.record),
+            deletions: changes.deletions.map(\.recordID)
+        )
+
         guard let dataManager else { return }
 
         // Load persisted deferred items from previous sessions
@@ -2012,6 +2088,7 @@ extension CloudKitSyncEngine: CKSyncEngineDelegate {
 
         // Apply modifications - process all incoming records
         for modification in changes.modifications {
+            guard !RecordType.accountCategory.contains(modification.record.recordType) else { continue }
             let result = await applyRemoteRecord(modification.record, to: dataManager)
             if case .deferred(let playlistID, let itemID) = result {
                 newlyDeferredItems.append((modification.record, playlistID, itemID))
@@ -2047,6 +2124,7 @@ extension CloudKitSyncEngine: CKSyncEngineDelegate {
 
         // Apply deletions
         for deletion in changes.deletions {
+            guard !AccountRecordName.isAccountCategory(deletion.recordID.recordName) else { continue }
             await applyRemoteDeletion(deletion.recordID, to: dataManager)
         }
 

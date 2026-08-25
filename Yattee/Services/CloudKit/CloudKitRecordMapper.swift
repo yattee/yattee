@@ -894,4 +894,220 @@ final class CloudKitRecordMapper {
             layout: layout
         )
     }
+
+    // MARK: - Account Mapping
+
+    /// Converts an `Account` to a CKRecord.
+    ///
+    /// The login identifier is deliberately absent: it lives in the Keychain
+    /// beside the credential, so synced metadata never names a user.
+    func toCKRecord(account: Account) -> CKRecord {
+        let recordID = SyncableRecordType.account(id: account.id).recordID(in: zone)
+        let record = CKRecord(recordType: RecordType.account, recordID: recordID)
+
+        record["schemaVersion"] = currentSchemaVersion as CKRecordValue
+        record["accountID"] = account.id.uuidString as CKRecordValue
+        record["instanceID"] = account.instanceID.uuidString as CKRecordValue
+        record["displayName"] = account.displayName as CKRecordValue?
+        record["dateAdded"] = account.dateAdded as CKRecordValue
+        record["updatedAt"] = account.updatedAt as CKRecordValue
+
+        return record
+    }
+
+    /// Creates an `Account` from a CKRecord.
+    func toAccount(from record: CKRecord) throws -> Account {
+        let recordType = RecordType.account
+        guard record.recordType == recordType else {
+            throw CloudKitError.recordNotFound
+        }
+
+        let version = (record["schemaVersion"] as? Int64) ?? 1
+        guard version <= currentSchemaVersion else {
+            throw CloudKitError.unsupportedSchemaVersion(version: version, recordType: recordType)
+        }
+
+        guard let accountIDString = record["accountID"] as? String else {
+            throw CloudKitError.missingRequiredField(field: "accountID", recordType: recordType)
+        }
+        guard let accountID = UUID(uuidString: accountIDString) else {
+            throw CloudKitError.typeMismatch(field: "accountID", recordType: recordType, expected: "valid UUID string")
+        }
+        guard let instanceIDString = record["instanceID"] as? String else {
+            throw CloudKitError.missingRequiredField(field: "instanceID", recordType: recordType)
+        }
+        guard let instanceID = UUID(uuidString: instanceIDString) else {
+            throw CloudKitError.typeMismatch(field: "instanceID", recordType: recordType, expected: "valid UUID string")
+        }
+        guard let dateAdded = record["dateAdded"] as? Date else {
+            throw CloudKitError.missingRequiredField(field: "dateAdded", recordType: recordType)
+        }
+        guard let updatedAt = record["updatedAt"] as? Date else {
+            throw CloudKitError.missingRequiredField(field: "updatedAt", recordType: recordType)
+        }
+
+        // The record name is the identity every device agrees on; a record whose
+        // payload disagrees with it would resolve conflicts against a different
+        // account than the one it overwrites.
+        guard record.recordID.recordName == AccountRecordName.account(accountID) else {
+            throw CloudKitError.typeMismatch(
+                field: "accountID",
+                recordType: recordType,
+                expected: "value matching the record name"
+            )
+        }
+
+        return Account(
+            id: accountID,
+            instanceID: instanceID,
+            displayName: record["displayName"] as? String,
+            dateAdded: dateAdded,
+            updatedAt: updatedAt
+        )
+    }
+
+    // MARK: - Legacy Account Migration Marker Mapping
+
+    /// A permanent marker recording that this instance's legacy login has been
+    /// turned into an account. Write-once: it carries no mutable state.
+    func toCKRecord(legacyMigrationInstanceID instanceID: UUID) -> CKRecord {
+        let recordID = SyncableRecordType.legacyAccountMigration(instanceID: instanceID).recordID(in: zone)
+        let record = CKRecord(recordType: RecordType.legacyAccountMigration, recordID: recordID)
+
+        record["schemaVersion"] = currentSchemaVersion as CKRecordValue
+        record["instanceID"] = instanceID.uuidString as CKRecordValue
+        record["migratedAt"] = Date() as CKRecordValue
+
+        return record
+    }
+
+    func toLegacyMigrationInstanceID(from record: CKRecord) throws -> UUID {
+        let recordType = RecordType.legacyAccountMigration
+        guard record.recordType == recordType else {
+            throw CloudKitError.recordNotFound
+        }
+
+        let version = (record["schemaVersion"] as? Int64) ?? 1
+        guard version <= currentSchemaVersion else {
+            throw CloudKitError.unsupportedSchemaVersion(version: version, recordType: recordType)
+        }
+
+        guard let instanceIDString = record["instanceID"] as? String else {
+            throw CloudKitError.missingRequiredField(field: "instanceID", recordType: recordType)
+        }
+        guard let instanceID = UUID(uuidString: instanceIDString) else {
+            throw CloudKitError.typeMismatch(field: "instanceID", recordType: recordType, expected: "valid UUID string")
+        }
+        guard record.recordID.recordName == AccountRecordName.legacyMigration(instanceID) else {
+            throw CloudKitError.typeMismatch(
+                field: "instanceID",
+                recordType: recordType,
+                expected: "value matching the record name"
+            )
+        }
+
+        return instanceID
+    }
+
+    // MARK: - Account Deletion Tombstone Mapping
+
+    /// A permanent tombstone for a deleted account.
+    func toCKRecord(accountDeletionID accountID: UUID, deletedAt: Date = Date()) -> CKRecord {
+        let recordID = SyncableRecordType.accountDeletion(accountID: accountID).recordID(in: zone)
+        let record = CKRecord(recordType: RecordType.accountDeletion, recordID: recordID)
+
+        record["schemaVersion"] = currentSchemaVersion as CKRecordValue
+        record["accountID"] = accountID.uuidString as CKRecordValue
+        record["deletedAt"] = deletedAt as CKRecordValue
+
+        return record
+    }
+
+    func toAccountDeletionID(from record: CKRecord) throws -> UUID {
+        let recordType = RecordType.accountDeletion
+        guard record.recordType == recordType else {
+            throw CloudKitError.recordNotFound
+        }
+
+        let version = (record["schemaVersion"] as? Int64) ?? 1
+        guard version <= currentSchemaVersion else {
+            throw CloudKitError.unsupportedSchemaVersion(version: version, recordType: recordType)
+        }
+
+        guard let accountIDString = record["accountID"] as? String else {
+            throw CloudKitError.missingRequiredField(field: "accountID", recordType: recordType)
+        }
+        guard let accountID = UUID(uuidString: accountIDString) else {
+            throw CloudKitError.typeMismatch(field: "accountID", recordType: recordType, expected: "valid UUID string")
+        }
+        guard record.recordID.recordName == AccountRecordName.accountDeletion(accountID) else {
+            throw CloudKitError.typeMismatch(
+                field: "accountID",
+                recordType: recordType,
+                expected: "value matching the record name"
+            )
+        }
+
+        return accountID
+    }
+
+    // MARK: - DataContext Mapping
+
+    /// The singleton record holding the selected data context.
+    ///
+    /// `changedAt` is app-managed and is the only ordering ever used for this
+    /// record — CloudKit's modification date says when a *record* was written,
+    /// not when the user made a choice.
+    func toCKRecord(dataContext stored: StoredDataContext) -> CKRecord {
+        let recordID = SyncableRecordType.dataContext.recordID(in: zone)
+        let record = CKRecord(recordType: RecordType.dataContext, recordID: recordID)
+
+        record["schemaVersion"] = currentSchemaVersion as CKRecordValue
+        record["changedAt"] = stored.changedAt as CKRecordValue
+
+        switch stored.context {
+        case .local:
+            record["contextKind"] = "local" as CKRecordValue
+            record["accountID"] = nil
+        case let .account(id):
+            record["contextKind"] = "account" as CKRecordValue
+            record["accountID"] = id.uuidString as CKRecordValue
+        }
+
+        return record
+    }
+
+    func toStoredDataContext(from record: CKRecord) throws -> StoredDataContext {
+        let recordType = RecordType.dataContext
+        guard record.recordType == recordType else {
+            throw CloudKitError.recordNotFound
+        }
+
+        let version = (record["schemaVersion"] as? Int64) ?? 1
+        guard version <= currentSchemaVersion else {
+            throw CloudKitError.unsupportedSchemaVersion(version: version, recordType: recordType)
+        }
+
+        guard let kind = record["contextKind"] as? String else {
+            throw CloudKitError.missingRequiredField(field: "contextKind", recordType: recordType)
+        }
+        guard let changedAt = record["changedAt"] as? Date else {
+            throw CloudKitError.missingRequiredField(field: "changedAt", recordType: recordType)
+        }
+
+        switch kind {
+        case "local":
+            return StoredDataContext(context: .local, changedAt: changedAt)
+        case "account":
+            guard let accountIDString = record["accountID"] as? String else {
+                throw CloudKitError.missingRequiredField(field: "accountID", recordType: recordType)
+            }
+            guard let accountID = UUID(uuidString: accountIDString) else {
+                throw CloudKitError.typeMismatch(field: "accountID", recordType: recordType, expected: "valid UUID string")
+            }
+            return StoredDataContext(context: .account(accountID), changedAt: changedAt)
+        default:
+            throw CloudKitError.typeMismatch(field: "contextKind", recordType: recordType, expected: "\"local\" or \"account\"")
+        }
+    }
 }

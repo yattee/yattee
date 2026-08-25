@@ -52,6 +52,7 @@ final class AppEnvironment {
     /// resolves the scope for all of them.
     let credentialIdentityScope: CredentialIdentityScope
     let accountsManager: AccountsManager
+    let accountSyncCoordinator: AccountSyncCoordinator
     let homeInstanceCache: HomeInstanceCache
     let invidiousAPI: InvidiousAPI
     let pipedAPI: PipedAPI
@@ -185,6 +186,17 @@ final class AppEnvironment {
         )
         self.cloudKitSync = cloudKit
         dm.cloudKitSync = cloudKit
+
+        // Accounts sync as CloudKit records rather than through KVS: they need
+        // per-record conflict resolution and durable deletions, neither of
+        // which a single overwritten key-value document can provide.
+        let accountSync = AccountSyncCoordinator(
+            accountsManager: accounts,
+            identityScope: identityScope,
+            isCategoryEnabled: { [weak cloudKit] in cloudKit?.canSyncAccounts ?? false }
+        )
+        self.accountSyncCoordinator = accountSync
+        cloudKit.accountSync = accountSync
 
         // Initialize DeArrow with low-priority networking
         let lowPrioritySession = URLSessionFactory.shared.lowPrioritySession()
@@ -366,6 +378,16 @@ final class AppEnvironment {
         dataContextValidator.setAppEnvironment(self)
         subscriptionService.setContextValidator(dataContextValidator)
         subscriptionAccountValidator.setAccountsManager(accounts)
+
+        // A deletion that arrives from another device takes the credential with
+        // it. Only a deletion does this — an account merely missing from a
+        // fetch keeps everything, because a fetch is not an enumeration.
+        accountSync.onAccountDeleted = { [weak self] account in
+            guard let self else { return }
+            let credentials = self.accountCredentialsManager(for: account)
+            credentials?.deleteCredential(for: account)
+            credentials?.deleteLegacyCredentialIfOwned(for: account)
+        }
 
         // Statuses are cleared whenever the identity namespace reloads, so they
         // have to be recomputed once the new scope's Keychain is readable —

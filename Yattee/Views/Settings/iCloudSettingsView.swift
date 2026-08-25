@@ -540,6 +540,13 @@ struct iCloudSettingsView: View {
         case .instances:
             settingsManager?.syncInstances = true
             instancesManager?.replaceWithiCloudData()
+            // Accounts ride this category. Records that arrived while it was off
+            // were kept, unapplied — activate them now rather than resetting the
+            // engine's token, which would discard other categories' pending
+            // changes.
+            Task {
+                await appEnvironment?.accountSyncCoordinator.activate()
+            }
         case .subscriptions:
             settingsManager?.syncSubscriptions = true
             // Upload existing subscriptions to CloudKit

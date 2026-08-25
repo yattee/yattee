@@ -58,6 +58,23 @@ final class AccountsManager {
     private(set) var pendingUploads: Set<UUID> = []
     private(set) var pendingDeletions: Set<UUID> = []
 
+    /// Instances whose migration marker still has to reach the server.
+    ///
+    /// Tracked apart from `migratedInstanceIDs` because the marker is held back
+    /// until the account it describes is confirmed: a marker that outran a
+    /// silently failed account save would suppress synthesis everywhere for an
+    /// account no device has.
+    private(set) var pendingMarkerUploads: Set<UUID> = []
+
+    /// Whether the selected context still has to reach the server.
+    private(set) var pendingContextUpload = false
+
+    /// Accounts known to be deleted. Permanent, and the only thing that
+    /// authorises removing an account that arrives from sync: a record's
+    /// *absence* proves nothing, because a fetch resumes from a change token
+    /// rather than enumerating the zone.
+    private(set) var deletedAccountIDs: Set<UUID> = []
+
     var currentContext: DataContext { storedContext.context }
 
     // MARK: - Initialization
@@ -154,10 +171,23 @@ final class AccountsManager {
         // `usesAccountLogin`, which posts instancesDidChange and re-runs
         // reconciliation immediately — without this the reconciliation would
         // synthesize a second, credential-less account for the same instance.
-        migratedInstanceIDs.insert(instanceID)
+        markMigrated(instanceID)
 
         save()
+        NotificationCenter.default.post(name: .accountsDidChange, object: nil)
         return account
+    }
+
+    /// Records that this instance's legacy login is now represented by an
+    /// account, and that the fact has to be published.
+    ///
+    /// Publishing matters even when the account was created by a fresh sign-in
+    /// rather than by synthesis: without the marker, every other device would
+    /// still synthesize its own credential-less account for the same instance.
+    private func markMigrated(_ instanceID: UUID) {
+        guard !migratedInstanceIDs.contains(instanceID) else { return }
+        migratedInstanceIDs.insert(instanceID)
+        pendingMarkerUploads.insert(instanceID)
     }
 
     func updateDisplayName(_ displayName: String?, for accountID: UUID) {
@@ -166,6 +196,7 @@ final class AccountsManager {
         accounts[index].updatedAt = Date()
         pendingUploads.insert(accountID)
         save()
+        NotificationCenter.default.post(name: .accountsDidChange, object: nil)
     }
 
     /// Removes an account and everything keyed to it.
@@ -174,24 +205,35 @@ final class AccountsManager {
     /// crash mid-way still replays it — and so a peer that recreates the
     /// account from a stale queued edit is corrected rather than obeyed.
     func removeAccount(_ accountID: UUID) {
-        guard let account = account(id: accountID) else { return }
+        guard account(id: accountID) != nil else { return }
 
-        accounts.removeAll { $0.id == accountID }
-        accountStatuses[accountID] = nil
-        pendingUploads.remove(accountID)
+        forgetAccount(accountID)
         pendingDeletions.insert(accountID)
-
-        // Selecting a deleted account would leave the UI pointing at nothing.
-        // This is an explicit local deletion, which is one of the few things
-        // allowed to correct the context.
-        if storedContext.context == .account(accountID) {
-            setContext(.local)
-        }
 
         save()
 
         NotificationCenter.default.post(name: .accountsDidChange, object: nil)
-        _ = account
+    }
+
+    /// Drops an account and everything keyed to it, and records the permanent
+    /// local tombstone.
+    ///
+    /// Shared by explicit local deletion and by deletions arriving from sync, so
+    /// that both leave exactly the same state behind — including the tombstone,
+    /// which is what stops a stale device's queued edit from resurrecting the
+    /// account here.
+    private func forgetAccount(_ accountID: UUID) {
+        accounts.removeAll { $0.id == accountID }
+        accountStatuses[accountID] = nil
+        pendingUploads.remove(accountID)
+        deletedAccountIDs.insert(accountID)
+
+        // Selecting a deleted account would leave the UI pointing at nothing.
+        // A deletion the app can point at is one of the few things allowed to
+        // correct the context.
+        if storedContext.context == .account(accountID) {
+            setContext(.local)
+        }
     }
 
     /// Marks a deletion as confirmed by the server. Until then it stays in the
@@ -202,9 +244,151 @@ final class AccountsManager {
         save()
     }
 
-    func confirmUpload(_ accountID: UUID) {
+    /// Marks an account upload as confirmed by the server.
+    ///
+    /// `updatedAt` is the timestamp of the record that was actually sent: an
+    /// edit made between the record being built and the server acknowledging it
+    /// leaves the account dirty, or that edit would never be uploaded.
+    func confirmUpload(_ accountID: UUID, updatedAt: Date? = nil) {
+        if let updatedAt, let account = account(id: accountID), account.updatedAt > updatedAt {
+            return
+        }
         pendingUploads.remove(accountID)
         save()
+    }
+
+    func confirmMarkerUpload(instanceID: UUID) {
+        pendingMarkerUploads.remove(instanceID)
+        save()
+    }
+
+    /// Marks the context upload as confirmed, unless the user has chosen a
+    /// different context since the uploaded record was built.
+    func confirmContextUpload(changedAt: Date) {
+        guard storedContext.changedAt <= changedAt else { return }
+        pendingContextUpload = false
+        save()
+    }
+
+    func isDeleted(_ accountID: UUID) -> Bool {
+        deletedAccountIDs.contains(accountID)
+    }
+
+    /// Marks every account record dirty again.
+    ///
+    /// For a server that holds nothing — sync being enabled for the first time,
+    /// or the zone having been deleted from another device. The outbox
+    /// otherwise tracks only what changed, which says nothing about records the
+    /// server never received. Tombstones are included: without them a device
+    /// that still has a deleted account could put it back.
+    func markAllRecordsForUpload() {
+        pendingUploads.formUnion(accounts.map(\.id))
+        pendingMarkerUploads.formUnion(migratedInstanceIDs)
+        pendingDeletions.formUnion(deletedAccountIDs)
+        pendingContextUpload = hasStoredContext
+        save()
+    }
+
+    // MARK: - Upload ordering
+
+    /// Whether an instance's marker may be published yet.
+    ///
+    /// Held while any account on that instance is still waiting to upload — see
+    /// `pendingMarkerUploads`.
+    func canUploadMarker(instanceID: UUID) -> Bool {
+        !accounts(forInstance: instanceID).contains { pendingUploads.contains($0.id) }
+    }
+
+    /// Whether the selected context may be published yet.
+    ///
+    /// A context naming an account the server has never seen would let a fresh
+    /// device fetch the selection, find no such account, and treat a merely
+    /// pending account as removed.
+    var canUploadContext: Bool {
+        guard case let .account(id) = storedContext.context else { return true }
+        return !pendingUploads.contains(id)
+    }
+
+    // MARK: - Applying synced state
+
+    /// Applies an account fetched from another device.
+    ///
+    /// - Returns: `true` when the local copy is the newer one and has to be
+    ///   pushed back, since the server still holds the older version.
+    @discardableResult
+    func applySyncedAccount(_ incoming: Account) -> Bool {
+        // A tombstone dominates the account everywhere. The caller repairs the
+        // server copy; here it simply never becomes local state again.
+        guard !deletedAccountIDs.contains(incoming.id) else { return false }
+
+        if let index = accounts.firstIndex(where: { $0.id == incoming.id }) {
+            let existing = accounts[index]
+            guard incoming.updatedAt > existing.updatedAt else {
+                guard existing.updatedAt > incoming.updatedAt else { return false }
+                // The server holds the older copy. Marked dirty rather than
+                // merely re-registered with the engine, so the correction
+                // survives a crash before it is sent.
+                pendingUploads.insert(existing.id)
+                save()
+                return true
+            }
+            accounts[index] = incoming
+        } else {
+            accounts.append(incoming)
+        }
+
+        save()
+        NotificationCenter.default.post(name: .accountsDidChange, object: nil)
+        return false
+    }
+
+    /// Applies a deletion tombstone fetched from another device.
+    ///
+    /// The tombstone's presence on the server also settles our own outbox: an
+    /// entry still queued here would only re-save a record that already exists.
+    @discardableResult
+    func applyRemoteTombstone(_ accountID: UUID) -> Account? {
+        let removed = account(id: accountID)
+        forgetAccount(accountID)
+        pendingDeletions.remove(accountID)
+        save()
+
+        NotificationCenter.default.post(name: .accountsDidChange, object: nil)
+        return removed
+    }
+
+    /// Applies a deletion *event* — the account record itself disappeared.
+    ///
+    /// Authorises removal just like a tombstone, but leaves the tombstone
+    /// queued: a bare record deletion is not durable, and the account would come
+    /// back the moment a device that never fetched this event flushes a queued
+    /// edit.
+    @discardableResult
+    func applyRemoteAccountDeletionEvent(_ accountID: UUID) -> Account? {
+        let removed = account(id: accountID)
+        forgetAccount(accountID)
+        pendingDeletions.insert(accountID)
+        save()
+
+        NotificationCenter.default.post(name: .accountsDidChange, object: nil)
+        return removed
+    }
+
+    /// Applies a legacy-migration marker fetched from another device.
+    ///
+    /// The marker only ever *prevents* synthesis. It never retracts an account
+    /// already synthesized here — an account record may simply be in a later
+    /// fetch event, or beyond the incremental window.
+    func applySyncedMigrationMarker(instanceID: UUID) {
+        let isNew = !migratedInstanceIDs.contains(instanceID)
+        migratedInstanceIDs.insert(instanceID)
+        // Already on the server, so ours is redundant.
+        pendingMarkerUploads.remove(instanceID)
+        save()
+
+        if isNew {
+            NotificationCenter.default.post(name: .accountsDidChange, object: nil)
+        }
     }
 
     // MARK: - Context
@@ -230,6 +414,7 @@ final class AccountsManager {
     func setContext(_ context: DataContext) {
         storedContext = StoredDataContext(context: context)
         hasStoredContext = true
+        pendingContextUpload = true
         save()
         NotificationCenter.default.post(name: .dataContextDidChange, object: nil)
     }
@@ -237,12 +422,24 @@ final class AccountsManager {
     /// Applies a context that arrived from another device, honouring the
     /// app-managed timestamp: an older value never overwrites a newer one, so a
     /// migration write can't undo a deliberate choice made elsewhere.
-    func applySyncedContext(_ incoming: StoredDataContext) {
-        guard incoming.changedAt > storedContext.changedAt else { return }
+    ///
+    /// - Returns: `true` when the local choice is the newer one and has to be
+    ///   pushed back over the stale server copy.
+    @discardableResult
+    func applySyncedContext(_ incoming: StoredDataContext) -> Bool {
+        guard incoming.changedAt > storedContext.changedAt else {
+            // Nothing to push back before the user has ever chosen: the local
+            // value is a default, not a decision.
+            guard hasStoredContext, storedContext.changedAt > incoming.changedAt else { return false }
+            pendingContextUpload = true
+            save()
+            return true
+        }
         storedContext = incoming
         hasStoredContext = true
         save()
         NotificationCenter.default.post(name: .dataContextDidChange, object: nil)
+        return false
     }
 
     // MARK: - Status
@@ -276,17 +473,28 @@ final class AccountsManager {
             guard instance.type.accountCapabilities.isSelectableContext else { continue }
             guard !migratedInstanceIDs.contains(instance.id) else { continue }
 
+            // A synthesized account reuses the instance's UUID, so a tombstone
+            // for that UUID is this instance's migration already having been
+            // undone. It can arrive before the marker record does — both are
+            // permanent, but they are separate records — so the tombstone has
+            // to gate synthesis in its own right.
+            guard !deletedAccountIDs.contains(instance.id) else {
+                markMigrated(instance.id)
+                didChange = true
+                continue
+            }
+
             // Any account on this instance means its login is already
             // represented — whether by an earlier migration or by a fresh
             // sign-in. Synthesizing beside it would leave a credential-less
             // duplicate.
             guard accounts(forInstance: instance.id).isEmpty else {
-                migratedInstanceIDs.insert(instance.id)
+                markMigrated(instance.id)
                 didChange = true
                 continue
             }
 
-            migratedInstanceIDs.insert(instance.id)
+            markMigrated(instance.id)
             didChange = true
 
             let account = Account.migrated(from: instance.id, dateAdded: instance.dateAdded)
@@ -326,6 +534,9 @@ final class AccountsManager {
 
         storedContext = .migrated(context)
         hasStoredContext = true
+        // Published like any other context, but stamped at the epoch: if a real
+        // choice exists anywhere it outranks this one whichever arrives first.
+        pendingContextUpload = true
         save()
 
         LoggingService.shared.info(
@@ -392,6 +603,16 @@ final class AccountsManager {
         if let ids = defaults.array(forKey: key("pendingDeletions")) as? [String] {
             pendingDeletions = Set(ids.compactMap(UUID.init(uuidString:)))
         }
+
+        if let ids = defaults.array(forKey: key("pendingMarkerUploads")) as? [String] {
+            pendingMarkerUploads = Set(ids.compactMap(UUID.init(uuidString:)))
+        }
+
+        if let ids = defaults.array(forKey: key("deletedAccounts")) as? [String] {
+            deletedAccountIDs = Set(ids.compactMap(UUID.init(uuidString:)))
+        }
+
+        pendingContextUpload = defaults.bool(forKey: key("pendingContextUpload"))
     }
 
     private func save() {
@@ -404,6 +625,9 @@ final class AccountsManager {
         defaults.set(migratedInstanceIDs.map(\.uuidString), forKey: key("migrated"))
         defaults.set(pendingUploads.map(\.uuidString), forKey: key("pendingUploads"))
         defaults.set(pendingDeletions.map(\.uuidString), forKey: key("pendingDeletions"))
+        defaults.set(pendingMarkerUploads.map(\.uuidString), forKey: key("pendingMarkerUploads"))
+        defaults.set(deletedAccountIDs.map(\.uuidString), forKey: key("deletedAccounts"))
+        defaults.set(pendingContextUpload, forKey: key("pendingContextUpload"))
     }
 
     /// Re-reads storage under the current identity namespace.
@@ -417,6 +641,9 @@ final class AccountsManager {
         migratedInstanceIDs = []
         pendingUploads = []
         pendingDeletions = []
+        pendingMarkerUploads = []
+        deletedAccountIDs = []
+        pendingContextUpload = false
 
         load()
         reconcileLegacyAccounts()
