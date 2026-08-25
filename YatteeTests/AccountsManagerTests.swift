@@ -202,6 +202,54 @@ struct AccountsManagerTests {
     }
 }
 
+@Suite("DataContext validation", .serialized)
+@MainActor
+struct DataContextValidatorTests {
+    private func makeValidator(
+        instances: InstancesManager
+    ) -> (AccountsManager, DataContextValidator) {
+        let accounts = AccountsManager(
+            identityScope: CredentialIdentityScope(fixedScope: "identity-A"),
+            instancesManager: instances,
+            defaults: UserDefaults(suiteName: "yattee.tests.\(UUID().uuidString)")!
+        )
+        let validator = DataContextValidator(
+            accountsManager: accounts,
+            instancesManager: instances,
+            toastManager: ToastManager()
+        )
+        return (accounts, validator)
+    }
+
+    @Test("A switched-off instance makes its context unavailable, not removed")
+    func disabledInstanceIsUnavailable() {
+        let instances = InstancesManager()
+        var instance = Instance(type: .invidious, url: URL(string: "https://inv.example.com")!)
+        instances.add(instance)
+
+        let (accounts, validator) = makeValidator(instances: instances)
+        let account = accounts.addAccount(instanceID: instance.id)
+        accounts.setStatus(.signedIn, for: account.id)
+        accounts.setContext(.account(account.id))
+
+        #expect(validator.validity == .valid)
+
+        // Disabling the instance leaves the account signed in, so nothing about
+        // the account itself says the server may no longer be used.
+        instance.isEnabled = false
+        instances.update(instance)
+
+        #expect(validator.validity == .temporarilyUnavailable(.instanceDisabled))
+        // The user's selection is kept — turning the instance back on restores
+        // it without them having to choose again.
+        #expect(accounts.currentContext == .account(account.id))
+        #expect(validator.effectiveContext == .local)
+        #expect(!validator.allowsServerMutations)
+
+        instances.remove(instance)
+    }
+}
+
 @Suite("Account capabilities")
 @MainActor
 struct AccountCapabilitiesTests {

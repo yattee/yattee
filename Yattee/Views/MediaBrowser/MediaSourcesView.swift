@@ -165,7 +165,7 @@ struct MediaSourcesView: View {
 
     private func confirmDelete() {
         if let instance = pendingDeleteInstance {
-            instancesManager?.remove(instance)
+            appEnvironment?.removeInstance(instance)
             pendingDeleteInstance = nil
         }
         if let source = pendingDeleteSource {

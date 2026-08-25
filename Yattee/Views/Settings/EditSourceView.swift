@@ -308,7 +308,7 @@ private struct EditRemoteServerContent: View {
             titleVisibility: .visible
         ) {
             Button(String(localized: "common.delete"), role: .destructive) {
-                appEnvironment?.instancesManager.remove(instance)
+                appEnvironment?.removeInstance(instance)
                 dismiss()
             }
             Button(String(localized: "common.cancel"), role: .cancel) {}

@@ -68,6 +68,7 @@ final class AppEnvironment {
     private(set) var activeControlsCenterSettings: CenterSectionSettings = .default
 
     @ObservationIgnored private var controlsSettingsObservers: [NSObjectProtocol] = []
+    @ObservationIgnored private var contextMirrorObserver: NSObjectProtocol?
 
     // MARK: - Shared Instance
 
@@ -379,6 +380,19 @@ final class AppEnvironment {
         subscriptionService.setContextValidator(dataContextValidator)
         subscriptionAccountValidator.setAccountsManager(accounts)
 
+        // The context can now change without anyone touching this device — a
+        // choice made on another one, or an account deleted there. The legacy
+        // setting several views still read has to follow it, and the feed cache
+        // is global rather than account-keyed, so it would otherwise keep
+        // serving the previous account's videos.
+        contextMirrorObserver = NotificationCenter.default.addObserver(
+            forName: .dataContextDidChange,
+            object: nil,
+            queue: .main
+        ) { [weak self] _ in
+            MainActor.assumeIsolated { self?.mirrorContextToLegacySelection() }
+        }
+
         // A deletion that arrives from another device takes the credential with
         // it. Only a deletion does this — an account merely missing from a
         // fetch keeps everything, because a fetch is not an enumeration.
@@ -502,6 +516,66 @@ final class AppEnvironment {
     }
 
     // MARK: - Accounts
+
+    /// Keeps the pre-revamp `subscriptionAccount` selection, and the feed cache
+    /// keyed to it, in step with the current data context.
+    ///
+    /// The two stores are written together everywhere the user changes the
+    /// context by hand; this covers the changes nobody on this device made — a
+    /// selection synced from another device, or the selected account being
+    /// deleted there. Phase 3's switcher removes the last readers of the legacy
+    /// setting and this mirror with them.
+    private func mirrorContextToLegacySelection() {
+        let legacy: SubscriptionAccount
+
+        switch accountsManager.currentContext {
+        case .local:
+            legacy = .local
+
+        case let .account(id):
+            // An account whose instance has not arrived yet cannot be mapped
+            // onto the legacy shape. Leaving the old value alone is right: the
+            // context is preserved, and the validator reports it unavailable
+            // rather than pointing the UI at something else.
+            guard let account = accountsManager.account(id: id),
+                  let instance = accountsManager.instance(for: account) else { return }
+
+            switch instance.type {
+            case .invidious: legacy = .invidious(instance.id)
+            case .piped: legacy = .piped(instance.id)
+            default: return
+            }
+        }
+
+        guard settingsManager.subscriptionAccount != legacy else { return }
+
+        settingsManager.subscriptionAccount = legacy
+        SubscriptionFeedCache.shared.handleAccountChange()
+
+        LoggingService.shared.info(
+            "Data context changed — cleared the feed cache and updated the legacy selection",
+            category: .general
+        )
+    }
+
+    /// Deletes an instance together with the accounts that live on it.
+    ///
+    /// The cascade has to happen here, while the instance is still resolvable:
+    /// once it is gone, an account's credential manager cannot be determined
+    /// from its type, and the credential would be stranded with no way to reach
+    /// it. Only an explicit deletion cascades — an instance disappearing from
+    /// iCloud leaves its accounts orphaned rather than deleted, because absence
+    /// is not a deletion.
+    func removeInstance(_ instance: Instance) {
+        for account in accountsManager.accounts(forInstance: instance.id) {
+            let credentials = accountCredentialsManager(for: account)
+            credentials?.deleteCredential(for: account)
+            credentials?.deleteLegacyCredentialIfOwned(for: account)
+            accountsManager.removeAccount(account.id)
+        }
+
+        instancesManager.remove(instance)
+    }
 
     /// The account-keyed credentials manager for an account's instance.
     /// `nil` when the instance is unknown or its type has no account concept.

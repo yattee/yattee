@@ -11,6 +11,10 @@ import Foundation
 enum DataContextUnavailability: Hashable, Sendable {
     /// The account exists but its instance hasn't arrived from iCloud yet.
     case instancePending
+    /// The account's instance has been switched off. The selection is kept —
+    /// the user can turn the instance back on — but nothing may be served from
+    /// or written to a server they have disabled.
+    case instanceDisabled
     /// No credential on this device yet. On tvOS this never resolves on its own
     /// — app Keychain items are not synced there — so the UI offers a local
     /// sign-in rather than implying a wait.
@@ -87,8 +91,16 @@ final class DataContextValidator {
                 return .temporarilyUnavailable(.instancePending)
             }
 
-            guard accountsManager.instance(for: account) != nil else {
+            guard let instance = accountsManager.instance(for: account) else {
                 return .temporarilyUnavailable(.instancePending)
+            }
+
+            // The account's own status says nothing about the instance being
+            // switched off, and `availableContexts` already hides disabled
+            // instances — a context that stayed valid here would keep sending
+            // requests to a server the user has turned off.
+            guard instance.isEnabled else {
+                return .temporarilyUnavailable(.instanceDisabled)
             }
 
             switch accountsManager.status(for: id) {

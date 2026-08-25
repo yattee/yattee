@@ -95,6 +95,12 @@ final class InstancesManager {
 
         // Update sync time
         settingsManager?.updateLastSyncTime()
+
+        // Instances arriving from iCloud are as much a change as a local edit.
+        // Without this, a legacy authenticated instance delivered here never
+        // reaches account migration — the account, and the action to adopt its
+        // saved login, would appear only after an unrelated edit or a relaunch.
+        NotificationCenter.default.post(name: .instancesDidChange, object: nil)
     }
 
     /// Syncs local data to iCloud (called when enabling iCloud sync).
@@ -126,6 +132,8 @@ final class InstancesManager {
         instances = iCloudInstances
         localDefaults.set(iCloudData, forKey: instancesKey)
         settingsManager?.updateLastSyncTime()
+
+        NotificationCenter.default.post(name: .instancesDidChange, object: nil)
     }
 
     // MARK: - Public Methods
