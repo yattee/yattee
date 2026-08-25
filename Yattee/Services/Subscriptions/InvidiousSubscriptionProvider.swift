@@ -110,8 +110,12 @@ final class InvidiousSubscriptionProvider: SubscriptionProvider {
     func unsubscribe(from channelID: String) async throws {
         let (instance, sid) = try await getAuthenticatedInstance()
         
-        // Unsubscribe on Invidious server
-        try await invidiousAPI.unsubscribe(from: channelID, instance: instance, sid: sid)
+        // Unsubscribe on Invidious server. Tracked like every other
+        // authenticated call: a rejected credential noticed here must mark the
+        // account, or it keeps reporting itself as signed in.
+        try await tracking {
+            try await invidiousAPI.unsubscribe(from: channelID, instance: instance, sid: sid)
+        }
         
         // Update in-memory cache only
         cachedChannelIDs.remove(channelID)

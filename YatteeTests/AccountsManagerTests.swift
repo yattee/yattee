@@ -186,6 +186,24 @@ struct AccountsManagerTests {
         #expect(manager.context(forLegacyInstanceID: instanceID) == .account(second.id))
     }
 
+    @Test("A fresh device adopts the synced context")
+    func firstSyncedContextIsAdopted() {
+        let manager = makeManager()
+        let accountID = UUID()
+
+        // The local value is a default stamped when the manager was built, so
+        // it is always "newer" than a choice made on another device yesterday.
+        // Ordering against it would leave a fresh device on local forever.
+        let synced = StoredDataContext(
+            context: .account(accountID),
+            changedAt: Date().addingTimeInterval(-86_400)
+        )
+
+        #expect(!manager.applySyncedContext(synced))
+        #expect(manager.currentContext == .account(accountID))
+        #expect(!manager.pendingContextUpload)
+    }
+
     @Test("Correcting away from a deleted account never outranks a real choice")
     func deletionCorrectionIsNotAChoice() {
         let manager = makeManager()
@@ -202,6 +220,7 @@ struct AccountsManagerTests {
         // device hearing about it. Timestamping the fallback "now" would sink
         // that choice — and publishing it would push the fallback over it.
         #expect(manager.storedContext.changedAt == chosenAt)
+        // Including any upload the deleted choice had queued.
         #expect(!manager.pendingContextUpload)
 
         let elsewhere = StoredDataContext(

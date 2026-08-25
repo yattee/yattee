@@ -327,6 +327,12 @@ private struct EditRemoteServerContent: View {
             }
         }
         #endif
+        // Signing out happens in the accounts section below, which cannot reach
+        // this state directly. Without this the authenticated import actions
+        // stay on screen after the last account is removed, and then fail.
+        .onReceive(NotificationCenter.default.publisher(for: .accountsDidChange)) { _ in
+            isLoggedIn = appEnvironment?.isSignedIn(to: instance) ?? false
+        }
         .onAppear {
             isLoggedIn = appEnvironment?.isSignedIn(to: instance) ?? false
 
@@ -422,6 +428,12 @@ private struct EditRemoteServerContent: View {
 
         appEnvironment.accountsManager.setStatus(.signedIn, for: account.id)
         appEnvironment.instancesManager.setUsesAccountLogin(true, for: instance)
+
+        // Signing in again keeps the same account, so nothing downstream sees a
+        // change of context — but the credential behind it may now belong to
+        // somebody else, and their data must not survive the swap.
+        appEnvironment.accountCredentialDidChange(for: account)
+
         isLoggedIn = true
     }
 

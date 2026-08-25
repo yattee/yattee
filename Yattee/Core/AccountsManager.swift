@@ -250,6 +250,10 @@ final class AccountsManager {
     /// writing anything.
     private func correctContextAfterDeletion() {
         storedContext = StoredDataContext(context: .local, changedAt: storedContext.changedAt)
+        // Including any upload the deleted choice had queued: sending it now
+        // would publish this fallback under that choice's timestamp, which is
+        // exactly what not stamping it "now" is meant to prevent.
+        pendingContextUpload = false
         NotificationCenter.default.post(name: .dataContextDidChange, object: nil)
     }
 
@@ -444,10 +448,20 @@ final class AccountsManager {
     ///   pushed back over the stale server copy.
     @discardableResult
     func applySyncedContext(_ incoming: StoredDataContext) -> Bool {
+        // Before the user has ever chosen here there is nothing to order
+        // against: the local value is a default stamped when this manager was
+        // constructed, so a synced choice made yesterday would lose to it and a
+        // fresh device would never adopt the selection at all.
+        guard hasStoredContext else {
+            storedContext = incoming
+            hasStoredContext = true
+            save()
+            NotificationCenter.default.post(name: .dataContextDidChange, object: nil)
+            return false
+        }
+
         guard incoming.changedAt > storedContext.changedAt else {
-            // Nothing to push back before the user has ever chosen: the local
-            // value is a default, not a decision.
-            guard hasStoredContext, storedContext.changedAt > incoming.changedAt else { return false }
+            guard storedContext.changedAt > incoming.changedAt else { return false }
             pendingContextUpload = true
             save()
             return true

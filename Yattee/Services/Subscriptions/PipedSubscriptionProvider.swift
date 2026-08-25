@@ -93,8 +93,12 @@ final class PipedSubscriptionProvider: SubscriptionProvider {
     func subscribe(to channel: Channel) async throws {
         let (instance, authToken) = try await getAuthenticatedInstance()
 
-        // Subscribe on Piped server
-        try await pipedAPI.subscribe(channelID: channel.id.channelID, instance: instance, authToken: authToken)
+        // Subscribe on Piped server. Tracked like every other authenticated
+        // call: a rejected credential noticed here must mark the account, or it
+        // keeps reporting itself as signed in.
+        try await tracking {
+            try await pipedAPI.subscribe(channelID: channel.id.channelID, instance: instance, authToken: authToken)
+        }
 
         // Update in-memory cache only
         cachedChannelIDs.insert(channel.id.channelID)
@@ -109,7 +113,9 @@ final class PipedSubscriptionProvider: SubscriptionProvider {
         let (instance, authToken) = try await getAuthenticatedInstance()
 
         // Unsubscribe on Piped server
-        try await pipedAPI.unsubscribe(channelID: channelID, instance: instance, authToken: authToken)
+        try await tracking {
+            try await pipedAPI.unsubscribe(channelID: channelID, instance: instance, authToken: authToken)
+        }
 
         // Update in-memory cache only
         cachedChannelIDs.remove(channelID)

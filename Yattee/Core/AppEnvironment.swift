@@ -389,18 +389,29 @@ final class AppEnvironment {
         // is global rather than account-keyed, so it would otherwise keep
         // serving the previous account's videos.
         //
-        // Accounts arriving is a second trigger, not a redundant one: a context
-        // naming an account that has not synced yet cannot be mapped onto the
-        // legacy shape, and this is what restores the mapping once it can be
-        // made rather than leaving that moment permanent.
+        // Accounts and instances arriving are triggers too, not redundant ones:
+        // a context naming an account that has not synced yet — or one whose
+        // instance has not — cannot be mapped onto the legacy shape, and these
+        // are what restore the mapping once it can be made rather than leaving
+        // that moment permanent. The same arrivals are what make a synced
+        // account's credential findable, so statuses are recomputed with them:
+        // an account that appears mid-session would otherwise sit at "sign in
+        // required" until the app was relaunched.
+        //
         // Seeded with what is on screen now, so launching does not look like a
         // change and throw away caches that are still the right ones.
         lastMirroredContext = accounts.currentContext
 
-        for name: Notification.Name in [.dataContextDidChange, .accountsDidChange] {
+        for name: Notification.Name in [.dataContextDidChange, .accountsDidChange, .instancesDidChange] {
             contextMirrorObservers.append(
                 NotificationCenter.default.addObserver(forName: name, object: nil, queue: .main) { [weak self] _ in
-                    MainActor.assumeIsolated { self?.mirrorContextToLegacySelection() }
+                    MainActor.assumeIsolated {
+                        guard let self else { return }
+                        if name != .dataContextDidChange {
+                            self.refreshAccountStatuses()
+                        }
+                        self.mirrorContextToLegacySelection()
+                    }
                 }
             )
         }
@@ -610,6 +621,23 @@ final class AppEnvironment {
             "Data context changed — updated the legacy subscription selection",
             category: .general
         )
+    }
+
+    /// Discards everything cached under an account's previous credential.
+    ///
+    /// Signing in again keeps the account ID and the selected context, so
+    /// nothing about the *context* changes — but the login behind it may be a
+    /// different person entirely, and their subscriptions and feed would
+    /// otherwise stay on screen.
+    func accountCredentialDidChange(for account: Account) {
+        subscriptionService.discardProvider(for: account.id)
+        HomeInstanceCache.shared.clear(instanceID: account.instanceID, contentType: .feed)
+
+        if accountsManager.currentContext == .account(account.id) {
+            SubscriptionFeedCache.shared.handleAccountChange()
+        }
+
+        refreshAccountStatuses()
     }
 
     /// Drops everything cached for whichever account was being shown.
