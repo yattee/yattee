@@ -169,9 +169,11 @@ final class AccountSyncCoordinator {
 
     /// Handles the identity moving under a running app.
     ///
-    /// Nothing is migrated between namespaces here: the previous identity's
-    /// staging, outbox and bootstrap flag stay where they are, unread, and the
-    /// new identity starts from its own.
+    /// Nothing is migrated between namespaces: the previous identity's staging,
+    /// outbox and bootstrap flag stay where they are, unread, and the new one
+    /// starts from its own. Bumping the generation is what makes that stick —
+    /// work already in flight for the previous identity refuses to apply its
+    /// results afterwards.
     ///
     /// Internal so tests can drive it directly rather than racing a real scope
     /// resolution.
