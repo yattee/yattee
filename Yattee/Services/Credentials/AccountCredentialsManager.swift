@@ -41,6 +41,12 @@ protocol AccountCredentialsManager: AnyObject, Observable {
     /// key needs only the account's ID.
     func deleteCredential(forAccountID accountID: UUID)
 
+    /// Rewrites stored credentials so they carry the current iCloud sync
+    /// setting. Whether a Keychain item syncs is decided when it is written, so
+    /// enabling sync later would otherwise leave existing logins local — and
+    /// every other device with an account whose credential never arrives.
+    func resyncCredentialsWithCurrentSetting()
+
     /// The login identifier the user typed. Kept in the Keychain beside the
     /// credential so it never enters synced metadata.
     func setUsername(_ username: String, for account: Account)

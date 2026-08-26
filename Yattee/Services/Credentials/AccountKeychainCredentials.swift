@@ -111,6 +111,35 @@ final class AccountKeychainCredentials {
         HomeInstanceCache.shared.clear(instanceID: account.instanceID, contentType: .feed)
     }
 
+    /// Rewrites the stored credentials so they carry the current sync setting.
+    ///
+    /// `kSecAttrSynchronizable` is fixed when an item is written, so a login
+    /// stored while iCloud sync was off stays local forever. Enabling sync
+    /// afterwards uploads the account metadata, and every other device would
+    /// then show an account whose credential never arrives. Called when the
+    /// user turns sync on.
+    func resyncCredentialsWithCurrentSetting() {
+        guard let scope = identityScope.current else { return }
+
+        for accountID in loginsByScope[scope] ?? [] {
+            let credentialKey = KeychainCredentialStore.credentialKey(scope: scope, accountID: accountID)
+            let usernameKey = KeychainCredentialStore.usernameKey(scope: scope, accountID: accountID)
+            let syncEnabled = shouldSyncToiCloud
+
+            if let credential = store.value(forKey: credentialKey) {
+                _ = store.set(credential, forKey: credentialKey, synchronizable: syncEnabled)
+            }
+            if let username = store.value(forKey: usernameKey) {
+                _ = store.set(username, forKey: usernameKey, synchronizable: syncEnabled)
+            }
+        }
+
+        LoggingService.shared.info(
+            "Rewrote stored \(credentialNoun)s with the current iCloud sync setting",
+            category: .keychain
+        )
+    }
+
     func deleteCredential(forAccountID accountID: UUID) {
         guard let scope = currentScope() else { return }
 

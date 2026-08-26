@@ -267,6 +267,27 @@ struct AccountSyncTests {
             #expect(try mapper.toStoredDataContext(from: serverWins).context == .account(accountID))
         }
 
+        @Test("Two accounts edited in the same instant converge")
+        func equalAccountTimestampsBreakTheTieTheSameWayEverywhere() async throws {
+            let mapper = AccountSyncTests.makeMapper()
+            let resolver = CloudKitConflictResolver()
+            let id = UUID()
+            let instanceID = UUID()
+            let sameMoment = Date(timeIntervalSince1970: 500)
+
+            let lower = Account(id: id, instanceID: instanceID, displayName: "A", updatedAt: sameMoment)
+            let higher = Account(id: id, instanceID: instanceID, displayName: "B", updatedAt: sameMoment)
+
+            #expect(lower.isOutranked(by: higher))
+            #expect(!higher.isOutranked(by: lower))
+
+            let resolved = await resolver.resolveAccountConflict(
+                local: mapper.toCKRecord(account: higher),
+                server: mapper.toCKRecord(account: lower)
+            )
+            #expect(try mapper.toAccount(from: resolved).displayName == "B")
+        }
+
         @Test("Two migrated contexts converge instead of diverging")
         func equalTimestampsBreakTheTieTheSameWayEverywhere() async throws {
             let mapper = AccountSyncTests.makeMapper()

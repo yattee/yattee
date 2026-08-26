@@ -71,4 +71,16 @@ struct Account: Identifiable, Codable, Hashable, Sendable {
     /// Whether this account was produced by the legacy migration rather than an
     /// explicit sign-in.
     var isMigrated: Bool { id == instanceID }
+
+    /// Whether `other` should replace this copy.
+    ///
+    /// Ordered by the app-managed `updatedAt`, with the label settling an exact
+    /// tie. The tie is reachable — two devices can migrate the same account in
+    /// the same instant, and every migrated account is stamped at the epoch — and
+    /// without a tie-break each device would keep its own label and consider the
+    /// matter closed, which is a divergence neither would ever notice.
+    func isOutranked(by other: Account) -> Bool {
+        if other.updatedAt != updatedAt { return other.updatedAt > updatedAt }
+        return (other.displayName ?? "") > (displayName ?? "")
+    }
 }

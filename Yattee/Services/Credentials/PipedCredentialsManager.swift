@@ -218,6 +218,10 @@ extension PipedCredentialsManager: AccountCredentialsManager {
         accountCredentials.deleteCredential(forAccountID: accountID)
     }
 
+    func resyncCredentialsWithCurrentSetting() {
+        accountCredentials.resyncCredentialsWithCurrentSetting()
+    }
+
     func setUsername(_ username: String, for account: Account) {
         accountCredentials.setUsername(username, for: account)
     }

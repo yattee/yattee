@@ -1565,8 +1565,11 @@ final class CloudKitSyncEngine: @unchecked Sendable {
     /// recreating the zone after it was deleted elsewhere. The account outbox
     /// normally tracks only what changed, which is not enough when the server
     /// has nothing at all.
+    /// Deliberately not gated on the category being enabled: the zone can be
+    /// deleted while account sync is off, and marking the records dirty is what
+    /// lets re-enabling restore them. The outbox is durable and nothing is sent
+    /// while the category is off, so priming it costs nothing.
     func uploadAllAccounts() {
-        guard canSyncAccounts else { return }
         uploadProgress?.currentCategory = "Accounts"
         accountSync?.uploadEverything()
     }

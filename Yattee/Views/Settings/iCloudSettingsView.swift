@@ -528,6 +528,18 @@ struct iCloudSettingsView: View {
         settingsManager?.replaceWithiCloudData()
         instancesManager?.replaceWithiCloudData()
         mediaSourcesManager?.replaceWithiCloudData()
+
+        resyncStoredLogins()
+    }
+
+    /// Rewrites stored logins so they carry the sync setting that has just
+    /// changed. Whether a Keychain item syncs is fixed when it is written, so a
+    /// login stored while sync was off would stay on this device while its
+    /// account record travelled — every other device showing an account whose
+    /// credential never arrives.
+    private func resyncStoredLogins() {
+        appEnvironment?.invidiousCredentialsManager.resyncCredentialsWithCurrentSetting()
+        appEnvironment?.pipedCredentialsManager.resyncCredentialsWithCurrentSetting()
     }
 
     private func disableiCloudSync() {
@@ -547,6 +559,7 @@ struct iCloudSettingsView: View {
             Task {
                 await appEnvironment?.accountSyncCoordinator.activate()
             }
+            resyncStoredLogins()
         case .subscriptions:
             settingsManager?.syncSubscriptions = true
             // Upload existing subscriptions to CloudKit

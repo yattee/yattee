@@ -389,28 +389,6 @@ final class AppEnvironment {
         // is global rather than account-keyed, so it would otherwise keep
         // serving the previous account's videos.
         //
-        // Accounts and instances arriving are triggers too, not redundant ones:
-        // a context naming an account that has not synced yet — or one whose
-        // instance has not — cannot be mapped onto the legacy shape, and these
-        // are what restore the mapping once it can be made rather than leaving
-        // that moment permanent. The same arrivals are what make a synced
-        // account's credential findable, so statuses are recomputed with them:
-        // an account that appears mid-session would otherwise sit at "sign in
-        // required" until the app was relaunched.
-        for name: Notification.Name in [.dataContextDidChange, .accountsDidChange, .instancesDidChange] {
-            contextMirrorObservers.append(
-                NotificationCenter.default.addObserver(forName: name, object: nil, queue: .main) { [weak self] _ in
-                    MainActor.assumeIsolated {
-                        guard let self else { return }
-                        if name != .dataContextDidChange {
-                            self.refreshAccountStatuses()
-                        }
-                        self.mirrorContextToLegacySelection()
-                    }
-                }
-            )
-        }
-
         // A deletion that arrives from another device takes the credential with
         // it. Only a deletion does this — an account merely missing from a
         // fetch keeps everything, because a fetch is not an enumeration.
@@ -450,19 +428,16 @@ final class AppEnvironment {
                 guard let self else { return }
                 self.refreshAccountStatuses()
 
-                // Cleared unconditionally, because the identity moving means
-                // everything cached belongs to the Apple account that just went
-                // away — even when the new namespace happens to select the same
-                // context and the change comparison would find nothing.
-                self.clearAccountScopedCaches()
-                if let owner = self.credentialIdentityScope.current {
-                    UserDefaults.standard.set(owner, forKey: Self.cacheOwnerKey)
-                }
+                // Compared against the recorded owner rather than cleared
+                // outright: a scope that merely dropped to unresolved and came
+                // back is the same Apple account, and with iCloud Drive off
+                // that happens on every activation.
+                self.discardCachesFromAnotherIdentityIfNeeded()
                 self.mirrorContextToLegacySelection(resetWhenUnresolvable: true)
             }
         }
 
-        discardCachesFromAnotherIdentityIfNeeded()
+        discardCachesFromAnotherIdentityIfNeeded(atLaunch: true)
 
         // Turn any pre-revamp single-instance logins into accounts. Repeatable:
         // it runs again whenever instances arrive from iCloud.
@@ -473,6 +448,28 @@ final class AppEnvironment {
         // Seeded once the statuses it depends on are known, so launching does
         // not look like a change and throw away caches that are still right.
         lastCachedContext = dataContextValidator.effectiveContext
+
+        // Accounts and instances arriving are triggers too, not redundant ones:
+        // a context naming an account that has not synced yet — or one whose
+        // instance has not — cannot be mapped onto the legacy shape, and these
+        // are what restore the mapping once it can be made rather than leaving
+        // that moment permanent. The same arrivals are what make a synced
+        // account's credential findable, so statuses are recomputed with them:
+        // an account that appears mid-session would otherwise sit at "sign in
+        // required" until the app was relaunched.
+        for name: Notification.Name in [.dataContextDidChange, .accountsDidChange, .instancesDidChange] {
+            contextMirrorObservers.append(
+                NotificationCenter.default.addObserver(forName: name, object: nil, queue: .main) { [weak self] _ in
+                    MainActor.assumeIsolated {
+                        guard let self else { return }
+                        if name != .dataContextDidChange {
+                            self.refreshAccountStatuses()
+                        }
+                        self.mirrorContextToLegacySelection()
+                    }
+                }
+            )
+        }
 
         // Resolve the credential identity scope if this Apple account has never
         // been seen on this device. Until it lands, account credentials report
@@ -663,12 +660,28 @@ final class AppEnvironment {
     /// being constructed, which is before any observer here exists. So an Apple
     /// account switched while the app was closed would otherwise reach the new
     /// user with the previous one's feeds still on disk.
-    private func discardCachesFromAnotherIdentityIfNeeded() {
-        // Unresolved: no conclusion either way, and the observer covers it once
-        // the scope lands.
-        guard let owner = credentialIdentityScope.current else { return }
-
+    /// - Parameter atLaunch: whether this is the startup check. It decides what
+    ///   an *unresolved* identity means. At launch it means the cached data's
+    ///   owner cannot be confirmed at all — which is exactly the state a switch
+    ///   to an unseen Apple account while offline produces — so the safe answer
+    ///   is to discard. Mid-session it is a transient: with iCloud Drive off the
+    ///   scope drops to unresolved and re-resolves on every activation, and
+    ///   clearing on that would throw the caches away several times a day.
+    private func discardCachesFromAnotherIdentityIfNeeded(atLaunch: Bool = false) {
         let defaults = UserDefaults.standard
+
+        guard let owner = credentialIdentityScope.current else {
+            guard atLaunch, defaults.string(forKey: Self.cacheOwnerKey) != nil else { return }
+
+            clearAccountScopedCaches()
+            defaults.removeObject(forKey: Self.cacheOwnerKey)
+            LoggingService.shared.info(
+                "Cannot confirm who the cached account data belongs to — discarded it",
+                category: .general
+            )
+            return
+        }
+
         let previous = defaults.string(forKey: Self.cacheOwnerKey)
         defaults.set(owner, forKey: Self.cacheOwnerKey)
 
@@ -676,7 +689,7 @@ final class AppEnvironment {
 
         clearAccountScopedCaches()
         LoggingService.shared.info(
-            "Apple account changed while the app was closed — discarded cached account data",
+            "Apple account changed — discarded the previous account's cached data",
             category: .general
         )
     }

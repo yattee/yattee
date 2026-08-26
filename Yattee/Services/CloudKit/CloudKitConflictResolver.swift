@@ -342,8 +342,11 @@ actor CloudKitConflictResolver {
     ///   modification date: an edit made offline has to stay orderable against
     ///   a concurrent edit elsewhere, and a migrated account carries an
     ///   epoch-old date precisely so any real edit outranks it.
-    /// - `instanceID` and `dateAdded` are immutable identity, taken from
-    ///   whichever side wins only so a malformed record cannot strip them.
+    /// - An exact tie is settled by the label, so two devices that edited in the
+    ///   same instant — or migrated the same account, all of which are stamped
+    ///   at the epoch — converge instead of each keeping its own. This has to
+    ///   match `Account.isOutranked`, or a record could win the upload and still
+    ///   be refused on arrival.
     func resolveAccountConflict(
         local: CKRecord,
         server: CKRecord
@@ -351,10 +354,17 @@ actor CloudKitConflictResolver {
         let localUpdated = (local["updatedAt"] as? Date) ?? Date.distantPast
         let serverUpdated = (server["updatedAt"] as? Date) ?? Date.distantPast
 
+        let localWins: Bool
+        if localUpdated != serverUpdated {
+            localWins = localUpdated > serverUpdated
+        } else {
+            localWins = ((local["displayName"] as? String) ?? "") > ((server["displayName"] as? String) ?? "")
+        }
+
         // IMPORTANT: Always start with server record to preserve recordChangeTag
         let resolved = server
 
-        if localUpdated > serverUpdated {
+        if localWins {
             resolved["displayName"] = local["displayName"]
             resolved["updatedAt"] = local["updatedAt"]
         }

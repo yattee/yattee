@@ -344,8 +344,8 @@ final class AccountsManager {
 
         if let index = accounts.firstIndex(where: { $0.id == incoming.id }) {
             let existing = accounts[index]
-            guard incoming.updatedAt > existing.updatedAt else {
-                guard existing.updatedAt > incoming.updatedAt else { return false }
+            guard existing.isOutranked(by: incoming) else {
+                guard incoming.isOutranked(by: existing) else { return false }
                 // The server holds the older copy. Marked dirty rather than
                 // merely re-registered with the engine, so the correction
                 // survives a crash before it is sent.
