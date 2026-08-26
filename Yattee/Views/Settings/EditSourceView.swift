@@ -389,8 +389,11 @@ private struct EditRemoteServerContent: View {
     ///
     /// The identifier is stored beside the credential in the Keychain rather
     /// than on the account record, so it never travels as synced metadata.
-    private func storeLogin(credential: String, username: String, target: AccountLoginTarget) {
-        guard let appEnvironment else { return }
+    /// - Returns: whether the credential was stored. A login the server
+    ///   accepted is not the same as one this device could keep.
+    @discardableResult
+    private func storeLogin(credential: String, username: String, target: AccountLoginTarget) -> Bool {
+        guard let appEnvironment else { return false }
 
         // Credential storage refuses to write under an unresolved identity
         // scope, so creating the account first would leave one with no
@@ -400,13 +403,13 @@ private struct EditRemoteServerContent: View {
             appEnvironment.toastManager.showError(
                 String(localized: "accounts.signIn.identityUnresolved")
             )
-            return
+            return false
         }
 
         let account = target.account
             ?? appEnvironment.accountsManager.addAccount(instanceID: instance.id)
 
-        guard let credentials = appEnvironment.accountCredentialsManager(for: account) else { return }
+        guard let credentials = appEnvironment.accountCredentialsManager(for: account) else { return false }
 
         credentials.setCredential(credential, for: account)
 
@@ -420,7 +423,7 @@ private struct EditRemoteServerContent: View {
             appEnvironment.toastManager.showError(
                 String(localized: "accounts.signIn.storeFailed")
             )
-            return
+            return false
         }
         if !username.isEmpty {
             credentials.setUsername(username, for: account)
@@ -442,6 +445,7 @@ private struct EditRemoteServerContent: View {
         appEnvironment.accountCredentialDidChange(for: account)
 
         isLoggedIn = true
+        return true
     }
 
     private func loadServerInfo() async {

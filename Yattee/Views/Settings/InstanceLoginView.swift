@@ -9,13 +9,18 @@ import SwiftUI
 
 struct InstanceLoginView: View {
     let instance: Instance
-    /// Receives the credential **and** the identifier the user signed in with.
+    /// Receives the credential **and** the identifier the user signed in with,
+    /// and reports whether it was stored.
     ///
     /// The identifier is handed back rather than stored here because it belongs
     /// beside the credential in the Keychain, not in synced account metadata —
     /// so only the caller, which knows which account this login is for, can
     /// file it correctly.
-    let onLoginSuccess: (_ credential: String, _ username: String) -> Void
+    ///
+    /// The return value matters because signing in successfully is not the same
+    /// as having somewhere to keep the result: dismissing on a Keychain failure
+    /// would throw away what the user typed and make them do it all again.
+    let onLoginSuccess: (_ credential: String, _ username: String) -> Bool
 
     @Environment(\.dismiss) private var dismiss
     @Environment(\.appEnvironment) private var appEnvironment
@@ -153,7 +158,13 @@ struct InstanceLoginView: View {
                 let credential = try await performLogin(appEnvironment: appEnvironment)
 
                 await MainActor.run {
-                    onLoginSuccess(credential, username)
+                    guard onLoginSuccess(credential, username) else {
+                        // The failure is reported by a toast from the storing
+                        // side; staying open keeps the form filled in so the
+                        // user can retry once it can succeed.
+                        isLoading = false
+                        return
+                    }
                     dismiss()
                 }
             } catch APIError.unauthorized {
@@ -213,13 +224,13 @@ struct InstanceLoginView: View {
 #Preview("Invidious") {
     InstanceLoginView(
         instance: Instance(type: .invidious, url: URL(string: "https://invidious.example.com")!)
-    ) { _, _ in }
+    ) { _, _ in true }
     .appEnvironment(.preview)
 }
 
 #Preview("Piped") {
     InstanceLoginView(
         instance: Instance(type: .piped, url: URL(string: "https://piped.example.com")!)
-    ) { _, _ in }
+    ) { _, _ in true }
     .appEnvironment(.preview)
 }

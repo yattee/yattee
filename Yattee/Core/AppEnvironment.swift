@@ -71,7 +71,7 @@ final class AppEnvironment {
     @ObservationIgnored private var contextMirrorObservers: [NSObjectProtocol] = []
 
     /// The context the account-scoped caches currently hold data for.
-    @ObservationIgnored private var lastMirroredContext: DataContext = .local
+    @ObservationIgnored private var lastCachedContext: DataContext = .local
 
     // MARK: - Shared Instance
 
@@ -397,11 +397,6 @@ final class AppEnvironment {
         // account's credential findable, so statuses are recomputed with them:
         // an account that appears mid-session would otherwise sit at "sign in
         // required" until the app was relaunched.
-        //
-        // Seeded with what is on screen now, so launching does not look like a
-        // change and throw away caches that are still the right ones.
-        lastMirroredContext = accounts.currentContext
-
         for name: Notification.Name in [.dataContextDidChange, .accountsDidChange, .instancesDidChange] {
             contextMirrorObservers.append(
                 NotificationCenter.default.addObserver(forName: name, object: nil, queue: .main) { [weak self] _ in
@@ -474,6 +469,10 @@ final class AppEnvironment {
         accounts.reconcileLegacyAccounts()
         accounts.migrateLegacyContextIfNeeded()
         refreshAccountStatuses()
+
+        // Seeded once the statuses it depends on are known, so launching does
+        // not look like a change and throw away caches that are still right.
+        lastCachedContext = dataContextValidator.effectiveContext
 
         // Resolve the credential identity scope if this Apple account has never
         // been seen on this device. Until it lands, account credentials report
@@ -580,20 +579,20 @@ final class AppEnvironment {
     ///   previous identity's selection is worse than losing a mapping, and the
     ///   correct value returns as soon as the new namespace's accounts arrive.
     private func mirrorContextToLegacySelection(resetWhenUnresolvable: Bool = false) {
-        let context = accountsManager.currentContext
-
-        // Cached data is invalidated on the *context*, not on the legacy value
-        // it maps to: two logins on the same instance collapse onto the same
-        // legacy selection, so comparing that would let one account's private
-        // feed stay on screen after switching to the other.
-        if context != lastMirroredContext {
-            lastMirroredContext = context
+        // Cached data is invalidated on the *effective* context — the one whose
+        // data is actually on screen. Not on the legacy value, because two
+        // logins on the same instance collapse onto the same one; and not on
+        // the stored context, because that does not move when a credential
+        // arrives or disappears and the app falls back to local and back again.
+        let effective = dataContextValidator.effectiveContext
+        if effective != lastCachedContext {
+            lastCachedContext = effective
             clearAccountScopedCaches()
         }
 
         let legacy: SubscriptionAccount
 
-        switch context {
+        switch accountsManager.currentContext {
         case .local:
             legacy = .local
 
@@ -787,10 +786,22 @@ final class AppEnvironment {
             guard credentials.isScopeResolved else { continue }
 
             credentials.refreshLoginStatus(for: account)
-            accountsManager.setStatus(
-                credentials.isLoggedIn(for: account) ? .signedIn : .credentialMissing,
-                for: account.id
-            )
+
+            guard credentials.isLoggedIn(for: account) else {
+                accountsManager.setStatus(.credentialMissing, for: account.id)
+                continue
+            }
+
+            // A credential the server has rejected is still a credential: only
+            // the server can say it works again. Reporting "signed in" here
+            // because the Keychain item exists would erase the rejection the
+            // moment it was recorded — the API layer sets it, which posts the
+            // notification that runs this — and the user would never be asked
+            // to sign in again. Storing a new credential resets the status
+            // explicitly.
+            guard accountsManager.status(for: account.id) != .credentialRejected else { continue }
+
+            accountsManager.setStatus(.signedIn, for: account.id)
         }
     }
 
