@@ -427,7 +427,14 @@ private struct EditRemoteServerContent: View {
         }
 
         appEnvironment.accountsManager.setStatus(.signedIn, for: account.id)
-        appEnvironment.instancesManager.setUsesAccountLogin(true, for: instance)
+
+        // `usesAccountLogin` is deliberately not set. It is pre-revamp state
+        // that migration only reads, and it syncs through iCloud key-value
+        // storage independently of the account records — a device receiving the
+        // flag before the account would synthesize a migrated account for a
+        // login that was never legacy, and the marker that arrives later does
+        // not retract it. Accounts describe logins now; the flag only describes
+        // the world before they existed.
 
         // Signing in again keeps the same account, so nothing downstream sees a
         // change of context — but the credential behind it may now belong to

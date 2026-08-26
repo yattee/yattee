@@ -448,6 +448,24 @@ final class AccountsManager {
     ///   pushed back over the stale server copy.
     @discardableResult
     func applySyncedContext(_ incoming: StoredDataContext) -> Bool {
+        var incoming = incoming
+
+        // A tombstone dominates the account everywhere, contexts included. An
+        // offline device can select an account another device has deleted and
+        // publish that choice with a newer timestamp; adopting it would leave
+        // every device pointing at an account that is never coming back. The
+        // choice's own timestamp is kept, so a later real selection still wins,
+        // and every device that holds the tombstone repairs it identically.
+        if let accountID = incoming.context.accountID, deletedAccountIDs.contains(accountID) {
+            incoming = StoredDataContext(context: .local, changedAt: incoming.changedAt)
+
+            LoggingService.shared.info(
+                "Ignoring a synced context that names a deleted account",
+                category: .general,
+                details: "accountID=\(accountID)"
+            )
+        }
+
         // Before the user has ever chosen here there is nothing to order
         // against: the local value is a default stamped when this manager was
         // constructed, so a synced choice made yesterday would lose to it and a

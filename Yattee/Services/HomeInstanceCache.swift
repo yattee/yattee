@@ -24,6 +24,10 @@ final class HomeInstanceCache {
     /// Whether the disk cache has been loaded.
     private var diskCacheLoaded = false
 
+    /// Set when feeds had to be dropped before the disk cache was read, so the
+    /// entries that load carry the same purge.
+    private var pendingFeedPurge = false
+
     private init() {}
 
     // MARK: - Cache Key Management
@@ -70,6 +74,11 @@ final class HomeInstanceCache {
             )
         } else {
             LoggingService.shared.debug("No home instance cache found on disk", category: .general)
+        }
+
+        if pendingFeedPurge {
+            pendingFeedPurge = false
+            clearAllFeeds()
         }
     }
 
@@ -184,6 +193,19 @@ final class HomeInstanceCache {
     /// otherwise be served each other's. Popular and trending are public and
     /// stay.
     func clearAllFeeds() {
+        // A purge can be asked for before the disk cache has been read — the
+        // identity check runs at startup, the load is async. Dropping only what
+        // is in memory would then be undone by the load, so the requirement is
+        // remembered and applied to whatever it brings in.
+        guard diskCacheLoaded else {
+            pendingFeedPurge = true
+            LoggingService.shared.debug(
+                "HomeInstanceCache.clearAllFeeds: Deferred until the disk cache is loaded",
+                category: .general
+            )
+            return
+        }
+
         let keysToRemove = cache.keys.filter { $0.hasSuffix("_\(InstanceContentType.feed.rawValue)") }
         guard !keysToRemove.isEmpty else { return }
 

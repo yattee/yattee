@@ -612,8 +612,32 @@ struct AccountSyncTests {
         #expect(identityA.accounts.account(id: account.id) != nil)
     }
 
+    @Test("A context naming a deleted account is never adopted")
+    func tombstoneDominatesASyncedContext() async {
+        let harness = Self.makeHarness()
+        let account = harness.accounts.addAccount(instanceID: UUID())
+        harness.accounts.removeAccount(account.id)
+
+        // An offline device can select an account another device has already
+        // deleted, and publish that choice with a newer timestamp.
+        let stale = StoredDataContext(
+            context: .account(account.id),
+            changedAt: Date().addingTimeInterval(3_600)
+        )
+        harness.coordinator.stageFetched(
+            records: [harness.mapper.toCKRecord(dataContext: stale)],
+            deletions: []
+        )
+        await harness.coordinator.activate()
+
+        #expect(harness.accounts.currentContext == .local)
+        // The choice's own timestamp is kept, so a later real selection still
+        // outranks this repair on every device.
+        #expect(harness.accounts.storedContext.changedAt == stale.changedAt)
+    }
+
     @Test("Records fetched before the identity resolves are recovered by a bootstrap")
-    func unresolvedIdentityForcesAnotherBootstrap() {
+    func unresolvedIdentityForcesAnotherBootstrap() async {
         let defaults = Self.makeDefaults()
         let store = AccountSyncStore(defaults: defaults)
         store.markBootstrapCompleted(in: "identity-A")
@@ -640,14 +664,27 @@ struct AccountSyncTests {
         #expect(store.stagedChanges(in: "unresolved").isEmpty)
 
         // The engine's token has moved past those records, so the identity that
-        // resolves has to fetch the zone in full again to see them.
+        // resolves has to fetch the zone in full again to see them. The
+        // requirement is persisted, not held in memory: the token may already
+        // have advanced, and a launch that lost it would neither replay nor
+        // bootstrap.
+        #expect(store.hasPendingIdentityRecovery)
+
         identity.value = "identity-A"
-        coordinator.identityDidChange()
+        let relaunched = AccountSyncCoordinator(
+            accountsManager: accounts,
+            namespaceProvider: { identity.value },
+            store: AccountSyncStore(defaults: defaults),
+            isCategoryEnabled: { true }
+        )
+        await relaunched.activate()
+
         #expect(!store.isBootstrapCompleted(in: "identity-A"))
+        #expect(!store.hasPendingIdentityRecovery)
     }
 
     @Test("A switch of Apple account never claims records dropped while unresolved")
-    func switchedIdentityDoesNotClaimDroppedRecords() {
+    func switchedIdentityDoesNotClaimDroppedRecords() async {
         let defaults = Self.makeDefaults()
         let store = AccountSyncStore(defaults: defaults)
         store.markBootstrapCompleted(in: "identity-A")
@@ -672,10 +709,8 @@ struct AccountSyncTests {
             records: [AccountSyncTests.makeMapper().toCKRecord(account: Account(instanceID: UUID()))],
             deletions: []
         )
-        coordinator.identityDidChange()
-
         identity.value = "identity-B"
-        coordinator.identityDidChange()
+        await coordinator.activate()
 
         // Neither identity is handed the other's records; both recover their
         // own from their own zone instead.

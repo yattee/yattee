@@ -154,6 +154,21 @@ final class AccountSyncStore {
         defaults.removeObject(forKey: key("schemaVersion", in: namespace))
     }
 
+    // MARK: - Identity recovery
+
+    /// Whether account records were dropped because no identity was resolved to
+    /// stage them under.
+    ///
+    /// Deliberately not namespaced — the identity they belonged to is the one
+    /// thing that could not be established — and persisted, because the engine
+    /// may already have moved its change token past those records: a crash
+    /// before the identity resolved would otherwise leave them unreachable by
+    /// any later fetch.
+    var hasPendingIdentityRecovery: Bool {
+        get { defaults.bool(forKey: "accountSync.pendingIdentityRecovery") }
+        set { defaults.set(newValue, forKey: "accountSync.pendingIdentityRecovery") }
+    }
+
     /// The account-category schema this build understands. Raising it makes
     /// every identity bootstrap once more, which is how a future release picks
     /// up record types this one ignores.

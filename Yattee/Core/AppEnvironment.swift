@@ -460,9 +460,14 @@ final class AppEnvironment {
                 // away — even when the new namespace happens to select the same
                 // context and the change comparison would find nothing.
                 self.clearAccountScopedCaches()
+                if let owner = self.credentialIdentityScope.current {
+                    UserDefaults.standard.set(owner, forKey: Self.cacheOwnerKey)
+                }
                 self.mirrorContextToLegacySelection(resetWhenUnresolvable: true)
             }
         }
+
+        discardCachesFromAnotherIdentityIfNeeded()
 
         // Turn any pre-revamp single-instance logins into accounts. Repeatable:
         // it runs again whenever instances arrive from iCloud.
@@ -650,6 +655,33 @@ final class AppEnvironment {
         HomeInstanceCache.shared.clearAllFeeds()
     }
 
+    private static let cacheOwnerKey = "accountScopedCacheOwner"
+
+    /// Discards cached private data left behind by a different Apple account.
+    ///
+    /// The identity-change notification cannot cover this: a scope this device
+    /// has seen before resolves synchronously while `CredentialIdentityScope` is
+    /// being constructed, which is before any observer here exists. So an Apple
+    /// account switched while the app was closed would otherwise reach the new
+    /// user with the previous one's feeds still on disk.
+    private func discardCachesFromAnotherIdentityIfNeeded() {
+        // Unresolved: no conclusion either way, and the observer covers it once
+        // the scope lands.
+        guard let owner = credentialIdentityScope.current else { return }
+
+        let defaults = UserDefaults.standard
+        let previous = defaults.string(forKey: Self.cacheOwnerKey)
+        defaults.set(owner, forKey: Self.cacheOwnerKey)
+
+        guard let previous, previous != owner else { return }
+
+        clearAccountScopedCaches()
+        LoggingService.shared.info(
+            "Apple account changed while the app was closed — discarded cached account data",
+            category: .general
+        )
+    }
+
     /// Deletes an instance together with the accounts that live on it.
     ///
     /// The cascade has to happen here, while the instance is still resolvable:
@@ -810,6 +842,21 @@ final class AppEnvironment {
         if instance.type == .yatteeServer || instance.usesBasicAuth,
            !basicAuthCredentialsManager.hasCredentials(for: instance) {
             return true
+        }
+
+        // Accounts describe the logins on an instance once there are any, so the
+        // pre-revamp flag is consulted only for instances that have none —
+        // fresh logins deliberately no longer set it.
+        let accounts = accountsManager.accounts(forInstance: instance.id)
+        if !accounts.isEmpty {
+            // An unresolved identity scope means "cannot tell yet". Reporting a
+            // missing credential on it would badge every account on every
+            // launch until the scope lands.
+            guard credentialIdentityScope.isResolved else { return false }
+
+            return !accounts.contains { account in
+                accountCredentialsManager(for: account)?.isLoggedIn(for: account) ?? false
+            }
         }
 
         if instance.usesAccountLogin,

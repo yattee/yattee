@@ -78,10 +78,6 @@ final class AccountSyncCoordinator {
     /// no identity was resolved.
     private var lastResolvedNamespace: String?
 
-    /// Set when account records had to be dropped because no identity was
-    /// resolved yet. The engine's token has already moved past them, so the
-    /// identity that resolves next has to bootstrap again to recover them.
-    private var droppedRecordsWhileUnresolved = false
 
     private var isActivating = false
     private var activationRequested = false
@@ -182,29 +178,7 @@ final class AccountSyncCoordinator {
     func identityDidChange() {
         identityGeneration += 1
 
-        guard let current = namespace else { return }
-        let previouslyResolved = lastResolvedNamespace
-        lastResolvedNamespace = current
-
-        // Records dropped for want of a resolved identity belonged to whichever
-        // Apple account was signed in at the time, and that cannot be
-        // reconstructed afterwards: a first launch and a sign-out/sign-in look
-        // identical from here. Rather than guess, every identity that could have
-        // owned them bootstraps again and recovers its own from its own zone. A
-        // redundant full fetch is the whole cost of that; guessing wrongly would
-        // show one Apple account's logins under another's.
-        if droppedRecordsWhileUnresolved {
-            droppedRecordsWhileUnresolved = false
-
-            for candidate in Set([current, previouslyResolved].compactMap { $0 }) {
-                store.clearBootstrapCompletion(in: candidate)
-            }
-
-            LoggingService.shared.logCloudKit(
-                "Account records arrived before the identity resolved — bootstrapping again to recover them"
-            )
-        }
-
+        guard namespace != nil else { return }
         Task { await activate() }
     }
 
@@ -239,7 +213,7 @@ final class AccountSyncCoordinator {
             // Staging under a guessed identity is the one thing worse than
             // losing the records: they would be applied to, and uploaded from,
             // an account they never belonged to.
-            droppedRecordsWhileUnresolved = true
+            store.hasPendingIdentityRecovery = true
             LoggingService.shared.logCloudKit(
                 "Dropping \(accountRecords.count + accountDeletions.count) account records fetched before the identity resolved"
             )
@@ -306,6 +280,9 @@ final class AccountSyncCoordinator {
             return
         }
 
+        recoverDroppedRecordsIfNeeded(in: namespace)
+        lastResolvedNamespace = namespace
+
         await runBootstrapIfNeeded(in: namespace)
 
         guard store.isBootstrapCompleted(in: namespace) else { return }
@@ -313,6 +290,32 @@ final class AccountSyncCoordinator {
 
         applyStagedChanges(in: namespace)
         enqueueDirtyRecords()
+    }
+
+    /// Makes every identity that could have owned dropped records fetch its zone
+    /// again.
+    ///
+    /// Which identity they belonged to cannot be reconstructed — a first launch
+    /// and a sign-out followed by a different sign-in look identical from here —
+    /// so instead of guessing, each candidate recovers its own records from its
+    /// own zone. A redundant full fetch is the whole cost; guessing wrongly
+    /// would show one Apple account's logins under another's.
+    ///
+    /// Only the identity signed in now and the last one seen in this process are
+    /// candidates. An identity that owned dropped records, is not signed in now,
+    /// and was last seen in an earlier process keeps its completed flag; nothing
+    /// here knows it exists.
+    private func recoverDroppedRecordsIfNeeded(in namespace: String) {
+        guard store.hasPendingIdentityRecovery else { return }
+        store.hasPendingIdentityRecovery = false
+
+        for candidate in Set([namespace, lastResolvedNamespace].compactMap { $0 }) {
+            store.clearBootstrapCompletion(in: candidate)
+        }
+
+        LoggingService.shared.logCloudKit(
+            "Account records arrived before the identity resolved — bootstrapping again to recover them"
+        )
     }
 
     private func applyStagedChanges(in namespace: String) {
