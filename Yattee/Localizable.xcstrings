@@ -233,6 +233,16 @@
         }
       }
     },
+    "accounts.useThisAccount" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Use This Account"
+          }
+        }
+      }
+    },
     "accounts.useSavedLogin" : {
       "localizations" : {
         "en" : {

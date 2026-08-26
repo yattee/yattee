@@ -367,7 +367,13 @@ actor CloudKitConflictResolver {
     /// Resolves a conflict between local and server data-context records.
     ///
     /// Strategy: last write wins on the app-managed `changedAt` — the moment
-    /// the user chose, not the moment a record happened to be written.
+    /// the user chose, not the moment a record happened to be written — with
+    /// an exact tie settled by the selected account's ID.
+    ///
+    /// The tie is not hypothetical: every migrated context is stamped at the
+    /// epoch, so two devices migrating different legacy selections produce
+    /// identical timestamps. This has to match `StoredDataContext.isOutranked`,
+    /// or a record could win the upload and still be refused on arrival.
     func resolveDataContextConflict(
         local: CKRecord,
         server: CKRecord
@@ -375,9 +381,18 @@ actor CloudKitConflictResolver {
         let localChanged = (local["changedAt"] as? Date) ?? Date.distantPast
         let serverChanged = (server["changedAt"] as? Date) ?? Date.distantPast
 
+        let localWins: Bool
+        if localChanged != serverChanged {
+            localWins = localChanged > serverChanged
+        } else {
+            let localKey = (local["accountID"] as? String) ?? ""
+            let serverKey = (server["accountID"] as? String) ?? ""
+            localWins = localKey > serverKey
+        }
+
         let resolved = server
 
-        if localChanged > serverChanged {
+        if localWins {
             resolved["contextKind"] = local["contextKind"]
             resolved["accountID"] = local["accountID"]
             resolved["changedAt"] = local["changedAt"]

@@ -502,8 +502,12 @@ struct SubscriptionsView: View {
                     .onReceive(NotificationCenter.default.publisher(for: .watchHistoryDidChange)) { _ in
                         loadWatchEntries()
                     }
-                    .onChange(of: appEnvironment?.settingsManager.subscriptionAccount) { _, _ in
-                        // Clear cache and refresh when subscription account changes
+                    // The data context, not the legacy setting: two logins on
+                    // the same instance map onto the same legacy value, so
+                    // switching between them would change nothing here and this
+                    // view would keep showing the first account's subscriptions
+                    // while writes went to the second.
+                    .onReceive(NotificationCenter.default.publisher(for: .dataContextDidChange)) { _ in
                         feedCache.handleAccountChange()
                         subscriptions = []
                         subscriptionsLoaded = false

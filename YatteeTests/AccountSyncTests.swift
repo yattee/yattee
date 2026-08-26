@@ -267,6 +267,28 @@ struct AccountSyncTests {
             #expect(try mapper.toStoredDataContext(from: serverWins).context == .account(accountID))
         }
 
+        @Test("Two migrated contexts converge instead of diverging")
+        func equalTimestampsBreakTheTieTheSameWayEverywhere() async throws {
+            let mapper = AccountSyncTests.makeMapper()
+            let resolver = CloudKitConflictResolver()
+
+            // Every migrated context is stamped at the epoch, so two devices
+            // migrating different legacy selections tie exactly.
+            let lower = StoredDataContext.migrated(.account(UUID(uuidString: "00000000-0000-0000-0000-000000000001")!))
+            let higher = StoredDataContext.migrated(.account(UUID(uuidString: "FFFFFFFF-0000-0000-0000-000000000001")!))
+
+            #expect(lower.isOutranked(by: higher))
+            #expect(!higher.isOutranked(by: lower))
+
+            // The upload side has to reach the same verdict, or a record could
+            // win the conflict and then be refused when it arrives.
+            let resolved = await resolver.resolveDataContextConflict(
+                local: mapper.toCKRecord(dataContext: higher),
+                server: mapper.toCKRecord(dataContext: lower)
+            )
+            #expect(try mapper.toStoredDataContext(from: resolved).context == higher.context)
+        }
+
         @Test("Write-once records resolve to the server copy")
         func writeOnceResolvesToServer() async {
             let mapper = AccountSyncTests.makeMapper()

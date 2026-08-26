@@ -417,21 +417,21 @@ final class AppEnvironment {
         accountSync.onAccountDeleted = { [weak self] accountID, account in
             guard let self else { return }
 
-            guard let account else {
-                // No metadata for this account here, so its backend is unknown
-                // and the right credential manager cannot be picked. The scoped
-                // key is the account ID either way, so both are asked to drop
-                // it; at most one of them holds anything. The unscoped legacy
-                // item is left alone — deleting it needs the instance, and its
-                // ownership check is bound to one.
+            // The backend is unknown whenever the account itself never arrived
+            // here, and equally when its instance is already gone — an instance
+            // deletion can reach this device before the tombstone does. The
+            // scoped key is the account ID either way, so both managers are
+            // asked to drop it; at most one of them holds anything. The
+            // unscoped legacy item is left alone in that case: deleting it
+            // needs the instance, and its ownership check is bound to one.
+            guard let account, let credentials = self.accountCredentialsManager(for: account) else {
                 self.invidiousCredentialsManager.deleteCredential(forAccountID: accountID)
                 self.pipedCredentialsManager.deleteCredential(forAccountID: accountID)
                 return
             }
 
-            let credentials = self.accountCredentialsManager(for: account)
-            credentials?.deleteCredential(for: account)
-            credentials?.deleteLegacyCredentialIfOwned(for: account)
+            credentials.deleteCredential(for: account)
+            credentials.deleteLegacyCredentialIfOwned(for: account)
         }
 
         // Statuses are cleared whenever the identity namespace reloads, so they

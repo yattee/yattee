@@ -24,6 +24,16 @@ enum DataContext: Codable, Hashable, Sendable {
     }
 
     var isLocal: Bool { self == .local }
+
+    /// Total order used **only** to break a tie between two contexts chosen at
+    /// the same instant.
+    ///
+    /// Migrated contexts are all deliberately stamped at the epoch, so two
+    /// devices migrating different legacy selections produce genuinely equal
+    /// timestamps. Without a tie-break each would keep its own and consider the
+    /// matter settled — a permanent, silent divergence. The value is arbitrary;
+    /// what matters is that every device computes the same one.
+    var tieBreakKey: String { accountID?.uuidString ?? "" }
 }
 
 /// A context together with the moment it was chosen.
@@ -51,6 +61,16 @@ struct StoredDataContext: Codable, Hashable, Sendable {
     }
 
     var isMigrated: Bool { changedAt == Date(timeIntervalSince1970: 0) }
+
+    /// Whether `other` should replace this selection.
+    ///
+    /// Ordered by the app-managed timestamp, with `DataContext.tieBreakKey`
+    /// settling an exact tie so that every device converges on the same answer
+    /// rather than each keeping its own.
+    func isOutranked(by other: StoredDataContext) -> Bool {
+        if other.changedAt != changedAt { return other.changedAt > changedAt }
+        return other.context.tieBreakKey > context.tieBreakKey
+    }
 }
 
 // MARK: - Legacy migration

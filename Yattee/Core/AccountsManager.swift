@@ -478,8 +478,8 @@ final class AccountsManager {
             return false
         }
 
-        guard incoming.changedAt > storedContext.changedAt else {
-            guard storedContext.changedAt > incoming.changedAt else { return false }
+        guard storedContext.isOutranked(by: incoming) else {
+            guard incoming.isOutranked(by: storedContext) else { return false }
             pendingContextUpload = true
             save()
             return true

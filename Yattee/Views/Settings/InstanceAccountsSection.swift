@@ -72,6 +72,19 @@ struct InstanceAccountsSection: View {
         }
         .frame(maxWidth: .infinity, alignment: .leading)
         .contextMenu {
+            // Without this a second login on an instance cannot be reached: the
+            // legacy picker lists one entry per instance, so it always resolves
+            // to whichever account was signed in first. The switcher that makes
+            // this a first-class choice everywhere comes later; until then this
+            // is what makes a second login usable at all.
+            if !isCurrentContext(account) {
+                Button {
+                    appEnvironment?.accountsManager.setContext(.account(account.id))
+                } label: {
+                    Label(String(localized: "accounts.useThisAccount"), systemImage: "checkmark.circle")
+                }
+            }
+
             Button {
                 loginTarget = .existing(account)
             } label: {
@@ -150,6 +163,10 @@ struct InstanceAccountsSection: View {
         case .credentialRejected: String(localized: "accounts.status.credentialRejected")
         case .unreachable: String(localized: "accounts.status.unreachable")
         }
+    }
+
+    private func isCurrentContext(_ account: Account) -> Bool {
+        appEnvironment?.accountsManager.currentContext == .account(account.id)
     }
 
     private func statusColor(for account: Account) -> Color {
