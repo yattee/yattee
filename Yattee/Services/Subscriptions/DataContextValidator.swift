@@ -9,6 +9,10 @@ import Foundation
 
 /// Why the selected context cannot be used at the moment.
 enum DataContextUnavailability: Hashable, Sendable {
+    /// Nothing is known yet: the Apple account the credentials are keyed by is
+    /// still being established, so the Keychain cannot be read under the right
+    /// scope. Never render this as "sign in required".
+    case checking
     /// The account exists but its instance hasn't arrived from iCloud yet.
     case instancePending
     /// The account's instance has been switched off. The selection is kept —
@@ -105,6 +109,7 @@ final class DataContextValidator {
 
             switch accountsManager.status(for: id) {
             case .signedIn: return .valid
+            case .checking: return .temporarilyUnavailable(.checking)
             case .credentialMissing: return .temporarilyUnavailable(.credentialMissing)
             case .credentialRejected: return .temporarilyUnavailable(.credentialRejected)
             case .unreachable: return .temporarilyUnavailable(.unreachable)

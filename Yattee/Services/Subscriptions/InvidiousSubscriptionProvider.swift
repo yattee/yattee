@@ -38,7 +38,22 @@ final class InvidiousSubscriptionProvider: SubscriptionProvider {
             return
         }
 
-        guard case APIError.unauthorized = error else { return }
+        // A server that cannot be reached says nothing about the credential.
+        // Recorded all the same: the account has to stop reporting itself as
+        // usable, or reads never fall back and the user is shown failures
+        // instead of local data.
+        switch error {
+        case APIError.timeout, APIError.noConnection:
+            accountsManager.setStatus(.unreachable, for: account.id)
+            return
+        case APIError.cancelled:
+            return
+        case APIError.unauthorized:
+            break
+        default:
+            return
+        }
+
         guard accountsManager.instance(for: account)?.usesBasicAuth == false else { return }
 
         accountsManager.setStatus(.credentialRejected, for: account.id)

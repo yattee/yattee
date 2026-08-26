@@ -9,6 +9,12 @@ import Foundation
 
 /// Why an account cannot currently be used.
 enum AccountStatus: Hashable, Sendable {
+    /// Nothing is known yet — the Apple account this device's credentials are
+    /// keyed by has not been established, so the Keychain cannot be read under
+    /// the right scope. Distinct from `credentialMissing`, which is an answer:
+    /// this one is the absence of one, and must never be presented as "signed
+    /// out" or acted on.
+    case checking
     /// Signed in and usable.
     case signedIn
     /// No credential on this device. On tvOS this is permanent until the user
@@ -499,8 +505,14 @@ final class AccountsManager {
         NotificationCenter.default.post(name: .accountsDidChange, object: nil)
     }
 
+    /// An account with no recorded status is *unknown*, not signed out. While
+    /// the identity scope is unresolved nothing can read the Keychain under the
+    /// right scope, and reporting a missing credential then would tell a user
+    /// with a perfectly good login to sign in again — and drop reads to local
+    /// data — for as long as iCloud stayed unreachable.
     func status(for accountID: UUID) -> AccountStatus {
-        accountStatuses[accountID] ?? .credentialMissing
+        if let status = accountStatuses[accountID] { return status }
+        return identityScope.isResolved ? .credentialMissing : .checking
     }
 
     // MARK: - Legacy migration

@@ -805,14 +805,17 @@ final class AppEnvironment {
                 continue
             }
 
-            // A credential the server has rejected is still a credential: only
-            // the server can say it works again. Reporting "signed in" here
-            // because the Keychain item exists would erase the rejection the
-            // moment it was recorded — the API layer sets it, which posts the
-            // notification that runs this — and the user would never be asked
-            // to sign in again. Storing a new credential resets the status
-            // explicitly.
-            guard accountsManager.status(for: account.id) != .credentialRejected else { continue }
+            // A credential the server rejected — or a server that could not be
+            // reached — is still a credential, and only the server can say
+            // otherwise. Reporting "signed in" here because the Keychain item
+            // exists would erase those the moment they were recorded: the API
+            // layer sets them, and that posts the notification that runs this.
+            // The next successful call clears them; storing a new credential
+            // resets the status explicitly.
+            switch accountsManager.status(for: account.id) {
+            case .credentialRejected, .unreachable: continue
+            case .checking, .signedIn, .credentialMissing: break
+            }
 
             accountsManager.setStatus(.signedIn, for: account.id)
         }

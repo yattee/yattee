@@ -153,11 +153,12 @@ struct InstanceAccountsSection: View {
     }
 
     private func status(for account: Account) -> AccountStatus {
-        appEnvironment?.accountsManager.status(for: account.id) ?? .credentialMissing
+        appEnvironment?.accountsManager.status(for: account.id) ?? .checking
     }
 
     private func statusText(for account: Account) -> String {
         switch status(for: account) {
+        case .checking: String(localized: "accounts.status.checking")
         case .signedIn: String(localized: "accounts.status.signedIn")
         case .credentialMissing: String(localized: "accounts.status.credentialMissing")
         case .credentialRejected: String(localized: "accounts.status.credentialRejected")
@@ -171,6 +172,7 @@ struct InstanceAccountsSection: View {
 
     private func statusColor(for account: Account) -> Color {
         switch status(for: account) {
+        case .checking: .secondary
         case .signedIn: .secondary
         case .credentialMissing: .secondary
         case .credentialRejected: .red

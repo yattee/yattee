@@ -532,11 +532,19 @@ struct iCloudSettingsView: View {
         resyncStoredLogins()
     }
 
-    /// Rewrites stored logins so they carry the sync setting that has just
-    /// changed. Whether a Keychain item syncs is fixed when it is written, so a
-    /// login stored while sync was off would stay on this device while its
+    /// Rewrites stored logins so they carry the sync setting that has just been
+    /// turned **on**. Whether a Keychain item syncs is fixed when it is written,
+    /// so a login stored while sync was off would stay on this device while its
     /// account record travelled — every other device showing an account whose
     /// credential never arrives.
+    ///
+    /// Deliberately not called when sync is switched off. Making a
+    /// synchronizable item local means deleting and rewriting it, and deleting
+    /// a synchronizable item propagates to every device (Apple-documented, and
+    /// measured for this project) — so "stop syncing this login" would sign the
+    /// user out on their other devices, which is not what the toggle says.
+    /// Turning sync off stops new writes from syncing and stops account records
+    /// from uploading; what is already in iCloud Keychain stays.
     private func resyncStoredLogins() {
         appEnvironment?.invidiousCredentialsManager.resyncCredentialsWithCurrentSetting()
         appEnvironment?.pipedCredentialsManager.resyncCredentialsWithCurrentSetting()

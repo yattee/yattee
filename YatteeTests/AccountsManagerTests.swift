@@ -186,6 +186,24 @@ struct AccountsManagerTests {
         #expect(manager.context(forLegacyInstanceID: instanceID) == .account(second.id))
     }
 
+    @Test("An unresolved identity is not a missing credential")
+    func unknownStatusIsNotSignedOut() {
+        let defaults = makeDefaults()
+        let unresolved = AccountsManager(
+            identityScope: CredentialIdentityScope(fixedScope: nil),
+            defaults: defaults
+        )
+        let account = unresolved.addAccount(instanceID: UUID())
+
+        // Nothing can read the Keychain under the right scope yet, so "no
+        // credential" is not an answer the app is entitled to give.
+        #expect(unresolved.status(for: account.id) == .checking)
+
+        let resolved = makeManager(defaults: defaults, scope: "identity-A")
+        let other = resolved.addAccount(instanceID: UUID())
+        #expect(resolved.status(for: other.id) == .credentialMissing)
+    }
+
     @Test("A fresh device adopts the synced context")
     func firstSyncedContextIsAdopted() {
         let manager = makeManager()

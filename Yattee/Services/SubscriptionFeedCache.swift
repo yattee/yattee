@@ -178,6 +178,8 @@ final class SubscriptionFeedCache {
 
     /// Updates the cache with new videos and persists to disk.
     func update(videos: [Video]) {
+        guard isCurrentAccountsResult() else { return }
+
         let oldCount = self.videos.count
         let oldDate = self.lastUpdated
         self.videos = videos
@@ -193,6 +195,8 @@ final class SubscriptionFeedCache {
 
     /// Appends videos to the existing cache (for pagination).
     private func appendVideos(_ newVideos: [Video]) {
+        guard isCurrentAccountsResult() else { return }
+
         let existingIDs = Set(videos.map { $0.id })
         let uniqueNewVideos = newVideos.filter { !existingIDs.contains($0.id) }
         videos.append(contentsOf: uniqueNewVideos)
@@ -210,8 +214,38 @@ final class SubscriptionFeedCache {
     /// Call this when the user switches between local and Invidious accounts.
     func handleAccountChange() {
         LoggingService.shared.info("Subscription account changed, clearing feed cache", category: .general)
+        // Anything already in flight was authenticated as the previous account.
+        // Clearing does not cancel it, and signing in again keeps the same
+        // account ID and context — so without this fence the old request lands
+        // afterwards and writes the previous user's private feed straight back
+        // into the cache, and onto disk.
+        accountGeneration += 1
         clear()
         feedLoadState = .idle
+    }
+
+    /// Which account's data the running request belongs to.
+    ///
+    /// Only one refresh runs at a time (every entry point guards on
+    /// `isLoading`), so a single pair of counters is enough to tell "this result
+    /// is for the account we are showing" from "this result is a leftover".
+    private var accountGeneration = 0
+    private var requestGeneration = 0
+
+    /// Marks the start of a request, capturing the account it is for.
+    private func beginRequest() {
+        requestGeneration = accountGeneration
+    }
+
+    private func isCurrentAccountsResult() -> Bool {
+        guard requestGeneration == accountGeneration else {
+            LoggingService.shared.info(
+                "Discarding a feed result that belongs to the previous login",
+                category: .general
+            )
+            return false
+        }
+        return true
     }
 
     // MARK: - Refresh
@@ -228,6 +262,8 @@ final class SubscriptionFeedCache {
             LoggingService.shared.debug("Feed refresh called but already loading, skipping", category: .general)
             return
         }
+
+        beginRequest()
 
         // The *effective* context, so an account still waiting on its instance
         // or credential falls back to local rather than reporting
@@ -437,6 +473,7 @@ final class SubscriptionFeedCache {
             return
         }
 
+        beginRequest()
         isLoading = true
         feedLoadState = .loadingMore
 

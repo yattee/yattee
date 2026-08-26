@@ -183,6 +183,16 @@
         }
       }
     },
+    "accounts.status.checking" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Checking\u2026"
+          }
+        }
+      }
+    },
     "accounts.status.credentialMissing" : {
       "localizations" : {
         "en" : {
