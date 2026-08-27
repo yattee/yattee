@@ -499,10 +499,17 @@ final class AccountsManager {
 
     // MARK: - Status
 
+    /// Records what the app currently knows about an account's usability.
+    ///
+    /// Announced separately from the account *list* changing. Recomputing
+    /// statuses from the Keychain is one of the things that listens for a list
+    /// change, and it cannot tell that a server rejected a credential or failed
+    /// to answer — so sharing one notification meant every status the API layer
+    /// recorded was overwritten by the reaction to recording it.
     func setStatus(_ status: AccountStatus, for accountID: UUID) {
         guard accountStatuses[accountID] != status else { return }
         accountStatuses[accountID] = status
-        NotificationCenter.default.post(name: .accountsDidChange, object: nil)
+        NotificationCenter.default.post(name: .accountStatusesDidChange, object: nil)
     }
 
     /// An account with no recorded status is *unknown*, not signed out. While
@@ -719,5 +726,7 @@ final class AccountsManager {
 
 extension Notification.Name {
     static let accountsDidChange = Notification.Name("stream.yattee.accountsDidChange")
+    /// An account's usability changed — not the list of accounts.
+    static let accountStatusesDidChange = Notification.Name("stream.yattee.accountStatusesDidChange")
     static let dataContextDidChange = Notification.Name("stream.yattee.dataContextDidChange")
 }

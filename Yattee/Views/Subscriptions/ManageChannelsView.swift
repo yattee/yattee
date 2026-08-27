@@ -281,7 +281,11 @@ struct ManageChannelsView: View {
                 await refreshChannels()
             }
         }
-        .onChange(of: settingsManager?.subscriptionAccount) { _, _ in
+        // The data context, not the legacy setting: switching between two
+        // logins on the same instance leaves that value identical, and this
+        // view would keep listing one account's channels while unsubscribes
+        // went to the other.
+        .onReceive(NotificationCenter.default.publisher(for: .dataContextDidChange)) { _ in
             Task {
                 await refreshChannels()
             }

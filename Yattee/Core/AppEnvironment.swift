@@ -457,12 +457,19 @@ final class AppEnvironment {
         // account's credential findable, so statuses are recomputed with them:
         // an account that appears mid-session would otherwise sit at "sign in
         // required" until the app was relaunched.
-        for name: Notification.Name in [.dataContextDidChange, .accountsDidChange, .instancesDidChange] {
+        // A status change is deliberately not one of the refresh triggers: the
+        // refresher reads the Keychain, which cannot know what a server said,
+        // so reacting to a status by recomputing it would erase every verdict
+        // the API layer records. It still runs the mirror, because a credential
+        // arriving or being rejected moves the effective context.
+        for name: Notification.Name in [
+            .dataContextDidChange, .accountsDidChange, .instancesDidChange, .accountStatusesDidChange
+        ] {
             contextMirrorObservers.append(
                 NotificationCenter.default.addObserver(forName: name, object: nil, queue: .main) { [weak self] _ in
                     MainActor.assumeIsolated {
                         guard let self else { return }
-                        if name != .dataContextDidChange {
+                        if name == .accountsDidChange || name == .instancesDidChange {
                             self.refreshAccountStatuses()
                         }
                         self.mirrorContextToLegacySelection()
@@ -685,11 +692,17 @@ final class AppEnvironment {
         let previous = defaults.string(forKey: Self.cacheOwnerKey)
         defaults.set(owner, forKey: Self.cacheOwnerKey)
 
-        guard let previous, previous != owner else { return }
+        guard previous != owner else { return }
 
+        // A missing owner is not the same as "ours". The first launch after
+        // upgrading finds caches written before anyone recorded who they belong
+        // to, and the Apple account may have changed since. Adopting them would
+        // be a guess with someone's private feed as the stake.
         clearAccountScopedCaches()
         LoggingService.shared.info(
-            "Apple account changed — discarded the previous account's cached data",
+            previous == nil
+                ? "Cached account data predates knowing who it belongs to — discarded it"
+                : "Apple account changed — discarded the previous account's cached data",
             category: .general
         )
     }
@@ -805,16 +818,21 @@ final class AppEnvironment {
                 continue
             }
 
-            // A credential the server rejected — or a server that could not be
-            // reached — is still a credential, and only the server can say
-            // otherwise. Reporting "signed in" here because the Keychain item
-            // exists would erase those the moment they were recorded: the API
-            // layer sets them, and that posts the notification that runs this.
-            // The next successful call clears them; storing a new credential
+            // A credential the server rejected is still a credential: the
+            // Keychain cannot tell that it stopped working, so this must not
+            // report "signed in" over it. Only the server clears a rejection —
+            // on the next successful call — or storing a new credential, which
             // resets the status explicitly.
+            //
+            // `unreachable` is deliberately *not* preserved. It is transient,
+            // and it stops reads from reaching the server at all, so keeping it
+            // here would strand the account: nothing would ever call out to
+            // discover that the network came back. Recomputing it on the events
+            // that run this — foreground, an account or instance arriving — is
+            // what lets it retry.
             switch accountsManager.status(for: account.id) {
-            case .credentialRejected, .unreachable: continue
-            case .checking, .signedIn, .credentialMissing: break
+            case .credentialRejected: continue
+            case .checking, .signedIn, .credentialMissing, .unreachable: break
             }
 
             accountsManager.setStatus(.signedIn, for: account.id)

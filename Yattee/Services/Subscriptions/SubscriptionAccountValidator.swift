@@ -150,6 +150,7 @@ final class SubscriptionAccountValidator {
         // Find first available account to switch to
         if let newAccount = availableAccounts.first {
             settingsManager.subscriptionAccount = newAccount
+            adoptCorrectedSelection(newAccount)
             feedCache.handleAccountChange()
 
             let newName = displayName(for: newAccount)
@@ -166,6 +167,7 @@ final class SubscriptionAccountValidator {
             // No valid accounts available - set to local anyway
             // The feed will show an appropriate error state
             settingsManager.subscriptionAccount = .local
+            adoptCorrectedSelection(.local)
             feedCache.handleAccountChange()
 
             LoggingService.shared.warning(
@@ -173,6 +175,20 @@ final class SubscriptionAccountValidator {
                 category: .general
             )
         }
+    }
+
+    /// Moves the data context with a correction made to the legacy setting.
+    ///
+    /// Reads and writes resolve through the context now, so correcting only the
+    /// legacy value would leave the picker naming one account while the data
+    /// came from another.
+    private func adoptCorrectedSelection(_ account: SubscriptionAccount) {
+        guard let accountsManager else { return }
+
+        let context = accountsManager.context(forLegacyInstanceID: account.instanceID)
+        guard context != accountsManager.currentContext else { return }
+
+        accountsManager.setContext(context)
     }
 
     // MARK: - Display Names

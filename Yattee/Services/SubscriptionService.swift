@@ -157,7 +157,13 @@ final class SubscriptionService {
     /// served after the account is gone.
     func discardProvider(for accountID: UUID) {
         accountProviders[accountID] = nil
+        providerGeneration += 1
     }
+
+    /// Which generation of logins the cached providers belong to. Bumped
+    /// whenever one is discarded, so a fetch that outlived its provider can be
+    /// told from a current one.
+    private var providerGeneration = 0
 
     /// The provider for **writes**.
     ///
@@ -289,9 +295,25 @@ final class SubscriptionService {
         isLoading = true
         lastError = nil
 
+        // Dropping a provider from the cache does not stop a fetch it has
+        // already started: the running task holds it, and the result would
+        // arrive afterwards as the current account's subscriptions. Signing in
+        // again or switching Apple account changes neither the context nor the
+        // account ID, so nothing else downstream would notice.
+        let generation = providerGeneration
+
         do {
             let channels = try await provider.fetchSubscriptions()
             isLoading = false
+
+            guard generation == providerGeneration else {
+                LoggingService.shared.info(
+                    "Discarding subscriptions fetched for a login that has since been replaced",
+                    category: .general
+                )
+                throw SubscriptionError.providerNotAvailable
+            }
+
             return channels
         } catch {
             lastError = error
