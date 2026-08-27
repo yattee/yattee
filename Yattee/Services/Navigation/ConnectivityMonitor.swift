@@ -42,7 +42,17 @@ final class ConnectivityMonitor: @unchecked Sendable {
     func startMonitoring() {
         monitor.pathUpdateHandler = { [weak self] path in
             Task { @MainActor [weak self] in
+                let wasOffline = self?.isOnline == false
                 self?.isOnline = path.status == .satisfied
+
+                // Anything that gave up while there was no network needs to
+                // hear that there is one again — an account marked unreachable
+                // stops reads from going out at all, so nothing else would ever
+                // discover it.
+                if wasOffline, path.status == .satisfied {
+                    NotificationCenter.default.post(name: .connectivityDidReturn, object: nil)
+                }
+
                 self?.isCellular = path.usesInterfaceType(.cellular)
                 self?.isExpensive = path.isExpensive
                 self?.isConstrained = path.isConstrained
@@ -55,4 +65,9 @@ final class ConnectivityMonitor: @unchecked Sendable {
     func stopMonitoring() {
         monitor.cancel()
     }
+}
+
+extension Notification.Name {
+    /// Posted when the device goes from offline to online.
+    static let connectivityDidReturn = Notification.Name("stream.yattee.connectivityDidReturn")
 }

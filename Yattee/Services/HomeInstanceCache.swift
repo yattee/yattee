@@ -28,6 +28,12 @@ final class HomeInstanceCache {
     /// entries that load carry the same purge.
     private var pendingFeedPurge = false
 
+    /// Which login the cached feeds belong to. Bumped whenever a feed is
+    /// dropped because the account behind it changed, so a request that was
+    /// already awaiting the server cannot write the previous user's videos back
+    /// in — clearing a cache does not cancel what is in flight.
+    private var accountGeneration = 0
+
     private init() {}
 
     // MARK: - Cache Key Management
@@ -100,7 +106,8 @@ final class HomeInstanceCache {
         }
 
         let key = cacheKey(instanceID: instanceID, contentType: contentType)
-        
+        let generation = accountGeneration
+
         LoggingService.shared.debug(
             "HomeInstanceCache.refresh: Fetching \(contentType.rawValue) from \(instance.displayName)",
             category: .general
@@ -138,6 +145,14 @@ final class HomeInstanceCache {
                 videos = try await appEnvironment.contentService.feed(for: instance, credential: credential)
             }
 
+            guard generation == accountGeneration else {
+                LoggingService.shared.info(
+                    "Discarding a \(contentType.rawValue) result that belongs to the previous login",
+                    category: .general
+                )
+                return
+            }
+
             // Update cache
             cache[key] = videos
             lastUpdated[key] = Date()
@@ -170,6 +185,8 @@ final class HomeInstanceCache {
 
     /// Clears cached content for a specific instance and content type.
     func clear(instanceID: UUID, contentType: InstanceContentType) {
+        accountGeneration += 1
+
         let key = cacheKey(instanceID: instanceID, contentType: contentType)
         cache.removeValue(forKey: key)
         lastUpdated.removeValue(forKey: key)
@@ -193,6 +210,8 @@ final class HomeInstanceCache {
     /// otherwise be served each other's. Popular and trending are public and
     /// stay.
     func clearAllFeeds() {
+        accountGeneration += 1
+
         // A purge can be asked for before the disk cache has been read — the
         // identity check runs at startup, the load is async. Dropping only what
         // is in memory would then be undone by the load, so the requirement is

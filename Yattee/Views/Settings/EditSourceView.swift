@@ -418,7 +418,11 @@ private struct EditRemoteServerContent: View {
         // behind it.
         guard credentials.credential(for: account) != nil else {
             if target.account == nil {
-                appEnvironment.accountsManager.removeAccount(account.id)
+                // Rolled back, not deleted: creating it also queued the marker
+                // that stops other devices synthesizing an account for this
+                // instance's pre-revamp login, and a sign-in that never
+                // completed must not leave that behind.
+                appEnvironment.accountsManager.rollbackAccountCreation(account.id)
             }
             appEnvironment.toastManager.showError(
                 String(localized: "accounts.signIn.storeFailed")

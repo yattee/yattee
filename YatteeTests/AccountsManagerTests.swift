@@ -186,6 +186,40 @@ struct AccountsManagerTests {
         #expect(manager.context(forLegacyInstanceID: instanceID) == .account(second.id))
     }
 
+    @Test("A sign-in that could not be stored leaves no migration marker")
+    func rolledBackLoginRetractsItsMarker() {
+        let manager = makeManager()
+        let instanceID = UUID()
+
+        let account = manager.addAccount(instanceID: instanceID)
+        #expect(manager.migratedInstanceIDs.contains(instanceID))
+
+        manager.rollbackAccountCreation(account.id)
+
+        // The marker would have told every other device that this instance's
+        // pre-revamp login is already represented — on the strength of an
+        // account that does not exist anywhere.
+        #expect(!manager.migratedInstanceIDs.contains(instanceID))
+        #expect(!manager.pendingMarkerUploads.contains(instanceID))
+        #expect(manager.account(id: account.id) == nil)
+        // And no tombstone: nothing was ever published to retract.
+        #expect(!manager.isDeleted(account.id))
+        #expect(!manager.pendingDeletions.contains(account.id))
+    }
+
+    @Test("Rolling back a confirmed account is a real deletion")
+    func rolledBackConfirmedAccountIsDeleted() {
+        let manager = makeManager()
+        let account = manager.addAccount(instanceID: UUID())
+        manager.confirmUpload(account.id)
+
+        manager.rollbackAccountCreation(account.id)
+
+        // It exists on the server, so other devices have to be told.
+        #expect(manager.isDeleted(account.id))
+        #expect(manager.pendingDeletions.contains(account.id))
+    }
+
     @Test("An unresolved identity is not a missing credential")
     func unknownStatusIsNotSignedOut() {
         let defaults = makeDefaults()

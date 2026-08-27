@@ -224,6 +224,47 @@ final class AccountsManager {
         NotificationCenter.default.post(name: .accountsDidChange, object: nil)
     }
 
+    /// Undoes an account that was created moments ago and could not be
+    /// completed — a sign-in whose credential the Keychain refused to store.
+    ///
+    /// Not the same as deleting it. Creating an account also marks its instance
+    /// migrated and queues the permanent marker that stops every other device
+    /// from synthesizing an account for that instance's pre-revamp login. A
+    /// deletion is meant to leave that marker standing; a creation that never
+    /// happened must not, or a legacy login that is still perfectly valid would
+    /// be suppressed everywhere on the strength of an account nobody has.
+    func rollbackAccountCreation(_ accountID: UUID) {
+        guard let account = account(id: accountID) else { return }
+
+        // Confirmed by the server already? Then it is a real account elsewhere,
+        // and undoing it means a real deletion, tombstone and all.
+        guard pendingUploads.contains(accountID) else {
+            removeAccount(accountID)
+            return
+        }
+
+        accounts.removeAll { $0.id == accountID }
+        accountStatuses[accountID] = nil
+        pendingUploads.remove(accountID)
+
+        // Retracted only while the marker is still ours to retract: never
+        // confirmed by the server, and nothing else on the instance relying on
+        // it. A tombstone for the migrated account keeps synthesis suppressed
+        // on its own, so nothing is resurrected by this.
+        if pendingMarkerUploads.contains(account.instanceID),
+           accounts(forInstance: account.instanceID).isEmpty {
+            pendingMarkerUploads.remove(account.instanceID)
+            migratedInstanceIDs.remove(account.instanceID)
+        }
+
+        if storedContext.context == .account(accountID) {
+            correctContextAfterDeletion()
+        }
+
+        save()
+        NotificationCenter.default.post(name: .accountsDidChange, object: nil)
+    }
+
     /// Drops an account and everything keyed to it, and records the permanent
     /// local tombstone.
     ///

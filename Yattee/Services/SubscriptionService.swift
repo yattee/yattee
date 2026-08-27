@@ -101,7 +101,7 @@ final class SubscriptionService {
             object: nil,
             queue: .main
         ) { [weak self] _ in
-            MainActor.assumeIsolated { self?.accountProviders.removeAll() }
+            MainActor.assumeIsolated { self?.discardAllProviders() }
         }
     }
 
@@ -157,6 +157,17 @@ final class SubscriptionService {
     /// served after the account is gone.
     func discardProvider(for accountID: UUID) {
         accountProviders[accountID] = nil
+        providerGeneration += 1
+    }
+
+    /// Drops every cached provider, for a change of Apple account.
+    ///
+    /// Bumping the generation is the half that matters: emptying the dictionary
+    /// only affects future lookups, while a fetch already awaiting a response
+    /// still holds its provider and would otherwise deliver the previous
+    /// identity's subscriptions.
+    func discardAllProviders() {
+        accountProviders.removeAll()
         providerGeneration += 1
     }
 

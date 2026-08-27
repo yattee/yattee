@@ -463,13 +463,14 @@ final class AppEnvironment {
         // the API layer records. It still runs the mirror, because a credential
         // arriving or being rejected moves the effective context.
         for name: Notification.Name in [
-            .dataContextDidChange, .accountsDidChange, .instancesDidChange, .accountStatusesDidChange
+            .dataContextDidChange, .accountsDidChange, .instancesDidChange,
+            .accountStatusesDidChange, .connectivityDidReturn
         ] {
             contextMirrorObservers.append(
                 NotificationCenter.default.addObserver(forName: name, object: nil, queue: .main) { [weak self] _ in
                     MainActor.assumeIsolated {
                         guard let self else { return }
-                        if name == .accountsDidChange || name == .instancesDidChange {
+                        if name != .dataContextDidChange, name != .accountStatusesDidChange {
                             self.refreshAccountStatuses()
                         }
                         self.mirrorContextToLegacySelection()
@@ -678,7 +679,11 @@ final class AppEnvironment {
         let defaults = UserDefaults.standard
 
         guard let owner = credentialIdentityScope.current else {
-            guard atLaunch, defaults.string(forKey: Self.cacheOwnerKey) != nil else { return }
+            // No recorded owner is not the same as "nothing to protect": the
+            // first launch after upgrading finds caches written before anyone
+            // recorded whose they are, which is exactly the case that must not
+            // be adopted.
+            guard atLaunch else { return }
 
             clearAccountScopedCaches()
             defaults.removeObject(forKey: Self.cacheOwnerKey)
@@ -745,9 +750,13 @@ final class AppEnvironment {
     /// instead of the pre-revamp instance-keyed Keychain lookup, which a new
     /// login no longer writes.
     func account(forInstance instance: Instance) -> Account? {
+        // The selected account is preferred only when it can actually answer.
+        // Returning a credential-less one would report the whole instance as
+        // signed out while a sibling login sits right there, usable.
         if case let .account(id) = accountsManager.currentContext,
            let account = accountsManager.account(id: id),
-           account.instanceID == instance.id {
+           account.instanceID == instance.id,
+           accountCredentialsManager(for: account)?.isLoggedIn(for: account) == true {
             return account
         }
 
