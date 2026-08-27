@@ -108,6 +108,7 @@ final class AccountSyncCoordinator {
         self.init(
             accountsManager: accountsManager,
             namespaceProvider: { identityScope.current },
+            identityScope: identityScope,
             store: store,
             conflictResolver: conflictResolver,
             zone: zone,
@@ -120,6 +121,7 @@ final class AccountSyncCoordinator {
     init(
         accountsManager: AccountsManager,
         namespaceProvider: @escaping @MainActor () -> String?,
+        identityScope: CredentialIdentityScope? = nil,
         store: AccountSyncStore? = nil,
         conflictResolver: CloudKitConflictResolver = CloudKitConflictResolver(),
         zone: CKRecordZone = RecordType.createZone(),
@@ -134,12 +136,17 @@ final class AccountSyncCoordinator {
         self.isCategoryEnabled = isCategoryEnabled
         self.lastResolvedNamespace = namespaceProvider()
 
-        identityObserver = NotificationCenter.default.addObserver(
-            forName: .credentialIdentityScopeDidChange,
-            object: nil,
-            queue: .main
-        ) { [weak self] _ in
-            MainActor.assumeIsolated { self?.identityDidChange() }
+        // Observed on *this* scope: another one resolving says nothing about
+        // the identity these records are namespaced by. Tests pass no scope and
+        // drive `identityDidChange()` directly.
+        if let identityScope {
+            identityObserver = NotificationCenter.default.addObserver(
+                forName: .credentialIdentityScopeDidChange,
+                object: identityScope,
+                queue: .main
+            ) { [weak self] _ in
+                MainActor.assumeIsolated { self?.identityDidChange() }
+            }
         }
 
         // Local edits mark themselves dirty in AccountsManager; these turn that

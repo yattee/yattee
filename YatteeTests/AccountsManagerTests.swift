@@ -187,8 +187,12 @@ struct AccountsManagerTests {
     }
 
     @Test("An unreachable server is retried rather than written off")
-    func unreachableStatusExpires() {
-        let manager = makeManager()
+    func unreachableStatusExpires() async throws {
+        let manager = AccountsManager(
+            identityScope: CredentialIdentityScope(fixedScope: "identity-A"),
+            defaults: makeDefaults(),
+            unreachableRetryInterval: 0.05
+        )
         let account = manager.addAccount(instanceID: UUID())
 
         manager.setStatus(.unreachable, for: account.id)
@@ -196,8 +200,9 @@ struct AccountsManagerTests {
 
         // The state stops reads from going out at all, so nothing would ever
         // discover that the server came back — a timeout during an outage
-        // produces no connectivity change to react to either.
-        manager.setStatus(.unreachable, for: account.id, at: Date().addingTimeInterval(-3_600))
+        // produces no connectivity change to react to either. It has to lift
+        // by mutating the status: nothing re-reads a value because time passed.
+        try await Task.sleep(for: .seconds(0.5))
         #expect(manager.status(for: account.id) == .signedIn)
     }
 

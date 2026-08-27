@@ -429,7 +429,7 @@ final class AppEnvironment {
         // otherwise a synced account shows "sign in required" until relaunch.
         NotificationCenter.default.addObserver(
             forName: .credentialIdentityScopeDidChange,
-            object: nil,
+            object: identityScope,
             queue: .main
         ) { [weak self] _ in
             // Deferred rather than run inline: AccountsManager observes the same

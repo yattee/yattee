@@ -88,11 +88,13 @@ final class AccountsManager {
     init(
         identityScope: CredentialIdentityScope,
         instancesManager: InstancesManager? = nil,
-        defaults: UserDefaults = .standard
+        defaults: UserDefaults = .standard,
+        unreachableRetryInterval: TimeInterval = 60
     ) {
         self.identityScope = identityScope
         self.instancesManager = instancesManager
         self.defaults = defaults
+        self.unreachableRetryInterval = unreachableRetryInterval
 
         load()
 
@@ -100,7 +102,7 @@ final class AccountsManager {
         // so everything held in memory belongs to the previous one.
         NotificationCenter.default.addObserver(
             forName: .credentialIdentityScopeDidChange,
-            object: nil,
+            object: identityScope,
             queue: .main
         ) { [weak self] _ in
             MainActor.assumeIsolated { self?.reloadForCurrentIdentity() }
@@ -158,9 +160,12 @@ final class AccountsManager {
         accounts.filter { capabilities(for: $0)?.isSelectableContext == true }
     }
 
-    /// Accounts whose instance is gone. Surfaced in the accounts screen with a
-    /// remove action rather than being deleted automatically — an instance can
-    /// be missing because iCloud hasn't delivered it yet.
+    /// Accounts whose instance is gone.
+    ///
+    /// Never deleted automatically: an instance can be missing because iCloud
+    /// has not delivered it yet, and absence is not a deletion. The screen that
+    /// lists these and offers to remove them is Phase 3 work; until it exists
+    /// an orphan stays out of the selectable contexts and out of the way.
     var orphanedAccounts: [Account] {
         accounts.filter { instance(for: $0) == nil }
     }
@@ -550,11 +555,12 @@ final class AccountsManager {
     /// - Parameter date: when the verdict was reached. Only `unreachable` uses
     ///   it — to decide when to try again — and only tests pass anything but
     ///   the default.
-    func setStatus(_ status: AccountStatus, for accountID: UUID, at date: Date = Date()) {
+    func setStatus(_ status: AccountStatus, for accountID: UUID) {
+        unreachableExpiries[accountID]?.cancel()
+        unreachableExpiries[accountID] = nil
+
         if status == .unreachable {
-            unreachableSince[accountID] = date
-        } else {
-            unreachableSince[accountID] = nil
+            scheduleUnreachableExpiry(for: accountID)
         }
 
         guard accountStatuses[accountID] != status else { return }
@@ -562,16 +568,34 @@ final class AccountsManager {
         NotificationCenter.default.post(name: .accountStatusesDidChange, object: nil)
     }
 
-    /// When each unreachable verdict was reached.
-    private var unreachableSince: [UUID: Date] = [:]
+    /// Pending "try this account again" timers.
+    private var unreachableExpiries: [UUID: Task<Void, Never>] = [:]
 
     /// How long "could not be reached" stands before the app tries again.
     ///
-    /// It has to expire on its own. The state stops reads from going to the
-    /// server at all, so nothing would ever discover that the server came back
-    /// — and a timeout during an outage never produces a connectivity change to
-    /// react to either.
-    private static let unreachableRetryInterval: TimeInterval = 60
+    /// It has to expire on its own, and visibly: the state stops reads from
+    /// going to the server at all, so nothing would discover that the server
+    /// came back — and a timeout during an outage produces no connectivity
+    /// change to react to either. Expiring by mutating the status, rather than
+    /// by having the getter compare the clock, is what makes the fallback
+    /// actually lift: nothing re-reads a value merely because time passed.
+    /// Injectable so tests do not have to wait a real minute.
+    private let unreachableRetryInterval: TimeInterval
+
+    private func scheduleUnreachableExpiry(for accountID: UUID) {
+        unreachableExpiries[accountID] = Task { [weak self] in
+            try? await Task.sleep(for: .seconds(self?.unreachableRetryInterval ?? 60))
+            guard !Task.isCancelled else { return }
+
+            await MainActor.run {
+                guard let self, self.accountStatuses[accountID] == .unreachable else { return }
+                self.unreachableExpiries[accountID] = nil
+                // Back to being usable: the credential was never in question,
+                // and the next request settles it either way.
+                self.setStatus(.signedIn, for: accountID)
+            }
+        }
+    }
 
     /// An account with no recorded status is *unknown*, not signed out. While
     /// the identity scope is unresolved nothing can read the Keychain under the
@@ -579,20 +603,7 @@ final class AccountsManager {
     /// with a perfectly good login to sign in again — and drop reads to local
     /// data — for as long as iCloud stayed unreachable.
     func status(for accountID: UUID) -> AccountStatus {
-        guard let status = accountStatuses[accountID] else {
-            return identityScope.isResolved ? .credentialMissing : .checking
-        }
-
-        // A server that did not answer a minute ago is worth trying again. The
-        // credential is untouched by any of this, so the account goes back to
-        // being usable and the next request settles it either way.
-        if status == .unreachable,
-           let since = unreachableSince[accountID],
-           Date().timeIntervalSince(since) > Self.unreachableRetryInterval {
-            return .signedIn
-        }
-
-        return status
+        accountStatuses[accountID] ?? (identityScope.isResolved ? .credentialMissing : .checking)
     }
 
     // MARK: - Legacy migration

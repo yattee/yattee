@@ -109,7 +109,10 @@ final class CredentialIdentityScope {
         state = newState
         guard current != previous else { return }
 
-        NotificationCenter.default.post(name: .credentialIdentityScopeDidChange, object: nil)
+        // Posted with the scope as the object: everything namespaced by identity
+        // observes *its* scope, so an unrelated one resolving cannot make it
+        // throw away state that never belonged to that scope.
+        NotificationCenter.default.post(name: .credentialIdentityScopeDidChange, object: self)
     }
 
     var isResolved: Bool { current != nil }

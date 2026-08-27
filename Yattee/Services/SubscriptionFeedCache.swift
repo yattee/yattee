@@ -129,6 +129,11 @@ final class SubscriptionFeedCache {
             return
         }
         diskCacheLoaded = true
+
+        // Ordered behind any purge already asked for, or this reads the file
+        // that purge is about to delete.
+        await diskClearTask?.value
+
         let generation = accountGeneration
 
         if let cacheData = await FeedCache.shared.load() {
@@ -165,10 +170,17 @@ final class SubscriptionFeedCache {
         lastUpdated = nil
         hasMorePages = false
         currentPage = 1
-        Task {
+        diskClearTask = Task {
             await FeedCache.shared.clear()
         }
     }
+
+    /// The outstanding erase of the on-disk feed.
+    ///
+    /// A load starting after a purge can still reach the cache actor first and
+    /// bring the erased feed back — the generation it captures is already the
+    /// new one, so nothing downstream can tell. Loads wait for this instead.
+    private var diskClearTask: Task<Void, Never>?
 
     func invalidate() {
         lastUpdated = nil
