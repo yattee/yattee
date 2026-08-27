@@ -129,8 +129,21 @@ final class SubscriptionFeedCache {
             return
         }
         diskCacheLoaded = true
+        let generation = accountGeneration
 
         if let cacheData = await FeedCache.shared.load() {
+            // The identity or the login can change while this is awaiting the
+            // disk. Applying what it brings back would restore the previous
+            // account's private feed on top of a cache that was deliberately
+            // emptied.
+            guard generation == accountGeneration else {
+                LoggingService.shared.info(
+                    "Discarding a disk feed that belongs to the previous login",
+                    category: .general
+                )
+                return
+            }
+
             videos = cacheData.videos
             lastUpdated = cacheData.lastUpdated
             hasLoadedOnce = true
@@ -222,6 +235,11 @@ final class SubscriptionFeedCache {
         accountGeneration += 1
         clear()
         feedLoadState = .idle
+        // The request that was running belongs to the previous account and its
+        // result is now fenced out, so it must not go on blocking the
+        // replacement — the new account would sit on an empty feed until
+        // something else asked for a refresh.
+        isLoading = false
     }
 
     /// Which account's data the running request belongs to.

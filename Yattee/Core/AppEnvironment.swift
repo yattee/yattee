@@ -73,6 +73,13 @@ final class AppEnvironment {
     /// The context the account-scoped caches currently hold data for.
     @ObservationIgnored private var lastCachedContext: DataContext = .local
 
+    /// The credential each rejection was recorded against, so a replacement
+    /// arriving over iCloud Keychain is not treated as still rejected.
+    @ObservationIgnored private var rejectedCredentialFingerprints: [UUID: String] = [:]
+
+    /// Re-reads the Keychain for a while after an account turns up without one.
+    @ObservationIgnored private var credentialArrivalTask: Task<Void, Never>?
+
     // MARK: - Shared Instance
 
     /// The single, process-wide app environment.
@@ -829,22 +836,83 @@ final class AppEnvironment {
 
             // A credential the server rejected is still a credential: the
             // Keychain cannot tell that it stopped working, so this must not
-            // report "signed in" over it. Only the server clears a rejection —
-            // on the next successful call — or storing a new credential, which
-            // resets the status explicitly.
+            // report "signed in" over it. What it *can* tell is whether the
+            // credential is still the same one — signing in again on another
+            // device replaces it under the same key — and a rejection only
+            // applies to the secret that earned it.
             //
-            // `unreachable` is deliberately *not* preserved. It is transient,
+            // `unreachable` is deliberately not preserved here. It is transient,
             // and it stops reads from reaching the server at all, so keeping it
-            // here would strand the account: nothing would ever call out to
-            // discover that the network came back. Recomputing it on the events
-            // that run this — foreground, an account or instance arriving — is
-            // what lets it retry.
-            switch accountsManager.status(for: account.id) {
-            case .credentialRejected: continue
-            case .checking, .signedIn, .credentialMissing, .unreachable: break
+            // would strand the account: nothing would call out to discover that
+            // the server came back.
+            let fingerprint = credentials.credential(for: account)
+                .map { CloudKitIdentity.shortDigest(of: Data($0.utf8)) }
+
+            if accountsManager.status(for: account.id) == .credentialRejected {
+                if let rejected = rejectedCredentialFingerprints[account.id], rejected != fingerprint {
+                    LoggingService.shared.info(
+                        "The rejected credential has been replaced — clearing the rejection",
+                        category: .keychain,
+                        details: "accountID=\(account.id)"
+                    )
+                } else {
+                    rejectedCredentialFingerprints[account.id] = fingerprint
+                    continue
+                }
             }
 
+            rejectedCredentialFingerprints[account.id] = nil
+
             accountsManager.setStatus(.signedIn, for: account.id)
+        }
+
+        waitForArrivingCredentialsIfNeeded()
+    }
+
+    /// Re-reads the Keychain for a couple of minutes while any account is
+    /// missing its credential.
+    ///
+    /// iCloud Keychain delivers on its own schedule and announces nothing when
+    /// it does, so an account that syncs ahead of its credential — the ordinary
+    /// case on a new device — would sit at "sign in required", with reads
+    /// falling back to local, until something unrelated happened to recompute
+    /// statuses. Stops as soon as nothing is waiting, and gives up rather than
+    /// polling forever: on tvOS, where app Keychain items never sync at all,
+    /// the wait is permanent by design.
+    private func waitForArrivingCredentialsIfNeeded() {
+        let isWaiting = accountsManager.accounts.contains { accountsManager.status(for: $0.id) == .credentialMissing }
+
+        guard isWaiting else {
+            credentialArrivalTask?.cancel()
+            credentialArrivalTask = nil
+            return
+        }
+
+        guard credentialArrivalTask == nil else { return }
+
+        credentialArrivalTask = Task { [weak self] in
+            for _ in 0 ..< 8 {
+                try? await Task.sleep(for: .seconds(15))
+                guard !Task.isCancelled, let self else { return }
+
+                let stillWaiting = self.accountsManager.accounts.contains {
+                    self.accountsManager.status(for: $0.id) == .credentialMissing
+                }
+                guard stillWaiting else { break }
+
+                for account in self.accountsManager.accounts
+                where self.accountsManager.status(for: account.id) == .credentialMissing {
+                    guard let credentials = self.accountCredentialsManager(for: account),
+                          credentials.isScopeResolved else { continue }
+
+                    credentials.refreshLoginStatus(for: account)
+                    if credentials.isLoggedIn(for: account) {
+                        self.accountsManager.setStatus(.signedIn, for: account.id)
+                    }
+                }
+            }
+
+            self?.credentialArrivalTask = nil
         }
     }
 

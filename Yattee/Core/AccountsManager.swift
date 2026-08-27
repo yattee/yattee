@@ -547,11 +547,31 @@ final class AccountsManager {
     /// change, and it cannot tell that a server rejected a credential or failed
     /// to answer — so sharing one notification meant every status the API layer
     /// recorded was overwritten by the reaction to recording it.
-    func setStatus(_ status: AccountStatus, for accountID: UUID) {
+    /// - Parameter date: when the verdict was reached. Only `unreachable` uses
+    ///   it — to decide when to try again — and only tests pass anything but
+    ///   the default.
+    func setStatus(_ status: AccountStatus, for accountID: UUID, at date: Date = Date()) {
+        if status == .unreachable {
+            unreachableSince[accountID] = date
+        } else {
+            unreachableSince[accountID] = nil
+        }
+
         guard accountStatuses[accountID] != status else { return }
         accountStatuses[accountID] = status
         NotificationCenter.default.post(name: .accountStatusesDidChange, object: nil)
     }
+
+    /// When each unreachable verdict was reached.
+    private var unreachableSince: [UUID: Date] = [:]
+
+    /// How long "could not be reached" stands before the app tries again.
+    ///
+    /// It has to expire on its own. The state stops reads from going to the
+    /// server at all, so nothing would ever discover that the server came back
+    /// — and a timeout during an outage never produces a connectivity change to
+    /// react to either.
+    private static let unreachableRetryInterval: TimeInterval = 60
 
     /// An account with no recorded status is *unknown*, not signed out. While
     /// the identity scope is unresolved nothing can read the Keychain under the
@@ -559,8 +579,20 @@ final class AccountsManager {
     /// with a perfectly good login to sign in again — and drop reads to local
     /// data — for as long as iCloud stayed unreachable.
     func status(for accountID: UUID) -> AccountStatus {
-        if let status = accountStatuses[accountID] { return status }
-        return identityScope.isResolved ? .credentialMissing : .checking
+        guard let status = accountStatuses[accountID] else {
+            return identityScope.isResolved ? .credentialMissing : .checking
+        }
+
+        // A server that did not answer a minute ago is worth trying again. The
+        // credential is untouched by any of this, so the account goes back to
+        // being usable and the next request settles it either way.
+        if status == .unreachable,
+           let since = unreachableSince[accountID],
+           Date().timeIntervalSince(since) > Self.unreachableRetryInterval {
+            return .signedIn
+        }
+
+        return status
     }
 
     // MARK: - Legacy migration
