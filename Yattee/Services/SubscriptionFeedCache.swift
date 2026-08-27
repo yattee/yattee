@@ -190,8 +190,12 @@ final class SubscriptionFeedCache {
     }
 
     /// Updates the cache with new videos and persists to disk.
-    func update(videos: [Video]) {
-        guard isCurrentAccountsResult() else { return }
+    ///
+    /// `generation` is the account this result was requested for, captured when
+    /// the request started — several requests can be in flight at once, so it
+    /// cannot be read from shared state at the end.
+    func update(videos: [Video], generation: Int) {
+        guard isCurrentAccountsResult(generation) else { return }
 
         let oldCount = self.videos.count
         let oldDate = self.lastUpdated
@@ -207,8 +211,8 @@ final class SubscriptionFeedCache {
     }
 
     /// Appends videos to the existing cache (for pagination).
-    private func appendVideos(_ newVideos: [Video]) {
-        guard isCurrentAccountsResult() else { return }
+    private func appendVideos(_ newVideos: [Video], generation: Int) {
+        guard isCurrentAccountsResult(generation) else { return }
 
         let existingIDs = Set(videos.map { $0.id })
         let uniqueNewVideos = newVideos.filter { !existingIDs.contains($0.id) }
@@ -242,21 +246,18 @@ final class SubscriptionFeedCache {
         isLoading = false
     }
 
-    /// Which account's data the running request belongs to.
-    ///
-    /// Only one refresh runs at a time (every entry point guards on
-    /// `isLoading`), so a single pair of counters is enough to tell "this result
-    /// is for the account we are showing" from "this result is a leftover".
+    /// Which login the cache currently holds data for.
     private var accountGeneration = 0
-    private var requestGeneration = 0
 
-    /// Marks the start of a request, capturing the account it is for.
-    private func beginRequest() {
-        requestGeneration = accountGeneration
+    /// The account a request starting now belongs to. Carried by the request
+    /// itself: switching accounts mid-flight starts a replacement while the
+    /// first one is still running.
+    private func beginRequest() -> Int {
+        accountGeneration
     }
 
-    private func isCurrentAccountsResult() -> Bool {
-        guard requestGeneration == accountGeneration else {
+    private func isCurrentAccountsResult(_ generation: Int) -> Bool {
+        guard generation == accountGeneration else {
             LoggingService.shared.info(
                 "Discarding a feed result that belongs to the previous login",
                 category: .general
@@ -281,7 +282,7 @@ final class SubscriptionFeedCache {
             return
         }
 
-        beginRequest()
+        let generation = beginRequest()
 
         // The *effective* context, so an account still waiting on its instance
         // or credential falls back to local rather than reporting
@@ -298,17 +299,17 @@ final class SubscriptionFeedCache {
         await Task.detached { @MainActor in
             switch backend {
             case .local:
-                await self.refreshLocalAccount(using: appEnvironment)
+                await self.refreshLocalAccount(using: appEnvironment, generation: generation)
             case .invidious:
-                await self.refreshInvidiousAccount(using: appEnvironment)
+                await self.refreshInvidiousAccount(using: appEnvironment, generation: generation)
             case .piped:
-                await self.refreshPipedAccount(using: appEnvironment)
+                await self.refreshPipedAccount(using: appEnvironment, generation: generation)
             }
         }.value
     }
 
     /// Refreshes feed for local account using Yattee Server.
-    private func refreshLocalAccount(using appEnvironment: AppEnvironment) async {
+    private func refreshLocalAccount(using appEnvironment: AppEnvironment, generation: Int) async {
         // Require Yattee Server for local accounts
         guard let serverInstance = appEnvironment.instancesManager.instances.first(where: {
             $0.type == .yatteeServer && $0.isEnabled
@@ -320,11 +321,11 @@ final class SubscriptionFeedCache {
         }
 
         LoggingService.shared.info("Refreshing feed using Yattee Server: \(serverInstance.url.absoluteString)", category: .general)
-        await refreshFromStatelessServer(instance: serverInstance, using: appEnvironment)
+        await refreshFromStatelessServer(instance: serverInstance, using: appEnvironment, generation: generation)
     }
 
     /// Refreshes feed for Invidious account using authenticated feed endpoint.
-    private func refreshInvidiousAccount(using appEnvironment: AppEnvironment) async {
+    private func refreshInvidiousAccount(using appEnvironment: AppEnvironment, generation: Int) async {
         guard let (instance, sid) = getInvidiousAuth(using: appEnvironment) else {
             LoggingService.shared.warning("Invidious account not authenticated", category: .general)
             feedLoadState = .error(.notAuthenticated)
@@ -337,7 +338,7 @@ final class SubscriptionFeedCache {
         // Reset pagination for fresh refresh
         currentPage = 1
         
-        await refreshFromInvidiousFeed(instance: instance, sid: sid, using: appEnvironment)
+        await refreshFromInvidiousFeed(instance: instance, sid: sid, using: appEnvironment, generation: generation)
     }
 
     /// Gets the authenticated Invidious instance and session ID.
@@ -378,7 +379,7 @@ final class SubscriptionFeedCache {
     // MARK: - Piped Account
 
     /// Refreshes feed for Piped account using authenticated feed endpoint.
-    private func refreshPipedAccount(using appEnvironment: AppEnvironment) async {
+    private func refreshPipedAccount(using appEnvironment: AppEnvironment, generation: Int) async {
         guard let (instance, authToken) = getPipedAuth(using: appEnvironment) else {
             LoggingService.shared.warning("Piped account not authenticated", category: .general)
             feedLoadState = .error(.notAuthenticated)
@@ -399,7 +400,7 @@ final class SubscriptionFeedCache {
 
             LoggingService.shared.info("Piped feed: Received \(feedVideos.count) videos", category: .general)
 
-            update(videos: feedVideos)
+            update(videos: feedVideos, generation: generation)
             appEnvironment.dataManager.updateLastVideoPublishedDates(from: feedVideos)
             prefetchDeArrow(for: feedVideos, using: appEnvironment)
             feedLoadState = .ready
@@ -437,7 +438,8 @@ final class SubscriptionFeedCache {
     private func refreshFromInvidiousFeed(
         instance: Instance,
         sid: String,
-        using appEnvironment: AppEnvironment
+        using appEnvironment: AppEnvironment,
+        generation: Int
     ) async {
         isLoading = true
         feedLoadState = .loading
@@ -458,7 +460,7 @@ final class SubscriptionFeedCache {
             )
 
             // For first page, replace all videos. For subsequent pages, this shouldn't be called.
-            update(videos: feedVideos)
+            update(videos: feedVideos, generation: generation)
             appEnvironment.dataManager.updateLastVideoPublishedDates(from: feedVideos)
 
             // Update pagination state
@@ -491,7 +493,7 @@ final class SubscriptionFeedCache {
             return
         }
 
-        beginRequest()
+        let generation = beginRequest()
         isLoading = true
         feedLoadState = .loadingMore
 
@@ -512,7 +514,7 @@ final class SubscriptionFeedCache {
             )
 
             // Append new videos to existing cache
-            appendVideos(feedVideos)
+            appendVideos(feedVideos, generation: generation)
 
             // Update pagination state
             hasMorePages = response.hasMore
@@ -537,7 +539,7 @@ final class SubscriptionFeedCache {
     // MARK: - Yattee Server Feed
 
     /// Refreshes feed from Yattee Server's stateless POST feed API.
-    private func refreshFromStatelessServer(instance: Instance, using appEnvironment: AppEnvironment) async {
+    private func refreshFromStatelessServer(instance: Instance, using appEnvironment: AppEnvironment, generation: Int) async {
         let subscriptions = appEnvironment.dataManager.subscriptions()
         LoggingService.shared.debug("refreshFromStatelessServer: Found \(subscriptions.count) subscriptions", category: .general)
         guard !subscriptions.isEmpty else {
@@ -582,7 +584,7 @@ final class SubscriptionFeedCache {
                 "refreshFromStatelessServer: Received \(serverVideos.count) videos from server, status: \(response.status), ready: \(response.isReady)",
                 category: .general
             )
-            update(videos: serverVideos)
+            update(videos: serverVideos, generation: generation)
             appEnvironment.dataManager.updateLastVideoPublishedDates(from: serverVideos)
 
             // Prefetch DeArrow branding
@@ -604,7 +606,8 @@ final class SubscriptionFeedCache {
                     await pollUntilReady(
                         channels: channelRequests,
                         instance: instance,
-                        appEnvironment: appEnvironment
+                        appEnvironment: appEnvironment,
+                        generation: generation
                     )
                 }
                 await pollingTask?.value
@@ -625,7 +628,8 @@ final class SubscriptionFeedCache {
     private func pollUntilReady(
         channels: [StatelessChannelRequest],
         instance: Instance,
-        appEnvironment: AppEnvironment
+        appEnvironment: AppEnvironment,
+        generation: Int
     ) async {
         let statusChannels = channels.map {
             StatelessChannelStatusRequest(channelId: $0.channelId, site: $0.site)
@@ -680,7 +684,7 @@ final class SubscriptionFeedCache {
                         instance: instance
                     ) {
                         let serverVideos = response.toVideos()
-                        update(videos: serverVideos)
+                        update(videos: serverVideos, generation: generation)
                         appEnvironment.dataManager.updateLastVideoPublishedDates(from: serverVideos)
                         prefetchDeArrow(for: serverVideos, using: appEnvironment)
                     }

@@ -73,9 +73,9 @@ final class AppEnvironment {
     /// The context the account-scoped caches currently hold data for.
     @ObservationIgnored private var lastCachedContext: DataContext = .local
 
-    /// The credential each rejection was recorded against, so a replacement
-    /// arriving over iCloud Keychain is not treated as still rejected.
-    @ObservationIgnored private var rejectedCredentialFingerprints: [UUID: String] = [:]
+    /// A digest of each account's stored credential, so a replacement arriving
+    /// over iCloud Keychain can be told from the same secret being re-read.
+    @ObservationIgnored private var credentialFingerprints: [UUID: String] = [:]
 
     /// Re-reads the Keychain for a while after an account turns up without one.
     @ObservationIgnored private var credentialArrivalTask: Task<Void, Never>?
@@ -409,6 +409,11 @@ final class AppEnvironment {
             // asked to drop it; at most one of them holds anything. The
             // unscoped legacy item is left alone in that case: deleting it
             // needs the instance, and its ownership check is bound to one.
+            // The provider holds this account's subscriptions in memory and may
+            // have a fetch in flight; without dropping it, the deleted
+            // account's channels can still arrive and be shown.
+            self.subscriptionService.discardProvider(for: accountID)
+
             guard let account, let credentials = self.accountCredentialsManager(for: account) else {
                 self.invidiousCredentialsManager.deleteCredential(forAccountID: accountID)
                 self.pipedCredentialsManager.deleteCredential(forAccountID: accountID)
@@ -646,14 +651,18 @@ final class AppEnvironment {
     /// different person entirely, and their subscriptions and feed would
     /// otherwise stay on screen.
     func accountCredentialDidChange(for account: Account) {
+        invalidateCaches(for: account)
+        refreshAccountStatuses()
+    }
+
+    /// Drops everything cached under an account's previous credential.
+    private func invalidateCaches(for account: Account) {
         subscriptionService.discardProvider(for: account.id)
         HomeInstanceCache.shared.clear(instanceID: account.instanceID, contentType: .feed)
 
         if accountsManager.currentContext == .account(account.id) {
             SubscriptionFeedCache.shared.handleAccountChange()
         }
-
-        refreshAccountStatuses()
     }
 
     /// Drops everything cached for whichever account was being shown.
@@ -732,6 +741,7 @@ final class AppEnvironment {
             let credentials = accountCredentialsManager(for: account)
             credentials?.deleteCredential(for: account)
             credentials?.deleteLegacyCredentialIfOwned(for: account)
+            subscriptionService.discardProvider(for: account.id)
             accountsManager.removeAccount(account.id)
         }
 
@@ -845,23 +855,31 @@ final class AppEnvironment {
             // and it stops reads from reaching the server at all, so keeping it
             // would strand the account: nothing would call out to discover that
             // the server came back.
+            // The secret itself is watched, not just the account: iCloud
+            // Keychain can replace it under the same key when the user signs in
+            // again elsewhere. The account ID, the context and the status all
+            // stay put, so nothing else would notice that the data on screen
+            // now belongs to a different backend user.
             let fingerprint = credentials.credential(for: account)
                 .map { CloudKitIdentity.shortDigest(of: Data($0.utf8)) }
+            let previousFingerprint = credentialFingerprints[account.id]
+            let didReplaceCredential = previousFingerprint != nil && previousFingerprint != fingerprint
+            credentialFingerprints[account.id] = fingerprint
 
-            if accountsManager.status(for: account.id) == .credentialRejected {
-                if let rejected = rejectedCredentialFingerprints[account.id], rejected != fingerprint {
-                    LoggingService.shared.info(
-                        "The rejected credential has been replaced — clearing the rejection",
-                        category: .keychain,
-                        details: "accountID=\(account.id)"
-                    )
-                } else {
-                    rejectedCredentialFingerprints[account.id] = fingerprint
-                    continue
-                }
+            if didReplaceCredential {
+                LoggingService.shared.info(
+                    "The stored credential was replaced — discarding what it had cached",
+                    category: .keychain,
+                    details: "accountID=\(account.id)"
+                )
+                invalidateCaches(for: account)
             }
 
-            rejectedCredentialFingerprints[account.id] = nil
+            // A rejection belongs to the credential that earned it. A
+            // replacement has not been rejected by anyone.
+            if accountsManager.status(for: account.id) == .credentialRejected, !didReplaceCredential {
+                continue
+            }
 
             accountsManager.setStatus(.signedIn, for: account.id)
         }
