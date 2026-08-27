@@ -789,6 +789,12 @@ final class AccountsManager {
     func reloadForCurrentIdentity() {
         accounts = []
         accountStatuses = [:]
+        // Their accounts belong to the namespace being left. A migrated account
+        // reuses its instance's UUID, so the same ID can exist under the new
+        // identity — and an old timer would then declare *that* account
+        // reachable again on the strength of a verdict about someone else's.
+        for expiry in unreachableExpiries.values { expiry.cancel() }
+        unreachableExpiries = [:]
         storedContext = StoredDataContext(context: .local)
         migratedInstanceIDs = []
         pendingUploads = []

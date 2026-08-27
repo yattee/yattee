@@ -91,6 +91,30 @@ struct KeychainCredentialStore: Sendable {
         return SecItemAdd(query as CFDictionary, nil)
     }
 
+    /// Whether the stored item is marked as syncing through iCloud Keychain.
+    ///
+    /// `nil` when there is no item under this key. The attribute records what
+    /// was requested when the item was written — that is exactly the question
+    /// here, and deliberately not "does this item belong to the current Apple
+    /// account", which it cannot answer (measured).
+    func isSynchronizable(key: String) -> Bool? {
+        for synchronizable in [true, false] {
+            let query: [String: Any] = [
+                kSecClass as String: kSecClassGenericPassword,
+                kSecAttrService as String: service,
+                kSecAttrAccount as String: key,
+                kSecAttrSynchronizable as String: synchronizable,
+                kSecMatchLimit as String: kSecMatchLimitOne
+            ]
+
+            if SecItemCopyMatching(query as CFDictionary, nil) == errSecSuccess {
+                return synchronizable
+            }
+        }
+
+        return nil
+    }
+
     /// Writes a value, replacing any existing item in either synchronizable form.
     @discardableResult
     func set(_ value: String, forKey key: String, synchronizable: Bool) -> OSStatus {

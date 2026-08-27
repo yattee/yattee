@@ -121,22 +121,42 @@ final class AccountKeychainCredentials {
     func resyncCredentialsWithCurrentSetting() {
         guard let scope = identityScope.current else { return }
 
+        let syncEnabled = shouldSyncToiCloud
+
         for accountID in loginsByScope[scope] ?? [] {
-            let credentialKey = KeychainCredentialStore.credentialKey(scope: scope, accountID: accountID)
-            let usernameKey = KeychainCredentialStore.usernameKey(scope: scope, accountID: accountID)
-            let syncEnabled = shouldSyncToiCloud
-
-            if let credential = store.value(forKey: credentialKey) {
-                _ = store.set(credential, forKey: credentialKey, synchronizable: syncEnabled)
-            }
-            if let username = store.value(forKey: usernameKey) {
-                _ = store.set(username, forKey: usernameKey, synchronizable: syncEnabled)
-            }
+            rewrite(
+                key: KeychainCredentialStore.credentialKey(scope: scope, accountID: accountID),
+                synchronizable: syncEnabled
+            )
+            rewrite(
+                key: KeychainCredentialStore.usernameKey(scope: scope, accountID: accountID),
+                synchronizable: syncEnabled
+            )
         }
+    }
 
-        LoggingService.shared.info(
-            "Rewrote stored \(credentialNoun)s with the current iCloud sync setting",
-            category: .keychain
+    /// Rewrites one item so it carries the wanted sync flag.
+    ///
+    /// Skipped when the flag already matches: the only way to change it is to
+    /// delete and re-add, which risks the login for no reason — and deleting a
+    /// synchronizable item propagates to every device. If the re-add does fail,
+    /// the original is put back the way it was rather than left missing.
+    private func rewrite(key: String, synchronizable: Bool) {
+        guard let value = store.value(forKey: key) else { return }
+
+        let current = store.isSynchronizable(key: key)
+        guard current != synchronizable else { return }
+
+        let status = store.set(value, forKey: key, synchronizable: synchronizable)
+        guard status != errSecSuccess else { return }
+
+        let restored = store.set(value, forKey: key, synchronizable: current ?? false)
+        LoggingService.shared.error(
+            restored == errSecSuccess
+                ? "Could not change how a \(credentialNoun) syncs — left it as it was"
+                : "Could not change how a \(credentialNoun) syncs, and could not restore it",
+            category: .keychain,
+            details: "status=\(store.describe(status))"
         )
     }
 

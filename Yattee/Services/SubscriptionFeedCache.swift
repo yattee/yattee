@@ -409,6 +409,7 @@ final class SubscriptionFeedCache {
         do {
             let pipedAPI = PipedAPI(httpClient: appEnvironment.httpClient)
             let feedVideos = try await pipedAPI.feed(instance: instance, authToken: authToken)
+            guard isCurrentAccountsResult(generation) else { return }
 
             LoggingService.shared.info("Piped feed: Received \(feedVideos.count) videos", category: .general)
 
@@ -418,6 +419,7 @@ final class SubscriptionFeedCache {
             feedLoadState = .ready
         } catch {
             LoggingService.shared.error("Failed to fetch Piped feed: \(error.localizedDescription)", category: .general)
+            guard isCurrentAccountsResult(generation) else { return }
             feedLoadState = .error(.networkError(error.localizedDescription))
         }
 
@@ -465,6 +467,8 @@ final class SubscriptionFeedCache {
                 maxResults: 50
             )
 
+            guard isCurrentAccountsResult(generation) else { return }
+
             let feedVideos = response.videos
             LoggingService.shared.info(
                 "Invidious feed: Received \(feedVideos.count) videos (page \(currentPage))",
@@ -488,6 +492,7 @@ final class SubscriptionFeedCache {
                 "Failed to fetch Invidious feed: \(error.localizedDescription)",
                 category: .general
             )
+            guard isCurrentAccountsResult(generation) else { return }
             feedLoadState = .error(.networkError(error.localizedDescription))
         }
 
@@ -518,6 +523,8 @@ final class SubscriptionFeedCache {
                 page: nextPage,
                 maxResults: 50
             )
+
+            guard isCurrentAccountsResult(generation) else { return }
 
             let feedVideos = response.videos
             LoggingService.shared.info(

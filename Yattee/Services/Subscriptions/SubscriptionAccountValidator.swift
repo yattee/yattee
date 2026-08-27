@@ -127,6 +127,19 @@ final class SubscriptionAccountValidator {
             return
         }
 
+        // Local is always a valid context. This validator predates that: it
+        // treats local as unavailable unless a Yattee Server is configured,
+        // which is a *feed* concern — the feed says so itself — not a reason to
+        // move the user onto somebody's backend account, or to overwrite a
+        // local choice synced from another device.
+        if accountsManager?.currentContext.isLocal == true {
+            LoggingService.shared.debug(
+                "Leaving the local selection alone — local data is always available",
+                category: .general
+            )
+            return
+        }
+
         // A selection whose account still exists is never corrected here. This
         // validator predates account-scoped credentials and reads "not signed
         // in" as "not available", which is now routinely temporary — an
