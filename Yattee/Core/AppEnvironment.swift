@@ -629,8 +629,13 @@ final class AppEnvironment {
         // logins on the same instance collapse onto the same one; and not on
         // the stored context, because that does not move when a credential
         // arrives or disappears and the app falls back to local and back again.
+        // Never while the identity is unresolved. With iCloud Drive off the
+        // scope drops to unresolved on every activation and comes back
+        // unchanged; the context reads as local in between, and treating that
+        // as a move would throw the caches away several times a day. "Cannot
+        // tell yet" is not grounds for anything destructive.
         let effective = dataContextValidator.effectiveContext
-        if effective != lastCachedContext {
+        if effective != lastCachedContext, credentialIdentityScope.isResolved {
             lastCachedContext = effective
             clearAccountScopedCaches()
         }

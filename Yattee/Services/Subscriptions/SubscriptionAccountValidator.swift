@@ -74,13 +74,11 @@ final class SubscriptionAccountValidator {
     var availableAccounts: [SubscriptionAccount] {
         var accounts: [SubscriptionAccount] = []
 
-        // Add local if Yattee Server is configured and enabled
-        let hasYatteeServer = instancesManager.instances.contains {
-            $0.type == .yatteeServer && $0.isEnabled
-        }
-        if hasYatteeServer {
-            accounts.append(.local)
-        }
+        // Local is always offered. Its *feed* needs a Yattee Server and says so
+        // itself when there is none; that is not a reason to make the user's
+        // own data unselectable — and since correction no longer moves away
+        // from local, leaving it out would make it unreachable once left.
+        accounts.append(.local)
 
         // Add logged-in and enabled Invidious instances
         for instance in instancesManager.instances {

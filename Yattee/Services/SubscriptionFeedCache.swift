@@ -433,8 +433,8 @@ final class SubscriptionFeedCache {
             feedLoadState = .ready
         } catch {
             LoggingService.shared.error("Failed to fetch Piped feed: \(error.localizedDescription)", category: .general)
-            recordOutcome(error, backend: .piped, using: appEnvironment)
             guard isCurrentAccountsResult(generation) else { return }
+            recordOutcome(error, backend: .piped, using: appEnvironment)
             feedLoadState = .error(.networkError(error.localizedDescription))
         }
 
@@ -508,8 +508,8 @@ final class SubscriptionFeedCache {
                 "Failed to fetch Invidious feed: \(error.localizedDescription)",
                 category: .general
             )
-            recordOutcome(error, backend: .invidious, using: appEnvironment)
             guard isCurrentAccountsResult(generation) else { return }
+            recordOutcome(error, backend: .invidious, using: appEnvironment)
             feedLoadState = .error(.networkError(error.localizedDescription))
         }
 

@@ -518,9 +518,14 @@ struct SubscriptionsView: View {
                     .onReceive(NotificationCenter.default.publisher(for: .dataContextDidChange)) { _ in
                         reloadForContextChange()
                     }
+                    // Instances count for the same reason: switching one off
+                    // moves reads to local without touching the stored context
+                    // or any account status.
                     .onReceive(NotificationCenter.default.publisher(for: .accountStatusesDidChange)) { _ in
-                        guard appEnvironment?.dataContextValidator.effectiveContext != loadedContext else { return }
-                        reloadForContextChange()
+                        reloadIfEffectiveContextMoved()
+                    }
+                    .onReceive(NotificationCenter.default.publisher(for: .instancesDidChange)) { _ in
+                        reloadIfEffectiveContextMoved()
                     }
                 .task(id: instanceConfigurationID) {
                     LoggingService.shared.debug("SubscriptionsView task triggered, instanceConfigurationID: \(instanceConfigurationID)", category: .general)
@@ -1338,6 +1343,11 @@ struct SubscriptionsView: View {
 
     /// Loads subscriptions asynchronously from the current provider.
     /// For Invidious, this fetches from the API and creates temporary Subscription objects for UI.
+    private func reloadIfEffectiveContextMoved() {
+        guard appEnvironment?.dataContextValidator.effectiveContext != loadedContext else { return }
+        reloadForContextChange()
+    }
+
     /// Drops what is on screen and reloads it for whatever context is current.
     private func reloadForContextChange() {
         loadedContext = appEnvironment?.dataContextValidator.effectiveContext

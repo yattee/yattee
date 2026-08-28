@@ -447,6 +447,14 @@ struct InstanceBrowseView: View {
         .onReceive(NotificationCenter.default.publisher(for: .accountsDidChange)) { _ in
             refreshLoginState()
         }
+        // Selecting the other login on this instance changes whose feed and
+        // playlists these are. Nothing else here would notice: the instance,
+        // the tab and the "already has data" shortcut are all unchanged.
+        .onReceive(NotificationCenter.default.publisher(for: .dataContextDidChange)) { _ in
+            discardAccountScopedContent()
+            refreshLoginState()
+            Task { await startContentLoad() }
+        }
         .onChange(of: selectedTab) { _, _ in
             isLoading = true
             errorMessage = nil
@@ -1179,6 +1187,15 @@ struct InstanceBrowseView: View {
 
     // MARK: - Data Loading
     
+    /// Drops what belonged to the previously selected login.
+    ///
+    /// Public browsing — popular and trending — is unauthenticated and stays.
+    private func discardAccountScopedContent() {
+        feedVideos = []
+        feedSubscriptions = []
+        userPlaylists = []
+    }
+
     private func refreshLoginState() {
         guard instance.supportsAuthentication else { return }
         isLoggedIn = appEnvironment?.isSignedIn(to: instance) ?? false
