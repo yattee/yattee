@@ -69,8 +69,21 @@ final class HomeInstanceCache {
             return
         }
         diskCacheLoaded = true
+        let generation = accountGeneration
 
         if let cacheData = await HomeInstanceDiskCache.shared.load() {
+            // The context or the Apple account can move while this is
+            // suspended. The in-memory cache is empty by then, so the purge
+            // finds nothing to drop and this would quietly reinstate the
+            // previous login's private feeds.
+            guard generation == accountGeneration else {
+                LoggingService.shared.info(
+                    "Discarding a disk cache that belongs to the previous login",
+                    category: .general
+                )
+                return
+            }
+
             cache = cacheData.videos
             lastUpdated = cacheData.lastUpdated
             let totalVideos = cache.values.map { $0.count }.reduce(0, +)

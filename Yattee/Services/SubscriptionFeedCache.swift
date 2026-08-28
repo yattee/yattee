@@ -615,6 +615,8 @@ final class SubscriptionFeedCache {
                 instance: instance
             )
 
+            guard isCurrentAccountsResult(generation) else { return }
+
             let serverVideos = response.toVideos()
             LoggingService.shared.info(
                 "refreshFromStatelessServer: Received \(serverVideos.count) videos from server, status: \(response.status), ready: \(response.isReady)",

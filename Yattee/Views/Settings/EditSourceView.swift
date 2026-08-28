@@ -411,10 +411,29 @@ private struct EditRemoteServerContent: View {
             return false
         }
 
+        // Re-resolved rather than trusted: signing in takes a round trip, and
+        // the account can be deleted on another device while it is happening.
+        // Writing the credential then would file a secret under an account that
+        // no longer exists, and report success for it.
+        if let existing = target.account, appEnvironment.accountsManager.account(id: existing.id) == nil {
+            appEnvironment.toastManager.showError(
+                String(localized: "accounts.signIn.storeFailed")
+            )
+            return false
+        }
+
         let account = target.account
             ?? appEnvironment.accountsManager.addAccount(instanceID: instance.id)
 
-        guard let credentials = appEnvironment.accountCredentialsManager(for: account) else { return false }
+        guard let credentials = appEnvironment.accountCredentialsManager(for: account) else {
+            // Its instance may have gone in the meantime, which is what makes
+            // the backend unresolvable. A provisional account created moments
+            // ago must not be left behind.
+            if target.account == nil {
+                appEnvironment.accountsManager.rollbackAccountCreation(account.id)
+            }
+            return false
+        }
 
         credentials.setCredential(credential, for: account)
 

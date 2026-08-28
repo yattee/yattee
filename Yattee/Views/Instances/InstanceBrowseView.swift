@@ -26,6 +26,9 @@ struct InstanceBrowseView: View {
     @State private var showFilterSheet = false
 
     // Feed state (for Invidious/Piped login)
+    /// Which login the account-scoped content belongs to, so a page still in
+    /// flight cannot be appended to the next one's feed.
+    @State private var accountContentGeneration = 0
     @State private var feedVideos: [Video] = []
     @State private var feedSubscriptions: [Channel] = []
     
@@ -1198,9 +1201,13 @@ struct InstanceBrowseView: View {
     ///
     /// Public browsing — popular and trending — is unauthenticated and stays.
     private func discardAccountScopedContent() {
+        accountContentGeneration += 1
         feedVideos = []
         feedSubscriptions = []
         userPlaylists = []
+        feedPage = 1
+        hasMoreFeedResults = false
+        isLoadingMoreFeed = false
     }
 
     private func refreshLoginState() {
@@ -1434,12 +1441,19 @@ struct InstanceBrowseView: View {
         feedLoadedVideoCount = feedVideos.count  // Mark current count to prevent re-triggering
         feedPage += 1
 
+        // The login can change while this page is in flight, and appending
+        // afterwards would mix one account's private videos into another's
+        // feed.
+        let generation = accountContentGeneration
+
         Task {
             do {
                 let api = InvidiousAPI(httpClient: appEnvironment.httpClient)
                 let feedResponse = try await api.feed(instance: instance, sid: sid, page: feedPage)
 
                 await MainActor.run {
+                    guard generation == accountContentGeneration else { return }
+
                     feedVideos.append(contentsOf: feedResponse.videos)
                     hasMoreFeedResults = feedResponse.hasMore
                     isLoadingMoreFeed = false
