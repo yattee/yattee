@@ -441,6 +441,17 @@ final class AppEnvironment {
             guard let account, let credentials = self.accountCredentialsManager(for: account) else {
                 self.invidiousCredentialsManager.deleteCredential(forAccountID: accountID)
                 self.pipedCredentialsManager.deleteCredential(forAccountID: accountID)
+
+                // The unscoped legacy item needs the instance to be identified,
+                // but not to be *checked*: the adoption marker is specific to
+                // service, account, scope and the exact secret, so asking both
+                // managers retires it if either owns it and does nothing
+                // otherwise. Worth asking — this account was explicitly deleted,
+                // and the instance may simply have gone first.
+                if let account {
+                    self.invidiousCredentialsManager.deleteLegacyCredentialIfOwned(for: account)
+                    self.pipedCredentialsManager.deleteLegacyCredentialIfOwned(for: account)
+                }
                 return
             }
 
@@ -696,6 +707,12 @@ final class AppEnvironment {
         if accountsManager.currentContext == .account(account.id) {
             SubscriptionFeedCache.shared.handleAccountChange()
         }
+
+        // Views hold their own copies of this account's data, and signing in
+        // again as somebody else changes neither the account ID, the context,
+        // nor usually the status — so nothing they observe would move. Told
+        // explicitly instead.
+        NotificationCenter.default.post(name: .accountCredentialDidChange, object: nil)
     }
 
     /// Drops everything cached for whichever account was being shown.

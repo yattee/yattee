@@ -455,6 +455,13 @@ struct InstanceBrowseView: View {
             refreshLoginState()
             Task { await startContentLoad() }
         }
+        // Same reason, without the context moving: the credential behind this
+        // instance's account was replaced.
+        .onReceive(NotificationCenter.default.publisher(for: .accountCredentialDidChange)) { _ in
+            discardAccountScopedContent()
+            refreshLoginState()
+            Task { await startContentLoad() }
+        }
         .onChange(of: selectedTab) { _, _ in
             isLoading = true
             errorMessage = nil

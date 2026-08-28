@@ -892,5 +892,9 @@ extension Notification.Name {
     static let accountsDidChange = Notification.Name("stream.yattee.accountsDidChange")
     /// An account's usability changed — not the list of accounts.
     static let accountStatusesDidChange = Notification.Name("stream.yattee.accountStatusesDidChange")
+    /// An account's stored credential was replaced. The account itself is
+    /// unchanged, so anything holding data fetched with the old one has to be
+    /// told: it may belong to an entirely different person on that server.
+    static let accountCredentialDidChange = Notification.Name("stream.yattee.accountCredentialDidChange")
     static let dataContextDidChange = Notification.Name("stream.yattee.dataContextDidChange")
 }

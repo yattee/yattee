@@ -527,6 +527,12 @@ struct SubscriptionsView: View {
                     .onReceive(NotificationCenter.default.publisher(for: .instancesDidChange)) { _ in
                         reloadIfEffectiveContextMoved()
                     }
+                    // Signing in again keeps the same account and context, so
+                    // nothing above would fire — but the data on screen may now
+                    // belong to a different person on that server.
+                    .onReceive(NotificationCenter.default.publisher(for: .accountCredentialDidChange)) { _ in
+                        reloadForContextChange()
+                    }
                 .task(id: instanceConfigurationID) {
                     LoggingService.shared.debug("SubscriptionsView task triggered, instanceConfigurationID: \(instanceConfigurationID)", category: .general)
                     await loadSubscriptionsAsync()
