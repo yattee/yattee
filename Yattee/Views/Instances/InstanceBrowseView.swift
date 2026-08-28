@@ -417,10 +417,7 @@ struct InstanceBrowseView: View {
                 )
             }
             
-            // Check login status for instances that support authentication
-            if instance.supportsAuthentication {
-                isLoggedIn = appEnvironment?.isSignedIn(to: instance) ?? false
-            }
+            refreshLoginState()
             
             // Set initial tab only once (not on navigation back)
             if !hasInitializedTab {
@@ -440,6 +437,15 @@ struct InstanceBrowseView: View {
         }
         .onReceive(NotificationCenter.default.publisher(for: .watchHistoryDidChange)) { _ in
             loadWatchEntries()
+        }
+        // A credential can arrive over iCloud Keychain, or an account be added,
+        // while this stays on screen — the Feed tab depends on it and would
+        // otherwise stay missing until the view was rebuilt.
+        .onReceive(NotificationCenter.default.publisher(for: .accountStatusesDidChange)) { _ in
+            refreshLoginState()
+        }
+        .onReceive(NotificationCenter.default.publisher(for: .accountsDidChange)) { _ in
+            refreshLoginState()
         }
         .onChange(of: selectedTab) { _, _ in
             isLoading = true
@@ -1173,6 +1179,11 @@ struct InstanceBrowseView: View {
 
     // MARK: - Data Loading
     
+    private func refreshLoginState() {
+        guard instance.supportsAuthentication else { return }
+        isLoggedIn = appEnvironment?.isSignedIn(to: instance) ?? false
+    }
+
     private func loadWatchEntries() {
         watchEntriesMap = appEnvironment?.dataManager.watchEntriesMap() ?? [:]
     }

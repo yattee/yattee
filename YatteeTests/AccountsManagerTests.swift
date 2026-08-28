@@ -186,6 +186,24 @@ struct AccountsManagerTests {
         #expect(manager.context(forLegacyInstanceID: instanceID) == .account(second.id))
     }
 
+    @Test("An account arriving after its instance was deleted is deleted too")
+    func lateAccountForDeletedInstanceIsDeleted() {
+        let manager = makeManager()
+        let instanceID = UUID()
+
+        manager.recordInstanceDeletion(instanceID)
+
+        // Deleting an instance deletes the accounts on it; one still in transit
+        // does not escape that by arriving late, and installing it would leave
+        // an orphan whose credential nothing can reach.
+        let late = Account(instanceID: instanceID)
+        #expect(!manager.applySyncedAccount(late))
+
+        #expect(manager.account(id: late.id) == nil)
+        #expect(manager.isDeleted(late.id))
+        #expect(manager.pendingDeletions.contains(late.id))
+    }
+
     @Test("An unreachable server is retried rather than written off")
     func unreachableStatusExpires() async throws {
         let manager = AccountsManager(

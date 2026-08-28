@@ -75,7 +75,31 @@ final class AppEnvironment {
 
     /// A digest of each account's stored credential, so a replacement arriving
     /// over iCloud Keychain can be told from the same secret being re-read.
+    ///
+    /// Persisted, because the replacement can arrive while the app is not
+    /// running: the Apple account and the context are unchanged on the next
+    /// launch, so nothing else would notice that the cached feed belongs to
+    /// whoever was signed in before.
     @ObservationIgnored private var credentialFingerprints: [UUID: String] = [:]
+
+    private var credentialFingerprintsKey: String {
+        "accountCredentialFingerprints.\(credentialIdentityScope.current ?? "unresolved")"
+    }
+
+    private func loadCredentialFingerprints() {
+        credentialFingerprints = (UserDefaults.standard
+            .dictionary(forKey: credentialFingerprintsKey) as? [String: String] ?? [:])
+            .reduce(into: [:]) { result, entry in
+                if let id = UUID(uuidString: entry.key) { result[id] = entry.value }
+            }
+    }
+
+    private func saveCredentialFingerprints() {
+        let stored = credentialFingerprints.reduce(into: [String: String]()) { result, entry in
+            result[entry.key.uuidString] = entry.value
+        }
+        UserDefaults.standard.set(stored, forKey: credentialFingerprintsKey)
+    }
 
     /// Re-reads the Keychain for a while after an account turns up without one.
     @ObservationIgnored private var credentialArrivalTask: Task<Void, Never>?
@@ -438,6 +462,9 @@ final class AppEnvironment {
             // silently fragile.
             Task { @MainActor [weak self] in
                 guard let self else { return }
+                // Fingerprints are recorded per identity, like everything else
+                // keyed to one.
+                self.loadCredentialFingerprints()
                 self.refreshAccountStatuses()
 
                 // Compared against the recorded owner rather than cleared
@@ -449,6 +476,7 @@ final class AppEnvironment {
             }
         }
 
+        loadCredentialFingerprints()
         discardCachesFromAnotherIdentityIfNeeded(atLaunch: true)
 
         // Turn any pre-revamp single-instance logins into accounts. Repeatable:
@@ -737,6 +765,11 @@ final class AppEnvironment {
     /// iCloud leaves its accounts orphaned rather than deleted, because absence
     /// is not a deletion.
     func removeInstance(_ instance: Instance) {
+        // Recorded first: the accounts on this instance may not have arrived
+        // yet, and one turning up afterwards has to be deleted rather than
+        // left as an orphan.
+        accountsManager.recordInstanceDeletion(instance.id)
+
         for account in accountsManager.accounts(forInstance: instance.id) {
             let credentials = accountCredentialsManager(for: account)
             credentials?.deleteCredential(for: account)
@@ -829,6 +862,9 @@ final class AppEnvironment {
     /// credential is something only the server can tell us, so that state is set
     /// by the API layer when a request actually fails.
     func refreshAccountStatuses() {
+        var didChangeFingerprints = false
+        defer { if didChangeFingerprints { saveCredentialFingerprints() } }
+
         for account in accountsManager.accounts {
             guard let credentials = accountCredentialsManager(for: account) else { continue }
 
@@ -865,6 +901,7 @@ final class AppEnvironment {
             let previousFingerprint = credentialFingerprints[account.id]
             let didReplaceCredential = previousFingerprint != nil && previousFingerprint != fingerprint
             credentialFingerprints[account.id] = fingerprint
+            didChangeFingerprints = true
 
             if didReplaceCredential {
                 LoggingService.shared.info(

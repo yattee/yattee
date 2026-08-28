@@ -75,6 +75,14 @@ final class AccountsManager {
     /// Whether the selected context still has to reach the server.
     private(set) var pendingContextUpload = false
 
+    /// Instances the user has deleted here.
+    ///
+    /// Deleting an instance deletes the accounts on it, but those accounts may
+    /// not have arrived yet — CloudKit and the instance list travel
+    /// separately. Remembered so a late arrival is deleted rather than
+    /// installed as an orphan whose credential nothing can reach.
+    private(set) var deletedInstanceIDs: Set<UUID> = []
+
     /// Accounts known to be deleted. Permanent, and the only thing that
     /// authorises removing an account that arrives from sync: a record's
     /// *absence* proves nothing, because a fetch resumes from a change token
@@ -343,6 +351,14 @@ final class AccountsManager {
         save()
     }
 
+    /// Records that an instance was deleted here, so accounts on it that have
+    /// yet to arrive are deleted on sight rather than orphaned.
+    func recordInstanceDeletion(_ instanceID: UUID) {
+        guard !deletedInstanceIDs.contains(instanceID) else { return }
+        deletedInstanceIDs.insert(instanceID)
+        save()
+    }
+
     func isDeleted(_ accountID: UUID) -> Bool {
         deletedAccountIDs.contains(accountID)
     }
@@ -393,6 +409,23 @@ final class AccountsManager {
         // A tombstone dominates the account everywhere. The caller repairs the
         // server copy; here it simply never becomes local state again.
         guard !deletedAccountIDs.contains(incoming.id) else { return false }
+
+        // Its instance was deleted here while this account was still in
+        // transit. Deleting an instance deletes its accounts, so this one is
+        // deleted too — arriving late does not exempt it, and installing it
+        // would leave an orphan nothing can reach the credential of.
+        guard !deletedInstanceIDs.contains(incoming.instanceID) else {
+            pendingDeletions.insert(incoming.id)
+            deletedAccountIDs.insert(incoming.id)
+            save()
+
+            LoggingService.shared.info(
+                "An account arrived for an instance that was deleted here — deleting it too",
+                category: .general,
+                details: "accountID=\(incoming.id)"
+            )
+            return false
+        }
 
         if let index = accounts.firstIndex(where: { $0.id == incoming.id }) {
             let existing = accounts[index]
@@ -799,6 +832,10 @@ final class AccountsManager {
             deletedAccountIDs = Set(ids.compactMap(UUID.init(uuidString:)))
         }
 
+        if let ids = defaults.array(forKey: key("deletedInstances")) as? [String] {
+            deletedInstanceIDs = Set(ids.compactMap(UUID.init(uuidString:)))
+        }
+
         pendingContextUpload = defaults.bool(forKey: key("pendingContextUpload"))
     }
 
@@ -814,6 +851,7 @@ final class AccountsManager {
         defaults.set(pendingDeletions.map(\.uuidString), forKey: key("pendingDeletions"))
         defaults.set(pendingMarkerUploads.map(\.uuidString), forKey: key("pendingMarkerUploads"))
         defaults.set(deletedAccountIDs.map(\.uuidString), forKey: key("deletedAccounts"))
+        defaults.set(deletedInstanceIDs.map(\.uuidString), forKey: key("deletedInstances"))
         defaults.set(pendingContextUpload, forKey: key("pendingContextUpload"))
     }
 
@@ -836,6 +874,7 @@ final class AccountsManager {
         pendingDeletions = []
         pendingMarkerUploads = []
         deletedAccountIDs = []
+        deletedInstanceIDs = []
         pendingContextUpload = false
 
         load()

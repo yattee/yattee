@@ -333,6 +333,11 @@ private struct EditRemoteServerContent: View {
         .onReceive(NotificationCenter.default.publisher(for: .accountsDidChange)) { _ in
             isLoggedIn = appEnvironment?.isSignedIn(to: instance) ?? false
         }
+        // A credential arriving over iCloud Keychain changes only the status,
+        // and the authenticated import actions depend on it.
+        .onReceive(NotificationCenter.default.publisher(for: .accountStatusesDidChange)) { _ in
+            isLoggedIn = appEnvironment?.isSignedIn(to: instance) ?? false
+        }
         .onAppear {
             isLoggedIn = appEnvironment?.isSignedIn(to: instance) ?? false
 
