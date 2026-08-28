@@ -1716,6 +1716,9 @@ extension CloudKitSyncEngine: CKSyncEngineDelegate {
                 case .willFetchChanges:
                     LoggingService.shared.logCloudKit("CKSyncEngine will fetch changes (auto-triggered)")
                     isReceivingChanges = true
+                    // Binds everything this fetch delivers to the identity it
+                    // started under; the Apple account can move mid-fetch.
+                    accountSync?.fetchDidBegin()
 
                 case .didFetchChanges:
                     LoggingService.shared.logCloudKit("CKSyncEngine finished fetching changes")

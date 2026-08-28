@@ -103,6 +103,18 @@ final class SubscriptionService {
         ) { [weak self] _ in
             MainActor.assumeIsolated { self?.discardAllProviders() }
         }
+
+        // Switching context deliberately keeps the providers — each is one
+        // account's cache and stays valid — but a fetch already running belongs
+        // to the account that was selected when it started, and finishing after
+        // the switch would put its channels on screen for another one.
+        NotificationCenter.default.addObserver(
+            forName: .dataContextDidChange,
+            object: nil,
+            queue: .main
+        ) { [weak self] _ in
+            MainActor.assumeIsolated { self?.providerGeneration += 1 }
+        }
     }
 
     // MARK: - Current Provider
@@ -174,7 +186,7 @@ final class SubscriptionService {
     /// Which generation of logins the cached providers belong to. Bumped
     /// whenever one is discarded, so a fetch that outlived its provider can be
     /// told from a current one.
-    private var providerGeneration = 0
+    fileprivate var providerGeneration = 0
 
     /// The provider for **writes**.
     ///

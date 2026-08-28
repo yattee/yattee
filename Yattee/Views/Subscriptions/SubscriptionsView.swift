@@ -22,6 +22,9 @@ struct SubscriptionsView: View {
     @State private var feedCache = SubscriptionFeedCache.shared
     @State private var subscriptions: [Subscription] = []
     @State private var subscriptionsLoaded = false
+    /// The effective context the visible subscriptions were loaded for, so a
+    /// status change that does not move it does not force a reload.
+    @State private var loadedContext: DataContext?
     @State private var selectedChannelID: String? = nil
     @State private var errorMessage: String?
     @State private var watchEntriesMap: [String: WatchEntry] = [:]
@@ -507,15 +510,17 @@ struct SubscriptionsView: View {
                     // switching between them would change nothing here and this
                     // view would keep showing the first account's subscriptions
                     // while writes went to the second.
+                    //
+                    // Status changes count too, through the *effective* context:
+                    // a credential arriving or being rejected moves reads
+                    // between the account and local without the stored context
+                    // moving at all.
                     .onReceive(NotificationCenter.default.publisher(for: .dataContextDidChange)) { _ in
-                        feedCache.handleAccountChange()
-                        subscriptions = []
-                        subscriptionsLoaded = false
-                        Task {
-                            guard let appEnvironment else { return }
-                            await loadSubscriptionsAsync()
-                            await feedCache.refresh(using: appEnvironment)
-                        }
+                        reloadForContextChange()
+                    }
+                    .onReceive(NotificationCenter.default.publisher(for: .accountStatusesDidChange)) { _ in
+                        guard appEnvironment?.dataContextValidator.effectiveContext != loadedContext else { return }
+                        reloadForContextChange()
                     }
                 .task(id: instanceConfigurationID) {
                     LoggingService.shared.debug("SubscriptionsView task triggered, instanceConfigurationID: \(instanceConfigurationID)", category: .general)
@@ -1333,8 +1338,27 @@ struct SubscriptionsView: View {
 
     /// Loads subscriptions asynchronously from the current provider.
     /// For Invidious, this fetches from the API and creates temporary Subscription objects for UI.
+    /// Drops what is on screen and reloads it for whatever context is current.
+    private func reloadForContextChange() {
+        loadedContext = appEnvironment?.dataContextValidator.effectiveContext
+        feedCache.handleAccountChange()
+        subscriptions = []
+        subscriptionsLoaded = false
+
+        Task {
+            guard let appEnvironment else { return }
+            await loadSubscriptionsAsync()
+            await feedCache.refresh(using: appEnvironment)
+        }
+    }
+
     private func loadSubscriptionsAsync() async {
         guard let subscriptionService, let appEnvironment else { return }
+
+        // Recorded on every load, not only on a context change: the first load
+        // of a session has to establish what is on screen, or the first status
+        // change would look like a move and reload for nothing.
+        loadedContext = appEnvironment.dataContextValidator.effectiveContext
 
         // For local account, just load from DataManager (fast)
         if appEnvironment.accountsManager.currentContext.isLocal {

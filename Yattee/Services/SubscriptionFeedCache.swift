@@ -237,6 +237,19 @@ final class SubscriptionFeedCache {
         saveToDisk()
     }
 
+    /// Reports what a feed request implies about the account it used.
+    ///
+    /// The feed talks to the same servers as the subscription providers but
+    /// does not go through one, so without this a credential that expires
+    /// during a feed-only refresh would keep looking signed in and the local
+    /// fallback would never engage.
+    private func recordOutcome(_ error: Error?, backend: AppEnvironment.FeedBackend, using appEnvironment: AppEnvironment) {
+        let type: InstanceType = backend == .invidious ? .invidious : .piped
+        guard let account = appEnvironment.account(forSelectedContext: type) else { return }
+
+        appEnvironment.accountsManager.recordServerOutcome(error, for: account)
+    }
+
     // MARK: - Account Change Handling
 
     /// Clears cache when subscription account changes.
@@ -412,6 +425,7 @@ final class SubscriptionFeedCache {
             guard isCurrentAccountsResult(generation) else { return }
 
             LoggingService.shared.info("Piped feed: Received \(feedVideos.count) videos", category: .general)
+            recordOutcome(nil, backend: .piped, using: appEnvironment)
 
             update(videos: feedVideos, generation: generation)
             appEnvironment.dataManager.updateLastVideoPublishedDates(from: feedVideos)
@@ -419,6 +433,7 @@ final class SubscriptionFeedCache {
             feedLoadState = .ready
         } catch {
             LoggingService.shared.error("Failed to fetch Piped feed: \(error.localizedDescription)", category: .general)
+            recordOutcome(error, backend: .piped, using: appEnvironment)
             guard isCurrentAccountsResult(generation) else { return }
             feedLoadState = .error(.networkError(error.localizedDescription))
         }
@@ -474,6 +489,7 @@ final class SubscriptionFeedCache {
                 "Invidious feed: Received \(feedVideos.count) videos (page \(currentPage))",
                 category: .general
             )
+            recordOutcome(nil, backend: .invidious, using: appEnvironment)
 
             // For first page, replace all videos. For subsequent pages, this shouldn't be called.
             update(videos: feedVideos, generation: generation)
@@ -492,6 +508,7 @@ final class SubscriptionFeedCache {
                 "Failed to fetch Invidious feed: \(error.localizedDescription)",
                 category: .general
             )
+            recordOutcome(error, backend: .invidious, using: appEnvironment)
             guard isCurrentAccountsResult(generation) else { return }
             feedLoadState = .error(.networkError(error.localizedDescription))
         }

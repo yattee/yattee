@@ -208,6 +208,18 @@ final class AccountSyncCoordinator {
 
     // MARK: - Fetching
 
+    /// Notes which identity the fetch now starting belongs to.
+    ///
+    /// The engine's fetch spans several delegate events, and the Apple account
+    /// can move between them. Staging under whatever is current when the
+    /// records happen to arrive would file one identity's accounts under
+    /// another's.
+    func fetchDidBegin() {
+        fetchIdentity = (namespace, identityGeneration)
+    }
+
+    private var fetchIdentity: (namespace: String?, generation: Int)?
+
     /// Stages the account-category part of one fetch event.
     ///
     /// Called before the delegate returns, so the staged state is never behind
@@ -218,13 +230,17 @@ final class AccountSyncCoordinator {
 
         guard !accountRecords.isEmpty || !accountDeletions.isEmpty else { return }
 
-        guard let namespace else {
+        // The identity the *fetch* began under, not whatever is current now.
+        let owner = fetchIdentity ?? (namespace, identityGeneration)
+
+        guard let namespace = owner.namespace, owner.generation == identityGeneration else {
             // Staging under a guessed identity is the one thing worse than
             // losing the records: they would be applied to, and uploaded from,
-            // an account they never belonged to.
+            // an account they never belonged to. A bootstrap recovers them for
+            // whichever identity they turn out to belong to.
             store.hasPendingIdentityRecovery = true
             LoggingService.shared.logCloudKit(
-                "Dropping \(accountRecords.count + accountDeletions.count) account records fetched before the identity resolved"
+                "Dropping \(accountRecords.count + accountDeletions.count) account records fetched under an identity that has since moved"
             )
             return
         }

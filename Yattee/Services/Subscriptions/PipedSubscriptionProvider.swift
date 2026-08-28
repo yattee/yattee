@@ -24,39 +24,11 @@ final class PipedSubscriptionProvider: SubscriptionProvider {
     private let credentialsManager: PipedCredentialsManager
     private let accountsManager: AccountsManager
 
-    /// Records the outcome of a server call against the account.
-    ///
-    /// Deliberately conservative: a raw 401 marks the credential rejected only
-    /// when no reverse-proxy basic auth is configured, because otherwise the
-    /// 401 may well have come from the proxy rather than the account. The
-    /// two-stage probe that disambiguates the remaining case is Phase 2 work;
-    /// until then an ambiguous failure leaves the status untouched rather than
-    /// wrongly telling the user to sign in again.
+    /// Records the outcome of a server call against the account. The
+    /// classification lives in one place so the feed cache, which talks to the
+    /// same servers without going through a provider, reaches the same verdict.
     private func recordOutcome(_ error: Error?) {
-        guard let error else {
-            accountsManager.setStatus(.signedIn, for: account.id)
-            return
-        }
-
-        // A server that cannot be reached says nothing about the credential.
-        // Recorded all the same: the account has to stop reporting itself as
-        // usable, or reads never fall back and the user is shown failures
-        // instead of local data.
-        switch error {
-        case APIError.timeout, APIError.noConnection:
-            accountsManager.setStatus(.unreachable, for: account.id)
-            return
-        case APIError.cancelled:
-            return
-        case APIError.unauthorized:
-            break
-        default:
-            return
-        }
-
-        guard accountsManager.instance(for: account)?.usesBasicAuth == false else { return }
-
-        accountsManager.setStatus(.credentialRejected, for: account.id)
+        accountsManager.recordServerOutcome(error, for: account)
     }
     private let settingsManager: SettingsManager
 

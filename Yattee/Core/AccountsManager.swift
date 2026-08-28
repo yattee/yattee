@@ -606,6 +606,41 @@ final class AccountsManager {
         accountStatuses[accountID] ?? (identityScope.isResolved ? .credentialMissing : .checking)
     }
 
+    /// Records what a server call implies about the account that made it.
+    ///
+    /// Deliberately conservative about rejection: a raw 401 marks the
+    /// credential only when no reverse-proxy basic auth is configured, because
+    /// otherwise the 401 may well have come from the proxy. The two-stage probe
+    /// that disambiguates the rest is Phase 2 work; until then an ambiguous
+    /// failure leaves the status alone rather than wrongly telling the user to
+    /// sign in again.
+    ///
+    /// Shared by the subscription providers and the feed cache: a credential
+    /// that expires during a feed-only refresh has to mark the account too, or
+    /// nothing ever reports it and the fallback never engages.
+    func recordServerOutcome(_ error: Error?, for account: Account) {
+        guard let error else {
+            setStatus(.signedIn, for: account.id)
+            return
+        }
+
+        // A server that cannot be reached says nothing about the credential.
+        // Recorded all the same: the account has to stop reporting itself as
+        // usable, or reads never fall back and the user is shown failures
+        // instead of local data.
+        switch error {
+        case APIError.timeout, APIError.noConnection:
+            setStatus(.unreachable, for: account.id)
+        case APIError.cancelled:
+            return
+        case APIError.unauthorized:
+            guard instance(for: account)?.usesBasicAuth == false else { return }
+            setStatus(.credentialRejected, for: account.id)
+        default:
+            return
+        }
+    }
+
     // MARK: - Legacy migration
 
     /// Turns each pre-revamp single-login instance into an account.
