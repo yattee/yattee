@@ -612,7 +612,11 @@ final class AccountSyncCoordinator {
             return mapper.toCKRecord(accountDeletionID: accountID)
 
         case .dataContext:
-            guard accountsManager.canUploadContext else { return nil }
+            // The pending flag, not just the ordering: correcting away from a
+            // deleted account clears it deliberately, and sending that
+            // automatic fallback would publish it under the deleted choice's
+            // timestamp — over a deliberate choice made elsewhere.
+            guard accountsManager.pendingContextUpload, accountsManager.canUploadContext else { return nil }
             return mapper.toCKRecord(dataContext: accountsManager.storedContext)
 
         case nil:
@@ -623,13 +627,13 @@ final class AccountSyncCoordinator {
     /// Clears outbox entries the server has confirmed, and releases whatever was
     /// waiting on them.
     func didSave(records: [CKRecord]) {
-        var didConfirmAccount = false
+        var didSaveAccountRecord = false
 
         for record in records {
             switch AccountRecordName.parse(record.recordID.recordName) {
             case let .account(id):
                 accountsManager.confirmUpload(id, updatedAt: record["updatedAt"] as? Date)
-                didConfirmAccount = true
+                didSaveAccountRecord = true
 
             case let .legacyMigration(instanceID):
                 accountsManager.confirmMarkerUpload(instanceID: instanceID)
@@ -644,14 +648,17 @@ final class AccountSyncCoordinator {
                 if let changedAt = record["changedAt"] as? Date {
                     accountsManager.confirmContextUpload(changedAt: changedAt)
                 }
+                didSaveAccountRecord = true
 
             case nil:
                 break
             }
         }
 
-        // A marker or a context held behind one of these accounts can go now.
-        if didConfirmAccount {
+        // Whatever was held behind these can go now — a marker waiting on its
+        // account, or a context the user changed while the previous one was
+        // still in flight, which confirmation deliberately left dirty.
+        if didSaveAccountRecord {
             enqueueDirtyRecords()
         }
     }

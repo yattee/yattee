@@ -27,7 +27,13 @@ final class PipedSubscriptionProvider: SubscriptionProvider {
     /// Records the outcome of a server call against the account. The
     /// classification lives in one place so the feed cache, which talks to the
     /// same servers without going through a provider, reaches the same verdict.
-    private func recordOutcome(_ error: Error?) {
+    private func recordOutcome(_ error: Error?, credential: String) {
+        // Only for the secret the request actually used. Signing in again — or
+        // a switch of Apple account — replaces it under the same key while a
+        // request is still out, and a late 401 would otherwise reject the
+        // replacement, or a late success clear a rejection it never earned.
+        guard credentialsManager.credential(for: account) == credential else { return }
+
         accountsManager.recordServerOutcome(error, for: account)
     }
     private let settingsManager: SettingsManager
@@ -63,7 +69,7 @@ final class PipedSubscriptionProvider: SubscriptionProvider {
         let (instance, authToken) = try await getAuthenticatedInstance()
 
         // Fetch subscriptions from Piped
-        let subscriptions = try await tracking {
+        let subscriptions = try await tracking(credential: authToken) {
             try await pipedAPI.subscriptions(instance: instance, authToken: authToken)
         }
 
@@ -83,7 +89,7 @@ final class PipedSubscriptionProvider: SubscriptionProvider {
         // Subscribe on Piped server. Tracked like every other authenticated
         // call: a rejected credential noticed here must mark the account, or it
         // keeps reporting itself as signed in.
-        try await tracking {
+        try await tracking(credential: authToken) {
             try await pipedAPI.subscribe(channelID: channel.id.channelID, instance: instance, authToken: authToken)
         }
 
@@ -100,7 +106,7 @@ final class PipedSubscriptionProvider: SubscriptionProvider {
         let (instance, authToken) = try await getAuthenticatedInstance()
 
         // Unsubscribe on Piped server
-        try await tracking {
+        try await tracking(credential: authToken) {
             try await pipedAPI.unsubscribe(channelID: channelID, instance: instance, authToken: authToken)
         }
 
@@ -137,13 +143,13 @@ final class PipedSubscriptionProvider: SubscriptionProvider {
 
     /// Gets the authenticated Piped instance and auth token from account settings.
     /// Runs a server call and records what it implies about the credential.
-    private func tracking<T>(_ operation: () async throws -> T) async rethrows -> T {
+    private func tracking<T>(credential: String, _ operation: () async throws -> T) async rethrows -> T {
         do {
             let value = try await operation()
-            recordOutcome(nil)
+            recordOutcome(nil, credential: credential)
             return value
         } catch {
-            recordOutcome(error)
+            recordOutcome(error, credential: credential)
             throw error
         }
     }

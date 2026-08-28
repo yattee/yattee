@@ -27,7 +27,13 @@ final class InvidiousSubscriptionProvider: SubscriptionProvider {
     /// Records the outcome of a server call against the account. The
     /// classification lives in one place so the feed cache, which talks to the
     /// same servers without going through a provider, reaches the same verdict.
-    private func recordOutcome(_ error: Error?) {
+    private func recordOutcome(_ error: Error?, credential: String) {
+        // Only for the secret the request actually used. Signing in again — or
+        // a switch of Apple account — replaces it under the same key while a
+        // request is still out, and a late 401 would otherwise reject the
+        // replacement, or a late success clear a rejection it never earned.
+        guard credentialsManager.credential(for: account) == credential else { return }
+
         accountsManager.recordServerOutcome(error, for: account)
     }
     private let settingsManager: SettingsManager
@@ -63,7 +69,7 @@ final class InvidiousSubscriptionProvider: SubscriptionProvider {
         let (instance, sid) = try await getAuthenticatedInstance()
         
         // Fetch subscriptions from Invidious
-        let subscriptions = try await tracking {
+        let subscriptions = try await tracking(credential: sid) {
             try await invidiousAPI.subscriptions(instance: instance, sid: sid)
         }
         
@@ -81,7 +87,7 @@ final class InvidiousSubscriptionProvider: SubscriptionProvider {
         let (instance, sid) = try await getAuthenticatedInstance()
         
         // Subscribe on Invidious server
-        try await tracking {
+        try await tracking(credential: sid) {
             try await invidiousAPI.subscribe(to: channel.id.channelID, instance: instance, sid: sid)
         }
         
@@ -100,7 +106,7 @@ final class InvidiousSubscriptionProvider: SubscriptionProvider {
         // Unsubscribe on Invidious server. Tracked like every other
         // authenticated call: a rejected credential noticed here must mark the
         // account, or it keeps reporting itself as signed in.
-        try await tracking {
+        try await tracking(credential: sid) {
             try await invidiousAPI.unsubscribe(from: channelID, instance: instance, sid: sid)
         }
         
@@ -137,13 +143,13 @@ final class InvidiousSubscriptionProvider: SubscriptionProvider {
 
     /// Gets the authenticated Invidious instance and session ID from account settings.
     /// Runs a server call and records what it implies about the credential.
-    private func tracking<T>(_ operation: () async throws -> T) async rethrows -> T {
+    private func tracking<T>(credential: String, _ operation: () async throws -> T) async rethrows -> T {
         do {
             let value = try await operation()
-            recordOutcome(nil)
+            recordOutcome(nil, credential: credential)
             return value
         } catch {
-            recordOutcome(error)
+            recordOutcome(error, credential: credential)
             throw error
         }
     }
