@@ -170,6 +170,12 @@ final class SubscriptionFeedCache {
         lastUpdated = nil
         hasMorePages = false
         currentPage = 1
+        // The Top Shelf snapshot lives in the shared app group and is read by
+        // tvOS without the app running, so emptying the cache is not enough:
+        // the previous login's feed would stay on the system home screen until
+        // some later refresh happened to rewrite it. Written from the cleared
+        // cache, so this erases it.
+        TopShelfSnapshotWriter.writeFeed()
         diskClearTask = Task {
             await FeedCache.shared.clear()
         }
