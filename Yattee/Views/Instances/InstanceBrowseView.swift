@@ -1208,6 +1208,11 @@ struct InstanceBrowseView: View {
         feedPage = 1
         hasMoreFeedResults = false
         isLoadingMoreFeed = false
+        // The high-water mark belongs to the discarded feed. Left behind, it
+        // gates pagination against the previous login's count: the next one
+        // would have to exceed a page it never loaded before it could ask for
+        // a second.
+        feedLoadedVideoCount = 0
     }
 
     private func refreshLoginState() {
@@ -1253,6 +1258,13 @@ struct InstanceBrowseView: View {
         isLoading = !hasData  // Only show loading spinner when no existing data
         errorMessage = nil
 
+        // Which login the account-scoped tabs are being loaded for. Cancelling
+        // the previous task is not enough on its own: a request that already
+        // came back races the cancellation, and its results would be installed
+        // after the purge that was meant to remove them. Popular and trending
+        // are unauthenticated and deliberately not fenced.
+        let generation = accountContentGeneration
+
         do {
             switch selectedTab {
             case .popular:
@@ -1280,6 +1292,7 @@ struct InstanceBrowseView: View {
                 // Load subscriptions and feed based on instance type
                 let subscriptionChannels: [Channel]
                 let videos: [Video]
+                let hasMore: Bool
 
                 switch instance.type {
                 case .invidious:
@@ -1302,7 +1315,7 @@ struct InstanceBrowseView: View {
 
                     subscriptionChannels = enrichedSubscriptions.map { $0.toChannel(baseURL: instance.url) }
                     videos = feedResponse.videos
-                    hasMoreFeedResults = feedResponse.hasMore
+                    hasMore = feedResponse.hasMore
 
                 case .piped:
                     let api = PipedAPI(httpClient: appEnvironment.httpClient)
@@ -1316,7 +1329,7 @@ struct InstanceBrowseView: View {
                     subscriptionChannels = pipedSubscriptions.map { $0.toChannel() }
                     videos = feedVideos
                     // Piped doesn't support pagination for feed
-                    hasMoreFeedResults = false
+                    hasMore = false
 
                 default:
                     errorMessage = String(localized: "feed.error.notSupported")
@@ -1324,6 +1337,9 @@ struct InstanceBrowseView: View {
                     return
                 }
 
+                guard generation == accountContentGeneration else { return }
+
+                hasMoreFeedResults = hasMore
                 feedSubscriptions = subscriptionChannels.map { $0.enrichedThumbnail(using: appEnvironment.dataManager) }
                 feedVideos = videos
                 prefetchBranding(for: videos)
@@ -1343,6 +1359,9 @@ struct InstanceBrowseView: View {
 
                 let api = InvidiousAPI(httpClient: appEnvironment.httpClient)
                 let playlists = try await api.userPlaylists(instance: instance, sid: credential)
+
+                guard generation == accountContentGeneration else { return }
+
                 userPlaylists = playlists
             }
         } catch is CancellationError {
