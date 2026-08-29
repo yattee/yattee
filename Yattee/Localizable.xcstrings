@@ -153,6 +153,16 @@
         }
       }
     },
+    "accounts.signIn.identityChanged" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Your iCloud account changed while signing in. Try again."
+          }
+        }
+      }
+    },
     "accounts.signIn.identityUnresolved" : {
       "localizations" : {
         "en" : {

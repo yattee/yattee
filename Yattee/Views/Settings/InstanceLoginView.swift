@@ -153,11 +153,31 @@ struct InstanceLoginView: View {
         isLoading = true
         errorMessage = nil
 
+        // Which Apple identity this login is being made under. Credentials are
+        // filed per identity, and the round trip below leaves room for the
+        // scope to move — storing afterwards would file the account obtained
+        // here in somebody else's namespace, and sync it to their Keychain.
+        let scopeAtStart = appEnvironment.credentialIdentityScope.current
+
         Task {
             do {
                 let credential = try await performLogin(appEnvironment: appEnvironment)
 
                 await MainActor.run {
+                    // Only a move between two *named* identities is a mismatch.
+                    // Unresolved at either end is left to `storeLogin`, which
+                    // already refuses to write under a scope it cannot name —
+                    // rejecting here as well would turn an ordinary sign-in
+                    // that began before iCloud settled, or a tokenless scope
+                    // revalidating on activation, into a failed login.
+                    if let scopeAtStart,
+                       let scopeNow = appEnvironment.credentialIdentityScope.current,
+                       scopeNow != scopeAtStart {
+                        errorMessage = String(localized: "accounts.signIn.identityChanged")
+                        isLoading = false
+                        return
+                    }
+
                     guard onLoginSuccess(credential, username) else {
                         // The failure is reported by a toast from the storing
                         // side; staying open keeps the form filled in so the
