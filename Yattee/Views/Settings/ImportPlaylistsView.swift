@@ -370,6 +370,18 @@ struct ImportPlaylistsView: View {
                     importProgress = (current: index + 1, total: total)
                 }
 
+                // These videos are private to the login they were read with,
+                // and the destination is not: local playlists are shared by
+                // whoever uses the device and sync to iCloud. The sheet can be
+                // dismissed and somebody else signed in on the same server
+                // while this runs, so the credential is checked before every
+                // write rather than only at the start. What has already been
+                // written stays — it was imported under the login that asked
+                // for it.
+                guard appEnvironment.credential(forInstance: instance) == credential else {
+                    throw ImportError.loginChanged
+                }
+
                 // Skip if already in playlist
                 if localPlaylist.contains(videoID: video.id.videoID) {
                     skippedCount += 1
@@ -425,6 +437,7 @@ struct ImportPlaylistsView: View {
     enum ImportError: LocalizedError {
         case notLoggedIn
         case notSupported
+        case loginChanged
 
         var errorDescription: String? {
             switch self {
@@ -432,6 +445,8 @@ struct ImportPlaylistsView: View {
                 return String(localized: "import.playlists.notLoggedIn")
             case .notSupported:
                 return String(localized: "import.playlists.notSupported")
+            case .loginChanged:
+                return String(localized: "import.playlists.loginChanged")
             }
         }
     }

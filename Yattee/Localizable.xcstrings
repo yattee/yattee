@@ -5006,6 +5006,17 @@
         }
       }
     },
+    "import.playlists.loginChanged" : {
+      "comment" : "Error message when the account was signed out or replaced during an import",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The login changed while importing, so the rest was not added."
+          }
+        }
+      }
+    },
     "import.playlists.notLoggedIn" : {
       "comment" : "Error message when not logged in to Invidious",
       "localizations" : {
