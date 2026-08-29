@@ -84,6 +84,31 @@ final class HomeInstanceCache {
                     "Discarding a disk cache that belongs to the previous login",
                     category: .general
                 )
+
+                // Not installing it is only half of it. The purge that moved
+                // the generation ran while this was suspended, found the
+                // in-memory cache empty, and returned without rewriting the
+                // file — so the previous login's feeds are still on disk, and
+                // the identity check has already recorded the new owner. The
+                // next launch would find no mismatch and load them.
+                //
+                // Only the feeds are private, so only the feeds are dropped:
+                // saving the empty in-memory cache instead would throw away
+                // popular and trending, which are public and cost a cold start
+                // to fetch again. Anything the new login has already cached
+                // wins over what came off disk.
+                var videos = cacheData.videos
+                var timestamps = cacheData.lastUpdated
+                for key in videos.keys where key.hasSuffix("_\(InstanceContentType.feed.rawValue)") {
+                    videos.removeValue(forKey: key)
+                    timestamps.removeValue(forKey: key)
+                }
+                videos.merge(cache) { _, current in current }
+                timestamps.merge(lastUpdated) { _, current in current }
+
+                await HomeInstanceDiskCache.shared.save(
+                    HomeInstanceDiskCache.CacheData(videos: videos, lastUpdated: timestamps)
+                )
                 return
             }
 
