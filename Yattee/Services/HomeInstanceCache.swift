@@ -77,6 +77,9 @@ final class HomeInstanceCache {
             // finds nothing to drop and this would quietly reinstate the
             // previous login's private feeds.
             guard generation == accountGeneration else {
+                // Whatever asked for the purge has already done it — this is
+                // the only load there will be, so the request is spent too.
+                pendingFeedPurge = false
                 LoggingService.shared.info(
                     "Discarding a disk cache that belongs to the previous login",
                     category: .general
