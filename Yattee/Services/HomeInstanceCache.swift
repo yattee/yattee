@@ -97,12 +97,15 @@ final class HomeInstanceCache {
                 // popular and trending, which are public and cost a cold start
                 // to fetch again. Anything the new login has already cached
                 // wins over what came off disk.
+                let isFeedKey = { (key: String) in
+                    key.hasSuffix("_\(InstanceContentType.feed.rawValue)")
+                }
                 var videos = cacheData.videos
                 var timestamps = cacheData.lastUpdated
-                for key in videos.keys where key.hasSuffix("_\(InstanceContentType.feed.rawValue)") {
-                    videos.removeValue(forKey: key)
-                    timestamps.removeValue(forKey: key)
-                }
+                // Filtered independently: a timestamp can outlive its entry,
+                // and one left behind is a feed this login was never shown.
+                videos = videos.filter { !isFeedKey($0.key) }
+                timestamps = timestamps.filter { !isFeedKey($0.key) }
                 videos.merge(cache) { _, current in current }
                 timestamps.merge(lastUpdated) { _, current in current }
 
