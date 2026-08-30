@@ -26,6 +26,9 @@ struct ImportPlaylistsView: View {
     /// different account or leave an empty playlist behind for one that is
     /// gone.
     @State private var loginChangedDuringImport = false
+    /// The merge started from the confirmation dialog, which runs detached
+    /// from the batch that queued it. Held so the batch can wait for it.
+    @State private var mergeImportTask: Task<Void, Never>?
 
     // Merge warning state
     @State private var showMergeWarning = false
@@ -92,7 +95,7 @@ struct ImportPlaylistsView: View {
             ) {
                 Button(String(localized: "import.playlists.mergeWarning.merge")) {
                     if let playlist = pendingMergePlaylist, let localPlaylist = existingLocalPlaylist {
-                        Task { await performImport(playlist, into: localPlaylist) }
+                        mergeImportTask = Task { await performImport(playlist, into: localPlaylist) }
                     }
                 }
                 Button(String(localized: "common.cancel"), role: .cancel) {
@@ -338,8 +341,21 @@ struct ImportPlaylistsView: View {
     }
 
     private func performImport(_ playlist: Playlist, into localPlaylist: LocalPlaylist) async {
-        guard let appEnvironment,
-              let credential = appEnvironment.credential(forInstance: instance) else {
+        guard let appEnvironment else { return }
+
+        // The login can go between choosing this playlist and reading it —
+        // the merge dialog in particular waits on the user. Returning quietly
+        // would leave the row importing forever and let a batch carry on.
+        guard let credential = appEnvironment.credential(forInstance: instance) else {
+            loginChangedDuringImport = true
+            importingPlaylistID = nil
+            importProgress = nil
+            pendingMergePlaylist = nil
+            existingLocalPlaylist = nil
+            appEnvironment.toastManager.showError(
+                String(localized: "import.playlists.failed.title"),
+                subtitle: ImportError.loginChanged.localizedDescription
+            )
             return
         }
 
@@ -443,14 +459,22 @@ struct ImportPlaylistsView: View {
         for playlist in unimportedPlaylists {
             await addPlaylist(playlist)
 
-            // The rest of the batch belongs to a login that is no longer
-            // there. Reported once, by whichever import stopped first.
-            if loginChangedDuringImport { break }
-
             // If merge warning is shown, wait for user interaction
             while showMergeWarning {
                 try? await Task.sleep(for: .milliseconds(100))
             }
+
+            // The merge the dialog starts is detached from it, so dismissing
+            // the dialog is not the merge finishing. Waiting keeps the batch
+            // sequential — and lets a login change the merge runs into stop
+            // the rest, rather than the next import beginning under whoever
+            // replaced it.
+            await mergeImportTask?.value
+            mergeImportTask = nil
+
+            // The rest of the batch belongs to a login that is no longer
+            // there. Reported once, by whichever import stopped first.
+            if loginChangedDuringImport { break }
         }
     }
 
