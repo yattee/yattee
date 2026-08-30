@@ -29,6 +29,11 @@ struct ImportPlaylistsView: View {
     /// The merge started from the confirmation dialog, which runs detached
     /// from the batch that queued it. Held so the batch can wait for it.
     @State private var mergeImportTask: Task<Void, Never>?
+    /// The credential the listed playlists were read with. Everything on
+    /// screen belongs to it, so every import is checked against this rather
+    /// than against whatever is current — a replacement is a different
+    /// person's account, and its playlist IDs mean something else entirely.
+    @State private var loadedCredential: String?
 
     // Merge warning state
     @State private var showMergeWarning = false
@@ -278,6 +283,8 @@ struct ImportPlaylistsView: View {
 
         isLoading = true
         error = nil
+        loadedCredential = credential
+        loginChangedDuringImport = false
 
         do {
             let fetchedPlaylists: [Playlist]
@@ -319,7 +326,7 @@ struct ImportPlaylistsView: View {
         // Checked before anything is created: a playlist made for a login that
         // has already gone would be left behind empty, because the import
         // aborts on its first write.
-        guard appEnvironment.credential(forInstance: instance) != nil else {
+        guard appEnvironment.credential(forInstance: instance) == loadedCredential else {
             loginChangedDuringImport = true
             return
         }
@@ -338,15 +345,25 @@ struct ImportPlaylistsView: View {
         // Create new local playlist and import
         let localPlaylist = appEnvironment.dataManager.createPlaylist(title: playlist.title)
         await performImport(playlist, into: localPlaylist)
+
+        // The guard above and the one inside are a suspension apart, so the
+        // login can still go in between. Nothing was read, and an empty
+        // playlist named after somebody else's is not worth keeping.
+        if loginChangedDuringImport, localPlaylist.items?.isEmpty ?? true {
+            appEnvironment.dataManager.deletePlaylist(localPlaylist)
+        }
     }
 
     private func performImport(_ playlist: Playlist, into localPlaylist: LocalPlaylist) async {
         guard let appEnvironment else { return }
 
-        // The login can go between choosing this playlist and reading it —
-        // the merge dialog in particular waits on the user. Returning quietly
-        // would leave the row importing forever and let a batch carry on.
-        guard let credential = appEnvironment.credential(forInstance: instance) else {
+        // The login can go, or be replaced, between choosing this playlist and
+        // reading it — the merge dialog in particular waits on the user.
+        // Returning quietly would leave the row importing forever and let a
+        // batch carry on; reading it under a replacement would fetch whatever
+        // that ID means to somebody else.
+        guard let credential = appEnvironment.credential(forInstance: instance),
+              credential == loadedCredential else {
             loginChangedDuringImport = true
             importingPlaylistID = nil
             importProgress = nil
