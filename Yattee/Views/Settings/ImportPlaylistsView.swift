@@ -34,6 +34,10 @@ struct ImportPlaylistsView: View {
     /// than against whatever is current — a replacement is a different
     /// person's account, and its playlist IDs mean something else entirely.
     @State private var loadedCredential: String?
+    /// Which listing the imports in flight belong to. Reloading the list
+    /// invalidates them: they were chosen from rows that are being replaced,
+    /// and the credential they are checked against is about to move.
+    @State private var listGeneration = 0
 
     // Merge warning state
     @State private var showMergeWarning = false
@@ -283,7 +287,8 @@ struct ImportPlaylistsView: View {
 
         isLoading = true
         error = nil
-        loadedCredential = credential
+        // Anything still importing was chosen from the rows being replaced.
+        listGeneration += 1
         loginChangedDuringImport = false
 
         do {
@@ -303,6 +308,11 @@ struct ImportPlaylistsView: View {
             }
 
             playlists = fetchedPlaylists.sorted { $0.title.localizedCaseInsensitiveCompare($1.title) == .orderedAscending }
+            // Recorded only now: the baseline is whichever login actually
+            // produced the rows on screen. A failed load leaves the previous
+            // one standing, so an import still running keeps being checked
+            // against the login that listed it.
+            loadedCredential = credential
 
             // Check which playlists are already imported (by matching title)
             let localPlaylists = appEnvironment.dataManager.playlists()
@@ -362,6 +372,11 @@ struct ImportPlaylistsView: View {
         // Returning quietly would leave the row importing forever and let a
         // batch carry on; reading it under a replacement would fetch whatever
         // that ID means to somebody else.
+        // The listing this playlist was chosen from can be replaced while the
+        // import runs, which re-baselines the credential it is checked
+        // against. Captured so a reload cannot quietly re-authorise it.
+        let generation = listGeneration
+
         guard let credential = appEnvironment.credential(forInstance: instance),
               credential == loadedCredential else {
             loginChangedDuringImport = true
@@ -424,7 +439,9 @@ struct ImportPlaylistsView: View {
                 // write rather than only at the start. What has already been
                 // written stays — it was imported under the login that asked
                 // for it.
-                guard appEnvironment.credential(forInstance: instance) == credential else {
+                guard generation == listGeneration,
+                      appEnvironment.credential(forInstance: instance) == credential,
+                      credential == loadedCredential else {
                     throw ImportError.loginChanged
                 }
 
@@ -472,8 +489,13 @@ struct ImportPlaylistsView: View {
 
     private func addAllPlaylists() async {
         loginChangedDuringImport = false
+        let generation = listGeneration
 
         for playlist in unimportedPlaylists {
+            // The rows this batch is working through have been replaced, and
+            // the remaining ones no longer describe what is on screen.
+            guard generation == listGeneration else { break }
+
             await addPlaylist(playlist)
 
             // If merge warning is shown, wait for user interaction
