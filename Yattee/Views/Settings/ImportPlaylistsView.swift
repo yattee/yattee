@@ -21,6 +21,11 @@ struct ImportPlaylistsView: View {
     // Import progress state
     @State private var importingPlaylistID: String?
     @State private var importProgress: (current: Int, total: Int)?
+    /// Set when an import stopped because the login behind it changed, so a
+    /// batch stops with it: everything after would either be read under a
+    /// different account or leave an empty playlist behind for one that is
+    /// gone.
+    @State private var loginChangedDuringImport = false
 
     // Merge warning state
     @State private var showMergeWarning = false
@@ -308,6 +313,14 @@ struct ImportPlaylistsView: View {
     private func addPlaylist(_ playlist: Playlist) async {
         guard let appEnvironment else { return }
 
+        // Checked before anything is created: a playlist made for a login that
+        // has already gone would be left behind empty, because the import
+        // aborts on its first write.
+        guard appEnvironment.credential(forInstance: instance) != nil else {
+            loginChangedDuringImport = true
+            return
+        }
+
         // Check if local playlist with same title exists
         let localPlaylists = appEnvironment.dataManager.playlists()
         if let existing = localPlaylists.first(where: { $0.title == playlist.title }) {
@@ -411,6 +424,9 @@ struct ImportPlaylistsView: View {
             }
         } catch {
             await MainActor.run {
+                if error as? ImportError == .loginChanged {
+                    loginChangedDuringImport = true
+                }
                 importingPlaylistID = nil
                 importProgress = nil
                 appEnvironment.toastManager.showError(
@@ -422,8 +438,14 @@ struct ImportPlaylistsView: View {
     }
 
     private func addAllPlaylists() async {
+        loginChangedDuringImport = false
+
         for playlist in unimportedPlaylists {
             await addPlaylist(playlist)
+
+            // The rest of the batch belongs to a login that is no longer
+            // there. Reported once, by whichever import stopped first.
+            if loginChangedDuringImport { break }
 
             // If merge warning is shown, wait for user interaction
             while showMergeWarning {
@@ -434,7 +456,7 @@ struct ImportPlaylistsView: View {
 
     // MARK: - Errors
 
-    enum ImportError: LocalizedError {
+    enum ImportError: LocalizedError, Equatable {
         case notLoggedIn
         case notSupported
         case loginChanged
