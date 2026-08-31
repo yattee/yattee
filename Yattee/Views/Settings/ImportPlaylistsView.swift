@@ -303,6 +303,11 @@ struct ImportPlaylistsView: View {
         // Anything still importing was chosen from the rows being replaced.
         listGeneration += 1
         loginChangedDuringImport = false
+        // Its progress belongs to a row that is going away. Left set, the
+        // incoming listing renders it against whichever row carries that ID
+        // now — another account's playlist, shown as importing.
+        importingPlaylistID = nil
+        importProgress = nil
 
         do {
             let fetchedPlaylists: [Playlist]
