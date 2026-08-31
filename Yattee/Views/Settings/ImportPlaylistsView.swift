@@ -42,6 +42,9 @@ struct ImportPlaylistsView: View {
     // Merge warning state
     @State private var showMergeWarning = false
     @State private var pendingMergePlaylist: Playlist?
+    /// The listing the pending merge was chosen from. The dialog waits on the
+    /// user, so the list can be replaced before they answer it.
+    @State private var pendingMergeGeneration = 0
     @State private var existingLocalPlaylist: LocalPlaylist?
 
     // MARK: - Accessibility Identifiers
@@ -104,7 +107,10 @@ struct ImportPlaylistsView: View {
             ) {
                 Button(String(localized: "import.playlists.mergeWarning.merge")) {
                     if let playlist = pendingMergePlaylist, let localPlaylist = existingLocalPlaylist {
-                        mergeImportTask = Task { await performImport(playlist, into: localPlaylist) }
+                        let generation = pendingMergeGeneration
+                        mergeImportTask = Task {
+                            await performImport(playlist, into: localPlaylist, generation: generation)
+                        }
                     }
                 }
                 Button(String(localized: "common.cancel"), role: .cancel) {
@@ -333,6 +339,11 @@ struct ImportPlaylistsView: View {
     private func addPlaylist(_ playlist: Playlist) async {
         guard let appEnvironment else { return }
 
+        // The listing this row came from, taken here rather than wherever the
+        // import eventually starts: a merge waits on the user, and by then the
+        // list may have been replaced.
+        let generation = listGeneration
+
         // Checked before anything is created: a playlist made for a login that
         // has already gone would be left behind empty, because the import
         // aborts on its first write.
@@ -346,6 +357,7 @@ struct ImportPlaylistsView: View {
         if let existing = localPlaylists.first(where: { $0.title == playlist.title }) {
             // Show merge warning
             pendingMergePlaylist = playlist
+            pendingMergeGeneration = generation
             existingLocalPlaylist = existing
             importingPlaylistID = playlist.id.playlistID
             showMergeWarning = true
@@ -354,7 +366,7 @@ struct ImportPlaylistsView: View {
 
         // Create new local playlist and import
         let localPlaylist = appEnvironment.dataManager.createPlaylist(title: playlist.title)
-        await performImport(playlist, into: localPlaylist)
+        await performImport(playlist, into: localPlaylist, generation: generation)
 
         // The guard above and the one inside are a suspension apart, so the
         // login can still go in between. Nothing was read, and an empty
@@ -364,7 +376,14 @@ struct ImportPlaylistsView: View {
         }
     }
 
-    private func performImport(_ playlist: Playlist, into localPlaylist: LocalPlaylist) async {
+    /// - Parameter generation: the listing `playlist` was chosen from, taken at
+    ///   selection time. Reading it under a later one would fetch whatever that
+    ///   ID happens to name to whoever replaced the login.
+    private func performImport(
+        _ playlist: Playlist,
+        into localPlaylist: LocalPlaylist,
+        generation: Int
+    ) async {
         guard let appEnvironment else { return }
 
         // The login can go, or be replaced, between choosing this playlist and
@@ -372,12 +391,8 @@ struct ImportPlaylistsView: View {
         // Returning quietly would leave the row importing forever and let a
         // batch carry on; reading it under a replacement would fetch whatever
         // that ID means to somebody else.
-        // The listing this playlist was chosen from can be replaced while the
-        // import runs, which re-baselines the credential it is checked
-        // against. Captured so a reload cannot quietly re-authorise it.
-        let generation = listGeneration
-
-        guard let credential = appEnvironment.credential(forInstance: instance),
+        guard generation == listGeneration,
+              let credential = appEnvironment.credential(forInstance: instance),
               credential == loadedCredential else {
             loginChangedDuringImport = true
             importingPlaylistID = nil
