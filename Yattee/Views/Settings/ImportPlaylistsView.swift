@@ -474,9 +474,17 @@ struct ImportPlaylistsView: View {
             }
 
             await MainActor.run {
-                importedPlaylistIDs.insert(playlist.id.playlistID)
                 importingPlaylistID = nil
                 importProgress = nil
+
+                // The list can be replaced after the last video is written —
+                // an empty remote playlist never reaches a check at all.
+                // Marking it imported would attach to whatever row carries
+                // that ID now, which on another account is a different
+                // playlist.
+                guard generation == listGeneration else { return }
+
+                importedPlaylistIDs.insert(playlist.id.playlistID)
 
                 if skippedCount > 0 {
                     appEnvironment.toastManager.showSuccess(
