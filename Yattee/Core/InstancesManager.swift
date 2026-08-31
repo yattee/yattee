@@ -98,8 +98,8 @@ final class InstancesManager {
 
         // Instances arriving from iCloud are as much a change as a local edit.
         // Without this, a legacy authenticated instance delivered here never
-        // reaches account migration — the account, and the action to adopt its
-        // saved login, would appear only after an unrelated edit or a relaunch.
+        // reaches account migration — the account, and the adoption of its
+        // saved login, would happen only after an unrelated edit or a relaunch.
         NotificationCenter.default.post(name: .instancesDidChange, object: nil)
     }
 

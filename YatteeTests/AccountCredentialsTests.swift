@@ -281,6 +281,97 @@ struct LegacyCredentialAdoptionTests {
         store.delete(key: KeychainCredentialStore.legacyKey(instanceID: instanceID))
     }
 
+    @Test("An adopted credential stays local even if its marker was never written")
+    func resyncRecognizesAnAdoptedCopyWithoutItsMarker() {
+        let service = makeService()
+        let instanceID = UUID()
+        let account = Account.migrated(from: instanceID)
+        seedLegacyItem(service: service, instanceID: instanceID, value: "legacy-secret")
+
+        let settings = SettingsManager()
+        let previousSync = settings.iCloudSyncEnabled
+        let previousInstances = settings.syncInstances
+        settings.iCloudSyncEnabled = false
+        settings.syncInstances = false
+        defer {
+            settings.iCloudSyncEnabled = previousSync
+            settings.syncInstances = previousInstances
+        }
+
+        let store = KeychainCredentialStore(service: service)
+        let key = KeychainCredentialStore.credentialKey(scope: "identity-A", accountID: account.id)
+        // Exactly the state left behind when the app dies between the adoption
+        // copy and the marker that describes it: the scoped item exists, no
+        // marker claims it, and adoption will not retry because the key is
+        // occupied.
+        store.set("legacy-secret", forKey: key, synchronizable: false)
+
+        let credentials = makeCredentials(
+            service: service,
+            scope: "identity-A",
+            markers: makeMarkers(),
+            settingsManager: settings
+        )
+        #expect(credentials.isLoggedIn(for: account) == true)
+
+        settings.iCloudSyncEnabled = true
+        settings.syncInstances = true
+        credentials.resyncCredentialsWithCurrentSetting()
+
+        #expect(store.isSynchronizable(key: key) == false)
+
+        credentials.deleteCredential(for: account)
+        store.delete(key: KeychainCredentialStore.legacyKey(instanceID: instanceID))
+    }
+
+    @Test("Signing in again lets the new credential sync")
+    func signingInAgainClearsTheAdoptionMarker() {
+        let service = makeService()
+        let instanceID = UUID()
+        let account = Account.migrated(from: instanceID)
+        seedLegacyItem(service: service, instanceID: instanceID, value: "legacy-secret")
+
+        let settings = SettingsManager()
+        let previousSync = settings.iCloudSyncEnabled
+        let previousInstances = settings.syncInstances
+        settings.iCloudSyncEnabled = false
+        settings.syncInstances = false
+        defer {
+            settings.iCloudSyncEnabled = previousSync
+            settings.syncInstances = previousInstances
+        }
+
+        let markers = makeMarkers()
+        let credentials = makeCredentials(
+            service: service,
+            scope: "identity-A",
+            markers: markers,
+            settingsManager: settings
+        )
+        #expect(credentials.adoptLegacyCredential(for: account) == true)
+
+        // The user signs in again while sync is off, so the replacement is
+        // stored locally like any other credential.
+        credentials.setCredential("freshly-typed-secret", for: account)
+        #expect(markers.hasAdopted(service: service, instanceID: instanceID, scope: "identity-A") == false)
+
+        // Turning sync on must now carry it to the other devices — they are
+        // showing an account whose credential never arrives.
+        settings.iCloudSyncEnabled = true
+        settings.syncInstances = true
+        credentials.resyncCredentialsWithCurrentSetting()
+
+        let store = KeychainCredentialStore(service: service)
+        #expect(
+            store.isSynchronizable(
+                key: KeychainCredentialStore.credentialKey(scope: "identity-A", accountID: account.id)
+            ) == true
+        )
+
+        credentials.deleteCredential(for: account)
+        store.delete(key: KeychainCredentialStore.legacyKey(instanceID: instanceID))
+    }
+
     @Test("A login the user added themselves never inherits the legacy item")
     func onlyTheMigratedAccountAdopts() {
         let service = makeService()

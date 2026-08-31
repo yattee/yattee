@@ -24,8 +24,10 @@ import Foundation
 /// keeps `kSecAttrSynchronizable = true` and still matches a strict
 /// `== true` query with **no** Apple account signed in — so the attribute
 /// cannot be used to tell "belongs to the current account" from "left over
-/// from the previous one". Scoping the key is the only reliable defence, and
-/// legacy items are never adopted automatically (see
+/// from the previous one". Scoping the key is the only reliable defence.
+/// A pre-revamp item is adopted into a scoped key automatically, but only as a
+/// device-local copy, so an unproven secret never reaches the current
+/// identity's iCloud Keychain (see
 /// ``AccountKeychainCredentials/adoptLegacyCredential(for:)``).
 ///
 /// ### Why the CloudKit user record, not the ubiquity token

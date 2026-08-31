@@ -92,6 +92,14 @@ final class AccountKeychainCredentials {
 
         loginsByScope[scope, default: []].insert(account.id)
 
+        // Whatever was adopted here is gone, replaced by a login the user just
+        // proved they hold. Leaving the marker would keep this account out of
+        // the resync that follows the iCloud toggle, so the new credential
+        // would stay on this device and every other one would show an account
+        // it never receives a login for. It would also let a deletion retire an
+        // unscoped item this account no longer has anything to do with.
+        markers.removeMarker(service: store.service, instanceID: account.instanceID, scope: scope)
+
         LoggingService.shared.info(
             "Stored \(credentialNoun)",
             category: .keychain,
@@ -131,10 +139,22 @@ final class AccountKeychainCredentials {
         let adopted = markers.adoptedAccountIDs(service: store.service, scope: scope)
 
         for accountID in loginsByScope[scope] ?? [] where !adopted.contains(accountID) {
-            rewrite(
-                key: KeychainCredentialStore.credentialKey(scope: scope, accountID: accountID),
-                synchronizable: syncEnabled
-            )
+            let credentialKey = KeychainCredentialStore.credentialKey(scope: scope, accountID: accountID)
+
+            // The marker is written *after* the copy it describes, so a launch
+            // that ends in between leaves an adopted credential no marker will
+            // ever claim — and adoption will not retry, because the key is no
+            // longer empty. Recognising the value itself closes that gap: a
+            // scoped credential identical to the unscoped item it could only
+            // have come from is an adopted copy, marker or not. Migrated
+            // accounts reuse their instance's UUID, which is what the legacy
+            // key is made of, and they are the only accounts allowed to adopt.
+            if let stored = store.value(forKey: credentialKey),
+               stored == store.value(forKey: KeychainCredentialStore.legacyKey(instanceID: accountID)) {
+                continue
+            }
+
+            rewrite(key: credentialKey, synchronizable: syncEnabled)
             rewrite(
                 key: KeychainCredentialStore.usernameKey(scope: scope, accountID: accountID),
                 synchronizable: syncEnabled

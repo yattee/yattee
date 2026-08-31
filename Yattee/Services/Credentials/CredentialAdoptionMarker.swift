@@ -60,8 +60,10 @@ final class CredentialAdoptionMarkerStore {
 
     /// Whether this identity has already adopted the legacy item for an instance.
     ///
-    /// Once true, the app stops offering adoption and stops reading the legacy
-    /// key entirely for that account.
+    /// Once true, the app stops adopting and stops reading the legacy key
+    /// entirely for that account. Cleared when the user signs in again: the
+    /// credential is then one they proved they hold, and nothing about the
+    /// adopted copy applies to it any more.
     func hasAdopted(service: String, instanceID: UUID, scope: String) -> Bool {
         marker(service: service, instanceID: instanceID, scope: scope) != nil
     }
@@ -121,6 +123,11 @@ final class CredentialAdoptionMarkerStore {
     ///
     /// 1. This device has a marker for the instance — no marker means this
     ///    device never adopted anything, so the legacy item is not ours to touch.
+    ///    Since adoption became automatic this proves only that the device took
+    ///    the secret, not that the identity signed in now originally owned it.
+    ///    Deleting anyway is deliberate: the user is removing this login from
+    ///    this device, which is exactly what the pre-revamp release did to the
+    ///    same item on logout. Condition 4 is what carries the real weight now.
     /// 2. The marker belongs to the current identity — Apple account A's marker
     ///    cannot authorize a deletion while B is signed in.
     /// 3. The marker belongs to the account being deleted. An instance can hold

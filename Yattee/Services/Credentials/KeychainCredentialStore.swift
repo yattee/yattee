@@ -39,8 +39,9 @@ struct KeychainCredentialStore: Sendable {
 
     /// The pre-revamp key: a bare instance UUID, with no identity scope.
     ///
-    /// Only the adoption path may read this, and only when the user explicitly
-    /// asks for it.
+    /// Only the adoption path may read this. Ordinary credential reads never
+    /// fall back to it — an implicit read-through would leave no record of what
+    /// was taken, and nothing to bound a later deletion with.
     static func legacyKey(instanceID: UUID) -> String {
         instanceID.uuidString
     }
@@ -75,9 +76,9 @@ struct KeychainCredentialStore: Sendable {
     /// Writes a value **only if the key is currently empty**, returning
     /// `errSecDuplicateItem` otherwise.
     ///
-    /// Used by legacy adoption: between rendering the offer and the user
-    /// tapping it, iCloud Keychain may deliver the real scoped credential, and
-    /// a replacing write would silently overwrite it with the older secret.
+    /// Used by legacy adoption: iCloud Keychain may deliver the real scoped
+    /// credential while the migration is deciding to copy the older one, and a
+    /// replacing write would silently overwrite the newer secret.
     @discardableResult
     func addIfAbsent(_ value: String, forKey key: String, synchronizable: Bool) -> OSStatus {
         let query: [String: Any] = [
