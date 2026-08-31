@@ -66,6 +66,18 @@ final class CredentialAdoptionMarkerStore {
         marker(service: service, instanceID: instanceID, scope: scope) != nil
     }
 
+    /// The accounts whose credential on this device came from a legacy item.
+    ///
+    /// Their copies are deliberately device-local, so anything that rewrites
+    /// stored credentials to follow the sync setting has to leave them out.
+    func adoptedAccountIDs(service: String, scope: String) -> Set<UUID> {
+        Set(
+            markers()
+                .filter { $0.service == service && $0.identityScope == scope }
+                .map(\.accountID)
+        )
+    }
+
     private func marker(service: String, instanceID: UUID, scope: String) -> CredentialAdoptionMarker? {
         markers().first {
             $0.service == service && $0.instanceID == instanceID && $0.identityScope == scope

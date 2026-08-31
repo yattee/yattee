@@ -122,8 +122,15 @@ final class AccountKeychainCredentials {
         guard let scope = identityScope.current else { return }
 
         let syncEnabled = shouldSyncToiCloud
+        // An adopted legacy secret is deliberately kept on this device (see
+        // `adoptLegacyCredential`). Rewriting it here would undo that: the
+        // toggle would push a credential of unknown provenance into whichever
+        // iCloud Keychain is current, which is the one thing silent adoption is
+        // careful not to do. Nothing is lost — the legacy item it was copied
+        // from already syncs, so the user's other devices adopt their own copy.
+        let adopted = markers.adoptedAccountIDs(service: store.service, scope: scope)
 
-        for accountID in loginsByScope[scope] ?? [] {
+        for accountID in loginsByScope[scope] ?? [] where !adopted.contains(accountID) {
             rewrite(
                 key: KeychainCredentialStore.credentialKey(scope: scope, accountID: accountID),
                 synchronizable: syncEnabled
@@ -222,6 +229,12 @@ final class AccountKeychainCredentials {
 
     func hasAdoptableLegacyCredential(for account: Account) -> Bool {
         guard let scope = currentScope() else { return false }
+        // Only the account this instance's pre-revamp login became may inherit
+        // its secret. The legacy item is keyed by instance, so any
+        // credential-less account on the instance would otherwise match — and a
+        // second login the user added themselves would silently come up holding
+        // somebody else's session.
+        guard account.isMigrated else { return false }
         guard !markers.hasAdopted(service: store.service, instanceID: account.instanceID, scope: scope) else { return false }
         guard credential(for: account) == nil else { return false }
 
@@ -235,9 +248,21 @@ final class AccountKeychainCredentials {
     /// here would log the user out of devices still running the previous
     /// release, mid-rollout. It is retained until the account is really
     /// deleted; general cleanup waits for a compatibility-breaking release.
+    ///
+    /// The copy is written **device-local**, whatever the sync setting says.
+    /// The pre-revamp release read its unscoped item with
+    /// `kSecAttrSynchronizableAny` and no identity in the key, so a credential
+    /// retained across an Apple Account change is already served to whoever
+    /// holds the device — this migration does not widen that. What it must not
+    /// do is re-file that secret as synchronizable under the identity that is
+    /// current now, which would upload a login of unproven provenance into that
+    /// person's iCloud Keychain and spread it to their other devices. Keeping
+    /// the copy local costs the genuine owner nothing: their legacy item syncs,
+    /// so every device of theirs finds it and adopts its own copy.
     @discardableResult
     func adoptLegacyCredential(for account: Account) -> Bool {
         guard let scope = currentScope() else { return false }
+        guard account.isMigrated else { return false }
         guard !markers.hasAdopted(service: store.service, instanceID: account.instanceID, scope: scope) else { return false }
         guard let legacy = legacyCredential(for: account) else { return false }
 
@@ -254,7 +279,7 @@ final class AccountKeychainCredentials {
         }
 
         let key = KeychainCredentialStore.credentialKey(scope: scope, accountID: account.id)
-        let status = store.addIfAbsent(legacy, forKey: key, synchronizable: shouldSyncToiCloud)
+        let status = store.addIfAbsent(legacy, forKey: key, synchronizable: false)
 
         // A duplicate means a scoped credential landed between the check above
         // and this write — leave it strictly alone, it is newer than the legacy

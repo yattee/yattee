@@ -54,8 +54,6 @@ struct InstanceAccountsSection: View {
         } footer: {
             Text(String(localized: accounts.isEmpty ? "login.footer.loginBenefits" : "login.footer.loggedIn"))
         }
-
-        adoptionSection
     }
 
     // MARK: - Rows
@@ -114,38 +112,6 @@ struct InstanceAccountsSection: View {
         #endif
     }
 
-    /// The one-tap adoption of a login saved by an earlier version.
-    ///
-    /// Shown only when such an item exists and has not been adopted. It is a
-    /// deliberate action because a retained Keychain item carries no proof of
-    /// which Apple Account it belonged to — the app cannot tell an inherited
-    /// credential from the user's own.
-    @ViewBuilder
-    private var adoptionSection: some View {
-        let adoptable = accounts.filter { account in
-            appEnvironment?
-                .accountCredentialsManager(for: account)?
-                .hasAdoptableLegacyCredential(for: account) == true
-        }
-
-        if !adoptable.isEmpty {
-            Section {
-                ForEach(adoptable) { account in
-                    Button {
-                        adoptLegacyCredential(for: account)
-                    } label: {
-                        Label(String(localized: "accounts.useSavedLogin"), systemImage: "key.horizontal")
-                    }
-                    #if os(tvOS)
-                    .buttonStyle(TVSettingsButtonStyle())
-                    #endif
-                }
-            } footer: {
-                Text(String(localized: "accounts.useSavedLogin.footer"))
-            }
-        }
-    }
-
     // MARK: - Presentation
 
     private func displayName(for account: Account) -> String {
@@ -196,20 +162,6 @@ struct InstanceAccountsSection: View {
 
         if appEnvironment.accountsManager.accounts(forInstance: instance.id).isEmpty {
             appEnvironment.instancesManager.setUsesAccountLogin(false, for: instance)
-        }
-    }
-
-    private func adoptLegacyCredential(for account: Account) {
-        guard let appEnvironment,
-              let credentials = appEnvironment.accountCredentialsManager(for: account)
-        else { return }
-
-        if credentials.adoptLegacyCredential(for: account) {
-            appEnvironment.accountsManager.setStatus(.signedIn, for: account.id)
-        } else {
-            appEnvironment.toastManager.showError(
-                String(localized: "accounts.useSavedLogin.failed")
-            )
         }
     }
 }

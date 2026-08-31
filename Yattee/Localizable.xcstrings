@@ -263,36 +263,6 @@
         }
       }
     },
-    "accounts.useSavedLogin" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Use Saved Login From This Device"
-          }
-        }
-      }
-    },
-    "accounts.useSavedLogin.failed" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Could not use the saved login. Sign in again."
-          }
-        }
-      }
-    },
-    "accounts.useSavedLogin.footer" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "A login saved by an earlier version of Yattee is stored on this device. It cannot be confirmed to belong to the Apple Account currently signed in, so it is only used if you choose to."
-          }
-        }
-      }
-    },
     "alert.ambiguousLink.message %@" : {
       "localizations" : {
         "en" : {

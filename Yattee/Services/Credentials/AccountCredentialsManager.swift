@@ -60,14 +60,22 @@ protocol AccountCredentialsManager: AnyObject, Observable {
     /// Whether a pre-revamp credential for this account's instance exists on
     /// this device and has not been adopted by the current identity.
     ///
-    /// Never acted on automatically: a retained Keychain item carries no proof
-    /// of which Apple account it belonged to (measured — see
-    /// ``CredentialIdentityScope``), so adoption is always a deliberate user
-    /// action.
+    /// True only for the account the instance's legacy login was migrated into
+    /// — the old item is keyed by instance, and a second login the user added
+    /// themselves must never inherit it.
     func hasAdoptableLegacyCredential(for account: Account) -> Bool
 
-    /// Copies the legacy item into this account's scoped key after the user
-    /// asks for it. Returns whether the copy verified.
+    /// Copies the legacy item into this account's scoped key. Returns whether
+    /// the copy verified.
+    ///
+    /// Runs by itself as part of recomputing account status: the upgrade is not
+    /// a decision to put to the user. A retained Keychain item carries no proof
+    /// of which Apple account it belonged to (measured — see
+    /// ``CredentialIdentityScope``), but the pre-revamp release read that item
+    /// with `kSecAttrSynchronizableAny` and no identity in its key, so it was
+    /// already being served to whoever held the device. The copy is written
+    /// device-local so this migration cannot put a secret of unproven
+    /// provenance into the current identity's iCloud Keychain.
     @discardableResult
     func adoptLegacyCredential(for account: Account) -> Bool
 

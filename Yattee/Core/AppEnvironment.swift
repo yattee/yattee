@@ -897,6 +897,17 @@ final class AppEnvironment {
 
             credentials.refreshLoginStatus(for: account)
 
+            // An account migrated from a pre-revamp login has its credential
+            // under the old unscoped key. Move it across before concluding
+            // anything: the upgrade is not something to ask the user about —
+            // the previous release already served that item to whoever held the
+            // device, and the copy made here stays on it.
+            if !credentials.isLoggedIn(for: account),
+               credentials.hasAdoptableLegacyCredential(for: account),
+               credentials.adoptLegacyCredential(for: account) {
+                credentials.refreshLoginStatus(for: account)
+            }
+
             guard credentials.isLoggedIn(for: account) else {
                 accountsManager.setStatus(.credentialMissing, for: account.id)
                 continue

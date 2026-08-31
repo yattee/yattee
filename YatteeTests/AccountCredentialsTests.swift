@@ -158,18 +158,21 @@ struct LegacyCredentialAdoptionTests {
     private func makeCredentials(
         service: String,
         scope: String,
-        markers: CredentialAdoptionMarkerStore
+        markers: CredentialAdoptionMarkerStore,
+        settingsManager: SettingsManager? = nil
     ) -> AccountKeychainCredentials {
-        AccountKeychainCredentials(
+        let credentials = AccountKeychainCredentials(
             service: service,
             credentialNoun: "credential",
             identityScope: CredentialIdentityScope(fixedScope: scope),
             markers: markers
         )
+        credentials.settingsManager = settingsManager
+        return credentials
     }
 
-    @Test("A legacy credential is never adopted automatically")
-    func legacyCredentialIsNotAutoAdopted() {
+    @Test("Reading a credential never falls back to the unscoped legacy item")
+    func readingNeverFallsBackToLegacyItem() {
         let service = makeService()
         let instanceID = UUID()
         let account = Account.migrated(from: instanceID)
@@ -177,12 +180,122 @@ struct LegacyCredentialAdoptionTests {
 
         let credentials = makeCredentials(service: service, scope: "identity-B", markers: makeMarkers())
 
-        // Reading never falls back to the unscoped item — that is the whole
-        // point of scoping, since a retained item proves nothing about who owns it.
+        // The whole point of scoping: the legacy item is reachable only through
+        // the adoption path, which copies it deliberately and records what it
+        // took. An implicit read-through would leave nothing to bound deletion
+        // with later.
         #expect(credentials.credential(for: account) == nil)
         #expect(credentials.isLoggedIn(for: account) == false)
-        // But it is offered as an explicit action.
         #expect(credentials.hasAdoptableLegacyCredential(for: account) == true)
+
+        KeychainCredentialStore(service: service)
+            .delete(key: KeychainCredentialStore.legacyKey(instanceID: instanceID))
+    }
+
+    @Test("An adopted credential is kept on this device even when sync is on")
+    func adoptedCredentialIsNeverSynchronizable() {
+        let service = makeService()
+        let instanceID = UUID()
+        let account = Account.migrated(from: instanceID)
+        seedLegacyItem(service: service, instanceID: instanceID, value: "legacy-secret")
+
+        let settings = SettingsManager()
+        let previousSync = settings.iCloudSyncEnabled
+        let previousInstances = settings.syncInstances
+        settings.iCloudSyncEnabled = true
+        settings.syncInstances = true
+        defer {
+            settings.iCloudSyncEnabled = previousSync
+            settings.syncInstances = previousInstances
+        }
+
+        let credentials = makeCredentials(
+            service: service,
+            scope: "identity-A",
+            markers: makeMarkers(),
+            settingsManager: settings
+        )
+        #expect(credentials.adoptLegacyCredential(for: account) == true)
+
+        // A retained legacy item cannot be shown to belong to the identity
+        // signed in now. Adopting it locally leaves exposure where the previous
+        // release already had it; writing it synchronizably would upload
+        // somebody else's secret into this identity's iCloud Keychain.
+        let store = KeychainCredentialStore(service: service)
+        let key = KeychainCredentialStore.credentialKey(scope: "identity-A", accountID: account.id)
+        #expect(store.isSynchronizable(key: key) == false)
+
+        credentials.deleteCredential(for: account)
+        store.delete(key: KeychainCredentialStore.legacyKey(instanceID: instanceID))
+    }
+
+    @Test("Turning iCloud sync on does not upload an adopted credential")
+    func resyncLeavesAdoptedCredentialsLocal() {
+        let service = makeService()
+        let instanceID = UUID()
+        let adopted = Account.migrated(from: instanceID)
+        let typedIn = Account(instanceID: instanceID)
+        seedLegacyItem(service: service, instanceID: instanceID, value: "legacy-secret")
+
+        let settings = SettingsManager()
+        let previousSync = settings.iCloudSyncEnabled
+        let previousInstances = settings.syncInstances
+        settings.iCloudSyncEnabled = false
+        settings.syncInstances = false
+        defer {
+            settings.iCloudSyncEnabled = previousSync
+            settings.syncInstances = previousInstances
+        }
+
+        let credentials = makeCredentials(
+            service: service,
+            scope: "identity-A",
+            markers: makeMarkers(),
+            settingsManager: settings
+        )
+        #expect(credentials.adoptLegacyCredential(for: adopted) == true)
+        credentials.setCredential("typed-in-secret", for: typedIn)
+
+        settings.iCloudSyncEnabled = true
+        settings.syncInstances = true
+        credentials.resyncCredentialsWithCurrentSetting()
+
+        let store = KeychainCredentialStore(service: service)
+        // The login the user typed is theirs, and they just asked for it to
+        // sync.
+        #expect(
+            store.isSynchronizable(
+                key: KeychainCredentialStore.credentialKey(scope: "identity-A", accountID: typedIn.id)
+            ) == true
+        )
+        // The adopted one is left alone — its provenance is unproven, and the
+        // legacy item it came from already syncs for whoever really owns it.
+        #expect(
+            store.isSynchronizable(
+                key: KeychainCredentialStore.credentialKey(scope: "identity-A", accountID: adopted.id)
+            ) == false
+        )
+
+        credentials.deleteCredential(for: adopted)
+        credentials.deleteCredential(for: typedIn)
+        store.delete(key: KeychainCredentialStore.legacyKey(instanceID: instanceID))
+    }
+
+    @Test("A login the user added themselves never inherits the legacy item")
+    func onlyTheMigratedAccountAdopts() {
+        let service = makeService()
+        let instanceID = UUID()
+        // Not `Account.migrated`: a second login on the same instance, created
+        // by signing in. The legacy item is keyed by instance, so without the
+        // migrated-account rule this one would match it.
+        let sibling = Account(instanceID: instanceID)
+        seedLegacyItem(service: service, instanceID: instanceID, value: "legacy-secret")
+
+        let credentials = makeCredentials(service: service, scope: "identity-A", markers: makeMarkers())
+
+        #expect(credentials.hasAdoptableLegacyCredential(for: sibling) == false)
+        #expect(credentials.adoptLegacyCredential(for: sibling) == false)
+        #expect(credentials.credential(for: sibling) == nil)
 
         KeychainCredentialStore(service: service)
             .delete(key: KeychainCredentialStore.legacyKey(instanceID: instanceID))
