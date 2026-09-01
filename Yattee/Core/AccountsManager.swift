@@ -639,14 +639,25 @@ final class AccountsManager {
         accountStatuses[accountID] ?? (identityScope.isResolved ? .credentialMissing : .checking)
     }
 
+    /// Asked to confirm an auth-shaped failure before anything is concluded
+    /// from it. `nil` — tests, and the window before wiring completes — means
+    /// nothing is concluded at all, which is the safe direction.
+    ///
+    /// Held here as a hook rather than as a dependency because the confirmation
+    /// needs an API client, and this manager deliberately knows nothing about
+    /// the network.
+    @ObservationIgnored var onSuspectedCredentialRejection: (@MainActor (Account) -> Void)?
+
     /// Records what a server call implies about the account that made it.
     ///
-    /// Deliberately conservative about rejection: a raw 401 marks the
-    /// credential only when no reverse-proxy basic auth is configured, because
-    /// otherwise the 401 may well have come from the proxy. The two-stage probe
-    /// that disambiguates the rest is Phase 2 work; until then an ambiguous
-    /// failure leaves the status alone rather than wrongly telling the user to
-    /// sign in again.
+    /// Nothing here rejects a credential. A raw 401 or 403 is *suspicion*: the
+    /// same statuses come back from a reverse proxy, from endpoints a valid
+    /// session may not touch, and — on Invidious — from a genuinely revoked
+    /// session, and the request that failed cannot tell them apart. It is
+    /// handed to `onSuspectedCredentialRejection`, which asks the question again
+    /// against an endpoint that exists to be authenticated; only that second
+    /// answer marks the account. Until it arrives the status is left alone,
+    /// rather than wrongly telling the user to sign in again.
     ///
     /// Shared by the subscription providers and the feed cache: a credential
     /// that expires during a feed-only refresh has to mark the account too, or
@@ -667,11 +678,29 @@ final class AccountsManager {
         case APIError.cancelled:
             return
         case APIError.unauthorized:
-            guard instance(for: account)?.usesBasicAuth == false else { return }
-            setStatus(.credentialRejected, for: account.id)
+            suspectRejection(of: account)
+        case let APIError.httpError(statusCode, _) where statusCode == 401 || statusCode == 403:
+            // 403 arrives untranslated on purpose: the shared HTTP mapping
+            // turns only 401 into `.unauthorized`, because unauthenticated call
+            // sites read 403 as "this instance is blocked" rather than "this
+            // login is". Both shapes mean the same thing here.
+            suspectRejection(of: account)
         default:
             return
         }
+    }
+
+    /// Passes an auth-shaped failure on for confirmation, unless the instance
+    /// itself can explain it.
+    private func suspectRejection(of account: Account) {
+        // An instance behind HTTP Basic Auth answers 401 at the proxy for every
+        // request made to it, whichever account made it — so the status says
+        // nothing about this credential, and a probe would only be answered by
+        // the same proxy. An orphaned account, whose instance is unknown, is
+        // skipped by the same guard: there is nothing to probe against.
+        guard instance(for: account)?.usesBasicAuth == false else { return }
+
+        onSuspectedCredentialRejection?(account)
     }
 
     // MARK: - Legacy migration

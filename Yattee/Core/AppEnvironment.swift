@@ -56,6 +56,7 @@ final class AppEnvironment {
     let homeInstanceCache: HomeInstanceCache
     let invidiousAPI: InvidiousAPI
     let pipedAPI: PipedAPI
+    let credentialProbeService: CredentialProbeService
     let subscriptionAccountValidator: SubscriptionAccountValidator
     let dataContextValidator: DataContextValidator
     let playerControlsLayoutService: PlayerControlsLayoutService
@@ -212,6 +213,45 @@ final class AppEnvironment {
         // Initialize Piped API (used by SubscriptionService and SubscriptionFeedCache)
         let pipedAPI = PipedAPI(httpClient: client)
         self.pipedAPI = pipedAPI
+
+        // A 401 or 403 from an ordinary request is never allowed to reject a
+        // login on its own — it is re-asked here against an endpoint that
+        // exists to be authenticated, and only that answer marks the account.
+        let probeService = CredentialProbeService(
+            accountsManager: accounts,
+            credentialReader: { [weak accounts, weak invidiousCreds, weak pipedCreds] account in
+                guard let type = accounts?.instance(for: account)?.type else { return nil }
+                switch type {
+                case .invidious: return invidiousCreds?.credential(for: account)
+                case .piped: return pipedCreds?.credential(for: account)
+                default: return nil
+                }
+            },
+            transport: { instance, credential in
+                do {
+                    switch instance.type {
+                    case .invidious:
+                        // GET /api/v1/auth/subscriptions — the cheapest call
+                        // that does nothing except require a session.
+                        _ = try await invidiousAPI.subscriptions(instance: instance, sid: credential)
+                    case .piped:
+                        _ = try await pipedAPI.subscriptions(instance: instance, authToken: credential)
+                    default:
+                        return .indeterminate
+                    }
+                    return .authenticated
+                } catch {
+                    return CredentialProbeService.classify(error)
+                }
+            }
+        )
+        self.credentialProbeService = probeService
+
+        // Weak: the manager is owned for the life of the app and the probe
+        // service holds it back, so a strong capture here would be a cycle.
+        accounts.onSuspectedCredentialRejection = { [weak probeService] account in
+            probeService?.probeSuspectedRejection(for: account)
+        }
 
         // Initialize SubscriptionService with all required dependencies
         self.subscriptionService = SubscriptionService(
@@ -725,6 +765,13 @@ final class AppEnvironment {
     private func invalidateCaches(for account: Account) {
         subscriptionService.discardProvider(for: account.id)
         HomeInstanceCache.shared.clear(instanceID: account.instanceID, contentType: .feed)
+
+        // Reached by both ways a credential is replaced — the user signing in
+        // again here, and a replacement arriving over iCloud Keychain that the
+        // fingerprint digest spots — so the probe service's per-account dedup
+        // is retired here rather than at either call site. A verdict earned by
+        // the old secret must never delay asking about the new one.
+        credentialProbeService.credentialDidChange(for: account.id)
 
         if accountsManager.currentContext == .account(account.id) {
             SubscriptionFeedCache.shared.handleAccountChange()
