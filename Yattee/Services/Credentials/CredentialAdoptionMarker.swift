@@ -109,9 +109,20 @@ final class CredentialAdoptionMarkerStore {
         save(all)
     }
 
-    func removeMarker(service: String, instanceID: UUID, scope: String) {
+    /// Retires the marker for one account.
+    ///
+    /// Scoped to `accountID` as well as the instance: an instance can hold
+    /// several logins, and only the account that actually adopted the legacy
+    /// secret may retire its marker. Matching on the instance alone let a
+    /// *sibling* sign-in clear it, which silently withdrew the migrated
+    /// account's claim on the unscoped item — after that its deletion could
+    /// no longer retire the legacy secret, and it could re-adopt it.
+    func removeMarker(service: String, instanceID: UUID, accountID: UUID, scope: String) {
         save(markers().filter {
-            !($0.service == service && $0.instanceID == instanceID && $0.identityScope == scope)
+            !($0.service == service
+                && $0.instanceID == instanceID
+                && $0.accountID == accountID
+                && $0.identityScope == scope)
         })
     }
 

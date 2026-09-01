@@ -92,13 +92,22 @@ final class AccountKeychainCredentials {
 
         loginsByScope[scope, default: []].insert(account.id)
 
-        // Whatever was adopted here is gone, replaced by a login the user just
-        // proved they hold. Leaving the marker would keep this account out of
-        // the resync that follows the iCloud toggle, so the new credential
-        // would stay on this device and every other one would show an account
-        // it never receives a login for. It would also let a deletion retire an
+        // Whatever *this account* adopted is gone, replaced by a login the user
+        // just proved they hold. Leaving the marker would keep it out of the
+        // resync that follows the iCloud toggle, so the new credential would
+        // stay on this device and every other one would show an account it
+        // never receives a login for. It would also let a deletion retire an
         // unscoped item this account no longer has anything to do with.
-        markers.removeMarker(service: store.service, instanceID: account.instanceID, scope: scope)
+        //
+        // A sibling's marker is left strictly alone: signing a second login
+        // into the same instance says nothing about the account that adopted
+        // that instance's pre-revamp secret.
+        markers.removeMarker(
+            service: store.service,
+            instanceID: account.instanceID,
+            accountID: account.id,
+            scope: scope
+        )
 
         LoggingService.shared.info(
             "Stored \(credentialNoun)",
@@ -412,7 +421,12 @@ final class AccountKeychainCredentials {
         }
 
         store.delete(key: legacyKey)
-        markers.removeMarker(service: store.service, instanceID: account.instanceID, scope: scope)
+        markers.removeMarker(
+            service: store.service,
+            instanceID: account.instanceID,
+            accountID: account.id,
+            scope: scope
+        )
 
         LoggingService.shared.info(
             "Deleted the legacy \(credentialNoun) alongside its account",

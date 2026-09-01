@@ -372,6 +372,33 @@ struct LegacyCredentialAdoptionTests {
         store.delete(key: KeychainCredentialStore.legacyKey(instanceID: instanceID))
     }
 
+    @Test("A sibling sign-in does not retire the adopter's marker")
+    func siblingSignInLeavesTheAdoptionMarkerAlone() {
+        let service = makeService()
+        let markers = makeMarkers()
+        let instanceID = UUID()
+        let adopter = Account.migrated(from: instanceID)
+        // A second login the user adds on the same instance.
+        let sibling = Account(instanceID: instanceID)
+        seedLegacyItem(service: service, instanceID: instanceID, value: "legacy-secret")
+
+        let credentials = makeCredentials(service: service, scope: "identity-A", markers: markers)
+        #expect(credentials.adoptLegacyCredential(for: adopter) == true)
+
+        // Signing the sibling in says nothing about the account that adopted
+        // this instance's pre-revamp secret.
+        credentials.setCredential("sibling-secret", for: sibling)
+        #expect(markers.hasAdopted(service: service, instanceID: instanceID, scope: "identity-A") == true)
+
+        // So the adopter can still retire the legacy item when it is deleted —
+        // matching on the instance alone silently withdrew that claim.
+        credentials.deleteLegacyCredentialIfOwned(for: adopter)
+        #expect(legacyValue(service: service, instanceID: instanceID) == nil)
+
+        credentials.deleteCredential(for: adopter)
+        credentials.deleteCredential(for: sibling)
+    }
+
     @Test("A login the user added themselves never inherits the legacy item")
     func onlyTheMigratedAccountAdopts() {
         let service = makeService()
