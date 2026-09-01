@@ -28,6 +28,18 @@ struct InstanceAccountsSection: View {
 
     @Environment(\.appEnvironment) private var appEnvironment
 
+    /// Bumped whenever a credential is replaced, purely to re-read the login
+    /// identifier the rows display.
+    ///
+    /// That identifier lives in the Keychain beside the secret, not in any
+    /// observable state, so signing in again as somebody else moves nothing
+    /// SwiftUI watches — same account, same context, and the status was
+    /// already `signedIn`. Without this the row keeps naming the previous
+    /// person while the app is already serving the new one's data, which is
+    /// exactly backwards: the label is the only thing telling two logins on
+    /// one instance apart.
+    @State private var credentialRevision = 0
+
     private var accounts: [Account] {
         appEnvironment?.accountsManager.accounts(forInstance: instance.id) ?? []
     }
@@ -37,6 +49,10 @@ struct InstanceAccountsSection: View {
             ForEach(accounts) { account in
                 accountRow(account)
             }
+            // Read here on purpose, so the rows genuinely depend on it rather
+            // than relying on a state write invalidating a body that never
+            // mentions it.
+            .id(credentialRevision)
 
             Button {
                 loginTarget = .newAccount
@@ -53,6 +69,9 @@ struct InstanceAccountsSection: View {
             Text(String(localized: "login.header.account"))
         } footer: {
             Text(String(localized: accounts.isEmpty ? "login.footer.loginBenefits" : "login.footer.loggedIn"))
+        }
+        .onReceive(NotificationCenter.default.publisher(for: .accountCredentialDidChange)) { _ in
+            credentialRevision &+= 1
         }
     }
 
