@@ -67,8 +67,14 @@ final class CredentialIdentityScope {
     private let retryDelay: @Sendable (Int) async -> Void
     /// Written only on the main actor; read in `deinit`, which runs after the
     /// last reference is gone and so cannot race with it.
-    private nonisolated(unsafe) var identityChangeObserver: NSObjectProtocol?
-    private nonisolated(unsafe) var cloudKitAccountObserver: NSObjectProtocol?
+    ///
+    /// Kept out of observation deliberately. These are notification tokens, not
+    /// state anything renders, and `@Observable` would rewrite them into
+    /// computed accessors — which is what made the compiler report the
+    /// isolation annotation as having no effect while also refusing the plain
+    /// `nonisolated` it suggested.
+    @ObservationIgnored private nonisolated(unsafe) var identityChangeObserver: NSObjectProtocol?
+    @ObservationIgnored private nonisolated(unsafe) var cloudKitAccountObserver: NSObjectProtocol?
 
     private static let cacheKey = "credentialIdentityScopeCache"
 
