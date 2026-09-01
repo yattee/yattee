@@ -198,7 +198,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Checking\u2026"
+            "value" : "Checking…"
           }
         }
       }
@@ -1499,22 +1499,22 @@
         }
       }
     },
-    "controls.button.audioTrack" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Audio Track"
-          }
-        }
-      }
-    },
     "controls.button.audioMode" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Audio Mode"
+          }
+        }
+      }
+    },
+    "controls.button.audioTrack" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Audio Track"
           }
         }
       }
@@ -2493,17 +2493,6 @@
         }
       }
     },
-    "downloads.retry" : {
-      "comment" : "Retry failed download button",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Retry"
-          }
-        }
-      }
-    },
     "downloads.resume" : {
       "comment" : "Resume paused download context menu item",
       "localizations" : {
@@ -2511,6 +2500,17 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Resume"
+          }
+        }
+      }
+    },
+    "downloads.retry" : {
+      "comment" : "Retry failed download button",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Retry"
           }
         }
       }
@@ -4943,6 +4943,17 @@
         }
       }
     },
+    "import.playlists.loginChanged" : {
+      "comment" : "Error message when the account was signed out or replaced during an import",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The login changed while importing, so the rest was not added."
+          }
+        }
+      }
+    },
     "import.playlists.mergeWarning.merge" : {
       "comment" : "Button to confirm merging videos into existing playlist",
       "localizations" : {
@@ -4972,17 +4983,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Playlist Exists"
-          }
-        }
-      }
-    },
-    "import.playlists.loginChanged" : {
-      "comment" : "Error message when the account was signed out or replaced during an import",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "The login changed while importing, so the rest was not added."
           }
         }
       }
@@ -5430,6 +5430,7 @@
     },
     "login.logout" : {
       "comment" : "Log out button label",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
