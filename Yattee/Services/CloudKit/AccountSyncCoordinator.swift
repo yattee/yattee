@@ -52,6 +52,13 @@ final class AccountSyncCoordinator {
     /// lost by not having one.
     private var enqueueChanges: EnqueueChanges?
 
+    /// Drops the conflict-resolved account records the engine holds for upload.
+    /// That cache is keyed by record name only, and the names are deterministic
+    /// across identities, so it is emptied when the identity moves rather than
+    /// left holding the previous one's records. Their stamps would refuse them
+    /// anyway; this is what keeps them from lingering in memory until they do.
+    private var discardCachedRecords: (@MainActor () -> Void)?
+
     /// The private database, for the bootstrap fetch that runs outside the
     /// engine's change token.
     private weak var database: CKDatabase?
@@ -81,6 +88,11 @@ final class AccountSyncCoordinator {
 
     private var isActivating = false
     private var activationRequested = false
+
+    /// Set while staged changes are being applied. Applying posts the very
+    /// notifications this coordinator retries deferred activations from, so
+    /// without it a run would ask itself to run again.
+    private var isApplyingStagedChanges = false
 
     private nonisolated(unsafe) var identityObserver: NSObjectProtocol?
     private nonisolated(unsafe) var accountsObserver: NSObjectProtocol?
@@ -151,12 +163,14 @@ final class AccountSyncCoordinator {
 
         // Local edits mark themselves dirty in AccountsManager; these turn that
         // into engine registrations without every call site knowing about sync.
+        // They are also how `reloadForCurrentIdentity()` announces itself, which
+        // is what releases records held back by the reload fence.
         accountsObserver = NotificationCenter.default.addObserver(
             forName: .accountsDidChange,
             object: nil,
             queue: .main
         ) { [weak self] _ in
-            MainActor.assumeIsolated { self?.enqueueDirtyRecords() }
+            MainActor.assumeIsolated { self?.accountStateDidChange() }
         }
 
         contextObserver = NotificationCenter.default.addObserver(
@@ -164,7 +178,7 @@ final class AccountSyncCoordinator {
             object: nil,
             queue: .main
         ) { [weak self] _ in
-            MainActor.assumeIsolated { self?.enqueueDirtyRecords() }
+            MainActor.assumeIsolated { self?.accountStateDidChange() }
         }
     }
 
@@ -187,22 +201,52 @@ final class AccountSyncCoordinator {
     func identityDidChange() {
         identityGeneration += 1
 
+        // Records already built for the previous identity are still sitting in
+        // the engine's conflict cache, which is not namespaced and would serve
+        // them at send time behind this coordinator's back.
+        discardCachedRecords?()
+
         guard namespace != nil else { return }
+        Task { await activate() }
+    }
+
+    /// Re-runs an activation that was held back because `AccountsManager` had
+    /// not reloaded yet.
+    ///
+    /// Only meaningful while something is staged and unapplied — activation
+    /// itself posts the notifications this is called from, so it would
+    /// otherwise ask for a run on the way out of every run it performs.
+    private func accountStateDidChange() {
+        enqueueDirtyRecords()
+
+        guard !isApplyingStagedChanges else { return }
+        guard let namespace, isManagerLoaded(for: namespace) else { return }
+        guard !store.stagedChanges(in: namespace).isEmpty else { return }
+
         Task { await activate() }
     }
 
     // MARK: - Engine attachment
 
     /// Connects the coordinator to a live sync engine.
-    func attach(database: CKDatabase?, enqueueChanges: @escaping EnqueueChanges) {
+    ///
+    /// - Parameter discardingCachedRecords: empties whatever account records the
+    ///   engine is holding from conflict resolution, for when the identity moves.
+    func attach(
+        database: CKDatabase?,
+        discardingCachedRecords discardCachedRecords: (@MainActor () -> Void)? = nil,
+        enqueueChanges: @escaping EnqueueChanges
+    ) {
         self.database = database
         self.enqueueChanges = enqueueChanges
+        self.discardCachedRecords = discardCachedRecords
     }
 
     /// Disconnects when the engine is torn down. The durable state — staging,
     /// outbox, bootstrap flag — is deliberately left untouched.
     func detach() {
         enqueueChanges = nil
+        discardCachedRecords = nil
         database = nil
     }
 
@@ -313,6 +357,22 @@ final class AccountSyncCoordinator {
         guard store.isBootstrapCompleted(in: namespace) else { return }
         guard namespace == self.namespace else { return }
 
+        // Applying is a write into `AccountsManager`'s memory, and during the
+        // reload gap that memory still belongs to the identity being left. The
+        // damage is not hypothetical: an incoming account whose deterministic ID
+        // matches a tombstone the *previous* identity holds would be read as a
+        // resurrection and deleted from the new identity's zone, and a tombstone
+        // applied against the previous identity's list removes that account —
+        // taking its Keychain credential with it. Staging is durable, so this
+        // defers rather than drops; `accountStateDidChange()` retries it when the
+        // reload announces itself.
+        guard isManagerLoaded(for: namespace) else {
+            LoggingService.shared.logCloudKit(
+                "Account records stay staged: the accounts in memory still belong to the previous identity"
+            )
+            return
+        }
+
         applyStagedChanges(in: namespace)
         enqueueDirtyRecords()
     }
@@ -346,6 +406,9 @@ final class AccountSyncCoordinator {
     private func applyStagedChanges(in namespace: String) {
         let staged = store.stagedChanges(in: namespace)
         guard !staged.isEmpty else { return }
+
+        isApplyingStagedChanges = true
+        defer { isApplyingStagedChanges = false }
 
         // Tombstone-first. A deletion that arrived in a later event than the
         // account record it kills must still be applied before it, or the
@@ -553,6 +616,7 @@ final class AccountSyncCoordinator {
     func enqueueDirtyRecords() {
         guard let enqueueChanges, let namespace else { return }
         guard isCategoryEnabled(), store.isBootstrapCompleted(in: namespace) else { return }
+        guard isManagerLoaded(for: namespace) else { return }
 
         var changes: [CKSyncEngine.PendingRecordZoneChange] = []
 
@@ -584,8 +648,48 @@ final class AccountSyncCoordinator {
     /// Registers every account record for upload, for a zone with nothing in it
     /// — first enable, or a zone recreated after being deleted elsewhere.
     func uploadEverything() {
+        // Marking everything dirty commits the *in-memory* list to this
+        // identity's zone, so it must not run against a snapshot loaded under
+        // another one.
+        guard let namespace, isManagerLoaded(for: namespace) else { return }
+
         accountsManager.markAllRecordsForUpload()
         enqueueDirtyRecords()
+    }
+
+    /// Whether the account manager's in-memory state belongs to the namespace
+    /// this coordinator uploads into.
+    ///
+    /// The identity scope moves before `AccountsManager` reloads — the reload
+    /// runs from a main-queue observer — so in that window `namespace` already
+    /// names the new identity while the accounts, the outboxes and the selected
+    /// context in memory are still the previous one's. Engine callbacks can
+    /// land there, and building records from that snapshot would publish one
+    /// Apple account's accounts into another's zone. Observer ordering is not
+    /// contractual, so this fences rather than assuming an order; the outbox is
+    /// durable, and the reload re-enqueues whatever is still owed.
+    private func isManagerLoaded(for namespace: String) -> Bool {
+        accountsManager.loadedNamespace == namespace
+    }
+
+    /// Whether an account-category record belongs to the identity that is
+    /// current now — and may therefore be uploaded, cached for retry, or have
+    /// its confirmation acted on.
+    ///
+    /// Judged on the record's own stamp rather than on anything kept beside it.
+    /// A side table keyed by record name cannot answer this: the names are
+    /// deterministic, so two identities' copies of the "same" record collide in
+    /// it, and the second send silently relabels the first one's. The engine
+    /// also delivers delegate events from a previous identity to the same
+    /// instance, and an async conflict handler can resume long after the
+    /// identity moved — both arrive holding a record, which is the one thing
+    /// that still knows where it came from.
+    ///
+    /// An unstamped record fails closed: nothing this build sends is unstamped,
+    /// so it is not ours to act on.
+    func belongsToCurrentIdentity(_ record: CKRecord) -> Bool {
+        guard let namespace, isManagerLoaded(for: namespace) else { return false }
+        return record[AccountRecordName.identityNamespaceField] as? String == namespace
     }
 
     /// Builds the record for a pending save at send time.
@@ -596,7 +700,19 @@ final class AccountSyncCoordinator {
     /// change is registered again as soon as what it waits on is confirmed.
     func recordToSave(named recordName: String) -> CKRecord? {
         guard let namespace, isCategoryEnabled(), store.isBootstrapCompleted(in: namespace) else { return nil }
+        guard isManagerLoaded(for: namespace) else { return nil }
 
+        // Stamped at the moment of building, which is the only moment that says
+        // for certain whose zone this copy of the record is going into. It
+        // travels with the record from here on: to the server, back in the
+        // confirmation, and into the engine's retry cache.
+        let record = buildRecord(named: recordName)
+        record?[AccountRecordName.identityNamespaceField] = namespace as CKRecordValue
+
+        return record
+    }
+
+    private func buildRecord(named recordName: String) -> CKRecord? {
         switch AccountRecordName.parse(recordName) {
         case let .account(id):
             guard !accountsManager.isDeleted(id), let account = accountsManager.account(id: id) else { return nil }
@@ -626,11 +742,33 @@ final class AccountSyncCoordinator {
 
     /// Clears outbox entries the server has confirmed, and releases whatever was
     /// waiting on them.
+    ///
+    /// A confirmation only ever clears state for the identity that sent the
+    /// record. The names are deterministic, so the identity that took over
+    /// during the send has an outbox entry under the same name; honouring the
+    /// previous identity's confirmation would clear that entry without the
+    /// server having confirmed anything — and, for a tombstone, register the
+    /// deletion of the new identity's live account record.
     func didSave(records: [CKRecord]) {
         var didSaveAccountRecord = false
+        var didIgnoreConfirmation = false
 
         for record in records {
-            switch AccountRecordName.parse(record.recordID.recordName) {
+            let recordName = record.recordID.recordName
+
+            guard !AccountRecordName.isAccountCategory(recordName) || belongsToCurrentIdentity(record) else {
+                // Left pending rather than confirmed: the outbox is durable and
+                // the record is registered again for whichever identity still
+                // owes it. Nothing is enqueued from here — least of all the
+                // deletion a tombstone's confirmation releases.
+                didIgnoreConfirmation = true
+                LoggingService.shared.logCloudKit(
+                    "Ignoring a confirmation for \(recordName) sent under a different Apple account"
+                )
+                continue
+            }
+
+            switch AccountRecordName.parse(recordName) {
             case let .account(id):
                 accountsManager.confirmUpload(id, updatedAt: record["updatedAt"] as? Date)
                 didSaveAccountRecord = true
@@ -658,7 +796,13 @@ final class AccountSyncCoordinator {
         // Whatever was held behind these can go now — a marker waiting on its
         // account, or a context the user changed while the previous one was
         // still in flight, which confirmation deliberately left dirty.
-        if didSaveAccountRecord {
+        //
+        // An ignored confirmation needs the same call, for the opposite reason:
+        // the send it belonged to consumed the engine's pending change for that
+        // record name, and the current identity's reload — which is what would
+        // otherwise re-register it — has already been and gone. Without this the
+        // entry stays owed in a durable outbox that nothing is reading.
+        if didSaveAccountRecord || didIgnoreConfirmation {
             enqueueDirtyRecords()
         }
     }
@@ -675,26 +819,15 @@ final class AccountSyncCoordinator {
 
     /// Resolves a conflict on an account-category record, and applies the
     /// outcome locally.
-    ///
-    /// The local apply matters here in a way it does not for the other
-    /// categories: CloudKit never delivers back a record this device saved, so
-    /// a conflict the server won would otherwise leave stale state on screen
-    /// until some unrelated future change to the same record.
     func resolveConflict(local: CKRecord, server: CKRecord) async -> CKRecord {
         let resolved: CKRecord
 
         switch server.recordType {
         case RecordType.account:
             resolved = await conflictResolver.resolveAccountConflict(local: local, server: server)
-            if let account = try? mapper.toAccount(from: resolved), !accountsManager.isDeleted(account.id) {
-                accountsManager.applySyncedAccount(account)
-            }
 
         case RecordType.dataContext:
             resolved = await conflictResolver.resolveDataContextConflict(local: local, server: server)
-            if let context = try? mapper.toStoredDataContext(from: resolved) {
-                accountsManager.applySyncedContext(context)
-            }
 
         case RecordType.legacyAccountMigration, RecordType.accountDeletion:
             resolved = await conflictResolver.resolveWriteOnceConflict(local: local, server: server)
@@ -703,7 +836,50 @@ final class AccountSyncCoordinator {
             resolved = server
         }
 
+        // The merge can take fields from the server's copy, including its stamp,
+        // so provenance is restored from the local side: this record is a retry
+        // of the record *this device built*, and that is whose zone it is going
+        // into. Stamping it with whatever is current instead would launder a
+        // resolution begun under the previous Apple account into the one that
+        // took over while it was being computed.
+        inheritProvenance(from: local, to: resolved)
+
+        applyResolvedRecord(resolved)
+
         return resolved
+    }
+
+    /// Copies the identity stamp of the record a resolution started from onto
+    /// its outcome.
+    private func inheritProvenance(from local: CKRecord, to resolved: CKRecord) {
+        guard resolved !== local else { return }
+        resolved[AccountRecordName.identityNamespaceField] = local[AccountRecordName.identityNamespaceField]
+    }
+
+    /// Writes a resolution's outcome into memory.
+    ///
+    /// Matters here in a way it does not for the other categories: CloudKit
+    /// never delivers back a record this device saved, so a conflict the server
+    /// won would otherwise leave stale state on screen until some unrelated
+    /// future change to the same record. Fenced on the record's own provenance —
+    /// the resolution suspends, and the identity can move across that suspension.
+    private func applyResolvedRecord(_ resolved: CKRecord) {
+        guard belongsToCurrentIdentity(resolved) else { return }
+
+        switch resolved.recordType {
+        case RecordType.account:
+            guard let account = try? mapper.toAccount(from: resolved),
+                  !accountsManager.isDeleted(account.id) else { return }
+            accountsManager.applySyncedAccount(account)
+
+        case RecordType.dataContext:
+            guard let context = try? mapper.toStoredDataContext(from: resolved) else { return }
+            accountsManager.applySyncedContext(context)
+
+        default:
+            // Write-once records carry no local state to correct.
+            break
+        }
     }
 
     // MARK: - Helpers

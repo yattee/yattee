@@ -399,7 +399,12 @@ final class CloudKitSyncEngine: @unchecked Sendable {
             // to complete before anything is uploaded, or a device upgrading
             // from the previous release would publish its unmerged local list
             // over records it has not seen yet.
-            accountSync?.attach(database: database) { [weak self] changes in
+            accountSync?.attach(
+                database: database,
+                discardingCachedRecords: { [weak self] in
+                    self?.discardConflictResolvedAccountRecords()
+                }
+            ) { [weak self] changes in
                 self?.addPendingChanges(changes)
             }
             await accountSync?.activate()
@@ -1759,7 +1764,17 @@ extension CloudKitSyncEngine: CKSyncEngineDelegate {
 
         // A conflict-resolved record (carrying the server change tag) takes precedence
         if let resolved = conflictResolvedRecords[recordName] {
-            return resolved
+            if mayUseResolvedRecord(resolved) {
+                return resolved
+            }
+
+            // An account record built under another identity can never become
+            // valid here — including one resolved after the identity moved but
+            // before the accounts in memory caught up, which the invalidation on
+            // the change itself cannot have seen. Dropping it costs at most one
+            // more conflict round-trip; serving it would upload another Apple
+            // account's data.
+            conflictResolvedRecords.removeValue(forKey: recordName)
         }
 
         if let record = await materializeRecord(named: recordName) {
@@ -1769,6 +1784,52 @@ extension CloudKitSyncEngine: CKSyncEngineDelegate {
         engine.state.remove(pendingRecordZoneChanges: [.saveRecord(recordID)])
         LoggingService.shared.logCloudKit("Skipping save for \(recordName) — no matching local data")
         return nil
+    }
+
+    /// Whether a conflict-resolved record may be cached for retry, and served
+    /// when that retry is sent.
+    ///
+    /// This cache is keyed by record name alone, and account record names are
+    /// deterministic across Apple accounts — so the name says nothing about
+    /// whose record this is, and the record's own stamp has to be asked. Both
+    /// ends need the question: the resolution runs asynchronously and can finish
+    /// after the identity moved (too late for the invalidation that change
+    /// triggers), and the send can come later still. Falling through to
+    /// materialization is safe — the coordinator holds the change there, and the
+    /// durable outbox re-registers it. Every other category is unaffected:
+    /// nothing else here is namespaced by Apple account.
+    private func mayUseResolvedRecord(_ record: CKRecord) -> Bool {
+        guard AccountRecordName.isAccountCategory(record.recordID.recordName) else { return true }
+        return accountSync?.belongsToCurrentIdentity(record) ?? false
+    }
+
+    /// Puts an account record's engine change back when a conflict is abandoned.
+    ///
+    /// The send consumed the pending change, and these paths return without
+    /// registering another — but the account outbox is durable and still owes
+    /// the record, and unlike the SwiftData categories nothing re-derives it
+    /// from a model change. It would sit there until an unrelated edit, an
+    /// identity reload or a relaunch happened to re-register it. The coordinator
+    /// decides what is actually still owed; a record that is not simply does
+    /// nothing here. Other categories keep the existing behaviour.
+    private func restoreAccountOutboxIfNeeded(for recordName: String) {
+        guard AccountRecordName.isAccountCategory(recordName) else { return }
+        accountSync?.enqueueDirtyRecords()
+    }
+
+    /// Drops the account records held from conflict resolution, for when the
+    /// identity moves. Called by the coordinator, which is what observes that.
+    private func discardConflictResolvedAccountRecords() {
+        let stale = conflictResolvedRecords.keys.filter { AccountRecordName.isAccountCategory($0) }
+        guard !stale.isEmpty else { return }
+
+        for recordName in stale {
+            conflictResolvedRecords.removeValue(forKey: recordName)
+        }
+
+        LoggingService.shared.logCloudKit(
+            "Discarded \(stale.count) conflict-resolved account records after the Apple account changed"
+        )
     }
 
     // MARK: - Scope-Aware Local Lookups
@@ -1935,6 +1996,7 @@ extension CloudKitSyncEngine: CKSyncEngineDelegate {
             guard let serverRecord = error.serverRecord else {
                 LoggingService.shared.logCloudKitError("No server record in conflict error for \(recordName)", error: error)
                 conflictResolvedRecords.removeValue(forKey: recordName)
+                restoreAccountOutboxIfNeeded(for: recordName)
                 return
             }
 
@@ -1946,6 +2008,7 @@ extension CloudKitSyncEngine: CKSyncEngineDelegate {
                 )
                 conflictResolvedRecords.removeValue(forKey: recordName)
                 retryCount.removeValue(forKey: recordName)
+                restoreAccountOutboxIfNeeded(for: recordName)
                 return
             }
             retryCount[recordName] = attempts + 1
@@ -1954,6 +2017,20 @@ extension CloudKitSyncEngine: CKSyncEngineDelegate {
             // The resolved record keeps the server change tag, so the retry
             // is accepted as an update.
             let resolved = await resolveConflict(local: record, server: serverRecord)
+
+            // The resolution suspends, and the Apple account can move across
+            // that suspension: this handler may have begun for an identity that
+            // is no longer the one this cache would serve the retry to. Neither
+            // the record nor its retry is this identity's to send.
+            guard mayUseResolvedRecord(resolved) else {
+                conflictResolvedRecords.removeValue(forKey: recordName)
+                retryCount.removeValue(forKey: recordName)
+                LoggingService.shared.logCloudKit(
+                    "Dropping the conflict resolution for \(recordName) — it was built under a different Apple account"
+                )
+                return
+            }
+
             conflictResolvedRecords[recordName] = resolved
             syncEngine?.state.add(pendingRecordZoneChanges: [.saveRecord(recordID)])
             LoggingService.shared.logCloudKit("Resolved \(serverRecord.recordType) conflict for \(recordName), retrying (attempt \(attempts + 1))")

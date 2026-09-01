@@ -117,6 +117,20 @@ final class SubscriptionAccountValidator {
     /// Validates the current account and auto-corrects if invalid.
     /// Call this on app launch and when configuration changes.
     func validateAndCorrectIfNeeded() {
+        // Availability is decided from account statuses, and every status is
+        // "cannot tell yet" while the credential identity scope is unresolved.
+        // This runs on every foreground activation, so correcting from that
+        // would overwrite the user's selection with `.local` on a state that
+        // was never an answer. The observation loop re-runs when the scope
+        // resolves and the statuses become real.
+        if accountsManager?.isIdentityResolved == false {
+            LoggingService.shared.debug(
+                "Leaving the subscription account alone — the credential identity is still unresolved",
+                category: .general
+            )
+            return
+        }
+
         guard !isCurrentAccountValid else {
             LoggingService.shared.debug(
                 "Current subscription account is valid: \(settingsManager.subscriptionAccount.type)",

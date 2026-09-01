@@ -684,6 +684,13 @@ final class AccountsManager {
     /// migrated account would simply recreate it, because `usesAccountLogin`
     /// remains true on the instance forever.
     func reconcileLegacyAccounts() {
+        // Nothing may be synthesized into the unresolved namespace: the app
+        // cannot yet tell whose accounts these are, and the marker it would
+        // write there is permanent while the namespace itself is discarded.
+        // Nothing is lost by waiting — resolution runs
+        // `reloadForCurrentIdentity()`, which reconciles under the namespace
+        // that will actually be read.
+        guard identityScope.isResolved else { return }
         guard let instancesManager else { return }
 
         var didChange = false
@@ -742,6 +749,11 @@ final class AccountsManager {
     /// previous release wrote the key to iCloud but never imported it back — on
     /// a fresh install the only copy lives in KVS.
     func migrateLegacyContextIfNeeded() {
+        // A one-way migration is spent the moment it runs, so running it
+        // against the unresolved namespace would consume it against storage
+        // that is thrown away — and mark a context chosen that the identity
+        // owning the choice never sees.
+        guard identityScope.isResolved else { return }
         guard !hasStoredContext else { return }
 
         guard let legacy = legacySubscriptionAccount() else { return }
@@ -792,16 +804,41 @@ final class AccountsManager {
         identityScope.current ?? "unresolved"
     }
 
+    /// Whether the identity everything here is keyed by is known.
+    ///
+    /// Exposed because the corrections other services make — rewriting the
+    /// legacy selection, resetting a context whose account is "missing" — are
+    /// only meaningful once this is true. While it is false the app is looking
+    /// at a namespace it will discard, and acting on what it finds there
+    /// corrects real state from state that was never authoritative.
+    var isIdentityResolved: Bool { identityScope.isResolved }
+
+    /// The namespace the in-memory state was loaded from.
+    ///
+    /// `namespace` moves the instant the identity scope does, but the reload
+    /// that refills memory runs on a main-queue observer afterwards. In that
+    /// window everything held here still belongs to the previous identity, so
+    /// writes are fenced on this rather than on `namespace` — otherwise one
+    /// Apple account's accounts would be persisted, and uploaded, under
+    /// another's. Kept out of observation: it is a storage fence, not state
+    /// anything renders.
+    @ObservationIgnored private(set) var loadedNamespace = ""
+
     private func key(_ name: String) -> String {
         "accounts.\(namespace).\(name)"
     }
 
     private var hasStoredContext: Bool {
         get { defaults.bool(forKey: key("hasContext")) }
-        set { defaults.set(newValue, forKey: key("hasContext")) }
+        set {
+            guard loadedNamespace == namespace else { return }
+            defaults.set(newValue, forKey: key("hasContext"))
+        }
     }
 
     private func load() {
+        loadedNamespace = namespace
+
         if let data = defaults.data(forKey: key("accounts")),
            let decoded = try? JSONDecoder().decode([Account].self, from: data) {
             accounts = decoded
@@ -837,9 +874,53 @@ final class AccountsManager {
         }
 
         pendingContextUpload = defaults.bool(forKey: key("pendingContextUpload"))
+
+        purgeUnresolvedNamespace()
+    }
+
+    /// Every key `save()` writes, for purging a namespace wholesale.
+    private static let storedKeyNames = [
+        "accounts", "context", "hasContext", "migrated", "pendingUploads",
+        "pendingDeletions", "pendingMarkerUploads", "deletedAccounts",
+        "deletedInstances", "pendingContextUpload"
+    ]
+
+    /// Deletes whatever was written while the identity was still unresolved.
+    ///
+    /// That namespace is a holding pen no resolved identity ever reads back,
+    /// and what accumulates there is actively wrong: a snapshot from before a
+    /// tombstone was applied, outboxes owing uploads to a zone nothing will
+    /// ever send them to. With iCloud Drive switched off the scope dips to
+    /// unresolved on every foreground activation, so it is written in ordinary
+    /// use rather than only in exotic states.
+    ///
+    /// Run from `load()`, which covers both a launch that resolves immediately
+    /// (where no reload ever runs) and one that resolves later. Repeatable, so
+    /// there is nothing to remember about having done it.
+    private func purgeUnresolvedNamespace() {
+        guard identityScope.isResolved else { return }
+
+        for name in Self.storedKeyNames {
+            defaults.removeObject(forKey: "accounts.unresolved.\(name)")
+        }
     }
 
     private func save() {
+        // The namespace moved and the reload has not run yet, so this is the
+        // previous identity's state being written under the new identity's
+        // keys. Dropped rather than deferred: the reload that follows loads
+        // whatever storage already holds for the new identity, and everything
+        // dropped here is either that identity's — and still on disk — or the
+        // previous one's, which its own namespace still holds.
+        guard loadedNamespace == namespace else {
+            LoggingService.shared.warning(
+                "Dropping an account save made while the identity namespace was reloading",
+                category: .general,
+                details: "loaded=\(loadedNamespace), current=\(namespace)"
+            )
+            return
+        }
+
         if let data = try? JSONEncoder().encode(accounts) {
             defaults.set(data, forKey: key("accounts"))
         }
@@ -879,6 +960,12 @@ final class AccountsManager {
 
         load()
         reconcileLegacyAccounts()
+        // Both migrations are held back while the scope is unresolved, and this
+        // is where a launch that resolved late gets them. Reconciliation only
+        // runs the context migration when it changed something, so a namespace
+        // whose accounts were already migrated would otherwise keep its legacy
+        // selection until the next relaunch. Idempotent via `hasStoredContext`.
+        migrateLegacyContextIfNeeded()
 
         NotificationCenter.default.post(name: .accountsDidChange, object: nil)
         // The context belongs to the namespace too, so this reload replaced it.

@@ -94,6 +94,18 @@ final class AppEnvironment {
             }
     }
 
+    /// Drops the fingerprints recorded while the identity was unresolved.
+    ///
+    /// Nothing legitimate is written under that key — `refreshAccountStatuses`
+    /// refuses to read the Keychain until the scope resolves — so anything left
+    /// there is a digest of a credential read under a scope the app could not
+    /// vouch for, and comparing a real credential against it would report a
+    /// replacement that never happened.
+    private func purgeUnresolvedCredentialFingerprints() {
+        guard credentialIdentityScope.isResolved else { return }
+        UserDefaults.standard.removeObject(forKey: "accountCredentialFingerprints.unresolved")
+    }
+
     private func saveCredentialFingerprints() {
         let stored = credentialFingerprints.reduce(into: [String: String]()) { result, entry in
             result[entry.key.uuidString] = entry.value
@@ -476,6 +488,7 @@ final class AppEnvironment {
                 // Fingerprints are recorded per identity, like everything else
                 // keyed to one.
                 self.loadCredentialFingerprints()
+                self.purgeUnresolvedCredentialFingerprints()
                 self.refreshAccountStatuses()
 
                 // Compared against the recorded owner rather than cleared
@@ -488,6 +501,7 @@ final class AppEnvironment {
         }
 
         loadCredentialFingerprints()
+        purgeUnresolvedCredentialFingerprints()
         discardCachesFromAnotherIdentityIfNeeded(atLaunch: true)
 
         // Turn any pre-revamp single-instance logins into accounts. Repeatable:
@@ -650,6 +664,14 @@ final class AppEnvironment {
             lastCachedContext = effective
             clearAccountScopedCaches()
         }
+
+        // The context in memory belongs to whichever namespace was loaded, and
+        // an unresolved scope is not one whose accounts anybody has looked at
+        // yet. Mirroring from it would rewrite the legacy selection to `.local`
+        // on every activation dip — several times a day with iCloud Drive off —
+        // and the user would find their picker reset. The observer refires when
+        // the scope comes back, so the mirror catches up rather than being lost.
+        guard credentialIdentityScope.isResolved else { return }
 
         let legacy: SubscriptionAccount
 

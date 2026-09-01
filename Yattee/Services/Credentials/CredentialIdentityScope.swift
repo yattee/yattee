@@ -224,6 +224,23 @@ final class CredentialIdentityScope {
         state = fixedScope.map { State.resolved($0) } ?? .unresolved
     }
 
+    /// Test seam: moves a pinned scope after construction.
+    ///
+    /// - Parameter announcing: whether to take the real `setState` path, which
+    ///   posts the change notification everything namespaced by identity
+    ///   reloads on. `false` mutates the state silently, which is the only way
+    ///   to reproduce the window between the scope moving and those observers
+    ///   running — the window writes have to be fenced against.
+    func setFixedScope(_ scope: String?, announcing: Bool = true) {
+        let newState = scope.map { State.resolved($0) } ?? .unresolved
+
+        if announcing {
+            setState(newState)
+        } else {
+            state = newState
+        }
+    }
+
     // MARK: - Resolution
 
     /// Re-reads the Apple account and restores the cached scope if there is

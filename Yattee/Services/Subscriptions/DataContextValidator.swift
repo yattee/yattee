@@ -165,6 +165,10 @@ final class DataContextValidator {
     /// must never reach here — those are all "unknown", and treating them as
     /// removal is how a user loses their selection during a slow sync.
     func correctIfContextRemoved() {
+        // An unresolved identity has not loaded anybody's accounts yet, so an
+        // account "missing" from that state proves nothing — least of all a
+        // deletion, which is the only thing allowed to move the context here.
+        guard accountsManager.isIdentityResolved else { return }
         guard case let .account(id) = accountsManager.currentContext else { return }
         guard accountsManager.account(id: id) == nil else { return }
 

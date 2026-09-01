@@ -339,6 +339,156 @@ struct AccountsManagerTests {
         #expect(relaunched.currentContext == .local)
     }
 
+    /// Every key the manager persists, spelled out here rather than read from
+    /// it: a purge that stopped covering one of them would otherwise be
+    /// invisible to these tests.
+    private static let storedKeyNames = [
+        "accounts", "context", "hasContext", "migrated", "pendingUploads",
+        "pendingDeletions", "pendingMarkerUploads", "deletedAccounts",
+        "deletedInstances", "pendingContextUpload"
+    ]
+
+    private func unresolvedKeysAreAbsent(in defaults: UserDefaults) -> Bool {
+        Self.storedKeyNames.allSatisfy { defaults.object(forKey: "accounts.unresolved.\($0)") == nil }
+    }
+
+    private func makeLegacyInstance() -> Instance {
+        Instance(
+            type: .invidious,
+            url: URL(string: "https://legacy-\(UUID().uuidString).example.com")!,
+            usesAccountLogin: true
+        )
+    }
+
+    @Test("An unresolved identity never migrates a legacy login")
+    func unresolvedIdentityDoesNotMigrate() {
+        let defaults = makeDefaults()
+        let instances = InstancesManager()
+        let instance = makeLegacyInstance()
+        instances.add(instance)
+        defer { instances.remove(instance) }
+
+        let unresolved = AccountsManager(
+            identityScope: CredentialIdentityScope(fixedScope: nil),
+            instancesManager: instances,
+            defaults: defaults
+        )
+        unresolved.reconcileLegacyAccounts()
+
+        // Synthesizing here would file the account — and the permanent marker
+        // that suppresses synthesis everywhere else — under a namespace no
+        // identity ever reads back.
+        #expect(unresolved.accounts.isEmpty)
+        #expect(unresolved.migratedInstanceIDs.isEmpty)
+        #expect(unresolved.pendingUploads.isEmpty)
+        #expect(unresolved.pendingMarkerUploads.isEmpty)
+        #expect(unresolvedKeysAreAbsent(in: defaults))
+
+        // Held back, not lost: the same instance migrates as soon as there is
+        // an identity to migrate it for.
+        let resolved = makeManager(defaults: defaults, instances: instances)
+        resolved.reconcileLegacyAccounts()
+        #expect(resolved.accounts(forInstance: instance.id).count == 1)
+        #expect(resolved.migratedInstanceIDs.contains(instance.id))
+    }
+
+    @Test("A scope that dips to unresolved and returns writes nothing in between")
+    func scopeRoundTripLeavesTheUnresolvedNamespaceEmpty() async throws {
+        let defaults = makeDefaults()
+        let instances = InstancesManager()
+        let instance = makeLegacyInstance()
+        instances.add(instance)
+        defer { instances.remove(instance) }
+
+        let scope = CredentialIdentityScope(fixedScope: "identity-A")
+        let manager = AccountsManager(
+            identityScope: scope,
+            instancesManager: instances,
+            defaults: defaults
+        )
+        manager.reconcileLegacyAccounts()
+
+        let account = try #require(manager.accounts(forInstance: instance.id).first)
+        manager.setContext(.account(account.id))
+
+        // With iCloud Drive switched off this happens on every foreground
+        // activation — the scope drops and comes back as the same account.
+        scope.setFixedScope(nil)
+        try await Task.sleep(for: .milliseconds(50))
+        #expect(manager.accounts.isEmpty)
+
+        // Instances keep arriving over iCloud while this lasts, and each
+        // arrival asks for reconciliation.
+        NotificationCenter.default.post(name: .instancesDidChange, object: nil)
+        try await Task.sleep(for: .milliseconds(50))
+        #expect(manager.accounts.isEmpty)
+        #expect(manager.migratedInstanceIDs.isEmpty)
+        // Checked here as well as after the flip back: once an identity is
+        // resolved the purge would hide a write made while it was not.
+        #expect(unresolvedKeysAreAbsent(in: defaults))
+
+        scope.setFixedScope("identity-A")
+        try await Task.sleep(for: .milliseconds(50))
+
+        #expect(manager.accounts(forInstance: instance.id).map(\.id) == [account.id])
+        #expect(manager.currentContext == .account(account.id))
+        #expect(unresolvedKeysAreAbsent(in: defaults))
+    }
+
+    @Test("Resolving an identity purges what was stored while it was unknown")
+    func resolutionPurgesTheUnresolvedNamespace() {
+        let defaults = makeDefaults()
+
+        let identityA = makeManager(defaults: defaults)
+        let account = identityA.addAccount(instanceID: UUID(), displayName: "Main")
+
+        // The blob measured on the device: a snapshot written before the
+        // identity was known, contradicting the one that owns the storage.
+        let unresolved = AccountsManager(
+            identityScope: CredentialIdentityScope(fixedScope: nil),
+            defaults: defaults
+        )
+        let stale = unresolved.addAccount(instanceID: UUID())
+        unresolved.setContext(.account(stale.id))
+        #expect(defaults.data(forKey: "accounts.unresolved.accounts") != nil)
+
+        let relaunched = makeManager(defaults: defaults)
+
+        #expect(unresolvedKeysAreAbsent(in: defaults))
+        #expect(relaunched.account(id: account.id)?.displayName == "Main")
+        #expect(relaunched.account(id: stale.id) == nil)
+    }
+
+    @Test("A save made while the namespace is reloading is dropped")
+    func saveDuringTheReloadGapIsDropped() async throws {
+        let defaults = makeDefaults()
+        let scope = CredentialIdentityScope(fixedScope: "identity-A")
+        let manager = AccountsManager(identityScope: scope, defaults: defaults)
+        let account = manager.addAccount(instanceID: UUID())
+
+        // The scope moves before the observer that reloads this manager runs,
+        // so `namespace` already names the new identity while everything in
+        // memory is still the previous one's.
+        scope.setFixedScope("identity-B", announcing: false)
+        manager.setContext(.account(account.id))
+
+        // identity-B must not be handed identity-A's selection...
+        #expect(defaults.data(forKey: "accounts.identity-B.context") == nil)
+        #expect(!defaults.bool(forKey: "accounts.identity-B.hasContext"))
+
+        // ...and identity-A's stored copy must not have moved either: the write
+        // was aimed at keys that no longer describe what is in memory.
+        let storedA = try #require(defaults.data(forKey: "accounts.identity-A.context"))
+        #expect(try JSONDecoder().decode(StoredDataContext.self, from: storedA).context == .local)
+
+        // The announced flip is the real path, and it reloads cleanly.
+        scope.setFixedScope("identity-A")
+        try await Task.sleep(for: .milliseconds(50))
+
+        #expect(manager.accounts.map(\.id) == [account.id])
+        #expect(manager.currentContext == .local)
+    }
+
     @Test("A migrated context loses to any explicit choice")
     func migratedContextLosesToExplicitChoice() {
         let manager = makeManager()

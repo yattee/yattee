@@ -197,6 +197,16 @@ enum AccountRecordName {
     static let accountDeletionPrefix = "accountDeletion-"
     static let dataContext = "datacontext-current"
 
+    /// The field every outbound account-category record carries, naming the
+    /// identity that built it.
+    ///
+    /// Record names here are deterministic, so they are identical under every
+    /// Apple account and prove nothing about whose record this is — provenance
+    /// has to travel inside the record itself. Written and read only by the
+    /// account sync coordinator for that comparison; the mappers never look at
+    /// it, so it cannot reach the `Account` model.
+    static let identityNamespaceField = "identityNamespace"
+
     static func account(_ id: UUID) -> String { accountPrefix + id.uuidString }
     static func legacyMigration(_ instanceID: UUID) -> String { legacyMigrationPrefix + instanceID.uuidString }
     static func accountDeletion(_ accountID: UUID) -> String { accountDeletionPrefix + accountID.uuidString }

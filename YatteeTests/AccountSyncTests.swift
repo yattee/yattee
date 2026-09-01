@@ -63,6 +63,16 @@ struct AccountSyncTests {
         let category: CategorySwitch
         let mapper: CloudKitRecordMapper
         let scope: String
+
+        /// Confirms records the way the server does: what comes back is the
+        /// copy the sending identity built, stamped with that identity.
+        @MainActor
+        func confirm(_ records: [CKRecord]) {
+            for record in records {
+                record[AccountRecordName.identityNamespaceField] = scope as CKRecordValue
+            }
+            coordinator.didSave(records: records)
+        }
     }
 
     /// A coordinator with its bootstrap already satisfied.
@@ -535,7 +545,7 @@ struct AccountSyncTests {
         #expect(harness.coordinator.recordToSave(named: "legacymigrated-\(instanceID.uuidString)") == nil)
 
         harness.recorder.clear()
-        harness.coordinator.didSave(records: [harness.mapper.toCKRecord(account: account)])
+        harness.confirm([harness.mapper.toCKRecord(account: account)])
 
         #expect(!harness.accounts.pendingUploads.contains(account.id))
         #expect(harness.recorder.savedNames.contains("legacymigrated-\(instanceID.uuidString)"))
@@ -553,7 +563,7 @@ struct AccountSyncTests {
         #expect(!harness.accounts.canUploadContext)
         #expect(harness.coordinator.recordToSave(named: "datacontext-current") == nil)
 
-        harness.coordinator.didSave(records: [harness.mapper.toCKRecord(account: account)])
+        harness.confirm([harness.mapper.toCKRecord(account: account)])
         #expect(harness.accounts.canUploadContext)
         #expect(harness.coordinator.recordToSave(named: "datacontext-current") != nil)
     }
@@ -573,7 +583,7 @@ struct AccountSyncTests {
 
         // The record deletion is registered only once the durable half landed.
         harness.recorder.clear()
-        harness.coordinator.didSave(records: [harness.mapper.toCKRecord(accountDeletionID: account.id)])
+        harness.confirm([harness.mapper.toCKRecord(accountDeletionID: account.id)])
 
         #expect(!harness.accounts.pendingDeletions.contains(account.id))
         #expect(harness.recorder.deletedNames.contains("account-\(account.id.uuidString)"))
@@ -601,7 +611,7 @@ struct AccountSyncTests {
         let sent = harness.mapper.toCKRecord(account: account)
 
         harness.accounts.updateDisplayName("Renamed", for: account.id)
-        harness.coordinator.didSave(records: [sent])
+        harness.confirm([sent])
 
         #expect(harness.accounts.pendingUploads.contains(account.id))
     }
@@ -629,7 +639,7 @@ struct AccountSyncTests {
         #expect(!harness.recorder.savedNames.contains("legacymigrated-\(kept.instanceID.uuidString)"))
 
         harness.recorder.clear()
-        harness.coordinator.didSave(records: [harness.mapper.toCKRecord(account: kept)])
+        harness.confirm([harness.mapper.toCKRecord(account: kept)])
         #expect(harness.recorder.savedNames.contains("legacymigrated-\(kept.instanceID.uuidString)"))
     }
 
@@ -761,6 +771,254 @@ struct AccountSyncTests {
         #expect(store.stagedChanges(in: "identity-B").isEmpty)
         #expect(!store.isBootstrapCompleted(in: "identity-A"))
         #expect(!store.isBootstrapCompleted(in: "identity-B"))
+    }
+
+    @Test("Nothing is uploaded from a snapshot loaded under another identity")
+    func reloadGapBlocksUploads() {
+        let defaults = Self.makeDefaults()
+        let store = AccountSyncStore(defaults: defaults)
+        store.markBootstrapCompleted(in: "identity-A")
+
+        // The manager still holds what it loaded while the scope was
+        // unresolved; the coordinator is already namespaced by the identity
+        // that resolved. That is the window between the scope moving and the
+        // manager's reload observer running, and engine callbacks land in it.
+        let accounts = AccountsManager(
+            identityScope: CredentialIdentityScope(fixedScope: nil),
+            defaults: defaults
+        )
+        let account = accounts.addAccount(instanceID: UUID())
+        accounts.setContext(.account(account.id))
+
+        let recorder = Recorder()
+        let coordinator = AccountSyncCoordinator(
+            accountsManager: accounts,
+            namespaceProvider: { "identity-A" },
+            store: store,
+            isCategoryEnabled: { true }
+        )
+        coordinator.attach(database: nil) { recorder.record($0) }
+
+        coordinator.enqueueDirtyRecords()
+        #expect(recorder.changes.isEmpty)
+
+        // Nothing is built at send time either — a change registered before the
+        // scope moved is withdrawn rather than filled in from the wrong state.
+        #expect(coordinator.recordToSave(named: "account-\(account.id.uuidString)") == nil)
+
+        coordinator.uploadEverything()
+        #expect(recorder.changes.isEmpty)
+
+        // And the outbox of the identity that owns the namespace is untouched:
+        // marking everything dirty would have committed another identity's list
+        // to this one's zone.
+        for name in ["accounts", "context", "hasContext", "pendingUploads", "pendingContextUpload"] {
+            #expect(defaults.object(forKey: "accounts.identity-A.\(name)") == nil)
+        }
+    }
+
+    @Test("Staged records are never applied to another identity's accounts")
+    func reloadGapDefersStagedChanges() async throws {
+        let defaults = Self.makeDefaults()
+        let store = AccountSyncStore(defaults: defaults)
+        store.markBootstrapCompleted(in: "identity-B")
+
+        // identity-A's list, still in memory: one live account, and a tombstone
+        // for another whose ID identity-B happens to reuse — migrated accounts
+        // take their instance's UUID, so the collision is ordinary rather than
+        // exotic.
+        let scope = CredentialIdentityScope(fixedScope: "identity-A")
+        let accounts = AccountsManager(identityScope: scope, defaults: defaults)
+        let livingAccount = accounts.addAccount(instanceID: UUID())
+        let sharedID = accounts.addAccount(instanceID: UUID()).id
+        accounts.removeAccount(sharedID)
+
+        // The scope moved; the reload that refills memory has not run yet.
+        scope.setFixedScope("identity-B", announcing: false)
+
+        let recorder = Recorder()
+        let coordinator = AccountSyncCoordinator(
+            accountsManager: accounts,
+            namespaceProvider: { scope.current },
+            store: store,
+            isCategoryEnabled: { true }
+        )
+        coordinator.attach(database: nil) { recorder.record($0) }
+
+        var deletedAccounts: [(UUID, Account?)] = []
+        coordinator.onAccountDeleted = { deletedAccounts.append(($0, $1)) }
+
+        let mapper = Self.makeMapper()
+        coordinator.stageFetched(
+            records: [
+                mapper.toCKRecord(accountDeletionID: livingAccount.id),
+                mapper.toCKRecord(account: Account(id: sharedID, instanceID: UUID()))
+            ],
+            deletions: []
+        )
+        await coordinator.activate()
+
+        // Nothing applied: identity-B's tombstone would have removed
+        // identity-A's account and taken its credential with it, and
+        // identity-B's account would have been read as a resurrection of
+        // identity-A's tombstone and deleted from identity-B's zone.
+        #expect(accounts.account(id: livingAccount.id) != nil)
+        #expect(deletedAccounts.isEmpty)
+        #expect(recorder.changes.isEmpty)
+        #expect(!store.stagedChanges(in: "identity-B").isEmpty)
+
+        // Deferred, not dropped. The reload announces itself, and that is what
+        // releases them — against the right list this time.
+        accounts.reloadForCurrentIdentity()
+        try await Task.sleep(for: .milliseconds(200))
+
+        #expect(store.stagedChanges(in: "identity-B").isEmpty)
+        #expect(accounts.account(id: sharedID) != nil)
+        #expect(!recorder.deletedNames.contains("account-\(sharedID.uuidString)"))
+        // The tombstone applies to identity-B, which never had that account —
+        // so the credential removal it triggers carries no account of
+        // identity-A's.
+        #expect(deletedAccounts.map(\.0) == [livingAccount.id])
+        #expect(deletedAccounts.first?.1 == nil)
+    }
+
+    @Test("A confirmation from the previous identity clears nothing")
+    func confirmationsAreTiedToTheIdentityThatSentThem() async throws {
+        let defaults = Self.makeDefaults()
+        let store = AccountSyncStore(defaults: defaults)
+        store.markBootstrapCompleted(in: "identity-A")
+        store.markBootstrapCompleted(in: "identity-B")
+
+        let scope = CredentialIdentityScope(fixedScope: "identity-A")
+        let accounts = AccountsManager(identityScope: scope, defaults: defaults)
+        let identity = Identity("identity-A")
+
+        let recorder = Recorder()
+        let coordinator = AccountSyncCoordinator(
+            accountsManager: accounts,
+            namespaceProvider: { identity.value },
+            store: store,
+            isCategoryEnabled: { true }
+        )
+        coordinator.attach(database: nil) { recorder.record($0) }
+
+        // A deletion built and sent under identity-A, in flight when the Apple
+        // account changes.
+        let sharedID = accounts.addAccount(instanceID: UUID()).id
+        accounts.removeAccount(sharedID)
+        coordinator.enqueueDirtyRecords()
+        #expect(recorder.savedNames.contains("accountDeletion-\(sharedID.uuidString)"))
+        let sentByA = try #require(coordinator.recordToSave(named: "accountDeletion-\(sharedID.uuidString)"))
+
+        scope.setFixedScope("identity-B")
+        try await Task.sleep(for: .milliseconds(200))
+        identity.value = "identity-B"
+
+        // identity-B owes the same record name — the IDs are deterministic — and
+        // has had no answer from the server about it. It even builds and sends
+        // its own copy, which is what makes anything kept *beside* the record,
+        // keyed by that shared name, unable to tell the two apart.
+        accounts.applySyncedAccount(Account(id: sharedID, instanceID: UUID()))
+        accounts.removeAccount(sharedID)
+        let sentByB = try #require(coordinator.recordToSave(named: "accountDeletion-\(sharedID.uuidString)"))
+        recorder.clear()
+
+        coordinator.didSave(records: [sentByA])
+
+        // Still owed, and no deletion was registered off the back of it:
+        // releasing the account record's deletion here would delete identity-B's
+        // record on the strength of identity-A's confirmation.
+        #expect(accounts.pendingDeletions.contains(sharedID))
+        #expect(recorder.deletedNames.isEmpty)
+
+        // identity-B's own copy is its own confirmation.
+        recorder.clear()
+        coordinator.didSave(records: [sentByB])
+
+        #expect(!accounts.pendingDeletions.contains(sharedID))
+        #expect(recorder.deletedNames.contains("account-\(sharedID.uuidString)"))
+    }
+
+    @Test("A skipped confirmation puts back what the current identity still owes")
+    func skippedConfirmationRestoresTheOutbox() async throws {
+        let defaults = Self.makeDefaults()
+        let store = AccountSyncStore(defaults: defaults)
+        store.markBootstrapCompleted(in: "identity-A")
+        store.markBootstrapCompleted(in: "identity-B")
+
+        let scope = CredentialIdentityScope(fixedScope: "identity-A")
+        let accounts = AccountsManager(identityScope: scope, defaults: defaults)
+        let identity = Identity("identity-A")
+
+        let recorder = Recorder()
+        let coordinator = AccountSyncCoordinator(
+            accountsManager: accounts,
+            namespaceProvider: { identity.value },
+            store: store,
+            isCategoryEnabled: { true }
+        )
+        coordinator.attach(database: nil) { recorder.record($0) }
+
+        let accountID = accounts.addAccount(instanceID: UUID()).id
+        let sentByA = try #require(coordinator.recordToSave(named: "account-\(accountID.uuidString)"))
+
+        scope.setFixedScope("identity-B")
+        try await Task.sleep(for: .milliseconds(200))
+        identity.value = "identity-B"
+
+        // identity-B's own upload, registered by the reload that has already
+        // happened. identity-A's send consumed the engine's pending change for
+        // that record name, so after its confirmation is skipped nothing else
+        // is left to re-register the debt.
+        let owed = accounts.addAccount(instanceID: UUID()).id
+        recorder.clear()
+
+        coordinator.didSave(records: [sentByA])
+
+        #expect(accounts.pendingUploads.contains(owed))
+        #expect(recorder.savedNames.contains("account-\(owed.uuidString)"))
+        #expect(recorder.deletedNames.isEmpty)
+    }
+
+    @Test("A change of identity invalidates the records the engine cached")
+    func identityChangeDropsCachedRecords() throws {
+        let defaults = Self.makeDefaults()
+        let store = AccountSyncStore(defaults: defaults)
+        store.markBootstrapCompleted(in: "identity-A")
+
+        let scope = CredentialIdentityScope(fixedScope: "identity-A")
+        let accounts = AccountsManager(identityScope: scope, defaults: defaults)
+        let identity = Identity("identity-A")
+
+        let coordinator = AccountSyncCoordinator(
+            accountsManager: accounts,
+            namespaceProvider: { identity.value },
+            store: store,
+            isCategoryEnabled: { true }
+        )
+
+        var didDiscardCachedRecords = false
+        coordinator.attach(
+            database: nil,
+            discardingCachedRecords: { didDiscardCachedRecords = true }
+        ) { _ in }
+
+        // The engine serves conflict-resolved records ahead of anything the
+        // coordinator builds, and that cache is keyed by record name alone —
+        // which every identity shares. The record's own stamp is what tells them
+        // apart.
+        let accountID = accounts.addAccount(instanceID: UUID()).id
+        let builtByA = try #require(coordinator.recordToSave(named: "account-\(accountID.uuidString)"))
+        #expect(coordinator.belongsToCurrentIdentity(builtByA))
+
+        identity.value = "identity-B"
+        #expect(!coordinator.belongsToCurrentIdentity(builtByA))
+
+        // And an unstamped record — one this build never sent — is nobody's.
+        #expect(!coordinator.belongsToCurrentIdentity(Self.makeMapper().toCKRecord(account: Account(instanceID: UUID()))))
+
+        coordinator.identityDidChange()
+        #expect(didDiscardCachedRecords)
     }
 
     /// A mutable identity, for driving scope changes deterministically.
