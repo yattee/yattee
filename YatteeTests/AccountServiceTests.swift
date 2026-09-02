@@ -154,6 +154,12 @@ private final class AccountServiceHarness {
     /// What the credential reader reports right now.
     var credential: String? = "secret-original"
 
+    /// Installed as ``credential`` the moment it is next read, so a test can
+    /// place a sign-out exactly between resolving a credential and using it —
+    /// the window the pre-transport recheck exists for, which is otherwise not
+    /// reachable from outside on the paths that do no awaiting first.
+    var credentialSwapOnNextRead: String?
+
     init(type: InstanceType = .invidious, isEnabled: Bool = true) {
         instances = InstancesManager()
         instance = Instance(
@@ -174,9 +180,18 @@ private final class AccountServiceHarness {
 
         service = AccountService(
             accountsManager: accounts,
-            credentialReader: { [weak self] _ in self?.credential },
+            credentialReader: { [weak self] _ in self?.readCredential() },
             transport: transport
         )
+    }
+
+    private func readCredential() -> String? {
+        let value = credential
+        if let swap = credentialSwapOnNextRead {
+            credential = swap
+            credentialSwapOnNextRead = nil
+        }
+        return value
     }
 
     /// Instances live in the shared defaults, so each harness takes its own
@@ -224,7 +239,8 @@ private func makeSnapshot(
                 ? .invidious(playlistID: playlistID, indexID: "TOKEN-\(video.id.videoID)")
                 : .piped(playlistID: playlistID, position: offset),
             video: video,
-            position: offset
+            position: offset,
+            displayRow: offset
         )
     }
 
@@ -416,6 +432,65 @@ struct AccountServiceTests {
         #expect(await harness.transport.calls == [.snapshot(id: "pl", credential: "secret-original")])
     }
 
+    // MARK: - Credential recheck before a write
+
+    @Test("A credential replaced during the Piped verify step sends no removal")
+    func pipedRemovalStopsWhenTheCredentialChangesMidVerify() async throws {
+        let harness = AccountServiceHarness(type: .piped)
+        defer { harness.tearDown() }
+        let snapshot = makeSnapshot(playlistID: "pl", videoIDs: ["aaa", "bbb"], kind: .piped)
+        await harness.transport.setSnapshot(snapshot)
+        await harness.transport.holdCalls()
+
+        let removal = Task { [service = harness.service!, account = harness.account] in
+            try await service.removeEntry(snapshot.entries[1], fromPlaylist: "pl", for: account)
+        }
+
+        // The verify fetch is out. Somebody signs out and back in as another
+        // user before it answers.
+        try await harness.transport.waitForCalls(1)
+        harness.credential = "secret-somebody-else"
+        await harness.transport.release()
+
+        await #expect(throws: AccountServiceError.notAuthenticated) {
+            try await removal.value
+        }
+
+        // The verify happened; the removal never did.
+        #expect(await harness.transport.calls == [.snapshot(id: "pl", credential: "secret-original")])
+    }
+
+    @Test("A mutation whose credential changed since it was resolved is not sent")
+    func mutationStopsWhenTheCredentialChangesBeforeTransport() async throws {
+        let harness = AccountServiceHarness()
+        defer { harness.tearDown() }
+        // Resolution reads "secret-original"; the recheck immediately before the
+        // write reads the replacement.
+        harness.credentialSwapOnNextRead = "secret-replacement"
+
+        await #expect(throws: AccountServiceError.notAuthenticated) {
+            _ = try await harness.service.createPlaylist(
+                title: "Watch later",
+                description: nil,
+                privacy: nil,
+                for: harness.account
+            )
+        }
+
+        #expect(await harness.transport.callCount == 0)
+    }
+
+    @Test("A read is not stopped by a credential change, only a write is")
+    func readsAreNotRechecked() async throws {
+        let harness = AccountServiceHarness()
+        defer { harness.tearDown() }
+        harness.credentialSwapOnNextRead = "secret-replacement"
+
+        _ = try await harness.service.userPlaylists(for: harness.account)
+
+        #expect(await harness.transport.calls == [.userPlaylists(credential: "secret-original")])
+    }
+
     @Test("An entry minted by another playlist is refused")
     func entryFromAnotherPlaylistIsRefused() async throws {
         let harness = AccountServiceHarness(type: .invidious)
@@ -492,6 +567,54 @@ struct RemotePlaylistsCacheTests {
         let calls = await harness.transport.calls
         #expect(calls.contains(.addVideo(playlistID: "pl", videoID: "bbb", credential: "secret-original")))
         #expect(calls.contains(.snapshot(id: "pl", credential: "secret-original")))
+    }
+
+    @Test("A delete that reported failure forgets a playlist the server no longer has")
+    func failedDeleteForgetsAVanishedPlaylist() async throws {
+        let harness = AccountServiceHarness()
+        defer { harness.tearDown() }
+        let cache = harness.makeCache()
+        await harness.transport.setSnapshot(makeSnapshot(playlistID: "pl", videoIDs: ["aaa"], kind: .invidious))
+        await harness.transport.setPlaylists([Playlist(id: .global("pl"), title: "Playlist")])
+
+        try await cache.refreshSnapshot(id: "pl", for: harness.account)
+        try await cache.refreshList(for: harness.account)
+        #expect(cache.snapshot(id: "pl", for: harness.account.id) != nil)
+
+        // The delete answers with an error, and every refetch after it 404s:
+        // the playlist is gone, whatever the delete said.
+        await harness.transport.setError(APIError.notFound(nil))
+
+        await #expect(throws: APIError.self) {
+            try await cache.deletePlaylist(id: "pl", for: harness.account)
+        }
+
+        #expect(cache.snapshot(id: "pl", for: harness.account.id) == nil)
+        #expect(cache.snapshotFetchDate(id: "pl", for: harness.account.id) == nil)
+        #expect(cache.playlists(for: harness.account.id)?.contains { $0.id.playlistID == "pl" } != true)
+    }
+
+    @Test("A delete that could not reach the server keeps the playlist it knows")
+    func failedDeleteKeepsThePlaylistWhenOffline() async throws {
+        let harness = AccountServiceHarness()
+        defer { harness.tearDown() }
+        let cache = harness.makeCache()
+        await harness.transport.setSnapshot(makeSnapshot(playlistID: "pl", videoIDs: ["aaa"], kind: .invidious))
+        await harness.transport.setPlaylists([Playlist(id: .global("pl"), title: "Playlist")])
+
+        try await cache.refreshSnapshot(id: "pl", for: harness.account)
+        try await cache.refreshList(for: harness.account)
+
+        await harness.transport.setError(APIError.noConnection)
+
+        await #expect(throws: APIError.self) {
+            try await cache.deletePlaylist(id: "pl", for: harness.account)
+        }
+
+        // Not reaching the server says nothing about whether the playlist still
+        // exists — the last fetch stays, as it does for every other read.
+        #expect(cache.snapshot(id: "pl", for: harness.account.id) != nil)
+        #expect(cache.playlists(for: harness.account.id)?.map(\.id.playlistID) == ["pl"])
     }
 
     @Test("Concurrent refreshes of the same list cost one round trip")

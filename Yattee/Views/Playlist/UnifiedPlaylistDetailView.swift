@@ -945,23 +945,18 @@ struct UnifiedPlaylistDetailView: View {
 
     /// Pairs each displayed row with the entry that can name it to the server.
     ///
-    /// `entries` is a *subsequence* of the playlist's videos — a row the server
-    /// refused to hand an identity to is still displayed, it just cannot be a
-    /// target — so the two lists are walked together rather than indexed
-    /// against each other. Matching on the video id alone would not do either:
-    /// a playlist may hold the same video twice, and each copy is its own row.
+    /// The correspondence is the one the snapshot builder recorded, not one
+    /// recovered here: `entries` is a *subsequence* of the playlist's videos —
+    /// a row the server refused to hand an identity to is still displayed, it
+    /// just cannot be a target — and matching the two lists back up by video id
+    /// cannot tell two rows of the same video apart, so a duplicate row without
+    /// an identity would steal its twin's entry and remove the wrong one.
     private static func rowEntries(for snapshot: RemotePlaylistSnapshot) -> [Int: RemotePlaylistEntry] {
-        let videos = snapshot.playlist.videos
+        let rowCount = snapshot.playlist.videos.count
         var map: [Int: RemotePlaylistEntry] = [:]
-        var row = 0
 
-        for entry in snapshot.entries {
-            while row < videos.count, videos[row].id != entry.video.id {
-                row += 1
-            }
-            guard row < videos.count else { break }
-            map[row] = entry
-            row += 1
+        for entry in snapshot.entries where entry.displayRow >= 0 && entry.displayRow < rowCount {
+            map[entry.displayRow] = entry
         }
 
         return map

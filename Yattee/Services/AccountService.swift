@@ -146,6 +146,7 @@ final class AccountService {
         let (instance, credential) = try resolve(account, requiring: \.supportsPlaylistWrites)
         let privacy = supportedPrivacy(privacy, for: account)
 
+        try requireStillCurrent(credential, for: account)
         return try await tracking(account, credential: credential) {
             try await transport.createPlaylist(
                 title: title,
@@ -168,6 +169,7 @@ final class AccountService {
         let (instance, credential) = try resolve(account, requiring: \.supportsPlaylistWrites)
         let privacy = supportedPrivacy(privacy, for: account)
 
+        try requireStillCurrent(credential, for: account)
         try await tracking(account, credential: credential) {
             try await transport.updatePlaylist(
                 id: id,
@@ -184,6 +186,7 @@ final class AccountService {
     func deletePlaylist(id: String, for account: Account) async throws {
         let (instance, credential) = try resolve(account, requiring: \.supportsPlaylistWrites)
 
+        try requireStillCurrent(credential, for: account)
         try await tracking(account, credential: credential) {
             try await transport.deletePlaylist(id: id, instance: instance, credential: credential)
         }
@@ -193,6 +196,7 @@ final class AccountService {
     func addVideo(videoID: String, toPlaylist id: String, for account: Account) async throws {
         let (instance, credential) = try resolve(account, requiring: \.supportsPlaylistWrites)
 
+        try requireStillCurrent(credential, for: account)
         try await tracking(account, credential: credential) {
             try await transport.addVideoToPlaylist(
                 playlistID: id,
@@ -212,6 +216,10 @@ final class AccountService {
     /// and the removal the playlist can still change, and only the caller's
     /// refetch afterwards can show what actually happened. Invidious needs none
     /// of this: its `indexId` names the row itself, whatever moved around it.
+    ///
+    /// The preflight is also where the credential can change out from under the
+    /// removal — it is the one place here that awaits a server before writing —
+    /// so the credential is read again before the removal is sent.
     func removeEntry(
         _ entry: RemotePlaylistEntry,
         fromPlaylist id: String,
@@ -237,6 +245,7 @@ final class AccountService {
             }
         }
 
+        try requireStillCurrent(credential, for: account)
         try await tracking(account, credential: credential) {
             try await transport.removeEntry(entry.id, instance: instance, credential: credential)
         }
@@ -272,6 +281,20 @@ final class AccountService {
         }
 
         return (instance, credential)
+    }
+
+    /// Refuses to send a write with a credential that is no longer the
+    /// account's.
+    ///
+    /// Resolving a credential and sending the request are not the same instant:
+    /// a sign-out and a sign-in as somebody else can both happen in between —
+    /// Piped's removals in particular await a whole playlist fetch first. A
+    /// stale *read* is merely wasted; a stale *write* changes the previous
+    /// user's data, so every mutation checks again immediately before it goes.
+    private func requireStillCurrent(_ credential: String, for account: Account) throws {
+        guard credentialReader(account) == credential else {
+            throw AccountServiceError.notAuthenticated
+        }
     }
 
     /// The privacy to send, or `nil` where the backend has no such setting.

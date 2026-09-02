@@ -163,8 +163,9 @@ final class RemotePlaylistsCache {
         } catch {
             // The delete may have landed even though the answer did not, so the
             // snapshot is refetched rather than assumed: whichever way it went,
-            // the server's answer replaces it.
-            await reconcileSnapshot(id: id, for: account)
+            // the server's answer replaces it — and a server that no longer has
+            // the playlist is answering that the delete did land.
+            await reconcileSnapshotAfterDelete(id: id, for: account)
             await reconcileList(for: account)
             throw error
         }
@@ -334,9 +335,48 @@ final class RemotePlaylistsCache {
         try? await fetchSnapshot(id: id, for: account)
     }
 
+    /// The same refetch, after a delete that reported failure — where the
+    /// refetch is also the verdict.
+    ///
+    /// A playlist the server says it does not have is gone, whatever the delete
+    /// said, so the stored snapshot is dropped rather than left to be shown by
+    /// a detail view that is still open on it. Every other failure is swallowed
+    /// like any reconciling refetch: not reaching the server says nothing about
+    /// whether the playlist still exists.
+    private func reconcileSnapshotAfterDelete(id: String, for account: Account) async {
+        do {
+            try await fetchSnapshot(id: id, for: account)
+        } catch let error as APIError where Self.saysPlaylistIsGone(error) {
+            forgetSnapshot(id: id, for: account.id)
+            forgetListEntry(id: id, for: account.id)
+        } catch {
+            // Swallowed: see the doc comment on `reconcileList(for:)`.
+        }
+    }
+
+    private static func saysPlaylistIsGone(_ error: APIError) -> Bool {
+        switch error {
+        case .notFound:
+            return true
+        case .httpError(let statusCode, _):
+            return statusCode == 404
+        default:
+            return false
+        }
+    }
+
     private func forgetSnapshot(id: String, for accountID: UUID) {
         snapshots[accountID]?[id] = nil
         snapshotFetchDates[accountID]?[id] = nil
+    }
+
+    /// Takes a playlist out of the account's last-fetched list.
+    ///
+    /// The list is refetched right after, which normally says the same thing —
+    /// but a refetch that cannot reach the server would otherwise leave a
+    /// playlist that is known to be gone sitting in it.
+    private func forgetListEntry(id: String, for accountID: UUID) {
+        lists[accountID]?.removeAll { $0.id.playlistID == id }
     }
 
     // MARK: - Fences

@@ -29,6 +29,9 @@ struct InstanceBrowseView: View {
     /// Which login the account-scoped content belongs to, so a page still in
     /// flight cannot be appended to the next one's feed.
     @State private var accountContentGeneration = 0
+    /// Which account the displayed — or in-flight — account-scoped content is
+    /// for, so a change of effective account can be noticed at all.
+    @State private var accountContentAccountID: UUID?
     @State private var feedVideos: [Video] = []
     @State private var feedSubscriptions: [Channel] = []
     
@@ -443,9 +446,16 @@ struct InstanceBrowseView: View {
         }
         // A credential can arrive over iCloud Keychain, or an account be added,
         // while this stays on screen — the Feed tab depends on it and would
-        // otherwise stay missing until the view was rebuilt.
+        // otherwise stay missing until the view was rebuilt. A status change can
+        // also move *which* account is effective here, since the resolution
+        // falls back to a sibling login on the same instance, so the content
+        // loaded for the previous one has to go with it.
         .onReceive(NotificationCenter.default.publisher(for: .accountStatusesDidChange)) { _ in
+            let accountChanged = discardAccountScopedContentIfAccountChanged()
             refreshLoginState()
+            if accountChanged {
+                Task { await startContentLoad() }
+            }
         }
         .onReceive(NotificationCenter.default.publisher(for: .accountsDidChange)) { _ in
             refreshLoginState()
@@ -1228,6 +1238,21 @@ struct InstanceBrowseView: View {
         // would have to exceed a page it never loaded before it could ask for
         // a second.
         feedLoadedVideoCount = 0
+        accountContentAccountID = nil
+    }
+
+    /// Drops account-scoped content when the account it belongs to is no longer
+    /// the one this instance resolves to.
+    ///
+    /// - Returns: whether anything was discarded, so the caller can reload.
+    @discardableResult
+    private func discardAccountScopedContentIfAccountChanged() -> Bool {
+        guard let loadedFor = accountContentAccountID, loadedFor != playlistsAccount?.id else {
+            return false
+        }
+
+        discardAccountScopedContent()
+        return true
     }
 
     private func refreshLoginState() {
@@ -1279,6 +1304,13 @@ struct InstanceBrowseView: View {
         // after the purge that was meant to remove them. Popular and trending
         // are unauthenticated and deliberately not fenced.
         let generation = accountContentGeneration
+
+        // Recorded before the request goes out, not after it lands: an account
+        // change while the fetch is in flight has to be able to see whose fetch
+        // it was.
+        if selectedTab == .feed || selectedTab == .playlists {
+            accountContentAccountID = playlistsAccount?.id
+        }
 
         do {
             switch selectedTab {

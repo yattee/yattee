@@ -76,6 +76,15 @@ private func pipedStreamJSON(videoId: String, title: String) -> String {
     """
 }
 
+/// A stream row Piped sent that the app cannot turn into a video — it still
+/// occupies a server position, and removals are addressed by that position.
+private let pipedMalformedStreamJSON = """
+{
+    "type": "channel",
+    "name": "Not a video at all"
+}
+"""
+
 /// Builds the first page of `/playlists/{id}`.
 private func pipedFirstPageJSON(streams: [String], nextpage: String? = nil) -> Data {
     let nextpageValue = nextpage.map { "\"\($0)\"" } ?? "null"
@@ -176,6 +185,34 @@ struct InvidiousRemotePlaylistSnapshotTests {
         #expect(snapshot.playlist.videos.map(\.id.videoID) == ["aaa", "nameless", "ccc"])
         #expect(snapshot.entries.map(\.video.id.videoID) == ["aaa", "ccc"])
         #expect(snapshot.entries.map(\.position) == [0, 2])
+        // The unnamed row is skipped, not squeezed out: the rows that follow it
+        // keep the display positions they are actually drawn at.
+        #expect(snapshot.entries.map(\.displayRow) == [0, 2])
+    }
+
+    @Test("A nameless duplicate never borrows the entry of its twin")
+    func namelessDuplicateKeepsItsTwinsEntry() throws {
+        // The same video twice, and only the second row has an identity. Pairing
+        // rows to entries by video id would hand row 0 the entry that belongs to
+        // row 1, so removing the first would delete the second.
+        let page = invidiousPageJSON(videoCount: 2, videos: [
+            invidiousVideoJSON(videoId: "dup", title: "Duplicated", index: 0, indexId: nil),
+            invidiousVideoJSON(videoId: "dup", title: "Duplicated", index: 1, indexId: "TOKEN1")
+        ])
+
+        let snapshot = try InvidiousAPI.authPlaylistSnapshot(
+            fromPageJSON: [page],
+            playlistID: "IVPLtest",
+            baseURL: testBaseURL
+        )
+
+        #expect(snapshot.playlist.videos.map(\.id.videoID) == ["dup", "dup"])
+        #expect(snapshot.entries.count == 1)
+        #expect(snapshot.entries[0].id == .invidious(playlistID: "IVPLtest", indexID: "TOKEN1"))
+        #expect(snapshot.entries[0].position == 1)
+        // The row the server named is row 1, and no entry claims row 0.
+        #expect(snapshot.entries[0].displayRow == 1)
+        #expect(!snapshot.entries.contains { $0.displayRow == 0 })
     }
 
     @Test("A row without an index is display-only and sorts last")
@@ -343,7 +380,7 @@ struct PipedRemotePlaylistSnapshotTests {
         #expect(snapshot.playlist.id.playlistID == "playlist-uuid")
     }
 
-    @Test("Entry n is the same row as playlist.videos[n]")
+    @Test("An entry's displayRow is the row it is shown as")
     func entriesAlignWithDisplayedVideos() throws {
         let page = pipedFirstPageJSON(streams: [
             pipedStreamJSON(videoId: "aaa", title: "First"),
@@ -359,10 +396,62 @@ struct PipedRemotePlaylistSnapshotTests {
 
         #expect(snapshot.entries.count == snapshot.playlist.videos.count)
         for entry in snapshot.entries {
-            #expect(snapshot.playlist.videos[entry.position].id == entry.video.id)
+            #expect(snapshot.playlist.videos[entry.displayRow].id == entry.video.id)
         }
+        // With nothing malformed in the way, the two numbers agree.
+        #expect(snapshot.entries.map(\.position) == [0, 1, 2])
+        #expect(snapshot.entries.map(\.displayRow) == [0, 1, 2])
         // Two rows of the same video stay two distinct entries.
         #expect(Set(snapshot.entries).count == 3)
+    }
+
+    @Test("A malformed row still occupies the server position it was sent at")
+    func malformedRowKeepsTheServerPositionsHonest() throws {
+        let page = pipedFirstPageJSON(streams: [
+            pipedMalformedStreamJSON,
+            pipedStreamJSON(videoId: "aaa", title: "First"),
+            pipedStreamJSON(videoId: "bbb", title: "Second")
+        ])
+
+        let snapshot = try PipedAPI.userPlaylistSnapshot(
+            fromPageJSON: [page],
+            playlistID: "playlist-uuid",
+            instanceURL: pipedBaseURL
+        )
+
+        // The malformed row is not displayed and cannot be removed…
+        #expect(snapshot.playlist.videos.map(\.id.videoID) == ["aaa", "bbb"])
+        #expect(snapshot.entries.map(\.video.id.videoID) == ["aaa", "bbb"])
+        // …but it still shifts every server position after it, which is what a
+        // removal is addressed by.
+        #expect(snapshot.entries.map(\.position) == [1, 2])
+        #expect(snapshot.entries.map(\.id) == [
+            .piped(playlistID: "playlist-uuid", position: 1),
+            .piped(playlistID: "playlist-uuid", position: 2)
+        ])
+        // The displayed rows are unaffected by it.
+        #expect(snapshot.entries.map(\.displayRow) == [0, 1])
+    }
+
+    @Test("Malformed rows shift positions across page boundaries too")
+    func malformedRowsShiftPositionsAcrossPages() throws {
+        let firstPage = pipedFirstPageJSON(streams: [
+            pipedStreamJSON(videoId: "aaa", title: "First"),
+            pipedMalformedStreamJSON
+        ], nextpage: "token")
+        let secondPage = pipedNextPageJSON(streams: [
+            pipedStreamJSON(videoId: "bbb", title: "Second")
+        ])
+
+        let snapshot = try PipedAPI.userPlaylistSnapshot(
+            fromPageJSON: [firstPage, secondPage],
+            playlistID: "playlist-uuid",
+            instanceURL: pipedBaseURL
+        )
+
+        #expect(snapshot.entries.map(\.video.id.videoID) == ["aaa", "bbb"])
+        #expect(snapshot.entries.map(\.position) == [0, 2])
+        #expect(snapshot.entries.map(\.displayRow) == [0, 1])
     }
 
     @Test("A playlist with no streams yields no entries")
@@ -456,12 +545,14 @@ struct RemotePlaylistEntryIDTests {
         let first = RemotePlaylistEntry(
             id: .invidious(playlistID: "one", indexID: "TOKEN0"),
             video: video,
-            position: 0
+            position: 0,
+            displayRow: 0
         )
         let second = RemotePlaylistEntry(
             id: .invidious(playlistID: "one", indexID: "TOKEN2"),
             video: video,
-            position: 2
+            position: 2,
+            displayRow: 2
         )
 
         #expect(first != second)

@@ -299,8 +299,23 @@ struct PlaylistFormSheet: View {
         let trimmedTitle = title.trimmingCharacters(in: .whitespacesAndNewlines)
         let trimmedDescription = descriptionText.trimmingCharacters(in: .whitespacesAndNewlines)
 
-        onSave(trimmedTitle, trimmedDescription.isEmpty ? nil : trimmedDescription, privacy)
+        onSave(trimmedTitle, savedDescription(trimmedDescription), privacy)
         dismiss()
+    }
+
+    /// What an emptied description field means to the caller.
+    ///
+    /// Editing a server-side playlist is the one case where the difference
+    /// matters: `nil` means "leave whatever is there" all the way down to the
+    /// write layer, so an emptied field has to travel as `""` or clearing a
+    /// description would silently keep it. Everywhere else — creating anything,
+    /// editing a local playlist — an empty description *is* no description.
+    private func savedDescription(_ trimmed: String) -> String? {
+        guard !trimmed.isEmpty else {
+            if case .editRemote = mode { return "" }
+            return nil
+        }
+        return trimmed
     }
 }
 

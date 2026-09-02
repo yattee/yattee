@@ -21,7 +21,9 @@ import Foundation
 /// - ``invidious(playlistID:indexID:)`` wraps the server's `indexId` token,
 ///   which names the same row across refetches even as videos above it are
 ///   removed.
-/// - ``piped(playlistID:position:)`` is **snapshot-scoped only**. Piped
+/// - ``piped(playlistID:position:)`` is **snapshot-scoped only**, and the
+///   position is the server's own index over every row it sent — not the row
+///   number the app draws. Piped
 ///   removes by position, so an id minted from one fetch is meaningless once
 ///   the playlist changes. This is safe because the caching layer refetches
 ///   the whole playlist after every mutation — never persist these, and never
@@ -47,13 +49,26 @@ struct RemotePlaylistEntry: Identifiable, Hashable, Sendable {
     /// The video shown for this row.
     let video: Video
 
-    /// Zero-based position within the playlist as the snapshot saw it.
+    /// Zero-based position within the playlist **as the server counts it** —
+    /// over every row it sent, including the ones the app could not parse and
+    /// does not display. This is the number a removal is addressed by, so it
+    /// must never be renumbered over the filtered display list.
     let position: Int
 
-    init(id: RemotePlaylistEntryID, video: Video, position: Int) {
+    /// Index of this entry in ``RemotePlaylistSnapshot/playlist``'s `videos`.
+    ///
+    /// Separate from ``position`` on purpose: rows the app cannot display are
+    /// dropped from `playlist.videos` but still occupy a server position, so the
+    /// two numbers diverge the moment a playlist holds one. Carried explicitly
+    /// rather than recovered by matching video ids, which cannot tell two rows
+    /// of the same video apart.
+    let displayRow: Int
+
+    init(id: RemotePlaylistEntryID, video: Video, position: Int, displayRow: Int) {
         self.id = id
         self.video = video
         self.position = position
+        self.displayRow = displayRow
     }
 }
 
@@ -61,6 +76,10 @@ struct RemotePlaylistEntry: Identifiable, Hashable, Sendable {
 ///
 /// `entries` may be shorter than `playlist.videos`: a video the server did not
 /// hand an identity to is still displayed, it just cannot be a mutation target.
+/// It can also be shorter than what the server sent: a row that failed to parse
+/// is neither displayed nor addressable, but it still holds a server position,
+/// which is why ``RemotePlaylistEntry/position`` and
+/// ``RemotePlaylistEntry/displayRow`` are two different numbers.
 struct RemotePlaylistSnapshot: Hashable, Sendable {
     /// The playlist for display.
     let playlist: Playlist

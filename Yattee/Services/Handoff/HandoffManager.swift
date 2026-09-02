@@ -32,6 +32,7 @@ final class HandoffManager {
         static let channelSource = "channelSource"
         static let playlistID = "playlistID"
         static let playlistSource = "playlistSource"
+        static let playlistAccountID = "playlistAccountID"
         static let localPlaylistUUID = "localPlaylistUUID"
         static let searchQuery = "searchQuery"
         static let playbackTime = "playbackTime"
@@ -164,17 +165,22 @@ final class HandoffManager {
                 userInfo[UserInfoKey.destinationType] = DestinationType.localPlaylist.rawValue
                 userInfo[UserInfoKey.localPlaylistUUID] = uuid.uuidString
                 activity.title = "Playlist"
-            // The owning account is deliberately left out of the payload. The
-            // userInfo is assembled key by key rather than encoded from the
-            // enum, so an extra associated value changes nothing about the
-            // coding shape either way — but an account is only usable on a
-            // device that holds its credential, and the receiving device
-            // resolves ownership for itself from the instance it lands on.
-            case .remote(let playlistID, _, _, _):
+            // The owning account travels with the playlist. Account ids are the
+            // same on every device the login is synced to, so the receiver can
+            // resolve one — and without it a Piped playlist arrives as nobody's:
+            // its id carries no hint of ownership the way an Invidious `IVPL`
+            // one does, so a private playlist would be loaded through the public
+            // endpoint and fail. A receiver that does not know the account is no
+            // worse off than before: the key is simply absent, which is also
+            // what an older payload looks like.
+            case .remote(let playlistID, _, _, let accountID):
                 userInfo[UserInfoKey.destinationType] = DestinationType.playlist.rawValue
                 userInfo[UserInfoKey.playlistID] = playlistID.playlistID
                 if let contentSource = playlistID.source {
                     userInfo[UserInfoKey.playlistSource] = encodeSource(contentSource)
+                }
+                if let accountID {
+                    userInfo[UserInfoKey.playlistAccountID] = accountID.uuidString
                 }
                 activity.title = "Playlist"
             }
@@ -312,7 +318,20 @@ final class HandoffManager {
             } else {
                 source = nil
             }
-            return (.playlist(.remote(PlaylistID(source: source, playlistID: playlistID), instance: nil)), nil)
+            // An account this device does not have resolves to nil in the
+            // detail view, which falls back to the ownership it can infer —
+            // exactly what a payload without the key does.
+            let accountID = (userInfo[UserInfoKey.playlistAccountID] as? String).flatMap(UUID.init(uuidString:))
+            return (
+                .playlist(
+                    .remote(
+                        PlaylistID(source: source, playlistID: playlistID),
+                        instance: nil,
+                        accountID: accountID
+                    )
+                ),
+                nil
+            )
 
         case .localPlaylist:
             guard let uuidString = userInfo[UserInfoKey.localPlaylistUUID] as? String,

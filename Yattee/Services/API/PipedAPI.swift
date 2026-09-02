@@ -444,16 +444,26 @@ actor PipedAPI: InstanceAPI {
             nextpage: nil
         ).toPlaylist(instanceURL: instanceURL, playlistID: playlistID)
 
-        // Positions run 0-based across every page in fetch order and are taken
-        // over the same list the playlist displays, so `entries[n]` and
-        // `playlist.videos[n]` are always the same row. Piped removes by
+        // Positions run 0-based across every page in fetch order and are counted
+        // over the *raw* stream list, malformed rows included: that is the index
+        // `POST /user/playlists/remove` addresses, and renumbering over the
+        // filtered display list would aim a removal one row off for every row
+        // the app could not parse. `displayRow` is the separate number that says
+        // where the entry appears in `playlist.videos`. Piped removes by
         // position, so these ids die with this snapshot.
-        let entries = playlist.videos.enumerated().map { offset, video in
-            RemotePlaylistEntry(
-                id: .piped(playlistID: playlistID, position: offset),
-                video: video,
-                position: offset
+        var displayRow = 0
+        var entries: [RemotePlaylistEntry] = []
+        for (position, item) in allStreams.enumerated() {
+            guard case .video(let video) = item else { continue }
+            entries.append(
+                RemotePlaylistEntry(
+                    id: .piped(playlistID: playlistID, position: position),
+                    video: video.toVideo(instanceURL: instanceURL),
+                    position: position,
+                    displayRow: displayRow
+                )
             )
+            displayRow += 1
         }
 
         return RemotePlaylistSnapshot(playlist: playlist, entries: entries)

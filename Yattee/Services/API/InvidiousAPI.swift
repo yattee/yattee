@@ -327,16 +327,27 @@ actor InvidiousAPI: InstanceAPI {
         // and `index` places it. Rows missing either are still displayed —
         // they stay in `playlist.videos` — they just never appear in `entries`,
         // so no removal can be aimed at a row the server refuses to name.
-        let entries: [RemotePlaylistEntry] = allVideos.compactMap { item in
-            guard case .video(let video) = item,
-                  let indexID = video.indexId,
-                  let index = video.index
-            else { return nil }
+        //
+        // `displayRow` is counted over exactly what `toPlaylist` keeps, so an
+        // entry says which visible row it belongs to without anyone having to
+        // match video ids — which could not tell two rows of the same video
+        // apart anyway.
+        var displayRow = 0
+        var entries: [RemotePlaylistEntry] = []
+        for item in allVideos {
+            guard case .video(let video) = item else { continue }
+            let row = displayRow
+            displayRow += 1
 
-            return RemotePlaylistEntry(
-                id: .invidious(playlistID: playlistID, indexID: indexID),
-                video: video.toVideo(baseURL: baseURL),
-                position: index
+            guard let indexID = video.indexId, let index = video.index else { continue }
+
+            entries.append(
+                RemotePlaylistEntry(
+                    id: .invidious(playlistID: playlistID, indexID: indexID),
+                    video: video.toVideo(baseURL: baseURL),
+                    position: index,
+                    displayRow: row
+                )
             )
         }
 
