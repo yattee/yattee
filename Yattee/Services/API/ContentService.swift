@@ -243,6 +243,232 @@ actor ContentService: ContentServiceProtocol {
         try await api(for: instance).channelSearch(id: id, query: query, instance: instance, page: page)
     }
 
+    // MARK: - Authenticated Playlists
+
+    /// Fetches the playlists the credential's owner has on the instance.
+    func userPlaylists(instance: Instance, credential: String) async throws -> [Playlist] {
+        switch instance.type {
+        case .invidious:
+            return try await invidiousAPI(for: instance).userPlaylists(instance: instance, sid: credential)
+        case .piped:
+            return try await pipedAPI(for: instance).userPlaylists(instance: instance, authToken: credential)
+        default:
+            throw APIError.notSupported
+        }
+    }
+
+    /// Fetches one of the credential owner's playlists along with the per-entry
+    /// identities its rows can be removed by.
+    func userPlaylistSnapshot(
+        id: String,
+        instance: Instance,
+        credential: String
+    ) async throws -> RemotePlaylistSnapshot {
+        switch instance.type {
+        case .invidious:
+            return try await invidiousAPI(for: instance).userPlaylistSnapshot(
+                id: id,
+                instance: instance,
+                sid: credential
+            )
+        case .piped:
+            return try await pipedAPI(for: instance).userPlaylistSnapshot(
+                id: id,
+                instance: instance,
+                authToken: credential
+            )
+        default:
+            throw APIError.notSupported
+        }
+    }
+
+    /// Creates a playlist for the credential's owner.
+    ///
+    /// The returned playlist is the little the server says about what it just
+    /// made — an id and a title. Nothing else is invented here: callers refetch
+    /// the list, which is the only description that is actually the server's.
+    /// - Parameters:
+    ///   - privacy: Ignored by backends without a visibility concept (Piped),
+    ///     and defaulted to private on those that have one when not given.
+    func createPlaylist(
+        title: String,
+        description: String?,
+        privacy: PlaylistPrivacy?,
+        instance: Instance,
+        credential: String
+    ) async throws -> Playlist {
+        switch instance.type {
+        case .invidious:
+            let api = await invidiousAPI(for: instance)
+            let playlist = try await api.createPlaylist(
+                title: title,
+                privacy: privacy ?? .private,
+                instance: instance,
+                sid: credential
+            )
+            // Creation takes no description, so a wanted one is a second call.
+            // Its failure is the caller's to see: a playlist that exists with
+            // the wrong description is not a silent success.
+            if let description, !description.isEmpty {
+                try await api.updatePlaylist(
+                    id: playlist.id.playlistID,
+                    title: title,
+                    description: description,
+                    privacy: privacy ?? .private,
+                    instance: instance,
+                    sid: credential
+                )
+            }
+            return playlist
+
+        case .piped:
+            let api = await pipedAPI(for: instance)
+            let playlistID = try await api.createPlaylist(
+                name: title,
+                instance: instance,
+                authToken: credential
+            )
+            if let description, !description.isEmpty {
+                try await api.updatePlaylistDescription(
+                    id: playlistID,
+                    description: description,
+                    instance: instance,
+                    authToken: credential
+                )
+            }
+            return Playlist(id: .global(playlistID), title: title, description: description)
+
+        default:
+            throw APIError.notSupported
+        }
+    }
+
+    /// Edits one of the credential owner's playlists.
+    ///
+    /// - Parameters:
+    ///   - description: `nil` leaves whatever the playlist has.
+    ///   - privacy: `nil` keeps the private default on backends that have
+    ///     visibility; ignored entirely on those that do not.
+    func updatePlaylist(
+        id: String,
+        title: String,
+        description: String?,
+        privacy: PlaylistPrivacy?,
+        instance: Instance,
+        credential: String
+    ) async throws {
+        switch instance.type {
+        case .invidious:
+            try await invidiousAPI(for: instance).updatePlaylist(
+                id: id,
+                title: title,
+                description: description,
+                privacy: privacy ?? .private,
+                instance: instance,
+                sid: credential
+            )
+
+        case .piped:
+            // Two calls, no transaction: Piped edits the name and the
+            // description through separate endpoints. The rename goes first so
+            // a failure of the second leaves the visible half applied, and the
+            // caller's refetch shows exactly what landed.
+            let api = await pipedAPI(for: instance)
+            try await api.renamePlaylist(
+                id: id,
+                newName: title,
+                instance: instance,
+                authToken: credential
+            )
+            if let description {
+                try await api.updatePlaylistDescription(
+                    id: id,
+                    description: description,
+                    instance: instance,
+                    authToken: credential
+                )
+            }
+
+        default:
+            throw APIError.notSupported
+        }
+    }
+
+    /// Deletes one of the credential owner's playlists.
+    func deletePlaylist(id: String, instance: Instance, credential: String) async throws {
+        switch instance.type {
+        case .invidious:
+            try await invidiousAPI(for: instance).deletePlaylist(id: id, instance: instance, sid: credential)
+        case .piped:
+            try await pipedAPI(for: instance).deletePlaylist(id: id, instance: instance, authToken: credential)
+        default:
+            throw APIError.notSupported
+        }
+    }
+
+    /// Appends a video to one of the credential owner's playlists.
+    func addVideoToPlaylist(
+        playlistID: String,
+        videoID: String,
+        instance: Instance,
+        credential: String
+    ) async throws {
+        switch instance.type {
+        case .invidious:
+            try await invidiousAPI(for: instance).addVideoToPlaylist(
+                playlistID: playlistID,
+                videoID: videoID,
+                instance: instance,
+                sid: credential
+            )
+        case .piped:
+            try await pipedAPI(for: instance).addToPlaylist(
+                id: playlistID,
+                videoID: videoID,
+                instance: instance,
+                authToken: credential
+            )
+        default:
+            throw APIError.notSupported
+        }
+    }
+
+    /// Removes one row from one of the credential owner's playlists.
+    ///
+    /// The entry id says which backend minted it, and it has to be the one this
+    /// instance runs: an Invidious `indexId` means nothing to Piped, and a
+    /// Piped position sent to Invidious would be a *different row* rather than
+    /// an error, so a mismatch is refused rather than translated.
+    func removeEntry(
+        _ entryID: RemotePlaylistEntryID,
+        instance: Instance,
+        credential: String
+    ) async throws {
+        switch (entryID, instance.type) {
+        case (.invidious(let playlistID, let indexID), .invidious):
+            try await invidiousAPI(for: instance).removeVideoFromPlaylist(
+                playlistID: playlistID,
+                indexID: indexID,
+                instance: instance,
+                sid: credential
+            )
+
+        case (.piped(let playlistID, let position), .piped):
+            try await pipedAPI(for: instance).removeFromPlaylist(
+                id: playlistID,
+                index: position,
+                instance: instance,
+                authToken: credential
+            )
+
+        case (_, .invidious), (_, .piped):
+            throw APIError.invalidRequest
+
+        default:
+            throw APIError.notSupported
+        }
+    }
+
     /// Fetches streams with proxy URLs for downloads (Yattee Server: hits /proxy/fast/
     /// so the server caches the file on disk; other backends apply Invidious URL rewriting).
     func proxyStreams(videoID: String, instance: Instance) async throws -> [Stream] {
@@ -361,6 +587,11 @@ actor ContentService: ContentServiceProtocol {
         return try await yatteeServerAPI(for: instance).fetchServerInfo(for: instance)
     }
 }
+
+/// The real transport behind ``AccountService``. Declared here rather than on
+/// the protocol's own file so the conformance is checked next to the methods
+/// that satisfy it; the protocol exists so tests can script a server.
+extension ContentService: RemotePlaylistTransport {}
 
 // MARK: - Search Result
 

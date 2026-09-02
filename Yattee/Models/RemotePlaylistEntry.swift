@@ -73,3 +73,14 @@ struct RemotePlaylistSnapshot: Hashable, Sendable {
         self.entries = entries
     }
 }
+
+/// Who may see a server-side playlist.
+///
+/// The raw values are the words Invidious accepts. Piped has no visibility
+/// concept at all — its capability row says so, and the write layer drops the
+/// value rather than inventing one.
+enum PlaylistPrivacy: String, Codable, Hashable, Sendable, CaseIterable {
+    case `public`
+    case unlisted
+    case `private`
+}

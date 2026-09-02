@@ -487,6 +487,177 @@ actor PipedAPI: InstanceAPI {
             instanceURL: instanceURL
         )
     }
+
+    // MARK: - Playlist Management
+
+    /// Creates a playlist owned by the logged-in user.
+    ///
+    /// Piped answers with `{"playlistId"}` alone — there is no privacy setting
+    /// to pass and no playlist body to read back.
+    /// - Parameters:
+    ///   - name: The playlist name
+    ///   - instance: The Piped instance
+    ///   - authToken: The auth token from login
+    /// - Returns: The new playlist's ID
+    func createPlaylist(name: String, instance: Instance, authToken: String) async throws -> String {
+        struct CreateRequest: Encodable, Sendable {
+            let name: String
+        }
+
+        struct CreateResponse: Decodable, Sendable {
+            let playlistId: String
+        }
+
+        let endpoint = try writeEndpoint(
+            path: "/user/playlists/create",
+            authToken: authToken,
+            body: CreateRequest(name: name)
+        )
+
+        let response: CreateResponse = try await httpClient.fetch(endpoint, baseURL: instance.url)
+        return response.playlistId
+    }
+
+    /// Renames one of the user's playlists.
+    /// - Parameters:
+    ///   - id: The playlist ID
+    ///   - newName: The name to store
+    ///   - instance: The Piped instance
+    ///   - authToken: The auth token from login
+    func renamePlaylist(id: String, newName: String, instance: Instance, authToken: String) async throws {
+        struct RenameRequest: Encodable, Sendable {
+            let playlistId: String
+            let newName: String
+        }
+
+        let endpoint = try writeEndpoint(
+            path: "/user/playlists/rename",
+            authToken: authToken,
+            body: RenameRequest(playlistId: id, newName: newName)
+        )
+
+        let _: PipedMessageResponse = try await httpClient.fetch(endpoint, baseURL: instance.url)
+    }
+
+    /// Replaces the description of one of the user's playlists.
+    ///
+    /// PATCH, unlike every other playlist write here. Upstream shipped this as
+    /// `POST /user/playlists/description/change` and replaced it with
+    /// `PATCH /user/playlists/description` the same afternoon, so no instance
+    /// worth supporting is still on the POST spelling.
+    /// - Parameters:
+    ///   - id: The playlist ID
+    ///   - description: The description to store
+    ///   - instance: The Piped instance
+    ///   - authToken: The auth token from login
+    func updatePlaylistDescription(
+        id: String,
+        description: String,
+        instance: Instance,
+        authToken: String
+    ) async throws {
+        struct DescriptionRequest: Encodable, Sendable {
+            let playlistId: String
+            let description: String
+        }
+
+        let endpoint = try writeEndpoint(
+            path: "/user/playlists/description",
+            method: .patch,
+            authToken: authToken,
+            body: DescriptionRequest(playlistId: id, description: description)
+        )
+
+        let _: PipedMessageResponse = try await httpClient.fetch(endpoint, baseURL: instance.url)
+    }
+
+    /// Deletes one of the user's playlists.
+    /// - Parameters:
+    ///   - id: The playlist ID
+    ///   - instance: The Piped instance
+    ///   - authToken: The auth token from login
+    func deletePlaylist(id: String, instance: Instance, authToken: String) async throws {
+        struct DeleteRequest: Encodable, Sendable {
+            let playlistId: String
+        }
+
+        let endpoint = try writeEndpoint(
+            path: "/user/playlists/delete",
+            authToken: authToken,
+            body: DeleteRequest(playlistId: id)
+        )
+
+        let _: PipedMessageResponse = try await httpClient.fetch(endpoint, baseURL: instance.url)
+    }
+
+    /// Appends a video to one of the user's playlists.
+    ///
+    /// Sent as `videoIds`, the plural form. Upstream reads both spellings — the
+    /// singular `videoId` is kept only for backwards compatibility, and the
+    /// plural has been accepted since the batching change — so the plural is
+    /// the one that will still be there.
+    /// - Parameters:
+    ///   - id: The playlist to add to
+    ///   - videoID: The video to add
+    ///   - instance: The Piped instance
+    ///   - authToken: The auth token from login
+    func addToPlaylist(id: String, videoID: String, instance: Instance, authToken: String) async throws {
+        struct AddRequest: Encodable, Sendable {
+            let playlistId: String
+            let videoIds: [String]
+        }
+
+        let endpoint = try writeEndpoint(
+            path: "/user/playlists/add",
+            authToken: authToken,
+            body: AddRequest(playlistId: id, videoIds: [videoID])
+        )
+
+        let _: PipedMessageResponse = try await httpClient.fetch(endpoint, baseURL: instance.url)
+    }
+
+    /// Removes the row at a position from one of the user's playlists.
+    ///
+    /// Positional, because Piped offers nothing else: the index is only
+    /// meaningful against the fetch it came from, and whoever calls this owes
+    /// the check that the position still holds what it did. That check is
+    /// deliberately not here — this layer is stateless and has no snapshot to
+    /// compare against.
+    /// - Parameters:
+    ///   - id: The playlist to remove from
+    ///   - index: Zero-based position of the row to remove
+    ///   - instance: The Piped instance
+    ///   - authToken: The auth token from login
+    func removeFromPlaylist(id: String, index: Int, instance: Instance, authToken: String) async throws {
+        struct RemoveRequest: Encodable, Sendable {
+            let playlistId: String
+            let index: Int
+        }
+
+        let endpoint = try writeEndpoint(
+            path: "/user/playlists/remove",
+            authToken: authToken,
+            body: RemoveRequest(playlistId: id, index: index)
+        )
+
+        let _: PipedMessageResponse = try await httpClient.fetch(endpoint, baseURL: instance.url)
+    }
+
+    /// Builds an authenticated JSON write request. Piped wants the token bare in
+    /// `Authorization` — no `Bearer` — on every one of these.
+    private nonisolated func writeEndpoint(
+        path: String,
+        method: HTTPMethod = .post,
+        authToken: String,
+        body: some Encodable
+    ) throws -> GenericEndpoint {
+        GenericEndpoint(
+            path: path,
+            method: method,
+            headers: ["Authorization": authToken, "Content-Type": "application/json"],
+            body: try JSONEncoder().encode(body)
+        )
+    }
 }
 
 // MARK: - Piped Authentication Response Models

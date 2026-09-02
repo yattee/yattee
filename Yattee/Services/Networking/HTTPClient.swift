@@ -24,9 +24,23 @@ actor HTTPClient {
 
     // MARK: - Initialization
 
-    init(session: URLSession = .shared, decoder: JSONDecoder = .init()) {
+    /// - Parameters:
+    ///   - userAgent: the User-Agent to send from the very first request. The
+    ///     setter below cannot serve that purpose for a client built inside a
+    ///     synchronous factory: awaiting it there is impossible, and scheduling
+    ///     it races the first request out of the door.
+    ///   - randomizeUserAgentPerRequest: whether to mint a fresh random
+    ///     User-Agent per request instead, ignoring `userAgent`.
+    init(
+        session: URLSession = .shared,
+        decoder: JSONDecoder = .init(),
+        userAgent: String? = nil,
+        randomizeUserAgentPerRequest: Bool = false
+    ) {
         self.session = session
         self.decoder = decoder
+        self.userAgent = userAgent
+        self.randomizeUserAgentPerRequest = randomizeUserAgentPerRequest
 
         Self.configureForAPIs(self.decoder)
     }

@@ -57,6 +57,8 @@ final class AppEnvironment {
     let invidiousAPI: InvidiousAPI
     let pipedAPI: PipedAPI
     let credentialProbeService: CredentialProbeService
+    let accountService: AccountService
+    let remotePlaylistsCache: RemotePlaylistsCache
     let subscriptionAccountValidator: SubscriptionAccountValidator
     let dataContextValidator: DataContextValidator
     let playerControlsLayoutService: PlayerControlsLayoutService
@@ -153,6 +155,16 @@ final class AppEnvironment {
             await client.setUserAgent(settings.customUserAgent)
             await client.setRandomizeUserAgentPerRequest(settings.randomizeUserAgentPerRequest)
         }
+
+        // Every per-instance client is minted by a factory rather than shared,
+        // and until this is recorded those clients send no User-Agent at all —
+        // which instances that whitelist the `Yattee/<version>` prefix answer
+        // with a 401 the shared client never earns. Set before anything that
+        // builds a factory, `ContentService` included.
+        UserAgentConfiguration.shared.update(
+            userAgent: settings.customUserAgent,
+            randomizePerRequest: settings.randomizeUserAgentPerRequest
+        )
 
         let instances = instancesManager ?? InstancesManager(settingsManager: settings)
         instances.setSettingsManager(settings)
@@ -252,6 +264,24 @@ final class AppEnvironment {
         accounts.onSuspectedCredentialRejection = { [weak probeService] account in
             probeService?.probeSuspectedRejection(for: account)
         }
+
+        // Server-side playlists, addressed by account. The same credential
+        // lookup the probe service uses — one account, one secret, whichever
+        // backend it belongs to — so neither can read a login the other cannot.
+        let accountSvc = AccountService(
+            accountsManager: accounts,
+            credentialReader: { [weak accounts, weak invidiousCreds, weak pipedCreds] account in
+                guard let type = accounts?.instance(for: account)?.type else { return nil }
+                switch type {
+                case .invidious: return invidiousCreds?.credential(for: account)
+                case .piped: return pipedCreds?.credential(for: account)
+                default: return nil
+                }
+            },
+            transport: contentSvc
+        )
+        self.accountService = accountSvc
+        self.remotePlaylistsCache = RemotePlaylistsCache(accountService: accountSvc)
 
         // Initialize SubscriptionService with all required dependencies
         self.subscriptionService = SubscriptionService(
@@ -487,8 +517,9 @@ final class AppEnvironment {
             // needs the instance, and its ownership check is bound to one.
             // The provider holds this account's subscriptions in memory and may
             // have a fetch in flight; without dropping it, the deleted
-            // account's channels can still arrive and be shown.
-            self.subscriptionService.discardProvider(for: accountID)
+            // account's channels can still arrive and be shown. Its playlists
+            // are held the same way, and go the same way.
+            self.discardAccountData(for: accountID)
 
             guard let account, let credentials = self.accountCredentialsManager(for: account) else {
                 self.invidiousCredentialsManager.deleteCredential(forAccountID: accountID)
@@ -647,6 +678,9 @@ final class AppEnvironment {
     func updateUserAgent() {
         let userAgent = settingsManager.customUserAgent
         let randomizePerRequest = settingsManager.randomizeUserAgentPerRequest
+        // Clients built from here on; the ones already handed out are updated
+        // through their own setters, and only the shared one is long-lived.
+        UserAgentConfiguration.shared.update(userAgent: userAgent, randomizePerRequest: randomizePerRequest)
         Task {
             await httpClient.setUserAgent(userAgent)
             await httpClient.setRandomizeUserAgentPerRequest(randomizePerRequest)
@@ -763,7 +797,7 @@ final class AppEnvironment {
 
     /// Drops everything cached under an account's previous credential.
     private func invalidateCaches(for account: Account) {
-        subscriptionService.discardProvider(for: account.id)
+        discardAccountData(for: account.id)
         HomeInstanceCache.shared.clear(instanceID: account.instanceID, contentType: .feed)
 
         // Reached by both ways a credential is replaced — the user signing in
@@ -784,6 +818,17 @@ final class AppEnvironment {
         NotificationCenter.default.post(name: .accountCredentialDidChange, object: nil)
     }
 
+    /// Drops the in-memory data an account left behind, and disowns whatever is
+    /// still being fetched for it.
+    ///
+    /// One call for every way an account stops being usable — signed out,
+    /// deleted here, deleted on another device, or its instance removed — so a
+    /// new place that has to be cleared is added once rather than four times.
+    func discardAccountData(for accountID: UUID) {
+        subscriptionService.discardProvider(for: accountID)
+        remotePlaylistsCache.clear(accountID: accountID)
+    }
+
     /// Drops everything cached for whichever account was being shown.
     ///
     /// Neither cache is keyed by account: the subscriptions feed is a single
@@ -792,6 +837,10 @@ final class AppEnvironment {
     private func clearAccountScopedCaches() {
         SubscriptionFeedCache.shared.handleAccountChange()
         HomeInstanceCache.shared.clearAllFeeds()
+        // Keyed by account, so nothing here is shared between two logins — but
+        // an Apple account switch replaces the whole account list, and results
+        // still in flight for the previous one have to be disowned.
+        remotePlaylistsCache.clearAll()
     }
 
     private static let cacheOwnerKey = "accountScopedCacheOwner"
@@ -865,7 +914,7 @@ final class AppEnvironment {
             let credentials = accountCredentialsManager(for: account)
             credentials?.deleteCredential(for: account)
             credentials?.deleteLegacyCredentialIfOwned(for: account)
-            subscriptionService.discardProvider(for: account.id)
+            discardAccountData(for: account.id)
             accountsManager.removeAccount(account.id)
         }
 

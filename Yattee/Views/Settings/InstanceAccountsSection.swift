@@ -175,9 +175,9 @@ struct InstanceAccountsSection: View {
         appEnvironment.accountCredentialsManager(for: account)?.deleteCredential(for: account)
         appEnvironment.accountCredentialsManager(for: account)?.deleteLegacyCredentialIfOwned(for: account)
         appEnvironment.accountsManager.removeAccount(account.id)
-        // Drop the provider too, or its in-memory subscription cache would keep
-        // answering for an account that no longer exists.
-        appEnvironment.subscriptionService.discardProvider(for: account.id)
+        // Drop what the account had in memory too, or its subscriptions and
+        // playlists would keep answering for an account that no longer exists.
+        appEnvironment.discardAccountData(for: account.id)
 
         if appEnvironment.accountsManager.accounts(forInstance: instance.id).isEmpty {
             appEnvironment.instancesManager.setUsesAccountLogin(false, for: instance)

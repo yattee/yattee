@@ -153,6 +153,46 @@
         }
       }
     },
+    "accounts.playlists.error.entryMismatch" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "This playlist changed on the server. Refresh and try again."
+          }
+        }
+      }
+    },
+    "accounts.playlists.error.instanceNotConfigured" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "This account's instance is unavailable."
+          }
+        }
+      }
+    },
+    "accounts.playlists.error.notAuthenticated" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sign in to this account to manage its playlists."
+          }
+        }
+      }
+    },
+    "accounts.playlists.error.notSupported" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "This instance does not support playlists."
+          }
+        }
+      }
+    },
     "accounts.signIn.identityChanged" : {
       "localizations" : {
         "en" : {

@@ -648,6 +648,168 @@ actor InvidiousAPI: InstanceAPI {
             customHeaders: ["Cookie": "SID=\(sid)"]
         )
     }
+
+    // MARK: - Playlist Management
+
+    /// Creates a playlist owned by the logged-in user.
+    ///
+    /// Invidious answers 201 with `{"title", "playlistId"}` — not the whole
+    /// playlist — so the returned value carries the new id and the title that
+    /// was asked for, and nothing else. Callers that need the rest refetch.
+    /// - Parameters:
+    ///   - title: The playlist title
+    ///   - privacy: Who may see it. Required by the server, which rejects the
+    ///     request outright when it is missing.
+    ///   - instance: The Invidious instance
+    ///   - sid: The session ID from login
+    /// - Returns: The created playlist, with no videos
+    func createPlaylist(
+        title: String,
+        privacy: PlaylistPrivacy,
+        instance: Instance,
+        sid: String
+    ) async throws -> Playlist {
+        struct CreateRequest: Encodable, Sendable {
+            let title: String
+            let privacy: String
+        }
+
+        struct CreateResponse: Decodable, Sendable {
+            let playlistId: String
+            let title: String?
+        }
+
+        let body = try JSONEncoder().encode(CreateRequest(title: title, privacy: privacy.rawValue))
+        let endpoint = GenericEndpoint(
+            path: "/api/v1/auth/playlists",
+            method: .post,
+            headers: authHeaders(sid: sid),
+            body: body
+        )
+
+        let response: CreateResponse = try await httpClient.fetch(endpoint, baseURL: instance.url)
+        return Playlist(id: .global(response.playlistId), title: response.title ?? title)
+    }
+
+    /// Edits a playlist's title, description or privacy.
+    ///
+    /// Title and privacy are sent even when unchanged: Invidious reads a missing
+    /// field as "leave it alone" for the description but validates the other two
+    /// on every request, so a partial body is rejected rather than merged.
+    /// Answers 204 with no body.
+    /// - Parameters:
+    ///   - id: The playlist ID
+    ///   - title: The title to store
+    ///   - description: The description to store, or `nil` to leave it alone
+    ///   - privacy: The visibility to store
+    ///   - instance: The Invidious instance
+    ///   - sid: The session ID from login
+    func updatePlaylist(
+        id: String,
+        title: String,
+        description: String?,
+        privacy: PlaylistPrivacy,
+        instance: Instance,
+        sid: String
+    ) async throws {
+        struct UpdateRequest: Encodable, Sendable {
+            let title: String
+            let privacy: String
+            /// Omitted from the JSON when nil, which is how the server is told
+            /// to keep the description it already has.
+            let description: String?
+        }
+
+        let body = try JSONEncoder().encode(
+            UpdateRequest(title: title, privacy: privacy.rawValue, description: description)
+        )
+        let endpoint = GenericEndpoint(
+            path: "/api/v1/auth/playlists/\(id)",
+            method: .patch,
+            headers: authHeaders(sid: sid),
+            body: body
+        )
+
+        try await httpClient.sendRequest(endpoint, baseURL: instance.url)
+    }
+
+    /// Deletes one of the user's playlists. Answers 204 with no body.
+    /// - Parameters:
+    ///   - id: The playlist ID
+    ///   - instance: The Invidious instance
+    ///   - sid: The session ID from login
+    func deletePlaylist(id: String, instance: Instance, sid: String) async throws {
+        let endpoint = GenericEndpoint(
+            path: "/api/v1/auth/playlists/\(id)",
+            method: .delete,
+            headers: authHeaders(sid: sid)
+        )
+        try await httpClient.sendRequest(endpoint, baseURL: instance.url)
+    }
+
+    /// Appends a video to one of the user's playlists.
+    ///
+    /// The 201 response carries the row the server minted, including the
+    /// `indexId` it can later be removed by. It is deliberately not decoded:
+    /// the whole playlist is refetched after every mutation, and a row parsed
+    /// from a response is one more thing that can disagree with the server.
+    /// - Parameters:
+    ///   - playlistID: The playlist to add to
+    ///   - videoID: The video to add
+    ///   - instance: The Invidious instance
+    ///   - sid: The session ID from login
+    func addVideoToPlaylist(
+        playlistID: String,
+        videoID: String,
+        instance: Instance,
+        sid: String
+    ) async throws {
+        struct AddRequest: Encodable, Sendable {
+            let videoId: String
+        }
+
+        let body = try JSONEncoder().encode(AddRequest(videoId: videoID))
+        let endpoint = GenericEndpoint(
+            path: "/api/v1/auth/playlists/\(playlistID)/videos",
+            method: .post,
+            headers: authHeaders(sid: sid),
+            body: body
+        )
+
+        try await httpClient.sendRequest(endpoint, baseURL: instance.url)
+    }
+
+    /// Removes one row from one of the user's playlists.
+    ///
+    /// Addressed by `indexId`, the per-entry token the fetch handed out — never
+    /// by position. The server names the same row by it across refetches, so a
+    /// removal cannot land on whatever moved into that position meanwhile.
+    /// Answers 204 with no body.
+    /// - Parameters:
+    ///   - playlistID: The playlist to remove from
+    ///   - indexID: The entry's `indexId` from ``userPlaylistSnapshot(id:instance:sid:)``
+    ///   - instance: The Invidious instance
+    ///   - sid: The session ID from login
+    func removeVideoFromPlaylist(
+        playlistID: String,
+        indexID: String,
+        instance: Instance,
+        sid: String
+    ) async throws {
+        let endpoint = GenericEndpoint(
+            path: "/api/v1/auth/playlists/\(playlistID)/videos/\(indexID)",
+            method: .delete,
+            headers: authHeaders(sid: sid)
+        )
+        try await httpClient.sendRequest(endpoint, baseURL: instance.url)
+    }
+
+    /// The headers every authenticated write carries. `Content-Type` is set for
+    /// all of them, including the bodiless ones, so a proxy in front of the
+    /// instance cannot guess something else.
+    private nonisolated func authHeaders(sid: String) -> [String: String] {
+        ["Cookie": "SID=\(sid)", "Content-Type": "application/json"]
+    }
 }
 
 // MARK: - Video Proxy
