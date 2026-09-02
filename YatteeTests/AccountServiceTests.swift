@@ -22,8 +22,9 @@ private actor ScriptedPlaylistTransport: RemotePlaylistTransport {
     enum Call: Equatable, Sendable {
         case userPlaylists(credential: String)
         case snapshot(id: String, credential: String)
-        case create(title: String, description: String?, privacy: PlaylistPrivacy?, credential: String)
-        case update(id: String, title: String, description: String?, privacy: PlaylistPrivacy?, credential: String)
+        case create(title: String, privacy: PlaylistPrivacy?, credential: String)
+        case rename(id: String, title: String, privacy: PlaylistPrivacy?, credential: String)
+        case setDescription(id: String, description: String, title: String, credential: String)
         case delete(id: String, credential: String)
         case addVideo(playlistID: String, videoID: String, credential: String)
         case remove(entryID: RemotePlaylistEntryID, credential: String)
@@ -33,6 +34,11 @@ private actor ScriptedPlaylistTransport: RemotePlaylistTransport {
 
     /// Thrown by the next call of any kind, once set.
     var nextError: Error?
+
+    /// The 1-based index of the first call that throws ``nextError``. Everything
+    /// before it answers normally, which is how a write that lands and a refetch
+    /// that then fails are scripted in one run.
+    private var firstFailingCall = 1
 
     /// What ``userPlaylistSnapshot(id:instance:credential:)`` answers.
     var snapshot = RemotePlaylistSnapshot(playlist: Playlist(id: .global("pl"), title: "Playlist"), entries: [])
@@ -45,9 +51,20 @@ private actor ScriptedPlaylistTransport: RemotePlaylistTransport {
     private var parked: [CheckedContinuation<Void, Never>] = []
 
     func setError(_ error: Error?) { nextError = error }
+
+    /// Fails every call from `index` on, leaving the earlier ones alone.
+    func setError(_ error: Error, fromCall index: Int) {
+        nextError = error
+        firstFailingCall = index
+    }
+
     func setSnapshot(_ snapshot: RemotePlaylistSnapshot) { self.snapshot = snapshot }
     func setPlaylists(_ playlists: [Playlist]) { self.playlists = playlists }
     func holdCalls() { holdsCallsOpen = true }
+
+    /// Stops parking *new* calls without releasing the ones already parked, so
+    /// a request can be left in flight while other work runs to completion.
+    func stopHoldingNewCalls() { holdsCallsOpen = false }
 
     func release() {
         holdsCallsOpen = false
@@ -74,7 +91,7 @@ private actor ScriptedPlaylistTransport: RemotePlaylistTransport {
             await withCheckedContinuation { parked.append($0) }
         }
 
-        if let error = nextError {
+        if let error = nextError, calls.count >= firstFailingCall {
             throw error
         }
     }
@@ -95,27 +112,33 @@ private actor ScriptedPlaylistTransport: RemotePlaylistTransport {
 
     func createPlaylist(
         title: String,
-        description: String?,
         privacy: PlaylistPrivacy?,
         instance _: Instance,
         credential: String
     ) async throws -> Playlist {
-        try await record(
-            .create(title: title, description: description, privacy: privacy, credential: credential)
-        )
-        return Playlist(id: .global("new-playlist"), title: title, description: description)
+        try await record(.create(title: title, privacy: privacy, credential: credential))
+        return Playlist(id: .global("new-playlist"), title: title)
     }
 
-    func updatePlaylist(
+    func renamePlaylist(
         id: String,
         title: String,
-        description: String?,
         privacy: PlaylistPrivacy?,
         instance _: Instance,
         credential: String
     ) async throws {
+        try await record(.rename(id: id, title: title, privacy: privacy, credential: credential))
+    }
+
+    func setPlaylistDescription(
+        id: String,
+        description: String,
+        title: String,
+        instance _: Instance,
+        credential: String
+    ) async throws {
         try await record(
-            .update(id: id, title: title, description: description, privacy: privacy, credential: credential)
+            .setDescription(id: id, description: description, title: title, credential: credential)
         )
     }
 
@@ -282,7 +305,7 @@ struct AccountServiceTests {
         )
 
         #expect(await harness.transport.calls == [
-            .create(title: "Watch later", description: nil, privacy: nil, credential: "secret-original")
+            .create(title: "Watch later", privacy: nil, credential: "secret-original")
         ])
     }
 
@@ -298,8 +321,119 @@ struct AccountServiceTests {
             for: harness.account
         )
 
+        // Two requests, because no backend takes a description at creation.
         #expect(await harness.transport.calls == [
-            .create(title: "Watch later", description: "Later", privacy: .unlisted, credential: "secret-original")
+            .create(title: "Watch later", privacy: .unlisted, credential: "secret-original"),
+            .setDescription(
+                id: "new-playlist",
+                description: "Later",
+                title: "Watch later",
+                credential: "secret-original"
+            )
+        ])
+    }
+
+    // MARK: - Composite writes
+
+    @Test("A credential replaced between a creation and its description stops the second call")
+    func creationStopsDescribingWhenTheCredentialChanges() async throws {
+        let harness = AccountServiceHarness(type: .invidious)
+        defer { harness.tearDown() }
+        await harness.transport.holdCalls()
+
+        let creation = Task { [service = harness.service!, account = harness.account] in
+            try await service.createPlaylist(
+                title: "Watch later",
+                description: "Later",
+                privacy: .private,
+                for: account
+            )
+        }
+
+        // The creation is out. Somebody signs out and back in as another user
+        // before it answers — the description must not go to the new login.
+        try await harness.transport.waitForCalls(1)
+        harness.credential = "secret-somebody-else"
+        await harness.transport.release()
+
+        await #expect(throws: AccountServiceError.notAuthenticated) {
+            _ = try await creation.value
+        }
+
+        #expect(await harness.transport.calls == [
+            .create(title: "Watch later", privacy: .private, credential: "secret-original")
+        ])
+    }
+
+    @Test("An edit sends the description only after rechecking the credential")
+    func editRechecksBetweenRenameAndDescription() async throws {
+        let harness = AccountServiceHarness(type: .piped)
+        defer { harness.tearDown() }
+        await harness.transport.holdCalls()
+
+        let edit = Task { [service = harness.service!, account = harness.account] in
+            try await service.updatePlaylist(
+                id: "pl",
+                title: "Renamed",
+                description: "New description",
+                privacy: nil,
+                for: account
+            )
+        }
+
+        try await harness.transport.waitForCalls(1)
+        harness.credential = "secret-somebody-else"
+        await harness.transport.release()
+
+        await #expect(throws: AccountServiceError.notAuthenticated) {
+            try await edit.value
+        }
+
+        // The rename landed under the old login; the description never went.
+        #expect(await harness.transport.calls == [
+            .rename(id: "pl", title: "Renamed", privacy: nil, credential: "secret-original")
+        ])
+    }
+
+    @Test("An edit that keeps its credential renames and then describes")
+    func editSendsBothHalvesWithTheSameCredential() async throws {
+        let harness = AccountServiceHarness(type: .invidious)
+        defer { harness.tearDown() }
+
+        try await harness.service.updatePlaylist(
+            id: "pl",
+            title: "Renamed",
+            description: "New description",
+            privacy: .public,
+            for: harness.account
+        )
+
+        #expect(await harness.transport.calls == [
+            .rename(id: "pl", title: "Renamed", privacy: .public, credential: "secret-original"),
+            .setDescription(
+                id: "pl",
+                description: "New description",
+                title: "Renamed",
+                credential: "secret-original"
+            )
+        ])
+    }
+
+    @Test("An edit that names no visibility sends none, rather than inventing one")
+    func editWithoutPrivacySendsNone() async throws {
+        let harness = AccountServiceHarness(type: .invidious)
+        defer { harness.tearDown() }
+
+        try await harness.service.updatePlaylist(
+            id: "pl",
+            title: "Renamed",
+            description: nil,
+            privacy: nil,
+            for: harness.account
+        )
+
+        #expect(await harness.transport.calls == [
+            .rename(id: "pl", title: "Renamed", privacy: nil, credential: "secret-original")
         ])
     }
 
@@ -592,6 +726,56 @@ struct RemotePlaylistsCacheTests {
         #expect(cache.snapshot(id: "pl", for: harness.account.id) == nil)
         #expect(cache.snapshotFetchDate(id: "pl", for: harness.account.id) == nil)
         #expect(cache.playlists(for: harness.account.id)?.contains { $0.id.playlistID == "pl" } != true)
+    }
+
+    @Test("A refresh in flight across a delete cannot bring the playlist back")
+    func inFlightRefreshCannotResurrectADeletedPlaylist() async throws {
+        let harness = AccountServiceHarness()
+        defer { harness.tearDown() }
+        let cache = harness.makeCache()
+        await harness.transport.setSnapshot(makeSnapshot(playlistID: "pl", videoIDs: ["aaa"], kind: .invidious))
+        await harness.transport.setPlaylists([Playlist(id: .global("pl"), title: "Playlist")])
+        await harness.transport.holdCalls()
+
+        let refresh = Task { [account = harness.account] in
+            try await cache.refreshSnapshot(id: "pl", for: account)
+        }
+        try await harness.transport.waitForCalls(1)
+
+        // That fetch is parked mid-flight. The delete runs to completion around
+        // it, and the server stops listing the playlist.
+        await harness.transport.stopHoldingNewCalls()
+        await harness.transport.setPlaylists([])
+        try await cache.deletePlaylist(id: "pl", for: harness.account)
+
+        // Only now does the older fetch answer. It describes a playlist that
+        // existed when it was asked for, and arriving late does not bring it
+        // back.
+        await harness.transport.release()
+        _ = try? await refresh.value
+
+        #expect(cache.snapshot(id: "pl", for: harness.account.id) == nil)
+        #expect(cache.playlists(for: harness.account.id)?.isEmpty == true)
+    }
+
+    @Test("A delete that landed drops the list entry even when the refetch fails")
+    func successfulDeleteForgetsTheListEntryWhenTheRefetchFails() async throws {
+        let harness = AccountServiceHarness()
+        defer { harness.tearDown() }
+        let cache = harness.makeCache()
+        await harness.transport.setSnapshot(makeSnapshot(playlistID: "pl", videoIDs: ["aaa"], kind: .invidious))
+        await harness.transport.setPlaylists([Playlist(id: .global("pl"), title: "Playlist")])
+
+        try await cache.refreshSnapshot(id: "pl", for: harness.account)
+        try await cache.refreshList(for: harness.account)
+
+        // The delete itself lands; the reconciling list refetch right after it
+        // cannot reach the server.
+        await harness.transport.setError(APIError.noConnection, fromCall: 4)
+        try await cache.deletePlaylist(id: "pl", for: harness.account)
+
+        #expect(cache.snapshot(id: "pl", for: harness.account.id) == nil)
+        #expect(cache.playlists(for: harness.account.id)?.isEmpty == true)
     }
 
     @Test("A delete that could not reach the server keeps the playlist it knows")

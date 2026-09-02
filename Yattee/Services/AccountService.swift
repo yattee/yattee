@@ -15,6 +15,13 @@ import Foundation
 /// conforms to it, and tests script it. Deliberately stateless and
 /// credential-carrying — resolving *which* credential is this service's job,
 /// and the transport must never guess.
+///
+/// **Every method here is exactly one request to the server.** Nothing composes
+/// two of them, because the credential can be replaced between any two requests
+/// and only this service can tell: a composite that awaited its own first call
+/// would send the second with a secret that has since changed hands. Backends
+/// that need several writes to change one playlist are sequenced above, with a
+/// recheck between each pair.
 protocol RemotePlaylistTransport: Sendable {
     func userPlaylists(instance: Instance, credential: String) async throws -> [Playlist]
 
@@ -26,17 +33,23 @@ protocol RemotePlaylistTransport: Sendable {
 
     func createPlaylist(
         title: String,
-        description: String?,
         privacy: PlaylistPrivacy?,
         instance: Instance,
         credential: String
     ) async throws -> Playlist
 
-    func updatePlaylist(
+    func renamePlaylist(
         id: String,
         title: String,
-        description: String?,
         privacy: PlaylistPrivacy?,
+        instance: Instance,
+        credential: String
+    ) async throws
+
+    func setPlaylistDescription(
+        id: String,
+        description: String,
+        title: String,
         instance: Instance,
         credential: String
     ) async throws
@@ -133,6 +146,12 @@ final class AccountService {
 
     /// Creates a playlist on the account's instance.
     ///
+    /// Two requests when a description was asked for, because no backend takes
+    /// one at creation — and the credential is checked again in between, since
+    /// it can be replaced while the first one is out. The second request's
+    /// failure is the caller's to see: a playlist that exists with the wrong
+    /// description is not a silent success.
+    ///
     /// - Parameter privacy: dropped on backends without a visibility concept,
     ///   rather than refused: the playlist is still perfectly creatable there,
     ///   and failing the whole call over a setting the server does not have
@@ -147,18 +166,44 @@ final class AccountService {
         let privacy = supportedPrivacy(privacy, for: account)
 
         try requireStillCurrent(credential, for: account)
-        return try await tracking(account, credential: credential) {
+        let playlist = try await tracking(account, credential: credential) {
             try await transport.createPlaylist(
                 title: title,
-                description: description,
                 privacy: privacy,
                 instance: instance,
                 credential: credential
             )
         }
+
+        if let description, !description.isEmpty {
+            try requireStillCurrent(credential, for: account)
+            try await tracking(account, credential: credential) {
+                try await transport.setPlaylistDescription(
+                    id: playlist.id.playlistID,
+                    description: description,
+                    title: title,
+                    instance: instance,
+                    credential: credential
+                )
+            }
+        }
+
+        return playlist
     }
 
     /// Edits a playlist on the account's instance.
+    ///
+    /// Two requests, no transaction, when the description is part of the edit:
+    /// Piped stores the name and the description behind separate endpoints, and
+    /// Invidious refuses to take a description without a title. The rename goes
+    /// first so a failure of the second leaves the visible half applied, and the
+    /// caller's refetch shows exactly what landed — with the credential checked
+    /// again in between, because it can be replaced while the rename is out.
+    ///
+    /// - Parameters:
+    ///   - description: `nil` leaves whatever the playlist has.
+    ///   - privacy: `nil` leaves whatever visibility the playlist has; ignored
+    ///     entirely on backends without one.
     func updatePlaylist(
         id: String,
         title: String,
@@ -171,14 +216,26 @@ final class AccountService {
 
         try requireStillCurrent(credential, for: account)
         try await tracking(account, credential: credential) {
-            try await transport.updatePlaylist(
+            try await transport.renamePlaylist(
                 id: id,
                 title: title,
-                description: description,
                 privacy: privacy,
                 instance: instance,
                 credential: credential
             )
+        }
+
+        if let description {
+            try requireStillCurrent(credential, for: account)
+            try await tracking(account, credential: credential) {
+                try await transport.setPlaylistDescription(
+                    id: id,
+                    description: description,
+                    title: title,
+                    instance: instance,
+                    credential: credential
+                )
+            }
         }
     }
 

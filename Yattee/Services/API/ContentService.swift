@@ -307,77 +307,54 @@ actor ContentService: ContentServiceProtocol {
         }
     }
 
-    /// Creates a playlist for the credential's owner.
+    /// Creates a playlist for the credential's owner. **One request.**
+    ///
+    /// Neither backend takes a description when creating, so this does not take
+    /// one either: setting it is a separate write, sequenced by the caller with
+    /// a credential recheck in between.
     ///
     /// The returned playlist is the little the server says about what it just
     /// made — an id and a title. Nothing else is invented here: callers refetch
     /// the list, which is the only description that is actually the server's.
     /// - Parameters:
     ///   - privacy: Ignored by backends without a visibility concept (Piped),
-    ///     and defaulted to private on those that have one when not given.
+    ///     and defaulted to private on those that have one when not given —
+    ///     Invidious rejects a creation that carries no visibility at all.
     func createPlaylist(
         title: String,
-        description: String?,
         privacy: PlaylistPrivacy?,
         instance: Instance,
         credential: String
     ) async throws -> Playlist {
         switch instance.type {
         case .invidious:
-            let api = await invidiousAPI(for: instance)
-            let playlist = try await api.createPlaylist(
+            return try await invidiousAPI(for: instance).createPlaylist(
                 title: title,
                 privacy: privacy ?? .private,
                 instance: instance,
                 sid: credential
             )
-            // Creation takes no description, so a wanted one is a second call.
-            // Its failure is the caller's to see: a playlist that exists with
-            // the wrong description is not a silent success.
-            if let description, !description.isEmpty {
-                try await api.updatePlaylist(
-                    id: playlist.id.playlistID,
-                    title: title,
-                    description: description,
-                    privacy: privacy ?? .private,
-                    instance: instance,
-                    sid: credential
-                )
-            }
-            return playlist
 
         case .piped:
-            let api = await pipedAPI(for: instance)
-            let playlistID = try await api.createPlaylist(
+            let playlistID = try await pipedAPI(for: instance).createPlaylist(
                 name: title,
                 instance: instance,
                 authToken: credential
             )
-            if let description, !description.isEmpty {
-                try await api.updatePlaylistDescription(
-                    id: playlistID,
-                    description: description,
-                    instance: instance,
-                    authToken: credential
-                )
-            }
-            return Playlist(id: .global(playlistID), title: title, description: description)
+            return Playlist(id: .global(playlistID), title: title)
 
         default:
             throw APIError.notSupported
         }
     }
 
-    /// Edits one of the credential owner's playlists.
+    /// Renames one of the credential owner's playlists. **One request.**
     ///
-    /// - Parameters:
-    ///   - description: `nil` leaves whatever the playlist has.
-    ///   - privacy: `nil` keeps the private default on backends that have
-    ///     visibility; ignored entirely on those that do not.
-    func updatePlaylist(
+    /// - Parameter privacy: the visibility to store, or `nil` to leave whatever
+    ///   the playlist has. Ignored on backends without a visibility concept.
+    func renamePlaylist(
         id: String,
         title: String,
-        description: String?,
         privacy: PlaylistPrivacy?,
         instance: Instance,
         credential: String
@@ -387,32 +364,55 @@ actor ContentService: ContentServiceProtocol {
             try await invidiousAPI(for: instance).updatePlaylist(
                 id: id,
                 title: title,
-                description: description,
-                privacy: privacy ?? .private,
+                description: nil,
+                privacy: privacy,
                 instance: instance,
                 sid: credential
             )
 
         case .piped:
-            // Two calls, no transaction: Piped edits the name and the
-            // description through separate endpoints. The rename goes first so
-            // a failure of the second leaves the visible half applied, and the
-            // caller's refetch shows exactly what landed.
-            let api = await pipedAPI(for: instance)
-            try await api.renamePlaylist(
+            try await pipedAPI(for: instance).renamePlaylist(
                 id: id,
                 newName: title,
                 instance: instance,
                 authToken: credential
             )
-            if let description {
-                try await api.updatePlaylistDescription(
-                    id: id,
-                    description: description,
-                    instance: instance,
-                    authToken: credential
-                )
-            }
+
+        default:
+            throw APIError.notSupported
+        }
+    }
+
+    /// Stores a playlist's description. **One request.**
+    ///
+    /// - Parameter title: the playlist's title, resent unchanged. Invidious
+    ///   edits every attribute through one endpoint and refuses a body without
+    ///   a title; Piped has a description endpoint of its own and ignores this.
+    func setPlaylistDescription(
+        id: String,
+        description: String,
+        title: String,
+        instance: Instance,
+        credential: String
+    ) async throws {
+        switch instance.type {
+        case .invidious:
+            try await invidiousAPI(for: instance).updatePlaylist(
+                id: id,
+                title: title,
+                description: description,
+                privacy: nil,
+                instance: instance,
+                sid: credential
+            )
+
+        case .piped:
+            try await pipedAPI(for: instance).updatePlaylistDescription(
+                id: id,
+                description: description,
+                instance: instance,
+                authToken: credential
+            )
 
         default:
             throw APIError.notSupported

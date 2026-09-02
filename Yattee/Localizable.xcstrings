@@ -8368,6 +8368,17 @@
         }
       }
     },
+    "playlist.privacy.footer.edit" : {
+      "comment" : "Explains the playlist visibility picker when editing a playlist that already exists",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Who can see this playlist on the server. The server does not report this exactly, so it only changes if you pick a different one."
+          }
+        }
+      }
+    },
     "playlist.privacy.private" : {
       "comment" : "Playlist visibility: only the account owner",
       "localizations" : {
@@ -8474,6 +8485,17 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Playlist changed on the server"
+          }
+        }
+      }
+    },
+    "playlist.remote.refresh.error" : {
+      "comment" : "Refetching a server-side playlist before editing it failed",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Could not load the latest playlist"
           }
         }
       }

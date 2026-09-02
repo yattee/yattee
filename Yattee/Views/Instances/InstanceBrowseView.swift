@@ -446,19 +446,16 @@ struct InstanceBrowseView: View {
         }
         // A credential can arrive over iCloud Keychain, or an account be added,
         // while this stays on screen — the Feed tab depends on it and would
-        // otherwise stay missing until the view was rebuilt. A status change can
-        // also move *which* account is effective here, since the resolution
-        // falls back to a sibling login on the same instance, so the content
-        // loaded for the previous one has to go with it.
+        // otherwise stay missing until the view was rebuilt. Either notification
+        // can also move *which* account is effective here: a status change
+        // because the resolution falls back to a sibling login on the same
+        // instance, an add or a remove because it changes what there is to fall
+        // back to. Content loaded for the previous one has to go with it.
         .onReceive(NotificationCenter.default.publisher(for: .accountStatusesDidChange)) { _ in
-            let accountChanged = discardAccountScopedContentIfAccountChanged()
-            refreshLoginState()
-            if accountChanged {
-                Task { await startContentLoad() }
-            }
+            handleEffectiveAccountChange()
         }
         .onReceive(NotificationCenter.default.publisher(for: .accountsDidChange)) { _ in
-            refreshLoginState()
+            handleEffectiveAccountChange()
         }
         // Selecting the other login on this instance changes whose feed and
         // playlists these are. Nothing else here would notice: the instance,
@@ -466,14 +463,18 @@ struct InstanceBrowseView: View {
         .onReceive(NotificationCenter.default.publisher(for: .dataContextDidChange)) { _ in
             discardAccountScopedContent()
             refreshLoginState()
-            Task { await startContentLoad() }
+            if !resetSelectedTabIfUnavailable() {
+                Task { await startContentLoad() }
+            }
         }
         // Same reason, without the context moving: the credential behind this
         // instance's account was replaced.
         .onReceive(NotificationCenter.default.publisher(for: .accountCredentialDidChange)) { _ in
             discardAccountScopedContent()
             refreshLoginState()
-            Task { await startContentLoad() }
+            if !resetSelectedTabIfUnavailable() {
+                Task { await startContentLoad() }
+            }
         }
         .onChange(of: selectedTab) { _, _ in
             isLoading = true
@@ -1252,6 +1253,37 @@ struct InstanceBrowseView: View {
         }
 
         discardAccountScopedContent()
+        return true
+    }
+
+    /// Handles a change to which account this instance resolves to, whatever
+    /// moved it: a status, or an account being added or removed.
+    private func handleEffectiveAccountChange() {
+        let accountChanged = discardAccountScopedContentIfAccountChanged()
+        refreshLoginState()
+
+        // Moving off a tab that no longer exists reloads by itself.
+        guard !resetSelectedTabIfUnavailable() else { return }
+
+        if accountChanged {
+            Task { await startContentLoad() }
+        }
+    }
+
+    /// Moves off a tab that has just stopped being offered.
+    ///
+    /// The Feed and Playlists tabs exist only while an account backs them. When
+    /// one goes away the picker drops it, and a selection left pointing at it
+    /// leaves an unhighlighted tab strip over content nobody can reach.
+    ///
+    /// - Returns: whether the selection moved, which reloads through
+    ///   `onChange(of: selectedTab)`.
+    @discardableResult
+    private func resetSelectedTabIfUnavailable() -> Bool {
+        let tabs = availableTabs
+        guard !tabs.contains(selectedTab), let first = tabs.first else { return false }
+
+        selectedTab = first
         return true
     }
 

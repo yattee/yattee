@@ -99,6 +99,12 @@ struct UnifiedPlaylistDetailView: View {
     /// The account this playlist belongs to, when it belongs to one.
     @State private var owningAccount: Account?
 
+    /// Whether the server lists this playlist publicly, as of the last snapshot.
+    @State private var remoteIsListed: Bool?
+
+    /// Whether the refetch that has to land before the edit sheet opens is out.
+    @State private var isPreparingEdit = false
+
     // MARK: - Local-only State
 
     @State private var localPlaylist: LocalPlaylist?
@@ -150,6 +156,18 @@ struct UnifiedPlaylistDetailView: View {
     private var remoteSupportsPrivacy: Bool {
         guard let owningAccount else { return false }
         return appEnvironment?.accountsManager.capabilities(for: owningAccount)?.supportsPlaylistPrivacy == true
+    }
+
+    /// The playlist's visibility, as far as the server said it.
+    ///
+    /// Invidious answers with a single "listed" flag, so `true` is exactly
+    /// public and `false` is unlisted *or* private with no way to tell which.
+    /// The form starts the picker at the conservative reading of `false` and
+    /// only sends a visibility the user actually chose, so the ambiguity never
+    /// turns into a change nobody asked for.
+    private var knownRemotePrivacy: PlaylistPrivacy? {
+        guard let remoteIsListed else { return nil }
+        return remoteIsListed ? .public : .private
     }
 
     /// Deleting a server-side playlist takes it off the server, which is a very
@@ -232,10 +250,12 @@ struct UnifiedPlaylistDetailView: View {
                     loadLocalPlaylist()
                 }
             } else if canEditRemotePlaylist {
-                // The fetch carries no visibility, so the picker starts at the
-                // conservative default rather than pretending to know.
                 PlaylistFormSheet(
-                    mode: .editRemote(title: title, description: descriptionText, privacy: nil),
+                    mode: .editRemote(
+                        title: title,
+                        description: descriptionText,
+                        privacy: knownRemotePrivacy
+                    ),
                     showsPrivacy: remoteSupportsPrivacy
                 ) { newTitle, newDescription, newPrivacy in
                     Task {
@@ -515,10 +535,11 @@ struct UnifiedPlaylistDetailView: View {
                 // account owns.
                 if (isLocal && localPlaylist != nil) || canEditRemotePlaylist {
                     Button {
-                        showingEditSheet = true
+                        beginEdit()
                     } label: {
                         Label(String(localized: "playlist.edit"), systemImage: "pencil")
                     }
+                    .disabled(isPreparingEdit)
 
                     Button(role: .destructive) {
                         showingDeleteConfirmation = true
@@ -679,13 +700,20 @@ struct UnifiedPlaylistDetailView: View {
             // account owns.
             if (isLocal && localPlaylist != nil) || canEditRemotePlaylist {
                 Button {
-                    showingEditSheet = true
+                    beginEdit()
                 } label: {
-                    Label(String(localized: "playlist.edit"), systemImage: "pencil")
-                        .frame(maxWidth: .infinity, minHeight: 50)
-                        .font(.headline)
+                    Group {
+                        if isPreparingEdit {
+                            ProgressView()
+                        } else {
+                            Label(String(localized: "playlist.edit"), systemImage: "pencil")
+                        }
+                    }
+                    .frame(maxWidth: .infinity, minHeight: 50)
+                    .font(.headline)
                 }
                 .buttonStyle(.bordered)
+                .disabled(isPreparingEdit)
 
                 Button {
                     showingDeleteConfirmation = true
@@ -740,7 +768,11 @@ struct UnifiedPlaylistDetailView: View {
         let indexColumnWidth: CGFloat = 32
         #endif
         return LazyVStack(spacing: 0) {
-            ForEach(Array(videos.enumerated()), id: \.element.id) { index, video in
+            // Keyed by row rather than by video: a playlist may hold the same
+            // video twice, and two rows sharing an identity leave SwiftUI free
+            // to pair a row's view with the other one's index — which is what
+            // the removal closure is addressed by.
+            ForEach(Array(videos.enumerated()), id: \.offset) { index, video in
                 VideoListRow(
                     isLast: index == videos.count - 1,
                     rowStyle: .regular,
@@ -916,8 +948,14 @@ struct UnifiedPlaylistDetailView: View {
     private func resolveOwningAccount(playlistID: PlaylistID, instance: Instance) -> Account? {
         guard let appEnvironment else { return nil }
 
+        // Only if that account is on *this* instance. An id that came in over
+        // Handoff was minted on another device, where it may name an account
+        // this one has on a different server entirely — and resolving it would
+        // send the authenticated fetch somewhere the playlist does not live,
+        // with a credential that has nothing to do with it.
         if let accountID = source.accountID,
-           let account = appEnvironment.accountsManager.account(id: accountID) {
+           let account = appEnvironment.accountsManager.account(id: accountID),
+           appEnvironment.accountsManager.instance(for: account)?.id == instance.id {
             return account
         }
 
@@ -941,6 +979,7 @@ struct UnifiedPlaylistDetailView: View {
         apply(snapshot.playlist)
         entries = snapshot.entries
         entriesByRow = Self.rowEntries(for: snapshot)
+        remoteIsListed = snapshot.isListed
     }
 
     /// Pairs each displayed row with the entry that can name it to the server.
@@ -1077,7 +1116,53 @@ struct UnifiedPlaylistDetailView: View {
         }
     }
 
-    private func saveRemoteEdit(title newTitle: String, description: String?, privacy: PlaylistPrivacy) async {
+    /// Opens the edit form — over the playlist as the server has it *now*, when
+    /// the playlist is one.
+    ///
+    /// The form saves every field at once, so an edit started from a snapshot
+    /// taken minutes ago would put that snapshot's title and description back
+    /// over anything another client changed since. A local playlist is the only
+    /// copy there is and needs none of this.
+    private func beginEdit() {
+        guard !isLocal else {
+            showingEditSheet = true
+            return
+        }
+        Task { await beginRemoteEdit() }
+    }
+
+    private func beginRemoteEdit() async {
+        guard let appEnvironment,
+              let account = owningAccount,
+              let playlistID = remotePlaylistID
+        else { return }
+
+        isPreparingEdit = true
+        defer { isPreparingEdit = false }
+
+        do {
+            try await appEnvironment.remotePlaylistsCache.refreshSnapshot(id: playlistID, for: account)
+
+            // Nothing came back to edit: the account was cleared while this was
+            // in flight and its data went with it, exactly as on load.
+            guard let snapshot = appEnvironment.remotePlaylistsCache.snapshot(
+                id: playlistID,
+                for: account.id
+            ) else { return }
+
+            apply(snapshot)
+            showingEditSheet = true
+        } catch {
+            // No sheet: editing from data known to be stale is the thing this
+            // refetch exists to prevent.
+            appEnvironment.toastManager.showError(
+                String(localized: "playlist.remote.refresh.error"),
+                subtitle: error.localizedDescription
+            )
+        }
+    }
+
+    private func saveRemoteEdit(title newTitle: String, description: String?, privacy: PlaylistPrivacy?) async {
         guard let appEnvironment,
               let account = owningAccount,
               let playlistID = remotePlaylistID

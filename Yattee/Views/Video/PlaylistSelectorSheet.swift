@@ -44,10 +44,19 @@ struct PlaylistSelectorSheet: View {
     /// Every account that can be added to, on every instance — not just the one
     /// currently selected as the data context. Adding a video to a playlist is
     /// not a browsing decision, and the user may well mean the other login.
+    ///
+    /// The same three things the write layer insists on, asked here so an
+    /// account that could only ever fail is not offered as somewhere to put a
+    /// video: the backend must do playlist writes, the instance must be one
+    /// this app still talks to, and there must be a credential to talk with.
+    /// Account *status* deliberately is not among them — a stale "rejected"
+    /// would hide a login that works, and a failed add says so with a toast.
     private var remoteDestinations: [Account] {
         guard let appEnvironment else { return [] }
-        return appEnvironment.accountsManager.accounts.filter {
-            appEnvironment.accountsManager.capabilities(for: $0)?.supportsPlaylistWrites == true
+        return appEnvironment.accountsManager.accounts.filter { account in
+            appEnvironment.accountsManager.capabilities(for: account)?.supportsPlaylistWrites == true
+                && appEnvironment.accountsManager.instance(for: account)?.isEnabled == true
+                && appEnvironment.accountCredentialsManager(for: account)?.isLoggedIn(for: account) == true
         }
     }
 
@@ -302,7 +311,7 @@ struct PlaylistSelectorSheet: View {
         on account: Account,
         title: String,
         description: String?,
-        privacy: PlaylistPrivacy
+        privacy: PlaylistPrivacy?
     ) async {
         guard let appEnvironment else { return }
 

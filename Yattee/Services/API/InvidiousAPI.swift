@@ -208,6 +208,7 @@ actor InvidiousAPI: InstanceAPI {
             author: firstResponse.author,
             authorId: firstResponse.authorId,
             videoCount: firstResponse.videoCount,
+            isListed: firstResponse.isListed,
             videos: allVideos
         ).toPlaylist(baseURL: instance.url)
     }
@@ -320,6 +321,7 @@ actor InvidiousAPI: InstanceAPI {
             author: firstPage.author,
             authorId: firstPage.authorId,
             videoCount: firstPage.videoCount,
+            isListed: firstPage.isListed,
             videos: allVideos
         ).toPlaylist(baseURL: baseURL)
 
@@ -351,7 +353,7 @@ actor InvidiousAPI: InstanceAPI {
             )
         }
 
-        return RemotePlaylistSnapshot(playlist: playlist, entries: entries)
+        return RemotePlaylistSnapshot(playlist: playlist, entries: entries, isListed: firstPage.isListed)
     }
 
     /// Runs the snapshot assembly over raw page payloads, decoding them the way
@@ -704,35 +706,38 @@ actor InvidiousAPI: InstanceAPI {
 
     /// Edits a playlist's title, description or privacy.
     ///
-    /// Title and privacy are sent even when unchanged: Invidious reads a missing
-    /// field as "leave it alone" for the description but validates the other two
-    /// on every request, so a partial body is rejected rather than merged.
-    /// Answers 204 with no body.
+    /// The title is sent even when unchanged: Invidious reads it out of the body
+    /// without a default and answers 403 `Missing hash key: "title"` when it is
+    /// absent (measured). The other two fields fall back to what is stored, so
+    /// omitting them is how the server is told to keep them — which is the only
+    /// way to leave a playlist's visibility alone, since the API never says
+    /// which of unlisted and private it currently is. Answers 204 with no body.
     /// - Parameters:
     ///   - id: The playlist ID
     ///   - title: The title to store
     ///   - description: The description to store, or `nil` to leave it alone
-    ///   - privacy: The visibility to store
+    ///   - privacy: The visibility to store, or `nil` to leave it alone
     ///   - instance: The Invidious instance
     ///   - sid: The session ID from login
     func updatePlaylist(
         id: String,
         title: String,
         description: String?,
-        privacy: PlaylistPrivacy,
+        privacy: PlaylistPrivacy?,
         instance: Instance,
         sid: String
     ) async throws {
         struct UpdateRequest: Encodable, Sendable {
             let title: String
-            let privacy: String
+            /// Omitted from the JSON when nil, which keeps the stored visibility.
+            let privacy: String?
             /// Omitted from the JSON when nil, which is how the server is told
             /// to keep the description it already has.
             let description: String?
         }
 
         let body = try JSONEncoder().encode(
-            UpdateRequest(title: title, privacy: privacy.rawValue, description: description)
+            UpdateRequest(title: title, privacy: privacy?.rawValue, description: description)
         )
         let endpoint = GenericEndpoint(
             path: "/api/v1/auth/playlists/\(id)",
@@ -1818,6 +1823,9 @@ private struct InvidiousPlaylist: Decodable, Sendable {
     let author: String?
     let authorId: String?
     let videoCount: Int
+    /// The whole of what Invidious says about visibility: `privacy.public?`,
+    /// serialised. Unlisted and private are both `false` and indistinguishable.
+    let isListed: Bool?
     let videos: [InvidiousPlaylistItem]?
 
     nonisolated func toPlaylist(baseURL: URL) -> Playlist {

@@ -87,9 +87,19 @@ struct RemotePlaylistSnapshot: Hashable, Sendable {
     /// The rows that can be addressed for removal, in playlist order.
     let entries: [RemotePlaylistEntry]
 
-    init(playlist: Playlist, entries: [RemotePlaylistEntry]) {
+    /// Whether the server lists this playlist publicly, where it says so.
+    ///
+    /// Deliberately not a ``PlaylistPrivacy``, because it is not one: Invidious
+    /// serialises visibility as `isListed`, which is literally `privacy.public?`
+    /// — `true` is public, and `false` is unlisted *or* private with no way to
+    /// tell the two apart over the API. `nil` where the backend has no
+    /// visibility concept at all, or did not answer with one.
+    let isListed: Bool?
+
+    init(playlist: Playlist, entries: [RemotePlaylistEntry], isListed: Bool? = nil) {
         self.playlist = playlist
         self.entries = entries
+        self.isListed = isListed
     }
 }
 

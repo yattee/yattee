@@ -46,9 +46,11 @@ private func invidiousVideoJSON(
 private func invidiousPageJSON(
     playlistID: String = "IVPLtest",
     videoCount: Int,
-    videos: [String]
+    videos: [String],
+    isListed: Bool? = nil
 ) -> Data {
-    """
+    let listedField = isListed.map { ",\n        \"isListed\": \($0)" } ?? ""
+    return """
     {
         "type": "invidiousPlaylist",
         "title": "Watch Later",
@@ -56,7 +58,7 @@ private func invidiousPageJSON(
         "author": "arek",
         "authorId": "UCowner",
         "description": "A private playlist",
-        "videoCount": \(videoCount),
+        "videoCount": \(videoCount)\(listedField),
         "videos": [\(videos.joined(separator: ", "))]
     }
     """.data(using: .utf8)!
@@ -319,6 +321,25 @@ struct InvidiousRemotePlaylistSnapshotTests {
         #expect(snapshot.playlist.description == "A private playlist")
         #expect(snapshot.playlist.videoCount == 1)
         #expect(snapshot.playlist.id.playlistID == "IVPLtest")
+    }
+
+    @Test("The listed flag is carried through, and its absence is not a no")
+    func snapshotCarriesVisibility() throws {
+        func snapshot(isListed: Bool?) throws -> RemotePlaylistSnapshot {
+            try InvidiousAPI.authPlaylistSnapshot(
+                fromPageJSON: [invidiousPageJSON(videoCount: 0, videos: [], isListed: isListed)],
+                playlistID: "IVPLtest",
+                baseURL: testBaseURL
+            )
+        }
+
+        // `true` is exactly public. `false` is unlisted *or* private — Invidious
+        // serialises `privacy.public?` and nothing else — and a page that says
+        // nothing leaves the visibility unknown rather than not-listed, which is
+        // what stops an edit from sending a guess back.
+        #expect(try snapshot(isListed: true).isListed == true)
+        #expect(try snapshot(isListed: false).isListed == false)
+        #expect(try snapshot(isListed: nil).isListed == nil)
     }
 
     @Test("An empty page set is a decoding failure, not an empty playlist")

@@ -14,9 +14,13 @@ struct PlaylistFormSheet: View {
         /// Editing a playlist that lives on a server.
         ///
         /// Server-side playlists are plain values rather than models, so what to
-        /// pre-fill is passed in. `privacy` is optional because the fetch does
-        /// not always say what it is — Invidious returns no visibility with the
-        /// playlist, so the picker falls back to its conservative default.
+        /// pre-fill is passed in. `privacy` is optional because the fetch cannot
+        /// always say what it is: Invidious reports visibility as a single
+        /// "listed" flag, which is exact for a public playlist and ambiguous
+        /// between unlisted and private for every other one. The picker then
+        /// starts at the conservative end — and an untouched picker sends
+        /// nothing at all, so a visibility that could not be read back is left
+        /// alone rather than overwritten with a guess.
         case editRemote(title: String, description: String?, privacy: PlaylistPrivacy?)
 
         static func == (lhs: Mode, rhs: Mode) -> Bool {
@@ -45,7 +49,9 @@ struct PlaylistFormSheet: View {
     /// the value rather than inventing it.
     let showsPrivacy: Bool
 
-    private let onSave: (String, String?, PlaylistPrivacy) -> Void
+    /// - Parameter privacy: `nil` means "leave whatever the playlist has",
+    ///   which only an edit can ask for.
+    private let onSave: (String, String?, PlaylistPrivacy?) -> Void
 
     /// Local playlists have no visibility, so their callers never see one.
     init(mode: Mode, onSave: @escaping (String, String?) -> Void) {
@@ -60,7 +66,7 @@ struct PlaylistFormSheet: View {
         mode: Mode,
         showsPrivacy: Bool,
         privacy: PlaylistPrivacy = .private,
-        onSaveWithPrivacy: @escaping (String, String?, PlaylistPrivacy) -> Void
+        onSaveWithPrivacy: @escaping (String, String?, PlaylistPrivacy?) -> Void
     ) {
         self.mode = mode
         self.showsPrivacy = showsPrivacy
@@ -72,6 +78,10 @@ struct PlaylistFormSheet: View {
     @State private var descriptionText: String = ""
     /// Private by default: the conservative choice, and the one Invidious makes.
     @State private var privacy: PlaylistPrivacy = .private
+
+    /// What the picker was pre-filled with when editing something that already
+    /// exists, so a selection left untouched can be told from one that was made.
+    @State private var prefilledPrivacy: PlaylistPrivacy?
 
     private let maxDescriptionLength = 1000
 
@@ -136,6 +146,7 @@ struct PlaylistFormSheet: View {
                 // Only when the fetch actually said so — otherwise whatever the
                 // caller preselected stands.
                 if let remotePrivacy { privacy = remotePrivacy }
+                prefilledPrivacy = privacy
             }
         }
         #if os(iOS)
@@ -193,7 +204,7 @@ struct PlaylistFormSheet: View {
                 } header: {
                     Text(String(localized: "playlist.privacy"))
                 } footer: {
-                    Text(String(localized: "playlist.privacy.footer"))
+                    Text(privacyFooter)
                 }
             }
         }
@@ -250,7 +261,7 @@ struct PlaylistFormSheet: View {
                     } header: {
                         Text(String(localized: "playlist.privacy"))
                     } footer: {
-                        Text(String(localized: "playlist.privacy.footer"))
+                        Text(privacyFooter)
                     }
                 }
 
@@ -273,6 +284,18 @@ struct PlaylistFormSheet: View {
     #endif
 
     // MARK: - Privacy
+
+    /// What the picker means here — which is not the same sentence when editing.
+    ///
+    /// Creating applies the selection outright. Editing applies it only if it
+    /// was changed, because the value it starts on is the server's answer as
+    /// far as the server gives one.
+    private var privacyFooter: String {
+        if case .editRemote = mode {
+            return String(localized: "playlist.privacy.footer.edit")
+        }
+        return String(localized: "playlist.privacy.footer")
+    }
 
     private var privacyPicker: some View {
         Picker(String(localized: "playlist.privacy"), selection: $privacy) {
@@ -299,8 +322,20 @@ struct PlaylistFormSheet: View {
         let trimmedTitle = title.trimmingCharacters(in: .whitespacesAndNewlines)
         let trimmedDescription = descriptionText.trimmingCharacters(in: .whitespacesAndNewlines)
 
-        onSave(trimmedTitle, savedDescription(trimmedDescription), privacy)
+        onSave(trimmedTitle, savedDescription(trimmedDescription), savedPrivacy)
         dismiss()
+    }
+
+    /// The visibility to send, or `nil` to leave the playlist's alone.
+    ///
+    /// An existing playlist keeps whatever it has unless the picker was
+    /// actually moved: the value it was pre-filled with is a best guess — the
+    /// server can say a playlist is not listed without saying whether it is
+    /// unlisted or private — and sending a guess back would change a setting
+    /// nobody asked to change. Creating is the opposite: there is nothing to
+    /// preserve, and Invidious refuses a creation without a visibility.
+    private var savedPrivacy: PlaylistPrivacy? {
+        privacy == prefilledPrivacy ? nil : privacy
     }
 
     /// What an emptied description field means to the caller.
