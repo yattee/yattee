@@ -220,6 +220,21 @@ actor InvidiousAPI: InstanceAPI {
     ///   - sid: The session ID from login
     /// - Returns: The playlist with videos
     func userPlaylist(id: String, instance: Instance, sid: String) async throws -> Playlist {
+        try await userPlaylistSnapshot(id: id, instance: instance, sid: sid).playlist
+    }
+
+    /// Fetches a user's playlist along with the per-entry identities needed to
+    /// mutate it.
+    ///
+    /// Same request as ``userPlaylist(id:instance:sid:)`` — that one is a thin
+    /// wrapper over this — but it keeps the `index`/`indexId` tokens Invidious
+    /// hands out for every row instead of dropping them on conversion.
+    /// - Parameters:
+    ///   - id: The playlist ID
+    ///   - instance: The Invidious instance
+    ///   - sid: The session ID from login
+    /// - Returns: The playlist plus its addressable entries
+    func userPlaylistSnapshot(id: String, instance: Instance, sid: String) async throws -> RemotePlaylistSnapshot {
         let headers = ["Cookie": "SID=\(sid)"]
         let firstEndpoint = GenericEndpoint(
             path: "/api/v1/auth/playlists/\(id)",
@@ -227,7 +242,7 @@ actor InvidiousAPI: InstanceAPI {
             headers: headers
         )
         let firstResponse: InvidiousPlaylist = try await httpClient.fetch(firstEndpoint, baseURL: instance.url)
-        var allVideos = firstResponse.videos ?? []
+        var additionalPages: [InvidiousPlaylist] = []
         let maxPages = 50
 
         if firstResponse.videoCount > 0 {
@@ -239,14 +254,41 @@ actor InvidiousAPI: InstanceAPI {
                     headers: headers
                 )
                 let response: InvidiousPlaylist = try await httpClient.fetch(endpoint, baseURL: instance.url)
-                let pageVideos = response.videos ?? []
-                if pageVideos.isEmpty { break }
-                allVideos.append(contentsOf: pageVideos)
+                if (response.videos ?? []).isEmpty { break }
+                additionalPages.append(response)
                 page += 1
             }
         }
 
-        // Invidious pagination uses overlapping pages — deduplicate by playlist index
+        return Self.buildAuthPlaylistSnapshot(
+            firstPage: firstResponse,
+            additionalPages: additionalPages,
+            playlistID: id,
+            baseURL: instance.url
+        )
+    }
+
+    /// Builds a snapshot from already-fetched pages of
+    /// `/api/v1/auth/playlists/{id}`.
+    ///
+    /// Pure: the network path and ``authPlaylistSnapshot(fromPageJSON:playlistID:baseURL:)``
+    /// both funnel through here, so the merge, dedupe and ordering rules have
+    /// exactly one implementation.
+    private static func buildAuthPlaylistSnapshot(
+        firstPage: InvidiousPlaylist,
+        additionalPages: [InvidiousPlaylist],
+        playlistID: String,
+        baseURL: URL
+    ) -> RemotePlaylistSnapshot {
+        var allVideos = firstPage.videos ?? []
+        for page in additionalPages {
+            allVideos.append(contentsOf: page.videos ?? [])
+        }
+
+        // Invidious pagination uses overlapping pages — deduplicate by playlist
+        // index. The key is deliberately never `videoId`: a playlist may hold
+        // the same video twice at different indexes, and each copy is its own
+        // removable row with its own indexId.
         var seenIndices = Set<Int>()
         allVideos = allVideos.filter { item in
             if case .video(let video) = item, let index = video.index {
@@ -255,15 +297,72 @@ actor InvidiousAPI: InstanceAPI {
             return true
         }
 
-        return InvidiousPlaylist(
-            playlistId: firstResponse.playlistId,
-            title: firstResponse.title,
-            description: firstResponse.description,
-            author: firstResponse.author,
-            authorId: firstResponse.authorId,
-            videoCount: firstResponse.videoCount,
+        // Order by the server's index so entry positions ascend even if a page
+        // arrives out of order. Rows the server left unindexed keep their
+        // arrival order and sort last; the sort is stable either way.
+        allVideos = allVideos.enumerated().sorted { lhs, rhs in
+            switch (lhs.element.playlistIndex, rhs.element.playlistIndex) {
+            case let (left?, right?):
+                return left == right ? lhs.offset < rhs.offset : left < right
+            case (_?, nil):
+                return true
+            case (nil, _?):
+                return false
+            case (nil, nil):
+                return lhs.offset < rhs.offset
+            }
+        }.map(\.element)
+
+        let playlist = InvidiousPlaylist(
+            playlistId: firstPage.playlistId,
+            title: firstPage.title,
+            description: firstPage.description,
+            author: firstPage.author,
+            authorId: firstPage.authorId,
+            videoCount: firstPage.videoCount,
             videos: allVideos
-        ).toPlaylist(baseURL: instance.url)
+        ).toPlaylist(baseURL: baseURL)
+
+        // A row needs both tokens to be a mutation target: `indexId` names it
+        // and `index` places it. Rows missing either are still displayed —
+        // they stay in `playlist.videos` — they just never appear in `entries`,
+        // so no removal can be aimed at a row the server refuses to name.
+        let entries: [RemotePlaylistEntry] = allVideos.compactMap { item in
+            guard case .video(let video) = item,
+                  let indexID = video.indexId,
+                  let index = video.index
+            else { return nil }
+
+            return RemotePlaylistEntry(
+                id: .invidious(playlistID: playlistID, indexID: indexID),
+                video: video.toVideo(baseURL: baseURL),
+                position: index
+            )
+        }
+
+        return RemotePlaylistSnapshot(playlist: playlist, entries: entries)
+    }
+
+    /// Runs the snapshot assembly over raw page payloads, decoding them the way
+    /// the network path does. Lets the merge/dedupe/ordering rules be exercised
+    /// without a server.
+    static func authPlaylistSnapshot(
+        fromPageJSON pages: [Data],
+        playlistID: String,
+        baseURL: URL
+    ) throws -> RemotePlaylistSnapshot {
+        let decoder = HTTPClient.makeAPIDecoder()
+        let decoded = try pages.map { try decoder.decode(InvidiousPlaylist.self, from: $0) }
+        guard let firstPage = decoded.first else {
+            throw APIError.decodingError("No playlist pages to decode")
+        }
+
+        return buildAuthPlaylistSnapshot(
+            firstPage: firstPage,
+            additionalPages: Array(decoded.dropFirst()),
+            playlistID: playlistID,
+            baseURL: baseURL
+        )
     }
 
     func comments(videoID: String, instance: Instance, continuation: String?) async throws -> CommentsPage {
@@ -812,6 +911,9 @@ private struct InvidiousAuthFeedResponse: Decodable, Sendable {
 private struct InvidiousVideo: Decodable, Sendable {
     let videoId: String
     let index: Int?
+    /// Per-entry token from the authenticated playlist endpoints; the handle
+    /// Invidious accepts when removing this exact row.
+    let indexId: String?
     let title: String
     let description: String?
     let author: String
@@ -1524,6 +1626,15 @@ private enum InvidiousPlaylistItem: Decodable, Sendable {
         default:
             self = .unknown
         }
+    }
+
+    /// The playlist index of the wrapped video, when the item is a video the
+    /// server indexed.
+    var playlistIndex: Int? {
+        if case .video(let video) = self {
+            return video.index
+        }
+        return nil
     }
 }
 

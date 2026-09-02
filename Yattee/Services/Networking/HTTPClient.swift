@@ -28,9 +28,23 @@ actor HTTPClient {
         self.session = session
         self.decoder = decoder
 
-        // Configure decoder for common API patterns
-        self.decoder.keyDecodingStrategy = .convertFromSnakeCase
-        self.decoder.dateDecodingStrategy = .iso8601
+        Self.configureForAPIs(self.decoder)
+    }
+
+    /// Applies the decoding rules every instance API response is parsed with.
+    ///
+    /// Exposed so code that parses an already-fetched payload — a merged page
+    /// set, say — decodes it exactly the way the network path would.
+    nonisolated static func configureForAPIs(_ decoder: JSONDecoder) {
+        decoder.keyDecodingStrategy = .convertFromSnakeCase
+        decoder.dateDecodingStrategy = .iso8601
+    }
+
+    /// A decoder configured the way this client decodes API responses.
+    nonisolated static func makeAPIDecoder() -> JSONDecoder {
+        let decoder = JSONDecoder()
+        configureForAPIs(decoder)
+        return decoder
     }
 
     // MARK: - Configuration

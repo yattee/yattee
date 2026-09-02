@@ -371,6 +371,22 @@ actor PipedAPI: InstanceAPI {
     ///   - authToken: The auth token from login
     /// - Returns: Playlist with videos
     func userPlaylist(id: String, instance: Instance, authToken: String) async throws -> Playlist {
+        try await userPlaylistSnapshot(id: id, instance: instance, authToken: authToken).playlist
+    }
+
+    /// Fetches a user playlist along with the per-entry identities needed to
+    /// mutate it.
+    ///
+    /// Same request as ``userPlaylist(id:instance:authToken:)`` — that one is a
+    /// thin wrapper over this. Piped has no per-entry token, so entries are
+    /// addressed by their position in this fetch and are only valid until the
+    /// playlist next changes.
+    /// - Parameters:
+    ///   - id: The playlist ID (UUID)
+    ///   - instance: The Piped instance
+    ///   - authToken: The auth token from login
+    /// - Returns: The playlist plus its addressable entries
+    func userPlaylistSnapshot(id: String, instance: Instance, authToken: String) async throws -> RemotePlaylistSnapshot {
         let headers = ["Authorization": authToken]
         let firstEndpoint = GenericEndpoint(
             path: "/playlists/\(id)",
@@ -397,17 +413,79 @@ actor PipedAPI: InstanceAPI {
             page += 1
         }
 
-        return PipedPlaylistResponse(
-            name: firstResponse.name,
-            description: firstResponse.description,
-            uploader: firstResponse.uploader,
-            uploaderUrl: firstResponse.uploaderUrl,
-            uploaderAvatar: firstResponse.uploaderAvatar,
-            videos: firstResponse.videos,
+        return Self.buildUserPlaylistSnapshot(
+            firstPage: firstResponse,
+            allStreams: allStreams,
+            playlistID: id,
+            instanceURL: instance.url
+        )
+    }
+
+    /// Builds a snapshot from an already-fetched first page plus every stream
+    /// paged in after it.
+    ///
+    /// Pure: the network path and ``userPlaylistSnapshot(fromPageJSON:playlistID:instanceURL:)``
+    /// both funnel through here, so positions are assigned in exactly one place.
+    private static func buildUserPlaylistSnapshot(
+        firstPage: PipedPlaylistResponse,
+        allStreams: [PipedVideoItem],
+        playlistID: String,
+        instanceURL: URL
+    ) -> RemotePlaylistSnapshot {
+        let playlist = PipedPlaylistResponse(
+            name: firstPage.name,
+            description: firstPage.description,
+            uploader: firstPage.uploader,
+            uploaderUrl: firstPage.uploaderUrl,
+            uploaderAvatar: firstPage.uploaderAvatar,
+            videos: firstPage.videos,
             relatedStreams: allStreams,
-            thumbnailUrl: firstResponse.thumbnailUrl,
+            thumbnailUrl: firstPage.thumbnailUrl,
             nextpage: nil
-        ).toPlaylist(instanceURL: instance.url, playlistID: id)
+        ).toPlaylist(instanceURL: instanceURL, playlistID: playlistID)
+
+        // Positions run 0-based across every page in fetch order and are taken
+        // over the same list the playlist displays, so `entries[n]` and
+        // `playlist.videos[n]` are always the same row. Piped removes by
+        // position, so these ids die with this snapshot.
+        let entries = playlist.videos.enumerated().map { offset, video in
+            RemotePlaylistEntry(
+                id: .piped(playlistID: playlistID, position: offset),
+                video: video,
+                position: offset
+            )
+        }
+
+        return RemotePlaylistSnapshot(playlist: playlist, entries: entries)
+    }
+
+    /// Runs the snapshot assembly over raw page payloads, decoding them the way
+    /// the network path does. Lets the paging and position rules be exercised
+    /// without a server: the first payload is a `/playlists/{id}` response,
+    /// every later one a `/nextpage/playlists/{id}` response.
+    static func userPlaylistSnapshot(
+        fromPageJSON pages: [Data],
+        playlistID: String,
+        instanceURL: URL
+    ) throws -> RemotePlaylistSnapshot {
+        let decoder = HTTPClient.makeAPIDecoder()
+        guard let firstData = pages.first else {
+            throw APIError.decodingError("No playlist pages to decode")
+        }
+
+        let firstPage = try decoder.decode(PipedPlaylistResponse.self, from: firstData)
+        var allStreams = firstPage.relatedStreams ?? []
+        for data in pages.dropFirst() {
+            let nextPage = try decoder.decode(PipedPlaylistNextPageResponse.self, from: data)
+            allStreams.append(contentsOf: nextPage.relatedStreams ?? [])
+        }
+
+        return buildUserPlaylistSnapshot(
+            firstPage: firstPage,
+            allStreams: allStreams,
+            playlistID: playlistID,
+            instanceURL: instanceURL
+        )
     }
 }
 
