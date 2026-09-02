@@ -351,7 +351,7 @@ struct URLRouterTests {
         let url = URL(string: "https://www.youtube.com/playlist?list=PLtest123")!
         let destination = router.route(url)
 
-        if case .playlist(.remote(let playlistID, _, _)) = destination {
+        if case .playlist(.remote(let playlistID, _, _, _)) = destination {
             #expect(playlistID.playlistID == "PLtest123")
             if case .global = playlistID.source {
                 // Expected
@@ -434,7 +434,7 @@ struct URLRouterTests {
         let url = URL(string: "yattee://playlist/PLtest123")!
         let destination = router.route(url)
 
-        if case .playlist(.remote(let playlistID, _, _)) = destination {
+        if case .playlist(.remote(let playlistID, _, _, _)) = destination {
             #expect(playlistID.playlistID == "PLtest123")
         } else {
             Issue.record("Expected playlist destination")

@@ -164,7 +164,13 @@ final class HandoffManager {
                 userInfo[UserInfoKey.destinationType] = DestinationType.localPlaylist.rawValue
                 userInfo[UserInfoKey.localPlaylistUUID] = uuid.uuidString
                 activity.title = "Playlist"
-            case .remote(let playlistID, _, _):
+            // The owning account is deliberately left out of the payload. The
+            // userInfo is assembled key by key rather than encoded from the
+            // enum, so an extra associated value changes nothing about the
+            // coding shape either way — but an account is only usable on a
+            // device that holds its credential, and the receiving device
+            // resolves ownership for itself from the instance it lands on.
+            case .remote(let playlistID, _, _, _):
                 userInfo[UserInfoKey.destinationType] = DestinationType.playlist.rawValue
                 userInfo[UserInfoKey.playlistID] = playlistID.playlistID
                 if let contentSource = playlistID.source {

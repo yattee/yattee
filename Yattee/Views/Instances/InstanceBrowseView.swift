@@ -586,10 +586,18 @@ struct InstanceBrowseView: View {
         .pickerStyle(.segmented)
     }
 
+    /// The account whose playlists the Playlists tab shows.
+    private var playlistsAccount: Account? {
+        appEnvironment?.account(forInstance: instance)
+    }
+
     private var availableTabs: [BrowseTab] {
         if instance.supportsFeed && isLoggedIn {
-            // Playlists tab only available for Invidious (Piped playlists to be added in future)
-            if instance.type == .invidious {
+            // Capabilities decide, never the instance type: a Piped account
+            // reads its playlists through exactly the same service, so the tab
+            // is offered wherever an account can actually fill it.
+            if let account = playlistsAccount,
+               appEnvironment?.accountsManager.capabilities(for: account)?.supportsPlaylistReads == true {
                 return [.feed, .popular, .trending, .playlists]
             }
             return [.feed, .popular, .trending]
@@ -918,7 +926,12 @@ struct InstanceBrowseView: View {
                     rowStyle: rowStyle,
                     listStyle: listStyle
                 ) {
-                    NavigationLink(value: NavigationDestination.playlist(.remote(playlist.id, instance: instance, title: playlist.title))) {
+                    // These are the account's own playlists, so the detail view
+                    // is told whose they are — that is what lets it fetch them
+                    // authenticated and offer to change them.
+                    NavigationLink(value: NavigationDestination.playlist(
+                        .remote(playlist.id, instance: instance, title: playlist.title, accountID: playlistsAccount?.id)
+                    )) {
                         SearchPlaylistRowView(playlist: playlist, style: rowStyle)
                             .contentShape(Rectangle())
                     }
@@ -933,7 +946,9 @@ struct InstanceBrowseView: View {
     private var playlistsGridContent: some View {
         VideoGridContent(columns: gridConfig.effectiveColumns) {
             ForEach(userPlaylists) { playlist in
-                NavigationLink(value: NavigationDestination.playlist(.remote(playlist.id, instance: instance, title: playlist.title))) {
+                NavigationLink(value: NavigationDestination.playlist(
+                    .remote(playlist.id, instance: instance, title: playlist.title, accountID: playlistsAccount?.id)
+                )) {
                     PlaylistCardView(playlist: playlist, isCompact: gridConfig.isCompactCards)
                         .contentShape(Rectangle())
                 }
@@ -1344,21 +1359,16 @@ struct InstanceBrowseView: View {
                 feedVideos = videos
                 prefetchBranding(for: videos)
             case .playlists:
-                // Playlists are currently only supported for Invidious
-                guard instance.type == .invidious else {
-                    errorMessage = String(localized: "feed.error.notSupported")
-                    isLoading = false
-                    return
-                }
-
-                guard let credential = appEnvironment.credential(forInstance: instance) else {
+                // Addressed by account rather than by instance and secret: the
+                // service resolves the credential, and refuses backends that
+                // cannot list playlists at all.
+                guard let account = playlistsAccount else {
                     errorMessage = String(localized: "feed.error.notLoggedIn")
                     isLoading = false
                     return
                 }
 
-                let api = InvidiousAPI(httpClient: appEnvironment.httpClient)
-                let playlists = try await api.userPlaylists(instance: instance, sid: credential)
+                let playlists = try await appEnvironment.accountService.userPlaylists(for: account)
 
                 guard generation == accountContentGeneration else { return }
 

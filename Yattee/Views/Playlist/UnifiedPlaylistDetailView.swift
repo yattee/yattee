@@ -24,13 +24,25 @@ private struct CachedPlaylistHeader {
 /// Source type for playlist data - either local (SwiftData) or remote (API).
 enum PlaylistSource: Hashable {
     case local(UUID, title: String? = nil)
-    case remote(PlaylistID, instance: Instance?, title: String? = nil)
+    /// - Parameter accountID: the account this playlist was opened as, when the
+    ///   place it was opened from knows. Ownership is what makes a playlist
+    ///   editable, and only Invidious ids carry a hint of it (the `IVPL`
+    ///   prefix) — a Piped playlist looks exactly like any other.
+    case remote(PlaylistID, instance: Instance?, title: String? = nil, accountID: UUID? = nil)
 
     /// Initial title to show while loading (if provided).
     var initialTitle: String? {
         switch self {
         case .local(_, let title): return title
-        case .remote(_, _, let title): return title
+        case .remote(_, _, let title, _): return title
+        }
+    }
+
+    /// The account whose playlist this is, when it was opened as one.
+    var accountID: UUID? {
+        switch self {
+        case .local: return nil
+        case .remote(_, _, _, let accountID): return accountID
         }
     }
 
@@ -39,7 +51,7 @@ enum PlaylistSource: Hashable {
         switch self {
         case .local(let uuid, _):
             return uuid
-        case .remote(let playlistID, _, _):
+        case .remote(let playlistID, _, _, _):
             return playlistID
         }
     }
@@ -73,6 +85,20 @@ struct UnifiedPlaylistDetailView: View {
     @State private var importProgress: (current: Int, total: Int)?
     @State private var remotePlaylist: Playlist?
 
+    // MARK: - Owned Remote Playlist State
+
+    /// The rows the server named in the authenticated fetch.
+    ///
+    /// `nil` means this playlist came from the public endpoint: no row here can
+    /// be named to the server, so nothing about it may be changed.
+    @State private var entries: [RemotePlaylistEntry]?
+
+    /// Which displayed row each addressable entry belongs to.
+    @State private var entriesByRow: [Int: RemotePlaylistEntry] = [:]
+
+    /// The account this playlist belongs to, when it belongs to one.
+    @State private var owningAccount: Account?
+
     // MARK: - Local-only State
 
     @State private var localPlaylist: LocalPlaylist?
@@ -100,6 +126,38 @@ struct UnifiedPlaylistDetailView: View {
     private var isLocal: Bool {
         if case .local = source { return true }
         return false
+    }
+
+    /// The server-side id of the playlist on screen, if it has one.
+    private var remotePlaylistID: String? {
+        if case .remote(let playlistID, _, _, _) = source { return playlistID.playlistID }
+        return nil
+    }
+
+    /// Whether this playlist is one the resolved account may change.
+    ///
+    /// `entries != nil` is part of the answer on purpose: the edit affordances
+    /// are only ever offered over the authenticated snapshot, never over a
+    /// public fetch that happens to be of an owned playlist. Account *status*
+    /// deliberately is not — a stale "rejected" would hide the affordances from
+    /// an account that works, and a failed write says so with a toast.
+    private var canEditRemotePlaylist: Bool {
+        guard case .remote = source, entries != nil, let owningAccount else { return false }
+        return appEnvironment?.accountsManager.capabilities(for: owningAccount)?.supportsPlaylistWrites == true
+    }
+
+    /// Whether the owning account's backend has a visibility setting at all.
+    private var remoteSupportsPrivacy: Bool {
+        guard let owningAccount else { return false }
+        return appEnvironment?.accountsManager.capabilities(for: owningAccount)?.supportsPlaylistPrivacy == true
+    }
+
+    /// Deleting a server-side playlist takes it off the server, which is a very
+    /// different sentence from deleting a local one.
+    private var deleteConfirmationTitle: String {
+        isLocal
+            ? String(localized: "playlist.delete.confirm")
+            : String(localized: "playlist.remote.delete.confirm")
     }
 
     private var navigationTitleText: String {
@@ -173,10 +231,23 @@ struct UnifiedPlaylistDetailView: View {
                     dataManager?.updatePlaylist(localPlaylist, title: newTitle, description: newDescription)
                     loadLocalPlaylist()
                 }
+            } else if canEditRemotePlaylist {
+                // The fetch carries no visibility, so the picker starts at the
+                // conservative default rather than pretending to know.
+                PlaylistFormSheet(
+                    mode: .editRemote(title: title, description: descriptionText, privacy: nil),
+                    showsPrivacy: remoteSupportsPrivacy
+                ) { newTitle, newDescription, newPrivacy in
+                    Task {
+                        await saveRemoteEdit(title: newTitle, description: newDescription, privacy: newPrivacy)
+                    }
+                }
             }
         }
+        // One dialog for both kinds of playlist: two of them attached to the
+        // same view compete over which is presented.
         .confirmationDialog(
-            String(localized: "playlist.delete.confirm"),
+            deleteConfirmationTitle,
             isPresented: $showingDeleteConfirmation,
             titleVisibility: .visible
         ) {
@@ -184,6 +255,8 @@ struct UnifiedPlaylistDetailView: View {
                 if let localPlaylist {
                     dataManager?.deletePlaylist(localPlaylist)
                     dismiss()
+                } else {
+                    Task { await deleteRemotePlaylist() }
                 }
             }
         }
@@ -438,8 +511,9 @@ struct UnifiedPlaylistDetailView: View {
                     }
                 }
 
-                // Local-only: Edit, Delete
-                if isLocal, localPlaylist != nil {
+                // Edit and Delete: local playlists, and server-side ones this
+                // account owns.
+                if (isLocal && localPlaylist != nil) || canEditRemotePlaylist {
                     Button {
                         showingEditSheet = true
                     } label: {
@@ -601,8 +675,9 @@ struct UnifiedPlaylistDetailView: View {
                 .disabled(isImporting)
             }
 
-            // Local-only: Edit, Delete
-            if isLocal, localPlaylist != nil {
+            // Edit and Delete: local playlists, and server-side ones this
+            // account owns.
+            if (isLocal && localPlaylist != nil) || canEditRemotePlaylist {
                 Button {
                     showingEditSheet = true
                 } label: {
@@ -679,7 +754,7 @@ struct UnifiedPlaylistDetailView: View {
                             index: index + 1,
                             video: video,
                             watchProgress: watchProgress(for: video),
-                            onRemove: isLocal ? { removeVideo(at: index) } : nil
+                            onRemove: removeAction(forRow: index)
                         )
                     }
                     .buttonStyle(.plain)
@@ -710,7 +785,7 @@ struct UnifiedPlaylistDetailView: View {
         switch source {
         case .local:
             loadLocalPlaylist()
-        case .remote(let playlistID, let instance, _):
+        case .remote(let playlistID, let instance, _, _):
             await loadRemotePlaylist(playlistID: playlistID, instance: instance)
         }
         loadWatchEntries()
@@ -773,40 +848,51 @@ struct UnifiedPlaylistDetailView: View {
             cachedHeader = CachedPlaylistHeader(from: recentPlaylist)
         }
 
+        // Whose playlist this is decides which endpoint can see it: the account
+        // reads its own, everybody else reads the public one. Resolved every
+        // load rather than once, because signing in or out changes the answer
+        // without the source ever changing.
+        let account = resolveOwningAccount(playlistID: playlistID, instance: resolvedInstance)
+        owningAccount = account
+
         do {
             let fetchedPlaylist: Playlist
 
-            // Check if this is an Invidious user playlist (IVPL prefix) that requires authentication
-            let isInvidiousUserPlaylist = playlistID.playlistID.hasPrefix("IVPL")
-            let isInvidiousInstance = resolvedInstance.type == .invidious
-            // Resolved through the account, not the instance: a login created
-            // after the revamp only ever writes an account-scoped credential,
-            // so the instance-keyed lookup would miss it and fall through to
-            // the public endpoint — which cannot see a private playlist.
-            let sid = appEnvironment.credential(forInstance: resolvedInstance)
-
-            if isInvidiousUserPlaylist && isInvidiousInstance, let sid {
-                // Use authenticated endpoint for Invidious user playlists (including private ones)
-                let api = InvidiousAPI(httpClient: appEnvironment.httpClient)
-                fetchedPlaylist = try await api.userPlaylist(
+            if let account,
+               appEnvironment.accountsManager.capabilities(for: account)?.supportsPlaylistReads == true {
+                // The authenticated fetch is the only one that can see a
+                // private playlist — and the only one that names the rows, so
+                // it is also what makes the playlist editable at all.
+                try await appEnvironment.remotePlaylistsCache.refreshSnapshot(
                     id: playlistID.playlistID,
-                    instance: resolvedInstance,
-                    sid: sid
+                    for: account
                 )
+
+                guard let snapshot = appEnvironment.remotePlaylistsCache.snapshot(
+                    id: playlistID.playlistID,
+                    for: account.id
+                ) else {
+                    // The account was cleared while this was in flight and its
+                    // data went with it. Nothing to show, and nothing to say
+                    // that whatever cleared it is not already saying.
+                    isLoading = false
+                    return
+                }
+
+                apply(snapshot)
+                fetchedPlaylist = snapshot.playlist
             } else {
-                // Use public endpoint for regular playlists
+                // Public endpoint: no account, no row identities, no editing.
+                entries = nil
+                entriesByRow = [:]
+
                 fetchedPlaylist = try await appEnvironment.contentService.playlist(
                     id: playlistID.playlistID,
                     instance: resolvedInstance
                 )
-            }
 
-            remotePlaylist = fetchedPlaylist
-            title = fetchedPlaylist.title
-            descriptionText = fetchedPlaylist.description
-            thumbnailURL = fetchedPlaylist.thumbnailURL
-            videos = fetchedPlaylist.videos
-            videoCount = fetchedPlaylist.videoCount
+                apply(fetchedPlaylist)
+            }
 
             // Save to recent playlists (only remote playlists, unless incognito mode is enabled or recent playlists disabled)
             if appEnvironment.settingsManager.incognitoModeEnabled != true,
@@ -818,6 +904,67 @@ struct UnifiedPlaylistDetailView: View {
         }
 
         isLoading = false
+    }
+
+    /// The account whose playlist this is, or `nil` when it is nobody's.
+    ///
+    /// The id passed in with the source is the reliable answer — the place the
+    /// playlist was opened from knew whose list it came out of. Failing that,
+    /// only Invidious leaves a trace: `IVPL` ids are user playlists, so a
+    /// signed-in account on that instance is very probably the owner. Piped ids
+    /// say nothing at all, which is why the accountID exists.
+    private func resolveOwningAccount(playlistID: PlaylistID, instance: Instance) -> Account? {
+        guard let appEnvironment else { return nil }
+
+        if let accountID = source.accountID,
+           let account = appEnvironment.accountsManager.account(id: accountID) {
+            return account
+        }
+
+        guard instance.type == .invidious, playlistID.playlistID.hasPrefix("IVPL") else { return nil }
+        return appEnvironment.account(forInstance: instance)
+    }
+
+    /// Shows a playlist that came from the public endpoint.
+    private func apply(_ playlist: Playlist) {
+        remotePlaylist = playlist
+        title = playlist.title
+        descriptionText = playlist.description
+        thumbnailURL = playlist.thumbnailURL
+        videos = playlist.videos
+        videoCount = playlist.videoCount
+    }
+
+    /// Shows a playlist the account fetched, together with the rows it may
+    /// address.
+    private func apply(_ snapshot: RemotePlaylistSnapshot) {
+        apply(snapshot.playlist)
+        entries = snapshot.entries
+        entriesByRow = Self.rowEntries(for: snapshot)
+    }
+
+    /// Pairs each displayed row with the entry that can name it to the server.
+    ///
+    /// `entries` is a *subsequence* of the playlist's videos — a row the server
+    /// refused to hand an identity to is still displayed, it just cannot be a
+    /// target — so the two lists are walked together rather than indexed
+    /// against each other. Matching on the video id alone would not do either:
+    /// a playlist may hold the same video twice, and each copy is its own row.
+    private static func rowEntries(for snapshot: RemotePlaylistSnapshot) -> [Int: RemotePlaylistEntry] {
+        let videos = snapshot.playlist.videos
+        var map: [Int: RemotePlaylistEntry] = [:]
+        var row = 0
+
+        for entry in snapshot.entries {
+            while row < videos.count, videos[row].id != entry.video.id {
+                row += 1
+            }
+            guard row < videos.count else { break }
+            map[row] = entry
+            row += 1
+        }
+
+        return map
     }
 
     /// Returns the appropriate instance for the playlist's content source.
@@ -875,7 +1022,7 @@ struct UnifiedPlaylistDetailView: View {
         switch source {
         case .local:
             return .manual
-        case .remote(let playlistID, _, _):
+        case .remote(let playlistID, _, _, _):
             return .playlist(playlistID: playlistID.playlistID, continuation: nil)
         }
     }
@@ -886,6 +1033,113 @@ struct UnifiedPlaylistDetailView: View {
         guard let localPlaylist else { return }
         dataManager?.removeVideoFromPlaylist(at: index, playlist: localPlaylist)
         loadLocalPlaylist()
+    }
+
+    // MARK: - Owned Remote Playlist Actions
+
+    /// The removal a row offers, or `nil` when it has none.
+    ///
+    /// Local rows always have one. A server-side row needs the account to own
+    /// the playlist *and* the server to have named the row in the snapshot —
+    /// a row it refused to name can never be the target of a removal.
+    private func removeAction(forRow index: Int) -> (() -> Void)? {
+        if isLocal {
+            return { removeVideo(at: index) }
+        }
+
+        guard canEditRemotePlaylist, let entry = entriesByRow[index] else { return nil }
+        return { Task { await removeRemoteEntry(entry) } }
+    }
+
+    private func removeRemoteEntry(_ entry: RemotePlaylistEntry) async {
+        guard let appEnvironment,
+              let account = owningAccount,
+              let playlistID = remotePlaylistID
+        else { return }
+
+        do {
+            try await appEnvironment.remotePlaylistsCache.removeEntry(
+                entry,
+                fromPlaylist: playlistID,
+                for: account
+            )
+            applyRefetchedSnapshot()
+        } catch AccountServiceError.entryMismatch {
+            // The row moved out from under the snapshot that named it. The
+            // cache has already refetched, so what is on screen after this is
+            // the playlist as it now stands.
+            applyRefetchedSnapshot()
+            appEnvironment.toastManager.showError(
+                String(localized: "playlist.remote.entryMismatch.title"),
+                subtitle: String(localized: "playlist.remote.entryMismatch.message")
+            )
+        } catch {
+            applyRefetchedSnapshot()
+            appEnvironment.toastManager.showError(
+                String(localized: "playlist.remote.remove.error"),
+                subtitle: error.localizedDescription
+            )
+        }
+    }
+
+    private func saveRemoteEdit(title newTitle: String, description: String?, privacy: PlaylistPrivacy) async {
+        guard let appEnvironment,
+              let account = owningAccount,
+              let playlistID = remotePlaylistID
+        else { return }
+
+        do {
+            try await appEnvironment.remotePlaylistsCache.updatePlaylist(
+                id: playlistID,
+                title: newTitle,
+                description: description,
+                privacy: privacy,
+                for: account
+            )
+            applyRefetchedSnapshot()
+        } catch {
+            // A half-applied edit is a real outcome on Piped, where the name and
+            // the description are two calls — the refetch is what says which
+            // half landed.
+            applyRefetchedSnapshot()
+            appEnvironment.toastManager.showError(
+                String(localized: "playlist.remote.edit.error"),
+                subtitle: error.localizedDescription
+            )
+        }
+    }
+
+    private func deleteRemotePlaylist() async {
+        guard let appEnvironment,
+              let account = owningAccount,
+              let playlistID = remotePlaylistID
+        else { return }
+
+        do {
+            try await appEnvironment.remotePlaylistsCache.deletePlaylist(id: playlistID, for: account)
+            dismiss()
+        } catch {
+            applyRefetchedSnapshot()
+            appEnvironment.toastManager.showError(
+                String(localized: "playlist.remote.delete.error"),
+                subtitle: error.localizedDescription
+            )
+        }
+    }
+
+    /// Re-reads whatever the cache's reconciling refetch left behind.
+    ///
+    /// Nothing here is edited optimistically: what the view shows after a change
+    /// is only ever what the server answered with — including after a failure,
+    /// because a write that reported one may still have landed.
+    private func applyRefetchedSnapshot() {
+        guard let appEnvironment,
+              let account = owningAccount,
+              let playlistID = remotePlaylistID,
+              let snapshot = appEnvironment.remotePlaylistsCache.snapshot(id: playlistID, for: account.id)
+        else { return }
+
+        apply(snapshot)
     }
 
     // MARK: - Remote Playlist Actions

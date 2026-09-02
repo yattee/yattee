@@ -11,6 +11,13 @@ struct PlaylistFormSheet: View {
     enum Mode: Equatable {
         case create
         case edit(LocalPlaylist)
+        /// Editing a playlist that lives on a server.
+        ///
+        /// Server-side playlists are plain values rather than models, so what to
+        /// pre-fill is passed in. `privacy` is optional because the fetch does
+        /// not always say what it is — Invidious returns no visibility with the
+        /// playlist, so the picker falls back to its conservative default.
+        case editRemote(title: String, description: String?, privacy: PlaylistPrivacy?)
 
         static func == (lhs: Mode, rhs: Mode) -> Bool {
             switch (lhs, rhs) {
@@ -18,6 +25,9 @@ struct PlaylistFormSheet: View {
                 return true
             case (.edit(let lhsPlaylist), .edit(let rhsPlaylist)):
                 return lhsPlaylist.id == rhsPlaylist.id
+            case (.editRemote(let lhsTitle, let lhsDescription, let lhsPrivacy),
+                  .editRemote(let rhsTitle, let rhsDescription, let rhsPrivacy)):
+                return lhsTitle == rhsTitle && lhsDescription == rhsDescription && lhsPrivacy == rhsPrivacy
             default:
                 return false
             }
@@ -27,16 +37,49 @@ struct PlaylistFormSheet: View {
     @Environment(\.dismiss) private var dismiss
 
     let mode: Mode
-    let onSave: (String, String?) -> Void
+
+    /// Whether the destination has a visibility setting to pick at all.
+    ///
+    /// Follows the destination account's capabilities: a backend without a
+    /// visibility concept is never asked about one, and the write layer drops
+    /// the value rather than inventing it.
+    let showsPrivacy: Bool
+
+    private let onSave: (String, String?, PlaylistPrivacy) -> Void
+
+    /// Local playlists have no visibility, so their callers never see one.
+    init(mode: Mode, onSave: @escaping (String, String?) -> Void) {
+        self.mode = mode
+        self.showsPrivacy = false
+        self.onSave = { title, description, _ in onSave(title, description) }
+    }
+
+    /// Server-side playlists, where the caller is the one that talks to the
+    /// account — this sheet still never touches a service.
+    init(
+        mode: Mode,
+        showsPrivacy: Bool,
+        privacy: PlaylistPrivacy = .private,
+        onSaveWithPrivacy: @escaping (String, String?, PlaylistPrivacy) -> Void
+    ) {
+        self.mode = mode
+        self.showsPrivacy = showsPrivacy
+        self.onSave = onSaveWithPrivacy
+        self._privacy = State(initialValue: privacy)
+    }
 
     @State private var title: String = ""
     @State private var descriptionText: String = ""
+    /// Private by default: the conservative choice, and the one Invidious makes.
+    @State private var privacy: PlaylistPrivacy = .private
 
     private let maxDescriptionLength = 1000
 
     private var isEditing: Bool {
-        if case .edit = mode { return true }
-        return false
+        switch mode {
+        case .create: return false
+        case .edit, .editRemote: return true
+        }
     }
 
     private var navigationTitle: String {
@@ -81,9 +124,18 @@ struct PlaylistFormSheet: View {
             #endif
         }
         .onAppear {
-            if case .edit(let playlist) = mode {
+            switch mode {
+            case .create:
+                break
+            case .edit(let playlist):
                 title = playlist.title
                 descriptionText = playlist.playlistDescription ?? ""
+            case .editRemote(let remoteTitle, let remoteDescription, let remotePrivacy):
+                title = remoteTitle
+                descriptionText = remoteDescription ?? ""
+                // Only when the fetch actually said so — otherwise whatever the
+                // caller preselected stands.
+                if let remotePrivacy { privacy = remotePrivacy }
             }
         }
         #if os(iOS)
@@ -134,6 +186,16 @@ struct PlaylistFormSheet: View {
                 }
                 .foregroundStyle(.secondary)
             }
+
+            if showsPrivacy {
+                Section {
+                    privacyPicker
+                } header: {
+                    Text(String(localized: "playlist.privacy"))
+                } footer: {
+                    Text(String(localized: "playlist.privacy.footer"))
+                }
+            }
         }
         #if os(iOS)
         .scrollDismissesKeyboard(.interactively)
@@ -182,6 +244,16 @@ struct PlaylistFormSheet: View {
                     .foregroundStyle(.secondary)
                 }
 
+                if showsPrivacy {
+                    Section {
+                        privacyPicker
+                    } header: {
+                        Text(String(localized: "playlist.privacy"))
+                    } footer: {
+                        Text(String(localized: "playlist.privacy.footer"))
+                    }
+                }
+
                 Section {
                     Button(saveButtonTitle) {
                         save()
@@ -200,13 +272,34 @@ struct PlaylistFormSheet: View {
     }
     #endif
 
+    // MARK: - Privacy
+
+    private var privacyPicker: some View {
+        Picker(String(localized: "playlist.privacy"), selection: $privacy) {
+            ForEach(PlaylistPrivacy.allCases, id: \.self) { option in
+                Text(Self.label(for: option)).tag(option)
+            }
+        }
+        #if os(macOS)
+        .labelsHidden()
+        #endif
+    }
+
+    private static func label(for privacy: PlaylistPrivacy) -> String {
+        switch privacy {
+        case .public: String(localized: "playlist.privacy.public")
+        case .unlisted: String(localized: "playlist.privacy.unlisted")
+        case .private: String(localized: "playlist.privacy.private")
+        }
+    }
+
     // MARK: - Actions
 
     private func save() {
         let trimmedTitle = title.trimmingCharacters(in: .whitespacesAndNewlines)
         let trimmedDescription = descriptionText.trimmingCharacters(in: .whitespacesAndNewlines)
 
-        onSave(trimmedTitle, trimmedDescription.isEmpty ? nil : trimmedDescription)
+        onSave(trimmedTitle, trimmedDescription.isEmpty ? nil : trimmedDescription, privacy)
         dismiss()
     }
 }

@@ -8346,6 +8346,149 @@
         }
       }
     },
+    "playlist.privacy" : {
+      "comment" : "Playlist visibility picker label",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Visibility"
+          }
+        }
+      }
+    },
+    "playlist.privacy.footer" : {
+      "comment" : "Explains what the playlist visibility picker does",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Who can see this playlist on the server. The selection shown here is applied when you save."
+          }
+        }
+      }
+    },
+    "playlist.privacy.private" : {
+      "comment" : "Playlist visibility: only the account owner",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Private"
+          }
+        }
+      }
+    },
+    "playlist.privacy.public" : {
+      "comment" : "Playlist visibility: anyone",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Public"
+          }
+        }
+      }
+    },
+    "playlist.privacy.unlisted" : {
+      "comment" : "Playlist visibility: anyone with the link",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Unlisted"
+          }
+        }
+      }
+    },
+    "playlist.remote.add.error" : {
+      "comment" : "Adding a video to a server-side playlist failed",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Could not add the video"
+          }
+        }
+      }
+    },
+    "playlist.remote.create.error" : {
+      "comment" : "Creating a playlist on the server failed",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Could not create the playlist"
+          }
+        }
+      }
+    },
+    "playlist.remote.delete.confirm" : {
+      "comment" : "Delete server-side playlist confirmation",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Delete this playlist from your account?"
+          }
+        }
+      }
+    },
+    "playlist.remote.delete.error" : {
+      "comment" : "Deleting a playlist from the server failed",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Could not delete the playlist"
+          }
+        }
+      }
+    },
+    "playlist.remote.edit.error" : {
+      "comment" : "Saving changes to a server-side playlist failed",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Could not save the playlist"
+          }
+        }
+      }
+    },
+    "playlist.remote.entryMismatch.message" : {
+      "comment" : "Body of the toast shown when a playlist row moved before it could be removed",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The list was refreshed — try removing the video again."
+          }
+        }
+      }
+    },
+    "playlist.remote.entryMismatch.title" : {
+      "comment" : "Title of the toast shown when a playlist row moved before it could be removed",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Playlist changed on the server"
+          }
+        }
+      }
+    },
+    "playlist.remote.remove.error" : {
+      "comment" : "Removing a video from a server-side playlist failed",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Could not remove the video"
+          }
+        }
+      }
+    },
     "playlist.removeVideo" : {
       "comment" : "Remove video from playlist menu item",
       "localizations" : {
@@ -8375,6 +8518,17 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Saving %lld/%lld…"
+          }
+        }
+      }
+    },
+    "playlist.section.local" : {
+      "comment" : "Header for the on-device playlists, shown when account playlists are listed too",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Local Playlists"
           }
         }
       }
