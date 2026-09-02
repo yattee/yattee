@@ -323,8 +323,10 @@ final class BackgroundFeedRefresher {
 
         do {
             // Fetch the Piped feed
-            let pipedAPI = PipedAPI(httpClient: appEnvironment.httpClient)
-            let feedVideos = try await pipedAPI.feed(instance: pipedInstance, authToken: authToken)
+            let feedVideos = try await appEnvironment.contentService.feed(
+                for: pipedInstance,
+                credential: authToken
+            )
 
             LoggingService.shared.debug("API returned \(feedVideos.count) total videos", category: .notifications)
 

@@ -172,6 +172,31 @@ actor ContentService: ContentServiceProtocol {
         }
     }
 
+    /// Fetches one page of the credential owner's feed.
+    ///
+    /// Separate from the unpaged `feed(for:credential:)` because only Invidious
+    /// has pages at all: Piped answers with the whole feed however it is asked,
+    /// which is why it always reports there is no more to come.
+    func feed(for instance: Instance, credential: String, page: Int) async throws -> FeedPage {
+        switch instance.type {
+        case .invidious:
+            let response = try await invidiousAPI(for: instance).feed(
+                instance: instance,
+                sid: credential,
+                page: page
+            )
+            return FeedPage(videos: response.videos, hasMore: response.hasMore)
+        case .piped:
+            let videos = try await pipedAPI(for: instance).feed(
+                instance: instance,
+                authToken: credential
+            )
+            return FeedPage(videos: videos, hasMore: false)
+        default:
+            throw APIError.notSupported
+        }
+    }
+
     func subscriptions(for instance: Instance, credential: String) async throws -> [Channel] {
         switch instance.type {
         case .invidious:
@@ -469,6 +494,46 @@ actor ContentService: ContentServiceProtocol {
         }
     }
 
+    // MARK: - Authentication
+
+    /// Signs in to an instance and returns the credential its backend issues —
+    /// a session id for Invidious, an auth token for Piped.
+    ///
+    /// Routed through here so a login carries the same per-instance
+    /// configuration every other request does: the reverse-proxy basic auth, the
+    /// certificate policy, and the User-Agent some instances insist on. A login
+    /// that skipped any of them would fail before reaching the login endpoint.
+    func login(username: String, password: String, instance: Instance) async throws -> String {
+        switch instance.type {
+        case .invidious:
+            // Invidious' login POST runs on its own ephemeral URLSession so it
+            // can read the Set-Cookie the SID arrives in, and therefore inherits
+            // nothing from the client's default headers. An instance behind a
+            // basic-auth proxy needs that header handed over explicitly, or the
+            // proxy answers 401 before the upstream ever sees the credentials.
+            var extraHeaders: [String: String]?
+            if let basicAuthHeader = await basicAuthCredentialsManager?.basicAuthHeader(for: instance) {
+                extraHeaders = ["Authorization": basicAuthHeader]
+            }
+            return try await invidiousAPI(for: instance).login(
+                email: username,
+                password: password,
+                instance: instance,
+                extraHeaders: extraHeaders
+            )
+        case .piped:
+            // Piped's login goes through the HTTPClient, so the per-instance
+            // client already carries the proxy header in its default headers.
+            return try await pipedAPI(for: instance).login(
+                username: username,
+                password: password,
+                instance: instance
+            )
+        default:
+            throw APIError.notSupported
+        }
+    }
+
     /// Fetches streams with proxy URLs for downloads (Yattee Server: hits /proxy/fast/
     /// so the server caches the file on disk; other backends apply Invidious URL rewriting).
     func proxyStreams(videoID: String, instance: Instance) async throws -> [Stream] {
@@ -592,6 +657,15 @@ actor ContentService: ContentServiceProtocol {
 /// the protocol's own file so the conformance is checked next to the methods
 /// that satisfy it; the protocol exists so tests can script a server.
 extension ContentService: RemotePlaylistTransport {}
+
+// MARK: - Feed Page
+
+/// One page of an authenticated feed, with whatever the backend says about
+/// there being another.
+struct FeedPage: Sendable {
+    let videos: [Video]
+    let hasMore: Bool
+}
 
 // MARK: - Search Result
 

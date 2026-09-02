@@ -204,38 +204,15 @@ struct InstanceLoginView: View {
     /// Performs the login based on instance type.
     /// - Returns: The credential (SID for Invidious, token for Piped)
     private func performLogin(appEnvironment: AppEnvironment) async throws -> String {
-        // If the instance sits behind an HTTP Basic Auth reverse proxy, the login
-        // POST must carry that proxy's Authorization header too — otherwise the
-        // request 401s before reaching the upstream login endpoint. Bake the
-        // header into a fresh per-instance HTTPClient.
-        let basicAuthHeader = appEnvironment.basicAuthCredentialsManager.basicAuthHeader(for: instance)
-        let extraHeaders: [String: String]? = basicAuthHeader.map { ["Authorization": $0] }
-
-        let httpClient: HTTPClient
-        if let basicAuthHeader {
-            httpClient = appEnvironment.httpClientFactory.createClient(for: instance)
-            await httpClient.setDefaultHeaders(["Authorization": basicAuthHeader])
-        } else {
-            httpClient = appEnvironment.httpClient
-        }
-
-        switch instance.type {
-        case .invidious:
-            // InvidiousAPI.login uses its own URLSession (to handle redirect/Set-Cookie),
-            // so it doesn't inherit defaultHeaders from the injected HTTPClient. Pass
-            // the basic-auth header explicitly so the login POST passes the proxy.
-            let api = InvidiousAPI(httpClient: httpClient)
-            return try await api.login(email: username, password: password, instance: instance, extraHeaders: extraHeaders)
-
-        case .piped:
-            // PipedAPI.login uses httpClient.fetch which DOES inherit defaultHeaders,
-            // so the basic-auth header on the per-instance client is sufficient.
-            let api = PipedAPI(httpClient: httpClient)
-            return try await api.login(username: username, password: password, instance: instance)
-
-        default:
-            throw APIError.notSupported
-        }
+        // The service owns the per-instance configuration a login needs — the
+        // reverse-proxy basic auth (without which the POST 401s before reaching
+        // the upstream login endpoint), the certificate policy, and the
+        // User-Agent instances may insist on.
+        try await appEnvironment.contentService.login(
+            username: username,
+            password: password,
+            instance: instance
+        )
     }
 }
 

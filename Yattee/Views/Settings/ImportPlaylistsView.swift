@@ -310,20 +310,14 @@ struct ImportPlaylistsView: View {
         importProgress = nil
 
         do {
-            let fetchedPlaylists: [Playlist]
-
-            switch instance.type {
-            case .invidious:
-                let api = InvidiousAPI(httpClient: appEnvironment.httpClient)
-                fetchedPlaylists = try await api.userPlaylists(instance: instance, sid: credential)
-
-            case .piped:
-                let api = PipedAPI(httpClient: appEnvironment.httpClient)
-                fetchedPlaylists = try await api.userPlaylists(instance: instance, authToken: credential)
-
-            default:
+            guard instance.type == .invidious || instance.type == .piped else {
                 throw ImportError.notSupported
             }
+
+            let fetchedPlaylists = try await appEnvironment.contentService.userPlaylists(
+                instance: instance,
+                credential: credential
+            )
 
             playlists = fetchedPlaylists.sorted { $0.title.localizedCaseInsensitiveCompare($1.title) == .orderedAscending }
             // Recorded only now: the baseline is whichever login actually
@@ -436,29 +430,18 @@ struct ImportPlaylistsView: View {
         existingLocalPlaylist = nil
 
         do {
-            // Fetch full playlist with videos
-            let fullPlaylist: Playlist
-
-            switch instance.type {
-            case .invidious:
-                let api = InvidiousAPI(httpClient: appEnvironment.httpClient)
-                fullPlaylist = try await api.userPlaylist(
-                    id: playlist.id.playlistID,
-                    instance: instance,
-                    sid: credential
-                )
-
-            case .piped:
-                let api = PipedAPI(httpClient: appEnvironment.httpClient)
-                fullPlaylist = try await api.userPlaylist(
-                    id: playlist.id.playlistID,
-                    instance: instance,
-                    authToken: credential
-                )
-
-            default:
+            guard instance.type == .invidious || instance.type == .piped else {
                 throw ImportError.notSupported
             }
+
+            // Fetch full playlist with videos. The snapshot's per-row identities
+            // are of no use to an import — nothing here is written back to the
+            // server — so only the playlist itself is taken.
+            let fullPlaylist = try await appEnvironment.contentService.userPlaylistSnapshot(
+                id: playlist.id.playlistID,
+                instance: instance,
+                credential: credential
+            ).playlist
 
             let videos = fullPlaylist.videos
             let total = videos.count

@@ -1309,39 +1309,34 @@ struct InstanceBrowseView: View {
                 let videos: [Video]
                 let hasMore: Bool
 
+                let contentService = appEnvironment.contentService
+
                 switch instance.type {
                 case .invidious:
-                    let api = InvidiousAPI(httpClient: appEnvironment.httpClient)
-
                     // Load subscriptions for channel filter
-                    async let subscriptionsTask = api.subscriptions(instance: instance, sid: credential)
+                    async let subscriptionsTask = contentService.subscriptions(for: instance, credential: credential)
 
                     // Load feed
-                    async let feedTask = api.feed(instance: instance, sid: credential, page: feedPage)
+                    async let feedTask = contentService.feed(for: instance, credential: credential, page: feedPage)
 
                     let (subscriptions, feedResponse) = try await (subscriptionsTask, feedTask)
 
                     // Fetch channel thumbnails in parallel (subscriptions API doesn't include them)
-                    let enrichedSubscriptions = await fetchChannelThumbnails(
+                    subscriptionChannels = await fetchChannelThumbnails(
                         for: subscriptions,
-                        instance: instance,
-                        api: api
+                        instance: instance
                     )
-
-                    subscriptionChannels = enrichedSubscriptions.map { $0.toChannel(baseURL: instance.url) }
                     videos = feedResponse.videos
                     hasMore = feedResponse.hasMore
 
                 case .piped:
-                    let api = PipedAPI(httpClient: appEnvironment.httpClient)
-
                     // Load subscriptions and feed in parallel
-                    async let subscriptionsTask = api.subscriptions(instance: instance, authToken: credential)
-                    async let feedTask = api.feed(instance: instance, authToken: credential)
+                    async let subscriptionsTask = contentService.subscriptions(for: instance, credential: credential)
+                    async let feedTask = contentService.feed(for: instance, credential: credential)
 
                     let (pipedSubscriptions, feedVideos) = try await (subscriptionsTask, feedTask)
 
-                    subscriptionChannels = pipedSubscriptions.map { $0.toChannel() }
+                    subscriptionChannels = pipedSubscriptions
                     videos = feedVideos
                     // Piped doesn't support pagination for feed
                     hasMore = false
@@ -1399,36 +1394,36 @@ struct InstanceBrowseView: View {
     /// Fetches channel thumbnails for subscriptions, using cache when available.
     /// Only fetches from network for channels not already cached.
     private func fetchChannelThumbnails(
-        for subscriptions: [InvidiousSubscription],
-        instance: Instance,
-        api: InvidiousAPI
-    ) async -> [InvidiousSubscription] {
-        guard let credentialsManager = appEnvironment?.invidiousCredentialsManager else {
-            return subscriptions
-        }
+        for subscriptions: [Channel],
+        instance: Instance
+    ) async -> [Channel] {
+        guard let appEnvironment else { return subscriptions }
+        let credentialsManager = appEnvironment.invidiousCredentialsManager
+        let contentService = appEnvironment.contentService
 
         // Build initial thumbnail map from cache
         var thumbnailMap: [String: URL] = [:]
         for subscription in subscriptions {
-            if let cachedURL = credentialsManager.thumbnailURL(forChannelID: subscription.authorId) {
-                thumbnailMap[subscription.authorId] = cachedURL
+            if let cachedURL = credentialsManager.thumbnailURL(forChannelID: subscription.id.channelID) {
+                thumbnailMap[subscription.id.channelID] = cachedURL
             }
         }
 
         // Find channels that need fetching
-        let allChannelIDs = subscriptions.map(\.authorId)
+        let allChannelIDs = subscriptions.map(\.id.channelID)
         let uncachedIDs = Set(credentialsManager.uncachedChannelIDs(from: allChannelIDs))
 
         // Fetch only uncached channels in parallel
         if !uncachedIDs.isEmpty {
             let fetchedThumbnails = await withTaskGroup(of: (String, URL?).self) { group in
-                for subscription in subscriptions where uncachedIDs.contains(subscription.authorId) {
+                for subscription in subscriptions where uncachedIDs.contains(subscription.id.channelID) {
+                    let channelID = subscription.id.channelID
                     group.addTask {
                         do {
-                            let channel = try await api.channel(id: subscription.authorId, instance: instance)
-                            return (subscription.authorId, channel.thumbnailURL)
+                            let channel = try await contentService.channel(id: channelID, instance: instance)
+                            return (channelID, channel.thumbnailURL)
                         } catch {
-                            return (subscription.authorId, nil)
+                            return (channelID, nil)
                         }
                     }
                 }
@@ -1453,11 +1448,24 @@ struct InstanceBrowseView: View {
             }
         }
 
-        // Create enriched subscriptions with thumbnails
+        // Create enriched subscriptions with thumbnails. A fetched or cached
+        // avatar wins over whatever the subscriptions listing carried, which is
+        // the precedence the Invidious subscription conversion applied when this
+        // ran over the raw listing.
         return subscriptions.map { subscription in
-            var enriched = subscription
-            enriched.thumbnailURL = thumbnailMap[subscription.authorId]
-            return enriched
+            guard let thumbnailURL = thumbnailMap[subscription.id.channelID] else {
+                return subscription
+            }
+            return Channel(
+                id: subscription.id,
+                name: subscription.name,
+                description: subscription.description,
+                subscriberCount: subscription.subscriberCount,
+                videoCount: subscription.videoCount,
+                thumbnailURL: thumbnailURL,
+                bannerURL: subscription.bannerURL,
+                isVerified: subscription.isVerified
+            )
         }
     }
 
@@ -1477,8 +1485,11 @@ struct InstanceBrowseView: View {
 
         Task {
             do {
-                let api = InvidiousAPI(httpClient: appEnvironment.httpClient)
-                let feedResponse = try await api.feed(instance: instance, sid: sid, page: feedPage)
+                let feedResponse = try await appEnvironment.contentService.feed(
+                    for: instance,
+                    credential: sid,
+                    page: feedPage
+                )
 
                 await MainActor.run {
                     guard generation == accountContentGeneration else { return }

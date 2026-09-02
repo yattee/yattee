@@ -224,22 +224,14 @@ struct ImportSubscriptionsView: View {
         error = nil
 
         do {
-            let fetchedChannels: [Channel]
-
-            switch instance.type {
-            case .invidious:
-                let api = InvidiousAPI(httpClient: appEnvironment.httpClient)
-                let subscriptions = try await api.subscriptions(instance: instance, sid: credential)
-                fetchedChannels = subscriptions.map { $0.toChannel(baseURL: instance.url) }
-
-            case .piped:
-                let api = PipedAPI(httpClient: appEnvironment.httpClient)
-                let subscriptions = try await api.subscriptions(instance: instance, authToken: credential)
-                fetchedChannels = subscriptions.map { $0.toChannel() }
-
-            default:
+            guard instance.type == .invidious || instance.type == .piped else {
                 throw ImportError.notSupported
             }
+
+            let fetchedChannels = try await appEnvironment.contentService.subscriptions(
+                for: instance,
+                credential: credential
+            )
 
             channels = fetchedChannels.sorted { $0.name.localizedCaseInsensitiveCompare($1.name) == .orderedAscending }
 

@@ -426,8 +426,10 @@ final class SubscriptionFeedCache {
         hasMorePages = false // Piped doesn't support pagination
 
         do {
-            let pipedAPI = PipedAPI(httpClient: appEnvironment.httpClient)
-            let feedVideos = try await pipedAPI.feed(instance: instance, authToken: authToken)
+            let feedVideos = try await appEnvironment.contentService.feed(
+                for: instance,
+                credential: authToken
+            )
             guard isCurrentAccountsResult(generation) else { return }
 
             LoggingService.shared.info("Piped feed: Received \(feedVideos.count) videos", category: .general)
