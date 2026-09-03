@@ -105,6 +105,15 @@ struct UnifiedPlaylistDetailView: View {
     /// Whether the refetch that has to land before the edit sheet opens is out.
     @State private var isPreparingEdit = false
 
+    /// Which load the state on screen belongs to.
+    ///
+    /// Credential notifications arrive repeatedly, and each one discards and
+    /// reloads. The reload awaits a server, so a second notification finds the
+    /// discard already done and starts another one — leaving the first still in
+    /// flight, free to write its error or drop the spinner over a load that has
+    /// superseded it. Only the newest generation is allowed to land.
+    @State private var loadGeneration = 0
+
     // MARK: - Local-only State
 
     @State private var localPlaylist: LocalPlaylist?
@@ -849,6 +858,11 @@ struct UnifiedPlaylistDetailView: View {
     private func discardAccountLoadedContentAndReload() {
         guard case .remote = source, entries != nil || owningAccount != nil else { return }
 
+        // Bumped here rather than only in the reload it starts: the load being
+        // superseded has to stop counting at the moment its content is thrown
+        // away, not whenever the replacement gets around to running.
+        loadGeneration += 1
+
         entries = nil
         entriesByRow = [:]
         owningAccount = nil
@@ -892,6 +906,12 @@ struct UnifiedPlaylistDetailView: View {
     }
 
     private func loadRemotePlaylist(playlistID: PlaylistID, instance: Instance?) async {
+        // Every load supersedes the ones before it — pull to refresh and retry
+        // as much as a credential change. Taken before the first suspension, so
+        // an older task can never claim it.
+        loadGeneration += 1
+        let generation = loadGeneration
+
         guard let appEnvironment else {
             errorMessage = "App not initialized"
             isLoading = false
@@ -949,6 +969,8 @@ struct UnifiedPlaylistDetailView: View {
                     for: account
                 )
 
+                guard generation == loadGeneration else { return }
+
                 guard let snapshot = appEnvironment.remotePlaylistsCache.snapshot(
                     id: playlistID.playlistID,
                     for: account.id
@@ -972,6 +994,8 @@ struct UnifiedPlaylistDetailView: View {
                     instance: resolvedInstance
                 )
 
+                guard generation == loadGeneration else { return }
+
                 apply(fetchedPlaylist)
             }
 
@@ -981,8 +1005,12 @@ struct UnifiedPlaylistDetailView: View {
                 appEnvironment.dataManager.addRecentPlaylist(fetchedPlaylist)
             }
         } catch {
+            guard generation == loadGeneration else { return }
+
             errorMessage = error.localizedDescription
         }
+
+        guard generation == loadGeneration else { return }
 
         isLoading = false
     }
