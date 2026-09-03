@@ -860,6 +860,13 @@ struct UnifiedPlaylistDetailView: View {
         let targetInstance: Instance?
         if let instance {
             targetInstance = instance
+        } else if let accountInstance = instanceForOpeningAccount() {
+            // The account the playlist was opened as names the server it lives
+            // on, and it says so with more authority than any guess from the
+            // id: a Piped playlist is `.global` like any other, so the guess
+            // below would land on an Invidious instance and the ownership check
+            // would then throw away the very account that can read it.
+            targetInstance = accountInstance
         } else if let playlistSource = playlistID.source {
             targetInstance = instanceForSource(playlistSource, instancesManager: appEnvironment.instancesManager)
         } else {
@@ -936,6 +943,17 @@ struct UnifiedPlaylistDetailView: View {
         }
 
         isLoading = false
+    }
+
+    /// The instance of the account the playlist was opened as, when the place
+    /// it was opened from named one and this device still has it.
+    private func instanceForOpeningAccount() -> Instance? {
+        guard let appEnvironment,
+              let accountID = source.accountID,
+              let account = appEnvironment.accountsManager.account(id: accountID)
+        else { return nil }
+
+        return appEnvironment.accountsManager.instance(for: account)
     }
 
     /// The account whose playlist this is, or `nil` when it is nobody's.
@@ -1212,12 +1230,21 @@ struct UnifiedPlaylistDetailView: View {
     /// Nothing here is edited optimistically: what the view shows after a change
     /// is only ever what the server answered with — including after a failure,
     /// because a write that reported one may still have landed.
+    ///
+    /// No snapshot left is an answer too: the refetch found the playlist gone
+    /// (a delete that reported a failure but landed), or the account it belonged
+    /// to was cleared. Either way there is nothing left to show or to edit, so
+    /// the view leaves exactly as it does after a delete that reported success.
     private func applyRefetchedSnapshot() {
         guard let appEnvironment,
               let account = owningAccount,
-              let playlistID = remotePlaylistID,
-              let snapshot = appEnvironment.remotePlaylistsCache.snapshot(id: playlistID, for: account.id)
+              let playlistID = remotePlaylistID
         else { return }
+
+        guard let snapshot = appEnvironment.remotePlaylistsCache.snapshot(id: playlistID, for: account.id) else {
+            dismiss()
+            return
+        }
 
         apply(snapshot)
     }
