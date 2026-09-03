@@ -466,9 +466,13 @@ struct UnifiedPlaylistDetailView: View {
                     .foregroundStyle(.secondary)
             }
 
-            // Action buttons row (iOS/macOS only)
+            // Action buttons row (iOS/macOS only).
+            //
+            // An owned playlist keeps its row after the last video is removed:
+            // renaming and deleting it are the only things left to do with it,
+            // and the row is where both live.
             #if !os(tvOS)
-            if !videos.isEmpty || localPlaylist != nil {
+            if !videos.isEmpty || localPlaylist != nil || canEditRemotePlaylist {
                 playlistActionButtons
             }
             #endif
@@ -482,51 +486,54 @@ struct UnifiedPlaylistDetailView: View {
     @ViewBuilder
     private var playlistActionButtons: some View {
         HStack(spacing: 12) {
-            // Play button (only when queue is enabled)
-            if isQueueEnabled {
-                Button {
-                    playAll()
-                } label: {
-                    Label(String(localized: "playlist.play"), systemImage: "play.fill")
-                        .fontWeight(.semibold)
+            // Playing and downloading need videos to act on; the menu does not.
+            if !videos.isEmpty {
+                // Play button (only when queue is enabled)
+                if isQueueEnabled {
+                    Button {
+                        playAll()
+                    } label: {
+                        Label(String(localized: "playlist.play"), systemImage: "play.fill")
+                            .fontWeight(.semibold)
+                    }
+                    .buttonStyle(.borderedProminent)
                 }
-                .buttonStyle(.borderedProminent)
-            }
 
-            // Download button with three states
-            if downloadCoordinator.isDownloading {
-                Button {
-                    // No action while downloading
-                } label: {
-                    HStack(spacing: 6) {
-                        ProgressView()
-                            .controlSize(.small)
-                        if let progress = downloadCoordinator.progress {
-                            Text("\(progress.current)/\(progress.total)")
-                                .monospacedDigit()
+                // Download button with three states
+                if downloadCoordinator.isDownloading {
+                    Button {
+                        // No action while downloading
+                    } label: {
+                        HStack(spacing: 6) {
+                            ProgressView()
+                                .controlSize(.small)
+                            if let progress = downloadCoordinator.progress {
+                                Text("\(progress.current)/\(progress.total)")
+                                    .monospacedDigit()
+                            }
                         }
                     }
+                    .fontWeight(.semibold)
+                    .buttonStyle(.bordered)
+                    .disabled(true)
+                } else if cachedAllVideosDownloaded {
+                    Button {
+                        // No action - already downloaded
+                    } label: {
+                        Label(String(localized: "playlist.downloaded"), systemImage: "checkmark.circle.fill")
+                    }
+                    .fontWeight(.semibold)
+                    .buttonStyle(.bordered)
+                    .disabled(true)
+                } else {
+                    Button {
+                        downloadCoordinator.startDownload(videos: videos)
+                    } label: {
+                        Label(String(localized: "playlist.downloadAll"), systemImage: "arrow.down.circle")
+                    }
+                    .fontWeight(.semibold)
+                    .buttonStyle(.bordered)
                 }
-                .fontWeight(.semibold)
-                .buttonStyle(.bordered)
-                .disabled(true)
-            } else if cachedAllVideosDownloaded {
-                Button {
-                    // No action - already downloaded
-                } label: {
-                    Label(String(localized: "playlist.downloaded"), systemImage: "checkmark.circle.fill")
-                }
-                .fontWeight(.semibold)
-                .buttonStyle(.bordered)
-                .disabled(true)
-            } else {
-                Button {
-                    downloadCoordinator.startDownload(videos: videos)
-                } label: {
-                    Label(String(localized: "playlist.downloadAll"), systemImage: "arrow.down.circle")
-                }
-                .fontWeight(.semibold)
-                .buttonStyle(.bordered)
             }
 
             Spacer()
@@ -535,16 +542,19 @@ struct UnifiedPlaylistDetailView: View {
             Menu {
                 // Remote-only: Save to Library, Share
                 if case .remote = source, let remotePlaylist, !remotePlaylist.isLocal {
-                    Button {
-                        Task { await importToLocal() }
-                    } label: {
-                        if isImporting, let progress = importProgress {
-                            Label(String(localized: "playlist.savingToLibrary \(progress.current) \(progress.total)"), systemImage: "plus.rectangle.on.folder")
-                        } else {
-                            Label(String(localized: "playlist.saveToLibrary"), systemImage: "plus.rectangle.on.folder")
+                    // Nothing to copy out of an empty playlist.
+                    if !videos.isEmpty {
+                        Button {
+                            Task { await importToLocal() }
+                        } label: {
+                            if isImporting, let progress = importProgress {
+                                Label(String(localized: "playlist.savingToLibrary \(progress.current) \(progress.total)"), systemImage: "plus.rectangle.on.folder")
+                            } else {
+                                Label(String(localized: "playlist.saveToLibrary"), systemImage: "plus.rectangle.on.folder")
+                            }
                         }
+                        .disabled(isImporting)
                     }
-                    .disabled(isImporting)
 
                     ShareLink(item: playlistShareURL()) {
                         Label(String(localized: "common.share"), systemImage: "square.and.arrow.up")
@@ -627,7 +637,9 @@ struct UnifiedPlaylistDetailView: View {
                     .foregroundStyle(.secondary)
             }
 
-            if !isDescriptionScrollLocked, !videos.isEmpty || localPlaylist != nil {
+            // An owned playlist keeps its buttons after the last video is
+            // removed: editing and deleting are all that is left to do with it.
+            if !isDescriptionScrollLocked, !videos.isEmpty || localPlaylist != nil || canEditRemotePlaylist {
                 tvOSPlaylistActionButtons
             }
 
@@ -685,8 +697,8 @@ struct UnifiedPlaylistDetailView: View {
     @ViewBuilder
     private var tvOSPlaylistActionButtons: some View {
         VStack(spacing: 12) {
-            // Play (only when queue is enabled)
-            if isQueueEnabled {
+            // Play (only when queue is enabled, and only with something to play)
+            if isQueueEnabled, !videos.isEmpty {
                 Button {
                     playAll()
                 } label: {
@@ -698,7 +710,7 @@ struct UnifiedPlaylistDetailView: View {
             }
 
             // Remote-only: Save to Library
-            if case .remote = source, let remotePlaylist, !remotePlaylist.isLocal {
+            if case .remote = source, let remotePlaylist, !remotePlaylist.isLocal, !videos.isEmpty {
                 Button {
                     Task { await importToLocal() }
                 } label: {

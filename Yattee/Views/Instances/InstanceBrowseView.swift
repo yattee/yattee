@@ -34,9 +34,7 @@ struct InstanceBrowseView: View {
     @State private var accountContentAccountID: UUID?
     @State private var feedVideos: [Video] = []
     @State private var feedSubscriptions: [Channel] = []
-    
-    // Playlists state (for Invidious login)
-    @State private var userPlaylists: [Playlist] = []
+
     @State private var selectedFeedChannelID: String?
     @State private var isLoggedIn = false
     @State private var feedPage = 1
@@ -600,6 +598,19 @@ struct InstanceBrowseView: View {
     /// The account whose playlists the Playlists tab shows.
     private var playlistsAccount: Account? {
         appEnvironment?.account(forInstance: instance)
+    }
+
+    /// The account's playlists, read from the shared cache rather than fetched
+    /// into this view.
+    ///
+    /// Everything that changes a server-side playlist goes through that cache —
+    /// the picker that creates one while adding a video, the detail view that
+    /// renames or deletes one — so reading it is what makes those changes show
+    /// up here. It is keyed by account, which is also the discard on an account
+    /// change: whose playlists these are moves with `playlistsAccount`.
+    private var userPlaylists: [Playlist] {
+        guard let appEnvironment, let account = playlistsAccount else { return [] }
+        return appEnvironment.remotePlaylistsCache.playlists(for: account.id) ?? []
     }
 
     private var availableTabs: [BrowseTab] {
@@ -1226,11 +1237,12 @@ struct InstanceBrowseView: View {
     /// Drops what belonged to the previously selected login.
     ///
     /// Public browsing — popular and trending — is unauthenticated and stays.
+    /// The playlists are not listed here either: they are read from the shared
+    /// cache under the account's own id, so they leave with the account.
     private func discardAccountScopedContent() {
         accountContentGeneration += 1
         feedVideos = []
         feedSubscriptions = []
-        userPlaylists = []
         feedPage = 1
         hasMoreFeedResults = false
         isLoadingMoreFeed = false
@@ -1319,7 +1331,9 @@ struct InstanceBrowseView: View {
         case .popular: hasData = !popularVideos.isEmpty
         case .trending: hasData = !trendingVideos.isEmpty
         case .feed: hasData = !feedVideos.isEmpty
-        case .playlists: hasData = !userPlaylists.isEmpty
+        // Never skipped: the list is a cache other screens change, and what was
+        // already fetched stays on screen while it is refetched.
+        case .playlists: hasData = false
         }
 
         if hasData && !forceRefresh {
@@ -1419,19 +1433,17 @@ struct InstanceBrowseView: View {
                 prefetchBranding(for: videos)
             case .playlists:
                 // Addressed by account rather than by instance and secret: the
-                // service resolves the credential, and refuses backends that
-                // cannot list playlists at all.
+                // cache resolves the credential through the service, and refuses
+                // backends that cannot list playlists at all. Nothing is stored
+                // here — the rows are read back out of the cache, which is what
+                // lets a playlist created or deleted elsewhere show up.
                 guard let account = playlistsAccount else {
                     errorMessage = String(localized: "feed.error.notLoggedIn")
                     isLoading = false
                     return
                 }
 
-                let playlists = try await appEnvironment.accountService.userPlaylists(for: account)
-
-                guard generation == accountContentGeneration else { return }
-
-                userPlaylists = playlists
+                try await appEnvironment.remotePlaylistsCache.refreshList(for: account)
             }
         } catch is CancellationError {
             // Task was cancelled — another load is taking over, don't touch state

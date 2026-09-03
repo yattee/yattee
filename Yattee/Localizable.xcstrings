@@ -8262,16 +8262,6 @@
         }
       }
     },
-    "playlist.empty.title" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Empty Playlist"
-          }
-        }
-      }
-    },
     "playlist.imported.title" : {
       "comment" : "Toast title when playlist is imported to library",
       "localizations" : {
@@ -8614,6 +8604,28 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Search playlists"
+          }
+        }
+      }
+    },
+    "playlists.selector.empty.account" : {
+      "comment" : "Shown in the playlist picker when an account has no playlists",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No playlists on this account yet."
+          }
+        }
+      }
+    },
+    "playlists.selector.empty.local" : {
+      "comment" : "Shown in the playlist picker when there are no playlists on this device",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No playlists on this device yet."
           }
         }
       }

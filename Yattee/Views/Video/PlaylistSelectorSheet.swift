@@ -90,8 +90,12 @@ struct PlaylistSelectorSheet: View {
                     }
 
                     // Existing playlists
-                    if !playlists.isEmpty {
-                        Section {
+                    Section {
+                        if playlists.isEmpty {
+                            emptyDestinationsRow(
+                                String(localized: "playlists.selector.empty.local")
+                            )
+                        } else {
                             ForEach(playlists, id: \.id) { playlist in
                                 PlaylistSelectionRow(
                                     playlist: playlist,
@@ -101,24 +105,12 @@ struct PlaylistSelectorSheet: View {
                                     addVideoToPlaylist(playlist)
                                 }
                             }
-                        } header: {
-                            // Unlabelled while local playlists are the only
-                            // destinations there are.
-                            if !remoteDestinations.isEmpty {
-                                Text(String(localized: "playlist.section.local"))
-                            }
                         }
-                    } else {
-                        Section {
-                            ContentUnavailableView {
-                                Label(
-                                    String(localized: "playlist.empty.title"),
-                                    systemImage: "music.note.list"
-                                )
-                            } description: {
-                                Text(String(localized: "playlist.empty.description"))
-                            }
-                            .frame(maxWidth: .infinity, maxHeight: .infinity)
+                    } header: {
+                        // Unlabelled while local playlists are the only
+                        // destinations there are.
+                        if !remoteDestinations.isEmpty {
+                            Text(String(localized: "playlist.section.local"))
                         }
                     }
 
@@ -199,15 +191,24 @@ struct PlaylistSelectorSheet: View {
             }
 
             if let remotePlaylists = appEnvironment?.remotePlaylistsCache.playlists(for: account.id) {
-                ForEach(remotePlaylists) { playlist in
-                    RemotePlaylistSelectionRow(
-                        playlist: playlist,
-                        wasAdded: addedRemotePlaylist == RemoteSelection(
-                            accountID: account.id,
-                            playlistID: playlist.id.playlistID
-                        )
-                    ) {
-                        Task { await addVideo(to: playlist, on: account) }
+                if remotePlaylists.isEmpty {
+                    // The fetch landed and the account simply has none, which is
+                    // worth saying — the "New Playlist" row above it is the only
+                    // other thing in the section.
+                    emptyDestinationsRow(
+                        String(localized: "playlists.selector.empty.account")
+                    )
+                } else {
+                    ForEach(remotePlaylists) { playlist in
+                        RemotePlaylistSelectionRow(
+                            playlist: playlist,
+                            wasAdded: addedRemotePlaylist == RemoteSelection(
+                                accountID: account.id,
+                                playlistID: playlist.id.playlistID
+                            )
+                        ) {
+                            Task { await addVideo(to: playlist, on: account) }
+                        }
                     }
                 }
             } else if loadingAccountIDs.contains(account.id) {
@@ -220,6 +221,14 @@ struct PlaylistSelectorSheet: View {
         } header: {
             Text(sectionTitle(for: account))
         }
+    }
+
+    /// Says that a section has no playlists to offer — not that some playlist is
+    /// empty, which is a different sentence entirely.
+    private func emptyDestinationsRow(_ text: String) -> some View {
+        Text(text)
+            .font(.subheadline)
+            .foregroundStyle(.secondary)
     }
 
     /// The account's name, and the host it lives on when the name does not
