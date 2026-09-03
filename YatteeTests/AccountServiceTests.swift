@@ -822,4 +822,75 @@ struct RemotePlaylistsCacheTests {
         #expect(await harness.transport.callCount == 1)
         #expect(cache.playlists(for: harness.account.id)?.count == 1)
     }
+
+    @Test("A second removal waits for the first one's refetch before it preflights")
+    func removalsOnOnePlaylistAreSerialized() async throws {
+        let harness = AccountServiceHarness(type: .piped)
+        defer { harness.tearDown() }
+        let cache = harness.makeCache()
+        let snapshot = makeSnapshot(playlistID: "pl", videoIDs: ["aaa", "bbb"], kind: .piped)
+        await harness.transport.setSnapshot(snapshot)
+        await harness.transport.holdCalls()
+
+        let first = Task { [account = harness.account] in
+            try await cache.removeEntry(snapshot.entries[0], fromPlaylist: "pl", for: account)
+        }
+        try await harness.transport.waitForCalls(1)
+
+        // Tapped while the first removal's preflight is still out. Its own
+        // preflight must not be sent yet: it would describe the playlist as it
+        // was *before* the first removal, and a Piped position taken from that
+        // names whatever shifts into the slot.
+        let second = Task { [account = harness.account] in
+            try await cache.removeEntry(snapshot.entries[1], fromPlaylist: "pl", for: account)
+        }
+
+        // Long enough for a second preflight to have been sent, had one been.
+        try await Task.sleep(for: .milliseconds(50))
+        #expect(await harness.transport.callCount == 1)
+
+        await harness.transport.release()
+        try await first.value
+        try await second.value
+
+        // Three calls each, in order, and never interleaved: preflight, remove,
+        // and the refetch that reconciles it.
+        #expect(await harness.transport.calls == [
+            .snapshot(id: "pl", credential: "secret-original"),
+            .remove(entryID: .piped(playlistID: "pl", position: 0), credential: "secret-original"),
+            .snapshot(id: "pl", credential: "secret-original"),
+            .snapshot(id: "pl", credential: "secret-original"),
+            .remove(entryID: .piped(playlistID: "pl", position: 1), credential: "secret-original"),
+            .snapshot(id: "pl", credential: "secret-original")
+        ])
+    }
+
+    @Test("Removals from different playlists do not wait for each other")
+    func removalsOnDifferentPlaylistsInterleave() async throws {
+        let harness = AccountServiceHarness(type: .piped)
+        defer { harness.tearDown() }
+        let cache = harness.makeCache()
+        let one = makeSnapshot(playlistID: "one", videoIDs: ["aaa"], kind: .piped)
+        let two = makeSnapshot(playlistID: "two", videoIDs: ["aaa"], kind: .piped)
+        await harness.transport.setSnapshot(one)
+        await harness.transport.holdCalls()
+
+        let first = Task { [account = harness.account] in
+            try await cache.removeEntry(one.entries[0], fromPlaylist: "one", for: account)
+        }
+        try await harness.transport.waitForCalls(1)
+
+        let second = Task { [account = harness.account] in
+            try await cache.removeEntry(two.entries[0], fromPlaylist: "two", for: account)
+        }
+
+        // Both preflights are out at once: the queue is per playlist, not one
+        // for the whole account.
+        try await harness.transport.waitForCalls(2)
+        #expect(await harness.transport.callCount == 2)
+
+        await harness.transport.release()
+        try await first.value
+        try await second.value
+    }
 }

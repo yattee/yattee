@@ -274,6 +274,16 @@ final class AccountService {
     /// refetch afterwards can show what actually happened. Invidious needs none
     /// of this: its `indexId` names the row itself, whatever moved around it.
     ///
+    /// Two rows of the same video are one row to a positional API, so the check
+    /// is weaker still where a playlist repeats one: it can say the position
+    /// holds that video, never that it holds *this* occurrence of it. In
+    /// `[A, A, B]`, another client removing the first `A` leaves the second in
+    /// its place and the check passes over the survivor. Nothing Piped exposes
+    /// tells two equal rows apart — there is no token for the row, only its
+    /// index — so no stronger comparison exists to make here; a fingerprint of
+    /// the neighbours would refuse legitimate removals without ever settling
+    /// the duplicate case. The refetch afterwards is what shows the result.
+    ///
     /// The preflight is also where the credential can change out from under the
     /// removal — it is the one place here that awaits a server before writing —
     /// so the credential is read again before the removal is sent.
@@ -348,6 +358,16 @@ final class AccountService {
     /// Piped's removals in particular await a whole playlist fetch first. A
     /// stale *read* is merely wasted; a stale *write* changes the previous
     /// user's data, so every mutation checks again immediately before it goes.
+    ///
+    /// It is a fence, not a lock, and the last of it is accepted rather than
+    /// closed: between this check and the bytes leaving the device there is at
+    /// least an actor hop, and a sign-out landing inside it still sends the old
+    /// secret. Keychain state cannot be made atomic with a remote send —
+    /// cancelling in-flight work or handing the transport a generation would
+    /// move the window, not remove it — so the recheck is the practical fence,
+    /// and what follows the send is what covers the remainder: an outcome is
+    /// recorded only against the secret the request actually used, so a late
+    /// answer never lands on a credential that did not earn it.
     private func requireStillCurrent(_ credential: String, for account: Account) throws {
         guard credentialReader(account) == credential else {
             throw AccountServiceError.notAuthenticated

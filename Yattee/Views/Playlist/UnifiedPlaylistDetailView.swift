@@ -287,6 +287,17 @@ struct UnifiedPlaylistDetailView: View {
         .onReceive(NotificationCenter.default.publisher(for: .watchHistoryDidChange)) { _ in
             loadWatchEntries()
         }
+        // Signing in again keeps the account, the source and usually the status,
+        // so nothing else this view watches would move — but the login behind an
+        // account-loaded playlist may now be somebody else.
+        .onReceive(NotificationCenter.default.publisher(for: .accountCredentialDidChange)) { _ in
+            discardAccountLoadedContentAndReload()
+        }
+        // The same, for a change of Apple account: every credential on the
+        // device belongs to an identity, and this one's are no longer readable.
+        .onReceive(NotificationCenter.default.publisher(for: .credentialIdentityScopeDidChange)) { _ in
+            discardAccountLoadedContentAndReload()
+        }
         #if !os(tvOS)
         .batchDownload(coordinator: downloadCoordinator)
         .onAppear {
@@ -821,6 +832,37 @@ struct UnifiedPlaylistDetailView: View {
             await loadRemotePlaylist(playlistID: playlistID, instance: instance)
         }
         loadWatchEntries()
+    }
+
+    /// Throws away everything an account fetched here, and loads again.
+    ///
+    /// Cleared first and synchronously, because the reload awaits a server:
+    /// until it answers, a playlist that may be private would otherwise still
+    /// be on screen — with its rows, its title and its destructive affordances
+    /// — under a credential that no longer belongs to the person who fetched
+    /// it. The reload resolves ownership again from scratch, and falls back to
+    /// the public endpoint when the account can no longer read the playlist.
+    ///
+    /// Only for a playlist an account loaded: a public one shows nothing that
+    /// a login could make private, and reloading it would be a flash for
+    /// nothing.
+    private func discardAccountLoadedContentAndReload() {
+        guard case .remote = source, entries != nil || owningAccount != nil else { return }
+
+        entries = nil
+        entriesByRow = [:]
+        owningAccount = nil
+        remoteIsListed = nil
+        remotePlaylist = nil
+        title = ""
+        descriptionText = nil
+        thumbnailURL = nil
+        videos = []
+        videoCount = 0
+        errorMessage = nil
+        isLoading = true
+
+        Task { await loadPlaylist() }
     }
 
     private func loadWatchEntries() {

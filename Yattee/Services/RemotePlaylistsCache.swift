@@ -74,6 +74,30 @@ final class RemotePlaylistsCache {
         let playlistID: String
     }
 
+    /// What a mutation holds while it runs, so two of them cannot overlap.
+    ///
+    /// A change and the refetch that reconciles it are one operation, and the
+    /// next change to the same playlist may not start until it is over: it
+    /// plans its write against the last snapshot, and a snapshot taken before
+    /// the previous change landed describes a playlist that no longer exists.
+    /// Piped is where this bites — its rows are addressed by *position*, so a
+    /// second removal that preflights the pre-removal snapshot passes its check
+    /// and then deletes whatever shifted into the slot.
+    ///
+    /// Creation queues on the account's *list* instead, and deliberately not
+    /// with the playlists: nothing it does depends on any playlist's contents,
+    /// and the list refetches that two mutations race over are already ordered
+    /// by `sequence`. One queue for the account would only make changes to
+    /// unrelated playlists wait for each other.
+    private enum MutationKey: Hashable {
+        case list(accountID: UUID)
+        case playlist(accountID: UUID, playlistID: String)
+    }
+
+    /// Who is queued behind each held key, in the order they arrived. A key
+    /// present is held; absent is free.
+    private var mutationWaiters: [MutationKey: [CheckedContinuation<Void, Never>]] = [:]
+
     // MARK: - Reads
 
     /// The account's playlists as last fetched, or `nil` if they never were.
@@ -125,13 +149,15 @@ final class RemotePlaylistsCache {
         privacy: PlaylistPrivacy?,
         for account: Account
     ) async throws -> Playlist {
-        try await reconcilingList(for: account) {
-            try await accountService.createPlaylist(
-                title: title,
-                description: description,
-                privacy: privacy,
-                for: account
-            )
+        try await serializing(.list(accountID: account.id)) {
+            try await reconcilingList(for: account) {
+                try await accountService.createPlaylist(
+                    title: title,
+                    description: description,
+                    privacy: privacy,
+                    for: account
+                )
+            }
         }
     }
 
@@ -143,38 +169,45 @@ final class RemotePlaylistsCache {
         privacy: PlaylistPrivacy?,
         for account: Account
     ) async throws {
-        try await reconciling(playlist: id, andList: true, for: account) {
-            try await accountService.updatePlaylist(
-                id: id,
-                title: title,
-                description: description,
-                privacy: privacy,
-                for: account
-            )
+        try await serializing(.playlist(accountID: account.id, playlistID: id)) {
+            try await reconciling(playlist: id, andList: true, for: account) {
+                try await accountService.updatePlaylist(
+                    id: id,
+                    title: title,
+                    description: description,
+                    privacy: privacy,
+                    for: account
+                )
+            }
         }
     }
 
     /// Deletes a playlist and republishes the account's list.
     func deletePlaylist(id: String, for account: Account) async throws {
-        do {
-            try await accountService.deletePlaylist(id: id, for: account)
-            forgetPlaylist(id: id, for: account.id)
-            await reconcileList(for: account)
-        } catch {
-            // The delete may have landed even though the answer did not, so the
-            // snapshot is refetched rather than assumed: whichever way it went,
-            // the server's answer replaces it — and a server that no longer has
-            // the playlist is answering that the delete did land.
-            await reconcileSnapshotAfterDelete(id: id, for: account)
-            await reconcileList(for: account)
-            throw error
+        try await serializing(.playlist(accountID: account.id, playlistID: id)) {
+            do {
+                try await accountService.deletePlaylist(id: id, for: account)
+                forgetPlaylist(id: id, for: account.id)
+                await reconcileList(for: account)
+            } catch {
+                // The delete may have landed even though the answer did not, so
+                // the snapshot is refetched rather than assumed: whichever way
+                // it went, the server's answer replaces it — and a server that
+                // no longer has the playlist is answering that the delete did
+                // land.
+                await reconcileSnapshotAfterDelete(id: id, for: account)
+                await reconcileList(for: account)
+                throw error
+            }
         }
     }
 
     /// Adds a video and republishes the playlist it was added to.
     func addVideo(videoID: String, toPlaylist id: String, for account: Account) async throws {
-        try await reconciling(playlist: id, andList: false, for: account) {
-            try await accountService.addVideo(videoID: videoID, toPlaylist: id, for: account)
+        try await serializing(.playlist(accountID: account.id, playlistID: id)) {
+            try await reconciling(playlist: id, andList: false, for: account) {
+                try await accountService.addVideo(videoID: videoID, toPlaylist: id, for: account)
+            }
         }
     }
 
@@ -184,8 +217,10 @@ final class RemotePlaylistsCache {
         fromPlaylist id: String,
         for account: Account
     ) async throws {
-        try await reconciling(playlist: id, andList: false, for: account) {
-            try await accountService.removeEntry(entry, fromPlaylist: id, for: account)
+        try await serializing(.playlist(accountID: account.id, playlistID: id)) {
+            try await reconciling(playlist: id, andList: false, for: account) {
+                try await accountService.removeEntry(entry, fromPlaylist: id, for: account)
+            }
         }
     }
 
@@ -381,6 +416,43 @@ final class RemotePlaylistsCache {
         snapshots[accountID]?[id] = nil
         snapshotFetchDates[accountID]?[id] = nil
         lists[accountID]?.removeAll { $0.id.playlistID == id }
+    }
+
+    // MARK: - Serialization
+
+    /// Runs a mutation with its key held, from the write to the end of the
+    /// refetch that reconciles it, and hands the key to whoever queued behind.
+    ///
+    /// First come, first served: waiters are resumed in arrival order, so two
+    /// removals tapped in sequence are sent in that sequence. Nothing here
+    /// blocks a *read* — refreshes stay coalesced and unqueued, and only a
+    /// change waits for a change.
+    private func serializing<T>(_ key: MutationKey, _ body: () async throws -> T) async throws -> T {
+        await acquire(key)
+        defer { release(key) }
+        return try await body()
+    }
+
+    private func acquire(_ key: MutationKey) async {
+        guard mutationWaiters[key] != nil else {
+            mutationWaiters[key] = []
+            return
+        }
+
+        await withCheckedContinuation { continuation in
+            mutationWaiters[key, default: []].append(continuation)
+        }
+    }
+
+    private func release(_ key: MutationKey) {
+        guard var waiting = mutationWaiters[key], !waiting.isEmpty else {
+            mutationWaiters[key] = nil
+            return
+        }
+
+        let next = waiting.removeFirst()
+        mutationWaiters[key] = waiting
+        next.resume()
     }
 
     // MARK: - Fences
