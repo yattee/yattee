@@ -59,7 +59,6 @@ final class AppEnvironment {
     let credentialProbeService: CredentialProbeService
     let accountService: AccountService
     let remotePlaylistsCache: RemotePlaylistsCache
-    let subscriptionAccountValidator: SubscriptionAccountValidator
     let dataContextValidator: DataContextValidator
     let playerControlsLayoutService: PlayerControlsLayoutService
     let legacyMigrationService: LegacyDataMigrationService
@@ -71,7 +70,7 @@ final class AppEnvironment {
     private(set) var activeControlsCenterSettings: CenterSectionSettings = .default
 
     @ObservationIgnored private var controlsSettingsObservers: [NSObjectProtocol] = []
-    @ObservationIgnored private var contextMirrorObservers: [NSObjectProtocol] = []
+    @ObservationIgnored private var contextCacheObservers: [NSObjectProtocol] = []
 
     /// The context the account-scoped caches currently hold data for.
     @ObservationIgnored private var lastCachedContext: DataContext = .local
@@ -429,18 +428,8 @@ final class AppEnvironment {
         // Initialize Home Instance Cache
         self.homeInstanceCache = .shared
 
-        // Initialize Subscription Account Validator
-        self.subscriptionAccountValidator = SubscriptionAccountValidator(
-            settingsManager: settings,
-            instancesManager: instances,
-            invidiousCredentialsManager: invidiousCreds,
-            pipedCredentialsManager: pipedCreds,
-            toastManager: toast,
-            feedCache: .shared
-        )
-
-        // Validates the account-based data context. Unlike the validator above
-        // it never corrects a selection it merely cannot verify yet
+        // Validates the account-based data context. Corrections are restricted
+        // to deletions: a selection that merely cannot be verified yet is kept
         self.dataContextValidator = DataContextValidator(
             accountsManager: accounts,
             instancesManager: instances,
@@ -494,12 +483,10 @@ final class AppEnvironment {
 
         dataContextValidator.setAppEnvironment(self)
         subscriptionService.setContextValidator(dataContextValidator)
-        subscriptionAccountValidator.setAccountsManager(accounts)
 
         // The context can now change without anyone touching this device — a
-        // choice made on another one, or an account deleted there. The legacy
-        // setting several views still read has to follow it, and the feed cache
-        // is global rather than account-keyed, so it would otherwise keep
+        // choice made on another one, or an account deleted there. The feed
+        // cache is global rather than account-keyed, so it would otherwise keep
         // serving the previous account's videos.
         //
         // A deletion that arrives from another device takes the credential with
@@ -567,7 +554,7 @@ final class AppEnvironment {
                 // back is the same Apple account, and with iCloud Drive off
                 // that happens on every activation.
                 self.discardCachesFromAnotherIdentityIfNeeded()
-                self.mirrorContextToLegacySelection(resetWhenUnresolvable: true)
+                self.refreshCachesForEffectiveContext()
             }
         }
 
@@ -587,29 +574,28 @@ final class AppEnvironment {
 
         // Accounts and instances arriving are triggers too, not redundant ones:
         // a context naming an account that has not synced yet — or one whose
-        // instance has not — cannot be mapped onto the legacy shape, and these
-        // are what restore the mapping once it can be made rather than leaving
-        // that moment permanent. The same arrivals are what make a synced
-        // account's credential findable, so statuses are recomputed with them:
-        // an account that appears mid-session would otherwise sit at "sign in
-        // required" until the app was relaunched.
+        // instance has not — reads as unavailable, and these arrivals are what
+        // move the effective context back onto it. They are also what make a
+        // synced account's credential findable, so statuses are recomputed with
+        // them: an account that appears mid-session would otherwise sit at
+        // "sign in required" until the app was relaunched.
         // A status change is deliberately not one of the refresh triggers: the
         // refresher reads the Keychain, which cannot know what a server said,
         // so reacting to a status by recomputing it would erase every verdict
-        // the API layer records. It still runs the mirror, because a credential
-        // arriving or being rejected moves the effective context.
+        // the API layer records. It still re-examines the caches, because a
+        // credential arriving or being rejected moves the effective context.
         for name: Notification.Name in [
             .dataContextDidChange, .accountsDidChange, .instancesDidChange,
             .accountStatusesDidChange, .connectivityDidReturn
         ] {
-            contextMirrorObservers.append(
+            contextCacheObservers.append(
                 NotificationCenter.default.addObserver(forName: name, object: nil, queue: .main) { [weak self] _ in
                     MainActor.assumeIsolated {
                         guard let self else { return }
                         if name != .dataContextDidChange, name != .accountStatusesDidChange {
                             self.refreshAccountStatuses()
                         }
-                        self.mirrorContextToLegacySelection()
+                        self.refreshCachesForEffectiveContext()
                     }
                 }
             )
@@ -709,20 +695,34 @@ final class AppEnvironment {
 
     // MARK: - Accounts
 
-    /// Keeps the pre-revamp `subscriptionAccount` selection, and the feed cache
-    /// keyed to it, in step with the current data context.
+    /// Switches the data context, from wherever in the app the user asked.
     ///
-    /// The two stores are written together everywhere the user changes the
-    /// context by hand; this covers the changes nobody on this device made — a
-    /// selection synced from another device, or the selected account being
-    /// deleted there. Phase 3's switcher removes the last readers of the legacy
-    /// setting and this mirror with them.
-    /// - Parameter resetWhenUnresolvable: whether a context that cannot be
-    ///   mapped should fall back to `.local` instead of leaving the previous
-    ///   value in place. True only when the Apple account changed: keeping the
-    ///   previous identity's selection is worse than losing a mapping, and the
-    ///   correct value returns as soon as the new namespace's accounts arrive.
-    private func mirrorContextToLegacySelection(resetWhenUnresolvable: Bool = false) {
+    /// The one entry point, so every switcher behaves identically: the cache
+    /// the feed is served from is global rather than account-keyed, and a
+    /// switch that skipped this would leave the previous account's videos on
+    /// screen under the new account's name.
+    func switchDataContext(to context: DataContext) {
+        guard context != accountsManager.currentContext else { return }
+
+        accountsManager.setContext(context)
+        SubscriptionFeedCache.shared.handleAccountChange()
+
+        LoggingService.shared.info(
+            "Data context switched by the user",
+            category: .general,
+            details: "context=\(context)"
+        )
+    }
+
+    /// Drops the account-scoped caches when the context whose data they hold
+    /// has moved.
+    ///
+    /// Covers the moves nobody on this device made — a selection synced from
+    /// another device, an account deleted there, a credential arriving or being
+    /// rejected. The switcher calls `switchDataContext(to:)` instead, which
+    /// clears the feed itself rather than waiting for a notification to make
+    /// the round trip.
+    private func refreshCachesForEffectiveContext() {
         // Cached data is invalidated on the *effective* context — the one whose
         // data is actually on screen. Not on the legacy value, because two
         // logins on the same instance collapse onto the same one; and not on
@@ -738,50 +738,6 @@ final class AppEnvironment {
             lastCachedContext = effective
             clearAccountScopedCaches()
         }
-
-        // The context in memory belongs to whichever namespace was loaded, and
-        // an unresolved scope is not one whose accounts anybody has looked at
-        // yet. Mirroring from it would rewrite the legacy selection to `.local`
-        // on every activation dip — several times a day with iCloud Drive off —
-        // and the user would find their picker reset. The observer refires when
-        // the scope comes back, so the mirror catches up rather than being lost.
-        guard credentialIdentityScope.isResolved else { return }
-
-        let legacy: SubscriptionAccount
-
-        switch accountsManager.currentContext {
-        case .local:
-            legacy = .local
-
-        case let .account(id):
-            // An account whose instance has not arrived yet cannot be mapped
-            // onto the legacy shape. Leaving the old value alone is right: the
-            // context is preserved, and the validator reports it unavailable
-            // rather than pointing the UI at something else. A later arrival
-            // runs this again and restores the mapping.
-            guard let account = accountsManager.account(id: id),
-                  let instance = accountsManager.instance(for: account) else {
-                if resetWhenUnresolvable, settingsManager.subscriptionAccount != .local {
-                    settingsManager.subscriptionAccount = .local
-                }
-                return
-            }
-
-            switch instance.type {
-            case .invidious: legacy = .invidious(instance.id)
-            case .piped: legacy = .piped(instance.id)
-            default: return
-            }
-        }
-
-        guard settingsManager.subscriptionAccount != legacy else { return }
-
-        settingsManager.subscriptionAccount = legacy
-
-        LoggingService.shared.info(
-            "Data context changed — updated the legacy subscription selection",
-            category: .general
-        )
     }
 
     /// Discards everything cached under an account's previous credential.

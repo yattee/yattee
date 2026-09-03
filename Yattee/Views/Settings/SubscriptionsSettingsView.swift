@@ -20,10 +20,6 @@ private struct ExportFile: Identifiable {
 struct SubscriptionsSettingsView: View {
     @Environment(\.appEnvironment) private var appEnvironment
 
-    // Account selection state
-    @State private var pendingAccountChange: SubscriptionAccount?
-    @State private var showingAccountSwitchConfirmation = false
-
     // Import state
     @State private var showingImportPicker = false
     @State private var isImporting = false
@@ -47,14 +43,6 @@ struct SubscriptionsSettingsView: View {
         appEnvironment?.dataManager
     }
 
-    private var settingsManager: SettingsManager? {
-        appEnvironment?.settingsManager
-    }
-
-    private var validator: SubscriptionAccountValidator? {
-        appEnvironment?.subscriptionAccountValidator
-    }
-
     private var subscriptionService: SubscriptionService? {
         appEnvironment?.subscriptionService
     }
@@ -69,20 +57,18 @@ struct SubscriptionsSettingsView: View {
         dataManager?.subscriptionCount ?? 0
     }
 
-    private var currentAccount: SubscriptionAccount {
-        settingsManager?.subscriptionAccount ?? .local
+    private var currentContext: DataContext {
+        appEnvironment?.accountsManager.currentContext ?? .local
     }
 
     var body: some View {
         List {
             accountSection
-            if validator?.hasAvailableAccounts == true {
-                importSection
-                exportSection
-                localDataSection
-            }
+            importSection
+            exportSection
+            localDataSection
         }
-        .task(id: currentAccount) {
+        .task(id: currentContext) {
             await refreshAccountSubscriptionCount()
         }
         .navigationTitle(String(localized: "settings.subscriptions.title"))
@@ -118,20 +104,6 @@ struct SubscriptionsSettingsView: View {
             }
         }
         .confirmationDialog(
-            String(localized: "settings.subscriptions.account.switch.title"),
-            isPresented: $showingAccountSwitchConfirmation,
-            titleVisibility: .visible
-        ) {
-            Button(String(localized: "settings.subscriptions.account.switch.action")) {
-                confirmAccountSwitch()
-            }
-            Button(String(localized: "common.cancel"), role: .cancel) {
-                cancelAccountSwitch()
-            }
-        } message: {
-            Text(String(localized: "settings.subscriptions.account.switch.message"))
-        }
-        .confirmationDialog(
             String(localized: "settings.subscriptions.localData.delete.confirmation.title \(localSubscriptionCount)"),
             isPresented: $showingDeleteLocalConfirmation,
             titleVisibility: .visible
@@ -150,79 +122,10 @@ struct SubscriptionsSettingsView: View {
     @ViewBuilder
     private var accountSection: some View {
         Section {
-            if let validator, validator.hasAvailableAccounts {
-                Picker(
-                    String(localized: "settings.subscriptions.account.label"),
-                    selection: Binding(
-                        get: { currentAccount },
-                        set: { newAccount in
-                            if newAccount != currentAccount {
-                                pendingAccountChange = newAccount
-                                showingAccountSwitchConfirmation = true
-                            }
-                        }
-                    )
-                ) {
-                    ForEach(validator.availableAccounts, id: \.self) { account in
-                        Text(validator.displayName(for: account))
-                            .tag(account)
-                    }
-                }
-            } else {
-                // No accounts available - show setup prompt
-                VStack(alignment: .leading, spacing: 8) {
-                    Label(
-                        String(localized: "settings.subscriptions.account.noAccounts.title"),
-                        systemImage: "exclamationmark.triangle"
-                    )
-                    .foregroundStyle(.secondary)
-
-                    Text(String(localized: "settings.subscriptions.account.noAccounts.message"))
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
-
-                    Button(String(localized: "settings.subscriptions.account.noAccounts.action")) {
-                        appEnvironment?.navigationCoordinator.navigate(to: .settings)
-                    }
-                    .font(.caption)
-                    .padding(.top, 4)
-                }
-                .padding(.vertical, 4)
-            }
+            DataContextSwitcherSettingsRow()
         } footer: {
-            if validator?.hasAvailableAccounts == true {
-                Text(String(localized: "settings.subscriptions.account.footer"))
-            }
+            Text(String(localized: "settings.subscriptions.account.footer"))
         }
-    }
-
-    // MARK: - Account Switch Actions
-
-    private func confirmAccountSwitch() {
-        guard let newAccount = pendingAccountChange else { return }
-
-        // Both stores are written: the context is what the data layer reads,
-        // the legacy setting is kept in step until the Phase 3 switcher removes
-        // the last readers of it. Letting them diverge would show one account
-        // in the UI while serving another's data.
-        settingsManager?.subscriptionAccount = newAccount
-        appEnvironment?.accountsManager.setContext(
-            appEnvironment?.accountsManager.context(forLegacyInstanceID: newAccount.instanceID) ?? .local
-        )
-        SubscriptionFeedCache.shared.handleAccountChange()
-
-        // Trigger feed refresh in background
-        Task {
-            guard let appEnvironment else { return }
-            await SubscriptionFeedCache.shared.refresh(using: appEnvironment)
-        }
-
-        pendingAccountChange = nil
-        LoggingService.shared.logSubscriptions("Switched subscription account to: \(String(describing: newAccount.type))")
-    }
-
-    private func cancelAccountSwitch() {
-        pendingAccountChange = nil
     }
 
     // MARK: - Import Section
@@ -285,7 +188,7 @@ struct SubscriptionsSettingsView: View {
     /// is active. Hidden in local mode, where the account IS the local store.
     @ViewBuilder
     private var localDataSection: some View {
-        if currentAccount.type != .local && localSubscriptionCount > 0 {
+        if !currentContext.isLocal && localSubscriptionCount > 0 {
             Section {
                 Button(role: .destructive) {
                     showingDeleteLocalConfirmation = true
@@ -383,7 +286,7 @@ struct SubscriptionsSettingsView: View {
     /// mode, or the server's list for Invidious/Piped accounts.
     private func performExport() async {
         let subscriptions: [Subscription]
-        if currentAccount.type == .local {
+        if currentContext.isLocal {
             guard let dataManager else { return }
             subscriptions = dataManager.allSubscriptions
         } else {

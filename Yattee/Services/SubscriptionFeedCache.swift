@@ -373,37 +373,18 @@ final class SubscriptionFeedCache {
     }
 
     /// Gets the authenticated Invidious instance and session ID.
+    ///
+    /// Resolved through the selected account and nothing else: a second login on
+    /// the same instance has its own credential, and the instance-keyed lookup
+    /// this used to fall back to cannot tell the two apart.
     private func getInvidiousAuth(using appEnvironment: AppEnvironment) -> (Instance, String)? {
-        // Resolve through the selected account so a second login on the same
-        // instance uses its own credential.
-        if let account = appEnvironment.account(forSelectedContext: .invidious),
-           let instance = appEnvironment.accountsManager.instance(for: account),
-           let sid = appEnvironment.accountCredentialsManager(for: account)?.credential(for: account) {
-            return (instance, sid)
-        }
-
-        let legacyAccount = appEnvironment.settingsManager.subscriptionAccount
-
-        let instance: Instance?
-        if let instanceID = legacyAccount.instanceID {
-            instance = appEnvironment.instancesManager.instances.first { $0.id == instanceID }
-        } else {
-            // Fall back to first enabled Invidious instance
-            instance = appEnvironment.instancesManager.instances.first {
-                $0.type == .invidious && $0.isEnabled
-            }
-        }
-        
-        guard let instance else {
-            LoggingService.shared.debug("No Invidious instance found for subscription account", category: .general)
+        guard let account = appEnvironment.account(forSelectedContext: .invidious),
+              let instance = appEnvironment.accountsManager.instance(for: account),
+              let sid = appEnvironment.accountCredentialsManager(for: account)?.credential(for: account) else {
+            LoggingService.shared.debug("No Invidious account resolved for the selected context", category: .general)
             return nil
         }
-        
-        guard let sid = appEnvironment.credential(forInstance: instance) else {
-            LoggingService.shared.debug("No session ID found for Invidious instance: \(instance.id)", category: .general)
-            return nil
-        }
-        
+
         return (instance, sid)
     }
 
@@ -451,22 +432,14 @@ final class SubscriptionFeedCache {
 
     /// Gets the authenticated Piped instance and auth token.
     private func getPipedAuth(using appEnvironment: AppEnvironment) -> (Instance, String)? {
-        if let account = appEnvironment.account(forSelectedContext: .piped),
-           let instance = appEnvironment.accountsManager.instance(for: account),
-           let token = appEnvironment.accountCredentialsManager(for: account)?.credential(for: account) {
-            return (instance, token)
-        }
-
-        let legacyAccount = appEnvironment.settingsManager.subscriptionAccount
-
-        guard let instanceID = legacyAccount.instanceID,
-              let instance = appEnvironment.instancesManager.instances.first(where: { $0.id == instanceID }),
-              let authToken = appEnvironment.credential(forInstance: instance) else {
-            LoggingService.shared.debug("No authenticated Piped instance found for subscription account", category: .general)
+        guard let account = appEnvironment.account(forSelectedContext: .piped),
+              let instance = appEnvironment.accountsManager.instance(for: account),
+              let token = appEnvironment.accountCredentialsManager(for: account)?.credential(for: account) else {
+            LoggingService.shared.debug("No Piped account resolved for the selected context", category: .general)
             return nil
         }
 
-        return (instance, authToken)
+        return (instance, token)
     }
 
     // MARK: - Invidious Feed

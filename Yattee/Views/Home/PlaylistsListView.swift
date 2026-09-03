@@ -102,6 +102,9 @@ struct PlaylistsListView: View {
             }
             #endif
             ToolbarItem(placement: viewOptionsPlacement) {
+                DataContextSwitcherMenu()
+            }
+            ToolbarItem(placement: viewOptionsPlacement) {
                 Button {
                     showViewOptions = true
                 } label: {
@@ -169,6 +172,8 @@ struct PlaylistsListView: View {
                 } label: {
                     Label(String(localized: "viewOptions.title"), systemImage: "slider.horizontal.3")
                 }
+
+                DataContextSwitcherButton()
             }
             .focusSection()
             .padding(.horizontal, 48)

@@ -324,6 +324,15 @@ struct SubscriptionsView: View {
         return progress > 0 && progress < 1 ? progress : nil
     }
 
+    /// Why the selected account is not the one answering, when it is not.
+    ///
+    /// Only for an account context: local data is never unavailable, and the
+    /// fallback the banner explains is local data itself.
+    private var contextUnavailability: DataContextUnavailability? {
+        guard appEnvironment?.accountsManager.currentContext.isLocal == false else { return nil }
+        return appEnvironment?.dataContextValidator.unavailability
+    }
+
     /// View options button lives on the leading edge on macOS, trailing elsewhere.
     private var viewOptionsPlacement: ToolbarItemPlacement {
         #if os(macOS)
@@ -430,6 +439,13 @@ struct SubscriptionsView: View {
                     }
                     #endif
                 }
+                // Above the feed rather than inside it: the feed is local data
+                // while this is showing, and nothing else on screen says so.
+                .safeAreaInset(edge: .top, spacing: 0) {
+                    if let unavailability = contextUnavailability {
+                        DataContextUnavailableBanner(reason: unavailability)
+                    }
+                }
                 #if !os(tvOS)
                 .navigationTitle(String(localized: "tabs.subscriptions"))
                 #if os(iOS)
@@ -438,6 +454,9 @@ struct SubscriptionsView: View {
                 .toolbarTitleDisplayMode(.inlineLarge)
                 #endif
                 .toolbar {
+                    ToolbarItem(placement: viewOptionsPlacement) {
+                        DataContextSwitcherMenu()
+                    }
                     ToolbarItem(placement: viewOptionsPlacement) {
                         Button {
                             showViewOptions = true
@@ -812,12 +831,16 @@ struct SubscriptionsView: View {
 
     #if os(tvOS)
     private var tvOSViewOptionsButton: some View {
-        Button {
-            showViewOptions = true
-        } label: {
-            Label(String(localized: "viewOptions.title"), systemImage: "slider.horizontal.3")
+        HStack(spacing: 16) {
+            Button {
+                showViewOptions = true
+            } label: {
+                Label(String(localized: "viewOptions.title"), systemImage: "slider.horizontal.3")
+            }
+            .buttonStyle(.bordered)
+
+            DataContextSwitcherButton()
         }
-        .buttonStyle(.bordered)
     }
 
     private var tvOSChannelsSidebar: some View {

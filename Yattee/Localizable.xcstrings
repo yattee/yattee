@@ -293,6 +293,17 @@
         }
       }
     },
+    "accounts.switcher.title" : {
+      "comment" : "Label of the control that switches the selected account",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Account"
+          }
+        }
+      }
+    },
     "accounts.useThisAccount" : {
       "localizations" : {
         "en" : {
@@ -17957,6 +17968,72 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "All Channels"
+          }
+        }
+      }
+    },
+    "subscriptions.banner.checking" : {
+      "comment" : "Banner shown while the selected account cannot be used yet",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Waiting for iCloud before your account can be used. Showing local data."
+          }
+        }
+      }
+    },
+    "subscriptions.banner.credentialMissing" : {
+      "comment" : "Banner shown while the selected account cannot be used yet",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sign in to this account on this device to see its data. Showing local data."
+          }
+        }
+      }
+    },
+    "subscriptions.banner.credentialRejected" : {
+      "comment" : "Banner shown while the selected account cannot be used yet",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "This account needs to be signed in again. Showing local data."
+          }
+        }
+      }
+    },
+    "subscriptions.banner.instanceDisabled" : {
+      "comment" : "Banner shown while the selected account cannot be used yet",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "This account's source is switched off. Showing local data."
+          }
+        }
+      }
+    },
+    "subscriptions.banner.instancePending" : {
+      "comment" : "Banner shown while the selected account cannot be used yet",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "This account's source has not arrived from iCloud yet. Showing local data."
+          }
+        }
+      }
+    },
+    "subscriptions.banner.unreachable" : {
+      "comment" : "Banner shown while the selected account cannot be used yet",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "This account's server could not be reached. Showing local data."
           }
         }
       }

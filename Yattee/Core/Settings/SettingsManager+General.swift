@@ -353,35 +353,6 @@ extension SettingsManager {
         }
     }
 
-    // MARK: - Subscription Account Settings
-
-    /// The subscription account storage key.
-    private static let subscriptionAccountKey = "subscriptionAccount"
-
-    /// The active subscription account configuration.
-    /// Determines where subscriptions are stored and fetched from.
-    /// Defaults to local (iCloud) if not set.
-    var subscriptionAccount: SubscriptionAccount {
-        get {
-            if let cached = _subscriptionAccount { return cached }
-            guard let data = localDefaults.data(forKey: Self.subscriptionAccountKey),
-                  let account = try? JSONDecoder().decode(SubscriptionAccount.self, from: data) else {
-                return .local
-            }
-            return account
-        }
-        set {
-            _subscriptionAccount = newValue
-            if let data = try? JSONEncoder().encode(newValue) {
-                localDefaults.set(data, forKey: Self.subscriptionAccountKey)
-                // Sync to iCloud if enabled
-                if iCloudSyncEnabled && syncSettings {
-                    ubiquitousStore.set(data, forKey: Self.subscriptionAccountKey)
-                }
-            }
-        }
-    }
-
     // MARK: - Notification Settings
 
     /// Whether background notifications are enabled. Default is false.

@@ -297,8 +297,10 @@ struct YatteeApp: App {
                     appEnvironment.refreshAccountStatuses()
                 }
 
-                // Validate subscription account (auto-correct if invalid)
-                appEnvironment.subscriptionAccountValidator.validateAndCorrectIfNeeded()
+                // Repair a context whose account was deleted on another device
+                // while this one was in the background. Only a deletion moves
+                // it — an account that merely has not synced yet is left alone.
+                appEnvironment.dataContextValidator.correctIfContextRemoved()
                 SubscriptionFeedCache.shared.warmIfNeeded(using: appEnvironment)
 
                 // Fetch remote CloudKit changes (catches missed push notifications)
@@ -353,8 +355,10 @@ struct YatteeApp: App {
                     appEnvironment.refreshAccountStatuses()
                 }
 
-                // Validate subscription account (auto-correct if invalid)
-                appEnvironment.subscriptionAccountValidator.validateAndCorrectIfNeeded()
+                // Repair a context whose account was deleted on another device
+                // while this one was in the background. Only a deletion moves
+                // it — an account that merely has not synced yet is left alone.
+                appEnvironment.dataContextValidator.correctIfContextRemoved()
                 SubscriptionFeedCache.shared.warmIfNeeded(using: appEnvironment)
 
                 // Check clipboard for external video URLs

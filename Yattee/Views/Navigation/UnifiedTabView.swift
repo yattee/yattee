@@ -423,6 +423,23 @@ struct UnifiedTabView: View {
     // MARK: - Sidebar
 
     private var sidebar: some View {
+        #if os(macOS)
+        VStack(spacing: 0) {
+            sidebarList
+
+            Divider()
+            // The window has no toolbar of its own to hang this off, and the
+            // sidebar is the one chrome every tab shares.
+            DataContextSwitcherSettingsRow()
+                .padding(.horizontal, 12)
+                .padding(.vertical, 8)
+        }
+        #else
+        sidebarList
+        #endif
+    }
+
+    private var sidebarList: some View {
         List(selection: $selection) {
             ForEach(visibleMainItems) { item in
                 sidebarRow(for: item)

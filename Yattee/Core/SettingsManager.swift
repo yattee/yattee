@@ -192,9 +192,6 @@ final class SettingsManager {
     var _saveRecentChannels: Bool?
     var _saveRecentPlaylists: Bool?
 
-    // Subscription account settings
-    var _subscriptionAccount: SubscriptionAccount?
-
     // Queue settings
     var _queueEnabled: Bool?
     var _queueAutoPlayNext: Bool?
@@ -536,7 +533,6 @@ final class SettingsManager {
         _saveRecentSearches = nil
         _saveRecentChannels = nil
         _saveRecentPlaylists = nil
-        _subscriptionAccount = nil
         _queueEnabled = nil
         _queueAutoPlayNext = nil
         _queueAutoPlayCountdown = nil
