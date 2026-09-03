@@ -509,12 +509,13 @@ struct AccountsManagerTests {
 @MainActor
 struct DataContextValidatorTests {
     private func makeValidator(
-        instances: InstancesManager
+        instances: InstancesManager,
+        defaults: UserDefaults? = nil
     ) -> (AccountsManager, DataContextValidator) {
         let accounts = AccountsManager(
             identityScope: CredentialIdentityScope(fixedScope: "identity-A"),
             instancesManager: instances,
-            defaults: UserDefaults(suiteName: "yattee.tests.\(UUID().uuidString)")!
+            defaults: defaults ?? UserDefaults(suiteName: "yattee.tests.\(UUID().uuidString)")!
         )
         let validator = DataContextValidator(
             accountsManager: accounts,
@@ -550,6 +551,196 @@ struct DataContextValidatorTests {
         #expect(!validator.allowsServerMutations)
 
         instances.remove(instance)
+    }
+
+    @Test("Only an account that is genuinely gone moves the context")
+    func correctionRunsOnlyOnAbsence() {
+        let instances = InstancesManager()
+        var instance = Instance(type: .invidious, url: URL(string: "https://inv-correct.example.com")!)
+        instances.add(instance)
+        defer { instances.remove(instance) }
+
+        let defaults = UserDefaults(suiteName: "yattee.tests.\(UUID().uuidString)")!
+        let (accounts, validator) = makeValidator(instances: instances, defaults: defaults)
+        let account = accounts.addAccount(instanceID: instance.id)
+        accounts.setStatus(.signedIn, for: account.id)
+        accounts.setContext(.account(account.id))
+
+        // Unusable, but the account is still there — the user gets it back by
+        // switching the instance on again, so nothing may be corrected.
+        instance.isEnabled = false
+        instances.update(instance)
+        validator.correctIfContextRemoved()
+        #expect(accounts.currentContext == .account(account.id))
+
+        instance.isEnabled = true
+        instances.update(instance)
+        accounts.setStatus(.credentialMissing, for: account.id)
+        validator.correctIfContextRemoved()
+        #expect(accounts.currentContext == .account(account.id))
+
+        // An account the store has never heard of is the one case that counts.
+        accounts.setContext(.account(UUID()))
+        validator.correctIfContextRemoved()
+        #expect(accounts.currentContext == .local)
+
+        // Persisted, not merely held in memory: the correction has to survive
+        // the relaunch that would otherwise re-read the dead selection.
+        let (reloaded, _) = makeValidator(instances: instances, defaults: defaults)
+        #expect(reloaded.currentContext == .local)
+    }
+
+    @Test("Only accounts the app can actually resolve are offered")
+    func availableContextsAreFiltered() {
+        let instances = InstancesManager()
+        let enabled = Instance(type: .invidious, url: URL(string: "https://inv-a.example.com")!)
+        let disabled = Instance(type: .invidious, url: URL(string: "https://inv-b.example.com")!, isEnabled: false)
+        // No account concept on PeerTube, so a context there could never be
+        // served from.
+        let unsupported = Instance(type: .peertube, url: URL(string: "https://pt.example.com")!)
+        for instance in [enabled, disabled, unsupported] { instances.add(instance) }
+        defer { for instance in [enabled, disabled, unsupported] { instances.remove(instance) } }
+
+        let (accounts, validator) = makeValidator(instances: instances)
+        let usable = accounts.addAccount(instanceID: enabled.id)
+        _ = accounts.addAccount(instanceID: disabled.id)
+        _ = accounts.addAccount(instanceID: unsupported.id)
+        // An account whose instance has not synced yet has no known
+        // capabilities, which is not the same as having none.
+        _ = accounts.addAccount(instanceID: UUID())
+
+        #expect(validator.availableContexts == [.local, .account(usable.id)])
+    }
+}
+
+@Suite("Data context repair", .serialized)
+@MainActor
+struct DataContextRepairTests {
+    private func makeInstance(_ host: String) -> Instance {
+        Instance(type: .invidious, url: URL(string: "https://\(host)-\(UUID().uuidString).example.com")!)
+    }
+
+    private func makeManager(instances: InstancesManager) -> AccountsManager {
+        AccountsManager(
+            identityScope: CredentialIdentityScope(fixedScope: "identity-A"),
+            instancesManager: instances,
+            defaults: UserDefaults(suiteName: "yattee.tests.\(UUID().uuidString)")!
+        )
+    }
+
+    @Test("Deleting the selected account falls back to a signed-in sibling")
+    func deletionPrefersSignedInSibling() {
+        let instances = InstancesManager()
+        let instance = makeInstance("inv")
+        instances.add(instance)
+        defer { instances.remove(instance) }
+
+        let manager = makeManager(instances: instances)
+        let selected = manager.addAccount(instanceID: instance.id)
+        let sibling = manager.addAccount(instanceID: instance.id)
+        manager.setStatus(.signedIn, for: sibling.id)
+        manager.setContext(.account(selected.id))
+
+        let chosenAt = manager.storedContext.changedAt
+        manager.removeAccount(selected.id)
+
+        #expect(manager.currentContext == .account(sibling.id))
+        // A repair, not a choice: it keeps the replaced selection's timestamp
+        // and is never published.
+        #expect(manager.storedContext.changedAt == chosenAt)
+        #expect(!manager.pendingContextUpload)
+    }
+
+    @Test("Without a signed-in sibling the repair lands on local")
+    func deletionWithoutSiblingFallsBackToLocal() {
+        let instances = InstancesManager()
+        let instance = makeInstance("inv")
+        instances.add(instance)
+        defer { instances.remove(instance) }
+
+        let manager = makeManager(instances: instances)
+        let selected = manager.addAccount(instanceID: instance.id)
+        // Present but not usable here — a context pointing at it would fall
+        // straight back to local data anyway.
+        let sibling = manager.addAccount(instanceID: instance.id)
+        manager.setStatus(.credentialMissing, for: sibling.id)
+        manager.setContext(.account(selected.id))
+
+        manager.removeAccount(selected.id)
+
+        #expect(manager.currentContext == .local)
+        #expect(!manager.pendingContextUpload)
+    }
+
+    @Test("A signed-in account on another server is never the repair")
+    func repairNeverCrossesInstances() {
+        let instances = InstancesManager()
+        let first = makeInstance("inv-first")
+        let second = makeInstance("inv-second")
+        instances.add(first)
+        instances.add(second)
+        defer {
+            instances.remove(first)
+            instances.remove(second)
+        }
+
+        let manager = makeManager(instances: instances)
+        let selected = manager.addAccount(instanceID: first.id)
+        let elsewhere = manager.addAccount(instanceID: second.id)
+        manager.setStatus(.signedIn, for: elsewhere.id)
+        manager.setContext(.account(selected.id))
+
+        manager.removeAccount(selected.id)
+
+        #expect(manager.currentContext == .local)
+    }
+
+    @Test("A synced context naming a deleted account repairs to its sibling")
+    func syncedTombstoneRepairPrefersSibling() {
+        let instances = InstancesManager()
+        let instance = makeInstance("inv")
+        instances.add(instance)
+        defer { instances.remove(instance) }
+
+        let manager = makeManager(instances: instances)
+        let deleted = manager.addAccount(instanceID: instance.id)
+        let sibling = manager.addAccount(instanceID: instance.id)
+        manager.setStatus(.signedIn, for: sibling.id)
+
+        manager.setContext(.local)
+        manager.removeAccount(deleted.id)
+
+        // Another device selected the account before it heard about the
+        // deletion, and stamped that choice later than anything here.
+        let incoming = StoredDataContext(
+            context: .account(deleted.id),
+            changedAt: Date().addingTimeInterval(60)
+        )
+        manager.applySyncedContext(incoming)
+
+        #expect(manager.currentContext == .account(sibling.id))
+    }
+
+    @Test("A synced context for a deleted account with no sibling lands on local")
+    func syncedTombstoneRepairFallsBackToLocal() {
+        let instances = InstancesManager()
+        let instance = makeInstance("inv")
+        instances.add(instance)
+        defer { instances.remove(instance) }
+
+        let manager = makeManager(instances: instances)
+        let deleted = manager.addAccount(instanceID: instance.id)
+
+        manager.setContext(.local)
+        manager.removeAccount(deleted.id)
+
+        let incoming = StoredDataContext(
+            context: .account(deleted.id),
+            changedAt: Date().addingTimeInterval(60)
+        )
+        manager.applySyncedContext(incoming)
+
+        #expect(manager.currentContext == .local)
     }
 }
 

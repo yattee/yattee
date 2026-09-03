@@ -89,6 +89,14 @@ final class AccountsManager {
     /// rather than enumerating the zone.
     private(set) var deletedAccountIDs: Set<UUID> = []
 
+    /// Which instance each deleted account lived on.
+    ///
+    /// Kept beside the tombstones for one purpose: repairing a context that
+    /// names a deleted account looks for another login on the same server, and
+    /// by then the account record itself is gone. Device-local and never
+    /// published, like the statuses that repair consults.
+    private(set) var deletedAccountInstanceIDs: [UUID: UUID] = [:]
+
     var currentContext: DataContext { storedContext.context }
 
     // MARK: - Initialization
@@ -271,7 +279,7 @@ final class AccountsManager {
         }
 
         if storedContext.context == .account(accountID) {
-            correctContextAfterDeletion()
+            correctContextAfterDeletion(onInstance: account.instanceID)
         }
 
         save()
@@ -286,16 +294,21 @@ final class AccountsManager {
     /// which is what stops a stale device's queued edit from resurrecting the
     /// account here.
     private func forgetAccount(_ accountID: UUID) {
+        let instanceID = account(id: accountID)?.instanceID
+
         accounts.removeAll { $0.id == accountID }
         accountStatuses[accountID] = nil
         pendingUploads.remove(accountID)
         deletedAccountIDs.insert(accountID)
+        if let instanceID {
+            deletedAccountInstanceIDs[accountID] = instanceID
+        }
 
         // Selecting a deleted account would leave the UI pointing at nothing.
         // A deletion the app can point at is one of the few things allowed to
         // correct the context.
         if storedContext.context == .account(accountID) {
-            correctContextAfterDeletion()
+            correctContextAfterDeletion(onInstance: instanceID)
         }
     }
 
@@ -305,16 +318,46 @@ final class AccountsManager {
     /// it replaces and is never published. Stamping it "now" would let an
     /// automatic fallback outrank a deliberate choice another device made
     /// between the deletion and this device hearing about it — and publishing
-    /// it would push that fallback over their choice. Every device that sees
-    /// the deletion performs the same repair, so they converge without anyone
-    /// writing anything.
-    private func correctContextAfterDeletion() {
-        storedContext = StoredDataContext(context: .local, changedAt: storedContext.changedAt)
+    /// it would push that fallback over their choice.
+    ///
+    /// The devices no longer converge on the same *value* the way they did when
+    /// this always chose local: a sibling is picked by status, and statuses are
+    /// device-local, so a device that has no credential for the sibling repairs
+    /// to local while another lands on the sibling. That is acceptable precisely
+    /// because the repair is never uploaded — nothing overwrites anybody — and
+    /// the next explicit choice re-converges everyone.
+    private func correctContextAfterDeletion(onInstance instanceID: UUID?) {
+        storedContext = StoredDataContext(
+            context: repairTarget(onInstance: instanceID),
+            changedAt: storedContext.changedAt
+        )
         // Including any upload the deleted choice had queued: sending it now
         // would publish this fallback under that choice's timestamp, which is
         // exactly what not stamping it "now" is meant to prevent.
         pendingContextUpload = false
         NotificationCenter.default.post(name: .dataContextDidChange, object: nil)
+    }
+
+    /// Where a context whose account was deleted should land.
+    ///
+    /// Another signed-in login on the same server is far closer to what the user
+    /// was doing than their local data, and on an instance holding two logins it
+    /// is usually the only other thing they meant. Only `signedIn` qualifies: a
+    /// sibling this device cannot use would repair the context onto something
+    /// that immediately falls back to local anyway, without the user's choice
+    /// surviving anywhere.
+    private func repairTarget(onInstance instanceID: UUID?) -> DataContext {
+        guard let instanceID else { return .local }
+
+        let sibling = accounts(forInstance: instanceID)
+            .filter { status(for: $0.id) == .signedIn }
+            .filter { capabilities(for: $0)?.isSelectableContext == true }
+            // Ordered so the answer does not depend on which order the accounts
+            // happened to arrive in, the same way a context tie is broken.
+            .min { $0.id.uuidString < $1.id.uuidString }
+
+        guard let sibling else { return .local }
+        return .account(sibling.id)
     }
 
     /// Marks a deletion as confirmed by the server. Until then it stays in the
@@ -540,9 +583,15 @@ final class AccountsManager {
         // publish that choice with a newer timestamp; adopting it would leave
         // every device pointing at an account that is never coming back. The
         // choice's own timestamp is kept, so a later real selection still wins,
-        // and every device that holds the tombstone repairs it identically.
+        // and the repair is never published — a device that repairs to something
+        // else does not overwrite anybody.
         if let accountID = incoming.context.accountID, deletedAccountIDs.contains(accountID) {
-            incoming = StoredDataContext(context: .local, changedAt: incoming.changedAt)
+            // Repaired the same way a local deletion is: onto a signed-in login
+            // on the same server when there is one, local otherwise.
+            incoming = StoredDataContext(
+                context: repairTarget(onInstance: deletedAccountInstanceIDs[accountID]),
+                changedAt: incoming.changedAt
+            )
 
             LoggingService.shared.info(
                 "Ignoring a synced context that names a deleted account",
@@ -902,6 +951,14 @@ final class AccountsManager {
             deletedInstanceIDs = Set(ids.compactMap(UUID.init(uuidString:)))
         }
 
+        if let pairs = defaults.dictionary(forKey: key("deletedAccountInstances")) as? [String: String] {
+            deletedAccountInstanceIDs = pairs.reduce(into: [:]) { result, pair in
+                guard let accountID = UUID(uuidString: pair.key),
+                      let instanceID = UUID(uuidString: pair.value) else { return }
+                result[accountID] = instanceID
+            }
+        }
+
         pendingContextUpload = defaults.bool(forKey: key("pendingContextUpload"))
 
         purgeUnresolvedNamespace()
@@ -911,7 +968,7 @@ final class AccountsManager {
     private static let storedKeyNames = [
         "accounts", "context", "hasContext", "migrated", "pendingUploads",
         "pendingDeletions", "pendingMarkerUploads", "deletedAccounts",
-        "deletedInstances", "pendingContextUpload"
+        "deletedInstances", "deletedAccountInstances", "pendingContextUpload"
     ]
 
     /// Deletes whatever was written while the identity was still unresolved.
@@ -962,6 +1019,12 @@ final class AccountsManager {
         defaults.set(pendingMarkerUploads.map(\.uuidString), forKey: key("pendingMarkerUploads"))
         defaults.set(deletedAccountIDs.map(\.uuidString), forKey: key("deletedAccounts"))
         defaults.set(deletedInstanceIDs.map(\.uuidString), forKey: key("deletedInstances"))
+        defaults.set(
+            deletedAccountInstanceIDs.reduce(into: [String: String]()) { result, pair in
+                result[pair.key.uuidString] = pair.value.uuidString
+            },
+            forKey: key("deletedAccountInstances")
+        )
         defaults.set(pendingContextUpload, forKey: key("pendingContextUpload"))
     }
 
@@ -985,6 +1048,7 @@ final class AccountsManager {
         pendingMarkerUploads = []
         deletedAccountIDs = []
         deletedInstanceIDs = []
+        deletedAccountInstanceIDs = [:]
         pendingContextUpload = false
 
         load()
