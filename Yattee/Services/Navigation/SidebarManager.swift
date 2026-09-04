@@ -18,6 +18,10 @@ final class SidebarManager {
     private(set) var channelItems: [SidebarItem] = []
 
     /// Playlist items for the Collections section.
+    ///
+    /// Local playlists only, whatever data context is selected — the playlists
+    /// screen follows the context but the sidebar does not. A known
+    /// inconsistency, kept for now rather than half-solved.
     private(set) var playlistItems: [SidebarItem] = []
 
     /// Media source items for the Media Sources section.

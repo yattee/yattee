@@ -8609,6 +8609,17 @@
         }
       }
     },
+    "playlists.remote.load.error" : {
+      "comment" : "Shown when an account's playlists could not be fetched",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Could not load playlists"
+          }
+        }
+      }
+    },
     "playlists.search.placeholder" : {
       "localizations" : {
         "en" : {

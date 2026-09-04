@@ -10,13 +10,50 @@ import SwiftUI
 struct PlaylistsListView: View {
     @Environment(\.appEnvironment) private var appEnvironment
     @Namespace private var sheetTransition
-    @State private var playlists: [LocalPlaylist] = []
+    @State private var localPlaylists: [LocalPlaylist] = []
     @State private var searchText = ""
     @State private var showingNewPlaylist = false
     @State private var playlistToEdit: LocalPlaylist?
     #if os(tvOS)
-    @FocusState private var focusedPlaylistID: UUID?
+    @FocusState private var focusedPlaylistID: PlaylistListItemID?
+    @State private var didSetInitialFocus = false
     #endif
+
+    // MARK: - Remote state
+
+    /// The account a creation is for, captured when the button was pressed —
+    /// the form must not follow a context that moves while it is open.
+    @State private var createAccount: Account?
+    @State private var remoteEdit: RemotePlaylistEdit?
+    @State private var remoteDeletion: RemotePlaylistDeletion?
+    /// Why the account's list could not be fetched, when it could not.
+    @State private var remoteErrorMessage: String?
+    /// The effective context the rows on screen belong to, so a status change
+    /// that does not move it does not force a reload.
+    @State private var loadedContext: DataContext?
+    /// Which load the state belongs to. Cancelling the previous task is not
+    /// enough on its own: a request that already came back races the
+    /// cancellation, and its failure would be reported for a context nobody is
+    /// looking at any more.
+    @State private var loadGeneration = 0
+    @State private var loadTask: Task<Void, Never>?
+
+    /// A form opened over a server-side playlist, filled from the refetch that
+    /// preceded it rather than from the row that was tapped.
+    private struct RemotePlaylistEdit: Identifiable {
+        let id = UUID()
+        let account: Account
+        let playlistID: String
+        let title: String
+        let description: String?
+        let privacy: PlaylistPrivacy?
+    }
+
+    /// A deletion waiting on its confirmation.
+    private struct RemotePlaylistDeletion {
+        let account: Account
+        let playlistID: String
+    }
 
     // View options (persisted)
     @AppStorage("playlists.layout") private var layout: VideoListLayout = .list
@@ -57,14 +94,74 @@ struct PlaylistsListView: View {
         #endif
     }
 
-    /// Playlists filtered by search.
-    private var filteredPlaylists: [LocalPlaylist] {
-        guard !searchText.isEmpty else { return playlists }
-        let query = searchText.lowercased()
-        return playlists.filter { playlist in
-            playlist.title.lowercased().contains(query) ||
-            (playlist.playlistDescription?.lowercased().contains(query) ?? false)
+    // MARK: - Context
+
+    /// The account whose playlists are on screen, or `nil` when these are the
+    /// device's own.
+    ///
+    /// The *effective* context, so a selected account that cannot be used right
+    /// now shows local playlists — with the banner saying why — instead of an
+    /// empty list nobody can explain.
+    private var contextAccount: Account? {
+        guard let appEnvironment,
+              case let .account(id) = appEnvironment.dataContextValidator.effectiveContext
+        else { return nil }
+
+        return appEnvironment.accountsManager.account(id: id)
+    }
+
+    /// The account these playlists may be changed on.
+    ///
+    /// Both halves are asked even though reads only ever follow a valid context
+    /// today: the write gate is what has to hold if that ever stops being true.
+    private var writableAccount: Account? {
+        guard let appEnvironment,
+              let account = contextAccount,
+              appEnvironment.dataContextValidator.allowsServerMutations,
+              appEnvironment.accountsManager.capabilities(for: account)?.supportsPlaylistWrites == true
+        else { return nil }
+
+        return account
+    }
+
+    /// Whether the create affordances have somewhere to create.
+    private var canCreatePlaylist: Bool {
+        contextAccount == nil || writableAccount != nil
+    }
+
+    private var contextUnavailability: DataContextUnavailability? {
+        guard appEnvironment?.accountsManager.currentContext.isLocal == false else { return nil }
+        return appEnvironment?.dataContextValidator.unavailability
+    }
+
+    // MARK: - Rows
+
+    /// The account's list as last fetched, or `nil` if it never was.
+    ///
+    /// Read live rather than copied into state: everything that changes a
+    /// server-side playlist goes through the cache, so reading it is what makes
+    /// a rename or a delete — here or in the detail view — show up.
+    private var remotePlaylists: [Playlist]? {
+        guard let appEnvironment, let account = contextAccount else { return nil }
+        return appEnvironment.remotePlaylistsCache.playlists(for: account.id)
+    }
+
+    private var items: [PlaylistListItem] {
+        guard contextAccount != nil else {
+            return localPlaylists.map { .local($0) }
         }
+        return (remotePlaylists ?? []).map { .remote($0) }
+    }
+
+    /// Playlists filtered by search.
+    private var filteredItems: [PlaylistListItem] {
+        PlaylistListItem.filtered(items, searchText: searchText)
+    }
+
+    /// Nothing fetched yet and no reason given — the spinner is for the first
+    /// load only, a refetch leaves the previous list on screen.
+    private var isLoadingRemoteList: Bool {
+        contextAccount != nil && remotePlaylists == nil && remoteErrorMessage == nil
     }
 
     var body: some View {
@@ -73,26 +170,27 @@ struct PlaylistsListView: View {
                 #if os(tvOS)
                 tvOSContent
                 #else
-                if filteredPlaylists.isEmpty {
-                    emptyView
-                } else {
-                    switch layout {
-                    case .list:
-                        listContent
-                    case .grid:
-                        gridContent
-                    }
-                }
+                content
                 #endif
             }
             .onChange(of: geometry.size.width, initial: true) { _, newWidth in
                 viewWidth = newWidth
             }
         }
+        // Above the list rather than inside it: the rows are local data while
+        // this is showing, and nothing else on screen says so.
+        .safeAreaInset(edge: .top, spacing: 0) {
+            if let contextUnavailability {
+                DataContextUnavailableBanner(reason: contextUnavailability)
+            }
+        }
         #if !os(tvOS)
         .navigationTitle(String(localized: "home.playlists.title"))
         .toolbarTitleDisplayMode(.inlineLarge)
         .searchable(text: $searchText, prompt: Text(String(localized: "playlists.search.placeholder")))
+        .refreshable {
+            await load()
+        }
         .toolbar {
             #if os(macOS)
             // Pin the trailing group (search field + toolbar buttons) to the right edge,
@@ -117,11 +215,13 @@ struct PlaylistsListView: View {
                 }
                 #endif
             }
-            ToolbarItem(placement: .primaryAction) {
-                Button {
-                    showingNewPlaylist = true
-                } label: {
-                    Image(systemName: "plus")
+            if canCreatePlaylist {
+                ToolbarItem(placement: .primaryAction) {
+                    Button {
+                        beginCreate()
+                    } label: {
+                        Image(systemName: "plus")
+                    }
                 }
             }
         }
@@ -133,9 +233,25 @@ struct PlaylistsListView: View {
         }
         #endif
         .sheet(isPresented: $showingNewPlaylist) {
-            PlaylistFormSheet(mode: .create) { title, description in
-                _ = dataManager?.createPlaylist(title: title, description: description)
-                loadPlaylists()
+            if let createAccount {
+                PlaylistFormSheet(
+                    mode: .create,
+                    showsPrivacy: supportsPrivacy(createAccount)
+                ) { title, description, privacy in
+                    Task {
+                        await createRemotePlaylist(
+                            title: title,
+                            description: description,
+                            privacy: privacy,
+                            on: createAccount
+                        )
+                    }
+                }
+            } else {
+                PlaylistFormSheet(mode: .create) { title, description in
+                    _ = dataManager?.createPlaylist(title: title, description: description)
+                    loadPlaylists()
+                }
             }
         }
         .sheet(item: $playlistToEdit) { playlist in
@@ -144,11 +260,87 @@ struct PlaylistsListView: View {
                 loadPlaylists()
             }
         }
+        .sheet(item: $remoteEdit) { edit in
+            PlaylistFormSheet(
+                mode: .editRemote(
+                    title: edit.title,
+                    description: edit.description,
+                    privacy: edit.privacy
+                ),
+                showsPrivacy: supportsPrivacy(edit.account)
+            ) { newTitle, newDescription, newPrivacy in
+                Task {
+                    await saveRemoteEdit(
+                        edit,
+                        title: newTitle,
+                        description: newDescription,
+                        privacy: newPrivacy
+                    )
+                }
+            }
+        }
+        // Taking a playlist off a server is a very different sentence from
+        // deleting a local one, which stays unconfirmed as it always was.
+        .confirmationDialog(
+            String(localized: "playlist.remote.delete.confirm"),
+            isPresented: Binding(
+                get: { remoteDeletion != nil },
+                set: { if !$0 { remoteDeletion = nil } }
+            ),
+            titleVisibility: .visible,
+            presenting: remoteDeletion
+        ) { deletion in
+            Button(String(localized: "common.delete"), role: .destructive) {
+                Task { await deleteRemotePlaylist(deletion) }
+            }
+        }
         .onAppear {
-            loadPlaylists()
+            startLoad()
         }
         .onReceive(NotificationCenter.default.publisher(for: .playlistsDidChange)) { _ in
             loadPlaylists()
+        }
+        // Selecting another account — or local — changes whose playlists these
+        // are, and the previous ones may not be shown for a moment longer.
+        .onReceive(NotificationCenter.default.publisher(for: .dataContextDidChange)) { _ in
+            startLoad()
+        }
+        // The same, without the context moving: the credential behind the
+        // account was replaced, so the list may now be someone else's.
+        .onReceive(NotificationCenter.default.publisher(for: .accountCredentialDidChange)) { _ in
+            startLoad()
+        }
+        // A status, an account or an instance changing moves reads between the
+        // account and local without the stored context moving at all.
+        .onReceive(NotificationCenter.default.publisher(for: .accountStatusesDidChange)) { _ in
+            reloadIfEffectiveContextMoved()
+        }
+        .onReceive(NotificationCenter.default.publisher(for: .accountsDidChange)) { _ in
+            reloadIfEffectiveContextMoved()
+        }
+        .onReceive(NotificationCenter.default.publisher(for: .instancesDidChange)) { _ in
+            reloadIfEffectiveContextMoved()
+        }
+    }
+
+    // MARK: - Content
+
+    @ViewBuilder
+    private var content: some View {
+        if isLoadingRemoteList {
+            ProgressView()
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+        } else if let remoteErrorMessage, items.isEmpty {
+            remoteErrorView(remoteErrorMessage)
+        } else if filteredItems.isEmpty {
+            emptyView
+        } else {
+            switch layout {
+            case .list:
+                listContent
+            case .grid:
+                gridContent
+            }
         }
     }
 
@@ -161,10 +353,22 @@ struct PlaylistsListView: View {
                 TextField(String(localized: "playlists.search.placeholder"), text: $searchText)
                     .textFieldStyle(.plain)
 
-                Button {
-                    showingNewPlaylist = true
-                } label: {
-                    Label(String(localized: "home.playlists.new"), systemImage: "plus")
+                if canCreatePlaylist {
+                    Button {
+                        beginCreate()
+                    } label: {
+                        Label(String(localized: "home.playlists.new"), systemImage: "plus")
+                    }
+                }
+
+                // Pull to refresh has no equivalent here, and a server-side list
+                // is the only one that can go stale.
+                if contextAccount != nil {
+                    Button {
+                        startLoad()
+                    } label: {
+                        Label(String(localized: "common.refresh"), systemImage: "arrow.clockwise")
+                    }
                 }
 
                 Button {
@@ -180,23 +384,15 @@ struct PlaylistsListView: View {
             .padding(.top, 20)
             .padding(.bottom, 20)
 
-            Group {
-                if filteredPlaylists.isEmpty {
-                    emptyView
-                } else {
-                    switch layout {
-                    case .list:
-                        listContent
-                    case .grid:
-                        gridContent
-                    }
-                }
-            }
-            .focusSection()
+            content
+                .focusSection()
         }
-        .onChange(of: playlists.first?.id, initial: true) { _, newValue in
+        .onChange(of: items.first?.id, initial: true) { _, newValue in
             // Work around tvOS focus bug: set initial focus to first playlist once cells materialize.
-            guard let newValue else { return }
+            // Only ever the first time cells appear — a refetch, or a switch the
+            // user made in the header, must not pull focus out from under them.
+            guard !didSetInitialFocus, let newValue else { return }
+            didSetInitialFocus = true
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.15) {
                 focusedPlaylistID = newValue
             }
@@ -220,12 +416,34 @@ struct PlaylistsListView: View {
         ContentUnavailableView {
             Label(String(localized: "home.playlists.title"), systemImage: "list.bullet.rectangle")
         } description: {
-            Text(String(localized: "home.empty.description"))
+            Text(emptyDescription)
         } actions: {
-            Button {
-                showingNewPlaylist = true
-            } label: {
-                Label(String(localized: "home.playlists.new"), systemImage: "plus")
+            if canCreatePlaylist {
+                Button {
+                    beginCreate()
+                } label: {
+                    Label(String(localized: "home.playlists.new"), systemImage: "plus")
+                }
+                .buttonStyle(.borderedProminent)
+            }
+        }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+    }
+
+    private var emptyDescription: String {
+        contextAccount == nil
+            ? String(localized: "home.empty.description")
+            : String(localized: "playlists.selector.empty.account")
+    }
+
+    private func remoteErrorView(_ message: String) -> some View {
+        ContentUnavailableView {
+            Label(String(localized: "playlists.remote.load.error"), systemImage: "exclamationmark.triangle")
+        } description: {
+            Text(message)
+        } actions: {
+            Button(String(localized: "common.retry")) {
+                startLoad()
             }
             .buttonStyle(.borderedProminent)
         }
@@ -239,37 +457,36 @@ struct PlaylistsListView: View {
             Spacer()
                 .frame(height: 16)
         } content: {
-            ForEach(Array(filteredPlaylists.enumerated()), id: \.element.id) { index, playlist in
-                VideoListRow(
-                    isLast: index == filteredPlaylists.count - 1,
-                    rowStyle: rowStyle,
-                    listStyle: listStyle,
-                    contentWidth: rowStyle.thumbnailWidth
-                ) {
-                    playlistRow(playlist: playlist)
-                }
-                #if !os(tvOS)
-                .swipeActions {
-                    SwipeAction(
-                        symbolImage: "pencil",
-                        tint: .white,
-                        background: .orange
-                    ) { reset in
-                        playlistToEdit = playlist
-                        reset()
-                    }
-                    SwipeAction(
-                        symbolImage: "trash.fill",
-                        tint: .white,
-                        background: .red
-                    ) { reset in
-                        dataManager?.deletePlaylist(playlist)
-                        loadPlaylists()
-                        reset()
-                    }
-                }
-                #endif
+            ForEach(Array(filteredItems.enumerated()), id: \.element.id) { index, item in
+                listRow(item: item, index: index, count: filteredItems.count)
             }
+        }
+    }
+
+    @ViewBuilder
+    private func listRow(item: PlaylistListItem, index: Int, count: Int) -> some View {
+        let row = VideoListRow(
+            isLast: index == count - 1,
+            rowStyle: rowStyle,
+            listStyle: listStyle,
+            contentWidth: rowStyle.thumbnailWidth
+        ) {
+            playlistRow(item: item)
+        }
+        #if !os(tvOS)
+        .swipeActions(actionsArray: swipeActions(for: item))
+        #endif
+
+        // Swipe is iOS-only, so a menu is the only way to reach a server-side
+        // playlist's actions on macOS and tvOS. Local rows keep exactly the
+        // affordances they had — and an account that may not change its
+        // playlists gets no menu rather than an empty one.
+        if case .remote = item, writableAccount != nil {
+            row.contextMenu {
+                rowActions(for: item)
+            }
+        } else {
+            row
         }
     }
 
@@ -278,8 +495,8 @@ struct PlaylistsListView: View {
     private var gridContent: some View {
         ScrollView {
             VideoGridContent(columns: gridConfig.effectiveColumns) {
-                ForEach(filteredPlaylists, id: \.id) { playlist in
-                    playlistCard(playlist: playlist)
+                ForEach(filteredItems, id: \.id) { item in
+                    playlistCard(item: item)
                 }
             }
         }
@@ -291,61 +508,385 @@ struct PlaylistsListView: View {
     // MARK: - Helper Views
 
     @ViewBuilder
-    private func playlistRow(playlist: LocalPlaylist) -> some View {
+    private func playlistRow(item: PlaylistListItem) -> some View {
         #if os(tvOS)
-        NavigationLink(value: NavigationDestination.playlist(.local(playlist.id, title: playlist.title))) {
-            PlaylistRowView(playlist: playlist, style: rowStyle)
+        NavigationLink(value: NavigationDestination.playlist(source(for: item))) {
+            rowContent(for: item)
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .contentShape(Rectangle())
         }
         .buttonStyle(.plain)
-        .zoomTransitionSource(id: playlist.id)
-        .focused($focusedPlaylistID, equals: playlist.id)
+        .zoomTransitionSource(id: item.transitionID)
+        .focused($focusedPlaylistID, equals: item.id)
         #else
-        PlaylistRowView(playlist: playlist, style: rowStyle)
+        rowContent(for: item)
             .frame(maxWidth: .infinity, alignment: .leading)
             .contentShape(Rectangle())
             .onTapGesture {
-                appEnvironment?.navigationCoordinator.navigate(to: .playlist(.local(playlist.id, title: playlist.title)))
+                appEnvironment?.navigationCoordinator.navigate(to: .playlist(source(for: item)))
             }
-            .zoomTransitionSource(id: playlist.id)
+            .zoomTransitionSource(id: item.transitionID)
         #endif
     }
 
     @ViewBuilder
-    private func playlistCard(playlist: LocalPlaylist) -> some View {
+    private func rowContent(for item: PlaylistListItem) -> some View {
+        switch item {
+        case let .local(playlist):
+            PlaylistRowView(playlist: playlist, style: rowStyle)
+        case let .remote(playlist):
+            SearchPlaylistRowView(playlist: playlist, style: rowStyle)
+        }
+    }
+
+    @ViewBuilder
+    private func playlistCard(item: PlaylistListItem) -> some View {
         #if os(tvOS)
-        NavigationLink(value: NavigationDestination.playlist(.local(playlist.id, title: playlist.title))) {
-            LocalPlaylistCardView(playlist: playlist, isCompact: gridConfig.isCompactCards)
+        let card = NavigationLink(value: NavigationDestination.playlist(source(for: item))) {
+            cardContent(for: item)
                 .frame(maxHeight: .infinity, alignment: .top)
         }
         .buttonStyle(.plain)
-        .zoomTransitionSource(id: playlist.id)
-        .focused($focusedPlaylistID, equals: playlist.id)
+        .zoomTransitionSource(id: item.transitionID)
+        .focused($focusedPlaylistID, equals: item.id)
+
+        if case .remote = item, writableAccount != nil {
+            card.contextMenu {
+                rowActions(for: item)
+            }
+        } else {
+            card
+        }
         #else
-        LocalPlaylistCardView(playlist: playlist, isCompact: gridConfig.isCompactCards)
+        let card = cardContent(for: item)
             .frame(maxHeight: .infinity, alignment: .top)
             .onTapGesture {
-                appEnvironment?.navigationCoordinator.navigate(to: .playlist(.local(playlist.id, title: playlist.title)))
+                appEnvironment?.navigationCoordinator.navigate(to: .playlist(source(for: item)))
             }
-            .zoomTransitionSource(id: playlist.id)
-            .contextMenu {
+            .zoomTransitionSource(id: item.transitionID)
+
+        if hasRowActions(item) {
+            card.contextMenu {
+                rowActions(for: item)
+            }
+        } else {
+            card
+        }
+        #endif
+    }
+
+    /// Whether a row has anything to offer in a menu.
+    ///
+    /// Local rows always do. A server-side row needs an account that may change
+    /// its playlists — an empty menu is worse than no menu at all.
+    private func hasRowActions(_ item: PlaylistListItem) -> Bool {
+        switch item {
+        case .local: true
+        case .remote: writableAccount != nil
+        }
+    }
+
+    @ViewBuilder
+    private func cardContent(for item: PlaylistListItem) -> some View {
+        switch item {
+        case let .local(playlist):
+            LocalPlaylistCardView(playlist: playlist, isCompact: gridConfig.isCompactCards)
+        case let .remote(playlist):
+            PlaylistCardView(playlist: playlist, isCompact: gridConfig.isCompactCards)
+        }
+    }
+
+    // MARK: - Navigation
+
+    /// Where a row leads.
+    ///
+    /// A server-side playlist carries both the account's instance and the
+    /// account's id, and they have to agree: the detail view only keeps
+    /// ownership — and with it editing and deletion — when the id it is handed
+    /// names an account on the instance it was opened for.
+    private func source(for item: PlaylistListItem) -> PlaylistSource {
+        switch item {
+        case let .local(playlist):
+            return .local(playlist.id, title: playlist.title)
+        case let .remote(playlist):
+            let account = contextAccount
+            return .remote(
+                playlist.id,
+                instance: account.flatMap { appEnvironment?.accountsManager.instance(for: $0) },
+                title: playlist.title,
+                accountID: account?.id
+            )
+        }
+    }
+
+    // MARK: - Row Actions
+
+    @ViewBuilder
+    private func rowActions(for item: PlaylistListItem) -> some View {
+        switch item {
+        case let .local(playlist):
+            Button {
+                playlistToEdit = playlist
+            } label: {
+                Label(String(localized: "playlist.edit"), systemImage: "pencil")
+            }
+            Button(role: .destructive) {
+                dataManager?.deletePlaylist(playlist)
+                loadPlaylists()
+            } label: {
+                Label(String(localized: "playlist.delete"), systemImage: "trash")
+            }
+
+        case let .remote(playlist):
+            if let account = writableAccount {
                 Button {
-                    playlistToEdit = playlist
+                    beginRemoteEdit(playlist, on: account)
                 } label: {
                     Label(String(localized: "playlist.edit"), systemImage: "pencil")
                 }
                 Button(role: .destructive) {
-                    dataManager?.deletePlaylist(playlist)
-                    loadPlaylists()
+                    remoteDeletion = RemotePlaylistDeletion(
+                        account: account,
+                        playlistID: playlist.id.playlistID
+                    )
                 } label: {
                     Label(String(localized: "playlist.delete"), systemImage: "trash")
                 }
             }
-        #endif
+        }
+    }
+
+    private func swipeActions(for item: PlaylistListItem) -> [SwipeAction] {
+        switch item {
+        case let .local(playlist):
+            return [
+                SwipeAction(
+                    symbolImage: "pencil",
+                    tint: .white,
+                    background: .orange
+                ) { reset in
+                    playlistToEdit = playlist
+                    reset()
+                },
+                SwipeAction(
+                    symbolImage: "trash.fill",
+                    tint: .white,
+                    background: .red
+                ) { reset in
+                    dataManager?.deletePlaylist(playlist)
+                    loadPlaylists()
+                    reset()
+                }
+            ]
+
+        case let .remote(playlist):
+            guard let account = writableAccount else { return [] }
+            return [
+                // Closed before anything is awaited: an edit begins with a
+                // refetch and a delete with a confirmation, and neither should
+                // happen behind a row still standing open.
+                SwipeAction(
+                    symbolImage: "pencil",
+                    tint: .white,
+                    background: .orange
+                ) { reset in
+                    reset()
+                    beginRemoteEdit(playlist, on: account)
+                },
+                SwipeAction(
+                    symbolImage: "trash.fill",
+                    tint: .white,
+                    background: .red
+                ) { reset in
+                    reset()
+                    remoteDeletion = RemotePlaylistDeletion(
+                        account: account,
+                        playlistID: playlist.id.playlistID
+                    )
+                }
+            ]
+        }
+    }
+
+    private func supportsPrivacy(_ account: Account) -> Bool {
+        appEnvironment?.accountsManager.capabilities(for: account)?.supportsPlaylistPrivacy == true
+    }
+
+    // MARK: - Creating
+
+    private func beginCreate() {
+        createAccount = writableAccount
+        showingNewPlaylist = true
+    }
+
+    private func createRemotePlaylist(
+        title: String,
+        description: String?,
+        privacy: PlaylistPrivacy?,
+        on account: Account
+    ) async {
+        guard let appEnvironment else { return }
+
+        do {
+            try await appEnvironment.remotePlaylistsCache.createPlaylist(
+                title: title,
+                description: description,
+                privacy: privacy,
+                for: account
+            )
+        } catch {
+            appEnvironment.toastManager.showError(
+                String(localized: "playlist.remote.create.error"),
+                subtitle: error.localizedDescription
+            )
+        }
+    }
+
+    // MARK: - Editing
+
+    /// Opens the edit form over the playlist as the server has it *now*.
+    ///
+    /// The form saves every field at once, so an edit started from a row fetched
+    /// minutes ago would put that row's title and description back over anything
+    /// changed since — by another client, or from the detail view. On failure
+    /// there is no sheet: editing from data known to be stale is the thing this
+    /// refetch exists to prevent.
+    private func beginRemoteEdit(_ playlist: Playlist, on account: Account) {
+        Task {
+            guard let appEnvironment else { return }
+            let playlistID = playlist.id.playlistID
+
+            do {
+                try await appEnvironment.remotePlaylistsCache.refreshSnapshot(id: playlistID, for: account)
+
+                // Nothing came back to edit: the account was cleared while this
+                // was in flight and its data went with it.
+                guard let snapshot = appEnvironment.remotePlaylistsCache.snapshot(
+                    id: playlistID,
+                    for: account.id
+                ) else { return }
+
+                remoteEdit = RemotePlaylistEdit(
+                    account: account,
+                    playlistID: playlistID,
+                    title: snapshot.playlist.title,
+                    description: snapshot.playlist.description,
+                    privacy: snapshot.isListed.map { $0 ? .public : .private }
+                )
+            } catch {
+                appEnvironment.toastManager.showError(
+                    String(localized: "playlist.remote.refresh.error"),
+                    subtitle: error.localizedDescription
+                )
+            }
+        }
+    }
+
+    private func saveRemoteEdit(
+        _ edit: RemotePlaylistEdit,
+        title: String,
+        description: String?,
+        privacy: PlaylistPrivacy?
+    ) async {
+        guard let appEnvironment else { return }
+
+        do {
+            try await appEnvironment.remotePlaylistsCache.updatePlaylist(
+                id: edit.playlistID,
+                title: title,
+                description: description,
+                privacy: privacy,
+                for: edit.account
+            )
+        } catch {
+            // A half-applied edit is a real outcome on Piped, where the name and
+            // the description are two calls — the cache's refetch is what says
+            // which half landed, and the rows are read straight out of it.
+            appEnvironment.toastManager.showError(
+                String(localized: "playlist.remote.edit.error"),
+                subtitle: error.localizedDescription
+            )
+        }
+    }
+
+    private func deleteRemotePlaylist(_ deletion: RemotePlaylistDeletion) async {
+        guard let appEnvironment else { return }
+
+        do {
+            try await appEnvironment.remotePlaylistsCache.deletePlaylist(
+                id: deletion.playlistID,
+                for: deletion.account
+            )
+        } catch {
+            appEnvironment.toastManager.showError(
+                String(localized: "playlist.remote.delete.error"),
+                subtitle: error.localizedDescription
+            )
+        }
+    }
+
+    // MARK: - Loading
+
+    private func startLoad() {
+        loadTask?.cancel()
+        loadTask = nil
+
+        guard let (account, generation) = beginLoad() else { return }
+        loadTask = Task { await fetchRemoteList(account, generation: generation) }
+    }
+
+    /// The same load, awaited — for pull to refresh, where the spinner has to
+    /// stay up until the fetch is over.
+    private func load() async {
+        guard let (account, generation) = beginLoad() else { return }
+        await fetchRemoteList(account, generation: generation)
+    }
+
+    private func reloadIfEffectiveContextMoved() {
+        guard appEnvironment?.dataContextValidator.effectiveContext != loadedContext else { return }
+        startLoad()
+    }
+
+    /// Records which context the rows belong to and loads the ones that are
+    /// already here, returning the account whose list still has to be fetched.
+    ///
+    /// Local data is read synchronously and stays that way: an await before it
+    /// would put the empty state on screen for a frame every time this view
+    /// appears.
+    private func beginLoad() -> (account: Account, generation: Int)? {
+        guard let appEnvironment else { return nil }
+
+        // Recorded on every load, not only on a context change: the first load
+        // of a session has to establish what is on screen, or the first status
+        // change would look like a move and reload for nothing.
+        loadedContext = appEnvironment.dataContextValidator.effectiveContext
+        loadGeneration += 1
+        remoteErrorMessage = nil
+
+        guard let account = contextAccount else {
+            loadPlaylists()
+            return nil
+        }
+
+        return (account, loadGeneration)
+    }
+
+    private func fetchRemoteList(_ account: Account, generation: Int) async {
+        guard let appEnvironment else { return }
+
+        do {
+            try await appEnvironment.remotePlaylistsCache.refreshList(for: account)
+        } catch is CancellationError {
+            // Another load is taking over — it owns the state now.
+        } catch let error as APIError where error == .cancelled {
+            // The same, one layer down.
+        } catch {
+            guard generation == loadGeneration else { return }
+            remoteErrorMessage = error.localizedDescription
+        }
     }
 
     private func loadPlaylists() {
-        playlists = (dataManager?.playlists() ?? []).sorted { $0.title.localizedCaseInsensitiveCompare($1.title) == .orderedAscending }
+        localPlaylists = (dataManager?.playlists() ?? []).sorted { $0.title.localizedCaseInsensitiveCompare($1.title) == .orderedAscending }
     }
 }

@@ -13,6 +13,9 @@ struct HomeView: View {
     #if !os(tvOS) && !os(macOS)
     @Namespace private var sheetTransition
     #endif
+    /// Deliberately local-only, unlike the playlists screen this shortcut leads
+    /// to: the count is of what is on the device, whatever data context is
+    /// selected. A known inconsistency, kept for now rather than half-solved.
     @State private var playlists: [LocalPlaylist] = []
     @State private var bookmarksCount: Int = 0
     @State private var recentBookmarks: [Bookmark] = []
