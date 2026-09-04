@@ -84,7 +84,7 @@ enum DataContextSwitcherLabels {
         let status = appEnvironment.accountsManager.status(for: id)
         guard status != .signedIn else { return title }
 
-        return "\(title) — \(statusText(for: status))"
+        return "\(title) — \(AccountStatusBadge.text(for: status))"
     }
 
     @MainActor
@@ -92,16 +92,6 @@ enum DataContextSwitcherLabels {
         appEnvironment.accountsManager.selectableAccounts
             .filter { appEnvironment.dataContextValidator.displayName(for: $0) == name }
             .count > 1
-    }
-
-    static func statusText(for status: AccountStatus) -> String {
-        switch status {
-        case .checking: String(localized: "accounts.status.checking")
-        case .signedIn: String(localized: "accounts.status.signedIn")
-        case .credentialMissing: String(localized: "accounts.status.credentialMissing")
-        case .credentialRejected: String(localized: "accounts.status.credentialRejected")
-        case .unreachable: String(localized: "accounts.status.unreachable")
-        }
     }
 }
 

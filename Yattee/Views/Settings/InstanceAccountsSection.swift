@@ -40,6 +40,11 @@ struct InstanceAccountsSection: View {
     /// one instance apart.
     @State private var credentialRevision = 0
 
+    /// The account a sign-out was asked for, held until the confirmation comes
+    /// back. Removing an account deletes its credential from every device
+    /// sharing the Keychain, which is not something to do on one tap.
+    @State private var pendingSignOut: Account?
+
     private var accounts: [Account] {
         appEnvironment?.accountsManager.accounts(forInstance: instance.id) ?? []
     }
@@ -83,20 +88,15 @@ struct InstanceAccountsSection: View {
             Text(displayName(for: account))
                 .lineLimit(1)
 
-            Text(statusText(for: account))
-                .font(.caption)
-                .foregroundStyle(statusColor(for: account))
+            AccountStatusBadge(status: status(for: account))
         }
         .frame(maxWidth: .infinity, alignment: .leading)
         .contextMenu {
-            // Without this a second login on an instance cannot be reached: the
-            // legacy picker lists one entry per instance, so it always resolves
-            // to whichever account was signed in first. The switcher that makes
-            // this a first-class choice everywhere comes later; until then this
-            // is what makes a second login usable at all.
+            // Selecting an account from the source that owns it, rather than
+            // hunting for it in the global switcher.
             if !isCurrentContext(account) {
                 Button {
-                    appEnvironment?.accountsManager.setContext(.account(account.id))
+                    appEnvironment?.switchDataContext(to: .account(account.id))
                 } label: {
                     Label(String(localized: "accounts.useThisAccount"), systemImage: "checkmark.circle")
                 }
@@ -109,11 +109,36 @@ struct InstanceAccountsSection: View {
             }
 
             Button(role: .destructive) {
-                signOut(account)
+                pendingSignOut = account
             } label: {
                 Label(String(localized: "login.signOutAndRemove"), systemImage: "rectangle.portrait.and.arrow.forward")
             }
         }
+        // Attached to the row that raised it rather than to the section: a
+        // presentation modifier on a `Section` inside a `Form` has no view of
+        // its own to present from.
+        .confirmationDialog(
+            String(localized: "accounts.remove.confirm.title \(displayName(for: account))"),
+            isPresented: Binding(
+                // By ID: a label edit arriving from another device while the
+                // dialog is up would otherwise close it.
+                get: { pendingSignOut?.id == account.id },
+                set: { if !$0 { pendingSignOut = nil } }
+            ),
+            titleVisibility: .visible
+        ) {
+            Button(String(localized: "common.remove"), role: .destructive) {
+                confirmSignOut()
+            }
+            Button(String(localized: "common.cancel"), role: .cancel) {
+                pendingSignOut = nil
+            }
+        } message: {
+            Text(String(localized: "accounts.remove.confirm.message"))
+        }
+        #if !os(tvOS)
+        .presentationCompactAdaptation(.sheet)
+        #endif
 
         #if os(tvOS)
         // tvOS never syncs app Keychain items, so an account that arrived from
@@ -141,46 +166,20 @@ struct InstanceAccountsSection: View {
         appEnvironment?.accountsManager.status(for: account.id) ?? .checking
     }
 
-    private func statusText(for account: Account) -> String {
-        switch status(for: account) {
-        case .checking: String(localized: "accounts.status.checking")
-        case .signedIn: String(localized: "accounts.status.signedIn")
-        case .credentialMissing: String(localized: "accounts.status.credentialMissing")
-        case .credentialRejected: String(localized: "accounts.status.credentialRejected")
-        case .unreachable: String(localized: "accounts.status.unreachable")
-        }
-    }
-
     private func isCurrentContext(_ account: Account) -> Bool {
         appEnvironment?.accountsManager.currentContext == .account(account.id)
     }
 
-    private func statusColor(for account: Account) -> Color {
-        switch status(for: account) {
-        case .checking: .secondary
-        case .signedIn: .secondary
-        case .credentialMissing: .secondary
-        case .credentialRejected: .red
-        case .unreachable: .orange
-        }
-    }
-
     // MARK: - Actions
 
-    private func signOut(_ account: Account) {
-        guard let appEnvironment else { return }
+    private func confirmSignOut() {
+        guard let appEnvironment, let account = pendingSignOut else { return }
+        defer { pendingSignOut = nil }
 
-        // Deleting the account is what authorizes removing the legacy item, and
-        // only when this device adopted it and it still holds that same secret.
-        appEnvironment.accountCredentialsManager(for: account)?.deleteCredential(for: account)
-        appEnvironment.accountCredentialsManager(for: account)?.deleteLegacyCredentialIfOwned(for: account)
-        appEnvironment.accountsManager.removeAccount(account.id)
-        // Drop what the account had in memory too, or its subscriptions and
-        // playlists would keep answering for an account that no longer exists.
-        appEnvironment.discardAccountData(for: account.id)
+        // Re-resolved rather than trusted: the dialog can outlive the account,
+        // which another device may have deleted while it was up.
+        guard let account = appEnvironment.accountsManager.account(id: account.id) else { return }
 
-        if appEnvironment.accountsManager.accounts(forInstance: instance.id).isEmpty {
-            appEnvironment.instancesManager.setUsesAccountLogin(false, for: instance)
-        }
+        appEnvironment.signOutAndRemoveAccount(account)
     }
 }

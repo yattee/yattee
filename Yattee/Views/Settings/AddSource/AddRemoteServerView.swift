@@ -68,6 +68,13 @@ struct AddRemoteServerView: View {
     @State private var showingYatteeServerWarning = false
     @State private var pendingYatteeServerInstance: Instance?
 
+    /// The instance whose optional sign-in step is on screen.
+    ///
+    /// The source is already added by then, so dismissing this sheet — by
+    /// signing in, by skipping, or by pulling it down — is what finishes
+    /// adding. Only instances that have accounts at all get this far.
+    @State private var signInInstance: Instance?
+
     // Closure to dismiss the parent sheet
     var dismissSheet: DismissAction?
 
@@ -131,6 +138,9 @@ struct AddRemoteServerView: View {
             Text(String(localized: "sources.yatteeServer.warning.message"))
         }
         .presentationCompactAdaptation(.sheet)
+        .fullScreenCover(item: $signInInstance, onDismiss: finishAdding) { instance in
+            signInStep(for: instance)
+        }
         #else
         formContent
             .navigationTitle(String(localized: "sources.addRemoteServer"))
@@ -147,7 +157,21 @@ struct AddRemoteServerView: View {
                 Text(String(localized: "sources.yatteeServer.warning.message"))
             }
             .presentationCompactAdaptation(.sheet)
+            .sheet(item: $signInInstance, onDismiss: finishAdding) { instance in
+                signInStep(for: instance)
+            }
         #endif
+    }
+
+    /// The optional login offered right after a source that supports accounts
+    /// is added, so the common case does not need a second trip through
+    /// settings to become useful.
+    private func signInStep(for instance: Instance) -> some View {
+        InstanceLoginView(instance: instance, isOptionalStep: true) { credential, username in
+            guard let appEnvironment else { return false }
+            return AccountSignInHandler(appEnvironment: appEnvironment, instance: instance)
+                .storeLogin(credential: credential, username: username, target: .newAccount)
+        }
     }
 
     @ViewBuilder
@@ -156,11 +180,7 @@ struct AddRemoteServerView: View {
             if let instance = pendingYatteeServerInstance {
                 appEnvironment?.instancesManager.disableOtherYatteeServerInstances(except: instance.id)
                 appEnvironment?.instancesManager.add(instance)
-                if let dismissSheet {
-                    dismissSheet()
-                } else {
-                    dismiss()
-                }
+                finishAdding()
             }
         }
         Button(String(localized: "common.cancel"), role: .cancel) {
@@ -768,11 +788,7 @@ struct AddRemoteServerView: View {
                             showingYatteeServerWarning = true
                         } else {
                             appEnvironment.instancesManager.add(instance)
-                            if let dismissSheet {
-                                dismissSheet()
-                            } else {
-                                dismiss()
-                            }
+                            finishAdding()
                         }
                     } else {
                         credentialValidationError = String(localized: "sources.error.invalidCredentials")
@@ -802,6 +818,20 @@ struct AddRemoteServerView: View {
         }
 
         appEnvironment.instancesManager.add(instance)
+
+        // A source that can hold accounts is worth offering a login for while
+        // the user is still here. Everything else is done.
+        if instance.supportsAuthentication {
+            signInInstance = instance
+        } else {
+            finishAdding()
+        }
+    }
+
+    /// Closes the add flow. Reached directly for sources with no login step,
+    /// and as the sign-in sheet's dismissal for the ones that have it —
+    /// signing in and skipping end the same way.
+    private func finishAdding() {
         if let dismissSheet {
             dismissSheet()
         } else {

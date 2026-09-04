@@ -878,6 +878,40 @@ final class AppEnvironment {
         instancesManager.remove(instance)
     }
 
+    /// Signs an account out and removes it, with everything keyed to it.
+    ///
+    /// The one cascade behind every by-hand sign-out, so a place that has to be
+    /// cleared is added here rather than in each screen that lists accounts.
+    func signOutAndRemoveAccount(_ account: Account) {
+        let instance = accountsManager.instance(for: account)
+
+        // Deleting the account is what authorizes removing the legacy item, and
+        // only when this device adopted it and it still holds that same secret.
+        accountCredentialsManager(for: account)?.deleteCredential(for: account)
+        accountCredentialsManager(for: account)?.deleteLegacyCredentialIfOwned(for: account)
+        accountsManager.removeAccount(account.id)
+        // Drop what the account had in memory too, or its subscriptions and
+        // playlists would keep answering for an account that no longer exists.
+        discardAccountData(for: account.id)
+
+        if let instance, accountsManager.accounts(forInstance: instance.id).isEmpty {
+            instancesManager.setUsesAccountLogin(false, for: instance)
+        }
+    }
+
+    /// Removes an account whose instance is gone.
+    ///
+    /// Separate from `signOutAndRemoveAccount(_:)` because none of the lookups
+    /// that cascade depends on can resolve without an instance.
+    func removeOrphanedAccount(_ accountID: UUID) {
+        AccountRemoval.removeOrphan(
+            accountID,
+            stores: [invidiousCredentialsManager, pipedCredentialsManager],
+            accountsManager: accountsManager,
+            discardData: { discardAccountData(for: $0) }
+        )
+    }
+
     /// The account-keyed credentials manager for an account's instance.
     /// `nil` when the instance is unknown or its type has no account concept.
     func accountCredentialsManager(for account: Account) -> (any AccountCredentialsManager)? {

@@ -1,0 +1,384 @@
+//
+//  AccountsListView.swift
+//  Yattee
+//
+//  Every account on this device, grouped by the source it lives on.
+//
+
+import SwiftUI
+
+/// A login started from this screen.
+///
+/// Unlike the per-instance section, this one spans every source — so the
+/// instance the sheet is for travels with the target rather than being a
+/// property of the view.
+private struct AccountsListLogin: Identifiable {
+    let id: UUID
+    let instance: Instance
+    let target: AccountLoginTarget
+}
+
+/// An account the user asked to remove, held until the confirmation comes back.
+private struct PendingAccountRemoval: Identifiable {
+    let id: UUID
+    let name: String
+    let isOrphan: Bool
+}
+
+/// The accounts screen: what is signed in where, and what to do about it.
+///
+/// The per-instance section in the source editor shows one server's logins
+/// while the user is already editing it. This is the other direction — every
+/// login the app knows about, including the ones whose source is gone and which
+/// no source editor can reach.
+struct AccountsListView: View {
+    @Environment(\.appEnvironment) private var appEnvironment
+
+    @State private var login: AccountsListLogin?
+    @State private var pendingRemoval: PendingAccountRemoval?
+
+    /// Bumped whenever a credential is replaced, purely to re-read the login
+    /// identifier the rows display.
+    ///
+    /// That identifier lives in the Keychain beside the secret, not in any
+    /// observable state, so signing in again as somebody else moves nothing
+    /// SwiftUI watches. The rest of the screen is driven by observation: the
+    /// account list, the statuses and the instances are all observable, and
+    /// rebuilding rows on every status change would cost tvOS its focus.
+    @State private var credentialRevision = 0
+
+    private var accountsManager: AccountsManager? {
+        appEnvironment?.accountsManager
+    }
+
+    // MARK: - Body
+
+    var body: some View {
+        Group {
+            #if os(tvOS)
+            TVSidebarDetailContainer(
+                systemImage: "person.crop.circle",
+                title: String(localized: "accounts.title")
+            ) {
+                content
+            }
+            #else
+            content
+            #endif
+        }
+        #if !os(tvOS)
+        .navigationTitle(String(localized: "accounts.title"))
+        #endif
+        #if os(iOS)
+        .navigationBarTitleDisplayMode(.inline)
+        #endif
+        #if os(tvOS)
+        .fullScreenCover(item: $login) { login in
+            loginSheet(login)
+        }
+        #else
+        .sheet(item: $login) { login in
+            loginSheet(login)
+        }
+        #endif
+        .confirmationDialog(
+            pendingRemoval.map { String(localized: "accounts.remove.confirm.title \($0.name)") } ?? "",
+            isPresented: Binding(
+                get: { pendingRemoval != nil },
+                set: { if !$0 { pendingRemoval = nil } }
+            ),
+            titleVisibility: .visible
+        ) {
+            Button(String(localized: "common.remove"), role: .destructive) {
+                confirmRemoval()
+            }
+            Button(String(localized: "common.cancel"), role: .cancel) {
+                pendingRemoval = nil
+            }
+        } message: {
+            Text(
+                String(
+                    localized: pendingRemoval?.isOrphan == true
+                        ? "accounts.remove.confirm.message.orphan"
+                        : "accounts.remove.confirm.message"
+                )
+            )
+        }
+        #if !os(tvOS)
+        .presentationCompactAdaptation(.sheet)
+        #endif
+        .onReceive(NotificationCenter.default.publisher(for: .accountCredentialDidChange)) { _ in
+            credentialRevision &+= 1
+        }
+        .accessibilityIdentifier("accounts.view")
+    }
+
+    @ViewBuilder
+    private var content: some View {
+        if accountsManager?.accounts.isEmpty ?? true {
+            emptyState
+        } else {
+            Form {
+                ForEach(groups, id: \.instance.id) { group in
+                    instanceSection(group.instance, accounts: group.accounts)
+                }
+
+                orphanSection
+            }
+            #if os(macOS)
+            .formStyle(.grouped)
+            #endif
+            .opaqueSettingsFormBackground()
+        }
+    }
+
+    private var emptyState: some View {
+        ContentUnavailableView {
+            Label(String(localized: "accounts.empty.title"), systemImage: "person.crop.circle")
+        } description: {
+            Text(String(localized: "accounts.empty.description"))
+        }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+    }
+
+    // MARK: - Sections
+
+    /// Instances that hold at least one account, oldest source first.
+    ///
+    /// A source with no logins is left out: the place to make one is the source
+    /// itself, and listing every server here would bury the accounts.
+    private var groups: [(instance: Instance, accounts: [Account])] {
+        guard let appEnvironment else { return [] }
+
+        return appEnvironment.instancesManager.instances
+            .sorted { $0.dateAdded < $1.dateAdded }
+            .compactMap { instance in
+                let accounts = sorted(appEnvironment.accountsManager.accounts(forInstance: instance.id))
+                return accounts.isEmpty ? nil : (instance, accounts)
+            }
+    }
+
+    /// Stable regardless of the order the accounts arrived from iCloud in.
+    private func sorted(_ accounts: [Account]) -> [Account] {
+        accounts.sorted {
+            ($0.dateAdded, $0.id.uuidString) < ($1.dateAdded, $1.id.uuidString)
+        }
+    }
+
+    @ViewBuilder
+    private func instanceSection(_ instance: Instance, accounts: [Account]) -> some View {
+        Section {
+            ForEach(accounts) { account in
+                accountRow(account, instance: instance)
+            }
+            // Read here on purpose, so the rows genuinely depend on it rather
+            // than relying on a state write invalidating a body that never
+            // mentions it.
+            .id(credentialRevision)
+        } header: {
+            Text(instance.displayName)
+        }
+    }
+
+    @ViewBuilder
+    private var orphanSection: some View {
+        let orphans = sorted(accountsManager?.orphanedAccounts ?? [])
+
+        if !orphans.isEmpty {
+            Section {
+                ForEach(orphans) { account in
+                    accountRow(account, instance: nil)
+                }
+            } header: {
+                Text(String(localized: "accounts.orphan.section"))
+            } footer: {
+                Text(String(localized: "accounts.orphan.footer"))
+            }
+        }
+    }
+
+    // MARK: - Rows
+
+    @ViewBuilder
+    private func accountRow(_ account: Account, instance: Instance?) -> some View {
+        VStack(alignment: .leading, spacing: 4) {
+            Text(title(for: account, instance: instance))
+                .lineLimit(1)
+
+            if instance == nil {
+                // An orphan has no status worth reporting: its capabilities are
+                // unknown and no request can be made on its behalf. What it has
+                // instead is the reason.
+                Text(String(localized: "accounts.status.instanceMissing"))
+                    .font(.caption)
+                    .foregroundStyle(.orange)
+            } else {
+                AccountStatusBadge(status: status(for: account))
+            }
+
+            if let capabilities = capabilityHints(for: account) {
+                Text(capabilities)
+                    .font(.caption2)
+                    .foregroundStyle(.tertiary)
+            }
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+        #if !os(tvOS)
+        .contextMenu {
+            rowActions(account, instance: instance)
+        }
+        #endif
+
+        #if os(tvOS)
+        // A context menu is not reachable on tvOS, and a Form row is a single
+        // focusable unit — so the actions are rows of their own.
+        rowActions(account, instance: instance)
+        #endif
+    }
+
+    @ViewBuilder
+    private func rowActions(_ account: Account, instance: Instance?) -> some View {
+        if let instance {
+            if isSelectable(account), !isCurrentContext(account) {
+                Button {
+                    appEnvironment?.switchDataContext(to: .account(account.id))
+                } label: {
+                    Label(String(localized: "accounts.useThisAccount"), systemImage: "checkmark.circle")
+                }
+                #if os(tvOS)
+                .buttonStyle(TVSettingsButtonStyle())
+                #endif
+            }
+
+            Button {
+                login = AccountsListLogin(
+                    id: account.id,
+                    instance: instance,
+                    target: .existing(account)
+                )
+            } label: {
+                Label(String(localized: "login.signInAgain"), systemImage: "person.badge.key")
+            }
+            #if os(tvOS)
+            .buttonStyle(TVSettingsButtonStyle())
+            #endif
+        }
+
+        Button(role: .destructive) {
+            pendingRemoval = PendingAccountRemoval(
+                id: account.id,
+                name: title(for: account, instance: instance),
+                isOrphan: instance == nil
+            )
+        } label: {
+            Label(
+                String(localized: instance == nil ? "common.remove" : "login.signOutAndRemove"),
+                systemImage: instance == nil ? "trash" : "rectangle.portrait.and.arrow.forward"
+            )
+        }
+        #if os(tvOS)
+        .buttonStyle(TVSettingsButtonStyle())
+        #endif
+    }
+
+    private func loginSheet(_ login: AccountsListLogin) -> some View {
+        InstanceLoginView(instance: login.instance) { credential, username in
+            guard let appEnvironment else { return false }
+            return AccountSignInHandler(appEnvironment: appEnvironment, instance: login.instance)
+                .storeLogin(credential: credential, username: username, target: login.target)
+        }
+    }
+
+    // MARK: - Presentation
+
+    /// The orphan's own label, never the validator's: with no instance to
+    /// resolve, its last-resort fallback is the words "Source missing", which
+    /// the row already says right underneath.
+    private func title(for account: Account, instance: Instance?) -> String {
+        guard instance != nil else {
+            if let name = account.displayName, !name.isEmpty { return name }
+            return String(localized: "accounts.orphan.unnamed")
+        }
+
+        return appEnvironment?.dataContextValidator.displayName(for: account)
+            ?? String(localized: "accounts.orphan.unnamed")
+    }
+
+    private func status(for account: Account) -> AccountStatus {
+        accountsManager?.status(for: account.id) ?? .checking
+    }
+
+    /// Asked of the validator rather than recomputed here: an account on a
+    /// disabled source passes the capability test but is not something the
+    /// switcher offers, and a screen that offered it would switch the app into
+    /// a context that immediately falls back to local.
+    private func isSelectable(_ account: Account) -> Bool {
+        appEnvironment?.dataContextValidator.availableContexts.contains(.account(account.id)) == true
+    }
+
+    private func isCurrentContext(_ account: Account) -> Bool {
+        accountsManager?.currentContext == .account(account.id)
+    }
+
+    /// What the backend behind this account lets it do. Deliberately a short
+    /// sentence rather than a row of glyphs — the difference between two Piped
+    /// logins is who they are, not what they support.
+    private func capabilityHints(for account: Account) -> String? {
+        guard let capabilities = accountsManager?.capabilities(for: account) else { return nil }
+
+        var parts: [String] = []
+        if capabilities.supportsSubscriptions {
+            parts.append(String(localized: "accounts.capability.subscriptions"))
+        }
+        if capabilities.supportsPlaylistReads {
+            parts.append(String(localized: "accounts.capability.playlists"))
+        }
+        if capabilities.supportsWatchHistory {
+            parts.append(String(localized: "accounts.capability.history"))
+        }
+
+        guard !parts.isEmpty else { return nil }
+        return parts.joined(separator: " · ")
+    }
+
+    /// Whether the settings entry should carry an attention badge.
+    ///
+    /// Both states the user can only clear from this screen: an orphan nothing
+    /// else lists, and a login the server has started refusing.
+    @MainActor
+    static func needsAttention(in appEnvironment: AppEnvironment?) -> Bool {
+        guard let appEnvironment else { return false }
+
+        if !appEnvironment.accountsManager.orphanedAccounts.isEmpty { return true }
+
+        return appEnvironment.accountsManager.accounts.contains {
+            appEnvironment.accountsManager.status(for: $0.id) == .credentialRejected
+        }
+    }
+
+    // MARK: - Actions
+
+    private func confirmRemoval() {
+        guard let appEnvironment, let pending = pendingRemoval else { return }
+        defer { pendingRemoval = nil }
+
+        // Re-resolved rather than trusted: the dialog can outlive the account,
+        // which another device may have deleted while it was up.
+        guard let account = appEnvironment.accountsManager.account(id: pending.id) else { return }
+
+        if pending.isOrphan {
+            appEnvironment.removeOrphanedAccount(account.id)
+        } else {
+            appEnvironment.signOutAndRemoveAccount(account)
+        }
+    }
+}
+
+// MARK: - Preview
+
+#Preview {
+    NavigationStack {
+        AccountsListView()
+    }
+    .appEnvironment(.preview)
+}

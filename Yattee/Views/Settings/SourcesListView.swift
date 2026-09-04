@@ -128,6 +128,12 @@ struct SourcesListView: View {
                 pendingDeleteInstance = nil
                 pendingDeleteSource = nil
             }
+        } message: {
+            // Deleting a source has always taken its logins with it; only the
+            // question was silent about it.
+            if let accounts = deleteConfirmationAccounts {
+                Text(accounts)
+            }
         }
         #if !os(tvOS)
         .presentationCompactAdaptation(.sheet)
@@ -602,6 +608,11 @@ struct SourcesListView: View {
             return String(localized: "sources.delete.confirmation.single \(source.name)")
         }
         return String(localized: "sources.delete.confirmation")
+    }
+
+    private var deleteConfirmationAccounts: String? {
+        guard let instance = pendingDeleteInstance else { return nil }
+        return InstanceDeletionDisclosure.message(for: instance, in: appEnvironment)
     }
 }
 

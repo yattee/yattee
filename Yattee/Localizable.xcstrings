@@ -153,6 +153,90 @@
         }
       }
     },
+    "accounts.capability.history" : {
+      "comment" : "Capability hint on an account row",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Watch history"
+          }
+        }
+      }
+    },
+    "accounts.capability.playlists" : {
+      "comment" : "Capability hint on an account row",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Playlists"
+          }
+        }
+      }
+    },
+    "accounts.capability.subscriptions" : {
+      "comment" : "Capability hint on an account row",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Subscriptions"
+          }
+        }
+      }
+    },
+    "accounts.empty.description" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sign in to an Invidious or Piped source to add an account."
+          }
+        }
+      }
+    },
+    "accounts.empty.title" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No Accounts"
+          }
+        }
+      }
+    },
+    "accounts.orphan.footer" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "These accounts belong to a source that is not on this device. It may still arrive from iCloud — removing an account here deletes its saved login."
+          }
+        }
+      }
+    },
+    "accounts.orphan.section" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Source Missing"
+          }
+        }
+      }
+    },
+    "accounts.orphan.unnamed" : {
+      "comment" : "Title of an account whose source is gone and which has no label",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Account"
+          }
+        }
+      }
+    },
     "accounts.playlists.error.entryMismatch" : {
       "localizations" : {
         "en" : {
@@ -189,6 +273,37 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "This instance does not support playlists."
+          }
+        }
+      }
+    },
+    "accounts.remove.confirm.message" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The saved login is deleted, and the account is removed from your other devices too."
+          }
+        }
+      }
+    },
+    "accounts.remove.confirm.message.orphan" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The saved login is deleted, and the account is removed from your other devices too. Its source is already gone from this device."
+          }
+        }
+      }
+    },
+    "accounts.remove.confirm.title %@" : {
+      "comment" : "Confirmation title with the account name",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Remove \"%@\"?"
           }
         }
       }
@@ -300,6 +415,17 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Account"
+          }
+        }
+      }
+    },
+    "accounts.title" : {
+      "comment" : "Title of the accounts screen",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Accounts"
           }
         }
       }
@@ -1495,6 +1621,17 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Share"
+          }
+        }
+      }
+    },
+    "common.skip" : {
+      "comment" : "Button that passes over an optional step",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Skip"
           }
         }
       }
@@ -5443,6 +5580,17 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Log in to access your subscription feed"
+          }
+        }
+      }
+    },
+    "login.footer.optionalStep" : {
+      "comment" : "Footer of the optional sign-in step shown after adding a source",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The source has been added. You can sign in later from Settings."
           }
         }
       }
@@ -16423,6 +16571,29 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Browse PeerTube Instances"
+          }
+        }
+      }
+    },
+    "sources.delete.accountsWarning %lld" : {
+      "comment" : "Lead-in to the accounts an instance deletion signs out, followed by their names",
+      "localizations" : {
+        "en" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "This also signs out and removes 1 account:"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "This also signs out and removes %lld accounts:"
+                }
+              }
+            }
           }
         }
       }

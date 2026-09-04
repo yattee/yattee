@@ -9,6 +9,16 @@ import SwiftUI
 
 struct InstanceLoginView: View {
     let instance: Instance
+
+    /// Whether signing in is optional here.
+    ///
+    /// Set when the sheet follows an action that already succeeded — adding a
+    /// source, which is saved before this appears. The way out is then "Skip"
+    /// rather than "Cancel", and it is offered as a button in the form as well:
+    /// tvOS has no cancellation affordance at all, so an optional step without
+    /// one would be a dead end there.
+    var isOptionalStep: Bool = false
+
     /// Receives the credential **and** the identifier the user signed in with,
     /// and reports whether it was stored.
     ///
@@ -47,7 +57,7 @@ struct InstanceLoginView: View {
                 #endif
                 .toolbar {
                     ToolbarItem(placement: .cancellationAction) {
-                        Button(String(localized: "common.cancel")) {
+                        Button(String(localized: isOptionalStep ? "common.skip" : "common.cancel")) {
                             dismiss()
                         }
                     }
@@ -112,6 +122,22 @@ struct InstanceLoginView: View {
                 #if os(tvOS)
                 .buttonStyle(TVSettingsButtonStyle())
                 #endif
+            }
+
+            if isOptionalStep {
+                Section {
+                    Button {
+                        dismiss()
+                    } label: {
+                        Text(String(localized: "common.skip"))
+                    }
+                    .accessibilityIdentifier("instance.login.skipButton")
+                    #if os(tvOS)
+                    .buttonStyle(TVSettingsButtonStyle())
+                    #endif
+                } footer: {
+                    Text(String(localized: "login.footer.optionalStep"))
+                }
             }
         }
         #if os(iOS)
