@@ -104,6 +104,18 @@ struct SubscriptionDestinationRows: View {
 
     @State private var membership = SubscriptionDestinationMembership()
     @State private var busy: Set<DataContext> = []
+    /// Bumped when the logins change, so the answers are asked for again.
+    @State private var membershipRound = 0
+
+    /// What a round of membership answers belongs to.
+    ///
+    /// The channel alone is not enough: the same channel on the same rows means
+    /// something different once a credential has been replaced, and the picker
+    /// deliberately stays open across such a change on tvOS.
+    private struct MembershipRequest: Equatable {
+        let channel: Channel.ID
+        let round: Int
+    }
 
     var body: some View {
         ForEach(destinations, id: \.self) { context in
@@ -121,9 +133,28 @@ struct SubscriptionDestinationRows: View {
         // Membership is only asked for once the rows are on screen: an unwarmed
         // provider answers by fetching that account's whole subscription list,
         // which is far too much to spend on a menu nobody opened.
-        .task(id: channel.id) {
+        .task(id: MembershipRequest(channel: channel.id, round: membershipRound)) {
             await loadMembership()
         }
+        // The credential behind an account was replaced, or the accounts
+        // themselves changed: every checkmark on screen describes the logins
+        // that were there before.
+        .onReceive(NotificationCenter.default.publisher(for: .accountCredentialDidChange)) { _ in
+            invalidateMembership()
+        }
+        .onReceive(NotificationCenter.default.publisher(for: .accountsDidChange)) { _ in
+            invalidateMembership()
+        }
+    }
+
+    /// Forgets what is known and asks again.
+    ///
+    /// Forgetting first, rather than waiting for the replacement answers: a row
+    /// toggled in between would otherwise toggle against the previous login's
+    /// membership and do the opposite of what its checkmark promises.
+    private func invalidateMembership() {
+        membership.invalidate()
+        membershipRound += 1
     }
 
     @ViewBuilder

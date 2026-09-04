@@ -338,6 +338,29 @@ final class AccountsManager {
         NotificationCenter.default.post(name: .dataContextDidChange, object: nil)
     }
 
+    /// Repairs a context still naming an account this device knows was deleted.
+    ///
+    /// The deletion paths repair as they run, so this is for a selection that
+    /// was left behind anyway: a tombstone recorded while the context named
+    /// something else, or a launch that reads both back from disk. Repaired
+    /// exactly like a deletion — same sibling preference, same timestamp, never
+    /// published — because it *is* one, only noticed later.
+    ///
+    /// The tombstone is the whole authorisation. An account merely missing from
+    /// the store has not been deleted, it has not arrived, and moving the
+    /// selection on that is how a slow sync costs the user their choice.
+    ///
+    /// - Returns: `true` when the selection actually moved.
+    @discardableResult
+    func correctContextIfAccountDeleted() -> Bool {
+        guard case let .account(id) = storedContext.context else { return false }
+        guard deletedAccountIDs.contains(id) else { return false }
+
+        correctContextAfterDeletion(onInstance: deletedAccountInstanceIDs[id])
+        save()
+        return true
+    }
+
     /// Where a context whose account was deleted should land.
     ///
     /// Another signed-in login on the same server is far closer to what the user
@@ -487,7 +510,19 @@ final class AccountsManager {
         }
 
         save()
+
+        // The legacy selection may name exactly this account. Migration refuses
+        // to adopt a context whose account is not there yet, and on a fresh
+        // install the account arrives from iCloud long after the migration ran —
+        // so it is retried here rather than left until the next launch. Free to
+        // repeat: it never runs once a context has been chosen.
+        let contextBefore = storedContext.context
+        migrateLegacyContextIfNeeded()
+
         NotificationCenter.default.post(name: .accountsDidChange, object: nil)
+        if storedContext.context != contextBefore {
+            NotificationCenter.default.post(name: .dataContextDidChange, object: nil)
+        }
         return false
     }
 
@@ -577,6 +612,7 @@ final class AccountsManager {
     @discardableResult
     func applySyncedContext(_ incoming: StoredDataContext) -> Bool {
         var incoming = incoming
+        var wasRepaired = false
 
         // A tombstone dominates the account everywhere, contexts included. An
         // offline device can select an account another device has deleted and
@@ -592,6 +628,7 @@ final class AccountsManager {
                 context: repairTarget(onInstance: deletedAccountInstanceIDs[accountID]),
                 changedAt: incoming.changedAt
             )
+            wasRepaired = true
 
             LoggingService.shared.info(
                 "Ignoring a synced context that names a deleted account",
@@ -605,24 +642,38 @@ final class AccountsManager {
         // constructed, so a synced choice made yesterday would lose to it and a
         // fresh device would never adopt the selection at all.
         guard hasStoredContext else {
-            storedContext = incoming
-            hasStoredContext = true
-            save()
-            NotificationCenter.default.post(name: .dataContextDidChange, object: nil)
+            adoptSyncedContext(incoming, wasRepaired: wasRepaired)
             return false
         }
 
         guard storedContext.isOutranked(by: incoming) else {
+            // The local choice is the newer one and survives untouched — a
+            // repair that lost the ordering never gets to clear what that
+            // choice still owes the server.
             guard incoming.isOutranked(by: storedContext) else { return false }
             pendingContextUpload = true
             save()
             return true
         }
+        adoptSyncedContext(incoming, wasRepaired: wasRepaired)
+        return false
+    }
+
+    /// Takes on a context that arrived from another device.
+    ///
+    /// A repaired value is an automatic fallback rather than a choice, so any
+    /// upload the replaced selection still owed is dropped along with it:
+    /// sending it now would publish this fallback under that choice's
+    /// timestamp, which is exactly what keeping the timestamp is meant to
+    /// prevent — the same reasoning as `correctContextAfterDeletion`.
+    private func adoptSyncedContext(_ incoming: StoredDataContext, wasRepaired: Bool) {
         storedContext = incoming
         hasStoredContext = true
+        if wasRepaired {
+            pendingContextUpload = false
+        }
         save()
         NotificationCenter.default.post(name: .dataContextDidChange, object: nil)
-        return false
     }
 
     // MARK: - Status

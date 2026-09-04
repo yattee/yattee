@@ -61,6 +61,16 @@ struct SubscriptionsSettingsView: View {
         appEnvironment?.accountsManager.currentContext ?? .local
     }
 
+    /// What the counts and the export are actually read from.
+    ///
+    /// While the selected account is unavailable that is the local store — so a
+    /// count or a file described as the account's would name a source it never
+    /// came from. The selection itself is untouched, and the moment the account
+    /// is usable again this follows it back.
+    private var effectiveContext: DataContext {
+        appEnvironment?.dataContextValidator.effectiveContext ?? currentContext
+    }
+
     var body: some View {
         List {
             accountSection
@@ -68,7 +78,10 @@ struct SubscriptionsSettingsView: View {
             exportSection
             localDataSection
         }
-        .task(id: currentContext) {
+        // Keyed to the effective context, not the selection: an account going
+        // unavailable — or coming back — changes which store the count is read
+        // from without the selection moving at all.
+        .task(id: effectiveContext) {
             await refreshAccountSubscriptionCount()
         }
         .navigationTitle(String(localized: "settings.subscriptions.title"))
@@ -282,11 +295,15 @@ struct SubscriptionsSettingsView: View {
         }
     }
 
-    /// Exports subscriptions of the active account: the local store in local
-    /// mode, or the server's list for Invidious/Piped accounts.
+    /// Exports subscriptions of whatever is being read from: the local store in
+    /// local mode, or the server's list for Invidious/Piped accounts.
+    ///
+    /// The branch follows the effective context because the fetch below does —
+    /// branching on the selection instead would take the server path only to
+    /// export local data through it.
     private func performExport() async {
         let subscriptions: [Subscription]
-        if currentContext.isLocal {
+        if effectiveContext.isLocal {
             guard let dataManager else { return }
             subscriptions = dataManager.allSubscriptions
         } else {
@@ -342,7 +359,7 @@ struct SubscriptionsSettingsView: View {
         if let cached = subscriptionService.cachedSubscriptionCount {
             accountSubscriptionCount = cached
         }
-        if !subscriptionService.currentContext.isLocal {
+        if !effectiveContext.isLocal {
             if let channels = try? await subscriptionService.fetchSubscriptions() {
                 accountSubscriptionCount = channels.count
             }

@@ -157,6 +157,49 @@ struct AccountsManagerTests {
         #expect(manager2.currentContext == .local)
     }
 
+    @Test("A legacy selection migrates when its account finally syncs")
+    func legacyContextMigratesOnLateAccountArrival() {
+        let defaults = makeDefaults()
+        let instanceID = UUID()
+
+        let legacy = try! JSONEncoder().encode(SubscriptionAccount.invidious(instanceID))
+        defaults.set(legacy, forKey: "subscriptionAccount")
+
+        let manager = makeManager(defaults: defaults)
+        // On a fresh install the accounts arrive from iCloud long after launch,
+        // so the migration finds nothing to point at and adopts nothing.
+        manager.migrateLegacyContextIfNeeded()
+        #expect(manager.currentContext == .local)
+
+        // The account the legacy value names, arriving at last. A migrated
+        // account reuses its instance's UUID, which is what the legacy mapping
+        // resolves to.
+        manager.applySyncedAccount(Account.migrated(from: instanceID, dateAdded: Date()))
+
+        #expect(manager.currentContext == .account(instanceID))
+    }
+
+    @Test("A choice made while the account was in transit is never overridden")
+    func lateAccountArrivalNeverOverridesAChoice() {
+        let defaults = makeDefaults()
+        let instanceID = UUID()
+
+        let legacy = try! JSONEncoder().encode(SubscriptionAccount.invidious(instanceID))
+        defaults.set(legacy, forKey: "subscriptionAccount")
+
+        let manager = makeManager(defaults: defaults)
+        manager.migrateLegacyContextIfNeeded()
+
+        // The user picked something in the meantime; a guess at what they meant
+        // before the upgrade never replaces what they actually chose after it.
+        let chosen = manager.addAccount(instanceID: UUID())
+        manager.setContext(.account(chosen.id))
+
+        manager.applySyncedAccount(Account.migrated(from: instanceID, dateAdded: Date()))
+
+        #expect(manager.currentContext == .account(chosen.id))
+    }
+
     @Test("A legacy instance selection resolves to a real account")
     func legacySelectionResolvesToRealAccount() {
         let manager = makeManager()
@@ -553,8 +596,8 @@ struct DataContextValidatorTests {
         instances.remove(instance)
     }
 
-    @Test("Only an account that is genuinely gone moves the context")
-    func correctionRunsOnlyOnAbsence() {
+    @Test("Only a deletion the app can point at moves the context")
+    func correctionRequiresATombstone() {
         let instances = InstancesManager()
         var instance = Instance(type: .invidious, url: URL(string: "https://inv-correct.example.com")!)
         instances.add(instance)
@@ -579,15 +622,48 @@ struct DataContextValidatorTests {
         validator.correctIfContextRemoved()
         #expect(accounts.currentContext == .account(account.id))
 
-        // An account the store has never heard of is the one case that counts.
-        accounts.setContext(.account(UUID()))
+        // An account the store has never heard of has not been proven deleted:
+        // it may be a record the fetch has yet to deliver, and this runs on
+        // foreground activation — before that fetch.
+        let pending = UUID()
+        accounts.setContext(.account(pending))
         validator.correctIfContextRemoved()
-        #expect(accounts.currentContext == .local)
+        #expect(accounts.currentContext == .account(pending))
 
-        // Persisted, not merely held in memory: the correction has to survive
-        // the relaunch that would otherwise re-read the dead selection.
-        let (reloaded, _) = makeValidator(instances: instances, defaults: defaults)
-        #expect(reloaded.currentContext == .local)
+        // Nor is it corrected on the way back in: a relaunch reads the same
+        // absence, and the user's choice has to survive it.
+        let (reloaded, reloadedValidator) = makeValidator(instances: instances, defaults: defaults)
+        reloadedValidator.correctIfContextRemoved()
+        #expect(reloaded.currentContext == .account(pending))
+    }
+
+    @Test("A tombstoned selection is repaired without being published")
+    func correctionFollowsTheTombstone() {
+        let instances = InstancesManager()
+        let instance = Instance(type: .invidious, url: URL(string: "https://inv-tombstone.example.com")!)
+        instances.add(instance)
+        defer { instances.remove(instance) }
+
+        let (accounts, validator) = makeValidator(instances: instances)
+        let deleted = accounts.addAccount(instanceID: instance.id)
+        let sibling = accounts.addAccount(instanceID: instance.id)
+        accounts.setStatus(.signedIn, for: sibling.id)
+
+        // Deleted while this device pointed somewhere else, then selected again
+        // by a stale choice that arrived afterwards — the case the deletion
+        // paths themselves never see.
+        accounts.setContext(.local)
+        accounts.applyRemoteTombstone(deleted.id)
+        accounts.setContext(.account(deleted.id))
+        let chosenAt = accounts.storedContext.changedAt
+
+        validator.correctIfContextRemoved()
+
+        // Repaired like any deletion: the signed-in login on the same server,
+        // the replaced choice's timestamp, and nothing left to publish.
+        #expect(accounts.currentContext == .account(sibling.id))
+        #expect(accounts.storedContext.changedAt == chosenAt)
+        #expect(!accounts.pendingContextUpload)
     }
 
     @Test("Only accounts the app can actually resolve are offered")
@@ -741,6 +817,62 @@ struct DataContextRepairTests {
         manager.applySyncedContext(incoming)
 
         #expect(manager.currentContext == .local)
+    }
+
+    @Test("Adopting a repaired synced context drops what the replaced choice owed")
+    func syncedTombstoneRepairIsNeverPublished() {
+        let instances = InstancesManager()
+        let instance = makeInstance("inv")
+        instances.add(instance)
+        defer { instances.remove(instance) }
+
+        let manager = makeManager(instances: instances)
+        let deleted = manager.addAccount(instanceID: instance.id)
+        let sibling = manager.addAccount(instanceID: instance.id)
+        manager.setStatus(.signedIn, for: sibling.id)
+
+        // A choice made here that has not reached the server yet.
+        manager.setContext(.local)
+        manager.removeAccount(deleted.id)
+        #expect(manager.pendingContextUpload)
+
+        let incoming = StoredDataContext(
+            context: .account(deleted.id),
+            changedAt: Date().addingTimeInterval(60)
+        )
+        manager.applySyncedContext(incoming)
+
+        // The repair replaced that choice, so the upload it owed goes with it —
+        // sending it now would publish the fallback under its timestamp.
+        #expect(manager.currentContext == .account(sibling.id))
+        #expect(!manager.pendingContextUpload)
+    }
+
+    @Test("A local choice that outranks a repair keeps its upload")
+    func repairThatLosesLeavesTheChoiceDirty() {
+        let instances = InstancesManager()
+        let instance = makeInstance("inv")
+        instances.add(instance)
+        defer { instances.remove(instance) }
+
+        let manager = makeManager(instances: instances)
+        let deleted = manager.addAccount(instanceID: instance.id)
+        let sibling = manager.addAccount(instanceID: instance.id)
+        manager.setStatus(.signedIn, for: sibling.id)
+
+        manager.removeAccount(deleted.id)
+        manager.setContext(.local)
+
+        // The other device's selection — and so its repair — is older than the
+        // choice made here.
+        let incoming = StoredDataContext(
+            context: .account(deleted.id),
+            changedAt: Date().addingTimeInterval(-60)
+        )
+        #expect(manager.applySyncedContext(incoming))
+
+        #expect(manager.currentContext == .local)
+        #expect(manager.pendingContextUpload)
     }
 }
 

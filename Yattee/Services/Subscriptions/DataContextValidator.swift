@@ -161,28 +161,30 @@ final class DataContextValidator {
 
     /// Corrects the context only when the selected account is provably gone.
     ///
-    /// Called after deletions. A timeout, a failed fetch or a missing record
-    /// must never reach here — those are all "unknown", and treating them as
-    /// removal is how a user loses their selection during a slow sync.
+    /// Called after deletions and on foreground activation. A timeout, a failed
+    /// fetch or a record that simply has not arrived must never move anything —
+    /// those are all "unknown", and treating them as removal is how a user
+    /// loses their selection during a slow sync. Only the deletion tombstone
+    /// counts, and the repair it triggers is never published.
     func correctIfContextRemoved() {
-        // An unresolved identity has not loaded anybody's accounts yet, so an
-        // account "missing" from that state proves nothing — least of all a
-        // deletion, which is the only thing allowed to move the context here.
+        // An unresolved identity has not loaded anybody's accounts yet, so
+        // neither the selection nor the tombstones read here are the ones this
+        // device will end up with.
         guard accountsManager.isIdentityResolved else { return }
-        guard case let .account(id) = accountsManager.currentContext else { return }
-        guard accountsManager.account(id: id) == nil else { return }
 
-        // Only an explicit deletion clears the account from the store, so
-        // reaching here means the account really is gone.
-        accountsManager.setContext(.local)
+        // The manager owns the decision: it holds the tombstones, and it
+        // repairs the same way an account deleted right now would be — onto a
+        // signed-in login on the same server when there is one, keeping the
+        // replaced choice's timestamp and publishing nothing.
+        guard accountsManager.correctContextIfAccountDeleted() else { return }
 
         toastManager.showInfo(
             String(localized: "subscriptions.accountSwitched.title"),
-            subtitle: String(localized: "subscriptions.account.local")
+            subtitle: displayName(for: accountsManager.currentContext)
         )
 
         LoggingService.shared.info(
-            "Selected account was deleted — data context reset to local",
+            "Selected account was deleted — data context repaired",
             category: .general
         )
     }

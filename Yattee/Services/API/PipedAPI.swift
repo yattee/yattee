@@ -943,7 +943,7 @@ private struct PipedStreamResponse: Decodable, Sendable {
             publishedAt: PipedSentinel.uploadedDate(uploaded),
             publishedText: uploadDate,
             viewCount: PipedSentinel.count(views),
-            likeCount: likes.map { Int($0) },
+            likeCount: PipedSentinel.count(likes),
             thumbnails: thumbnails,
             isLive: livestream ?? false,
             isUpcoming: false,
@@ -1116,8 +1116,8 @@ private struct PipedSearchItem: Decodable, Sendable {
             id: .global(channelId ?? ""),
             name: name ?? "",
             description: description,
-            subscriberCount: subscribers.map { Int($0) },
-            videoCount: videos.map { Int($0) },
+            subscriberCount: PipedSentinel.count(subscribers),
+            videoCount: PipedSentinel.count(videos),
             thumbnailURL: thumbnail.flatMap { URL(string: $0) },
             isVerified: uploaderVerified ?? false
         )
@@ -1128,7 +1128,7 @@ private struct PipedSearchItem: Decodable, Sendable {
             id: .global(playlistId ?? ""),
             title: name ?? "",
             author: uploaderName.map { Author(id: "", name: $0) },
-            videoCount: videos.map { Int($0) } ?? 0,
+            videoCount: PipedSentinel.count(videos) ?? 0,
             thumbnailURL: thumbnail.flatMap { URL(string: $0) }
         )
     }
@@ -1151,7 +1151,7 @@ private struct PipedChannelResponse: Decodable, Sendable {
             id: .global(id),
             name: name,
             description: description,
-            subscriberCount: subscriberCount.map { Int($0) },
+            subscriberCount: PipedSentinel.count(subscriberCount),
             thumbnailURL: avatarUrl.flatMap { URL(string: $0) },
             bannerURL: bannerUrl.flatMap { URL(string: $0) },
             isVerified: verified ?? false
@@ -1221,7 +1221,7 @@ private struct PipedTabPlaylist: Decodable, Sendable {
             id: .global(playlistId ?? ""),
             title: name ?? "",
             author: uploaderName.map { Author(id: uploaderUrl?.replacingOccurrences(of: "/channel/", with: "") ?? "", name: $0) },
-            videoCount: videos.map { Int($0) } ?? 0,
+            videoCount: PipedSentinel.count(videos) ?? 0,
             thumbnailURL: thumbnail.flatMap { URL(string: $0) }
         )
     }
@@ -1278,7 +1278,9 @@ private struct PipedPlaylistResponse: Decodable, Sendable {
     let uploader: String?
     let uploaderUrl: String?
     let uploaderAvatar: String?
-    let videos: Int?
+    /// Read as 64-bit like every other Piped count, so the `-1` sentinel goes
+    /// through the same reading as the rest.
+    let videos: Int64?
     let relatedStreams: [PipedVideoItem]?
     let thumbnailUrl: String?
     let nextpage: String?
@@ -1303,7 +1305,7 @@ private struct PipedPlaylistResponse: Decodable, Sendable {
                     thumbnailURL: uploaderAvatar.flatMap { URL(string: $0) }
                 )
             },
-            videoCount: videos ?? validVideos.count,
+            videoCount: PipedSentinel.count(videos) ?? validVideos.count,
             thumbnailURL: thumbnailUrl.flatMap { URL(string: $0) },
             videos: validVideos
         )
@@ -1322,14 +1324,14 @@ private struct PipedUserPlaylist: Decodable, Sendable {
     let name: String
     let shortDescription: String?
     let thumbnail: String?
-    let videos: Int?
+    let videos: Int64?
 
     nonisolated func toPlaylist() -> Playlist {
         Playlist(
             id: .global(id),
             title: name,
             description: shortDescription,
-            videoCount: videos ?? 0,
+            videoCount: PipedSentinel.count(videos) ?? 0,
             thumbnailURL: thumbnail.flatMap { URL(string: $0) }
         )
     }

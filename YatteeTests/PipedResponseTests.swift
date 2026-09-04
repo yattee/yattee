@@ -41,14 +41,15 @@ private func pipedStreamJSON(
     return "{\(fields.joined(separator: ", "))}"
 }
 
-/// Builds the first page of `/playlists/{id}`.
-private func pipedPlaylistPageJSON(streams: [String]) -> Data {
+/// Builds the first page of `/playlists/{id}`. `videos` defaults to the number
+/// of rows the page carries, which is what a healthy server sends.
+private func pipedPlaylistPageJSON(streams: [String], videos: Int64? = nil) -> Data {
     Data("""
     {
         "name": "Watch Later",
         "uploader": "arek",
         "uploaderUrl": "/channel/UCowner",
-        "videos": \(streams.count),
+        "videos": \(videos ?? Int64(streams.count)),
         "relatedStreams": [\(streams.joined(separator: ",\n"))],
         "nextpage": null
     }
@@ -126,6 +127,44 @@ struct PipedSentinelTests {
         let video = try #require(snapshot.entries.first?.video)
         #expect(video.viewCount == 4200)
         #expect(video.publishedAt == Date(timeIntervalSince1970: 1_609_459_200))
+    }
+
+    @Test("A playlist that says it holds -1 videos is counted by its rows")
+    func playlistCountSentinelFallsBackToTheRows() throws {
+        let page = pipedPlaylistPageJSON(
+            streams: [
+                pipedStreamJSON(videoId: "aaa", title: "First", views: 10, uploaded: nil),
+                pipedStreamJSON(videoId: "bbb", title: "Second", views: 20, uploaded: nil)
+            ],
+            videos: -1
+        )
+
+        let snapshot = try PipedAPI.userPlaylistSnapshot(
+            fromPageJSON: [page],
+            playlistID: "playlist-uuid",
+            instanceURL: pipedBaseURL
+        )
+
+        // "-1 videos" would show as a row count in the list, and reads as a
+        // playlist that lost everything in it.
+        #expect(snapshot.playlist.videoCount == 2)
+    }
+
+    @Test("A playlist count the server has beats the row count")
+    func playlistCountIsTakenFromTheServer() throws {
+        // More than the page carries — the rest is behind the pager.
+        let page = pipedPlaylistPageJSON(
+            streams: [pipedStreamJSON(videoId: "aaa", title: "First", views: 10, uploaded: nil)],
+            videos: 42
+        )
+
+        let snapshot = try PipedAPI.userPlaylistSnapshot(
+            fromPageJSON: [page],
+            playlistID: "playlist-uuid",
+            instanceURL: pipedBaseURL
+        )
+
+        #expect(snapshot.playlist.videoCount == 42)
     }
 }
 

@@ -29,6 +29,10 @@ struct ChannelView: View {
     @State private var isLoadingMore = false
     @State private var errorMessage: String?
     @State private var isSubscribed = false
+    /// Which subscription lookup the button state belongs to. A channel change
+    /// or a change of who is being read as bumps it, so a reply from the
+    /// previous one is dropped instead of answering for the channel on screen.
+    @State private var subscriptionGeneration = 0
     @State private var showingUnsubscribeConfirmation = false
     #if os(tvOS)
     @State private var showingSubscriptionDestinations = false
@@ -195,6 +199,15 @@ struct ChannelView: View {
         }
         .onReceive(NotificationCenter.default.publisher(for: .watchHistoryDidChange)) { _ in
             loadWatchEntries()
+        }
+        // Whose subscriptions the button speaks for just changed — by selection,
+        // or by the credential behind the selected account being replaced — so
+        // it has to be asked again rather than left showing the last answer.
+        .onReceive(NotificationCenter.default.publisher(for: .dataContextDidChange)) { _ in
+            refreshSubscription()
+        }
+        .onReceive(NotificationCenter.default.publisher(for: .accountCredentialDidChange)) { _ in
+            refreshSubscription()
         }
     }
 
@@ -1324,8 +1337,13 @@ struct ChannelView: View {
     /// A destination row toggled something. Only the account on screen changes
     /// what the main button says, and notification preferences are local and
     /// keyed by channel, so they follow the same rule.
+    ///
+    /// Compared against the *effective* context, which is what the button reads
+    /// from: while the selected account is unavailable the button speaks for
+    /// local data, and the menu offers Local precisely so the user can act on it
+    /// — a toggle there has to be the one the button then shows.
     private func destinationDidToggle(_ context: DataContext, subscribed: Bool) {
-        guard context == appEnvironment?.accountsManager.currentContext else { return }
+        guard context == appEnvironment?.dataContextValidator.effectiveContext else { return }
 
         if subscribed,
            appEnvironment?.settingsManager.defaultNotificationsForNewChannels == true,
@@ -2326,9 +2344,19 @@ struct ChannelView: View {
             isSubscribed = appEnvironment?.dataManager.subscription(for: effectiveChannelID) != nil
         }
 
+        subscriptionGeneration += 1
+        let generation = subscriptionGeneration
+
         Task {
             if let service = appEnvironment?.subscriptionService {
-                isSubscribed = await service.isSubscribed(to: effectiveChannelID)
+                let subscribed = await service.isSubscribed(to: effectiveChannelID)
+                // This view is reused as the user navigates from channel to
+                // channel, and the answer may have been asked for under another
+                // account entirely. Either way it no longer describes the button
+                // it would be written to.
+                guard generation == subscriptionGeneration,
+                      (channel?.id.channelID ?? channelID) == effectiveChannelID else { return }
+                isSubscribed = subscribed
             }
         }
     }
