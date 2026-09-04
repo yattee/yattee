@@ -325,7 +325,7 @@ actor PipedAPI: InstanceAPI {
         )
 
         // Returns {"message": "ok"} on success
-        let _: PipedMessageResponse = try await httpClient.fetch(endpoint, baseURL: instance.url)
+        _ = try await performWrite(PipedMessageResponse.self, endpoint: endpoint, instance: instance)
     }
 
     /// Unsubscribes from a channel.
@@ -346,7 +346,7 @@ actor PipedAPI: InstanceAPI {
             body: bodyData
         )
 
-        let _: PipedMessageResponse = try await httpClient.fetch(endpoint, baseURL: instance.url)
+        _ = try await performWrite(PipedMessageResponse.self, endpoint: endpoint, instance: instance)
     }
 
     /// Fetches the user's playlists.
@@ -524,7 +524,7 @@ actor PipedAPI: InstanceAPI {
             body: CreateRequest(name: name)
         )
 
-        let response: CreateResponse = try await httpClient.fetch(endpoint, baseURL: instance.url)
+        let response = try await performWrite(CreateResponse.self, endpoint: endpoint, instance: instance)
         return response.playlistId
     }
 
@@ -546,7 +546,7 @@ actor PipedAPI: InstanceAPI {
             body: RenameRequest(playlistId: id, newName: newName)
         )
 
-        let _: PipedMessageResponse = try await httpClient.fetch(endpoint, baseURL: instance.url)
+        _ = try await performWrite(PipedMessageResponse.self, endpoint: endpoint, instance: instance)
     }
 
     /// Replaces the description of one of the user's playlists.
@@ -578,7 +578,7 @@ actor PipedAPI: InstanceAPI {
             body: DescriptionRequest(playlistId: id, description: description)
         )
 
-        let _: PipedMessageResponse = try await httpClient.fetch(endpoint, baseURL: instance.url)
+        _ = try await performWrite(PipedMessageResponse.self, endpoint: endpoint, instance: instance)
     }
 
     /// Deletes one of the user's playlists.
@@ -597,7 +597,7 @@ actor PipedAPI: InstanceAPI {
             body: DeleteRequest(playlistId: id)
         )
 
-        let _: PipedMessageResponse = try await httpClient.fetch(endpoint, baseURL: instance.url)
+        _ = try await performWrite(PipedMessageResponse.self, endpoint: endpoint, instance: instance)
     }
 
     /// Appends a video to one of the user's playlists.
@@ -623,7 +623,7 @@ actor PipedAPI: InstanceAPI {
             body: AddRequest(playlistId: id, videoIds: [videoID])
         )
 
-        let _: PipedMessageResponse = try await httpClient.fetch(endpoint, baseURL: instance.url)
+        _ = try await performWrite(PipedMessageResponse.self, endpoint: endpoint, instance: instance)
     }
 
     /// Removes the row at a position from one of the user's playlists.
@@ -650,7 +650,50 @@ actor PipedAPI: InstanceAPI {
             body: RemoveRequest(playlistId: id, index: index)
         )
 
-        let _: PipedMessageResponse = try await httpClient.fetch(endpoint, baseURL: instance.url)
+        _ = try await performWrite(PipedMessageResponse.self, endpoint: endpoint, instance: instance)
+    }
+
+    /// Decodes the body of an authenticated Piped write.
+    ///
+    /// Piped answers a refused write with **HTTP 200** and `{"error": "..."}`:
+    /// adding a video it cannot fetch — region-blocked or deleted, neither rare
+    /// — and removing an index that is no longer there both come back that way,
+    /// so the status code settles nothing here. Decoding straight into the
+    /// success shape turns the server's own explanation into a decoding-failure
+    /// message nobody can act on, so the error shape is read first: a body that
+    /// carries `error` may carry `message` alongside it, and checking the
+    /// success shape first would read right past the failure.
+    /// - Parameters:
+    ///   - type: The success shape this endpoint answers with.
+    ///   - data: The raw response body.
+    /// - Returns: The decoded success shape.
+    /// - Throws: ``APIError/serverError(_:)`` carrying the server's message when
+    ///   the body is an error body.
+    static func decodeWriteResponse<T: Decodable>(_ type: T.Type, from data: Data) throws -> T {
+        let decoder = HTTPClient.makeAPIDecoder()
+
+        if let failure = try? decoder.decode(PipedErrorResponse.self, from: data) {
+            let message = failure.error.trimmingCharacters(in: .whitespacesAndNewlines)
+            if !message.isEmpty {
+                throw APIError.serverError(message)
+            }
+        }
+
+        do {
+            return try decoder.decode(type, from: data)
+        } catch let error as DecodingError {
+            throw APIError.decodingError(error)
+        }
+    }
+
+    /// Sends an authenticated write and reads its body the way ``decodeWriteResponse(_:from:)`` does.
+    private func performWrite<T: Decodable>(
+        _ type: T.Type,
+        endpoint: GenericEndpoint,
+        instance: Instance
+    ) async throws -> T {
+        let data = try await httpClient.fetchData(endpoint, baseURL: instance.url)
+        return try Self.decodeWriteResponse(type, from: data)
     }
 
     /// Builds an authenticated JSON write request. Piped wants the token bare in
@@ -677,9 +720,18 @@ private struct PipedLoginResponse: Decodable, Sendable {
     let token: String
 }
 
-/// Generic message response from Piped API (used by subscribe/unsubscribe).
-private struct PipedMessageResponse: Decodable, Sendable {
+/// Generic message response from Piped API (used by subscribe/unsubscribe and
+/// every playlist write). Not private so the write-decode seam can be exercised
+/// against the shape the server really answers with.
+struct PipedMessageResponse: Decodable, Sendable {
     let message: String
+}
+
+/// The body Piped returns for a refused write — under HTTP 200 as often as not.
+/// Some spellings carry a `message` alongside `error`, which is why this shape
+/// is read before the success one.
+private struct PipedErrorResponse: Decodable, Sendable {
+    let error: String
 }
 
 /// Subscription info from Piped API.
@@ -751,6 +803,28 @@ private func stripHTML(_ html: String) -> String {
     return text.trimmingCharacters(in: .whitespacesAndNewlines)
 }
 
+// MARK: - Piped Sentinels
+
+/// Piped writes `-1` where it has no value: playlist rows come back with
+/// `"views": -1` and `"uploaded": -1`, and trending rows carry the same
+/// sentinel. Mapped through as-is they render as "-0B views" and, once `-1`
+/// milliseconds becomes a date, "56 years ago" — so a negative reading is an
+/// absent one.
+enum PipedSentinel {
+    /// A count Piped actually has, or nil for its `-1` sentinel.
+    static func count(_ raw: Int64?) -> Int? {
+        guard let raw, raw >= 0 else { return nil }
+        return Int(raw)
+    }
+
+    /// The upload date Piped actually has, or nil for its `-1` sentinel.
+    /// Piped sends this field as epoch **milliseconds**.
+    static func uploadedDate(_ raw: Int64?) -> Date? {
+        guard let raw, raw >= 0 else { return nil }
+        return Date(timeIntervalSince1970: TimeInterval(raw) / 1000)
+    }
+}
+
 // MARK: - Piped Response Models
 
 private struct PipedVideo: Decodable, Sendable {
@@ -787,9 +861,9 @@ private struct PipedVideo: Decodable, Sendable {
                 thumbnailURL: uploaderAvatar.flatMap { URL(string: $0) }
             ),
             duration: TimeInterval(duration),
-            publishedAt: uploaded.map { Date(timeIntervalSince1970: TimeInterval($0) / 1000) },
+            publishedAt: PipedSentinel.uploadedDate(uploaded),
             publishedText: uploadedDate,
-            viewCount: views.map { Int($0) },
+            viewCount: PipedSentinel.count(views),
             likeCount: nil,
             thumbnails: Thumbnail.fallbackChain(for: thumbnail.flatMap { URL(string: $0) }),
             isLive: duration == -1,
@@ -866,9 +940,9 @@ private struct PipedStreamResponse: Decodable, Sendable {
                 thumbnailURL: uploaderAvatar.flatMap { URL(string: $0) }
             ),
             duration: TimeInterval(duration),
-            publishedAt: uploaded.map { Date(timeIntervalSince1970: TimeInterval($0) / 1000) },
+            publishedAt: PipedSentinel.uploadedDate(uploaded),
             publishedText: uploadDate,
-            viewCount: views.map { Int($0) },
+            viewCount: PipedSentinel.count(views),
             likeCount: likes.map { Int($0) },
             thumbnails: thumbnails,
             isLive: livestream ?? false,
@@ -1026,9 +1100,9 @@ private struct PipedSearchItem: Decodable, Sendable {
                 thumbnailURL: uploaderAvatar.flatMap { URL(string: $0) }
             ),
             duration: TimeInterval(duration ?? 0),
-            publishedAt: uploaded.map { Date(timeIntervalSince1970: TimeInterval($0) / 1000) },
+            publishedAt: PipedSentinel.uploadedDate(uploaded),
             publishedText: uploadedDate,
-            viewCount: views.map { Int($0) },
+            viewCount: PipedSentinel.count(views),
             likeCount: nil,
             thumbnails: Thumbnail.fallbackChain(for: thumbnail.flatMap { URL(string: $0) }),
             isLive: duration == -1,
