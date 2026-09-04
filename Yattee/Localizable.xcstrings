@@ -743,6 +743,17 @@
         }
       }
     },
+    "channel.menu.subscribeOn" : {
+      "comment" : "Submenu listing the accounts a channel can be subscribed on",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Subscribe On…"
+          }
+        }
+      }
+    },
     "channel.menu.unsubscribe" : {
       "localizations" : {
         "en" : {
@@ -810,6 +821,17 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Search in channel"
+          }
+        }
+      }
+    },
+    "channel.subscribe.contextUnavailable" : {
+      "comment" : "Menu hint when the selected account cannot be subscribed on right now",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The selected account is unavailable. Pick a destination below."
           }
         }
       }

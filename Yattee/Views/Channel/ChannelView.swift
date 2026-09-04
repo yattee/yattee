@@ -28,9 +28,11 @@ struct ChannelView: View {
     @State private var isLoading = true
     @State private var isLoadingMore = false
     @State private var errorMessage: String?
-    @State private var subscription: Subscription?
     @State private var isSubscribed = false
     @State private var showingUnsubscribeConfirmation = false
+    #if os(tvOS)
+    @State private var showingSubscriptionDestinations = false
+    #endif
     @State private var scrollOffset: CGFloat = 0
     @State private var scrollToTop: Bool = false
     @State private var cachedHeader: CachedChannelData?
@@ -727,6 +729,7 @@ struct ChannelView: View {
 
             if !isDescriptionScrollLocked {
                 tvOSSubscribeButton
+                tvOSSubscriptionDestinationsButton
             }
 
             if let description, !description.isEmpty {
@@ -789,7 +792,31 @@ struct ChannelView: View {
             .font(.headline)
         }
         .buttonStyle(.borderedProminent)
+        .disabled(!allowsCurrentContextMutation)
         .focused($isSubscribeFocused)
+    }
+
+    /// The destination list, as its own button: a menu is unusable with a
+    /// remote, and the primary tap has to stay the current account's toggle.
+    @ViewBuilder
+    private var tvOSSubscriptionDestinationsButton: some View {
+        if let channelToSubscribe, SubscriptionDestinations.areOffered(in: appEnvironment) {
+            Button {
+                showingSubscriptionDestinations = true
+            } label: {
+                Label(
+                    String(localized: "channel.menu.subscribeOn"),
+                    systemImage: "person.crop.circle.badge.plus"
+                )
+                .frame(maxWidth: .infinity, minHeight: 60)
+            }
+            .buttonStyle(.bordered)
+            .fullScreenCover(isPresented: $showingSubscriptionDestinations) {
+                SubscriptionDestinationPicker(channel: channelToSubscribe) { context, subscribed in
+                    destinationDidToggle(context, subscribed: subscribed)
+                }
+            }
+        }
     }
 
     private var tvOSTabButtons: some View {
@@ -1197,6 +1224,23 @@ struct ChannelView: View {
                     systemImage: isSubscribed ? "person.fill.xmark" : "person.badge.plus"
                 )
             }
+            .disabled(!allowsCurrentContextMutation)
+
+            if !allowsCurrentContextMutation {
+                Text(String(localized: "channel.subscribe.contextUnavailable"))
+            }
+
+            // Naming a destination is a different decision from the one the
+            // main button makes, so it survives an unusable current context.
+            // tvOS reaches the same list through its own button — this menu is
+            // never presented there.
+            #if !os(tvOS)
+            if let channelToSubscribe {
+                SubscriptionDestinationMenu(channel: channelToSubscribe) { context, subscribed in
+                    destinationDidToggle(context, subscribed: subscribed)
+                }
+            }
+            #endif
 
             // Notifications toggle (only visible when subscribed)
             if isSubscribed {
@@ -1222,6 +1266,29 @@ struct ChannelView: View {
 
     // MARK: - Subscription Actions
 
+    /// Whether the main button may write to the account being browsed.
+    ///
+    /// Local always may. A server account may only while it is usable: a
+    /// subscribe that cannot reach its account must be refused rather than
+    /// land in local data the user did not choose.
+    private var allowsCurrentContextMutation: Bool {
+        guard let appEnvironment else { return false }
+        guard !appEnvironment.accountsManager.currentContext.isLocal else { return true }
+        return appEnvironment.dataContextValidator.allowsServerMutations
+    }
+
+    /// The channel as it must be stored: the id carries the source this view
+    /// was opened for, which an extracted channel does not report itself.
+    private var channelToSubscribe: Channel? {
+        guard let channel else { return nil }
+        return Channel(
+            id: ChannelID(source: source, channelID: channel.id.channelID),
+            name: channel.name,
+            subscriberCount: channel.subscriberCount,
+            thumbnailURL: channel.thumbnailURL
+        )
+    }
+
     private func toggleSubscription() {
         if isSubscribed {
             showingUnsubscribeConfirmation = true
@@ -1231,26 +1298,19 @@ struct ChannelView: View {
     }
 
     private func subscribe() async {
-        guard let channel,
+        guard let channelToSubscribe,
               let subscriptionService = appEnvironment?.subscriptionService,
               let dataManager = appEnvironment?.dataManager else { return }
 
-        let author = Author(
-            id: channel.id.channelID,
-            name: channel.name,
-            thumbnailURL: channel.thumbnailURL,
-            subscriberCount: channel.subscriberCount
-        )
-
         do {
-            try await subscriptionService.subscribe(to: author, source: source)
-            
+            try await subscriptionService.subscribe(to: channelToSubscribe)
+
             // Set default notification preference for new subscription
             let defaultNotifications = appEnvironment?.settingsManager.defaultNotificationsForNewChannels ?? false
             if defaultNotifications {
-                dataManager.setNotificationsEnabled(true, for: channel.id.channelID)
+                dataManager.setNotificationsEnabled(true, for: channelToSubscribe.id.channelID)
             }
-            
+
             isSubscribed = true
             refreshSubscription()
         } catch {
@@ -1261,6 +1321,21 @@ struct ChannelView: View {
         }
     }
 
+    /// A destination row toggled something. Only the account on screen changes
+    /// what the main button says, and notification preferences are local and
+    /// keyed by channel, so they follow the same rule.
+    private func destinationDidToggle(_ context: DataContext, subscribed: Bool) {
+        guard context == appEnvironment?.accountsManager.currentContext else { return }
+
+        if subscribed,
+           appEnvironment?.settingsManager.defaultNotificationsForNewChannels == true,
+           let channelID = channelToSubscribe?.id.channelID {
+            appEnvironment?.dataManager.setNotificationsEnabled(true, for: channelID)
+        }
+
+        refreshSubscription()
+    }
+
     private func unsubscribe() {
         guard let channel else { return }
 
@@ -1268,7 +1343,6 @@ struct ChannelView: View {
             do {
                 try await appEnvironment?.subscriptionService.unsubscribe(from: channel.id.channelID)
                 isSubscribed = false
-                subscription = nil
             } catch {
                 appEnvironment?.toastManager.showError(
                     String(localized: "channel.unsubscribe.error.title"),
@@ -2097,13 +2171,7 @@ struct ChannelView: View {
         isLoading = true
         errorMessage = nil
 
-        // Load subscription state: optimistic from the local store, then
-        // corrected by the active provider (server accounts differ from local)
-        subscription = appEnvironment.dataManager.subscription(for: channelID)
-        isSubscribed = subscription != nil
-        Task {
-            isSubscribed = await appEnvironment.subscriptionService.isSubscribed(to: channelID)
-        }
+        refreshSubscription()
 
         // Load cached header data for immediate display
         cachedHeader = CachedChannelData.load(for: channelID, using: appEnvironment.dataManager)
@@ -2214,11 +2282,7 @@ struct ChannelView: View {
                 isLoading = false
 
                 // Check subscription status using extracted channel ID
-                subscription = appEnvironment.dataManager.subscription(for: fetchedChannel.id.channelID)
-                isSubscribed = subscription != nil
-                Task {
-                    isSubscribed = await appEnvironment.subscriptionService.isSubscribed(to: fetchedChannel.id.channelID)
-                }
+                refreshSubscription()
             }
         } catch let error as APIError {
             await MainActor.run {
@@ -2248,12 +2312,20 @@ struct ChannelView: View {
         }
     }
 
+    /// Re-reads the button's state from the account being browsed.
+    ///
+    /// The local store is only consulted when it *is* the active context: under
+    /// a server account it holds another account's channels, and reading it
+    /// first would show the wrong button until the provider answered.
     private func refreshSubscription() {
         // Use loaded channel's ID if available (important for external channels
         // where navigation channelID is the URL, not the actual channel ID)
         let effectiveChannelID = channel?.id.channelID ?? channelID
-        subscription = appEnvironment?.dataManager.subscription(for: effectiveChannelID)
-        isSubscribed = subscription != nil
+
+        if appEnvironment?.dataContextValidator.effectiveContext.isLocal == true {
+            isSubscribed = appEnvironment?.dataManager.subscription(for: effectiveChannelID) != nil
+        }
+
         Task {
             if let service = appEnvironment?.subscriptionService {
                 isSubscribed = await service.isSubscribed(to: effectiveChannelID)

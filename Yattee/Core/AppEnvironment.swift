@@ -285,12 +285,13 @@ final class AppEnvironment {
         // Initialize SubscriptionService with all required dependencies
         self.subscriptionService = SubscriptionService(
             dataManager: dm,
-            settingsManager: settings,
-            instancesManager: instances,
-            invidiousCredentialsManager: invidiousCreds,
-            pipedCredentialsManager: pipedCreds,
-            invidiousAPI: invidiousAPI,
-            pipedAPI: pipedAPI
+            providerFactory: DefaultSubscriptionProviderFactory(
+                invidiousAPI: invidiousAPI,
+                pipedAPI: pipedAPI,
+                invidiousCredentialsManager: invidiousCreds,
+                pipedCredentialsManager: pipedCreds,
+                settingsManager: settings
+            )
         )
         subscriptionService.setAccountsManager(accounts)
 

@@ -37,12 +37,7 @@ final class SubscriptionService {
     // MARK: - Dependencies
 
     private let dataManager: DataManager
-    private let settingsManager: SettingsManager
-    private let instancesManager: InstancesManager
-    private let invidiousCredentialsManager: InvidiousCredentialsManager
-    private let pipedCredentialsManager: PipedCredentialsManager
-    private let invidiousAPI: InvidiousAPI
-    private let pipedAPI: PipedAPI
+    private let providerFactory: any SubscriptionProviderFactory
 
     // MARK: - Providers
 
@@ -67,20 +62,10 @@ final class SubscriptionService {
 
     init(
         dataManager: DataManager,
-        settingsManager: SettingsManager,
-        instancesManager: InstancesManager,
-        invidiousCredentialsManager: InvidiousCredentialsManager,
-        pipedCredentialsManager: PipedCredentialsManager,
-        invidiousAPI: InvidiousAPI,
-        pipedAPI: PipedAPI
+        providerFactory: any SubscriptionProviderFactory
     ) {
         self.dataManager = dataManager
-        self.settingsManager = settingsManager
-        self.instancesManager = instancesManager
-        self.invidiousCredentialsManager = invidiousCredentialsManager
-        self.pipedCredentialsManager = pipedCredentialsManager
-        self.invidiousAPI = invidiousAPI
-        self.pipedAPI = pipedAPI
+        self.providerFactory = providerFactory
 
         // Account providers are built lazily: which accounts exist is not known
         // until AccountsManager has loaded and iCloud has delivered instances.
@@ -138,27 +123,11 @@ final class SubscriptionService {
                   instance.type.accountCapabilities.supportsSubscriptions
             else { return nil }
 
-            let provider: (any SubscriptionProvider)?
-            switch instance.type {
-            case .invidious:
-                provider = InvidiousSubscriptionProvider(
-                    account: account,
-                    invidiousAPI: invidiousAPI,
-                    credentialsManager: invidiousCredentialsManager,
-                    accountsManager: accountsManager,
-                    settingsManager: settingsManager
-                )
-            case .piped:
-                provider = PipedSubscriptionProvider(
-                    account: account,
-                    pipedAPI: pipedAPI,
-                    credentialsManager: pipedCredentialsManager,
-                    accountsManager: accountsManager,
-                    settingsManager: settingsManager
-                )
-            default:
-                provider = nil
-            }
+            let provider = providerFactory.provider(
+                for: account,
+                instance: instance,
+                accountsManager: accountsManager
+            )
 
             accountProviders[id] = provider
             return provider
@@ -220,92 +189,116 @@ final class SubscriptionService {
 
     // MARK: - Subscribe
 
-    /// Subscribes to a channel using the current provider.
-    /// - Parameter channel: The channel to subscribe to.
+    /// Subscribes to a channel on a named destination.
+    ///
+    /// The context is passed in rather than read: a destination the user picked
+    /// names its own target, so it must keep working while the *selected*
+    /// context is unusable.
     /// - Throws: SubscriptionProviderError if the operation fails.
-    func subscribe(to channel: Channel) async throws {
-        guard let provider = currentProvider else {
+    func subscribe(to channel: Channel, in context: DataContext) async throws {
+        guard let provider = provider(for: context) else {
             throw SubscriptionError.providerNotAvailable
         }
 
         isLoading = true
         lastError = nil
 
+        // The provider is captured before the await, so the write lands where
+        // it was aimed even if the logins are replaced meanwhile. The service's
+        // error cannot be treated the same way: it is shared by every caller,
+        // and one raised for a login that has since been replaced would be read
+        // as the current one's.
+        let generation = providerGeneration
+
+        defer { isLoading = false }
+
         do {
             try await provider.subscribe(to: channel)
-            postChangeNotificationForServerAccount()
+            postChangeNotification(for: context)
             LoggingService.shared.info(
-                "Subscribed to \(channel.name) via \(provider.context)",
+                "Subscribed to \(channel.name) via \(context)",
                 category: .general
             )
         } catch {
-            lastError = error
+            if generation == providerGeneration { lastError = error }
             LoggingService.shared.error(
                 "Failed to subscribe to \(channel.name): \(error.localizedDescription)",
                 category: .general
             )
             throw error
         }
-
-        isLoading = false
     }
 
-    /// Subscribes to a channel from an Author.
-    /// - Parameters:
-    ///   - author: The author/channel to subscribe to.
-    ///   - source: The content source.
-    func subscribe(to author: Author, source: ContentSource) async throws {
-        let channel = Channel(
-            id: ChannelID(source: source, channelID: author.id),
-            name: author.name,
-            subscriberCount: author.subscriberCount,
-            thumbnailURL: author.thumbnailURL
-        )
-        try await subscribe(to: channel)
+    /// Subscribes to a channel using the current provider.
+    /// - Parameter channel: The channel to subscribe to.
+    /// - Throws: SubscriptionProviderError if the operation fails.
+    func subscribe(to channel: Channel) async throws {
+        try await subscribe(to: channel, in: currentContext)
     }
 
     // MARK: - Unsubscribe
 
-    /// Unsubscribes from a channel using the current provider.
-    /// - Parameter channelID: The channel ID to unsubscribe from.
+    /// Unsubscribes from a channel on a named destination.
     /// - Throws: SubscriptionProviderError if the operation fails.
-    func unsubscribe(from channelID: String) async throws {
-        guard let provider = currentProvider else {
+    func unsubscribe(from channelID: String, in context: DataContext) async throws {
+        guard let provider = provider(for: context) else {
             throw SubscriptionError.providerNotAvailable
         }
 
         isLoading = true
         lastError = nil
 
+        let generation = providerGeneration
+
+        defer { isLoading = false }
+
         do {
             try await provider.unsubscribe(from: channelID)
-            postChangeNotificationForServerAccount()
+            postChangeNotification(for: context)
             LoggingService.shared.info(
-                "Unsubscribed from \(channelID) via \(provider.context)",
+                "Unsubscribed from \(channelID) via \(context)",
                 category: .general
             )
         } catch {
-            lastError = error
+            if generation == providerGeneration { lastError = error }
             LoggingService.shared.error(
                 "Failed to unsubscribe from \(channelID): \(error.localizedDescription)",
                 category: .general
             )
             throw error
         }
+    }
 
-        isLoading = false
+    /// Unsubscribes from a channel using the current provider.
+    /// - Parameter channelID: The channel ID to unsubscribe from.
+    /// - Throws: SubscriptionProviderError if the operation fails.
+    func unsubscribe(from channelID: String) async throws {
+        try await unsubscribe(from: channelID, in: currentContext)
     }
 
     // MARK: - Query
+
+    /// Whether a channel is subscribed on a named destination.
+    ///
+    /// Answers nil rather than false when nothing can be said: the destination
+    /// has no provider, or the logins were replaced while the answer was in
+    /// flight. A menu showing "not subscribed" for either would be a lie the
+    /// user could act on.
+    func isSubscribed(to channelID: String, in context: DataContext) async -> Bool? {
+        guard let provider = provider(for: context) else { return nil }
+
+        let generation = providerGeneration
+        let subscribed = await provider.isSubscribed(to: channelID)
+
+        guard generation == providerGeneration else { return nil }
+        return subscribed
+    }
 
     /// Checks if subscribed to a channel.
     /// - Parameter channelID: The channel ID to check.
     /// - Returns: `true` if subscribed, `false` otherwise.
     func isSubscribed(to channelID: String) async -> Bool {
-        guard let provider = readProvider else {
-            return false
-        }
-        return await provider.isSubscribed(to: channelID)
+        await isSubscribed(to: channelID, in: contextValidator?.effectiveContext ?? currentContext) ?? false
     }
 
     /// Fetches all subscriptions from the current provider.
@@ -419,7 +412,7 @@ final class SubscriptionService {
         }
 
         if imported > 0 {
-            postChangeNotificationForServerAccount()
+            postChangeNotification(for: currentContext)
         }
 
         return (imported, skipped)
@@ -429,8 +422,12 @@ final class SubscriptionService {
 
     /// Posts a subscriptions-changed notification for server accounts.
     /// Local accounts already post it from DataManager with a change payload.
-    private func postChangeNotificationForServerAccount() {
-        guard !currentContext.isLocal else { return }
+    ///
+    /// Takes the context the write went to, not the selected one: a subscribe
+    /// aimed at another account still changed something, and the views that
+    /// listen decide for themselves whether it concerns them.
+    private func postChangeNotification(for context: DataContext) {
+        guard !context.isLocal else { return }
         NotificationCenter.default.post(name: .subscriptionsDidChange, object: nil)
     }
 }
