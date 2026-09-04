@@ -145,6 +145,14 @@ struct SubscriptionDestinationRows: View {
         .onReceive(NotificationCenter.default.publisher(for: .accountsDidChange)) { _ in
             invalidateMembership()
         }
+        // An instance switched on adds a row to `destinations` on the spot, and
+        // the round that would have asked about it has already run. Unknown
+        // reads as unsubscribed, so an account the channel is already on gets a
+        // checkmark-less row whose tap subscribes again instead of doing the
+        // unsubscribe it promises.
+        .onReceive(NotificationCenter.default.publisher(for: .instancesDidChange)) { _ in
+            invalidateMembership()
+        }
     }
 
     /// Forgets what is known and asks again.

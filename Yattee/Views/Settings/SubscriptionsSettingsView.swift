@@ -353,14 +353,23 @@ struct SubscriptionsSettingsView: View {
     }
 
     /// Refreshes the account-scoped subscription count shown in the export footer.
+    ///
+    /// The context the fetch was started for is rechecked before its answer is
+    /// applied. A selection change would already have been fenced by the
+    /// service's provider generation, but the fallback to local is driven by the
+    /// account's availability and announces nothing — so a count still in flight
+    /// would otherwise land under the local heading it never came from.
     private func refreshAccountSubscriptionCount() async {
         guard let subscriptionService else { return }
 
         if let cached = subscriptionService.cachedSubscriptionCount {
             accountSubscriptionCount = cached
         }
-        if !effectiveContext.isLocal {
+
+        let context = effectiveContext
+        if !context.isLocal {
             if let channels = try? await subscriptionService.fetchSubscriptions() {
+                guard effectiveContext == context else { return }
                 accountSubscriptionCount = channels.count
             }
         }

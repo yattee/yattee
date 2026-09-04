@@ -353,6 +353,14 @@ final class AccountsManager {
     /// - Returns: `true` when the selection actually moved.
     @discardableResult
     func correctContextIfAccountDeleted() -> Bool {
+        // The namespace moved and the reload has not refilled memory yet, so
+        // the selection and the tombstones weighed against each other here both
+        // belong to the previous identity. Fenced on the loaded namespace for
+        // the same reason `save()` is: acting on that state repairs — and
+        // announces — a choice the identity being switched to never made. The
+        // reload replaces both sides, and the next activation asks again.
+        guard loadedNamespace == namespace else { return false }
+
         guard case let .account(id) = storedContext.context else { return false }
         guard deletedAccountIDs.contains(id) else { return false }
 

@@ -127,6 +127,13 @@ struct MediaSourcesView: View {
                 pendingDeleteInstance = nil
                 pendingDeleteSource = nil
             }
+        } message: {
+            // The same cascade runs from here as from Settings, so the same
+            // logins go with it — this dialog was simply the one still silent
+            // about it.
+            if let accounts = deleteConfirmationAccounts {
+                Text(accounts)
+            }
         }
         #if !os(tvOS)
         .presentationCompactAdaptation(.sheet)
@@ -161,6 +168,11 @@ struct MediaSourcesView: View {
             return String(localized: "sources.delete.confirmation.single \(source.name)")
         }
         return String(localized: "sources.delete.confirmation")
+    }
+
+    private var deleteConfirmationAccounts: String? {
+        guard let instance = pendingDeleteInstance else { return nil }
+        return InstanceDeletionDisclosure.message(for: instance, in: appEnvironment)
     }
 
     private func confirmDelete() {

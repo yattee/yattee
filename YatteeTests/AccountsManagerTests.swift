@@ -666,6 +666,53 @@ struct DataContextValidatorTests {
         #expect(!accounts.pendingContextUpload)
     }
 
+    @Test("Nothing is repaired while the namespace is reloading")
+    func correctionIsFencedToTheLoadedNamespace() {
+        let instances = InstancesManager()
+        let instance = Instance(type: .invidious, url: URL(string: "https://inv-reload.example.com")!)
+        instances.add(instance)
+        defer { instances.remove(instance) }
+
+        let scope = CredentialIdentityScope(fixedScope: "identity-A")
+        let toasts = ToastManager()
+        let accounts = AccountsManager(
+            identityScope: scope,
+            instancesManager: instances,
+            defaults: UserDefaults(suiteName: "yattee.tests.\(UUID().uuidString)")!
+        )
+        let validator = DataContextValidator(
+            accountsManager: accounts,
+            instancesManager: instances,
+            toastManager: toasts
+        )
+
+        let deleted = accounts.addAccount(instanceID: instance.id)
+        let sibling = accounts.addAccount(instanceID: instance.id)
+        accounts.setStatus(.signedIn, for: sibling.id)
+        accounts.setContext(.local)
+        accounts.applyRemoteTombstone(deleted.id)
+        accounts.setContext(.account(deleted.id))
+
+        // The scope moved before the observer that reloads the manager ran, so
+        // the selection and the tombstone are both still identity-A's — and the
+        // identity now resolved is identity-B, which chose neither.
+        scope.setFixedScope("identity-B", announcing: false)
+        validator.correctIfContextRemoved()
+
+        #expect(accounts.currentContext == .account(deleted.id))
+        // Least of all announced: a toast here tells the user their account was
+        // switched during a reload that has not shown them an account yet.
+        #expect(toasts.activeToasts.isEmpty)
+
+        // Back under the namespace the state in memory came from, the same
+        // repair runs exactly as it always did.
+        scope.setFixedScope("identity-A", announcing: false)
+        validator.correctIfContextRemoved()
+
+        #expect(accounts.currentContext == .account(sibling.id))
+        #expect(!toasts.activeToasts.isEmpty)
+    }
+
     @Test("Only accounts the app can actually resolve are offered")
     func availableContextsAreFiltered() {
         let instances = InstancesManager()
