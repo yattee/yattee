@@ -22,11 +22,44 @@ enum FeedLoadState: Equatable {
     case partiallyLoaded(readyCount: Int, pendingCount: Int, errorCount: Int)
     case error(FeedLoadError)
 
+    /// The feed error worth showing in this state, if any.
+    ///
+    /// While the context banner is up, only the errors it already answers for
+    /// stand down — the banner names their cause, so it is the one that stays.
+    /// Everything else keeps its own message and its retry: a local refresh
+    /// that failed on the network is news the banner does not carry, and
+    /// swallowing it leaves a stale feed with nothing to say and nothing to
+    /// press.
+    func displayedError(contextBannerVisible: Bool) -> FeedLoadError? {
+        guard case let .error(error) = self else { return nil }
+        guard !contextBannerVisible || !error.isAnsweredByContextBanner else { return nil }
+
+        return error
+    }
+
     /// Specific error types for feed loading.
     enum FeedLoadError: Equatable {
         case yatteeServerRequired
         case notAuthenticated
         case networkError(String)
+
+        /// Whether a context banner, when one is up, already answers for this.
+        ///
+        /// A selected account that cannot be used reads local data, and the
+        /// local feed then asks for the Yattee Server it has no reason to have
+        /// — "add a subscriptions account in Settings" under a banner saying
+        /// *this* account needs signing in again is two answers to one
+        /// question. These two are the account the banner is already talking
+        /// about; a refresh that failed on the way out is not, and has a retry
+        /// worth offering.
+        var isAnsweredByContextBanner: Bool {
+            switch self {
+            case .yatteeServerRequired, .notAuthenticated:
+                return true
+            case .networkError:
+                return false
+            }
+        }
     }
 }
 

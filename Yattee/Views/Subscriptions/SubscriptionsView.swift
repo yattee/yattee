@@ -165,20 +165,10 @@ struct SubscriptionsView: View {
     }
     #endif
 
-    /// The feed error worth showing, if any.
-    ///
-    /// Nothing while the context banner is up: a selected account that cannot be
-    /// used reads local data, and the local feed then reports the Yattee Server
-    /// it has no reason to have — "add a subscriptions account in Settings"
-    /// under a banner saying *this* account needs signing in again is two
-    /// answers to one question. The banner names the cause, so it is the one
-    /// that stays.
+    /// The feed error worth showing, if any — the banner takes over only for
+    /// the errors it is already the answer to.
     private var displayedFeedError: FeedLoadState.FeedLoadError? {
-        guard contextUnavailability == nil,
-              case let .error(error) = feedCache.feedLoadState
-        else { return nil }
-
-        return error
+        feedCache.feedLoadState.displayedError(contextBannerVisible: contextUnavailability != nil)
     }
 
     private var isShowingFullScreenError: Bool {
