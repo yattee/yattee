@@ -723,7 +723,9 @@ struct AccountSyncTests {
         harness.recorder.clear()
         await harness.coordinator.activate()
 
-        #expect(harness.accounts.currentContext == .account(sibling.id))
+        // The repair yields to the choice the server holds rather than pushing a
+        // fallback nobody made over it — and yielding sends nothing either.
+        #expect(harness.accounts.currentContext == .local)
         #expect(!harness.recorder.savedNames.contains("datacontext-current"))
         #expect(harness.coordinator.recordToSave(named: "datacontext-current") == nil)
     }
@@ -758,6 +760,38 @@ struct AccountSyncTests {
         #expect(harness.accounts.deletedAccountInstanceIDs[deleted.id] == instance.id)
         // Repaired onto the login the user can actually use, rather than falling
         // all the way back to local because the metadata was thrown away.
+        #expect(harness.accounts.currentContext == .account(sibling.id))
+    }
+
+    @Test("A context fetched ahead of the records it depends on is still applied last")
+    func stagedContextIsAppliedAfterTheAccountRecords() async {
+        let instances = InstancesManager()
+        let instance = Instance(type: .invidious, url: URL(string: "https://inv-\(UUID().uuidString).example.com")!)
+        instances.add(instance)
+        defer { instances.remove(instance) }
+
+        let harness = Self.makeHarness(instances: instances)
+        let sibling = harness.accounts.addAccount(instanceID: instance.id)
+        harness.accounts.setStatus(.signedIn, for: sibling.id)
+
+        // The order records come back in is CloudKit's, not ours: the same three
+        // as above, with the context enumerated first. Applied in that order the
+        // repair would run before anything knew the deleted account existed, let
+        // alone which server it lived on, and land on local past the sibling.
+        let deleted = Account(instanceID: instance.id)
+        harness.coordinator.stageFetched(
+            records: [
+                harness.mapper.toCKRecord(
+                    dataContext: StoredDataContext(context: .account(deleted.id), changedAt: Date())
+                ),
+                harness.mapper.toCKRecord(account: deleted),
+                harness.mapper.toCKRecord(accountDeletionID: deleted.id)
+            ],
+            deletions: []
+        )
+        await harness.coordinator.activate()
+
+        #expect(harness.accounts.deletedAccountInstanceIDs[deleted.id] == instance.id)
         #expect(harness.accounts.currentContext == .account(sibling.id))
     }
 

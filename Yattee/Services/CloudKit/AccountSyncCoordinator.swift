@@ -410,9 +410,24 @@ final class AccountSyncCoordinator {
         isApplyingStagedChanges = true
         defer { isApplyingStagedChanges = false }
 
-        // Tombstone-first. A deletion that arrived in a later event than the
+        // Applied by category rather than in the order the records happened to
+        // be fetched, because each category depends on the ones before it.
+        //
+        // Tombstone-first: a deletion that arrived in a later event than the
         // account record it kills must still be applied before it, or the
         // account becomes visible — and selectable — in between.
+        //
+        // Contexts last: repairing a context naming a deleted account reads the
+        // accounts and the instance a dominated record left behind, and a repair
+        // evaluated before that state exists lands on local past a signed-in
+        // sibling on the same server, with nothing to re-run it afterwards.
+        //
+        // Only within a batch, which is what a fetch delivers and what a
+        // deferred activation accumulates. A context applied in an *earlier*
+        // batch than the account record that says where the deleted account
+        // lived still repairs without it; the next explicit choice anywhere
+        // settles that, and re-repairing on every later record would undo
+        // choices made in between.
         let tombstones = staged.filter { change in
             switch AccountRecordName.parse(change.recordName) {
             case .accountDeletion: return change.kind == .save

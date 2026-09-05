@@ -82,8 +82,10 @@ final class AccountsManager {
     /// decides an older server copy has to be corrected. Without this the
     /// fallback would be pushed back over a deliberate choice another device
     /// made, which is exactly what not stamping it "now" is meant to prevent.
-    /// Persisted beside the context, or a relaunch would forget and publish it
-    /// on the next stale record it saw.
+    /// It is also what makes a repair yield to any context that arrives, rather
+    /// than winning on that borrowed rank and standing against the server
+    /// forever. Persisted beside the context, or a relaunch would forget and
+    /// publish it on the next stale record it saw.
     private(set) var storedContextIsRepair = false
 
     /// Instances the user has deleted here.
@@ -719,18 +721,30 @@ final class AccountsManager {
             return false
         }
 
+        // A repair never outranks a context somebody chose. It borrowed the
+        // replaced selection's timestamp only so that a later choice still beats
+        // it — that borrowed rank was never meant to win an argument with an
+        // explicit value, by being newer or by settling a tie on
+        // `DataContext.tieBreakKey`. Leaving it in place instead would keep a
+        // local fallback standing against the server's value indefinitely, since
+        // a repair is also never pushed back: nothing would ever resolve the
+        // disagreement. Migrated contexts make the tie real rather than
+        // theoretical — they are all stamped at the epoch.
+        //
+        // Adopting is safe whatever the incoming value says: one naming an
+        // account that is gone has already been turned back into a repair above,
+        // so it stays unpublished and lands on the same target this repair did.
+        if storedContextIsRepair {
+            adoptSyncedContext(incoming, wasRepaired: wasRepaired)
+            return false
+        }
+
         guard storedContext.isOutranked(by: incoming) else {
-            // The local choice is the newer one and survives untouched — a
-            // repair that lost the ordering never gets to clear what that
-            // choice still owes the server.
+            // The local choice is the newer one and survives untouched, keeping
+            // whatever it still owes the server.
             guard incoming.isOutranked(by: storedContext) else { return false }
-            // Newer, but not a choice. A repair carries the replaced selection's
-            // timestamp, so it outranks the server's older explicit value while
-            // having nothing of its own to say; publishing it would push an
-            // automatic fallback over that value. Nothing is uploaded here: the
-            // server's context stands remotely, the repair stays local, and the
-            // next explicit choice on any device re-converges everyone.
-            guard !storedContextIsRepair else { return false }
+            // The server holds the older copy of a deliberate choice, so it has
+            // to be pushed back over it.
             pendingContextUpload = true
             save()
             return true
@@ -1095,6 +1109,13 @@ final class AccountsManager {
         }
 
         pendingContextUpload = defaults.bool(forKey: key("pendingContextUpload"))
+        // An install that repaired its context before this key existed reads
+        // back as "chosen", so that one repair can still be marked dirty by an
+        // older incoming context and published once. Accepted: no shipped
+        // release ever persisted a data context — the whole revamp ships as a
+        // single release — so the window covers only interim development and
+        // TestFlight builds, it is one-shot, and the next explicit choice
+        // heals it.
         storedContextIsRepair = defaults.bool(forKey: key("contextIsRepair"))
 
         purgeUnresolvedNamespace()

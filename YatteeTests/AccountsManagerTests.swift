@@ -981,24 +981,151 @@ struct DataContextRepairTests {
         let older = StoredDataContext(context: .local, changedAt: chosenAt.addingTimeInterval(-60))
         #expect(!manager.applySyncedContext(older))
 
-        // The repair only outranks the server's copy because it inherited that
+        // The repair only outranked the server's copy because it inherited that
         // timestamp. Publishing it would put a fallback nobody chose over an
-        // explicit choice — the server's context stands, and the next real
-        // selection anywhere re-converges everyone.
-        #expect(manager.currentContext == .account(sibling.id))
-        #expect(manager.storedContext.changedAt == chosenAt)
+        // explicit choice, so the explicit value is taken as it stands instead —
+        // and nothing is sent.
+        #expect(manager.currentContext == .local)
+        #expect(manager.storedContext.changedAt == older.changedAt)
         #expect(!manager.pendingContextUpload)
 
-        // Still a repair after a relaunch, or the next stale record read from
-        // disk would publish it.
+        // What was adopted is a choice, so it publishes like one when this
+        // device later has the newer copy.
         let reloaded = makeManager(instances: instances, defaults: defaults)
         #expect(!reloaded.applySyncedContext(older))
         #expect(!reloaded.pendingContextUpload)
 
-        // Choosing it deliberately is a different thing entirely, and publishes.
         reloaded.setContext(.account(sibling.id))
         #expect(reloaded.applySyncedContext(older))
         #expect(reloaded.pendingContextUpload)
+    }
+
+    @Test("A repair read back from disk still yields rather than publishing")
+    func reloadedRepairStillYieldsToTheServersContext() {
+        let instances = InstancesManager()
+        let instance = makeInstance("inv")
+        instances.add(instance)
+        defer { instances.remove(instance) }
+
+        let defaults = UserDefaults(suiteName: "yattee.tests.\(UUID().uuidString)")!
+        let manager = makeManager(instances: instances, defaults: defaults)
+        let selected = manager.addAccount(instanceID: instance.id)
+        let sibling = manager.addAccount(instanceID: instance.id)
+        manager.setStatus(.signedIn, for: sibling.id)
+
+        manager.setContext(.account(selected.id))
+        let chosenAt = manager.storedContext.changedAt
+        manager.confirmContextUpload(changedAt: chosenAt)
+        manager.applyRemoteTombstone(selected.id)
+        #expect(manager.currentContext == .account(sibling.id))
+
+        // Relaunched before any record arrives: without the repair surviving on
+        // disk this reads as a choice, and the stale record below would be
+        // pushed back over rather than adopted.
+        let reloaded = makeManager(instances: instances, defaults: defaults)
+        reloaded.setStatus(.signedIn, for: sibling.id)
+        #expect(reloaded.currentContext == .account(sibling.id))
+
+        let older = StoredDataContext(context: .local, changedAt: chosenAt.addingTimeInterval(-60))
+        #expect(!reloaded.applySyncedContext(older))
+
+        #expect(reloaded.currentContext == .local)
+        #expect(!reloaded.pendingContextUpload)
+    }
+
+    @Test("A repair yields to an explicit context it ties with")
+    func repairYieldsToAnExplicitContextOnATie() {
+        let instances = InstancesManager()
+        let instance = makeInstance("inv")
+        instances.add(instance)
+        defer { instances.remove(instance) }
+
+        let manager = makeManager(instances: instances)
+        let selected = manager.addAccount(instanceID: instance.id)
+        let sibling = manager.addAccount(instanceID: instance.id)
+        manager.setStatus(.signedIn, for: sibling.id)
+
+        manager.setContext(.account(selected.id))
+        let chosenAt = manager.storedContext.changedAt
+        manager.confirmContextUpload(changedAt: chosenAt)
+        manager.applyRemoteTombstone(selected.id)
+        #expect(manager.currentContext == .account(sibling.id))
+
+        // Exactly the same instant — which two migrated contexts always are,
+        // both being stamped at the epoch. The tie-break settles it against the
+        // incoming value, so the repair is neither outranked nor pushed back and
+        // would otherwise stand against the server's choice forever.
+        let tied = StoredDataContext(context: .local, changedAt: chosenAt)
+        #expect(!manager.applySyncedContext(tied))
+
+        #expect(manager.currentContext == .local)
+        #expect(!manager.pendingContextUpload)
+    }
+
+    @Test("A repair yields to an older context naming an account that is still there")
+    func repairYieldsToAnOlderContextNamingALiveAccount() {
+        let instances = InstancesManager()
+        let instance = makeInstance("inv")
+        instances.add(instance)
+        defer { instances.remove(instance) }
+
+        let manager = makeManager(instances: instances)
+        let selected = manager.addAccount(instanceID: instance.id)
+        let sibling = manager.addAccount(instanceID: instance.id)
+        let other = manager.addAccount(instanceID: instance.id)
+        manager.setStatus(.signedIn, for: sibling.id)
+
+        manager.setContext(.account(selected.id))
+        let chosenAt = manager.storedContext.changedAt
+        manager.confirmContextUpload(changedAt: chosenAt)
+        manager.applyRemoteTombstone(selected.id)
+        #expect(manager.currentContext == .account(sibling.id))
+
+        let older = StoredDataContext(
+            context: .account(other.id),
+            changedAt: chosenAt.addingTimeInterval(-60)
+        )
+        #expect(!manager.applySyncedContext(older))
+
+        // Somebody chose that account; the sibling was picked by this device's
+        // own statuses. Adopting it is what re-converges the devices, and it is
+        // still not a reason to send anything.
+        #expect(manager.currentContext == .account(other.id))
+        #expect(!manager.pendingContextUpload)
+    }
+
+    @Test("An older context naming the deleted account repairs again rather than landing on it")
+    func repairYieldsToAnOlderContextNamingTheDeletedAccount() {
+        let instances = InstancesManager()
+        let instance = makeInstance("inv")
+        instances.add(instance)
+        defer { instances.remove(instance) }
+
+        let manager = makeManager(instances: instances)
+        let selected = manager.addAccount(instanceID: instance.id)
+        let sibling = manager.addAccount(instanceID: instance.id)
+        manager.setStatus(.signedIn, for: sibling.id)
+
+        manager.setContext(.account(selected.id))
+        let chosenAt = manager.storedContext.changedAt
+        manager.confirmContextUpload(changedAt: chosenAt)
+        manager.applyRemoteTombstone(selected.id)
+
+        // The server still holds the choice the tombstone killed. Yielding to it
+        // means yielding to what it repairs to, so the result is the repair
+        // again — and it is still a repair, so it still never publishes.
+        let older = StoredDataContext(
+            context: .account(selected.id),
+            changedAt: chosenAt.addingTimeInterval(-60)
+        )
+        #expect(!manager.applySyncedContext(older))
+
+        #expect(manager.currentContext == .account(sibling.id))
+        // Yielded rather than held onto: the borrowed timestamp goes back to
+        // what the server holds, so this device stops out-ranking it.
+        #expect(manager.storedContext.changedAt == older.changedAt)
+        #expect(manager.storedContextIsRepair)
+        #expect(!manager.pendingContextUpload)
     }
 
     @Test("A repair recomputes statuses before it picks a sibling")
