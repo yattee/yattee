@@ -282,6 +282,11 @@ struct UnifiedPlaylistDetailView: View {
         ) {
             Button(String(localized: "common.delete"), role: .destructive) {
                 if let localPlaylist {
+                    // Let go of the model *before* deleting it: dismissal is
+                    // animated, so this view renders at least once more, and
+                    // reading a deleted model — the duration in the subtitle is
+                    // enough — traps in SwiftData with "context is missing".
+                    self.localPlaylist = nil
                     dataManager?.deletePlaylist(localPlaylist)
                     dismiss()
                 } else {
