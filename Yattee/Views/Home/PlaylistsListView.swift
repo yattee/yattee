@@ -12,7 +12,6 @@ struct PlaylistsListView: View {
     @Namespace private var sheetTransition
     @State private var localPlaylists: [LocalPlaylist] = []
     @State private var searchText = ""
-    @State private var showingNewPlaylist = false
     @State private var playlistToEdit: LocalPlaylist?
     #if os(tvOS)
     @FocusState private var focusedPlaylistID: PlaylistListItemID?
@@ -21,9 +20,15 @@ struct PlaylistsListView: View {
 
     // MARK: - Remote state
 
-    /// The account a creation is for, captured when the button was pressed —
-    /// the form must not follow a context that moves while it is open.
-    @State private var createAccount: Account?
+    /// The creation being collected, and where it goes — captured when the
+    /// button was pressed.
+    ///
+    /// The destination travels with the presentation instead of standing beside
+    /// it in a second `@State`: a companion value is read by the sheet's own
+    /// closure one update behind the button that set it, so a creation on an
+    /// account took the local branch — writing to the device and losing the
+    /// visibility picker on the way.
+    @State private var creation: PlaylistCreationTarget?
     @State private var remoteEdit: RemotePlaylistEdit?
     @State private var remoteDeletion: RemotePlaylistDeletion?
     /// Why the account's list could not be fetched, when it could not.
@@ -110,23 +115,36 @@ struct PlaylistsListView: View {
         return appEnvironment.accountsManager.account(id: id)
     }
 
+    /// Where a playlist created right now would go, or `nil` when there is
+    /// nowhere to put one.
+    ///
+    /// The single answer both the create affordances and the row actions are
+    /// gated on, so the button that offers a write and the write it performs
+    /// can never have decided differently.
+    private var creationTarget: PlaylistCreationTarget? {
+        guard let appEnvironment else { return nil }
+        let account = contextAccount
+
+        return PlaylistCreationTarget.resolve(
+            effectiveContext: appEnvironment.dataContextValidator.effectiveContext,
+            account: account,
+            allowsServerMutations: appEnvironment.dataContextValidator.allowsServerMutations,
+            capabilities: account.flatMap { appEnvironment.accountsManager.capabilities(for: $0) }
+        )
+    }
+
     /// The account these playlists may be changed on.
     ///
     /// Both halves are asked even though reads only ever follow a valid context
     /// today: the write gate is what has to hold if that ever stops being true.
     private var writableAccount: Account? {
-        guard let appEnvironment,
-              let account = contextAccount,
-              appEnvironment.dataContextValidator.allowsServerMutations,
-              appEnvironment.accountsManager.capabilities(for: account)?.supportsPlaylistWrites == true
-        else { return nil }
-
+        guard case let .account(account) = creationTarget else { return nil }
         return account
     }
 
     /// Whether the create affordances have somewhere to create.
     private var canCreatePlaylist: Bool {
-        contextAccount == nil || writableAccount != nil
+        creationTarget != nil
     }
 
     private var contextUnavailability: DataContextUnavailability? {
@@ -232,18 +250,18 @@ struct PlaylistsListView: View {
                 .liquidGlassSheetContent(sourceID: "playlistsViewOptions", in: sheetTransition)
         }
         #endif
-        .sheet(isPresented: $showingNewPlaylist) {
-            if let createAccount {
+        .sheet(item: $creation) { creation in
+            if let account = creation.account {
                 PlaylistFormSheet(
                     mode: .create,
-                    showsPrivacy: supportsPrivacy(createAccount)
+                    showsPrivacy: supportsPrivacy(account)
                 ) { title, description, privacy in
                     Task {
                         await createRemotePlaylist(
                             title: title,
                             description: description,
                             privacy: privacy,
-                            on: createAccount
+                            on: account
                         )
                     }
                 }
@@ -328,12 +346,18 @@ struct PlaylistsListView: View {
     @ViewBuilder
     private var content: some View {
         if isLoadingRemoteList {
-            ProgressView()
-                .frame(maxWidth: .infinity, maxHeight: .infinity)
+            scrollableState {
+                ProgressView()
+                    .frame(maxWidth: .infinity)
+            }
         } else if let remoteErrorMessage, items.isEmpty {
-            remoteErrorView(remoteErrorMessage)
+            scrollableState {
+                remoteErrorView(remoteErrorMessage)
+            }
         } else if filteredItems.isEmpty {
-            emptyView
+            scrollableState {
+                emptyView
+            }
         } else {
             switch layout {
             case .list:
@@ -341,6 +365,18 @@ struct PlaylistsListView: View {
             case .grid:
                 gridContent
             }
+        }
+    }
+
+    /// A state with nothing to scroll, put in a scroll view anyway.
+    ///
+    /// Two things need one. Pull to refresh has nowhere to live without it —
+    /// and a navigation bar carrying a search field keeps its full height over
+    /// content that cannot scroll, which is what the banner was landing under.
+    private func scrollableState(@ViewBuilder _ state: () -> some View) -> some View {
+        ScrollView {
+            state()
+                .containerRelativeFrame(.vertical)
         }
     }
 
@@ -714,9 +750,13 @@ struct PlaylistsListView: View {
 
     // MARK: - Creating
 
+    /// Opens the form over the destination as it stands at this moment.
+    ///
+    /// Silent when there is nowhere to create: a toolbar item can outlive the
+    /// condition that put it there, and a write with nowhere to go is not a
+    /// write to somewhere else.
     private func beginCreate() {
-        createAccount = writableAccount
-        showingNewPlaylist = true
+        creation = creationTarget
     }
 
     private func createRemotePlaylist(

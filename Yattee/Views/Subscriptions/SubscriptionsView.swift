@@ -165,11 +165,24 @@ struct SubscriptionsView: View {
     }
     #endif
 
+    /// The feed error worth showing, if any.
+    ///
+    /// Nothing while the context banner is up: a selected account that cannot be
+    /// used reads local data, and the local feed then reports the Yattee Server
+    /// it has no reason to have — "add a subscriptions account in Settings"
+    /// under a banner saying *this* account needs signing in again is two
+    /// answers to one question. The banner names the cause, so it is the one
+    /// that stays.
+    private var displayedFeedError: FeedLoadState.FeedLoadError? {
+        guard contextUnavailability == nil,
+              case let .error(error) = feedCache.feedLoadState
+        else { return nil }
+
+        return error
+    }
+
     private var isShowingFullScreenError: Bool {
-        if case .error = feedCache.feedLoadState, feedCache.videos.isEmpty {
-            return true
-        }
-        return false
+        displayedFeedError != nil && feedCache.videos.isEmpty
     }
 
     private var dataManager: DataManager? { appEnvironment?.dataManager }
@@ -249,19 +262,21 @@ struct SubscriptionsView: View {
             .background(Color.black.opacity(0.3))
             #endif
 
-        case .error(let error):
-            HStack(spacing: 8) {
-                Image(systemName: "exclamationmark.triangle")
-                Text(errorMessage(for: error))
-                    .font(.caption)
+        case .error:
+            if let error = displayedFeedError {
+                HStack(spacing: 8) {
+                    Image(systemName: "exclamationmark.triangle")
+                    Text(errorMessage(for: error))
+                        .font(.caption)
+                }
+                .foregroundStyle(.red)
+                .padding(.horizontal)
+                .padding(.vertical, 8)
+                .frame(maxWidth: .infinity)
+                #if os(tvOS)
+                .background(Color.black.opacity(0.3))
+                #endif
             }
-            .foregroundStyle(.red)
-            .padding(.horizontal)
-            .padding(.vertical, 8)
-            .frame(maxWidth: .infinity)
-            #if os(tvOS)
-            .background(Color.black.opacity(0.3))
-            #endif
 
         case .loadingMore:
             HStack(spacing: 8) {
@@ -640,7 +655,7 @@ struct SubscriptionsView: View {
     /// Feed content rows or empty/loading states.
     @ViewBuilder
     private var feedContentRows: some View {
-        if case .error(let feedError) = feedCache.feedLoadState, feedCache.videos.isEmpty {
+        if let feedError = displayedFeedError, feedCache.videos.isEmpty {
             // Show specific error states
             switch feedError {
             case .yatteeServerRequired:
@@ -730,7 +745,7 @@ struct SubscriptionsView: View {
                 #endif
 
                 // Content
-                if case .error(let feedError) = feedCache.feedLoadState, feedCache.videos.isEmpty {
+                if let feedError = displayedFeedError, feedCache.videos.isEmpty {
                     // Show specific error states
                     switch feedError {
                     case .yatteeServerRequired:
