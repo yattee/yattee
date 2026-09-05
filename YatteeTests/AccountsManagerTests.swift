@@ -795,6 +795,35 @@ struct DataContextRepairTests {
         #expect(!manager.pendingContextUpload)
     }
 
+    @Test("A repair made while a sibling was still being checked never comes back")
+    func repairIsNotReconsideredWhenStatusesSettle() {
+        let instances = InstancesManager()
+        let instance = makeInstance("inv")
+        instances.add(instance)
+        defer { instances.remove(instance) }
+
+        let manager = makeManager(instances: instances)
+        let selected = manager.addAccount(instanceID: instance.id)
+        let sibling = manager.addAccount(instanceID: instance.id)
+        // Nothing is known about the sibling yet, so it cannot be repaired
+        // onto: `checking` is the absence of an answer, not a usable login.
+        manager.setStatus(.checking, for: sibling.id)
+        manager.setContext(.account(selected.id))
+
+        manager.removeAccount(selected.id)
+        #expect(manager.currentContext == .local)
+
+        // Statuses settling afterwards is not a second chance. The selection no
+        // longer names an account, so the tombstone repair has nothing left to
+        // act on and local is where the user stays — which is why foreground
+        // activation refreshes statuses *before* it lets a tombstone move
+        // anything, rather than repairing twice.
+        manager.setStatus(.signedIn, for: sibling.id)
+
+        #expect(!manager.correctContextIfAccountDeleted())
+        #expect(manager.currentContext == .local)
+    }
+
     @Test("A signed-in account on another server is never the repair")
     func repairNeverCrossesInstances() {
         let instances = InstancesManager()

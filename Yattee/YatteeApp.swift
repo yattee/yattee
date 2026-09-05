@@ -288,24 +288,10 @@ struct YatteeApp: App {
                 // Refresh media source password status (Keychain state can change in background)
                 appEnvironment.mediaSourcesManager.refreshPasswordStoredStatus()
 
-                // Retry a credential identity scope that never resolved (e.g.
-                // launched offline) - account credentials stay unavailable until it does
+                // Identity, statuses, deletion repair and the fetch, in that
+                // order — each one is what makes the next one correct.
                 Task {
-                    await appEnvironment.credentialIdentityScope.resolveIfNeeded()
-                    // A credential can arrive over iCloud Keychain without the
-                    // scope moving, so statuses are recomputed unconditionally.
-                    appEnvironment.refreshAccountStatuses()
-                }
-
-                // Repair a context whose account was deleted on another device
-                // while this one was in the background. Only a deletion moves
-                // it — an account that merely has not synced yet is left alone.
-                appEnvironment.dataContextValidator.correctIfContextRemoved()
-                SubscriptionFeedCache.shared.warmIfNeeded(using: appEnvironment)
-
-                // Fetch remote CloudKit changes (catches missed push notifications)
-                Task {
-                    await appEnvironment.cloudKitSync.fetchRemoteChanges()
+                    await resumeAccountState()
                 }
 
                 // Start periodic polling as fallback for missed push notifications
@@ -346,28 +332,14 @@ struct YatteeApp: App {
                 // Refresh media source password status (Keychain state can change in background)
                 appEnvironment.mediaSourcesManager.refreshPasswordStoredStatus()
 
-                // Retry a credential identity scope that never resolved (e.g.
-                // launched offline) - account credentials stay unavailable until it does
+                // Identity, statuses, deletion repair and the fetch, in that
+                // order — each one is what makes the next one correct.
                 Task {
-                    await appEnvironment.credentialIdentityScope.resolveIfNeeded()
-                    // A credential can arrive over iCloud Keychain without the
-                    // scope moving, so statuses are recomputed unconditionally.
-                    appEnvironment.refreshAccountStatuses()
+                    await resumeAccountState()
                 }
-
-                // Repair a context whose account was deleted on another device
-                // while this one was in the background. Only a deletion moves
-                // it — an account that merely has not synced yet is left alone.
-                appEnvironment.dataContextValidator.correctIfContextRemoved()
-                SubscriptionFeedCache.shared.warmIfNeeded(using: appEnvironment)
 
                 // Check clipboard for external video URLs
                 checkClipboardForExternalURL()
-
-                // Fetch remote CloudKit changes (catches missed push notifications)
-                Task {
-                    await appEnvironment.cloudKitSync.fetchRemoteChanges()
-                }
 
                 // Start periodic polling as fallback for missed push notifications
                 appEnvironment.cloudKitSync.startForegroundPolling()
@@ -433,6 +405,39 @@ struct YatteeApp: App {
             #endif
         }
         #endif
+    }
+
+    /// The part of foreground activation that has to happen in order.
+    ///
+    /// Every step here decides what the next one is allowed to see, so these
+    /// run as one sequence rather than as tasks racing each other:
+    ///
+    /// 1. The identity names whose accounts and credentials are in play at all.
+    /// 2. The status refresh says which of those this device can actually use.
+    /// 3. Only then may a tombstone move the selection — the repair prefers a
+    ///    signed-in login on the same server, and a sibling whose status is
+    ///    still being determined is one it would skip, landing on local
+    ///    instead. The repair commits, so there is no second chance at it.
+    /// 4. The fetch goes last for the same reason: a deletion it delivers
+    ///    repairs the context as it applies, off the statuses read above.
+    private func resumeAccountState() async {
+        // Retry a credential identity scope that never resolved (e.g.
+        // launched offline) - account credentials stay unavailable until it does
+        await appEnvironment.credentialIdentityScope.resolveIfNeeded()
+
+        // A credential can arrive over iCloud Keychain without the
+        // scope moving, so statuses are recomputed unconditionally.
+        appEnvironment.refreshAccountStatuses()
+
+        // Repair a context whose account was deleted on another device
+        // while this one was in the background. Only a deletion moves
+        // it — an account that merely has not synced yet is left alone.
+        appEnvironment.dataContextValidator.correctIfContextRemoved()
+
+        SubscriptionFeedCache.shared.warmIfNeeded(using: appEnvironment)
+
+        // Fetch remote CloudKit changes (catches missed push notifications)
+        await appEnvironment.cloudKitSync.fetchRemoteChanges()
     }
 
     private func registerBackgroundTasksIfNeeded() {
