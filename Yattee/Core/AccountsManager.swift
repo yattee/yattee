@@ -75,6 +75,17 @@ final class AccountsManager {
     /// Whether the selected context still has to reach the server.
     private(set) var pendingContextUpload = false
 
+    /// Whether `storedContext` holds an automatic repair rather than a choice.
+    ///
+    /// A repair keeps the timestamp of the selection it replaced, so every
+    /// ordering comparison reads it as that choice — including the one that
+    /// decides an older server copy has to be corrected. Without this the
+    /// fallback would be pushed back over a deliberate choice another device
+    /// made, which is exactly what not stamping it "now" is meant to prevent.
+    /// Persisted beside the context, or a relaunch would forget and publish it
+    /// on the next stale record it saw.
+    private(set) var storedContextIsRepair = false
+
     /// Instances the user has deleted here.
     ///
     /// Deleting an instance deletes the accounts on it, but those accounts may
@@ -331,6 +342,7 @@ final class AccountsManager {
             context: repairTarget(onInstance: instanceID),
             changedAt: storedContext.changedAt
         )
+        storedContextIsRepair = true
         // Including any upload the deleted choice had queued: sending it now
         // would publish this fallback under that choice's timestamp, which is
         // exactly what not stamping it "now" is meant to prevent.
@@ -380,6 +392,15 @@ final class AccountsManager {
     private func repairTarget(onInstance instanceID: UUID?) -> DataContext {
         guard let instanceID else { return .local }
 
+        // Asked here rather than at the call sites because a repair commits:
+        // once the selection no longer names the deleted account there is
+        // nothing left for a later status to move. A deletion delivered by a
+        // silent push arrives without any of the events that recompute statuses
+        // — a credential can reach this device over iCloud Keychain while it is
+        // in the background — so the sibling would be skipped as signed out
+        // while its credential sat right there.
+        refreshStatusesForRepair?()
+
         let sibling = accounts(forInstance: instanceID)
             .filter { status(for: $0.id) == .signedIn }
             .filter { capabilities(for: $0)?.isSelectableContext == true }
@@ -390,6 +411,16 @@ final class AccountsManager {
         guard let sibling else { return .local }
         return .account(sibling.id)
     }
+
+    /// Recomputes account statuses from the Keychain, just before a repair
+    /// decides which sibling — if any — it may land on.
+    ///
+    /// A hook rather than a dependency for the same reason as
+    /// `onSuspectedCredentialRejection`: reading the Keychain needs the
+    /// credential stores, and this manager deliberately knows nothing about
+    /// them. `nil` — tests, and the window before wiring completes — simply
+    /// leaves the statuses as they are, which is what the repair did before.
+    @ObservationIgnored var refreshStatusesForRepair: (@MainActor () -> Void)?
 
     /// Marks a deletion as confirmed by the server. Until then it stays in the
     /// outbox and is retried, because a tombstone that never lands lets a stale
@@ -437,6 +468,29 @@ final class AccountsManager {
         deletedAccountIDs.contains(accountID)
     }
 
+    /// Remembers which instance a deleted account lived on, learned from a
+    /// record that arrived after its tombstone.
+    ///
+    /// A device that meets the tombstone first — a fresh install, or any fetch
+    /// that stages both — has no account to read the instance off, and the
+    /// account record that follows is dominated and discarded. That record is
+    /// the only thing that still knows where the account lived, and without it
+    /// every later repair of a context naming it falls to local past a
+    /// perfectly good sibling on the same server.
+    func recordDeletedAccountInstance(_ instanceID: UUID, for accountID: UUID) {
+        // The namespace moved and the reload has not refilled memory yet, so
+        // this would file one identity's deletion under another's.
+        guard loadedNamespace == namespace else { return }
+        guard deletedAccountIDs.contains(accountID) else { return }
+        // The deletion this device performed itself read the instance off the
+        // account it removed, which is closer to the truth than a record that
+        // may have been resurrected since.
+        guard deletedAccountInstanceIDs[accountID] == nil else { return }
+
+        deletedAccountInstanceIDs[accountID] = instanceID
+        save()
+    }
+
     /// Marks every account record dirty again.
     ///
     /// For a server that holds nothing — sync being enabled for the first time,
@@ -448,7 +502,11 @@ final class AccountsManager {
         pendingUploads.formUnion(accounts.map(\.id))
         pendingMarkerUploads.formUnion(migratedInstanceIDs)
         pendingDeletions.formUnion(deletedAccountIDs)
-        pendingContextUpload = hasStoredContext
+        // An empty zone is no reason to publish a fallback nobody chose: a
+        // repair is never uploaded, however little the server holds. The next
+        // explicit choice fills the gap, and until then every device keeps
+        // repairing to whatever it can actually use.
+        pendingContextUpload = hasStoredContext && !storedContextIsRepair
         save()
     }
 
@@ -481,8 +539,13 @@ final class AccountsManager {
     @discardableResult
     func applySyncedAccount(_ incoming: Account) -> Bool {
         // A tombstone dominates the account everywhere. The caller repairs the
-        // server copy; here it simply never becomes local state again.
-        guard !deletedAccountIDs.contains(incoming.id) else { return false }
+        // server copy; here it simply never becomes local state again — except
+        // for the one thing worth keeping: which instance it lived on, for a
+        // context repair that has no account left to read it off.
+        guard !deletedAccountIDs.contains(incoming.id) else {
+            recordDeletedAccountInstance(incoming.instanceID, for: incoming.id)
+            return false
+        }
 
         // Its instance was deleted here while this account was still in
         // transit. Deleting an instance deletes its accounts, so this one is
@@ -606,6 +669,8 @@ final class AccountsManager {
     func setContext(_ context: DataContext) {
         storedContext = StoredDataContext(context: context)
         hasStoredContext = true
+        // Whatever stood here before, this is a choice — and choices publish.
+        storedContextIsRepair = false
         pendingContextUpload = true
         save()
         NotificationCenter.default.post(name: .dataContextDidChange, object: nil)
@@ -659,6 +724,13 @@ final class AccountsManager {
             // repair that lost the ordering never gets to clear what that
             // choice still owes the server.
             guard incoming.isOutranked(by: storedContext) else { return false }
+            // Newer, but not a choice. A repair carries the replaced selection's
+            // timestamp, so it outranks the server's older explicit value while
+            // having nothing of its own to say; publishing it would push an
+            // automatic fallback over that value. Nothing is uploaded here: the
+            // server's context stands remotely, the repair stays local, and the
+            // next explicit choice on any device re-converges everyone.
+            guard !storedContextIsRepair else { return false }
             pendingContextUpload = true
             save()
             return true
@@ -677,6 +749,9 @@ final class AccountsManager {
     private func adoptSyncedContext(_ incoming: StoredDataContext, wasRepaired: Bool) {
         storedContext = incoming
         hasStoredContext = true
+        // A value adopted as it stands is somebody's choice and may be pushed
+        // back if the server ever holds an older one; a repaired one may not.
+        storedContextIsRepair = wasRepaired
         if wasRepaired {
             pendingContextUpload = false
         }
@@ -903,6 +978,7 @@ final class AccountsManager {
 
         storedContext = .migrated(context)
         hasStoredContext = true
+        storedContextIsRepair = false
         // Published like any other context, but stamped at the epoch: if a real
         // choice exists anywhere it outranks this one whichever arrives first.
         pendingContextUpload = true
@@ -1019,6 +1095,7 @@ final class AccountsManager {
         }
 
         pendingContextUpload = defaults.bool(forKey: key("pendingContextUpload"))
+        storedContextIsRepair = defaults.bool(forKey: key("contextIsRepair"))
 
         purgeUnresolvedNamespace()
     }
@@ -1027,7 +1104,8 @@ final class AccountsManager {
     private static let storedKeyNames = [
         "accounts", "context", "hasContext", "migrated", "pendingUploads",
         "pendingDeletions", "pendingMarkerUploads", "deletedAccounts",
-        "deletedInstances", "deletedAccountInstances", "pendingContextUpload"
+        "deletedInstances", "deletedAccountInstances", "pendingContextUpload",
+        "contextIsRepair"
     ]
 
     /// Deletes whatever was written while the identity was still unresolved.
@@ -1085,6 +1163,7 @@ final class AccountsManager {
             forKey: key("deletedAccountInstances")
         )
         defaults.set(pendingContextUpload, forKey: key("pendingContextUpload"))
+        defaults.set(storedContextIsRepair, forKey: key("contextIsRepair"))
     }
 
     /// Re-reads storage under the current identity namespace.
@@ -1109,6 +1188,7 @@ final class AccountsManager {
         deletedInstanceIDs = []
         deletedAccountInstanceIDs = [:]
         pendingContextUpload = false
+        storedContextIsRepair = false
 
         load()
         reconcileLegacyAccounts()

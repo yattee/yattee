@@ -743,11 +743,14 @@ struct DataContextRepairTests {
         Instance(type: .invidious, url: URL(string: "https://\(host)-\(UUID().uuidString).example.com")!)
     }
 
-    private func makeManager(instances: InstancesManager) -> AccountsManager {
+    private func makeManager(
+        instances: InstancesManager,
+        defaults: UserDefaults? = nil
+    ) -> AccountsManager {
         AccountsManager(
             identityScope: CredentialIdentityScope(fixedScope: "identity-A"),
             instancesManager: instances,
-            defaults: UserDefaults(suiteName: "yattee.tests.\(UUID().uuidString)")!
+            defaults: defaults ?? UserDefaults(suiteName: "yattee.tests.\(UUID().uuidString)")!
         )
     }
 
@@ -949,6 +952,113 @@ struct DataContextRepairTests {
 
         #expect(manager.currentContext == .local)
         #expect(manager.pendingContextUpload)
+    }
+
+    @Test("A repair is never pushed back over the server's older context")
+    func repairIsNeverPushedBackOverAnOlderContext() {
+        let instances = InstancesManager()
+        let instance = makeInstance("inv")
+        instances.add(instance)
+        defer { instances.remove(instance) }
+
+        let defaults = UserDefaults(suiteName: "yattee.tests.\(UUID().uuidString)")!
+        let manager = makeManager(instances: instances, defaults: defaults)
+        let selected = manager.addAccount(instanceID: instance.id)
+        let sibling = manager.addAccount(instanceID: instance.id)
+        manager.setStatus(.signedIn, for: sibling.id)
+
+        manager.setContext(.account(selected.id))
+        let chosenAt = manager.storedContext.changedAt
+        manager.confirmContextUpload(changedAt: chosenAt)
+        #expect(!manager.pendingContextUpload)
+
+        // One fetch carrying both: the tombstone repairs the selection, keeping
+        // the deleted choice's timestamp, and the older context the server still
+        // holds arrives right behind it.
+        manager.applyRemoteTombstone(selected.id)
+        #expect(manager.currentContext == .account(sibling.id))
+
+        let older = StoredDataContext(context: .local, changedAt: chosenAt.addingTimeInterval(-60))
+        #expect(!manager.applySyncedContext(older))
+
+        // The repair only outranks the server's copy because it inherited that
+        // timestamp. Publishing it would put a fallback nobody chose over an
+        // explicit choice — the server's context stands, and the next real
+        // selection anywhere re-converges everyone.
+        #expect(manager.currentContext == .account(sibling.id))
+        #expect(manager.storedContext.changedAt == chosenAt)
+        #expect(!manager.pendingContextUpload)
+
+        // Still a repair after a relaunch, or the next stale record read from
+        // disk would publish it.
+        let reloaded = makeManager(instances: instances, defaults: defaults)
+        #expect(!reloaded.applySyncedContext(older))
+        #expect(!reloaded.pendingContextUpload)
+
+        // Choosing it deliberately is a different thing entirely, and publishes.
+        reloaded.setContext(.account(sibling.id))
+        #expect(reloaded.applySyncedContext(older))
+        #expect(reloaded.pendingContextUpload)
+    }
+
+    @Test("A repair recomputes statuses before it picks a sibling")
+    func repairRefreshesStatusesBeforeChoosing() {
+        let instances = InstancesManager()
+        let instance = makeInstance("inv")
+        instances.add(instance)
+        defer { instances.remove(instance) }
+
+        let manager = makeManager(instances: instances)
+        let selected = manager.addAccount(instanceID: instance.id)
+        let sibling = manager.addAccount(instanceID: instance.id)
+        // The sibling's credential arrived over iCloud Keychain while the app
+        // was in the background. Nothing that recomputes statuses ran, so it
+        // still reads as signed out.
+        manager.setStatus(.credentialMissing, for: sibling.id)
+        manager.setContext(.account(selected.id))
+
+        var refreshes = 0
+        manager.refreshStatusesForRepair = { [weak manager] in
+            refreshes += 1
+            manager?.setStatus(.signedIn, for: sibling.id)
+        }
+
+        // A tombstone delivered by a silent push, with no foreground activation
+        // to sequence the refresh ahead of it.
+        manager.applyRemoteTombstone(selected.id)
+
+        #expect(refreshes == 1)
+        #expect(manager.currentContext == .account(sibling.id))
+    }
+
+    @Test("An account dominated by a tombstone still says where it lived")
+    func discardedAccountKeepsItsInstanceForRepair() {
+        let instances = InstancesManager()
+        let instance = makeInstance("inv")
+        instances.add(instance)
+        defer { instances.remove(instance) }
+
+        let manager = makeManager(instances: instances)
+        let sibling = manager.addAccount(instanceID: instance.id)
+        manager.setStatus(.signedIn, for: sibling.id)
+
+        // A device that meets the tombstone before the account it kills has
+        // nothing to read the instance off — the map entry cannot be made then.
+        let deleted = Account(instanceID: instance.id)
+        manager.applyRemoteTombstone(deleted.id)
+        #expect(manager.deletedAccountInstanceIDs[deleted.id] == nil)
+
+        // The dominated record that follows is the only thing that still knows.
+        manager.applySyncedAccount(deleted)
+        #expect(manager.account(id: deleted.id) == nil)
+        #expect(manager.deletedAccountInstanceIDs[deleted.id] == instance.id)
+
+        // Which is what lets the context naming it land on the sibling instead
+        // of falling all the way back to local.
+        manager.applySyncedContext(
+            StoredDataContext(context: .account(deleted.id), changedAt: Date())
+        )
+        #expect(manager.currentContext == .account(sibling.id))
     }
 }
 

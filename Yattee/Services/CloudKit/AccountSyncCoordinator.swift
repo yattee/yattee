@@ -496,6 +496,11 @@ final class AccountSyncCoordinator {
         // tombstone ignores it locally and deletes it again server-side; the
         // window is bounded by fetch propagation, not by trust.
         guard !accountsManager.isDeleted(account.id) else {
+            // The record is discarded, but not before it says where the account
+            // lived: a device that met the tombstone first has no other source
+            // for that, and a context repair without it lands on local past a
+            // signed-in sibling on the same server.
+            accountsManager.recordDeletedAccountInstance(account.instanceID, for: account.id)
             LoggingService.shared.logCloudKit("Ignoring resurrected account \(account.id) and re-deleting it")
             enqueueChanges?([.deleteRecord(recordID(for: .account(id: account.id)))])
             return
@@ -868,8 +873,14 @@ final class AccountSyncCoordinator {
 
         switch resolved.recordType {
         case RecordType.account:
-            guard let account = try? mapper.toAccount(from: resolved),
-                  !accountsManager.isDeleted(account.id) else { return }
+            guard let account = try? mapper.toAccount(from: resolved) else { return }
+            // Dominated by a tombstone, so nothing of it becomes local state —
+            // beyond the instance it lived on, which a later context repair has
+            // no other way to learn.
+            guard !accountsManager.isDeleted(account.id) else {
+                accountsManager.recordDeletedAccountInstance(account.instanceID, for: account.id)
+                return
+            }
             accountsManager.applySyncedAccount(account)
 
         case RecordType.dataContext:

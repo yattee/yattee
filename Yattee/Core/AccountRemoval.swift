@@ -30,11 +30,19 @@ enum AccountRemoval {
         accountsManager: AccountsManager,
         discardData: (UUID) -> Void
     ) {
+        // The deletion goes into the durable outbox first, for the same reason
+        // `removeAccount` records it before anything else: a crash after the
+        // credential was deleted but before the tombstone existed would bring
+        // the account back on the next launch as one nobody can sign into, with
+        // no deletion owed to any other device. Nothing here needs the account
+        // to still exist — the scoped credential key is built from the ID alone,
+        // which is the whole reason an orphan is removed this way.
+        accountsManager.removeAccount(accountID)
+
         for store in stores {
             store.deleteCredential(forAccountID: accountID)
         }
 
-        accountsManager.removeAccount(accountID)
         // Whatever the account had in memory goes with it, or its subscriptions
         // and playlists would keep answering for an account nobody has.
         discardData(accountID)

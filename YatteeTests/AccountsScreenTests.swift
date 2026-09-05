@@ -152,6 +152,35 @@ struct OrphanedAccountRemovalTests {
         #expect(accountsManager.pendingDeletions.contains(account.id))
     }
 
+    @Test("The deletion is durable before the secret is destroyed")
+    func removalRecordsTheTombstoneFirst() {
+        let scope = makeScope()
+        let instances = InstancesManager()
+        let instance = makeInstance(.invidious)
+        instances.add(instance)
+
+        let accountsManager = AccountsManager(
+            identityScope: scope,
+            instancesManager: instances,
+            defaults: makeDefaults()
+        )
+        let account = accountsManager.addAccount(instanceID: instance.id)
+
+        instances.remove(instance)
+
+        let store = DeletionOrderStore(accountsManager: accountsManager)
+        AccountRemoval.removeOrphan(
+            account.id,
+            stores: [store],
+            accountsManager: accountsManager,
+            discardData: { _ in }
+        )
+
+        // A crash in between would otherwise bring the account back on the next
+        // launch — signed out, with no deletion owed to any other device.
+        #expect(store.tombstoneWhenDeleted[account.id] == true)
+    }
+
     @Test("The pre-revamp instance-keyed item is deliberately left alone")
     func removalLeavesTheLegacyItem() {
         let scope = makeScope()
@@ -184,6 +213,44 @@ struct OrphanedAccountRemovalTests {
 
         #expect(invidious.credential(for: instance) == "legacy-sid")
     }
+}
+
+/// A credential store that records what the account manager already knew at the
+/// moment it was asked to destroy a secret.
+///
+/// The ordering is the whole point of the cascade and cannot be observed from
+/// its outcome — both orders end in the same state unless the process dies
+/// halfway.
+@Observable
+@MainActor
+private final class DeletionOrderStore: AccountCredentialsManager {
+    private let accountsManager: AccountsManager
+    var tombstoneWhenDeleted: [UUID: Bool] = [:]
+
+    init(accountsManager: AccountsManager) {
+        self.accountsManager = accountsManager
+    }
+
+    var loggedInAccountIDs: Set<UUID> { [] }
+    var isScopeResolved: Bool { true }
+
+    func setCredential(_: String, for _: Account) {}
+    func credential(for _: Account) -> String? { nil }
+    func deleteCredential(for account: Account) { deleteCredential(forAccountID: account.id) }
+
+    func deleteCredential(forAccountID accountID: UUID) {
+        tombstoneWhenDeleted[accountID] = accountsManager.isDeleted(accountID)
+            && accountsManager.pendingDeletions.contains(accountID)
+    }
+
+    func resyncCredentialsWithCurrentSetting() {}
+    func setUsername(_: String, for _: Account) {}
+    func username(for _: Account) -> String? { nil }
+    func isLoggedIn(for _: Account) -> Bool { false }
+    func refreshLoginStatus(for _: Account) {}
+    func hasAdoptableLegacyCredential(for _: Account) -> Bool { false }
+    @discardableResult func adoptLegacyCredential(for _: Account) -> Bool { false }
+    func deleteLegacyCredentialIfOwned(for _: Account) {}
 }
 
 @Suite("Instance deletion disclosure")

@@ -689,6 +689,78 @@ struct AccountSyncTests {
         #expect(harness.accounts.storedContext.changedAt == stale.changedAt)
     }
 
+    @Test("A repair made mid-batch is never uploaded over the server's older context")
+    func repairIsNotPublishedForAStaleServerContext() async {
+        let instances = InstancesManager()
+        let instance = Instance(type: .invidious, url: URL(string: "https://inv-\(UUID().uuidString).example.com")!)
+        instances.add(instance)
+        defer { instances.remove(instance) }
+
+        let harness = Self.makeHarness(instances: instances)
+        let selected = harness.accounts.addAccount(instanceID: instance.id)
+        let sibling = harness.accounts.addAccount(instanceID: instance.id)
+        harness.accounts.setStatus(.signedIn, for: sibling.id)
+        // Both accounts are on the server already, so nothing holds the context
+        // back for ordering reasons.
+        harness.accounts.confirmUpload(selected.id)
+        harness.accounts.confirmUpload(sibling.id)
+
+        harness.accounts.setContext(.account(selected.id))
+        let chosenAt = harness.accounts.storedContext.changedAt
+        harness.accounts.confirmContextUpload(changedAt: chosenAt)
+
+        // Tombstones are applied first, so the repair is in place — carrying the
+        // deleted choice's timestamp — by the time the older context is weighed
+        // against it.
+        let older = StoredDataContext(context: .local, changedAt: chosenAt.addingTimeInterval(-60))
+        harness.coordinator.stageFetched(
+            records: [
+                harness.mapper.toCKRecord(accountDeletionID: selected.id),
+                harness.mapper.toCKRecord(dataContext: older)
+            ],
+            deletions: []
+        )
+        harness.recorder.clear()
+        await harness.coordinator.activate()
+
+        #expect(harness.accounts.currentContext == .account(sibling.id))
+        #expect(!harness.recorder.savedNames.contains("datacontext-current"))
+        #expect(harness.coordinator.recordToSave(named: "datacontext-current") == nil)
+    }
+
+    @Test("An account discarded for its tombstone still repairs the context")
+    func discardedAccountKeepsItsInstance() async {
+        let instances = InstancesManager()
+        let instance = Instance(type: .invidious, url: URL(string: "https://inv-\(UUID().uuidString).example.com")!)
+        instances.add(instance)
+        defer { instances.remove(instance) }
+
+        let harness = Self.makeHarness(instances: instances)
+        let sibling = harness.accounts.addAccount(instanceID: instance.id)
+        harness.accounts.setStatus(.signedIn, for: sibling.id)
+
+        // A fresh device meets all three at once: the tombstone runs first,
+        // while the account it kills is still unknown here, and the record that
+        // follows is the only thing that says which server it lived on.
+        let deleted = Account(instanceID: instance.id)
+        harness.coordinator.stageFetched(
+            records: [
+                harness.mapper.toCKRecord(accountDeletionID: deleted.id),
+                harness.mapper.toCKRecord(account: deleted),
+                harness.mapper.toCKRecord(
+                    dataContext: StoredDataContext(context: .account(deleted.id), changedAt: Date())
+                )
+            ],
+            deletions: []
+        )
+        await harness.coordinator.activate()
+
+        #expect(harness.accounts.deletedAccountInstanceIDs[deleted.id] == instance.id)
+        // Repaired onto the login the user can actually use, rather than falling
+        // all the way back to local because the metadata was thrown away.
+        #expect(harness.accounts.currentContext == .account(sibling.id))
+    }
+
     @Test("Records fetched before the identity resolves are recovered by a bootstrap")
     func unresolvedIdentityForcesAnotherBootstrap() async {
         let defaults = Self.makeDefaults()

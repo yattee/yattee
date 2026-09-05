@@ -493,6 +493,18 @@ final class AppEnvironment {
         // A deletion that arrives from another device takes the credential with
         // it. Only a deletion does this — an account merely missing from a
         // fetch keeps everything, because a fetch is not an enumeration.
+        // A context repair reads statuses and commits — there is no second
+        // chance at it once the selection no longer names the deleted account —
+        // and the deletion that triggers one can arrive at any moment: a silent
+        // push handled in the background, long after anything last recomputed
+        // them. Foreground activation sequences the refresh ahead of the repair
+        // for exactly this reason; wiring it into the repair itself closes every
+        // other entry point too, instead of each fetch trigger having to
+        // remember the order.
+        accounts.refreshStatusesForRepair = { [weak self] in
+            self?.refreshAccountStatuses()
+        }
+
         accountSync.onAccountDeleted = { [weak self] accountID, account in
             guard let self else { return }
 
@@ -868,11 +880,15 @@ final class AppEnvironment {
         accountsManager.recordInstanceDeletion(instance.id)
 
         for account in accountsManager.accounts(forInstance: instance.id) {
+            // Resolved while the instance is still registered — it is removed
+            // below — and the account's own deletion recorded before its secret
+            // is touched, so a crash in between cannot leave a signed-out
+            // account behind with no deletion owed to anybody.
             let credentials = accountCredentialsManager(for: account)
+            accountsManager.removeAccount(account.id)
             credentials?.deleteCredential(for: account)
             credentials?.deleteLegacyCredentialIfOwned(for: account)
             discardAccountData(for: account.id)
-            accountsManager.removeAccount(account.id)
         }
 
         instancesManager.remove(instance)
@@ -884,12 +900,21 @@ final class AppEnvironment {
     /// cleared is added here rather than in each screen that lists accounts.
     func signOutAndRemoveAccount(_ account: Account) {
         let instance = accountsManager.instance(for: account)
+        // Resolved before the account is removed, though nothing about the
+        // lookup needs it to still be there: the store is chosen by the
+        // instance's type, and the instance is not going anywhere here.
+        let credentials = accountCredentialsManager(for: account)
+
+        // The tombstone and its outbox entry go first. A crash after the
+        // credential was deleted but before the deletion was recorded would
+        // otherwise leave the account standing on the next launch — signed out,
+        // and with nothing owed to the devices that still have it.
+        accountsManager.removeAccount(account.id)
 
         // Deleting the account is what authorizes removing the legacy item, and
         // only when this device adopted it and it still holds that same secret.
-        accountCredentialsManager(for: account)?.deleteCredential(for: account)
-        accountCredentialsManager(for: account)?.deleteLegacyCredentialIfOwned(for: account)
-        accountsManager.removeAccount(account.id)
+        credentials?.deleteCredential(for: account)
+        credentials?.deleteLegacyCredentialIfOwned(for: account)
         // Drop what the account had in memory too, or its subscriptions and
         // playlists would keep answering for an account that no longer exists.
         discardAccountData(for: account.id)
