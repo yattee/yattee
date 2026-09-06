@@ -56,11 +56,25 @@ final class WatchHistorySyncService {
 
     // MARK: - Session lifecycle
 
-    /// Starts a mirroring session for a video that is about to play.
+    /// Starts a mirroring session unless this video is already the one being
+    /// mirrored.
     ///
-    /// Called only for a genuinely new video. Reloads of the same one — the
-    /// audio-mode toggle, a quality switch, a stream retry — must not reach
-    /// here, or each of them would post again.
+    /// What playback calls on every load, because a load is not by itself a new
+    /// watch: an audio-mode toggle, a quality switch or a stream retry all come
+    /// through the same path with the same video, and starting a session for
+    /// each of them would post the video again every time. A session already
+    /// standing for this video is left exactly as it is — including its
+    /// `posted` flag, which is what makes the reload free.
+    func beginSessionIfNeeded(video: Video) {
+        if let currentSession, currentSession.videoID == video.id.videoID { return }
+        beginSession(video: video)
+    }
+
+    /// Starts a mirroring session for a video, replacing whatever was running.
+    ///
+    /// For the moments that are a new watch of a video already on screen —
+    /// replaying one that finished, repeat-one coming round again — where the
+    /// point is precisely to post it a second time.
     func beginSession(video: Video) {
         currentSession = nil
 
@@ -130,6 +144,7 @@ final class WatchHistorySyncService {
 
             do {
                 try await accountService.markWatched(videoID: videoID, for: account)
+                announceUpdate(videoID: videoID, accountID: accountID)
                 return
             } catch is CancellationError {
                 // The account was discarded or the app is going away. Not a
@@ -144,7 +159,13 @@ final class WatchHistorySyncService {
                 )
                 return
             } catch {
-                guard attempt == 0 else {
+                // Only what a second attempt could plausibly answer differently:
+                // a timeout, a dropped connection, a rate limit, a server that
+                // fell over. A 400 for an ID the server will never accept is
+                // just as wrong the second time.
+                let isRetryable = (error as? APIError)?.isRetryable == true
+
+                guard attempt == 0, isRetryable else {
                     LoggingService.shared.debug(
                         "Watch history mirror dropped for \(videoID): \(error)",
                         category: .api
@@ -153,6 +174,23 @@ final class WatchHistorySyncService {
                 }
             }
         }
+    }
+
+    /// Tells whoever is showing this account's server history that a video just
+    /// reached the front of it.
+    ///
+    /// The view has no other way to know: the local write it also does is not
+    /// news about the server, and the account's history is only ever read by
+    /// asking for it.
+    private func announceUpdate(videoID: String, accountID: UUID) {
+        NotificationCenter.default.post(
+            name: .serverWatchHistoryDidUpdate,
+            object: nil,
+            userInfo: [
+                ServerWatchHistoryUpdate.accountIDKey: accountID,
+                ServerWatchHistoryUpdate.videoIDKey: videoID
+            ]
+        )
     }
 
     // MARK: - Draining
@@ -188,4 +226,21 @@ final class WatchHistorySyncService {
             currentSession = nil
         }
     }
+}
+
+// MARK: - Announcement
+
+extension Notification.Name {
+    /// A video was recorded in an account's server-side history. The userInfo
+    /// carries which account and which video, so a list showing another
+    /// account's history can ignore it.
+    static let serverWatchHistoryDidUpdate = Notification.Name("stream.yattee.serverWatchHistoryDidUpdate")
+}
+
+/// The userInfo keys of ``Notification/Name/serverWatchHistoryDidUpdate``.
+enum ServerWatchHistoryUpdate {
+    /// `UUID` — the account whose history gained the video.
+    static let accountIDKey = "accountID"
+    /// `String` — the video that was recorded.
+    static let videoIDKey = "videoID"
 }

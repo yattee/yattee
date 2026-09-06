@@ -49,8 +49,13 @@ struct HistoryListView: View {
     /// looking at any more.
     @State private var loadGeneration = 0
     @State private var loadTask: Task<Void, Never>?
-    /// The page to ask for next; 1-based, like the server's own numbering.
-    @State private var nextPage = 1
+    /// The lowest page still worth asking for; 1-based, like the server's own
+    /// numbering.
+    ///
+    /// Normally the page number comes from the rows themselves. This is the
+    /// floor under it, raised past any page that turned out to hold nothing new,
+    /// so a page that cannot move the list on is never asked for twice.
+    @State private var pageFloor = 1
     @State private var hasMorePages = false
     @State private var isLoadingPage = false
     @State private var serverErrorMessage: String?
@@ -61,6 +66,19 @@ struct HistoryListView: View {
 
     /// How many IDs one page of server history asks for.
     private static let serverPageSize = 60
+
+    /// The page to ask the server for next.
+    ///
+    /// Read from the rows that are loaded rather than counted up from the last
+    /// request, so a deletion — which shifts every server offset after it —
+    /// cannot make the next request skip the item that moved back across the
+    /// page boundary.
+    private var nextServerPage: Int {
+        max(
+            ServerHistoryPaging.nextPage(loadedRowCount: rows.count, pageSize: Self.serverPageSize),
+            pageFloor
+        )
+    }
 
     // View options (persisted)
     @AppStorage("history.layout") private var layout: VideoListLayout = .list
@@ -347,6 +365,17 @@ struct HistoryListView: View {
         .onReceive(NotificationCenter.default.publisher(for: .instancesDidChange)) { _ in
             reloadIfEffectiveContextMoved()
         }
+        // Something was just watched and mirrored to the account whose history
+        // this is. The server has moved it to the front; so does the list,
+        // rather than waiting to be left and come back to.
+        .onReceive(NotificationCenter.default.publisher(for: .serverWatchHistoryDidUpdate)) { notification in
+            applyServerUpdate(notification)
+        }
+        // Searching reads titles, and a server row starts with only an ID.
+        .onChange(of: searchText) { _, newValue in
+            guard !newValue.isEmpty, case let .server(account) = displayMode else { return }
+            hydrateAllLoaded(account: account)
+        }
     }
 
     // MARK: - Content
@@ -454,7 +483,7 @@ struct HistoryListView: View {
     private var loadMoreFooter: some View {
         if case let .server(account) = displayMode {
             LoadMoreTrigger(isLoading: isLoadingPage, hasMore: hasMorePages) {
-                beginPageLoad(nextPage, account: account)
+                beginPageLoad(nextServerPage, account: account)
             }
         }
     }
@@ -586,7 +615,7 @@ struct HistoryListView: View {
         serverErrorMessage = nil
         isLoadingPage = false
         hydrationAttempted.removeAll()
-        nextPage = 1
+        pageFloor = 1
 
         guard case let .server(account) = displayMode else {
             hasMorePages = false
@@ -631,11 +660,24 @@ struct HistoryListView: View {
 
             guard generation == loadGeneration else { return }
 
-            append(ids)
-            nextPage = page + 1
+            let appended = append(ids)
+
+            // A page that held nothing this list did not already have cannot be
+            // what moves it on, however many times it is asked for.
+            if appended == 0 {
+                pageFloor = page + 1
+            }
+
             // A page the server could not fill is the last one there is; so is
             // an empty one, which is what asking past the end returns.
             hasMorePages = ids.count >= Self.serverPageSize
+
+            // A search is matching on titles, and rows that arrived without one
+            // would sit out of the results until somebody scrolled them into
+            // view — which, being filtered out, they never are.
+            if !searchText.isEmpty {
+                hydrateAllLoaded(account: account)
+            }
         } catch is CancellationError {
             // Another load is taking over — it owns the state now.
         } catch let error as APIError where error == .cancelled {
@@ -652,7 +694,9 @@ struct HistoryListView: View {
     /// Never re-sorted: the server's order *is* the history, newest first, and
     /// the local entries some of these rows have were written at times that say
     /// nothing about when the account watched them.
-    private func append(_ ids: [String]) {
+    /// - Returns: how many of the IDs were rows this list did not already have.
+    @discardableResult
+    private func append(_ ids: [String]) -> Int {
         var known = Set(rows.map(\.videoID))
         var appended: [HistoryRow] = []
 
@@ -661,10 +705,11 @@ struct HistoryListView: View {
             appended.append(makeRow(id: id))
         }
 
-        guard !appended.isEmpty else { return }
+        guard !appended.isEmpty else { return 0 }
 
         rows.append(contentsOf: appended)
         rowVideos.append(contentsOf: appended.map(\.video))
+        return appended.count
     }
 
     /// A row for one server-side ID, from local data where there is some.
@@ -710,6 +755,19 @@ struct HistoryListView: View {
         hydrate(row, account: account)
     }
 
+    /// Fetches metadata for every loaded row that has none, whether or not it is
+    /// on screen.
+    ///
+    /// For searching, which reads titles: a row still standing as its own video
+    /// ID matches nothing anybody would type, and the usual trigger — the row
+    /// appearing — cannot fire for a row the search has filtered out. Bounded by
+    /// what is loaded, and each row is still only ever asked for once.
+    private func hydrateAllLoaded(account: Account) {
+        for row in rows where !row.isHydrated {
+            hydrate(row, account: account)
+        }
+    }
+
     /// Fetches one row's metadata, as the row appears.
     ///
     /// Through the account's own instance: every ID the server returns is a
@@ -748,6 +806,44 @@ struct HistoryListView: View {
         if rowVideos.indices.contains(index) {
             rowVideos[index] = video
         }
+    }
+
+    // MARK: - Live updates
+
+    /// Moves a video that was just recorded on the server to the front of the
+    /// list.
+    ///
+    /// Only for the account the rows on screen were loaded for — `loadedContext`
+    /// rather than the live one, which is the same guard the generation gives an
+    /// awaited result: a post that lands as the context moves belongs to the
+    /// history that is on its way out, not the one arriving.
+    private func applyServerUpdate(_ notification: Notification) {
+        guard case let .server(account) = displayMode,
+              let accountID = notification.userInfo?[ServerWatchHistoryUpdate.accountIDKey] as? UUID,
+              accountID == account.id,
+              loadedContext == .account(accountID),
+              let videoID = notification.userInfo?[ServerWatchHistoryUpdate.videoIDKey] as? String
+        else { return }
+
+        bumpToFront(videoID)
+    }
+
+    /// Puts a video at the top of the rows, wherever it was — or was not.
+    ///
+    /// What the server does with a repeated post: the video moves to the front
+    /// of the history rather than appearing twice in it. A video not among the
+    /// loaded rows is new to the front of the list, and arrives with whatever
+    /// the device already knows about it, which for something just watched here
+    /// is everything.
+    private func bumpToFront(_ videoID: String) {
+        if let index = rows.firstIndex(where: { $0.videoID == videoID }) {
+            guard index != 0 else { return }
+            rows.insert(rows.remove(at: index), at: 0)
+        } else {
+            rows.insert(makeRow(id: videoID), at: 0)
+        }
+
+        rowVideos = rows.map(\.video)
     }
 
     // MARK: - Reading

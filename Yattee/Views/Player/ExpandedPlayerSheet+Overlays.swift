@@ -22,12 +22,14 @@ extension ExpandedPlayerSheet {
     }
 
     /// Restarts playback from the beginning.
+    ///
+    /// The video this offers has finished, so playing it again is a new watch —
+    /// which is the player's to know about, not the overlay's.
     func restartPlayback() {
         guard let playerService else { return }
 
         Task {
-            await playerService.seek(to: 0)
-            playerService.resume()
+            await playerService.replayCurrentVideo()
         }
     }
 

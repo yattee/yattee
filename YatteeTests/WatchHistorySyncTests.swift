@@ -102,6 +102,36 @@ private final class Flag {
     var isSet = false
 }
 
+/// Collects what ``Notification/Name/serverWatchHistoryDidUpdate`` announced.
+@MainActor
+private final class UpdateAnnouncements {
+    private(set) var received: [(accountID: UUID, videoID: String)] = []
+    private var observer: NSObjectProtocol?
+
+    init() {
+        // No queue: delivered synchronously, on the main actor the post is made
+        // from, so a test can look at it the moment the flush returns.
+        observer = NotificationCenter.default.addObserver(
+            forName: .serverWatchHistoryDidUpdate,
+            object: nil,
+            queue: nil
+        ) { [weak self] notification in
+            guard let accountID = notification.userInfo?[ServerWatchHistoryUpdate.accountIDKey] as? UUID,
+                  let videoID = notification.userInfo?[ServerWatchHistoryUpdate.videoIDKey] as? String
+            else { return }
+
+            MainActor.assumeIsolated {
+                self?.received.append((accountID: accountID, videoID: videoID))
+            }
+        }
+    }
+
+    func stop() {
+        if let observer { NotificationCenter.default.removeObserver(observer) }
+        observer = nil
+    }
+}
+
 private func makeVideo(_ id: String) -> Video {
     Video(
         id: .global(id),
@@ -209,6 +239,85 @@ struct WatchHistorySyncTests {
         #expect(await harness.transport.markedVideoIDs == ["aaa", "aaa"])
     }
 
+    @Test("A finished video played again is a new watch and posts again")
+    func aFreshSessionForTheSameVideoPostsAgain() async throws {
+        let harness = WatchHistorySyncHarness()
+        defer { harness.tearDown() }
+
+        harness.service.beginSession(video: makeVideo("aaa"))
+        harness.service.recordProgress(videoID: "aaa")
+
+        // The replay button, or repeat-one coming round: the same video, still
+        // loaded, watched a second time.
+        harness.service.beginSession(video: makeVideo("aaa"))
+        harness.service.recordProgress(videoID: "aaa")
+        await harness.service.flushPending()
+
+        #expect(await harness.transport.markedVideoIDs == ["aaa", "aaa"])
+    }
+
+    // MARK: - Reloads of the video already playing
+
+    @Test("Reloading the video already playing does not post it again")
+    func reloadingTheSameVideoKeepsTheSession() async throws {
+        let harness = WatchHistorySyncHarness()
+        defer { harness.tearDown() }
+
+        harness.service.beginSessionIfNeeded(video: makeVideo("aaa"))
+        harness.service.recordProgress(videoID: "aaa")
+
+        // An audio-mode toggle, a quality switch, a stream retry: the same
+        // video loaded again, and the same watch.
+        harness.service.beginSessionIfNeeded(video: makeVideo("aaa"))
+        harness.service.recordProgress(videoID: "aaa")
+        await harness.service.flushPending()
+
+        #expect(await harness.transport.markedVideoIDs == ["aaa"])
+    }
+
+    @Test("Moving to another video starts that video's session")
+    func anotherVideoReplacesTheSession() async throws {
+        let harness = WatchHistorySyncHarness()
+        defer { harness.tearDown() }
+
+        harness.service.beginSessionIfNeeded(video: makeVideo("aaa"))
+        harness.service.recordProgress(videoID: "aaa")
+
+        harness.service.beginSessionIfNeeded(video: makeVideo("bbb"))
+        harness.service.recordProgress(videoID: "bbb")
+        await harness.service.flushPending()
+
+        #expect(await harness.transport.markedVideoIDs == ["aaa", "bbb"])
+    }
+
+    @Test("The first video of a playback starts a session with nothing to compare to")
+    func theFirstVideoStartsASession() async throws {
+        let harness = WatchHistorySyncHarness()
+        defer { harness.tearDown() }
+
+        harness.service.beginSessionIfNeeded(video: makeVideo("aaa"))
+        harness.service.recordProgress(videoID: "aaa")
+        await harness.service.flushPending()
+
+        #expect(await harness.transport.markedVideoIDs == ["aaa"])
+    }
+
+    @Test("A video opened again after the player stopped is watched again")
+    func theSameVideoAfterAnEndedSessionPostsAgain() async throws {
+        let harness = WatchHistorySyncHarness()
+        defer { harness.tearDown() }
+
+        harness.service.beginSessionIfNeeded(video: makeVideo("aaa"))
+        harness.service.recordProgress(videoID: "aaa")
+        harness.service.endSession()
+
+        harness.service.beginSessionIfNeeded(video: makeVideo("aaa"))
+        harness.service.recordProgress(videoID: "aaa")
+        await harness.service.flushPending()
+
+        #expect(await harness.transport.markedVideoIDs == ["aaa", "aaa"])
+    }
+
     @Test("Progress for a video the session is not about is ignored")
     func progressForAnotherVideoIsIgnored() async throws {
         let harness = WatchHistorySyncHarness()
@@ -305,6 +414,37 @@ struct WatchHistorySyncTests {
         #expect(await harness.transport.callCount == 2)
     }
 
+    @Test("A post the server refused on its merits is not tried again")
+    func aNonRetryableFailureIsNotRetried() async throws {
+        let harness = WatchHistorySyncHarness()
+        defer { harness.tearDown() }
+
+        // An ID this server will not take is not going to take it the second
+        // time either.
+        await harness.transport.setError(APIError.httpError(statusCode: 400, message: "Invalid video id."))
+
+        harness.service.beginSession(video: makeVideo("aaa"))
+        harness.service.recordProgress(videoID: "aaa")
+        await harness.service.flushPending()
+        try await harness.transport.settle()
+
+        #expect(await harness.transport.callCount == 1)
+    }
+
+    @Test("A post the transport itself refused is not tried again")
+    func aServiceFailureFromTheTransportIsNotRetried() async throws {
+        let harness = WatchHistorySyncHarness()
+        defer { harness.tearDown() }
+        await harness.transport.setError(AccountServiceError.notSupported)
+
+        harness.service.beginSession(video: makeVideo("aaa"))
+        harness.service.recordProgress(videoID: "aaa")
+        await harness.service.flushPending()
+        try await harness.transport.settle()
+
+        #expect(await harness.transport.callCount == 1)
+    }
+
     @Test("A post that could not be resolved at all is not retried")
     func aResolutionFailureIsNotRetried() async throws {
         let harness = WatchHistorySyncHarness()
@@ -335,6 +475,40 @@ struct WatchHistorySyncTests {
         try await harness.transport.settle()
 
         #expect(await harness.transport.callCount == 0)
+    }
+
+    // MARK: - Announcing
+
+    @Test("A post that landed says so, naming the account and the video")
+    func aSuccessfulPostIsAnnounced() async throws {
+        let harness = WatchHistorySyncHarness()
+        defer { harness.tearDown() }
+        let announcements = UpdateAnnouncements()
+        defer { announcements.stop() }
+
+        harness.service.beginSession(video: makeVideo("aaa"))
+        harness.service.recordProgress(videoID: "aaa")
+        await harness.service.flushPending()
+
+        #expect(announcements.received.count == 1)
+        #expect(announcements.received.first?.accountID == harness.account.id)
+        #expect(announcements.received.first?.videoID == "aaa")
+    }
+
+    @Test("A post that never landed announces nothing")
+    func aFailedPostIsNotAnnounced() async throws {
+        let harness = WatchHistorySyncHarness()
+        defer { harness.tearDown() }
+        let announcements = UpdateAnnouncements()
+        defer { announcements.stop() }
+        await harness.transport.setError(APIError.timeout)
+
+        harness.service.beginSession(video: makeVideo("aaa"))
+        harness.service.recordProgress(videoID: "aaa")
+        await harness.service.flushPending()
+        try await harness.transport.settle()
+
+        #expect(announcements.received.isEmpty)
     }
 
     // MARK: - Draining and disowning

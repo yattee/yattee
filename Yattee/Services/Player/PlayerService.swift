@@ -264,13 +264,14 @@ final class PlayerService {
             saveProgressAndSync()
         }
 
-        // Mirror this watch into the active account's server history. Only for
-        // a genuinely new video: an audio-mode toggle or a quality switch
-        // reloads the same one, and starting a session for those would post it
-        // to the server a second time.
-        if isNewVideo {
-            watchHistorySyncService?.beginSession(video: video)
-        }
+        // Mirror this watch into the active account's server history.
+        // Unconditional, and the service decides: `isNewVideo` is already false
+        // for most openings, because openVideo() puts the video into state
+        // before this task runs. The service compares against the session it is
+        // holding instead, which keeps a reload of the same video — an
+        // audio-mode toggle, a quality switch, a stream retry — from posting it
+        // a second time.
+        watchHistorySyncService?.beginSessionIfNeeded(video: video)
 
         // Reset flag for the new video
         videoEndedNaturally = false
@@ -660,12 +661,28 @@ final class PlayerService {
         } else if state.playbackState == .ended {
             // Restart from beginning when video has ended
             Task {
-                await seek(to: 0)
-                resume()
+                await replayCurrentVideo()
             }
         } else {
             resume()
         }
+    }
+
+    /// Plays the current video again from the beginning, as a new watch.
+    ///
+    /// Every way a *finished* video is started again comes through here: the
+    /// replay button, the end-of-queue overlay, repeat-one, play/pause on an
+    /// ended video. Each of those is a second watch of the same video, so the
+    /// mirroring session is started fresh and the video is posted to the
+    /// account's history again — which is what moves it back to the front.
+    /// Seeking to the start mid-video is not this, and does not pass here.
+    func replayCurrentVideo() async {
+        if let video = state.currentVideo {
+            watchHistorySyncService?.beginSession(video: video)
+        }
+
+        await seek(to: 0)
+        resume()
     }
 
     /// Stops playback and clears the player.
@@ -807,9 +824,8 @@ final class PlayerService {
         // Handle queue mode behavior
         switch state.queueMode {
         case .repeatOne:
-            // Restart current video
-            await seek(to: 0)
-            resume()
+            // Restart current video — a second watch of it, not a continuation
+            await replayCurrentVideo()
             return
 
         case .repeatAll:
