@@ -63,9 +63,24 @@ struct HistoryListView: View {
     /// scrolls in and out again does not ask twice — including the ones whose
     /// fetch failed, which would otherwise retry on every pass.
     @State private var hydrationAttempted: Set<String> = []
+    /// The metadata fetches in flight, by video ID.
+    ///
+    /// Held on to so a reload can cancel them: without that, switching accounts
+    /// mid-scroll leaves a whole load's worth of requests running against an
+    /// instance whose history is already off screen, and starts a second set
+    /// beside them.
+    @State private var hydrationTasks: [String: Task<Void, Never>] = [:]
+    /// The rows waiting for a fetch slot, in the order they asked for one.
+    @State private var hydrationQueue: [String] = []
 
     /// How many IDs one page of server history asks for.
     private static let serverPageSize = 60
+
+    /// How many metadata fetches a load may have in flight at once.
+    ///
+    /// A page is 60 rows and a search hydrates all of them at once, which
+    /// unbounded would be 60 simultaneous requests to a public instance.
+    private static let hydrationConcurrency = 6
 
     /// The page to ask the server for next.
     ///
@@ -587,6 +602,7 @@ struct HistoryListView: View {
     private func startLoad() {
         loadTask?.cancel()
         loadTask = nil
+        cancelHydration()
 
         guard let account = beginLoad() else { return }
         beginPageLoad(1, account: account)
@@ -768,33 +784,67 @@ struct HistoryListView: View {
         }
     }
 
-    /// Fetches one row's metadata, as the row appears.
+    /// Asks for one row's metadata, as the row appears.
     ///
-    /// Through the account's own instance: every ID the server returns is a
-    /// YouTube ID, and the account's instance is the one that has it.
+    /// The request itself waits its turn: the row joins the queue, and the
+    /// fetches are started a few at a time from there.
     private func hydrate(_ row: HistoryRow, account: Account) {
         guard !row.isHydrated,
               !hydrationAttempted.contains(row.videoID),
               let appEnvironment,
-              let instance = appEnvironment.accountsManager.instance(for: account)
+              appEnvironment.accountsManager.instance(for: account) != nil
         else { return }
 
         hydrationAttempted.insert(row.videoID)
+        hydrationQueue.append(row.videoID)
+        pumpHydration(account: account)
+    }
 
-        let videoID = row.videoID
+    /// Starts as many queued fetches as there are free slots.
+    ///
+    /// Through the account's own instance: every ID the server returns is a
+    /// YouTube ID, and the account's instance is the one that has it.
+    private func pumpHydration(account: Account) {
+        guard let appEnvironment,
+              let instance = appEnvironment.accountsManager.instance(for: account)
+        else { return }
+
         let generation = loadGeneration
 
-        Task {
-            do {
-                let video = try await appEnvironment.contentService.video(id: videoID, instance: instance)
+        while hydrationTasks.count < Self.hydrationConcurrency, !hydrationQueue.isEmpty {
+            let videoID = hydrationQueue.removeFirst()
+
+            hydrationTasks[videoID] = Task {
+                do {
+                    let video = try await appEnvironment.contentService.video(id: videoID, instance: instance)
+                    guard generation == loadGeneration else { return }
+                    apply(video, to: videoID)
+                } catch {
+                    // The row keeps its placeholder. A video the account watched
+                    // is part of its history whether or not this instance can
+                    // describe it right now.
+                }
+
+                // A finished fetch frees its slot for the next row — but only
+                // for the load it belongs to. A later one has already emptied
+                // this queue and started its own, and giving back a slot there
+                // would drop a task that is still running.
                 guard generation == loadGeneration else { return }
-                apply(video, to: videoID)
-            } catch {
-                // The row keeps its placeholder. A video the account watched is
-                // part of its history whether or not this instance can describe
-                // it right now.
+                hydrationTasks[videoID] = nil
+                pumpHydration(account: account)
             }
         }
+    }
+
+    /// Drops everything the current load was still going to fetch, and stops
+    /// what it had already started.
+    private func cancelHydration() {
+        for task in hydrationTasks.values {
+            task.cancel()
+        }
+
+        hydrationTasks.removeAll()
+        hydrationQueue.removeAll()
     }
 
     private func apply(_ video: Video, to videoID: String) {

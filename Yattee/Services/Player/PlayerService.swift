@@ -681,8 +681,17 @@ final class PlayerService {
             watchHistorySyncService?.beginSession(video: video)
         }
 
+        // The end of the previous watch left the player set up for a video that
+        // is over: no save timer, and the natural-end flag that tells play() the
+        // final save is already done. A second watch has to undo both, in the
+        // order play() does it — the flag before the seek, the timer only once
+        // playback is running again, so a seek that never gets there cannot
+        // leave a timer saving progress for an ended video.
+        videoEndedNaturally = false
+
         await seek(to: 0)
         resume()
+        startProgressSaveTimer()
     }
 
     /// Stops playback and clears the player.
