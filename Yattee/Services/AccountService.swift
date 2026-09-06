@@ -66,6 +66,25 @@ protocol RemotePlaylistTransport: Sendable {
     func removeEntry(_ entryID: RemotePlaylistEntryID, instance: Instance, credential: String) async throws
 }
 
+/// The authenticated watch-history surface ``AccountService`` talks to.
+///
+/// Same contract as ``RemotePlaylistTransport``: stateless, credential-carrying,
+/// and **every method here is exactly one request to the server** — the
+/// credential can be replaced between any two of them, and only the service
+/// above can tell.
+protocol WatchHistoryTransport: Sendable {
+    func watchHistory(
+        instance: Instance,
+        credential: String,
+        page: Int,
+        maxResults: Int
+    ) async throws -> [String]
+
+    func markWatched(videoID: String, instance: Instance, credential: String) async throws
+
+    func removeWatched(videoID: String, instance: Instance, credential: String) async throws
+}
+
 /// Why an account could not do what was asked of it.
 enum AccountServiceError: Error, LocalizedError, Equatable, Sendable {
     /// No credential is readable for this account right now.
@@ -113,15 +132,18 @@ final class AccountService {
     private let accountsManager: AccountsManager
     private let credentialReader: CredentialReader
     private let transport: any RemotePlaylistTransport
+    private let historyTransport: any WatchHistoryTransport
 
     init(
         accountsManager: AccountsManager,
         credentialReader: @escaping CredentialReader,
-        transport: any RemotePlaylistTransport
+        transport: any RemotePlaylistTransport,
+        historyTransport: any WatchHistoryTransport
     ) {
         self.accountsManager = accountsManager
         self.credentialReader = credentialReader
         self.transport = transport
+        self.historyTransport = historyTransport
     }
 
     // MARK: - Reads
@@ -315,6 +337,61 @@ final class AccountService {
         try requireStillCurrent(credential, for: account)
         try await tracking(account, credential: credential) {
             try await transport.removeEntry(entry.id, instance: instance, credential: credential)
+        }
+    }
+
+    // MARK: - Watch history
+
+    /// One page of the account's server-side watch history, newest first.
+    ///
+    /// Video IDs only — the server stores nothing else — so whatever shows them
+    /// hydrates them from local history or a video fetch.
+    /// - Parameters:
+    ///   - page: 1-based page number
+    ///   - maxResults: How many IDs the page may hold
+    func watchHistory(page: Int, maxResults: Int, for account: Account) async throws -> [String] {
+        let (instance, credential) = try resolve(account, requiring: \.supportsWatchHistory)
+        return try await tracking(account, credential: credential) {
+            try await historyTransport.watchHistory(
+                instance: instance,
+                credential: credential,
+                page: page,
+                maxResults: maxResults
+            )
+        }
+    }
+
+    /// Records a video as watched in the account's server-side history.
+    ///
+    /// Repeating it is not an error: the server moves the video back to the
+    /// front of the history, which is what a re-watch should do.
+    func markWatched(videoID: String, for account: Account) async throws {
+        let (instance, credential) = try resolve(account, requiring: \.supportsWatchHistory)
+
+        try requireStillCurrent(credential, for: account)
+        try await tracking(account, credential: credential) {
+            try await historyTransport.markWatched(
+                videoID: videoID,
+                instance: instance,
+                credential: credential
+            )
+        }
+    }
+
+    /// Removes one video from the account's server-side history.
+    ///
+    /// The server's history only; the local ``WatchEntry`` is a separate store
+    /// with its own view, and nothing here touches it.
+    func removeFromWatchHistory(videoID: String, for account: Account) async throws {
+        let (instance, credential) = try resolve(account, requiring: \.supportsWatchHistory)
+
+        try requireStillCurrent(credential, for: account)
+        try await tracking(account, credential: credential) {
+            try await historyTransport.removeWatched(
+                videoID: videoID,
+                instance: instance,
+                credential: credential
+            )
         }
     }
 

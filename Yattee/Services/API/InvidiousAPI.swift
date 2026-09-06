@@ -820,6 +820,72 @@ actor InvidiousAPI: InstanceAPI {
         try await httpClient.sendRequest(endpoint, baseURL: instance.url)
     }
 
+    // MARK: - Watch History
+
+    /// One page of the user's server-side watch history, newest first.
+    ///
+    /// The server answers a bare array of video IDs — no titles, no durations,
+    /// nothing else — so a caller that wants to show them has to hydrate each
+    /// one itself. Past the end the array is empty, which is the only way to
+    /// tell there is no further page.
+    /// - Parameters:
+    ///   - instance: The Invidious instance
+    ///   - sid: The session ID from login
+    ///   - page: 1-based page number
+    ///   - maxResults: How many IDs the page may hold
+    /// - Returns: Video IDs, newest first
+    func watchHistory(
+        instance: Instance,
+        sid: String,
+        page: Int,
+        maxResults: Int
+    ) async throws -> [String] {
+        let endpoint = GenericEndpoint(
+            path: "/api/v1/auth/history",
+            queryItems: [
+                URLQueryItem(name: "page", value: String(page)),
+                URLQueryItem(name: "max_results", value: String(maxResults))
+            ],
+            headers: authHeaders(sid: sid)
+        )
+        let response: [String] = try await httpClient.fetch(endpoint, baseURL: instance.url)
+        return response
+    }
+
+    /// Records a video as watched in the user's server-side history.
+    ///
+    /// Answers 204 with no body, and repeating it is not an error: the server
+    /// moves an ID it already holds back to the front, which is what a re-watch
+    /// should do to the ordering.
+    /// - Parameters:
+    ///   - videoID: The YouTube video ID
+    ///   - instance: The Invidious instance
+    ///   - sid: The session ID from login
+    func markWatched(videoID: String, instance: Instance, sid: String) async throws {
+        let endpoint = GenericEndpoint(
+            path: "/api/v1/auth/history/\(videoID)",
+            method: .post,
+            headers: authHeaders(sid: sid)
+        )
+        try await httpClient.sendRequest(endpoint, baseURL: instance.url)
+    }
+
+    /// Removes one video from the user's server-side history.
+    ///
+    /// Idempotent — an ID the history never held answers 204 just the same.
+    /// - Parameters:
+    ///   - videoID: The YouTube video ID
+    ///   - instance: The Invidious instance
+    ///   - sid: The session ID from login
+    func removeWatched(videoID: String, instance: Instance, sid: String) async throws {
+        let endpoint = GenericEndpoint(
+            path: "/api/v1/auth/history/\(videoID)",
+            method: .delete,
+            headers: authHeaders(sid: sid)
+        )
+        try await httpClient.sendRequest(endpoint, baseURL: instance.url)
+    }
+
     /// The headers every authenticated write carries. `Content-Type` is set for
     /// all of them, including the bodiless ones, so a proxy in front of the
     /// instance cannot guess something else.

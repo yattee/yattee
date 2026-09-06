@@ -494,6 +494,59 @@ actor ContentService: ContentServiceProtocol {
         }
     }
 
+    // MARK: - Watch History
+
+    /// One page of the credential owner's server-side watch history.
+    ///
+    /// Invidious is the only backend with a history endpoint at all; the
+    /// capability gate above this refuses the others long before here.
+    func watchHistory(
+        instance: Instance,
+        credential: String,
+        page: Int,
+        maxResults: Int
+    ) async throws -> [String] {
+        switch instance.type {
+        case .invidious:
+            return try await invidiousAPI(for: instance).watchHistory(
+                instance: instance,
+                sid: credential,
+                page: page,
+                maxResults: maxResults
+            )
+        default:
+            throw APIError.notSupported
+        }
+    }
+
+    /// Records a video as watched in the credential owner's history.
+    func markWatched(videoID: String, instance: Instance, credential: String) async throws {
+        switch instance.type {
+        case .invidious:
+            try await invidiousAPI(for: instance).markWatched(
+                videoID: videoID,
+                instance: instance,
+                sid: credential
+            )
+        default:
+            throw APIError.notSupported
+        }
+    }
+
+    /// Removes one video from the credential owner's history.
+    func removeWatched(videoID: String, instance: Instance, credential: String) async throws {
+        switch instance.type {
+        case .invidious:
+            try await invidiousAPI(for: instance).removeWatched(
+                videoID: videoID,
+                instance: instance,
+                sid: credential
+            )
+        default:
+            throw APIError.notSupported
+        }
+    }
+
     // MARK: - Authentication
 
     /// Signs in to an instance and returns the credential its backend issues —
@@ -657,6 +710,8 @@ actor ContentService: ContentServiceProtocol {
 /// the protocol's own file so the conformance is checked next to the methods
 /// that satisfy it; the protocol exists so tests can script a server.
 extension ContentService: RemotePlaylistTransport {}
+
+extension ContentService: WatchHistoryTransport {}
 
 // MARK: - Feed Page
 

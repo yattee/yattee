@@ -128,6 +128,7 @@ final class PlayerService {
     private weak var queueManager: QueueManager?
     private weak var playerControlsLayoutService: PlayerControlsLayoutService?
     private weak var handoffManager: HandoffManager?
+    private weak var watchHistorySyncService: WatchHistorySyncService?
 
     // MARK: - Private State
 
@@ -261,6 +262,14 @@ final class PlayerService {
         // Skip if video ended naturally - 100% was already saved in backendDidFinishPlaying
         if state.currentVideo != nil && isNewVideo && !videoEndedNaturally {
             saveProgressAndSync()
+        }
+
+        // Mirror this watch into the active account's server history. Only for
+        // a genuinely new video: an audio-mode toggle or a quality switch
+        // reloads the same one, and starting a session for those would post it
+        // to the server a second time.
+        if isNewVideo {
+            watchHistorySyncService?.beginSession(video: video)
         }
 
         // Reset flag for the new video
@@ -672,6 +681,7 @@ final class PlayerService {
         currentPlayTask = nil
 
         saveProgressAndSync()
+        watchHistorySyncService?.endSession()
         cleanup()
 
         // Clear Handoff activity
@@ -2698,6 +2708,11 @@ final class PlayerService {
         self.handoffManager = manager
     }
 
+    /// Sets the service that mirrors playback into an account's server history.
+    func setWatchHistorySyncService(_ service: WatchHistorySyncService) {
+        self.watchHistorySyncService = service
+    }
+
     #if os(iOS)
     /// Called when the player sheet appears.
     func playerSheetDidAppear() {
@@ -2829,6 +2844,7 @@ final class PlayerService {
         // Save locally only during playback - no iCloud sync overhead.
         // Live streams still get a history entry, but no resume position.
         dataManager.updateWatchProgressLocal(for: video, seconds: state.currentTime, duration: state.duration, isLive: state.isLive)
+        watchHistorySyncService?.recordProgress(videoID: video.id.videoID)
 
         // Update Handoff activity with current playback time
         handoffManager?.updatePlaybackTime(state.currentTime)
@@ -2855,6 +2871,7 @@ final class PlayerService {
         // This is the only save for a naturally finished video — play() skips
         // saveProgressAndSync() when videoEndedNaturally is set.
         dataManager.updateWatchProgress(for: video, seconds: completedDuration, duration: completedDuration)
+        watchHistorySyncService?.recordProgress(videoID: video.id.videoID)
 
         // Update Handoff activity with completed time
         handoffManager?.updatePlaybackTime(completedDuration)
@@ -2871,6 +2888,7 @@ final class PlayerService {
 
         // Save and queue for iCloud sync (used when video closes/switches)
         dataManager.updateWatchProgress(for: video, seconds: state.currentTime, duration: state.duration, isLive: state.isLive)
+        watchHistorySyncService?.recordProgress(videoID: video.id.videoID)
         NotificationCenter.default.post(name: .watchHistoryDidChange, object: nil)
     }
 

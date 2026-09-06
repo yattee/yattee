@@ -60,6 +60,7 @@ final class AppEnvironment {
     let accountService: AccountService
     let remotePlaylistsCache: RemotePlaylistsCache
     let dataContextValidator: DataContextValidator
+    let watchHistorySync: WatchHistorySyncService
     let playerControlsLayoutService: PlayerControlsLayoutService
     let legacyMigrationService: LegacyDataMigrationService
     let sourcesSettings: SourcesSettings
@@ -277,7 +278,8 @@ final class AppEnvironment {
                 default: return nil
                 }
             },
-            transport: contentSvc
+            transport: contentSvc,
+            historyTransport: contentSvc
         )
         self.accountService = accountSvc
         self.remotePlaylistsCache = RemotePlaylistsCache(accountService: accountSvc)
@@ -436,6 +438,17 @@ final class AppEnvironment {
             instancesManager: instances,
             toastManager: toast
         )
+
+        // Mirrors what is played here into the active account's server-side
+        // history. Reads the *effective* context, so it has to be built after
+        // the validator that decides it.
+        let watchHistory = WatchHistorySyncService(
+            accountsManager: accounts,
+            accountService: accountSvc,
+            contextValidator: self.dataContextValidator
+        )
+        self.watchHistorySync = watchHistory
+        player.setWatchHistorySyncService(watchHistory)
 
         // Initialize Player Controls Layout Service
         let layoutService = PlayerControlsLayoutService()
@@ -796,6 +809,7 @@ final class AppEnvironment {
     func discardAccountData(for accountID: UUID) {
         subscriptionService.discardProvider(for: accountID)
         remotePlaylistsCache.clear(accountID: accountID)
+        watchHistorySync.cancelPending(for: accountID)
     }
 
     /// Drops everything cached for whichever account was being shown.

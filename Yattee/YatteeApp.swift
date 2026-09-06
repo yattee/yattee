@@ -305,6 +305,9 @@ struct YatteeApp: App {
                 appEnvironment.playerService.syncWatchProgress()
                 Task {
                     await appEnvironment.cloudKitSync.flushPendingChanges()
+                    // The progress save above is what enqueues the server-history
+                    // post, so the flush is created after it.
+                    await appEnvironment.watchHistorySync.flushPending()
                 }
             }
         }
@@ -369,6 +372,10 @@ struct YatteeApp: App {
                 appEnvironment.dataManager.save()
                 Task {
                     await appEnvironment.cloudKitSync.flushPendingChanges()
+                    // The progress save above is what enqueues the server-history
+                    // post, so the flush is created after it — and both finish
+                    // before the assertion is given up.
+                    await appEnvironment.watchHistorySync.flushPending()
                     if backgroundTask != .invalid {
                         UIApplication.shared.endBackgroundTask(backgroundTask)
                         backgroundTask = .invalid
@@ -381,6 +388,9 @@ struct YatteeApp: App {
                 #else
                 Task {
                     await appEnvironment.cloudKitSync.flushPendingChanges()
+                    // The progress save above is what enqueues the server-history
+                    // post, so the flush is created after it.
+                    await appEnvironment.watchHistorySync.flushPending()
                 }
                 #endif
             }

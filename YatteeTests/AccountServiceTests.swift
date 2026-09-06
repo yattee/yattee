@@ -18,7 +18,9 @@ import Foundation
 /// send — the privacy it dropped, the token it removed by — and any call can be
 /// parked mid-flight, which is where the credential-change and generation rules
 /// actually live.
-private actor ScriptedPlaylistTransport: RemotePlaylistTransport {
+/// Shared with `WatchHistorySyncTests`, whose service needs a playlist half it
+/// never reaches.
+actor ScriptedPlaylistTransport: RemotePlaylistTransport {
     enum Call: Equatable, Sendable {
         case userPlaylists(credential: String)
         case snapshot(id: String, credential: String)
@@ -160,6 +162,96 @@ private actor ScriptedPlaylistTransport: RemotePlaylistTransport {
     }
 }
 
+// MARK: - Scripted history transport
+
+/// A ``WatchHistoryTransport`` that answers from a script instead of a server.
+///
+/// Same shape as ``ScriptedPlaylistTransport`` — every call recorded, any call
+/// parkable — because the same questions are asked of it: which credential went
+/// out, and what happened while one was still in flight. Shared with
+/// `WatchHistorySyncTests`.
+actor ScriptedHistoryTransport: WatchHistoryTransport {
+    enum Call: Equatable, Sendable {
+        case history(page: Int, maxResults: Int, credential: String)
+        case markWatched(videoID: String, credential: String)
+        case removeWatched(videoID: String, credential: String)
+    }
+
+    private(set) var calls: [Call] = []
+
+    /// Thrown by every call, once set.
+    var nextError: Error?
+
+    /// What ``watchHistory(instance:credential:page:maxResults:)`` answers.
+    var history: [String] = []
+
+    /// While true, every call suspends until `release()`.
+    private var holdsCallsOpen = false
+    private var parked: [CheckedContinuation<Void, Never>] = []
+
+    func setError(_ error: Error?) { nextError = error }
+    func setHistory(_ history: [String]) { self.history = history }
+    func holdCalls() { holdsCallsOpen = true }
+
+    func release() {
+        holdsCallsOpen = false
+        let waiting = parked
+        parked = []
+        waiting.forEach { $0.resume() }
+    }
+
+    /// Waits until at least `count` calls have been entered.
+    func waitForCalls(_ count: Int) async throws {
+        for _ in 0 ..< 400 {
+            if calls.count >= count { return }
+            try await Task.sleep(for: .milliseconds(5))
+        }
+        Issue.record("The history transport was never entered \(count) time(s)")
+    }
+
+    /// Waits for the calls that should *not* happen to have had their chance.
+    func settle() async throws {
+        try await Task.sleep(for: .milliseconds(50))
+    }
+
+    var callCount: Int { calls.count }
+
+    var markedVideoIDs: [String] {
+        calls.compactMap {
+            if case .markWatched(let videoID, _) = $0 { return videoID }
+            return nil
+        }
+    }
+
+    private func record(_ call: Call) async throws {
+        calls.append(call)
+
+        if holdsCallsOpen {
+            await withCheckedContinuation { parked.append($0) }
+        }
+
+        if let nextError { throw nextError }
+    }
+
+    func watchHistory(
+        instance _: Instance,
+        credential: String,
+        page: Int,
+        maxResults: Int
+    ) async throws -> [String] {
+        try await record(.history(page: page, maxResults: maxResults, credential: credential))
+        return history
+    }
+
+    func markWatched(videoID: String, instance _: Instance, credential: String) async throws {
+        try await record(.markWatched(videoID: videoID, credential: credential))
+    }
+
+    func removeWatched(videoID: String, instance _: Instance, credential: String) async throws {
+        try await record(.removeWatched(videoID: videoID, credential: credential))
+    }
+}
+
 // MARK: - Harness
 
 /// An account on an instance, a scripted transport, and the service between
@@ -172,6 +264,7 @@ private final class AccountServiceHarness {
     let accounts: AccountsManager
     let account: Account
     let transport = ScriptedPlaylistTransport()
+    let historyTransport = ScriptedHistoryTransport()
     private(set) var service: AccountService!
 
     /// What the credential reader reports right now.
@@ -204,7 +297,8 @@ private final class AccountServiceHarness {
         service = AccountService(
             accountsManager: accounts,
             credentialReader: { [weak self] _ in self?.readCredential() },
-            transport: transport
+            transport: transport,
+            historyTransport: historyTransport
         )
     }
 
@@ -636,6 +730,97 @@ struct AccountServiceTests {
         }
 
         #expect(await harness.transport.callCount == 0)
+    }
+
+    // MARK: - Watch history
+
+    @Test("A backend without a history endpoint is refused before anything is sent")
+    func historyIsRefusedWhereUnsupported() async throws {
+        let harness = AccountServiceHarness(type: .piped)
+        defer { harness.tearDown() }
+
+        await #expect(throws: AccountServiceError.notSupported) {
+            _ = try await harness.service.watchHistory(page: 1, maxResults: 60, for: harness.account)
+        }
+        await #expect(throws: AccountServiceError.notSupported) {
+            try await harness.service.markWatched(videoID: "aaa", for: harness.account)
+        }
+        await #expect(throws: AccountServiceError.notSupported) {
+            try await harness.service.removeFromWatchHistory(videoID: "aaa", for: harness.account)
+        }
+
+        #expect(await harness.historyTransport.callCount == 0)
+    }
+
+    @Test("History without a credential is refused before anything is sent")
+    func historyIsRefusedWithoutACredential() async throws {
+        let harness = AccountServiceHarness()
+        defer { harness.tearDown() }
+        harness.credential = nil
+
+        await #expect(throws: AccountServiceError.notAuthenticated) {
+            _ = try await harness.service.watchHistory(page: 1, maxResults: 60, for: harness.account)
+        }
+        await #expect(throws: AccountServiceError.notAuthenticated) {
+            try await harness.service.markWatched(videoID: "aaa", for: harness.account)
+        }
+
+        #expect(await harness.historyTransport.callCount == 0)
+    }
+
+    @Test("A history page is asked for with the paging the caller chose")
+    func historyPageCarriesItsPaging() async throws {
+        let harness = AccountServiceHarness()
+        defer { harness.tearDown() }
+        await harness.historyTransport.setHistory(["aaa", "bbb"])
+
+        let ids = try await harness.service.watchHistory(page: 2, maxResults: 60, for: harness.account)
+
+        #expect(ids == ["aaa", "bbb"])
+        #expect(await harness.historyTransport.calls == [
+            .history(page: 2, maxResults: 60, credential: "secret-original")
+        ])
+    }
+
+    @Test("A credential replaced between resolving and marking stops the write")
+    func markingStopsWhenTheCredentialChanges() async throws {
+        let harness = AccountServiceHarness()
+        defer { harness.tearDown() }
+        harness.credentialSwapOnNextRead = "secret-replacement"
+
+        await #expect(throws: AccountServiceError.notAuthenticated) {
+            try await harness.service.markWatched(videoID: "aaa", for: harness.account)
+        }
+
+        #expect(await harness.historyTransport.callCount == 0)
+    }
+
+    @Test("A removal from the server's history goes out on its own")
+    func removalFromHistoryIsOneRequest() async throws {
+        let harness = AccountServiceHarness()
+        defer { harness.tearDown() }
+
+        try await harness.service.removeFromWatchHistory(videoID: "aaa", for: harness.account)
+
+        #expect(await harness.historyTransport.calls == [
+            .removeWatched(videoID: "aaa", credential: "secret-original")
+        ])
+    }
+
+    @Test("A history call reports what it learned about the login")
+    func historyRecordsItsOutcome() async throws {
+        let harness = AccountServiceHarness()
+        defer { harness.tearDown() }
+        harness.accounts.setStatus(.credentialMissing, for: harness.account.id)
+
+        try await harness.service.markWatched(videoID: "aaa", for: harness.account)
+        #expect(harness.status == .signedIn)
+
+        await harness.historyTransport.setError(APIError.timeout)
+        await #expect(throws: APIError.timeout) {
+            try await harness.service.markWatched(videoID: "bbb", for: harness.account)
+        }
+        #expect(harness.status == .unreachable)
     }
 }
 
