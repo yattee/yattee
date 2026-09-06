@@ -677,7 +677,8 @@ final class PlayerService {
     /// account's history again — which is what moves it back to the front.
     /// Seeking to the start mid-video is not this, and does not pass here.
     func replayCurrentVideo() async {
-        if let video = state.currentVideo {
+        let video = state.currentVideo
+        if let video {
             watchHistorySyncService?.beginSession(video: video)
         }
 
@@ -690,6 +691,14 @@ final class PlayerService {
         videoEndedNaturally = false
 
         await seek(to: 0)
+
+        // The seek is awaited, and the player can have moved on while it ran:
+        // stopped, or already playing something else. Only the replay that is
+        // still the current watch may resume playback and arm the save timer —
+        // otherwise this would unpause a video the user paused, or time saves
+        // for a watch that is not this one.
+        guard let video, state.currentVideo?.id == video.id else { return }
+
         resume()
         startProgressSaveTimer()
     }
