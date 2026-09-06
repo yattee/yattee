@@ -54,26 +54,62 @@ struct PrivacySettingsView: View {
     @ViewBuilder
     private var historySection: some View {
         if let settingsManager = appEnvironment?.settingsManager {
-            SettingsFormSection("settings.behavior.historyRetention.header", footer: "settings.behavior.historyRetention.footer") {
-                Toggle(
-                    String(localized: "settings.privacy.saveWatchHistory"),
-                    isOn: Bindable(settingsManager).saveWatchHistory
-                )
-
-                PlatformMenuPicker(
-                    String(localized: "settings.behavior.historyRetention"),
-                    selection: Binding(
-                        get: { settingsManager.historyRetentionDays },
-                        set: { settingsManager.historyRetentionDays = $0 }
+            SettingsFormSection(
+                "settings.behavior.historyRetention.header",
+                content: {
+                    Toggle(
+                        String(localized: "settings.privacy.saveWatchHistory"),
+                        isOn: Bindable(settingsManager).saveWatchHistory
                     )
-                ) {
-                    ForEach(historyRetentionOptions, id: \.self) { days in
-                        Text(labelForHistoryRetentionDays(days))
-                            .tag(days)
+
+                    PlatformMenuPicker(
+                        String(localized: "settings.behavior.historyRetention"),
+                        selection: Binding(
+                            get: { settingsManager.historyRetentionDays },
+                            set: { settingsManager.historyRetentionDays = $0 }
+                        )
+                    ) {
+                        ForEach(historyRetentionOptions, id: \.self) { days in
+                            Text(labelForHistoryRetentionDays(days))
+                                .tag(days)
+                        }
+                    }
+                },
+                footer: {
+                    VStack(alignment: .leading, spacing: 6) {
+                        Text(String(localized: "settings.behavior.historyRetention.footer"))
+
+                        // Only while an account that has a server-side history
+                        // is the selected source: that is exactly when watching
+                        // something writes to two places, and the two settings
+                        // above are what stop both.
+                        if let name = serverHistoryAccountName {
+                            Text(String(localized: "settings.privacy.history.account.footer \(name)"))
+                        }
                     }
                 }
-            }
+            )
         }
+    }
+
+    /// The account watched videos are being mirrored to, if any.
+    ///
+    /// Resolved the same way the history screen decides whose history it is
+    /// showing, so the note and the screen can never disagree about it.
+    private var serverHistoryAccountName: String? {
+        guard let appEnvironment else { return nil }
+
+        let context = appEnvironment.dataContextValidator.effectiveContext
+        let account = context.accountID.flatMap { appEnvironment.accountsManager.account(id: $0) }
+
+        let mode = HistoryDisplayMode.resolve(
+            effectiveContext: context,
+            account: account,
+            capabilities: account.flatMap { appEnvironment.accountsManager.capabilities(for: $0) }
+        )
+
+        guard let mirrored = mode.account else { return nil }
+        return appEnvironment.dataContextValidator.displayName(for: mirrored)
     }
 
     private func labelForHistoryRetentionDays(_ days: Int) -> String {

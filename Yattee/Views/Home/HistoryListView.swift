@@ -10,10 +10,57 @@ import SwiftUI
 struct HistoryListView: View {
     @Environment(\.appEnvironment) private var appEnvironment
     @Namespace private var sheetTransition
-    @State private var history: [WatchEntry] = []
-    @State private var videos: [Video] = []  // Cached Video conversions to avoid repeated toVideo() calls
+
+    /// One row, from whichever history the screen is reading.
+    ///
+    /// The local entry travels with it rather than being looked up again: it is
+    /// what supplies the progress bar and the resume point, and a server row
+    /// gets one whenever the same video was also watched on this device.
+    private struct HistoryRow: Identifiable {
+        let videoID: String
+        var video: Video
+        var entry: WatchEntry?
+        /// Whether `video` is real metadata rather than the standing-in
+        /// placeholder a bare server ID starts as.
+        var isHydrated: Bool
+
+        var id: String { videoID }
+    }
+
+    /// The rows on screen, and the same rows' videos beside them.
+    ///
+    /// The videos are kept as their own array because every row hands the whole
+    /// list to the queue: deriving it per row would walk the history once per
+    /// visible row instead of once per load.
+    @State private var rows: [HistoryRow] = []
+    @State private var rowVideos: [Video] = []
+
     @State private var showingClearConfirmation = false
     @State private var selectedClearOption: ClearHistoryOption?
+
+    // MARK: - Server state
+
+    /// The effective context the rows on screen belong to, so a status change
+    /// that does not move it does not force a reload.
+    @State private var loadedContext: DataContext?
+    /// Which load the state belongs to. Cancelling the previous task is not
+    /// enough on its own: a request that already came back races the
+    /// cancellation, and its rows would be appended to a history nobody is
+    /// looking at any more.
+    @State private var loadGeneration = 0
+    @State private var loadTask: Task<Void, Never>?
+    /// The page to ask for next; 1-based, like the server's own numbering.
+    @State private var nextPage = 1
+    @State private var hasMorePages = false
+    @State private var isLoadingPage = false
+    @State private var serverErrorMessage: String?
+    /// Videos a metadata fetch has already been started for, so a row that
+    /// scrolls in and out again does not ask twice — including the ones whose
+    /// fetch failed, which would otherwise retry on every pass.
+    @State private var hydrationAttempted: Set<String> = []
+
+    /// How many IDs one page of server history asks for.
+    private static let serverPageSize = 60
 
     // View options (persisted)
     @AppStorage("history.layout") private var layout: VideoListLayout = .list
@@ -37,24 +84,66 @@ struct HistoryListView: View {
 
     private var dataManager: DataManager? { appEnvironment?.dataManager }
 
-    /// History entries filtered by search text.
-    private var filteredHistory: [WatchEntry] {
-        guard !searchText.isEmpty else { return history }
+    // MARK: - Context
+
+    /// The account whose history is on screen, or `nil` when it is the device's.
+    ///
+    /// The *effective* context, so a selected account that cannot be used right
+    /// now shows the local history — with the banner saying why — instead of an
+    /// empty list nobody can explain.
+    private var contextAccount: Account? {
+        guard let appEnvironment,
+              case let .account(id) = appEnvironment.dataContextValidator.effectiveContext
+        else { return nil }
+
+        return appEnvironment.accountsManager.account(id: id)
+    }
+
+    /// Which history the rows, the row actions and the clear menu all belong to.
+    ///
+    /// Read live rather than stored: it follows the effective context, and the
+    /// same value gates every affordance so none of them can be offering an
+    /// action against a store the list is not showing.
+    private var displayMode: HistoryDisplayMode {
+        guard let appEnvironment else { return .local }
+        let account = contextAccount
+
+        return HistoryDisplayMode.resolve(
+            effectiveContext: appEnvironment.dataContextValidator.effectiveContext,
+            account: account,
+            capabilities: account.flatMap { appEnvironment.accountsManager.capabilities(for: $0) }
+        )
+    }
+
+    private var contextUnavailability: DataContextUnavailability? {
+        guard appEnvironment?.accountsManager.currentContext.isLocal == false else { return nil }
+        return appEnvironment?.dataContextValidator.unavailability
+    }
+
+    // MARK: - Rows
+
+    /// History rows filtered by search text.
+    private var filteredRows: [HistoryRow] {
+        guard !searchText.isEmpty else { return rows }
         let query = searchText.lowercased()
-        return history.filter { entry in
-            entry.title.lowercased().contains(query) ||
-            entry.authorName.lowercased().contains(query) ||
-            entry.videoID.lowercased().contains(query)
+        return rows.filter { row in
+            row.video.title.lowercased().contains(query) ||
+            row.video.author.name.lowercased().contains(query) ||
+            row.videoID.lowercased().contains(query)
         }
     }
 
-    /// Pre-computed Video objects for filtered history entries.
+    /// The filtered rows' videos, in the same order — what a row hands the queue.
     private var filteredVideos: [Video] {
-        guard !searchText.isEmpty else { return videos }
-        let filteredIDs = Set(filteredHistory.map { $0.videoID })
-        return zip(history, videos)
-            .filter { filteredIDs.contains($0.0.videoID) }
-            .map { $0.1 }
+        guard !searchText.isEmpty else { return rowVideos }
+        return filteredRows.map(\.video)
+    }
+
+    /// Nothing fetched yet and no reason given — the spinner is for the first
+    /// page only, a later page loads under the rows that are already there.
+    private var isLoadingFirstServerPage: Bool {
+        guard case .server = displayMode else { return false }
+        return rows.isEmpty && isLoadingPage
     }
 
     /// Gets the watch progress (0.0-1.0) for a watch entry, or nil if finished.
@@ -113,7 +202,9 @@ struct HistoryListView: View {
                         Label(String(localized: "viewOptions.title"), systemImage: "slider.horizontal.3")
                     }
 
-                    if !history.isEmpty {
+                    // The server has no clear-all, so this is the device's
+                    // history only — the same menu it has always been.
+                    if displayMode.isLocal, !rows.isEmpty {
                         Menu {
                             ForEach(ClearHistoryOption.allCases, id: \.self) { option in
                                 Button(role: .destructive) {
@@ -127,6 +218,8 @@ struct HistoryListView: View {
                             Label(String(localized: "home.history.clear"), systemImage: "trash")
                         }
                     }
+
+                    DataContextSwitcherButton()
                 }
                 .focusSection()
                 .padding(.horizontal, 48)
@@ -134,42 +227,25 @@ struct HistoryListView: View {
                 .padding(.bottom, 20)
 
                 // Content
-                Group {
-                    if filteredHistory.isEmpty {
-                        emptyView
-                    } else {
-                        switch layout {
-                        case .list:
-                            listContent
-                        case .grid:
-                            gridContent
-                        }
-                    }
-                }
-                .focusSection()
+                content
+                    .focusSection()
             }
             .onChange(of: geometry.size.width, initial: true) { _, newWidth in
                 viewWidth = newWidth
             }
             #else
-            Group {
-                if filteredHistory.isEmpty {
-                    // Empty state
-                    emptyView
-                } else {
-                    // Content based on layout
-                    switch layout {
-                    case .list:
-                        listContent
-                    case .grid:
-                        gridContent
-                    }
+            content
+                .onChange(of: geometry.size.width, initial: true) { _, newWidth in
+                    viewWidth = newWidth
                 }
-            }
-            .onChange(of: geometry.size.width, initial: true) { _, newWidth in
-                viewWidth = newWidth
-            }
             #endif
+        }
+        // Above the list rather than inside it: the rows are local data while
+        // this is showing, and nothing else on screen says so.
+        .safeAreaInset(edge: .top, spacing: 0) {
+            if let contextUnavailability {
+                DataContextUnavailableBanner(reason: contextUnavailability)
+            }
         }
         #if !os(tvOS)
         .navigationTitle(String(localized: "home.history.title"))
@@ -183,6 +259,9 @@ struct HistoryListView: View {
                 ToolbarSpacer(.flexible, placement: .primaryAction)
             }
             #endif
+            ToolbarItem(placement: viewOptionsPlacement) {
+                DataContextSwitcherMenu()
+            }
             // View options button (always visible)
             ToolbarItem(placement: viewOptionsPlacement) {
                 Button {
@@ -198,8 +277,9 @@ struct HistoryListView: View {
                 #endif
             }
 
-            // Clear history menu (only when not empty)
-            if !history.isEmpty {
+            // Clear history menu (local history only, and only when not empty):
+            // the server offers no way to clear a history in one call.
+            if displayMode.isLocal, !rows.isEmpty {
                 ToolbarItem(placement: .primaryAction) {
                     Menu {
                         ForEach(ClearHistoryOption.allCases, id: \.self) { option in
@@ -237,10 +317,58 @@ struct HistoryListView: View {
         }
         .presentationCompactAdaptation(.sheet)
         .onAppear {
-            loadHistory()
+            startLoad()
         }
         .onReceive(NotificationCenter.default.publisher(for: .watchHistoryDidChange)) { _ in
-            loadHistory()
+            // The device's own history changed. The account's is the server's to
+            // change, and a local write is not news about it.
+            if displayMode.isLocal {
+                loadHistory()
+            }
+        }
+        // Selecting another account — or local — changes whose history this is,
+        // and the previous rows may not be shown for a moment longer.
+        .onReceive(NotificationCenter.default.publisher(for: .dataContextDidChange)) { _ in
+            startLoad()
+        }
+        // The same, without the context moving: the credential behind the
+        // account was replaced, so the history may now be someone else's.
+        .onReceive(NotificationCenter.default.publisher(for: .accountCredentialDidChange)) { _ in
+            startLoad()
+        }
+        // A status, an account or an instance changing moves reads between the
+        // account and local without the stored context moving at all.
+        .onReceive(NotificationCenter.default.publisher(for: .accountStatusesDidChange)) { _ in
+            reloadIfEffectiveContextMoved()
+        }
+        .onReceive(NotificationCenter.default.publisher(for: .accountsDidChange)) { _ in
+            reloadIfEffectiveContextMoved()
+        }
+        .onReceive(NotificationCenter.default.publisher(for: .instancesDidChange)) { _ in
+            reloadIfEffectiveContextMoved()
+        }
+    }
+
+    // MARK: - Content
+
+    @ViewBuilder
+    private var content: some View {
+        if isLoadingFirstServerPage {
+            ProgressView()
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+        } else if let serverErrorMessage, rows.isEmpty {
+            serverErrorView(serverErrorMessage)
+        } else if filteredRows.isEmpty {
+            // Empty state
+            emptyView
+        } else {
+            // Content based on layout
+            switch layout {
+            case .list:
+                listContent
+            case .grid:
+                gridContent
+            }
         }
     }
 
@@ -261,61 +389,94 @@ struct HistoryListView: View {
         }
     }
 
+    private func serverErrorView(_ message: String) -> some View {
+        ContentUnavailableView {
+            Label(String(localized: "history.remote.load.error"), systemImage: "exclamationmark.triangle")
+        } description: {
+            Text(message)
+        } actions: {
+            Button(String(localized: "common.retry")) {
+                startLoad()
+            }
+            .buttonStyle(.borderedProminent)
+        }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+    }
+
     // MARK: - List Layout
 
     private var listContent: some View {
-        VideoListContainer(listStyle: listStyle, rowStyle: rowStyle) {
-            // Header spacer for top padding
-            Spacer()
-                .frame(height: 16)
-        } content: {
-            ForEach(Array(filteredHistory.enumerated()), id: \.element.videoID) { index, entry in
-                let video = filteredVideos[index]
-                VideoListRow(
-                    isLast: index == filteredHistory.count - 1,
-                    rowStyle: rowStyle,
-                    listStyle: listStyle
-                ) {
-                    entryRowView(entry: entry, index: index)
+        VideoListContainer(
+            listStyle: listStyle,
+            rowStyle: rowStyle,
+            header: {
+                // Header spacer for top padding
+                Spacer()
+                    .frame(height: 16)
+            },
+            content: {
+                ForEach(Array(filteredRows.enumerated()), id: \.element.id) { index, row in
+                    VideoListRow(
+                        isLast: index == filteredRows.count - 1,
+                        rowStyle: rowStyle,
+                        listStyle: listStyle
+                    ) {
+                        entryRowView(row: row, index: index)
+                    }
+                    #if !os(tvOS)
+                    .videoSwipeActions(
+                        video: row.video,
+                        fixedActions: [
+                            SwipeAction(
+                                symbolImage: "trash.fill",
+                                tint: .white,
+                                background: .red
+                            ) { reset in
+                                remove(row)
+                                reset()
+                            }
+                        ]
+                    )
+                    #endif
                 }
-                #if !os(tvOS)
-                .videoSwipeActions(
-                    video: video,
-                    fixedActions: [
-                        SwipeAction(
-                            symbolImage: "trash.fill",
-                            tint: .white,
-                            background: .red
-                        ) { reset in
-                            removeEntry(entry)
-                            reset()
-                        }
-                    ]
-                )
-                #endif
+            },
+            footer: {
+                loadMoreFooter
+            }
+        )
+    }
+
+    /// The trigger that asks for the next page, and the spinner while it is out.
+    ///
+    /// Server mode only — the device's history is read in one go and has no
+    /// second page to ask for.
+    @ViewBuilder
+    private var loadMoreFooter: some View {
+        if case let .server(account) = displayMode {
+            LoadMoreTrigger(isLoading: isLoadingPage, hasMore: hasMorePages) {
+                beginPageLoad(nextPage, account: account)
             }
         }
     }
 
     /// Reusable row view for a history entry.
     @ViewBuilder
-    private func entryRowView(entry: WatchEntry, index: Int) -> some View {
-        let video = filteredVideos[index]
+    private func entryRowView(row: HistoryRow, index: Int) -> some View {
         VideoRowView(
-            video: video,
+            video: row.video,
             style: rowStyle,
-            watchProgress: watchProgress(for: entry),
-            customMetadata: entry.isFinished || entry.isLive ? nil : String(localized: "home.history.remaining \(entry.remainingTime)")
+            watchProgress: row.entry.flatMap { watchProgress(for: $0) },
+            customMetadata: remainingMetadata(for: row)
         )
         .tappableVideo(
-            video,
-            startTime: entry.watchedSeconds,
+            row.video,
+            startTime: row.entry?.watchedSeconds,
             customActions: [
                 VideoContextAction(
                     String(localized: "home.history.remove"),
                     systemImage: "trash",
                     role: .destructive,
-                    action: { removeEntry(entry) }
+                    action: { remove(row) }
                 )
             ],
             context: .history,
@@ -325,39 +486,54 @@ struct HistoryListView: View {
             videoIndex: index,
             loadMoreVideos: loadMoreHistoryCallback
         )
+        .onAppear {
+            hydrateIfNeeded(row)
+        }
+    }
+
+    /// How much of the video is left, when a local entry knows.
+    private func remainingMetadata(for row: HistoryRow) -> String? {
+        guard let entry = row.entry, !entry.isFinished, !entry.isLive else { return nil }
+        return String(localized: "home.history.remaining \(entry.remainingTime)")
     }
 
     // MARK: - Grid Layout
 
     private var gridContent: some View {
         ScrollView {
-            VideoGridContent(columns: gridConfig.effectiveColumns) {
-                ForEach(Array(filteredHistory.enumerated()), id: \.element.videoID) { index, entry in
-                    let video = filteredVideos[index]
-                    VideoCardView(
-                        video: video,
-                        watchProgress: watchProgress(for: entry),
-                        isCompact: gridConfig.isCompactCards
-                    )
-                    .tappableVideo(
-                        video,
-                        startTime: entry.watchedSeconds,
-                        customActions: [
-                            VideoContextAction(
-                                String(localized: "home.history.remove"),
-                                systemImage: "trash",
-                                role: .destructive,
-                                action: { removeEntry(entry) }
-                            )
-                        ],
-                        context: .history,
-                        queueSource: historyQueueSource,
-                        sourceLabel: String(localized: "queue.source.history"),
-                        videoList: filteredVideos,
-                        videoIndex: index,
-                        loadMoreVideos: loadMoreHistoryCallback
-                    )
+            VStack(spacing: 0) {
+                VideoGridContent(columns: gridConfig.effectiveColumns) {
+                    ForEach(Array(filteredRows.enumerated()), id: \.element.id) { index, row in
+                        VideoCardView(
+                            video: row.video,
+                            watchProgress: row.entry.flatMap { watchProgress(for: $0) },
+                            isCompact: gridConfig.isCompactCards
+                        )
+                        .tappableVideo(
+                            row.video,
+                            startTime: row.entry?.watchedSeconds,
+                            customActions: [
+                                VideoContextAction(
+                                    String(localized: "home.history.remove"),
+                                    systemImage: "trash",
+                                    role: .destructive,
+                                    action: { remove(row) }
+                                )
+                            ],
+                            context: .history,
+                            queueSource: historyQueueSource,
+                            sourceLabel: String(localized: "queue.source.history"),
+                            videoList: filteredVideos,
+                            videoIndex: index,
+                            loadMoreVideos: loadMoreHistoryCallback
+                        )
+                        .onAppear {
+                            hydrateIfNeeded(row)
+                        }
+                    }
                 }
+
+                loadMoreFooter
             }
         }
         #if os(tvOS)
@@ -377,14 +553,258 @@ struct HistoryListView: View {
         return String(localized: "home.history.clear.confirm.timeRange \(option.localizedTitle)")
     }
 
-    private func loadHistory() {
-        history = dataManager?.watchHistory(limit: 10000) ?? []
-        videos = history.map { $0.toVideo() }  // Pre-compute all Video conversions once
+    // MARK: - Loading
+
+    private func startLoad() {
+        loadTask?.cancel()
+        loadTask = nil
+
+        guard let account = beginLoad() else { return }
+        beginPageLoad(1, account: account)
     }
 
-    private func removeEntry(_ entry: WatchEntry) {
-        dataManager?.removeFromHistory(videoID: entry.videoID)
-        loadHistory()
+    private func reloadIfEffectiveContextMoved() {
+        guard appEnvironment?.dataContextValidator.effectiveContext != loadedContext else { return }
+        startLoad()
+    }
+
+    /// Records which history the rows belong to and reads the local one when
+    /// that is what is being shown, returning the account whose pages still have
+    /// to be fetched.
+    ///
+    /// Local data is read synchronously and stays that way: an await before it
+    /// would put the empty state on screen for a frame every time this view
+    /// appears.
+    private func beginLoad() -> Account? {
+        guard let appEnvironment else { return nil }
+
+        // Recorded on every load, not only on a context change: the first load
+        // of a session has to establish what is on screen, or the first status
+        // change would look like a move and reload for nothing.
+        loadedContext = appEnvironment.dataContextValidator.effectiveContext
+        loadGeneration += 1
+        serverErrorMessage = nil
+        isLoadingPage = false
+        hydrationAttempted.removeAll()
+        nextPage = 1
+
+        guard case let .server(account) = displayMode else {
+            hasMorePages = false
+            loadHistory()
+            return nil
+        }
+
+        setRows([])
+        hasMorePages = true
+        return account
+    }
+
+    /// Starts one page fetch, marking the load as in flight before the task is
+    /// even scheduled.
+    ///
+    /// The flag has to be set here rather than inside the task: the trigger at
+    /// the end of the list can appear twice before a task body first runs, and
+    /// both would ask for the same page.
+    private func beginPageLoad(_ page: Int, account: Account) {
+        guard !isLoadingPage else { return }
+
+        isLoadingPage = true
+        let generation = loadGeneration
+        loadTask = Task { await loadPage(page, account: account, generation: generation) }
+    }
+
+    private func loadPage(_ page: Int, account: Account, generation: Int) async {
+        guard let appEnvironment else { return }
+
+        defer {
+            if generation == loadGeneration {
+                isLoadingPage = false
+            }
+        }
+
+        do {
+            let ids = try await appEnvironment.accountService.watchHistory(
+                page: page,
+                maxResults: Self.serverPageSize,
+                for: account
+            )
+
+            guard generation == loadGeneration else { return }
+
+            append(ids)
+            nextPage = page + 1
+            // A page the server could not fill is the last one there is; so is
+            // an empty one, which is what asking past the end returns.
+            hasMorePages = ids.count >= Self.serverPageSize
+        } catch is CancellationError {
+            // Another load is taking over — it owns the state now.
+        } catch let error as APIError where error == .cancelled {
+            // The same, one layer down.
+        } catch {
+            guard generation == loadGeneration else { return }
+            hasMorePages = false
+            serverErrorMessage = error.localizedDescription
+        }
+    }
+
+    /// Appends a page of server IDs, in the order the server gave them.
+    ///
+    /// Never re-sorted: the server's order *is* the history, newest first, and
+    /// the local entries some of these rows have were written at times that say
+    /// nothing about when the account watched them.
+    private func append(_ ids: [String]) {
+        var known = Set(rows.map(\.videoID))
+        var appended: [HistoryRow] = []
+
+        for id in ids where !known.contains(id) {
+            known.insert(id)
+            appended.append(makeRow(id: id))
+        }
+
+        guard !appended.isEmpty else { return }
+
+        rows.append(contentsOf: appended)
+        rowVideos.append(contentsOf: appended.map(\.video))
+    }
+
+    /// A row for one server-side ID, from local data where there is some.
+    ///
+    /// A video watched on this device is already known — title, thumbnail,
+    /// progress and all — so the row is complete before anything is fetched.
+    /// Everything else starts as a placeholder and is filled in as it appears.
+    private func makeRow(id: String) -> HistoryRow {
+        if let entry = dataManager?.watchEntry(for: id) {
+            return HistoryRow(videoID: id, video: entry.toVideo(), entry: entry, isHydrated: true)
+        }
+
+        return HistoryRow(videoID: id, video: Self.placeholder(for: id), entry: nil, isHydrated: false)
+    }
+
+    /// The row a server ID stands as until its metadata arrives — or instead of
+    /// it, when the fetch fails.
+    ///
+    /// The entry is never dropped for want of a title: the account watched this
+    /// video, and a history missing rows it cannot describe is a wrong history.
+    private static func placeholder(for videoID: String) -> Video {
+        Video(
+            id: .global(videoID),
+            title: videoID,
+            description: nil,
+            author: Author(id: "", name: ""),
+            duration: 0,
+            publishedAt: nil,
+            publishedText: nil,
+            viewCount: nil,
+            likeCount: nil,
+            thumbnails: [],
+            isLive: false,
+            isUpcoming: false,
+            scheduledStartTime: nil
+        )
+    }
+
+    // MARK: - Hydration
+
+    private func hydrateIfNeeded(_ row: HistoryRow) {
+        guard case let .server(account) = displayMode else { return }
+        hydrate(row, account: account)
+    }
+
+    /// Fetches one row's metadata, as the row appears.
+    ///
+    /// Through the account's own instance: every ID the server returns is a
+    /// YouTube ID, and the account's instance is the one that has it.
+    private func hydrate(_ row: HistoryRow, account: Account) {
+        guard !row.isHydrated,
+              !hydrationAttempted.contains(row.videoID),
+              let appEnvironment,
+              let instance = appEnvironment.accountsManager.instance(for: account)
+        else { return }
+
+        hydrationAttempted.insert(row.videoID)
+
+        let videoID = row.videoID
+        let generation = loadGeneration
+
+        Task {
+            do {
+                let video = try await appEnvironment.contentService.video(id: videoID, instance: instance)
+                guard generation == loadGeneration else { return }
+                apply(video, to: videoID)
+            } catch {
+                // The row keeps its placeholder. A video the account watched is
+                // part of its history whether or not this instance can describe
+                // it right now.
+            }
+        }
+    }
+
+    private func apply(_ video: Video, to videoID: String) {
+        guard let index = rows.firstIndex(where: { $0.videoID == videoID }) else { return }
+
+        rows[index].video = video
+        rows[index].isHydrated = true
+
+        if rowVideos.indices.contains(index) {
+            rowVideos[index] = video
+        }
+    }
+
+    // MARK: - Reading
+
+    private func loadHistory() {
+        let entries = dataManager?.watchHistory(limit: 10000) ?? []
+        setRows(entries.map { HistoryRow(videoID: $0.videoID, video: $0.toVideo(), entry: $0, isHydrated: true) })
+    }
+
+    private func setRows(_ newRows: [HistoryRow]) {
+        rows = newRows
+        rowVideos = newRows.map(\.video)
+    }
+
+    // MARK: - Removing
+
+    private func remove(_ row: HistoryRow) {
+        switch displayMode {
+        case .local:
+            dataManager?.removeFromHistory(videoID: row.videoID)
+            loadHistory()
+
+        case let .server(account):
+            removeFromServer(row.videoID, account: account)
+        }
+    }
+
+    /// Removes one video from the account's server history, and from the rows.
+    ///
+    /// The server's history only — the local ``WatchEntry`` behind the row, if
+    /// there is one, is the device's own record and is cleared from the local
+    /// history view.
+    private func removeFromServer(_ videoID: String, account: Account) {
+        guard let appEnvironment else { return }
+
+        let generation = loadGeneration
+
+        Task {
+            do {
+                try await appEnvironment.accountService.removeFromWatchHistory(videoID: videoID, for: account)
+
+                // The rows may belong to another account by now; the removal
+                // still happened, but this list is not the one to take it out of.
+                guard generation == loadGeneration else { return }
+                removeRow(videoID)
+            } catch {
+                appEnvironment.toastManager.showError(
+                    String(localized: "history.remote.delete.error"),
+                    subtitle: error.localizedDescription
+                )
+            }
+        }
+    }
+
+    private func removeRow(_ videoID: String) {
+        rows.removeAll { $0.videoID == videoID }
+        rowVideos = rows.map(\.video)
     }
 
     private func clearHistory() {

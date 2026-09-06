@@ -3896,6 +3896,28 @@
         }
       }
     },
+    "history.remote.delete.error" : {
+      "comment" : "Removing a video from the account's server-side history failed",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Could not remove from history"
+          }
+        }
+      }
+    },
+    "history.remote.load.error" : {
+      "comment" : "Loading the account's server-side history failed",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Could not load history"
+          }
+        }
+      }
+    },
     "history.search.placeholder" : {
       "localizations" : {
         "en" : {
@@ -14783,6 +14805,17 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Visibility"
+          }
+        }
+      }
+    },
+    "settings.privacy.history.account.footer %@" : {
+      "comment" : "Footer telling the user watched videos are mirrored to the selected account's server history",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Watched videos are also recorded to the history of %@ on its server. Turning off Save Watch History, or using Incognito, stops both."
           }
         }
       }
