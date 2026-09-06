@@ -3196,6 +3196,19 @@ extension PlayerService: PlayerBackendDelegate {
 
         state.setPlaybackState(.ended)
         saveProgressAsCompleted()
+
+        // The watch is over, so the session ends with it — after the completion
+        // save, which is the last progress this session has to mirror. A
+        // finished watch's session must not be left standing to absorb a future
+        // watch of the same video: the next load of it would otherwise reach
+        // `beginSessionIfNeeded`, recognise the video, keep the already-posted
+        // session and never mirror the second watch. Every way a finished video
+        // is played again on purpose starts a session of its own —
+        // `replayCurrentVideo()` explicitly, any other load through
+        // `beginSessionIfNeeded`. Ending the session does not touch a post
+        // already in flight.
+        watchHistorySyncService?.endSession()
+
         delegate?.playerServiceDidFinishPlaying(self)
 
         // Repeat one: restart immediately - no countdown, independent of queue contents

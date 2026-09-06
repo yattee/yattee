@@ -938,6 +938,12 @@ struct HistoryListView: View {
                 // The rows may belong to another account by now; the removal
                 // still happened, but this list is not the one to take it out of.
                 guard generation == loadGeneration else { return }
+
+                // Accepted: a watch finishing at the same moment can post this
+                // same video after the server took the delete, and this
+                // completion — arriving later than the order the server saw —
+                // then takes out a row the server still has. The list is wrong
+                // only until the next load reads the account's history again.
                 removeRow(videoID)
             } catch {
                 appEnvironment.toastManager.showError(
