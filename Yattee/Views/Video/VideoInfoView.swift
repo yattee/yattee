@@ -883,7 +883,13 @@ struct VideoInfoView: View {
                             // Prefer freshly loaded details for thumbnail (so expired proxy URLs get replaced) and avatar.
                             // Keep `video` as the card's stable identity so title/channel don't flicker.
                             let detailedVideo = loadedVideoDetails[video.id.videoID]
-                            videoCard(for: video, thumbnailFrom: detailedVideo, authorFrom: detailedVideo, isLoadingMore: isLoadingMoreVideos && isCurrent, showTitle: true, isCurrent: isCurrent)
+                            // Unless the list never had a title to keep: a row
+                            // from an account's server history arrives as its
+                            // own video ID, and holding on to that would leave
+                            // the card named after a string of characters under
+                            // the real channel and description.
+                            let titleVideo = video.hasPlaceholderTitle ? (detailedVideo ?? video) : video
+                            videoCard(for: titleVideo, thumbnailFrom: detailedVideo, authorFrom: detailedVideo, isLoadingMore: isLoadingMoreVideos && isCurrent, showTitle: true, isCurrent: isCurrent)
                                 .opacity(isCurrent ? 1.0 : peekOpacity)
                                 .containerRelativeFrame(.horizontal)
                                 .id(index)

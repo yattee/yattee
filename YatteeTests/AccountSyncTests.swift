@@ -691,7 +691,7 @@ struct AccountSyncTests {
 
     @Test("A repair made mid-batch is never uploaded over the server's older context")
     func repairIsNotPublishedForAStaleServerContext() async {
-        let instances = InstancesManager()
+        let instances = makeTestInstancesManager()
         let instance = Instance(type: .invidious, url: URL(string: "https://inv-\(UUID().uuidString).example.com")!)
         instances.add(instance)
         defer { instances.remove(instance) }
@@ -732,7 +732,7 @@ struct AccountSyncTests {
 
     @Test("An account discarded for its tombstone still repairs the context")
     func discardedAccountKeepsItsInstance() async {
-        let instances = InstancesManager()
+        let instances = makeTestInstancesManager()
         let instance = Instance(type: .invidious, url: URL(string: "https://inv-\(UUID().uuidString).example.com")!)
         instances.add(instance)
         defer { instances.remove(instance) }
@@ -765,7 +765,7 @@ struct AccountSyncTests {
 
     @Test("A context fetched ahead of the records it depends on is still applied last")
     func stagedContextIsAppliedAfterTheAccountRecords() async {
-        let instances = InstancesManager()
+        let instances = makeTestInstancesManager()
         let instance = Instance(type: .invidious, url: URL(string: "https://inv-\(UUID().uuidString).example.com")!)
         instances.add(instance)
         defer { instances.remove(instance) }

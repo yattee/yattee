@@ -35,7 +35,7 @@ private final class WatchHistorySyncHarness {
     var credentials: [UUID: String] = [:]
 
     init(type: InstanceType = .invidious) {
-        instances = InstancesManager()
+        instances = makeTestInstancesManager()
         instance = Instance(
             type: type,
             url: URL(string: "https://history-\(UUID().uuidString).example.com")!,

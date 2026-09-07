@@ -406,7 +406,7 @@ struct AccountsManagerTests {
     @Test("An unresolved identity never migrates a legacy login")
     func unresolvedIdentityDoesNotMigrate() {
         let defaults = makeDefaults()
-        let instances = InstancesManager()
+        let instances = makeTestInstancesManager()
         let instance = makeLegacyInstance()
         instances.add(instance)
         defer { instances.remove(instance) }
@@ -438,7 +438,7 @@ struct AccountsManagerTests {
     @Test("A scope that dips to unresolved and returns writes nothing in between")
     func scopeRoundTripLeavesTheUnresolvedNamespaceEmpty() async throws {
         let defaults = makeDefaults()
-        let instances = InstancesManager()
+        let instances = makeTestInstancesManager()
         let instance = makeLegacyInstance()
         instances.add(instance)
         defer { instances.remove(instance) }
@@ -570,7 +570,7 @@ struct DataContextValidatorTests {
 
     @Test("A switched-off instance makes its context unavailable, not removed")
     func disabledInstanceIsUnavailable() {
-        let instances = InstancesManager()
+        let instances = makeTestInstancesManager()
         var instance = Instance(type: .invidious, url: URL(string: "https://inv.example.com")!)
         instances.add(instance)
 
@@ -598,7 +598,7 @@ struct DataContextValidatorTests {
 
     @Test("Only a deletion the app can point at moves the context")
     func correctionRequiresATombstone() {
-        let instances = InstancesManager()
+        let instances = makeTestInstancesManager()
         var instance = Instance(type: .invidious, url: URL(string: "https://inv-correct.example.com")!)
         instances.add(instance)
         defer { instances.remove(instance) }
@@ -639,7 +639,7 @@ struct DataContextValidatorTests {
 
     @Test("A tombstoned selection is repaired without being published")
     func correctionFollowsTheTombstone() {
-        let instances = InstancesManager()
+        let instances = makeTestInstancesManager()
         let instance = Instance(type: .invidious, url: URL(string: "https://inv-tombstone.example.com")!)
         instances.add(instance)
         defer { instances.remove(instance) }
@@ -668,7 +668,7 @@ struct DataContextValidatorTests {
 
     @Test("Nothing is repaired while the namespace is reloading")
     func correctionIsFencedToTheLoadedNamespace() {
-        let instances = InstancesManager()
+        let instances = makeTestInstancesManager()
         let instance = Instance(type: .invidious, url: URL(string: "https://inv-reload.example.com")!)
         instances.add(instance)
         defer { instances.remove(instance) }
@@ -715,7 +715,7 @@ struct DataContextValidatorTests {
 
     @Test("Only accounts the app can actually resolve are offered")
     func availableContextsAreFiltered() {
-        let instances = InstancesManager()
+        let instances = makeTestInstancesManager()
         let enabled = Instance(type: .invidious, url: URL(string: "https://inv-a.example.com")!)
         let disabled = Instance(type: .invidious, url: URL(string: "https://inv-b.example.com")!, isEnabled: false)
         // No account concept on PeerTube, so a context there could never be
@@ -756,7 +756,7 @@ struct DataContextRepairTests {
 
     @Test("Deleting the selected account falls back to a signed-in sibling")
     func deletionPrefersSignedInSibling() {
-        let instances = InstancesManager()
+        let instances = makeTestInstancesManager()
         let instance = makeInstance("inv")
         instances.add(instance)
         defer { instances.remove(instance) }
@@ -779,7 +779,7 @@ struct DataContextRepairTests {
 
     @Test("Without a signed-in sibling the repair lands on local")
     func deletionWithoutSiblingFallsBackToLocal() {
-        let instances = InstancesManager()
+        let instances = makeTestInstancesManager()
         let instance = makeInstance("inv")
         instances.add(instance)
         defer { instances.remove(instance) }
@@ -800,7 +800,7 @@ struct DataContextRepairTests {
 
     @Test("A repair made while a sibling was still being checked never comes back")
     func repairIsNotReconsideredWhenStatusesSettle() {
-        let instances = InstancesManager()
+        let instances = makeTestInstancesManager()
         let instance = makeInstance("inv")
         instances.add(instance)
         defer { instances.remove(instance) }
@@ -829,7 +829,7 @@ struct DataContextRepairTests {
 
     @Test("A signed-in account on another server is never the repair")
     func repairNeverCrossesInstances() {
-        let instances = InstancesManager()
+        let instances = makeTestInstancesManager()
         let first = makeInstance("inv-first")
         let second = makeInstance("inv-second")
         instances.add(first)
@@ -852,7 +852,7 @@ struct DataContextRepairTests {
 
     @Test("A synced context naming a deleted account repairs to its sibling")
     func syncedTombstoneRepairPrefersSibling() {
-        let instances = InstancesManager()
+        let instances = makeTestInstancesManager()
         let instance = makeInstance("inv")
         instances.add(instance)
         defer { instances.remove(instance) }
@@ -878,7 +878,7 @@ struct DataContextRepairTests {
 
     @Test("A synced context for a deleted account with no sibling lands on local")
     func syncedTombstoneRepairFallsBackToLocal() {
-        let instances = InstancesManager()
+        let instances = makeTestInstancesManager()
         let instance = makeInstance("inv")
         instances.add(instance)
         defer { instances.remove(instance) }
@@ -900,7 +900,7 @@ struct DataContextRepairTests {
 
     @Test("Adopting a repaired synced context drops what the replaced choice owed")
     func syncedTombstoneRepairIsNeverPublished() {
-        let instances = InstancesManager()
+        let instances = makeTestInstancesManager()
         let instance = makeInstance("inv")
         instances.add(instance)
         defer { instances.remove(instance) }
@@ -929,7 +929,7 @@ struct DataContextRepairTests {
 
     @Test("A local choice that outranks a repair keeps its upload")
     func repairThatLosesLeavesTheChoiceDirty() {
-        let instances = InstancesManager()
+        let instances = makeTestInstancesManager()
         let instance = makeInstance("inv")
         instances.add(instance)
         defer { instances.remove(instance) }
@@ -956,7 +956,7 @@ struct DataContextRepairTests {
 
     @Test("A repair is never pushed back over the server's older context")
     func repairIsNeverPushedBackOverAnOlderContext() {
-        let instances = InstancesManager()
+        let instances = makeTestInstancesManager()
         let instance = makeInstance("inv")
         instances.add(instance)
         defer { instances.remove(instance) }
@@ -1002,7 +1002,7 @@ struct DataContextRepairTests {
 
     @Test("A repair read back from disk still yields rather than publishing")
     func reloadedRepairStillYieldsToTheServersContext() {
-        let instances = InstancesManager()
+        let instances = makeTestInstancesManager()
         let instance = makeInstance("inv")
         instances.add(instance)
         defer { instances.remove(instance) }
@@ -1035,7 +1035,7 @@ struct DataContextRepairTests {
 
     @Test("A repair yields to an explicit context it ties with")
     func repairYieldsToAnExplicitContextOnATie() {
-        let instances = InstancesManager()
+        let instances = makeTestInstancesManager()
         let instance = makeInstance("inv")
         instances.add(instance)
         defer { instances.remove(instance) }
@@ -1064,7 +1064,7 @@ struct DataContextRepairTests {
 
     @Test("A repair yields to an older context naming an account that is still there")
     func repairYieldsToAnOlderContextNamingALiveAccount() {
-        let instances = InstancesManager()
+        let instances = makeTestInstancesManager()
         let instance = makeInstance("inv")
         instances.add(instance)
         defer { instances.remove(instance) }
@@ -1096,7 +1096,7 @@ struct DataContextRepairTests {
 
     @Test("An older context naming the deleted account repairs again rather than landing on it")
     func repairYieldsToAnOlderContextNamingTheDeletedAccount() {
-        let instances = InstancesManager()
+        let instances = makeTestInstancesManager()
         let instance = makeInstance("inv")
         instances.add(instance)
         defer { instances.remove(instance) }
@@ -1130,7 +1130,7 @@ struct DataContextRepairTests {
 
     @Test("A repair recomputes statuses before it picks a sibling")
     func repairRefreshesStatusesBeforeChoosing() {
-        let instances = InstancesManager()
+        let instances = makeTestInstancesManager()
         let instance = makeInstance("inv")
         instances.add(instance)
         defer { instances.remove(instance) }
@@ -1160,7 +1160,7 @@ struct DataContextRepairTests {
 
     @Test("An account dominated by a tombstone still says where it lived")
     func discardedAccountKeepsItsInstanceForRepair() {
-        let instances = InstancesManager()
+        let instances = makeTestInstancesManager()
         let instance = makeInstance("inv")
         instances.add(instance)
         defer { instances.remove(instance) }

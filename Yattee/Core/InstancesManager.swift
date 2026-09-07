@@ -26,7 +26,7 @@ enum InstanceStatus: Equatable {
 final class InstancesManager {
     // MARK: - Storage
 
-    private let localDefaults = UserDefaults.standard
+    private let localDefaults: UserDefaults
     private let ubiquitousStore = NSUbiquitousKeyValueStore.default
     private let instancesKey = "configuredInstances"
     private let activeInstanceKey = "activeInstanceID"
@@ -45,8 +45,13 @@ final class InstancesManager {
 
     // MARK: - Initialization
 
-    init(settingsManager: SettingsManager? = nil) {
+    /// - Parameter defaults: where the configured instances are read and
+    ///   written. The app's own defaults, except under test: a manager built on
+    ///   the shared ones edits the list the app on that device is using, which
+    ///   is how test fixtures ended up in it.
+    init(settingsManager: SettingsManager? = nil, defaults: UserDefaults = .standard) {
         self.settingsManager = settingsManager
+        self.localDefaults = defaults
 
         loadInstances()
         loadActiveInstance()

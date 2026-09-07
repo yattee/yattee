@@ -147,3 +147,15 @@ struct InstanceIdentityTests {
         #expect(instance.id == originalID)
     }
 }
+
+// MARK: - Test Support
+
+/// An instances manager with defaults of its own.
+///
+/// `InstancesManager()` reads and writes `UserDefaults.standard`, which under a
+/// test host is the app's own container: an instance a fixture adds becomes one
+/// the app on that device is configured with, and it stays there after the run.
+@MainActor
+func makeTestInstancesManager() -> InstancesManager {
+    InstancesManager(defaults: UserDefaults(suiteName: "yattee.tests.instances.\(UUID().uuidString)")!)
+}

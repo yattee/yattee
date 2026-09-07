@@ -277,7 +277,7 @@ private final class AccountServiceHarness {
     var credentialSwapOnNextRead: String?
 
     init(type: InstanceType = .invidious, isEnabled: Bool = true) {
-        instances = InstancesManager()
+        instances = makeTestInstancesManager()
         instance = Instance(
             type: type,
             url: URL(string: "https://accounts-\(UUID().uuidString).example.com")!,

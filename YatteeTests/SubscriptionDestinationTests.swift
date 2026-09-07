@@ -117,7 +117,7 @@ struct SubscriptionDestinationRoutingTests {
     }
 
     private func makeFixture() throws -> Fixture {
-        let instances = InstancesManager()
+        let instances = makeTestInstancesManager()
         let made = (0 ..< 2).map { index in
             Instance(
                 type: .invidious,

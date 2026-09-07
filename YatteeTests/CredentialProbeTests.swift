@@ -47,7 +47,7 @@ private final class ProbeHarness {
         cooldown: TimeInterval = 0,
         unreachableRetryInterval: TimeInterval = 60
     ) {
-        instances = InstancesManager()
+        instances = makeTestInstancesManager()
         instance = Instance(
             type: type,
             url: URL(string: "https://probe-\(UUID().uuidString).example.com")!,

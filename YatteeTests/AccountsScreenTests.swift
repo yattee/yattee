@@ -30,7 +30,7 @@ struct OrphanedAccountRemovalTests {
     @Test("An account outlives its source, and knows nothing about it")
     func orphanHasNothingToResolveThrough() {
         let scope = makeScope()
-        let instances = InstancesManager()
+        let instances = makeTestInstancesManager()
         let instance = makeInstance(.invidious)
         instances.add(instance)
 
@@ -59,7 +59,7 @@ struct OrphanedAccountRemovalTests {
         let invidious = InvidiousCredentialsManager(identityScope: scope)
         let piped = PipedCredentialsManager(identityScope: scope)
 
-        let instances = InstancesManager()
+        let instances = makeTestInstancesManager()
         let instance = makeInstance(.invidious)
         instances.add(instance)
 
@@ -96,7 +96,7 @@ struct OrphanedAccountRemovalTests {
         let invidious = InvidiousCredentialsManager(identityScope: scope)
         let piped = PipedCredentialsManager(identityScope: scope)
 
-        let instances = InstancesManager()
+        let instances = makeTestInstancesManager()
         let instance = makeInstance(.piped)
         instances.add(instance)
 
@@ -126,7 +126,7 @@ struct OrphanedAccountRemovalTests {
     @Test("A deletion queued for the server survives the removal")
     func removalQueuesTheTombstone() {
         let scope = makeScope()
-        let instances = InstancesManager()
+        let instances = makeTestInstancesManager()
         let instance = makeInstance(.invidious)
         instances.add(instance)
 
@@ -155,7 +155,7 @@ struct OrphanedAccountRemovalTests {
     @Test("The deletion is durable before the secret is destroyed")
     func removalRecordsTheTombstoneFirst() {
         let scope = makeScope()
-        let instances = InstancesManager()
+        let instances = makeTestInstancesManager()
         let instance = makeInstance(.invidious)
         instances.add(instance)
 
@@ -186,7 +186,7 @@ struct OrphanedAccountRemovalTests {
         let scope = makeScope()
         let invidious = InvidiousCredentialsManager(identityScope: scope)
 
-        let instances = InstancesManager()
+        let instances = makeTestInstancesManager()
         let instance = makeInstance(.invidious)
         instances.add(instance)
 

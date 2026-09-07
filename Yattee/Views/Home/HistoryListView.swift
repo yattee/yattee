@@ -72,6 +72,26 @@ struct HistoryListView: View {
     @State private var hydrationTasks: [String: Task<Void, Never>] = [:]
     /// The rows waiting for a fetch slot, in the order they asked for one.
     @State private var hydrationQueue: [String] = []
+    /// Every row that has asked for metadata and has not been given any.
+    ///
+    /// Unlike ``hydrationAttempted`` this survives a reload, and it is what a
+    /// reload owes a fetch to afterwards: the work it cancelled would otherwise
+    /// be nobody's to start again.
+    @State private var hydrationPending: Set<String> = []
+    /// The rows on screen right now.
+    ///
+    /// A row asks for its metadata as it appears, and that is the only moment
+    /// it asks — so an appearance that lands while the account's history is not
+    /// what the screen is reading (a status still settling, an instance not yet
+    /// arrived) asks for nothing, and nothing would ever ask again. Remembering
+    /// what is on screen lets the next load make good on it.
+    @State private var visibleRowIDs: Set<String> = []
+    /// Which set of fetches the slots belong to.
+    ///
+    /// Bumped whenever the in-flight fetches are dropped, so a task from before
+    /// that cannot free a slot the load after it has since given to a fetch of
+    /// the same video.
+    @State private var hydrationEpoch = 0
 
     /// How many IDs one page of server history asks for.
     private static let serverPageSize = 60
@@ -361,8 +381,15 @@ struct HistoryListView: View {
         }
         // Selecting another account — or local — changes whose history this is,
         // and the previous rows may not be shown for a moment longer.
+        //
+        // Compared rather than taken on trust: the selection is announced by
+        // more than the switcher — a repair, an arriving sync, the first
+        // resolution of the stored choice — and most of those settle on the
+        // context that is already on screen. Reloading for one of those would
+        // throw away rows and half-finished metadata to fetch the same history
+        // again.
         .onReceive(NotificationCenter.default.publisher(for: .dataContextDidChange)) { _ in
-            startLoad()
+            reloadIfEffectiveContextMoved()
         }
         // The same, without the context moving: the credential behind the
         // account was replaced, so the history may now be someone else's.
@@ -531,7 +558,10 @@ struct HistoryListView: View {
             loadMoreVideos: loadMoreHistoryCallback
         )
         .onAppear {
-            hydrateIfNeeded(row)
+            rowDidAppear(row)
+        }
+        .onDisappear {
+            visibleRowIDs.remove(row.videoID)
         }
     }
 
@@ -572,7 +602,10 @@ struct HistoryListView: View {
                             loadMoreVideos: loadMoreHistoryCallback
                         )
                         .onAppear {
-                            hydrateIfNeeded(row)
+                            rowDidAppear(row)
+                        }
+                        .onDisappear {
+                            visibleRowIDs.remove(row.videoID)
                         }
                     }
                 }
@@ -626,12 +659,23 @@ struct HistoryListView: View {
         // Recorded on every load, not only on a context change: the first load
         // of a session has to establish what is on screen, or the first status
         // change would look like a move and reload for nothing.
-        loadedContext = appEnvironment.dataContextValidator.effectiveContext
+        let context = appEnvironment.dataContextValidator.effectiveContext
+        let movedContext = loadedContext != nil && loadedContext != context
+
+        loadedContext = context
         loadGeneration += 1
         serverErrorMessage = nil
         isLoadingPage = false
         hydrationAttempted.removeAll()
         pageFloor = 1
+
+        // What the rows are owed, and which of them are on screen, only means
+        // anything while they are the same rows. Another history's IDs would
+        // never match a row again.
+        if movedContext {
+            hydrationPending.removeAll()
+            visibleRowIDs.removeAll()
+        }
 
         guard case let .server(account) = displayMode else {
             hasMorePages = false
@@ -693,6 +737,12 @@ struct HistoryListView: View {
             // view — which, being filtered out, they never are.
             if !searchText.isEmpty {
                 hydrateAllLoaded(account: account)
+            } else {
+                // Rows that were already asking for metadata when this load
+                // replaced them. They are back, unchanged and still without a
+                // title, and nothing is going to announce their appearance a
+                // second time.
+                resumeHydration(account: account)
             }
         } catch is CancellationError {
             // Another load is taking over — it owns the state now.
@@ -738,35 +788,18 @@ struct HistoryListView: View {
             return HistoryRow(videoID: id, video: entry.toVideo(), entry: entry, isHydrated: true)
         }
 
-        return HistoryRow(videoID: id, video: Self.placeholder(for: id), entry: nil, isHydrated: false)
-    }
-
-    /// The row a server ID stands as until its metadata arrives — or instead of
-    /// it, when the fetch fails.
-    ///
-    /// The entry is never dropped for want of a title: the account watched this
-    /// video, and a history missing rows it cannot describe is a wrong history.
-    private static func placeholder(for videoID: String) -> Video {
-        Video(
-            id: .global(videoID),
-            title: videoID,
-            description: nil,
-            author: Author(id: "", name: ""),
-            duration: 0,
-            publishedAt: nil,
-            publishedText: nil,
-            viewCount: nil,
-            likeCount: nil,
-            thumbnails: [],
-            isLive: false,
-            isUpcoming: false,
-            scheduledStartTime: nil
-        )
+        // The entry is never dropped for want of a title: the account watched
+        // this video, and a history missing rows it cannot describe is a wrong
+        // history.
+        return HistoryRow(videoID: id, video: .metadataPlaceholder(for: id), entry: nil, isHydrated: false)
     }
 
     // MARK: - Hydration
 
-    private func hydrateIfNeeded(_ row: HistoryRow) {
+    /// A row came on screen: it is noted as visible, and asks for its metadata.
+    private func rowDidAppear(_ row: HistoryRow) {
+        visibleRowIDs.insert(row.videoID)
+
         guard case let .server(account) = displayMode else { return }
         hydrate(row, account: account)
     }
@@ -784,6 +817,21 @@ struct HistoryListView: View {
         }
     }
 
+    /// Makes good on the rows a load left without metadata.
+    ///
+    /// The ones whose fetch the reload cancelled, and the ones on screen that
+    /// never got to ask — a row appearing is the only thing that asks, and an
+    /// appearance during a moment when this was not the account's history at
+    /// all asks for nothing. Bounded by what has actually been looked at, and
+    /// each row is still only ever fetched once per load.
+    private func resumeHydration(account: Account) {
+        for row in rows
+        where !row.isHydrated
+            && (hydrationPending.contains(row.videoID) || visibleRowIDs.contains(row.videoID)) {
+            hydrate(row, account: account)
+        }
+    }
+
     /// Asks for one row's metadata, as the row appears.
     ///
     /// The request itself waits its turn: the row joins the queue, and the
@@ -796,6 +844,7 @@ struct HistoryListView: View {
         else { return }
 
         hydrationAttempted.insert(row.videoID)
+        hydrationPending.insert(row.videoID)
         hydrationQueue.append(row.videoID)
         pumpHydration(account: account)
     }
@@ -809,7 +858,8 @@ struct HistoryListView: View {
               let instance = appEnvironment.accountsManager.instance(for: account)
         else { return }
 
-        let generation = loadGeneration
+        let epoch = hydrationEpoch
+        let accountID = account.id
 
         while hydrationTasks.count < Self.hydrationConcurrency, !hydrationQueue.isEmpty {
             let videoID = hydrationQueue.removeFirst()
@@ -817,8 +867,13 @@ struct HistoryListView: View {
             hydrationTasks[videoID] = Task {
                 do {
                     let video = try await appEnvironment.contentService.video(id: videoID, instance: instance)
-                    guard generation == loadGeneration else { return }
-                    apply(video, to: videoID)
+                    // Whose history this describes is what decides whether it
+                    // may be shown — not which load asked for it. A reload of
+                    // the same account puts the same rows back, and metadata
+                    // fetched for one of them is still that row's metadata.
+                    if isShowing(accountID: accountID) {
+                        apply(video, to: videoID)
+                    }
                 } catch {
                     // The row keeps its placeholder. A video the account watched
                     // is part of its history whether or not this instance can
@@ -826,14 +881,20 @@ struct HistoryListView: View {
                 }
 
                 // A finished fetch frees its slot for the next row — but only
-                // for the load it belongs to. A later one has already emptied
-                // this queue and started its own, and giving back a slot there
-                // would drop a task that is still running.
-                guard generation == loadGeneration else { return }
+                // among the fetches it started with. A later set has already
+                // emptied this queue and started its own, and giving back a
+                // slot there would drop a task that is still running.
+                guard epoch == hydrationEpoch else { return }
                 hydrationTasks[videoID] = nil
                 pumpHydration(account: account)
             }
         }
+    }
+
+    /// Whether the rows on screen are still that account's history.
+    private func isShowing(accountID: UUID) -> Bool {
+        guard case let .server(account) = displayMode else { return false }
+        return account.id == accountID
     }
 
     /// Drops everything the current load was still going to fetch, and stops
@@ -845,9 +906,12 @@ struct HistoryListView: View {
 
         hydrationTasks.removeAll()
         hydrationQueue.removeAll()
+        hydrationEpoch += 1
     }
 
     private func apply(_ video: Video, to videoID: String) {
+        hydrationPending.remove(videoID)
+
         guard let index = rows.firstIndex(where: { $0.videoID == videoID }) else { return }
 
         rows[index].video = video
