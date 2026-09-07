@@ -53,6 +53,8 @@ final class AppEnvironment {
     let credentialIdentityScope: CredentialIdentityScope
     let accountsManager: AccountsManager
     let accountSyncCoordinator: AccountSyncCoordinator
+    /// Hands accounts added while signed out to whichever identity signs in.
+    let localNamespaceImporter: LocalNamespaceImporter
     let homeInstanceCache: HomeInstanceCache
     let invidiousAPI: InvidiousAPI
     let pipedAPI: PipedAPI
@@ -217,6 +219,37 @@ final class AppEnvironment {
         // the credentials it points at must always describe the same Apple account
         let accounts = AccountsManager(identityScope: identityScope, instancesManager: instances)
         self.accountsManager = accounts
+
+        // Accounts created while signed out live in the `local` namespace, and
+        // nothing reads that namespace once an identity resolves. This is what
+        // moves them — records, credentials and the chosen context — into the
+        // Apple account that signs in.
+        self.localNamespaceImporter = LocalNamespaceImporter(
+            accountsManager: accounts,
+            identityScope: identityScope,
+            credentialStores: { [weak accounts, weak invidiousCreds, weak pipedCreds] account in
+                // Same resolution as `accountCredentialsManager(for:)`, except
+                // that an instance which has not synced yet is not an answer:
+                // the scoped key is the account ID either way, so both stores
+                // are asked and at most one of them holds anything.
+                var stores: [any AccountCredentialsManager] = []
+
+                guard let type = accounts?.instance(for: account)?.type else {
+                    if let invidiousCreds { stores.append(invidiousCreds) }
+                    if let pipedCreds { stores.append(pipedCreds) }
+                    return stores
+                }
+
+                switch type {
+                case .invidious: if let invidiousCreds { stores.append(invidiousCreds) }
+                case .piped: if let pipedCreds { stores.append(pipedCreds) }
+                // The slot a future account-keyed store lands in, exactly as in
+                // `accountCredentialsManager(for:)`.
+                default: break
+                }
+                return stores
+            }
+        )
 
         // Initialize Invidious API (used by SubscriptionService and SubscriptionFeedCache)
         let invidiousAPI = InvidiousAPI(httpClient: client)
@@ -518,6 +551,17 @@ final class AppEnvironment {
             self?.refreshAccountStatuses()
         }
 
+        // Every activation of an identity namespace sweeps the signed-out one.
+        // A hook rather than another observer of the scope change: the sweep
+        // must run after the manager has reloaded, and observer registration
+        // order is not something to depend on for that. Statuses are recomputed
+        // only when something moved — a credential that just arrived under this
+        // identity is what decides whether its account reads as signed in.
+        accounts.onNamespaceActivated = { [weak self] in
+            guard let self, self.localNamespaceImporter.sweepIfNeeded() else { return }
+            self.refreshAccountStatuses()
+        }
+
         accountSync.onAccountDeleted = { [weak self] accountID, account in
             guard let self else { return }
 
@@ -592,6 +636,14 @@ final class AppEnvironment {
         // it runs again whenever instances arrive from iCloud.
         accounts.reconcileLegacyAccounts()
         accounts.migrateLegacyContextIfNeeded()
+
+        // A launch that restores its identity scope from cache resolves inside
+        // the initializer above, so no scope change will ever be announced for
+        // it and `onNamespaceActivated` never fires. Invoked once here so that
+        // path sweeps too; the sweep is idempotent, so an identity that does
+        // arrive later simply finds nothing left.
+        localNamespaceImporter.sweepIfNeeded()
+
         refreshAccountStatuses()
 
         // Seeded once the statuses it depends on are known, so launching does

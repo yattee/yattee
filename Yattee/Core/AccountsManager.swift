@@ -1022,6 +1022,222 @@ final class AccountsManager {
         return nil
     }
 
+    // MARK: - Local-namespace import
+
+    /// What the `local` namespace still holds, read without loading it.
+    ///
+    /// Only the three things an identity may take over. The deletion facts
+    /// stored beside them are deliberately absent: a deletion made while signed
+    /// out is a local fact and must never be published into an Apple account's
+    /// synced set (decision 3).
+    struct LocalNamespaceSnapshot {
+        var accounts: [Account] = []
+        var migratedInstanceIDs: Set<UUID> = []
+        /// The context chosen there, or `nil` when none ever was.
+        var storedContext: StoredDataContext?
+
+        /// Whether there is anything worth sweeping. The migration markers
+        /// alone are not: they are copied as a side effect of importing the
+        /// accounts they describe (decision 4), and unioning them on their own
+        /// every activation would write for nothing.
+        var hasContent: Bool { !accounts.isEmpty || storedContext != nil }
+    }
+
+    /// What became of a record offered to the active identity.
+    enum ImportOutcome {
+        case imported
+        case mergedIntoExisting
+        case rejectedByTombstone
+        /// Nothing was decided, because the namespace this manager holds is not
+        /// the one being imported into. The caller must leave the local record
+        /// exactly where it is.
+        case deferred
+    }
+
+    /// Whether the local namespace may be imported into what is loaded now.
+    ///
+    /// Three fences in one place. The first is the one `save()` uses: the scope
+    /// moved and the reload has not refilled memory yet, so anything decided
+    /// here would be one identity's data merged into another's. The second is
+    /// decision 9 — a sideloaded or signed-out install is permanently `local`,
+    /// where the sweep would import a namespace into itself. The third is
+    /// decision 10: `unresolved` is a holding pen that gets purged, never a
+    /// destination.
+    private var canImportIntoCurrentNamespace: Bool {
+        guard identityScope.isResolved else { return false }
+        guard namespace != CredentialIdentityScope.localScope else { return false }
+        return loadedNamespace == namespace
+    }
+
+    /// Reads the `local` namespace without disturbing it.
+    func localNamespaceSnapshot() -> LocalNamespaceSnapshot {
+        guard canImportIntoCurrentNamespace else { return LocalNamespaceSnapshot() }
+
+        let local = CredentialIdentityScope.localScope
+        var snapshot = LocalNamespaceSnapshot()
+
+        if let data = defaults.data(forKey: key("accounts", in: local)),
+           let decoded = try? JSONDecoder().decode([Account].self, from: data) {
+            snapshot.accounts = decoded
+        }
+
+        if let ids = defaults.array(forKey: key("migrated", in: local)) as? [String] {
+            snapshot.migratedInstanceIDs = Set(ids.compactMap(UUID.init(uuidString:)))
+        }
+
+        if defaults.bool(forKey: key("hasContext", in: local)),
+           let data = defaults.data(forKey: key("context", in: local)),
+           let decoded = try? JSONDecoder().decode(StoredDataContext.self, from: data) {
+            snapshot.storedContext = decoded
+        }
+
+        return snapshot
+    }
+
+    /// Offers a record from the local namespace to the active identity.
+    @discardableResult
+    func adoptImportedAccount(_ account: Account) -> ImportOutcome {
+        guard canImportIntoCurrentNamespace else { return .deferred }
+
+        // Decision 5, first rule: this identity deleted the account, and the
+        // IDs are deterministic enough for that to be the same account rather
+        // than a coincidence — a migrated one reuses its instance's UUID. A
+        // stale local copy must never resurrect it. The instance's own deletion
+        // says the same thing about everything that lived on it, and arrives as
+        // its own permanent fact.
+        guard !deletedAccountIDs.contains(account.id),
+              !deletedInstanceIDs.contains(account.instanceID) else {
+            LoggingService.shared.info(
+                "Refusing to import an account this identity has deleted",
+                category: .general,
+                details: "accountID=\(account.id)"
+            )
+            return .rejectedByTombstone
+        }
+
+        // Decision 5, second rule: the identity's own copy stands. A strictly
+        // newer label from the local copy is applied through the ordinary edit
+        // path, so it is marked dirty and ordered by `updatedAt` like any other
+        // change — nothing else about the record is taken.
+        if let existing = self.account(id: account.id) {
+            if account.updatedAt > existing.updatedAt, account.displayName != existing.displayName {
+                updateDisplayName(account.displayName, for: account.id)
+            }
+            return .mergedIntoExisting
+        }
+
+        // Decision 5, third rule: imported verbatim. `updatedAt` and `dateAdded`
+        // are preserved so conflict resolution everywhere else orders this
+        // record by when the user actually made it, not by when it moved.
+        accounts.append(account)
+        pendingUploads.insert(account.id)
+        save()
+
+        LoggingService.shared.info(
+            "Imported an account created while signed out into the active identity",
+            category: .general,
+            details: "accountID=\(account.id)"
+        )
+
+        NotificationCenter.default.post(name: .accountsDidChange, object: nil)
+        return .imported
+    }
+
+    /// Takes on the local namespace's migration markers (decision 4).
+    ///
+    /// Copied rather than moved: the local set stays where it is, so a later
+    /// sign-out cannot let `reconcileLegacyAccounts()` synthesize the same
+    /// account again from an `usesAccountLogin` flag that is still true — every
+    /// cycle would otherwise mint another import.
+    func adoptImportedMigratedInstances(_ ids: Set<UUID>) {
+        guard canImportIntoCurrentNamespace else { return }
+
+        let added = ids.subtracting(migratedInstanceIDs)
+        guard !added.isEmpty else { return }
+
+        migratedInstanceIDs.formUnion(added)
+        // A marker suppresses synthesis on every other device, so it may only be
+        // published for an instance whose account this identity actually holds.
+        // Publishing it for one whose account was refused would leave that
+        // instance's pre-revamp login unrepresented everywhere.
+        for instanceID in added where !accounts(forInstance: instanceID).isEmpty {
+            pendingMarkerUploads.insert(instanceID)
+        }
+        save()
+    }
+
+    /// Carries the local namespace's context over, if this identity has none.
+    ///
+    /// Epoch-stamped through the same rule the legacy-context migration uses:
+    /// a selection made while signed out is a guess at what the user wants under
+    /// this Apple account, so any explicit or synced choice outranks it whichever
+    /// arrives first (decision 6). Held back from the server by the existing
+    /// `canUploadContext` gate until the account it names is confirmed.
+    func adoptImportedContext(_ stored: StoredDataContext) {
+        guard canImportIntoCurrentNamespace else { return }
+        guard !hasStoredContext else { return }
+
+        storedContext = .migrated(stored.context)
+        hasStoredContext = true
+        storedContextIsRepair = false
+        pendingContextUpload = true
+        save()
+
+        LoggingService.shared.info(
+            "Carried a data context chosen while signed out into the active identity",
+            category: .general
+        )
+
+        NotificationCenter.default.post(name: .dataContextDidChange, object: nil)
+    }
+
+    /// Removes imported records from the local namespace (decision 2).
+    ///
+    /// Move semantics: a local record is only ever passed here once it has
+    /// landed under the identity — or was correctly refused — and its credential
+    /// has been dealt with, so a sign-out afterwards shows only what was never
+    /// imported. The local `migrated` and `deleted*` keys are never touched:
+    /// they are retained on purpose (decisions 3 and 4).
+    func pruneLocalNamespace(removingAccountIDs removed: Set<UUID>, clearContext: Bool) {
+        guard canImportIntoCurrentNamespace else { return }
+
+        let local = CredentialIdentityScope.localScope
+
+        if !removed.isEmpty {
+            var stored: [Account] = []
+            if let data = defaults.data(forKey: key("accounts", in: local)),
+               let decoded = try? JSONDecoder().decode([Account].self, from: data) {
+                stored = decoded
+            }
+
+            let remaining = stored.filter { !removed.contains($0.id) }
+            if remaining.isEmpty {
+                defaults.removeObject(forKey: key("accounts", in: local))
+            } else if let data = try? JSONEncoder().encode(remaining) {
+                defaults.set(data, forKey: key("accounts", in: local))
+            }
+        }
+
+        guard clearContext else { return }
+        for name in ["context", "hasContext", "contextIsRepair"] {
+            defaults.removeObject(forKey: key(name, in: local))
+        }
+    }
+
+    /// Called once the in-memory state describes an identity namespace that is
+    /// ready to be read and written.
+    ///
+    /// A hook rather than another `.credentialIdentityScopeDidChange` observer
+    /// because the import sweep has to run *after* this manager has reloaded,
+    /// reconciled and announced — and relying on notification observer
+    /// registration order for that would be silently fragile.
+    ///
+    /// Deliberately not fired for the load this manager performs in its own
+    /// initializer: nothing can have installed a hook by then. A launch that
+    /// resolves its identity from cache never changes scope afterwards, so the
+    /// app invokes the sweep once itself after wiring completes.
+    @ObservationIgnored var onNamespaceActivated: (@MainActor () -> Void)?
+
     // MARK: - Persistence
 
     /// Storage keys are namespaced by identity so a switch of Apple account
@@ -1052,6 +1268,12 @@ final class AccountsManager {
     @ObservationIgnored private(set) var loadedNamespace = ""
 
     private func key(_ name: String) -> String {
+        key(name, in: namespace)
+    }
+
+    /// A key in a namespace other than the active one — the import sweep reads
+    /// and prunes `local` while a resolved identity is loaded.
+    private func key(_ name: String, in namespace: String) -> String {
         "accounts.\(namespace).\(name)"
     }
 
@@ -1225,6 +1447,11 @@ final class AccountsManager {
         // Anything keyed to the selection — the legacy setting, the feed cache —
         // would otherwise keep serving the previous Apple account's data.
         NotificationCenter.default.post(name: .dataContextDidChange, object: nil)
+
+        // Last, and only once everything above has settled: whoever imports the
+        // signed-out namespace needs this manager to already describe the
+        // identity it is importing into.
+        onNamespaceActivated?()
     }
 }
 

@@ -238,6 +238,15 @@ extension PipedCredentialsManager: AccountCredentialsManager {
         accountCredentials.refreshLoginStatus(for: account)
     }
 
+    @discardableResult
+    func migrateCredential(forAccountID accountID: UUID, fromScope sourceScope: String) -> Bool {
+        accountCredentials.migrateCredential(forAccountID: accountID, fromScope: sourceScope)
+    }
+
+    func deleteCredential(forAccountID accountID: UUID, inScope scope: String) {
+        accountCredentials.deleteCredential(forAccountID: accountID, inScope: scope)
+    }
+
     func hasAdoptableLegacyCredential(for account: Account) -> Bool {
         accountCredentials.hasAdoptableLegacyCredential(for: account)
     }

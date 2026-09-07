@@ -55,6 +55,26 @@ protocol AccountCredentialsManager: AnyObject, Observable {
     func isLoggedIn(for account: Account) -> Bool
     func refreshLoginStatus(for account: Account)
 
+    // MARK: - Identity migration
+
+    /// Moves an account's credential and username from `sourceScope` into the
+    /// current one, for a record being imported out of the `local` namespace
+    /// when an Apple account claims it.
+    ///
+    /// - Returns: `true` when `sourceScope` no longer holds anything for this
+    ///   account. `false` means the move failed and left the source intact, so
+    ///   the record it belongs to must stay where it is and be retried.
+    @discardableResult
+    func migrateCredential(forAccountID accountID: UUID, fromScope sourceScope: String) -> Bool
+
+    /// Deletes an account's credential and username under a named scope.
+    ///
+    /// The scoped counterpart of `deleteCredential(forAccountID:)`: an import
+    /// refused because this identity already tombstoned the account has to take
+    /// the secret with it, and that secret is keyed by the scope being left
+    /// rather than the one in force.
+    func deleteCredential(forAccountID accountID: UUID, inScope scope: String)
+
     // MARK: - Legacy adoption
 
     /// Whether a pre-revamp credential for this account's instance exists on
