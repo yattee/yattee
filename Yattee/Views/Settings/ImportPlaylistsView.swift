@@ -310,7 +310,7 @@ struct ImportPlaylistsView: View {
         importProgress = nil
 
         do {
-            guard instance.type == .invidious || instance.type == .piped else {
+            guard instance.type.accountCapabilities.supportsPlaylistReads else {
                 throw ImportError.notSupported
             }
 
@@ -430,7 +430,7 @@ struct ImportPlaylistsView: View {
         existingLocalPlaylist = nil
 
         do {
-            guard instance.type == .invidious || instance.type == .piped else {
+            guard instance.type.accountCapabilities.supportsPlaylistReads else {
                 throw ImportError.notSupported
             }
 

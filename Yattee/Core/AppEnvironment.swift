@@ -933,6 +933,10 @@ final class AppEnvironment {
         // playlists would keep answering for an account that no longer exists.
         discardAccountData(for: account.id)
 
+        // Lowering the pre-revamp flag once nothing is left signed in on the
+        // instance. Migration-only state (see `Instance.usesAccountLogin`):
+        // left raised, it is what `needsCredentials(for:)` would keep reporting
+        // a missing credential from.
         if let instance, accountsManager.accounts(forInstance: instance.id).isEmpty {
             instancesManager.setUsesAccountLogin(false, for: instance)
         }
@@ -1174,6 +1178,13 @@ final class AppEnvironment {
     /// before these flags existed, based on credentials currently in the Keychain.
     /// Only ever sets the flags — a missing Keychain entry (e.g. right after a
     /// reinstall) must not clear a previously recorded flag.
+    ///
+    /// The `usesAccountLogin` half is one-way migration machinery: an upgrading
+    /// install whose flag was lost (it syncs through iCloud key-value storage)
+    /// but whose instance-keyed credential survived would otherwise never have
+    /// its legacy account synthesized by
+    /// `AccountsManager.reconcileLegacyAccounts()`. Fresh sign-ins never set
+    /// the flag.
     private func backfillCredentialFlags() {
         for instance in instancesManager.instances {
             if !instance.usesBasicAuth,

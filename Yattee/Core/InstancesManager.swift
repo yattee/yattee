@@ -197,9 +197,13 @@ final class InstancesManager {
         saveInstances()
     }
 
-    /// Records whether the user has logged into an account on an instance.
-    /// Persisted (and synced to iCloud) so missing Keychain credentials can be
-    /// detected after a reinstall.
+    /// Records that a pre-revamp single login existed on an instance.
+    ///
+    /// Migration-only: every caller is migration machinery (a Yattee 1 import,
+    /// the credential backfill, or the last account on the instance going
+    /// away). Signing in deliberately never calls this — accounts describe
+    /// logins now (see `AccountSignInHandler`, and `Instance.usesAccountLogin`
+    /// for who writes it and why).
     func setUsesAccountLogin(_ value: Bool, for instance: Instance) {
         guard let index = instances.firstIndex(where: { $0.id == instance.id }),
               instances[index].usesAccountLogin != value else { return }
@@ -260,12 +264,14 @@ final class InstancesManager {
         instances.contains { $0.isYatteeServerInstance }
     }
 
-    var invidiousPipedInstances: [Instance] {
-        instances.filter { $0.type == .invidious || $0.type == .piped }
+    /// Instances whose backend has accounts at all, asked of the capability
+    /// table rather than a type list.
+    var accountCapableInstances: [Instance] {
+        instances.filter { $0.type.accountCapabilities.supportsAccounts }
     }
 
-    var hasInvidiousPipedInstances: Bool {
-        instances.contains { $0.type == .invidious || $0.type == .piped }
+    var hasAccountCapableInstances: Bool {
+        instances.contains { $0.type.accountCapabilities.supportsAccounts }
     }
 
     var enabledYatteeServerInstances: [Instance] {

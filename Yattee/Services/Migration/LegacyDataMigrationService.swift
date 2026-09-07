@@ -192,6 +192,11 @@ final class LegacyDataMigrationService {
 
     /// Re-creates a legacy account by signing in with fresh credentials.
     /// The matching source is created if needed; otherwise the existing matching source is reused.
+    ///
+    /// The instance-keyed credential and `usesAccountLogin` written here are
+    /// deliberately pre-revamp shaped: this is a Yattee 1 login arriving, and
+    /// `AccountsManager.reconcileLegacyAccounts()` is what turns it into an
+    /// account (see `Instance.usesAccountLogin`).
     /// - Parameters:
     ///   - item: The legacy account to import
     ///   - username: Username/email to use for the v2 login

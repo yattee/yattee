@@ -194,7 +194,7 @@ struct SubscriptionsView: View {
         }
         return instances
             .filter { $0.type == .yatteeServer }
-            .map { "\($0.id):\($0.isEnabled):\($0.apiKey?.isEmpty == false)" }
+            .map { "\($0.id):\($0.isEnabled)" }
             .joined(separator: "|")
     }
 

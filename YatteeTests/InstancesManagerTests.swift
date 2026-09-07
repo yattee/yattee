@@ -28,6 +28,22 @@ struct InstanceFilteringTests {
         #expect(youtubeInstances.allSatisfy { $0.type == .invidious || $0.type == .piped })
     }
 
+    @Test("Account-capable instances come from the capability table")
+    func accountCapableInstancesFollowCapabilities() {
+        let manager = makeTestInstancesManager()
+        #expect(!manager.hasAccountCapableInstances)
+
+        manager.add(Instance(type: .peertube, url: URL(string: "https://pt.example.com")!))
+        manager.add(Instance(type: .yatteeServer, url: URL(string: "https://ys.example.com")!))
+        #expect(manager.accountCapableInstances.isEmpty)
+        #expect(!manager.hasAccountCapableInstances)
+
+        manager.add(Instance(type: .invidious, url: URL(string: "https://inv.example.com")!))
+        manager.add(Instance(type: .piped, url: URL(string: "https://piped.example.com")!))
+        #expect(manager.accountCapableInstances.map(\.type) == [.invidious, .piped])
+        #expect(manager.hasAccountCapableInstances)
+    }
+
     @Test("Filter PeerTube instances")
     func filterPeerTubeInstances() {
         let instances = [

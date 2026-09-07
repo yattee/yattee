@@ -31,6 +31,19 @@ struct AccountCapabilities: Hashable, Sendable {
         supportsPlaylistPrivacy: false
     )
 
+    /// Whether the backend has accounts at all — true as soon as an account
+    /// could do anything on it. This is what decides whether an instance offers
+    /// a sign-in; it is deliberately broader than ``isSelectableContext``, which
+    /// asks the narrower question of whether an account is worth switching *to*.
+    var supportsAccounts: Bool {
+        supportsSubscriptions
+            || supportsFeed
+            || supportsPlaylistReads
+            || supportsPlaylistWrites
+            || supportsWatchHistory
+            || supportsPlaylistPrivacy
+    }
+
     /// Whether this account can act as a `DataContext` at all. An account with
     /// nothing to offer is never listed as a switch target.
     var isSelectableContext: Bool {

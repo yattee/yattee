@@ -224,7 +224,7 @@ struct ImportSubscriptionsView: View {
         error = nil
 
         do {
-            guard instance.type == .invidious || instance.type == .piped else {
+            guard instance.type.accountCapabilities.supportsSubscriptions else {
                 throw ImportError.notSupported
             }
 

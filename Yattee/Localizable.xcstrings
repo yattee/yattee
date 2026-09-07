@@ -18137,16 +18137,6 @@
     "subscription.error.providerNotAvailable" : {
 
     },
-    "subscriptions.account.invidious" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Invidious Account"
-          }
-        }
-      }
-    },
     "subscriptions.account.invidiousInstance %@" : {
       "localizations" : {
         "en" : {
@@ -18163,16 +18153,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Yattee (iCloud)"
-          }
-        }
-      }
-    },
-    "subscriptions.account.piped" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Piped Account"
           }
         }
       }

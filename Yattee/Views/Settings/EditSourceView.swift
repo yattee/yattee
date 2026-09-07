@@ -199,42 +199,49 @@ private struct EditRemoteServerContent: View {
             if instance.supportsAuthentication {
                 InstanceAccountsSection(instance: instance, loginTarget: $loginTarget)
 
-                // Import section - show when logged in for Invidious and Piped instances
-                if isLoggedIn && (instance.type == .invidious || instance.type == .piped) {
+                // Import section - each entry offered only where the backend
+                // has something to import from.
+                if isLoggedIn,
+                   instance.type.accountCapabilities.supportsSubscriptions
+                   || instance.type.accountCapabilities.supportsPlaylistReads {
                     Section {
-                        NavigationLink {
-                            #if os(tvOS)
-                            TVSidebarDetailContainer(
-                                systemImage: "person.2",
-                                title: String(localized: "sources.import.subscriptions"),
-                                showsDismissButton: true
-                            ) {
+                        if instance.type.accountCapabilities.supportsSubscriptions {
+                            NavigationLink {
+                                #if os(tvOS)
+                                TVSidebarDetailContainer(
+                                    systemImage: "person.2",
+                                    title: String(localized: "sources.import.subscriptions"),
+                                    showsDismissButton: true
+                                ) {
+                                    ImportSubscriptionsView(instance: instance)
+                                }
+                                #else
                                 ImportSubscriptionsView(instance: instance)
+                                #endif
+                            } label: {
+                                Label(String(localized: "sources.import.subscriptions"), systemImage: "person.2")
                             }
-                            #else
-                            ImportSubscriptionsView(instance: instance)
-                            #endif
-                        } label: {
-                            Label(String(localized: "sources.import.subscriptions"), systemImage: "person.2")
+                            .accessibilityIdentifier("sources.import.subscriptions")
                         }
-                        .accessibilityIdentifier("sources.import.subscriptions")
 
-                        NavigationLink {
-                            #if os(tvOS)
-                            TVSidebarDetailContainer(
-                                systemImage: "list.bullet.rectangle",
-                                title: String(localized: "sources.import.playlists"),
-                                showsDismissButton: true
-                            ) {
+                        if instance.type.accountCapabilities.supportsPlaylistReads {
+                            NavigationLink {
+                                #if os(tvOS)
+                                TVSidebarDetailContainer(
+                                    systemImage: "list.bullet.rectangle",
+                                    title: String(localized: "sources.import.playlists"),
+                                    showsDismissButton: true
+                                ) {
+                                    ImportPlaylistsView(instance: instance)
+                                }
+                                #else
                                 ImportPlaylistsView(instance: instance)
+                                #endif
+                            } label: {
+                                Label(String(localized: "sources.import.playlists"), systemImage: "list.bullet.rectangle")
                             }
-                            #else
-                            ImportPlaylistsView(instance: instance)
-                            #endif
-                        } label: {
-                            Label(String(localized: "sources.import.playlists"), systemImage: "list.bullet.rectangle")
+                            .accessibilityIdentifier("sources.import.playlists")
                         }
-                        .accessibilityIdentifier("sources.import.playlists")
                     } header: {
                         Text(String(localized: "sources.header.import"))
                     }

@@ -1209,6 +1209,63 @@ struct AccountCapabilitiesTests {
         #expect(!InstanceType.peertube.accountCapabilities.isSelectableContext)
         #expect(!InstanceType.yatteeServer.accountCapabilities.isSelectableContext)
     }
+
+    @Test("A backend has accounts as soon as one flag is set")
+    func supportsAccountsIsAnyCapability() {
+        #expect(!AccountCapabilities.none.supportsAccounts)
+
+        // Broader than isSelectableContext deliberately: a backend whose only
+        // capability is watch history still has an account to sign into, even
+        // though there is nothing there worth switching to.
+        var historyOnly = AccountCapabilities.none
+        historyOnly.supportsWatchHistory = true
+        #expect(historyOnly.supportsAccounts)
+        #expect(!historyOnly.isSelectableContext)
+
+        #expect(InstanceType.invidious.accountCapabilities.supportsAccounts)
+        #expect(InstanceType.piped.accountCapabilities.supportsAccounts)
+        #expect(!InstanceType.peertube.accountCapabilities.supportsAccounts)
+        #expect(!InstanceType.yatteeServer.accountCapabilities.supportsAccounts)
+    }
+
+    @Test("Instance capabilities are answered by the capability table")
+    func instanceFlagsDelegateToCapabilities() {
+        for type in InstanceType.allCases {
+            let instance = Instance(type: type, url: URL(string: "https://example.com")!)
+            #expect(instance.supportsAuthentication == type.accountCapabilities.supportsAccounts)
+            #expect(instance.supportsFeed == type.accountCapabilities.supportsFeed)
+        }
+    }
+
+    @Test("Import is offered only where the backend has something to import")
+    func importGuardsFollowCapabilities() {
+        // What EditSourceView's menu entries and the two import views' guards
+        // ask before fetching.
+        #expect(InstanceType.piped.accountCapabilities.supportsSubscriptions)
+        #expect(InstanceType.piped.accountCapabilities.supportsPlaylistReads)
+        #expect(InstanceType.invidious.accountCapabilities.supportsSubscriptions)
+        #expect(InstanceType.invidious.accountCapabilities.supportsPlaylistReads)
+
+        for type in [InstanceType.peertube, .yatteeServer] {
+            #expect(!type.accountCapabilities.supportsSubscriptions)
+            #expect(!type.accountCapabilities.supportsPlaylistReads)
+        }
+    }
+}
+
+/// Constructors for the pre-revamp value the migration decodes. They live here
+/// rather than on the model because nothing in the app builds one any more —
+/// `SubscriptionAccount` exists only to be read off disk.
+extension SubscriptionAccount {
+    static let local = SubscriptionAccount(type: .local, instanceID: nil)
+
+    static func invidious(_ instanceID: UUID) -> SubscriptionAccount {
+        SubscriptionAccount(type: .invidious, instanceID: instanceID)
+    }
+
+    static func piped(_ instanceID: UUID) -> SubscriptionAccount {
+        SubscriptionAccount(type: .piped, instanceID: instanceID)
+    }
 }
 
 @Suite("DataContext legacy migration")
