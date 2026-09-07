@@ -151,6 +151,14 @@ final class PlayerService {
     /// Used to prevent saving progress when switching to next video after natural completion.
     private var videoEndedNaturally = false
 
+    /// Bumped every time the playback identity changes hands: a load claiming
+    /// the player, or a teardown clearing it. Work that suspends mid-playback
+    /// captures it and compares on the way back, so a continuation belonging to
+    /// a watch that is over cannot act on the one that replaced it — including
+    /// when the replacement is the very same video, which an ID check alone
+    /// cannot tell apart.
+    private var playbackGeneration = 0
+
     /// Current playback task - cancelled when video is closed or new video is opened.
     private var currentPlayTask: Task<Void, Never>?
 
@@ -272,6 +280,9 @@ final class PlayerService {
         // audio-mode toggle, a quality switch, a stream retry — from posting it
         // a second time.
         watchHistorySyncService?.beginSessionIfNeeded(video: video)
+
+        // This load is the playback from here on
+        playbackGeneration += 1
 
         // Reset flag for the new video
         videoEndedNaturally = false
@@ -690,14 +701,16 @@ final class PlayerService {
         // leave a timer saving progress for an ended video.
         videoEndedNaturally = false
 
+        let generation = playbackGeneration
         await seek(to: 0)
 
         // The seek is awaited, and the player can have moved on while it ran:
-        // stopped, or already playing something else. Only the replay that is
-        // still the current watch may resume playback and arm the save timer —
-        // otherwise this would unpause a video the user paused, or time saves
-        // for a watch that is not this one.
-        guard let video, state.currentVideo?.id == video.id else { return }
+        // stopped, playing something else, or stopped and given this same video
+        // a fresh start — which the id alone cannot tell from our own watch.
+        // Only the replay that is still the current playback may resume and arm
+        // the save timer — otherwise this would unpause a video the user paused
+        // or is still loading, or time saves for a watch that is not this one.
+        guard let video, playbackGeneration == generation, state.currentVideo?.id == video.id else { return }
 
         resume()
         startProgressSaveTimer()
@@ -1132,6 +1145,9 @@ final class PlayerService {
         // Cancel any previous play task before starting a new one
         currentPlayTask?.cancel()
 
+        // The opening owns the player from here, before the load task even runs
+        playbackGeneration += 1
+
         // Set video info before expanding so the sheet animates with content visible
         state.setPlaybackState(.loading)
         state.setCurrentVideo(video, stream: nil)
@@ -1175,6 +1191,9 @@ final class PlayerService {
 
         // Cancel any previous play task before starting a new one
         currentPlayTask?.cancel()
+
+        // The opening owns the player from here, before the load task even runs
+        playbackGeneration += 1
 
         // Set video info before expanding so the sheet animates with content visible
         state.setPlaybackState(.loading)
@@ -2979,6 +2998,9 @@ final class PlayerService {
     }
 
     private func cleanup() {
+        // Whatever was playing is gone from here on
+        playbackGeneration += 1
+
         // Clean up temp subtitle files for current video
         if let currentVideo = state.currentVideo {
             cleanupTempSubtitles(for: currentVideo.id.id)
