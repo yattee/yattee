@@ -71,6 +71,30 @@ struct InstanceFilteringTests {
         #expect(enabledInstances.count == 1)
         #expect(enabledInstances.first?.url.host == "enabled.example.com")
     }
+
+    @Test("A disabled instance leaves the enabled listing without leaving the app")
+    func disablingPartitionsRatherThanRemoves() {
+        let manager = makeTestInstancesManager()
+        let instance = Instance(type: .invidious, url: URL(string: "https://inv.example.com")!)
+        manager.add(instance)
+
+        #expect(manager.enabledInstances.map(\.id) == [instance.id])
+
+        manager.toggleEnabled(instance)
+
+        // Every listing in the Sources tab is filtered to `enabledInstances`,
+        // so this is exactly the disappearance the recovery section undoes —
+        // and it can only undo it because the instance is still here.
+        #expect(manager.enabledInstances.isEmpty)
+        #expect(manager.instances.filter { !$0.isEnabled }.map(\.id) == [instance.id])
+
+        // Turning it back on takes the stale copy the row was drawn from: the
+        // row's instance is a value, and it stopped matching the stored one the
+        // moment it was switched off.
+        manager.toggleEnabled(instance)
+
+        #expect(manager.enabledInstances.map(\.id) == [instance.id])
+    }
 }
 
 // MARK: - Instance Type Tests

@@ -962,6 +962,9 @@ final class AppEnvironment {
         switch instance.type {
         case .invidious: return invidiousCredentialsManager
         case .piped: return pipedCredentialsManager
+        // The slot a future account-keyed store lands in. What a backend's
+        // accounts can do is `InstanceType.accountCapabilities`; which store
+        // holds their secrets is this switch, and the two move together.
         default: return nil
         }
     }

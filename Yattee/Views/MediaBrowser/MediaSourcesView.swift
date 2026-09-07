@@ -31,9 +31,16 @@ struct MediaSourcesView: View {
         appEnvironment?.sourcesSettings
     }
 
+    /// Whether there is nothing here at all — not merely nothing switched on.
+    ///
+    /// A user whose only source is disabled has sources; offering them the
+    /// "add your first source" screen would be wrong, and would hide the one
+    /// control that gets them back.
     private var isEmpty: Bool {
         (instancesManager?.enabledInstances.isEmpty ?? true) &&
-        (mediaSourcesManager?.enabledSources.isEmpty ?? true)
+        (mediaSourcesManager?.enabledSources.isEmpty ?? true) &&
+        disabledInstances.isEmpty &&
+        disabledMediaSources.isEmpty
     }
 
     private var listStyle: VideoListStyle {
@@ -221,6 +228,8 @@ struct MediaSourcesView: View {
                             // Grouped by type (default)
                             groupedSourcesSections
                         }
+
+                        disabledSourcesSection
                     }
                 }
             )
@@ -387,6 +396,131 @@ struct MediaSourcesView: View {
             .padding(.bottom, 16)
         }
         #endif
+    }
+
+    // MARK: - Disabled Sources
+
+    /// The sources switched off, and the way back on.
+    ///
+    /// Every listing above is filtered to what is enabled, so switching a
+    /// source off makes it vanish from the only screen that browses it — and
+    /// the toggle that undoes it lives several taps away in Settings. This
+    /// section is that toggle, kept at the bottom where it stays out of the way
+    /// until it is the thing being looked for.
+    @ViewBuilder
+    private var disabledSourcesSection: some View {
+        let instances = disabledInstances
+        let sources = disabledMediaSources
+
+        if !instances.isEmpty || !sources.isEmpty {
+            sectionHeader(String(localized: "sources.status.disabled"))
+                .accessibilityIdentifier("sources.disabledSection")
+
+            sectionCard {
+                ForEach(Array(instances.enumerated()), id: \.element.id) { index, instance in
+                    disabledRow(
+                        name: instance.displayName,
+                        detail: "\(instance.type.displayName) - \(instance.url.host ?? instance.url.absoluteString)",
+                        systemImage: instance.type.systemImage,
+                        isLast: sources.isEmpty && index == instances.count - 1
+                    ) {
+                        instancesManager?.toggleEnabled(instance)
+                    }
+                }
+
+                ForEach(Array(sources.enumerated()), id: \.element.id) { index, source in
+                    disabledRow(
+                        name: source.name,
+                        detail: "\(source.type.displayName) - \(source.urlDisplayString)",
+                        systemImage: source.type.systemImage,
+                        isLast: index == sources.count - 1
+                    ) {
+                        mediaSourcesManager?.toggleEnabled(source)
+                    }
+                }
+            }
+
+            Text(String(localized: "sources.disabled.footer"))
+                .font(.caption)
+                .foregroundStyle(.secondary)
+                .frame(maxWidth: .infinity, alignment: .leading)
+                #if os(macOS)
+                .padding(.horizontal, 16)
+                #else
+                .padding(.horizontal, listStyle == .inset ? 32 : 16)
+                #endif
+                .padding(.bottom, 16)
+        }
+    }
+
+    /// Oldest first, matching the order every other listing settles into.
+    private var disabledInstances: [Instance] {
+        (instancesManager?.instances ?? [])
+            .filter { !$0.isEnabled }
+            .sorted { $0.dateAdded < $1.dateAdded }
+    }
+
+    private var disabledMediaSources: [MediaSource] {
+        (mediaSourcesManager?.sources ?? [])
+            .filter { !$0.isEnabled }
+            .sorted { $0.dateAdded < $1.dateAdded }
+    }
+
+    /// A source that is off: dimmed, and tappable only to turn it back on.
+    private func disabledRow(
+        name: String,
+        detail: String,
+        systemImage: String,
+        isLast: Bool,
+        enable: @escaping () -> Void
+    ) -> some View {
+        #if os(tvOS)
+        let rowSpacing: CGFloat = 24
+        #else
+        let rowSpacing: CGFloat = 12
+        #endif
+        #if os(macOS)
+        let iconFont: Font = .title3
+        let iconFrameWidth: CGFloat = 24
+        let titleFont: Font = .body
+        #else
+        let iconFont: Font = .title2
+        let iconFrameWidth: CGFloat = 32
+        let titleFont: Font = .headline
+        #endif
+
+        return SourceListRow(isLast: isLast, listStyle: listStyle) {
+            Button(action: enable) {
+                HStack(spacing: rowSpacing) {
+                    Image(systemName: systemImage)
+                        .font(iconFont)
+                        .foregroundStyle(.secondary)
+                        .frame(width: iconFrameWidth)
+
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text(name)
+                            .font(titleFont)
+                            .foregroundStyle(.secondary)
+
+                        Text(detail)
+                            .font(.caption)
+                            .foregroundStyle(.tertiary)
+                    }
+
+                    Spacer()
+
+                    Label(String(localized: "sources.enable"), systemImage: "power")
+                        .font(.caption)
+                        .foregroundStyle(.tint)
+                }
+                .contentShape(Rectangle())
+            }
+            #if os(macOS)
+            .buttonStyle(.plain)
+            #else
+            .foregroundStyle(.primary)
+            #endif
+        }
     }
 
     @ViewBuilder

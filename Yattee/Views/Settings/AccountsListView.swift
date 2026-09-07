@@ -202,8 +202,20 @@ struct AccountsListView: View {
     @ViewBuilder
     private func accountRow(_ account: Account, instance: Instance?) -> some View {
         VStack(alignment: .leading, spacing: 4) {
-            Text(title(for: account, instance: instance))
-                .lineLimit(1)
+            HStack(spacing: 6) {
+                // The same checkmark the switcher marks the selected context
+                // with — this screen offers "Use this account" on every other
+                // row, and the row it is missing from has to say why.
+                if isCurrentContext(account) {
+                    Image(systemName: "checkmark")
+                        .font(.caption.weight(.semibold))
+                        .foregroundStyle(.tint)
+                        .accessibilityLabel(String(localized: "accounts.current"))
+                }
+
+                Text(title(for: account, instance: instance))
+                    .lineLimit(1)
+            }
 
             if instance == nil {
                 // An orphan has no status worth reporting: its capabilities are
@@ -282,11 +294,21 @@ struct AccountsListView: View {
     }
 
     private func loginSheet(_ login: AccountsListLogin) -> some View {
-        InstanceLoginView(instance: login.instance) { credential, username in
+        InstanceLoginView(
+            instance: login.instance,
+            initialUsername: storedUsername(for: login.target)
+        ) { credential, username in
             guard let appEnvironment else { return false }
             return AccountSignInHandler(appEnvironment: appEnvironment, instance: login.instance)
                 .storeLogin(credential: credential, username: username, target: login.target)
         }
+    }
+
+    /// The identifier an existing account last signed in with, when this device
+    /// holds it. A new account has nobody to name yet.
+    private func storedUsername(for target: AccountLoginTarget) -> String? {
+        guard let account = target.account else { return nil }
+        return appEnvironment?.accountCredentialsManager(for: account)?.username(for: account)
     }
 
     // MARK: - Presentation

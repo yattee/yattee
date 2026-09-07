@@ -85,8 +85,20 @@ struct InstanceAccountsSection: View {
     @ViewBuilder
     private func accountRow(_ account: Account) -> some View {
         VStack(alignment: .leading, spacing: 4) {
-            Text(displayName(for: account))
-                .lineLimit(1)
+            HStack(spacing: 6) {
+                // The same checkmark the switcher marks the selected context
+                // with — the row's menu offers "Use this account" on every
+                // other account, and the row it is missing from has to say why.
+                if isCurrentContext(account) {
+                    Image(systemName: "checkmark")
+                        .font(.caption.weight(.semibold))
+                        .foregroundStyle(.tint)
+                        .accessibilityLabel(String(localized: "accounts.current"))
+                }
+
+                Text(displayName(for: account))
+                    .lineLimit(1)
+            }
 
             AccountStatusBadge(status: status(for: account))
         }

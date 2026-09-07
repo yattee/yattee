@@ -329,13 +329,13 @@ private struct EditRemoteServerContent: View {
         .presentationCompactAdaptation(.sheet)
         #if os(tvOS)
         .fullScreenCover(item: $loginTarget) { target in
-            InstanceLoginView(instance: instance) { credential, username in
+            InstanceLoginView(instance: instance, initialUsername: storedUsername(for: target)) { credential, username in
                 storeLogin(credential: credential, username: username, target: target)
             }
         }
         #else
         .sheet(item: $loginTarget) { target in
-            InstanceLoginView(instance: instance) { credential, username in
+            InstanceLoginView(instance: instance, initialUsername: storedUsername(for: target)) { credential, username in
                 storeLogin(credential: credential, username: username, target: target)
             }
         }
@@ -415,6 +415,13 @@ private struct EditRemoteServerContent: View {
             isLoggedIn = true
         }
         return stored
+    }
+
+    /// The identifier an existing account last signed in with, when this device
+    /// holds it. A new account has nobody to name yet.
+    private func storedUsername(for target: AccountLoginTarget) -> String? {
+        guard let account = target.account else { return nil }
+        return appEnvironment?.accountCredentialsManager(for: account)?.username(for: account)
     }
 
     private func loadServerInfo() async {

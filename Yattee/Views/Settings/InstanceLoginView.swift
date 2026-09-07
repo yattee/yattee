@@ -19,6 +19,14 @@ struct InstanceLoginView: View {
     /// one would be a dead end there.
     var isOptionalStep: Bool = false
 
+    /// The identifier to start the form with, when there is one to start from.
+    ///
+    /// Signing in again is almost always the same person proving themselves
+    /// once more, and the identifier they used is already on the device — beside
+    /// the credential, in the Keychain. Retyping it is work the app can do.
+    /// A new login has nobody to name and passes nothing.
+    var initialUsername: String?
+
     /// Receives the credential **and** the identifier the user signed in with,
     /// and reports whether it was stored.
     ///
@@ -143,30 +151,50 @@ struct InstanceLoginView: View {
         #if os(iOS)
         .scrollDismissesKeyboard(.interactively)
         #endif
+        .onAppear {
+            // Only ever fills an untouched field: the sheet's body runs again
+            // for every keystroke, and a prefill that reasserted itself would
+            // fight the user editing it.
+            if let initialUsername, !initialUsername.isEmpty, username.isEmpty {
+                username = initialUsername
+            }
+        }
     }
 
     // MARK: - Computed Properties
 
-    /// Returns the appropriate label for the username field based on instance type.
+    /// What the first field is called on this backend.
+    ///
+    /// Named per backend rather than genericised: Invidious signs in by email,
+    /// and calling that "Username" is how a user ends up typing the wrong thing.
+    /// Every case is spelled out so a backend that gains accounts —
+    /// `AccountCapabilities.supportsAccounts` is what decides that — arrives
+    /// here rather than falling through to somebody else's wording.
     private var usernameFieldLabel: String {
         switch instance.type {
         case .piped:
             return String(localized: "login.username")
         case .invidious:
             return String(localized: "login.email")
-        default:
+        case .yatteeServer:
+            return String(localized: "login.username")
+        case .peertube:
             return String(localized: "login.username")
         }
     }
 
-    /// Returns the appropriate footer text based on instance type.
+    /// What this form is signing in to, said in the user's terms.
     private var footerText: String {
         switch instance.type {
         case .piped:
             return String(localized: "login.footer.pipedAccount \(instance.displayName)")
         case .invidious:
             return String(localized: "login.footer.invidiousAccount \(instance.displayName)")
-        default:
+        case .yatteeServer:
+            return String(localized: "login.footer.yatteeServerAccount \(instance.displayName)")
+        case .peertube:
+            // No account concept at all, so no sign-in is offered — and if one
+            // ever were, an empty footer explains nothing.
             return ""
         }
     }

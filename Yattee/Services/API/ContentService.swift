@@ -583,6 +583,9 @@ actor ContentService: ContentServiceProtocol {
                 instance: instance
             )
         default:
+            // Routing, not policy: whether a backend has accounts to sign in to
+            // is `InstanceType.accountCapabilities.supportsAccounts`, and a case
+            // belongs here the moment that row turns true.
             throw APIError.notSupported
         }
     }

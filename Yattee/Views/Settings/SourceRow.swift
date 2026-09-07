@@ -39,6 +39,19 @@ struct SourceRow: View {
         return appEnvironment?.needsCredentials(for: instance) ?? false
     }
 
+    /// Whether one of this source's logins is being refused by the server.
+    ///
+    /// The instance-level statuses know nothing about accounts, so a rejected
+    /// login would otherwise show up nowhere the user looks for their sources.
+    private var hasRejectedAccount: Bool {
+        guard case .remoteServer(let instance) = source,
+              let accountsManager = appEnvironment?.accountsManager else { return false }
+
+        return accountsManager.accounts(forInstance: instance.id).contains {
+            accountsManager.status(for: $0.id) == .credentialRejected
+        }
+    }
+
     var body: some View {
         #if os(tvOS)
         Button(action: onEdit) {
@@ -99,7 +112,16 @@ struct SourceRow: View {
 
     @ViewBuilder
     private var statusView: some View {
-        if needsPassword || needsCredentials {
+        // A refused login comes first: it names one thing the user has to do,
+        // and two warnings stacked on one row say less than either alone.
+        if hasRejectedAccount {
+            Label(
+                AccountStatusBadge.text(for: .credentialRejected),
+                systemImage: "person.crop.circle.badge.exclamationmark"
+            )
+            .font(.caption2)
+            .foregroundStyle(AccountStatusBadge.color(for: .credentialRejected))
+        } else if needsPassword || needsCredentials {
             Label(String(localized: "sources.status.authRequired"), systemImage: "key.fill")
                 .font(.caption2)
                 .foregroundStyle(.orange)

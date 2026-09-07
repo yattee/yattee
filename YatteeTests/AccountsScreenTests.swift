@@ -319,3 +319,140 @@ struct AccountStatusBadgeTests {
         #expect(AccountStatusBadge.color(for: .checking) == .secondary)
     }
 }
+
+// MARK: - Switcher labels
+
+@Suite("Data context switcher labels")
+@MainActor
+struct DataContextSwitcherLabelTests {
+    private func makeDefaults() -> UserDefaults {
+        UserDefaults(suiteName: "yattee.tests.\(UUID().uuidString)")!
+    }
+
+    private func makeScope() -> CredentialIdentityScope {
+        CredentialIdentityScope(fixedScope: "identity-\(UUID().uuidString)")
+    }
+
+    /// The real managers a label is built from, with storage of their own.
+    private func makeFixture() -> (AccountsManager, InstancesManager, DataContextValidator) {
+        let instances = makeTestInstancesManager()
+        let accounts = AccountsManager(
+            identityScope: makeScope(),
+            instancesManager: instances,
+            defaults: makeDefaults()
+        )
+        let validator = DataContextValidator(
+            accountsManager: accounts,
+            instancesManager: instances,
+            toastManager: ToastManager()
+        )
+        return (accounts, instances, validator)
+    }
+
+    private func makeInstance(_ host: String) -> Instance {
+        Instance(type: .invidious, url: URL(string: "https://\(host)")!)
+    }
+
+    private func title(
+        _ account: Account,
+        _ accounts: AccountsManager,
+        _ validator: DataContextValidator,
+        usernames: [UUID: String] = [:]
+    ) -> String {
+        DataContextSwitcherLabels.title(
+            for: .account(account.id),
+            accountsManager: accounts,
+            validator: validator,
+            username: { usernames[$0.id] }
+        )
+    }
+
+    @Test("A name nobody shares is left alone")
+    func uniqueNameIsPlain() {
+        let (accounts, instances, validator) = makeFixture()
+        let instance = makeInstance("inv.example.com")
+        instances.add(instance)
+
+        let account = accounts.addAccount(instanceID: instance.id, displayName: "Work")
+        accounts.setStatus(.signedIn, for: account.id)
+
+        #expect(title(account, accounts, validator) == "Work")
+    }
+
+    @Test("Two sources sharing a name are told apart by their host")
+    func sharedNameOnTwoSourcesGetsTheHost() {
+        let (accounts, instances, validator) = makeFixture()
+        let first = makeInstance("one.example.com")
+        let second = makeInstance("two.example.com")
+        instances.add(first)
+        instances.add(second)
+
+        let a = accounts.addAccount(instanceID: first.id, displayName: "Work")
+        let b = accounts.addAccount(instanceID: second.id, displayName: "Work")
+        accounts.setStatus(.signedIn, for: a.id)
+        accounts.setStatus(.signedIn, for: b.id)
+
+        #expect(title(a, accounts, validator) == "Work · one.example.com")
+        #expect(title(b, accounts, validator) == "Work · two.example.com")
+    }
+
+    @Test("Two logins on one source are told apart by who they are")
+    func sharedNameOnOneSourceGetsTheUsername() {
+        let (accounts, instances, validator) = makeFixture()
+        let instance = makeInstance("inv.example.com")
+        instances.add(instance)
+
+        let a = accounts.addAccount(instanceID: instance.id, displayName: "Work")
+        let b = accounts.addAccount(instanceID: instance.id, displayName: "Work")
+        accounts.setStatus(.signedIn, for: a.id)
+        accounts.setStatus(.signedIn, for: b.id)
+
+        let usernames = [a.id: "alice", b.id: "bob"]
+
+        // The host is what they have in common, so a host suffix would leave
+        // the user choosing between two identical rows.
+        #expect(title(a, accounts, validator, usernames: usernames) == "Work · alice@inv.example.com")
+        #expect(title(b, accounts, validator, usernames: usernames) == "Work · bob@inv.example.com")
+    }
+
+    @Test("A status the user has to act on is named in the label")
+    func statusIsAppended() {
+        let (accounts, instances, validator) = makeFixture()
+        let instance = makeInstance("inv.example.com")
+        instances.add(instance)
+
+        let account = accounts.addAccount(instanceID: instance.id, displayName: "Work")
+        accounts.setStatus(.credentialRejected, for: account.id)
+
+        let label = title(account, accounts, validator)
+        #expect(label.hasPrefix("Work"))
+        #expect(label.contains(AccountStatusBadge.text(for: .credentialRejected)))
+    }
+
+    @Test("The identifier is preferred, the host is the fallback")
+    func disambiguationPrefersTheIdentifier() {
+        #expect(
+            DataContextSwitcherLabels.disambiguated("Work", username: "alice", host: "inv.example.com")
+                == "Work · alice@inv.example.com"
+        )
+        #expect(
+            DataContextSwitcherLabels.disambiguated("Work", username: nil, host: "inv.example.com")
+                == "Work · inv.example.com"
+        )
+        #expect(DataContextSwitcherLabels.disambiguated("Work", username: "alice", host: nil) == "Work · alice")
+    }
+
+    @Test("A name that already carries the host does not repeat it")
+    func hostIsNotRepeated() {
+        #expect(
+            DataContextSwitcherLabels.disambiguated("inv.example.com", username: nil, host: "inv.example.com")
+                == "inv.example.com"
+        )
+
+        // The identifier still adds something the name does not have.
+        #expect(
+            DataContextSwitcherLabels.disambiguated("inv.example.com", username: "alice", host: "inv.example.com")
+                == "inv.example.com · alice@inv.example.com"
+        )
+    }
+}

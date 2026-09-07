@@ -186,6 +186,17 @@
         }
       }
     },
+    "accounts.current" : {
+      "comment" : "Marks the account the app is currently using",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Current"
+          }
+        }
+      }
+    },
     "accounts.empty.description" : {
       "localizations" : {
         "en" : {
@@ -5623,6 +5634,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Sign in to your Piped account on %@"
+          }
+        }
+      }
+    },
+    "login.footer.yatteeServerAccount %@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sign in to your account on %@"
           }
         }
       }
@@ -16697,6 +16718,17 @@
         }
       }
     },
+    "sources.disabled.footer" : {
+      "comment" : "Explains the disabled sources section in the Sources tab",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Disabled sources are not browsed. Turn one back on to use it again."
+          }
+        }
+      }
+    },
     "sources.editSource" : {
       "comment" : "Title for edit source view",
       "localizations" : {
@@ -16726,6 +16758,17 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "No Sources"
+          }
+        }
+      }
+    },
+    "sources.enable" : {
+      "comment" : "Action that switches a disabled source back on",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Enable"
           }
         }
       }
@@ -17588,7 +17631,15 @@
       }
     },
     "sources.status.authFailed" : {
-
+      "comment" : "Status when authentication was rejected",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Auth Failed"
+          }
+        }
+      }
     },
     "sources.status.authRequired" : {
       "comment" : "Status when authentication is required",

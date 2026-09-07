@@ -59,38 +59,77 @@ struct DataContextSwitcherRows: View {
 /// Names the switchable contexts.
 enum DataContextSwitcherLabels {
     /// The context's name, plus whatever the user needs to tell it apart.
-    ///
-    /// The host is appended only when several accounts share a display name:
-    /// two logins on the same instance are told apart by their username, and a
-    /// name that already carries the host would otherwise repeat it.
     @MainActor
     static func title(for context: DataContext, in appEnvironment: AppEnvironment?) -> String {
         guard let appEnvironment else { return String(localized: "subscriptions.account.local") }
 
-        let name = appEnvironment.dataContextValidator.displayName(for: context)
+        return title(
+            for: context,
+            accountsManager: appEnvironment.accountsManager,
+            validator: appEnvironment.dataContextValidator,
+            username: { appEnvironment.accountCredentialsManager(for: $0)?.username(for: $0) }
+        )
+    }
 
-        guard case let .account(id) = context, let account = appEnvironment.accountsManager.account(id: id) else {
+    /// The same label, built from only what it needs.
+    ///
+    /// Taking the pieces rather than the environment is what lets the naming
+    /// rules be exercised on their own: which suffix a name gets depends on the
+    /// other accounts, the stored identifier and the host, and on nothing else.
+    @MainActor
+    static func title(
+        for context: DataContext,
+        accountsManager: AccountsManager,
+        validator: DataContextValidator,
+        username: (Account) -> String?
+    ) -> String {
+        let name = validator.displayName(for: context)
+
+        guard case let .account(id) = context, let account = accountsManager.account(id: id) else {
             return name
         }
 
         var title = name
 
-        if isAmbiguous(name, in: appEnvironment),
-           let host = appEnvironment.accountsManager.instance(for: account)?.url.host,
-           !name.localizedCaseInsensitiveContains(host) {
-            title = "\(name) · \(host)"
+        if isAmbiguous(name, accountsManager: accountsManager, validator: validator) {
+            title = disambiguated(
+                name,
+                username: username(account),
+                host: accountsManager.instance(for: account)?.url.host
+            )
         }
 
-        let status = appEnvironment.accountsManager.status(for: id)
+        let status = accountsManager.status(for: id)
         guard status != .signedIn else { return title }
 
         return "\(title) — \(AccountStatusBadge.text(for: status))"
     }
 
+    /// What a shared name needs added to it before it names one account.
+    ///
+    /// The identifier comes first: two logins on the *same* instance share a
+    /// host, so a host suffix would repeat the server and still leave the user
+    /// choosing between two identical rows. The host alone is what is left when
+    /// the identifier is not on this device — tvOS never receives one — and it
+    /// is dropped when the name already carries it.
+    static func disambiguated(_ name: String, username: String?, host: String?) -> String {
+        if let username, !username.isEmpty {
+            guard let host, !host.isEmpty else { return "\(name) · \(username)" }
+            return "\(name) · \(username)@\(host)"
+        }
+
+        guard let host, !host.isEmpty, !name.localizedCaseInsensitiveContains(host) else { return name }
+        return "\(name) · \(host)"
+    }
+
     @MainActor
-    private static func isAmbiguous(_ name: String, in appEnvironment: AppEnvironment) -> Bool {
-        appEnvironment.accountsManager.selectableAccounts
-            .filter { appEnvironment.dataContextValidator.displayName(for: $0) == name }
+    private static func isAmbiguous(
+        _ name: String,
+        accountsManager: AccountsManager,
+        validator: DataContextValidator
+    ) -> Bool {
+        accountsManager.selectableAccounts
+            .filter { validator.displayName(for: $0) == name }
             .count > 1
     }
 }
