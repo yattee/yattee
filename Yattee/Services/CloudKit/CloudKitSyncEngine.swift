@@ -2112,6 +2112,8 @@ extension CloudKitSyncEngine: CKSyncEngineDelegate {
             return await conflictResolver.resolveRecentPlaylistConflict(local: local, server: server)
         case RecordType.controlsPreset:
             return await conflictResolver.resolveLayoutPresetConflict(local: local, server: server)
+        case RecordType.channelNotificationSettings:
+            return await conflictResolver.resolveChannelNotificationSettingsConflict(local: local, server: server)
         case RecordType.account, RecordType.dataContext,
              RecordType.legacyAccountMigration, RecordType.accountDeletion:
             guard let accountSync else { return server }

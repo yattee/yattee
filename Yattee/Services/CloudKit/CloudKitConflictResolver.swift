@@ -333,6 +333,37 @@ actor CloudKitConflictResolver {
         return resolved
     }
 
+    // MARK: - ChannelNotificationSettings Conflict Resolution
+
+    /// Resolves a conflict between local and server channel notification settings.
+    ///
+    /// Strategy:
+    /// - Last write wins based on updatedAt timestamp — the same rule
+    ///   `DataManager.upsertChannelNotificationSettings` applies on arrival, so a
+    ///   record that wins the upload is never refused by the other device.
+    /// - Preserve server recordChangeTag
+    func resolveChannelNotificationSettingsConflict(
+        local: CKRecord,
+        server: CKRecord
+    ) -> CKRecord {
+        let localUpdated = (local["updatedAt"] as? Date) ?? Date.distantPast
+        let serverUpdated = (server["updatedAt"] as? Date) ?? Date.distantPast
+
+        // IMPORTANT: Always start with server record to preserve recordChangeTag
+        let resolved = server
+
+        // If local is newer, copy its fields to server record
+        if localUpdated > serverUpdated {
+            resolved["notificationsEnabled"] = local["notificationsEnabled"]
+            resolved["updatedAt"] = local["updatedAt"]
+            resolved["sourceRawValue"] = local["sourceRawValue"]
+            resolved["instanceURLString"] = local["instanceURLString"]
+            resolved["globalProvider"] = local["globalProvider"]
+        }
+
+        return resolved
+    }
+
     // MARK: - Account Conflict Resolution
 
     /// Resolves a conflict between local and server account records.

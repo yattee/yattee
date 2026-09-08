@@ -40,6 +40,22 @@ struct CloudKitSyncTests {
         return entry
     }
 
+    @MainActor
+    private static func makeNotificationSettings(
+        channelID: String = "channel1",
+        notificationsEnabled: Bool = false,
+        updatedAt: Date = Date(timeIntervalSince1970: 1_000)
+    ) -> ChannelNotificationSettings {
+        let settings = ChannelNotificationSettings(
+            channelID: channelID,
+            notificationsEnabled: notificationsEnabled,
+            sourceRawValue: "global",
+            globalProvider: "youtube"
+        )
+        settings.updatedAt = updatedAt
+        return settings
+    }
+
     // MARK: - Record Mapper
 
     @Suite("Record Mapper")
@@ -136,6 +152,69 @@ struct CloudKitSyncTests {
 
             #expect(resolved["isLive"] as? Int64 == 1)
             #expect(resolved["watchedSeconds"] as? Double == 0)
+        }
+    }
+
+    @Suite("Channel Notification Settings Conflicts")
+    struct ChannelNotificationSettingsConflictTests {
+        @Test("Newer local toggle wins over the older server value")
+        @MainActor
+        func newerLocalToggleWins() async throws {
+            let mapper = CloudKitSyncTests.makeMapper()
+            let local = mapper.toCKRecord(channelNotificationSettings: CloudKitSyncTests.makeNotificationSettings(
+                notificationsEnabled: false,
+                updatedAt: Date(timeIntervalSince1970: 2_000)
+            ))
+            let server = mapper.toCKRecord(channelNotificationSettings: CloudKitSyncTests.makeNotificationSettings(
+                notificationsEnabled: true,
+                updatedAt: Date(timeIntervalSince1970: 1_000)
+            ))
+
+            let resolver = CloudKitConflictResolver()
+            let resolved = await resolver.resolveChannelNotificationSettingsConflict(local: local, server: server)
+
+            #expect(resolved["notificationsEnabled"] as? Int64 == 0)
+            #expect(resolved["updatedAt"] as? Date == Date(timeIntervalSince1970: 2_000))
+        }
+
+        @Test("Newer server toggle keeps its value")
+        @MainActor
+        func newerServerToggleWins() async throws {
+            let mapper = CloudKitSyncTests.makeMapper()
+            let local = mapper.toCKRecord(channelNotificationSettings: CloudKitSyncTests.makeNotificationSettings(
+                notificationsEnabled: false,
+                updatedAt: Date(timeIntervalSince1970: 1_000)
+            ))
+            let server = mapper.toCKRecord(channelNotificationSettings: CloudKitSyncTests.makeNotificationSettings(
+                notificationsEnabled: true,
+                updatedAt: Date(timeIntervalSince1970: 2_000)
+            ))
+
+            let resolver = CloudKitConflictResolver()
+            let resolved = await resolver.resolveChannelNotificationSettingsConflict(local: local, server: server)
+
+            #expect(resolved["notificationsEnabled"] as? Int64 == 1)
+            #expect(resolved["updatedAt"] as? Date == Date(timeIntervalSince1970: 2_000))
+        }
+
+        @Test("A local record that only repeats the server value leaves it untouched")
+        @MainActor
+        func equalTimestampsKeepServerValue() async throws {
+            let mapper = CloudKitSyncTests.makeMapper()
+            let stamp = Date(timeIntervalSince1970: 1_000)
+            let local = mapper.toCKRecord(channelNotificationSettings: CloudKitSyncTests.makeNotificationSettings(
+                notificationsEnabled: false,
+                updatedAt: stamp
+            ))
+            let server = mapper.toCKRecord(channelNotificationSettings: CloudKitSyncTests.makeNotificationSettings(
+                notificationsEnabled: true,
+                updatedAt: stamp
+            ))
+
+            let resolver = CloudKitConflictResolver()
+            let resolved = await resolver.resolveChannelNotificationSettingsConflict(local: local, server: server)
+
+            #expect(resolved["notificationsEnabled"] as? Int64 == 1)
         }
     }
 }
