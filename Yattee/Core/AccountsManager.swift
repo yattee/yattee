@@ -1054,6 +1054,44 @@ final class AccountsManager {
         case deferred
     }
 
+    /// What this identity would do with a record from the local namespace, asked
+    /// without doing any of it.
+    enum ImportEligibility {
+        case adoptable
+        case rejectedByTombstone
+        /// The namespace moved under the question. Nothing may be decided.
+        case deferred
+    }
+
+    /// Answers a record's fate without writing anything.
+    ///
+    /// Separate from `adoptImportedAccount` because the sweep has to know what
+    /// it is dealing with *before* it touches the Keychain: adopting announces
+    /// the record, and an announcement is enough to bring observers — status
+    /// refresh, and the legacy adoption it can trigger — down on an account
+    /// whose credential has not settled yet.
+    func importEligibility(for account: Account) -> ImportEligibility {
+        guard canImportIntoCurrentNamespace else { return .deferred }
+
+        // Decision 5, first rule: this identity deleted the account, and the
+        // IDs are deterministic enough for that to be the same account rather
+        // than a coincidence — a migrated one reuses its instance's UUID. A
+        // stale local copy must never resurrect it. The instance's own deletion
+        // says the same thing about everything that lived on it, and arrives as
+        // its own permanent fact.
+        guard !deletedAccountIDs.contains(account.id),
+              !deletedInstanceIDs.contains(account.instanceID) else {
+            LoggingService.shared.info(
+                "Refusing to import an account this identity has deleted",
+                category: .general,
+                details: "accountID=\(account.id)"
+            )
+            return .rejectedByTombstone
+        }
+
+        return .adoptable
+    }
+
     /// Whether the local namespace may be imported into what is loaded now.
     ///
     /// Three fences in one place. The first is the one `save()` uses: the scope
@@ -1095,24 +1133,16 @@ final class AccountsManager {
     }
 
     /// Offers a record from the local namespace to the active identity.
+    ///
+    /// Only ever called once the record's credential is settled — the fate it
+    /// re-checks here is `importEligibility(for:)`'s, asked again because this
+    /// is the call that writes.
     @discardableResult
     func adoptImportedAccount(_ account: Account) -> ImportOutcome {
-        guard canImportIntoCurrentNamespace else { return .deferred }
-
-        // Decision 5, first rule: this identity deleted the account, and the
-        // IDs are deterministic enough for that to be the same account rather
-        // than a coincidence — a migrated one reuses its instance's UUID. A
-        // stale local copy must never resurrect it. The instance's own deletion
-        // says the same thing about everything that lived on it, and arrives as
-        // its own permanent fact.
-        guard !deletedAccountIDs.contains(account.id),
-              !deletedInstanceIDs.contains(account.instanceID) else {
-            LoggingService.shared.info(
-                "Refusing to import an account this identity has deleted",
-                category: .general,
-                details: "accountID=\(account.id)"
-            )
-            return .rejectedByTombstone
+        switch importEligibility(for: account) {
+        case .deferred: return .deferred
+        case .rejectedByTombstone: return .rejectedByTombstone
+        case .adoptable: break
         }
 
         // Decision 5, second rule: the identity's own copy stands. A strictly
@@ -1152,30 +1182,50 @@ final class AccountsManager {
     func adoptImportedMigratedInstances(_ ids: Set<UUID>) {
         guard canImportIntoCurrentNamespace else { return }
 
-        let added = ids.subtracting(migratedInstanceIDs)
+        // Only markers for instances this identity actually holds an account on
+        // — imported by the sweep that is running, or already here. The local
+        // set outlives the accounts it describes: deleting a migrated account
+        // while signed out leaves its marker behind (decisions 3 and 4 both keep
+        // the local namespace as it is), and copying that one over would say
+        // "this instance's legacy login is already an account" under an identity
+        // where it is not. Synthesis would be suppressed there forever, which is
+        // a deletion made while signed out leaking into an Apple account — the
+        // exact thing decision 3 refuses.
+        let added = ids
+            .subtracting(migratedInstanceIDs)
+            .filter { !accounts(forInstance: $0).isEmpty }
         guard !added.isEmpty else { return }
 
         migratedInstanceIDs.formUnion(added)
-        // A marker suppresses synthesis on every other device, so it may only be
-        // published for an instance whose account this identity actually holds.
-        // Publishing it for one whose account was refused would leave that
-        // instance's pre-revamp login unrepresented everywhere.
-        for instanceID in added where !accounts(forInstance: instanceID).isEmpty {
-            pendingMarkerUploads.insert(instanceID)
-        }
+        // A marker suppresses synthesis on every other device, so it is only
+        // published for an instance whose account this identity holds — which,
+        // after the filter above, is all of them.
+        pendingMarkerUploads.formUnion(added)
         save()
     }
 
-    /// Carries the local namespace's context over, if this identity has none.
+    /// Carries the local namespace's context over, if nothing better stands here.
     ///
     /// Epoch-stamped through the same rule the legacy-context migration uses:
     /// a selection made while signed out is a guess at what the user wants under
     /// this Apple account, so any explicit or synced choice outranks it whichever
     /// arrives first (decision 6). Held back from the server by the existing
     /// `canUploadContext` gate until the account it names is confirmed.
+    ///
+    /// "Nothing better" is the part that has to be judged rather than assumed.
+    /// `reloadForCurrentIdentity()` runs `migrateLegacyContextIfNeeded()` before
+    /// the sweep, so this identity can already hold an auto-derived context that
+    /// was never chosen by anyone — and refusing on the mere presence of one
+    /// would drop the user's own signed-out selection in favour of a guess, with
+    /// the local keys cleared behind it. Auto-derived contexts are recognisable:
+    /// they are stamped at the epoch, which is exactly the rank that says "any
+    /// real choice beats this". A repair that inherited an epoch stamp is
+    /// likewise a fallback rather than a choice, and is replaced on the same
+    /// terms. An explicit or synced selection is not epoch-stamped, and still
+    /// wins.
     func adoptImportedContext(_ stored: StoredDataContext) {
         guard canImportIntoCurrentNamespace else { return }
-        guard !hasStoredContext else { return }
+        guard !hasStoredContext || storedContext.isMigrated else { return }
 
         storedContext = .migrated(stored.context)
         hasStoredContext = true

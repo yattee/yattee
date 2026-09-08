@@ -244,7 +244,11 @@ final class AccountKeychainCredentials {
             // username still moves — it is what the sign-in sheet prefills —
             // and the record may only be pruned once that move is settled too.
             loginsByScope[sourceScope]?.remove(accountID)
-            return migrateUsername(forAccountID: accountID, from: sourceScope, to: scope)
+            let usernameSettled = migrateUsername(forAccountID: accountID, from: sourceScope, to: scope)
+            // Or a previous attempt moved the secret and died before the marker
+            // that describes where it went.
+            carryAdoptionProvenance(forAccountID: accountID, from: sourceScope, to: scope)
+            return usernameSettled
         }
 
         // Decision 5: a credential already stored under the current identity was
@@ -255,6 +259,15 @@ final class AccountKeychainCredentials {
             let sourceCleared = removed(key: sourceKey)
             loginsByScope[scope, default: []].insert(accountID)
             if sourceCleared { loginsByScope[sourceScope]?.remove(accountID) }
+
+            // "Already occupied" is not always somebody else's sign-in: it is
+            // also what a previous attempt at *this* move looks like when it
+            // died between the verified copy and the marker that records where
+            // the copy went. Left unrepaired, the next resync would read an
+            // unmarked credential as one the user proved they hold and upload
+            // an adopted secret into this identity's iCloud Keychain. The
+            // fingerprint tells the two apart.
+            carryAdoptionProvenance(forAccountID: accountID, from: sourceScope, to: scope)
 
             guard usernameSettled, sourceCleared else {
                 LoggingService.shared.error(
@@ -316,28 +329,10 @@ final class AccountKeychainCredentials {
         let sourceCleared = removed(key: sourceKey)
 
         // Recorded on the strength of the verified copy, not of the cleanup
-        // that follows it. A retry after a failed deletion takes the
-        // already-has-a-credential path above, which never looks at markers —
-        // so a marker left unwritten here would describe a copy that has moved
-        // and never be corrected.
-        if wasAdopted {
-            // The marker describes where the adopted copy now lives, or the
-            // deletion that retires the unscoped item would no longer recognise
-            // it as this account's to retire.
-            markers.record(
-                service: store.service,
-                instanceID: accountID,
-                accountID: accountID,
-                scope: scope,
-                secret: secret
-            )
-            markers.removeMarker(
-                service: store.service,
-                instanceID: accountID,
-                accountID: accountID,
-                scope: sourceScope
-            )
-        }
+        // that follows it: the marker has to describe where the adopted copy
+        // now lives, or the deletion that retires the unscoped item would no
+        // longer recognise it as this account's to retire.
+        carryAdoptionProvenance(forAccountID: accountID, from: sourceScope, to: scope)
 
         loginsByScope[scope, default: []].insert(accountID)
         if sourceCleared { loginsByScope[sourceScope]?.remove(accountID) }
@@ -362,6 +357,73 @@ final class AccountKeychainCredentials {
             details: "accountID=\(accountID), from=\(sourceScope), iCloudSync=\(syncEnabled)"
         )
         return true
+    }
+
+    /// Re-files an adoption marker under the scope its credential now lives in.
+    ///
+    /// A marker is the only thing that says a credential was *adopted* — copied
+    /// from the pre-revamp unscoped item rather than signed in for. That claim
+    /// has to follow the secret across a namespace move, because everything
+    /// downstream reads it: `resyncCredentialsWithCurrentSetting` leaves adopted
+    /// copies device-local instead of uploading a secret of unproven provenance
+    /// into an iCloud Keychain, and `canDeleteLegacyItem` needs it to recognise
+    /// the unscoped item as this account's to retire.
+    ///
+    /// Called from every path a migration can settle through, not just the one
+    /// that does the copying, because a move is several Keychain calls and any
+    /// of them can be the last one before the process dies. A retry then finds
+    /// the target already holding the secret and would otherwise report success
+    /// while the provenance stayed behind under a namespace nothing reads again.
+    ///
+    /// What makes that safe to repair blind is the fingerprint: the marker is
+    /// bound to one value, so a target credential that still fingerprints the
+    /// same is the adopted copy, and a different one is a real sign-in this
+    /// identity made — which the adopted copy was merely redundant beside, and
+    /// which nothing about the adoption applies to.
+    private func carryAdoptionProvenance(forAccountID accountID: UUID, from sourceScope: String, to scope: String) {
+        // Markers are keyed by instance, and only a migrated account — whose ID
+        // *is* its instance's — is ever allowed to adopt, so the account ID is
+        // the right instance to ask about.
+        guard markers.hasAdopted(service: store.service, instanceID: accountID, scope: sourceScope) else { return }
+
+        let targetKey = KeychainCredentialStore.credentialKey(scope: scope, accountID: accountID)
+
+        if let stored = store.value(forKey: targetKey),
+           markers.hasAdopted(
+               service: store.service,
+               instanceID: accountID,
+               scope: sourceScope,
+               matching: stored
+           ) {
+            markers.record(
+                service: store.service,
+                instanceID: accountID,
+                accountID: accountID,
+                scope: scope,
+                secret: stored
+            )
+
+            // And the copy itself stays where adoption put it. A repair reached
+            // through a path that never chose the sync flag — or after a resync
+            // that ran while the marker was missing — could be looking at an
+            // item marked synchronizable, which is the one thing an adopted
+            // secret must not be.
+            rewrite(key: targetKey, synchronizable: false)
+        }
+
+        // Retired only once the copy it described is really gone. While the
+        // source item survives — a deletion the Keychain refused — the marker
+        // is still the truth about it, and the sweep is coming back anyway.
+        guard store.value(
+            forKey: KeychainCredentialStore.credentialKey(scope: sourceScope, accountID: accountID)
+        ) == nil else { return }
+
+        markers.removeMarker(
+            service: store.service,
+            instanceID: accountID,
+            accountID: accountID,
+            scope: sourceScope
+        )
     }
 
     /// Moves the username item, which is a convenience rather than a secret.

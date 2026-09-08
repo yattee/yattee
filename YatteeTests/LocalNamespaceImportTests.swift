@@ -171,16 +171,18 @@ struct LocalNamespaceImportTests {
 
         try await harness.flip(to: "identity-A")
 
-        // The record is in both namespaces: imported under the identity, and
-        // still local because the secret it names has not moved. That is what
-        // brings the sweep back — pruning here would orphan `local|<id>` with
-        // nothing left to say it exists.
+        // The record stays where its secret is: entirely local, with the
+        // identity owning no part of it. Handing it over first would announce an
+        // account whose credential is still in another namespace — and leave it
+        // owned by two identities if the user signed into a second one before
+        // the retry.
         #expect(flaky.migrateCalls == 1)
-        #expect(harness.accounts.account(id: account.id)?.displayName == "Main")
+        #expect(harness.accounts.account(id: account.id) == nil)
+        #expect(harness.accounts.pendingUploads.isEmpty)
+        #expect(harness.storedAccounts(in: "identity-A").isEmpty)
         #expect(harness.storedAccounts(in: localScope).map(\.id) == [account.id])
 
-        // The retry converges: the collision rule reads the record it imported
-        // last time as one this identity already holds, so nothing duplicates.
+        // The retry converges: with the secret settled, the record follows it.
         flaky.refusesEverything = false
         #expect(harness.importer.sweepIfNeeded())
 
@@ -188,6 +190,148 @@ struct LocalNamespaceImportTests {
         #expect(harness.accounts.accounts.map(\.id) == [account.id])
         #expect(harness.accounts.pendingUploads == [account.id])
         #expect(harness.storedAccounts(in: localScope).isEmpty)
+    }
+
+    @Test("A settlement that fails leaves nothing for a second identity to collide with")
+    func aFailedSettlementNeverLeavesTheAccountInTwoIdentities() async throws {
+        let flaky = FlakyCredentialsManager()
+        let harness = Harness(startingScope: CredentialIdentityScope.localScope, credentialStore: flaky)
+        let account = harness.accounts.addAccount(instanceID: UUID(), displayName: "Main")
+        defer { harness.cleanUp(account.id) }
+
+        try await harness.flip(to: "identity-A")
+
+        // A holds nothing of it, so nothing of it is A's to keep.
+        #expect(harness.accounts.account(id: account.id) == nil)
+        #expect(harness.storedAccounts(in: "identity-A").isEmpty)
+        #expect(harness.storedAccounts(in: localScope).map(\.id) == [account.id])
+
+        // B signs in before A ever gets its retry. There is exactly one owner
+        // afterwards — the alternative, a record adopted beside a credential
+        // that would not follow, is an account permanently in two Apple
+        // accounts with nothing able to take it back out of the first.
+        flaky.refusesEverything = false
+        try await harness.flip(to: "identity-B")
+
+        #expect(harness.accounts.account(id: account.id)?.displayName == "Main")
+        #expect(harness.storedAccounts(in: "identity-B").map(\.id) == [account.id])
+        #expect(harness.storedAccounts(in: "identity-A").isEmpty)
+        #expect(harness.storedAccounts(in: localScope).isEmpty)
+    }
+
+    // MARK: - Ordering
+
+    @Test("An imported record is never announced before the credential that goes with it")
+    func nothingIsAnnouncedBeforeItsCredentialSettles() async throws {
+        let harness = Harness(startingScope: CredentialIdentityScope.localScope)
+        let account = harness.accounts.addAccount(instanceID: UUID(), displayName: "Main")
+        harness.credentials.setCredential("secret", for: account)
+        defer { harness.cleanUp(account.id) }
+
+        // What this guards against is an observer of `.accountsDidChange` acting
+        // on a record the moment it appears — the status refresh, and the silent
+        // legacy adoption it can reach, which would fill the empty identity key
+        // with the pre-revamp unscoped secret and leave the real login to be
+        // deleted as redundant. Announcements are answered here on exactly those
+        // terms: synchronously, from inside the sweep, asking the only question
+        // such an observer would act on.
+        let witness = AnnouncementWitness()
+        let observer = NotificationCenter.default.addObserver(
+            forName: .accountsDidChange,
+            object: nil,
+            queue: nil
+        ) { _ in
+            MainActor.assumeIsolated {
+                guard harness.accounts.account(id: account.id) != nil else { return }
+                witness.samples.append(harness.rawCredential(scope: "identity-A", accountID: account.id))
+            }
+        }
+        defer { NotificationCenter.default.removeObserver(observer) }
+
+        try await harness.flip(to: "identity-A")
+
+        // The record was announced, and the secret was already there every time.
+        #expect(!witness.samples.isEmpty)
+        #expect(witness.samples.allSatisfy { $0 == "secret" })
+        #expect(harness.rawCredential(scope: localScope, accountID: account.id) == nil)
+        #expect(harness.storedAccounts(in: localScope).isEmpty)
+    }
+
+    // MARK: - Provenance
+
+    @Test("A move interrupted before its provenance was filed repairs it on the retry")
+    func adoptionProvenanceIsRepairedOnTheRetry() async throws {
+        let harness = Harness(startingScope: CredentialIdentityScope.localScope)
+        let instance = harness.addInstance(usesAccountLogin: true)
+        harness.accounts.reconcileLegacyAccounts()
+        let account = try #require(harness.accounts.accounts(forInstance: instance.id).first)
+        defer { harness.cleanUp(account.id, instance.id) }
+
+        // What a process death between the verified copy and the marker leaves:
+        // the adopted secret is already under the identity, the namespace being
+        // left still holds its copy, and the only record of where that secret
+        // came from is filed under that namespace.
+        harness.seedCredential("legacy-secret", accountID: account.id, scope: localScope)
+        harness.seedCredential("legacy-secret", accountID: account.id, scope: "identity-A")
+        harness.markers.record(
+            service: harness.service,
+            instanceID: account.id,
+            accountID: account.id,
+            scope: localScope,
+            secret: "legacy-secret"
+        )
+
+        try await harness.flip(to: "identity-A")
+
+        // The retry recognises its own interrupted work by the fingerprint and
+        // re-files the provenance where the secret now is. Without it the next
+        // resync would read an unmarked credential as one the user proved they
+        // hold, and upload a secret of unproven origin into this identity's
+        // iCloud Keychain.
+        #expect(
+            harness.markers.hasAdopted(
+                service: harness.service,
+                instanceID: account.id,
+                scope: "identity-A",
+                matching: "legacy-secret"
+            )
+        )
+        #expect(!harness.markers.hasAdopted(service: harness.service, instanceID: account.id, scope: localScope))
+        #expect(harness.rawCredential(scope: "identity-A", accountID: account.id) == "legacy-secret")
+        #expect(harness.rawCredential(scope: localScope, accountID: account.id) == nil)
+        #expect(harness.storedAccounts(in: localScope).isEmpty)
+    }
+
+    @Test("A real sign-in the adopted copy was redundant beside is not marked as adopted")
+    func aGenuineCredentialIsNotClaimedByTheMarker() async throws {
+        let harness = Harness(startingScope: CredentialIdentityScope.localScope)
+        let instance = harness.addInstance(usesAccountLogin: true)
+        harness.accounts.reconcileLegacyAccounts()
+        let account = try #require(harness.accounts.accounts(forInstance: instance.id).first)
+        defer { harness.cleanUp(account.id, instance.id) }
+
+        // Same shape, different secret under the identity: this one was signed
+        // in for, and the adopted copy is genuinely redundant beside it.
+        harness.seedCredential("legacy-secret", accountID: account.id, scope: localScope)
+        harness.seedCredential("signed-in-secret", accountID: account.id, scope: "identity-A")
+        harness.markers.record(
+            service: harness.service,
+            instanceID: account.id,
+            accountID: account.id,
+            scope: localScope,
+            secret: "legacy-secret"
+        )
+
+        try await harness.flip(to: "identity-A")
+
+        // Nothing about the adoption applies to a credential the user proved
+        // they hold — claiming it would keep a real login off iCloud Keychain
+        // forever.
+        #expect(!harness.markers.hasAdopted(service: harness.service, instanceID: account.id, scope: "identity-A"))
+        // ...and the marker for the copy that was deleted goes with it.
+        #expect(!harness.markers.hasAdopted(service: harness.service, instanceID: account.id, scope: localScope))
+        #expect(harness.rawCredential(scope: "identity-A", accountID: account.id) == "signed-in-secret")
+        #expect(harness.rawCredential(scope: localScope, accountID: account.id) == nil)
     }
 
     @Test("A refused account whose secret cannot be deleted is refused again rather than forgotten")
@@ -256,6 +400,37 @@ struct LocalNamespaceImportTests {
 
     // MARK: - Context
 
+    @Test("A choice made while signed out beats a context the identity only derived")
+    func aCarriedChoiceBeatsAnAutoDerivedContext() async throws {
+        let harness = Harness(startingScope: CredentialIdentityScope.localScope)
+        let account = harness.accounts.addAccount(instanceID: UUID(), displayName: "Main")
+        defer { harness.cleanUp(account.id) }
+
+        harness.accounts.setContext(.account(account.id))
+
+        // The pre-revamp selection is not namespaced by identity, so it is still
+        // readable when the identity's namespace loads — and
+        // `reloadForCurrentIdentity` turns it into a context *before* the sweep
+        // runs. Refusing to carry anything over on the strength of that would
+        // lose the user's own choice to a value nobody made, with the local keys
+        // cleared behind it.
+        harness.defaults.set(
+            try JSONEncoder().encode(SubscriptionAccount(type: .local, instanceID: nil)),
+            forKey: "subscriptionAccount"
+        )
+
+        try await harness.flip(to: "identity-A")
+
+        #expect(harness.accounts.currentContext == .account(account.id))
+        // Still epoch-stamped: a choice made while signed out is a guess at what
+        // the user wants under *this* Apple account, so a real one from any of
+        // their devices outranks it whichever arrives first.
+        #expect(harness.accounts.storedContext.isMigrated)
+        #expect(harness.accounts.pendingContextUpload)
+        #expect(harness.defaults.data(forKey: "accounts.local.context") == nil)
+        #expect(!harness.defaults.bool(forKey: "accounts.local.hasContext"))
+    }
+
     @Test("A context chosen while signed out is dropped when the identity has one")
     func identityContextWins() async throws {
         let harness = Harness(startingScope: CredentialIdentityScope.localScope)
@@ -268,6 +443,9 @@ struct LocalNamespaceImportTests {
         try await harness.flip(to: "identity-A")
 
         #expect(harness.accounts.currentContext == .local)
+        // An explicit choice under this identity is not epoch-stamped, and is
+        // exactly what the carried one must not displace.
+        #expect(!harness.accounts.storedContext.isMigrated)
         // The local keys are cleared either way, or every activation would offer
         // the same stale selection again.
         #expect(harness.defaults.data(forKey: "accounts.local.context") == nil)
@@ -369,6 +547,35 @@ struct LocalNamespaceImportTests {
         harness.accounts.reconcileLegacyAccounts()
         #expect(harness.accounts.accounts.isEmpty)
         #expect(harness.accounts.migratedInstanceIDs.contains(instance.id))
+    }
+
+    @Test("A marker for an account deleted while signed out is not copied over")
+    func markersWithoutAnAccountAreNotAdopted() async throws {
+        let harness = Harness(startingScope: CredentialIdentityScope.localScope)
+        let keptInstanceID = UUID()
+        let abandonedInstanceID = UUID()
+
+        let kept = harness.accounts.addAccount(instanceID: keptInstanceID)
+        // Created and then deleted while signed out. Creating it marked its
+        // instance migrated, and the deletion deliberately leaves that marker
+        // standing — locally, where it belongs.
+        let doomed = harness.accounts.addAccount(instanceID: abandonedInstanceID)
+        harness.accounts.removeAccount(doomed.id)
+        defer { harness.cleanUp(kept.id, doomed.id) }
+
+        #expect(harness.localMigratedInstanceIDs() == [keptInstanceID, abandonedInstanceID])
+
+        try await harness.flip(to: "identity-A")
+
+        // A marker suppresses synthesis wherever it lands, so one whose account
+        // no longer exists would say "this instance's legacy login is already an
+        // account" under an identity where it is not — a deletion made while
+        // signed out leaking into an Apple account, which decision 3 refuses.
+        #expect(harness.accounts.migratedInstanceIDs == [keptInstanceID])
+        #expect(harness.accounts.pendingMarkerUploads == [keptInstanceID])
+
+        // The local set itself is untouched either way (decision 4).
+        #expect(harness.localMigratedInstanceIDs() == [keptInstanceID, abandonedInstanceID])
     }
 
     @Test("A deletion made while signed out is never published into the Apple account")
@@ -474,6 +681,12 @@ private final class Harness {
     let accounts: AccountsManager
     let credentials: TestCredentialsManager
     let importer: LocalNamespaceImporter
+    /// The provenance records that say a credential was adopted rather than
+    /// signed in for. Reachable so a test can leave one where an interrupted
+    /// move would have.
+    let markers: CredentialAdoptionMarkerStore
+    /// The Keychain service the markers are filed against.
+    let service: String
 
     /// Sweeps that actually took something over.
     private(set) var sweeps = 0
@@ -489,6 +702,7 @@ private final class Harness {
         let service = "com.yattee.tests.\(UUID().uuidString)"
 
         self.defaults = defaults
+        self.service = service
         self.store = KeychainCredentialStore(service: service)
         self.instances = makeTestInstancesManager()
 
@@ -502,10 +716,13 @@ private final class Harness {
         )
         self.accounts = accounts
 
+        let markers = CredentialAdoptionMarkerStore(defaults: defaults)
+        self.markers = markers
+
         let credentials = TestCredentialsManager(
             service: service,
             identityScope: scope,
-            markers: CredentialAdoptionMarkerStore(defaults: defaults)
+            markers: markers
         )
         self.credentials = credentials
 
@@ -571,6 +788,11 @@ private final class Harness {
 
     // MARK: Reading storage directly
 
+    func localMigratedInstanceIDs() -> Set<UUID> {
+        let stored = defaults.array(forKey: "accounts.local.migrated") as? [String] ?? []
+        return Set(stored.compactMap(UUID.init(uuidString:)))
+    }
+
     func storedAccounts(in namespace: String) -> [Account] {
         guard let data = defaults.data(forKey: "accounts.\(namespace).accounts"),
               let decoded = try? JSONDecoder().decode([Account].self, from: data)
@@ -597,6 +819,15 @@ private final class Harness {
             store.delete(key: KeychainCredentialStore.legacyKey(instanceID: accountID))
         }
     }
+}
+
+/// What the identity could see of a credential each time it announced a record.
+///
+/// A reference type so the notification block can write to it without capturing
+/// anything of the test's own state.
+@MainActor
+private final class AnnouncementWitness {
+    var samples: [String?] = []
 }
 
 /// An account-keyed credential store over a Keychain service of its own.

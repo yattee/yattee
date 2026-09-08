@@ -80,6 +80,20 @@ final class CredentialAdoptionMarkerStore {
         )
     }
 
+    /// Whether the marker under `scope` describes exactly this value.
+    ///
+    /// For deciding what a credential found under another scope *is*. A marker
+    /// says a secret was adopted rather than signed in for, and the fingerprint
+    /// is what ties that claim to one value: a copy that still fingerprints the
+    /// same is the adopted one, and a different value is a real login the
+    /// marker has nothing to say about.
+    func hasAdopted(service: String, instanceID: UUID, scope: String, matching secret: String) -> Bool {
+        guard let marker = marker(service: service, instanceID: instanceID, scope: scope) else {
+            return false
+        }
+        return marker.secretFingerprint == fingerprint(of: secret)
+    }
+
     private func marker(service: String, instanceID: UUID, scope: String) -> CredentialAdoptionMarker? {
         markers().first {
             $0.service == service && $0.instanceID == instanceID && $0.identityScope == scope

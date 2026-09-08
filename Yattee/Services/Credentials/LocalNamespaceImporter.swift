@@ -82,8 +82,34 @@ final class LocalNamespaceImporter {
         var pruneable: Set<UUID> = []
         var refused: Set<UUID> = []
 
+        // The credential is settled before the record is adopted, never the
+        // other way round, and both are needed twice over.
+        //
+        // Adopting announces: `.accountsDidChange` brings the status refresh —
+        // and the silent legacy adoption it can reach — down on the account
+        // synchronously, before this loop gets to its secret. That observer
+        // would find the identity's key empty and fill it with the pre-revamp
+        // unscoped item, an older secret of unproven provenance; the move that
+        // follows would then read its own target as occupied and delete the
+        // valid login as redundant. Nothing is announced here until there is
+        // nothing left to move.
+        //
+        // And a record adopted beside a credential that would not follow leaves
+        // the account owned by two namespaces at once. Signing into a second
+        // identity before the retry claims it there as well, and no later sweep
+        // can take it back out of the first — an account permanently in two
+        // Apple accounts. Settling first means a failure leaves *nothing* under
+        // the identity, so whoever signs in next simply imports it cleanly.
+        //
+        // Residual, and the reason this order rather than a transaction: a
+        // process death between the credential settling and the record being
+        // adopted strands the secret under the identity that was active. The
+        // record is still local, so it lands wherever the user signs in next and
+        // reads as sign-in-required there. Inconvenient, and recoverable by
+        // signing in again — never a silent corruption, which is what the other
+        // order risks.
         for account in snapshot.accounts {
-            switch accountsManager.adoptImportedAccount(account) {
+            switch accountsManager.importEligibility(for: account) {
             case .rejectedByTombstone:
                 // Decision 5: the account was deliberately deleted under this
                 // identity, so the local copy is not resurrected — and its
@@ -112,13 +138,11 @@ final class LocalNamespaceImporter {
                     )
                 }
 
-            case .imported, .mergedIntoExisting:
+            case .adoptable:
                 // Per-item atomicity: the local record is only dropped once its
-                // credential is verifiably no longer owed by the local scope. A
-                // failure leaves the record in *both* namespaces until the next
-                // sweep — safe, because the collision rule then reads it as an
-                // account the identity already holds and only fills in what is
-                // missing.
+                // credential is verifiably no longer owed by the local scope,
+                // and it is only handed to the identity once the same is true.
+                // A failure leaves both where they are for the next sweep.
                 // Every store is asked even after one fails: they hold separate
                 // Keychain services, and whichever can complete its move should,
                 // rather than waiting on a retry it has nothing to do with.
@@ -128,12 +152,28 @@ final class LocalNamespaceImporter {
                     moved = moved && storeMoved
                 }
 
-                if moved {
-                    pruneable.insert(account.id)
-                } else {
+                guard moved else {
                     LoggingService.shared.warning(
-                        "An imported account's credential could not be moved — leaving it for the next sweep",
+                        "An account's credential could not be moved — leaving the record where it is",
                         category: .keychain,
+                        details: "accountID=\(account.id)"
+                    )
+                    continue
+                }
+
+                switch accountsManager.adoptImportedAccount(account) {
+                case .imported, .mergedIntoExisting:
+                    pruneable.insert(account.id)
+
+                case .rejectedByTombstone, .deferred:
+                    // Neither is reachable: both answers come from the state
+                    // this loop read a moment ago, and nothing between the two
+                    // calls awaits or gives anything else a turn to change it.
+                    // Left local all the same — a next sweep re-reads the fate
+                    // and finishes the job whichever way it now reads.
+                    LoggingService.shared.warning(
+                        "An account's fate changed mid-import — leaving the record where it is",
+                        category: .general,
                         details: "accountID=\(account.id)"
                     )
                 }
