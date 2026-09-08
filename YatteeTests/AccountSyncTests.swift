@@ -1127,6 +1127,340 @@ struct AccountSyncTests {
         #expect(didDiscardCachedRecords)
     }
 
+    // MARK: - Importing the signed-out namespace
+
+    /// What the accounts created while signed out owe the server once an Apple
+    /// account claims them.
+    ///
+    /// Driven through the real wiring: one identity scope, one manager, the
+    /// importer on `onNamespaceActivated`, and the coordinator observing the
+    /// same scope — so what these assert about uploads is what the gates
+    /// actually do, not a re-statement of them.
+    @Suite("Imported accounts and sync", .serialized)
+    @MainActor
+    struct ImportInterplayTests {
+        private static let identity = "identity-A"
+
+        /// Sweeps that actually took something over.
+        private final class SweepCounter {
+            var value = 0
+        }
+
+        @MainActor
+        private struct ImportHarness {
+            let defaults: UserDefaults
+            let scope: CredentialIdentityScope
+            let instances: InstancesManager
+            let accounts: AccountsManager
+            let store: AccountSyncStore
+            let coordinator: AccountSyncCoordinator
+            /// Held for the length of the test: the manager's activation hook
+            /// only borrows it.
+            let importer: LocalNamespaceImporter
+            let recorder: AccountSyncTests.Recorder
+            let category: AccountSyncTests.CategorySwitch
+            let sweeps: SweepCounter
+            let mapper: CloudKitRecordMapper
+
+            /// Moves the identity scope the way a sign-in does, and lets the
+            /// main-queue observers that reload, import and activate run.
+            func flip(to newScope: String?) async throws {
+                scope.setFixedScope(newScope)
+                try await Task.sleep(for: .milliseconds(50))
+            }
+
+            /// Lets anything already queued on the main queue run, so a
+            /// measured pass starts from a quiet recorder.
+            func settle() async throws {
+                try await Task.sleep(for: .milliseconds(50))
+            }
+
+            @discardableResult
+            func addInstance() -> Instance {
+                let instance = Instance(
+                    type: .invidious,
+                    url: URL(string: "https://sync-import-\(UUID().uuidString).example.com")!
+                )
+                instances.add(instance)
+                return instance
+            }
+
+            /// Confirms records the way the server does.
+            func confirm(_ records: [CKRecord]) {
+                for record in records {
+                    record[AccountRecordName.identityNamespaceField] = (scope.current ?? "") as CKRecordValue
+                }
+                coordinator.didSave(records: records)
+            }
+
+            func confirmAccount(_ accountID: UUID) {
+                guard let account = accounts.account(id: accountID) else { return }
+                confirm([mapper.toCKRecord(account: account)])
+            }
+
+            /// How many times a record name was registered for sending.
+            func saveCount(_ recordName: String) -> Int {
+                recorder.savedNames.filter { $0 == recordName }.count
+            }
+
+            /// The signed-out namespace, read straight from storage — the
+            /// manager only ever reads the one it is loaded under.
+            func storedLocalAccounts() -> [Account] {
+                guard let data = defaults.data(
+                    forKey: "accounts.\(CredentialIdentityScope.localScope).accounts"
+                ),
+                    let decoded = try? JSONDecoder().decode([Account].self, from: data)
+                else { return [] }
+                return decoded
+            }
+        }
+
+        private static func makeHarness(categoryEnabled: Bool) -> ImportHarness {
+            let defaults = AccountSyncTests.makeDefaults()
+            let scope = CredentialIdentityScope(fixedScope: CredentialIdentityScope.localScope)
+            let instances = makeTestInstancesManager()
+            let accounts = AccountsManager(
+                identityScope: scope,
+                instancesManager: instances,
+                defaults: defaults
+            )
+
+            let store = AccountSyncStore(defaults: defaults)
+            // Only the identity's zone is bootstrapped. The signed-out
+            // namespace never is, which is what holds every send while the
+            // device has no Apple account.
+            store.markBootstrapCompleted(in: identity)
+
+            let category = AccountSyncTests.CategorySwitch(categoryEnabled)
+            let recorder = AccountSyncTests.Recorder()
+            let coordinator = AccountSyncCoordinator(
+                accountsManager: accounts,
+                identityScope: scope,
+                store: store,
+                isCategoryEnabled: { category.isEnabled }
+            )
+            coordinator.attach(database: nil) { recorder.record($0) }
+
+            // No credential stores: what happens to a secret on the way over is
+            // LocalNamespaceImportTests' subject, and asking for none keeps
+            // these off the Keychain the whole machine shares.
+            let importer = LocalNamespaceImporter(
+                accountsManager: accounts,
+                identityScope: scope,
+                credentialStores: { _ in [] }
+            )
+
+            let sweeps = SweepCounter()
+            accounts.onNamespaceActivated = { [weak importer] in
+                guard importer?.sweepIfNeeded() == true else { return }
+                sweeps.value += 1
+            }
+
+            return ImportHarness(
+                defaults: defaults,
+                scope: scope,
+                instances: instances,
+                accounts: accounts,
+                store: store,
+                coordinator: coordinator,
+                importer: importer,
+                recorder: recorder,
+                category: category,
+                sweeps: sweeps,
+                mapper: AccountSyncTests.makeMapper()
+            )
+        }
+
+        @Test("An account imported with sync off is uploaded once when sync is turned on")
+        func importedAccountUploadsOnceWhenTheCategoryIsEnabled() async throws {
+            let harness = Self.makeHarness(categoryEnabled: false)
+            let instance = harness.addInstance()
+            let account = harness.accounts.addAccount(instanceID: instance.id, displayName: "Signed out")
+            let accountRecord = "account-\(account.id.uuidString)"
+
+            try await harness.flip(to: Self.identity)
+
+            // The record moved namespaces and is owed to the server — but with
+            // the category off nothing is offered to the engine at all.
+            #expect(harness.sweeps.value == 1)
+            #expect(harness.accounts.account(id: account.id)?.displayName == "Signed out")
+            #expect(harness.accounts.pendingUploads.contains(account.id))
+            #expect(harness.storedLocalAccounts().isEmpty)
+            #expect(harness.recorder.changes.isEmpty)
+
+            harness.recorder.clear()
+            harness.category.isEnabled = true
+            await harness.coordinator.activate()
+
+            #expect(harness.saveCount(accountRecord) == 1)
+
+            harness.confirmAccount(account.id)
+            harness.confirm([harness.mapper.toCKRecord(legacyMigrationInstanceID: instance.id)])
+            #expect(harness.accounts.pendingUploads.isEmpty)
+            #expect(harness.accounts.pendingMarkerUploads.isEmpty)
+
+            // Off and on again: the outbox is settled and the signed-out
+            // namespace is empty, so a toggle owes the server nothing.
+            try await harness.settle()
+            harness.recorder.clear()
+            harness.category.isEnabled = false
+            await harness.coordinator.activate()
+            harness.category.isEnabled = true
+            await harness.coordinator.activate()
+
+            #expect(harness.recorder.changes.isEmpty)
+            #expect(harness.sweeps.value == 1)
+            #expect(harness.accounts.accounts.count == 1)
+            #expect(harness.storedLocalAccounts().isEmpty)
+        }
+
+        @Test("An imported upload that was never confirmed is re-registered, once per pass")
+        func unconfirmedImportSurvivesRepeatedToggling() async throws {
+            let harness = Self.makeHarness(categoryEnabled: false)
+            let instance = harness.addInstance()
+            let account = harness.accounts.addAccount(instanceID: instance.id)
+            let accountRecord = "account-\(account.id.uuidString)"
+
+            try await harness.flip(to: Self.identity)
+
+            harness.recorder.clear()
+            harness.category.isEnabled = true
+            await harness.coordinator.activate()
+            #expect(harness.saveCount(accountRecord) == 1)
+
+            // Nothing came back from the server, so the record is still owed.
+            harness.category.isEnabled = false
+            await harness.coordinator.activate()
+
+            try await harness.settle()
+            harness.recorder.clear()
+            harness.category.isEnabled = true
+            await harness.coordinator.activate()
+
+            #expect(harness.accounts.pendingUploads == [account.id])
+            #expect(harness.saveCount(accountRecord) == 1)
+
+            harness.confirmAccount(account.id)
+            harness.confirm([harness.mapper.toCKRecord(legacyMigrationInstanceID: instance.id)])
+
+            try await harness.settle()
+            harness.recorder.clear()
+            harness.category.isEnabled = false
+            await harness.coordinator.activate()
+            harness.category.isEnabled = true
+            await harness.coordinator.activate()
+
+            #expect(harness.recorder.changes.isEmpty)
+        }
+
+        @Test("A tombstone fetched while sync was off beats the imported account's upload")
+        func tombstoneBeatsAnImportedUpload() async throws {
+            let harness = Self.makeHarness(categoryEnabled: false)
+            let instance = harness.addInstance()
+            let account = harness.accounts.addAccount(instanceID: instance.id)
+
+            try await harness.flip(to: Self.identity)
+            #expect(harness.accounts.pendingUploads.contains(account.id))
+
+            // The identity deleted this account on another device; the fetch
+            // that carries the deletion lands while the category is still off.
+            harness.coordinator.stageFetched(
+                records: [harness.mapper.toCKRecord(accountDeletionID: account.id)],
+                deletions: []
+            )
+
+            try await harness.settle()
+            harness.recorder.clear()
+            harness.category.isEnabled = true
+            await harness.coordinator.activate()
+
+            // Tombstones are applied before dirty records are registered, so
+            // the account never reaches the engine.
+            #expect(harness.accounts.account(id: account.id) == nil)
+            #expect(harness.accounts.isDeleted(account.id))
+            #expect(!harness.accounts.pendingUploads.contains(account.id))
+            #expect(harness.saveCount("account-\(account.id.uuidString)") == 0)
+            #expect(harness.saveCount("accountDeletion-\(account.id.uuidString)") == 0)
+            #expect(harness.recorder.deletedNames.isEmpty)
+        }
+
+        @Test("An imported account's migration marker waits for the account through a toggle cycle")
+        func importedMarkerWaitsForItsAccount() async throws {
+            let harness = Self.makeHarness(categoryEnabled: false)
+            let instance = harness.addInstance()
+            let account = harness.accounts.addAccount(instanceID: instance.id)
+            let accountRecord = "account-\(account.id.uuidString)"
+            let markerRecord = "legacymigrated-\(instance.id.uuidString)"
+
+            try await harness.flip(to: Self.identity)
+
+            // The marker came over with the account it describes, and is owed.
+            #expect(harness.accounts.migratedInstanceIDs.contains(instance.id))
+            #expect(harness.accounts.pendingMarkerUploads.contains(instance.id))
+            #expect(!harness.accounts.canUploadMarker(instanceID: instance.id))
+
+            harness.recorder.clear()
+            harness.category.isEnabled = true
+            await harness.coordinator.activate()
+
+            #expect(harness.saveCount(accountRecord) == 1)
+            #expect(harness.saveCount(markerRecord) == 0)
+            #expect(harness.coordinator.recordToSave(named: markerRecord) == nil)
+
+            // Toggling does not release it either: the account is what it
+            // waits on, not the category.
+            harness.category.isEnabled = false
+            await harness.coordinator.activate()
+
+            try await harness.settle()
+            harness.recorder.clear()
+            harness.category.isEnabled = true
+            await harness.coordinator.activate()
+
+            #expect(harness.saveCount(accountRecord) == 1)
+            #expect(harness.saveCount(markerRecord) == 0)
+
+            harness.recorder.clear()
+            harness.confirmAccount(account.id)
+
+            #expect(harness.saveCount(markerRecord) == 1)
+            #expect(harness.coordinator.recordToSave(named: markerRecord) != nil)
+        }
+
+        @Test("An imported context waits for the account it names")
+        func importedContextWaitsForItsAccount() async throws {
+            let harness = Self.makeHarness(categoryEnabled: false)
+            let instance = harness.addInstance()
+            let account = harness.accounts.addAccount(instanceID: instance.id)
+            harness.accounts.setContext(.account(account.id))
+
+            try await harness.flip(to: Self.identity)
+
+            // Carried over epoch-stamped, and owed to the server.
+            #expect(harness.accounts.currentContext == .account(account.id))
+            #expect(harness.accounts.storedContext.isMigrated)
+            #expect(harness.accounts.pendingContextUpload)
+            #expect(!harness.accounts.canUploadContext)
+
+            harness.recorder.clear()
+            harness.category.isEnabled = true
+            await harness.coordinator.activate()
+
+            // A device that fetched this selection without the account it names
+            // would read a merely pending account as removed.
+            #expect(harness.saveCount("account-\(account.id.uuidString)") == 1)
+            #expect(harness.saveCount("datacontext-current") == 0)
+            #expect(harness.coordinator.recordToSave(named: "datacontext-current") == nil)
+
+            harness.recorder.clear()
+            harness.confirmAccount(account.id)
+
+            #expect(harness.accounts.canUploadContext)
+            #expect(harness.saveCount("datacontext-current") == 1)
+            #expect(harness.coordinator.recordToSave(named: "datacontext-current") != nil)
+        }
+    }
+
     /// A mutable identity, for driving scope changes deterministically.
     private final class Identity {
         var value: String?

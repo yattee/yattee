@@ -30,6 +30,7 @@ struct DeveloperSettingsView: View {
             dataSection
             #if DEBUG
             experimentsSection
+            identityScopeSimulatorSection
             #endif
         }
         .navigationTitle(String(localized: "settings.developer.title"))
@@ -225,6 +226,72 @@ struct DeveloperSettingsView: View {
                 KeychainProvenanceExperimentView()
             }
             #endif
+        }
+    }
+
+    /// Moves the credential identity scope by hand, the way signing in and out
+    /// of an Apple account does.
+    ///
+    /// A simulator cannot sign into iCloud, so the scope is the only seam the
+    /// local→identity import can be exercised through: switching here posts the
+    /// same notification a real resolution posts, and the production observers
+    /// do the rest — reload the account namespace, sweep the signed-out one
+    /// into it, refresh statuses.
+    ///
+    /// Nothing can be uploaded from an invented scope: every send is gated on
+    /// that namespace's bootstrap having completed, which needs a real zone
+    /// fetch under a real identity and so never happens for one of these.
+    @ViewBuilder
+    private var identityScopeSimulatorSection: some View {
+        if let scope = appEnvironment?.credentialIdentityScope {
+            SettingsFormSection("Identity Scope Simulator") {
+                HStack {
+                    Label {
+                        Text(verbatim: "Current scope")
+                    } icon: {
+                        Image(systemName: "person.badge.key")
+                    }
+                    Spacer()
+                    Text(verbatim: scope.current ?? "unresolved")
+                        .foregroundStyle(.secondary)
+                        .lineLimit(1)
+                        .truncationMode(.middle)
+                }
+
+                identityScopeButton("Switch to local", scope: CredentialIdentityScope.localScope, for: scope)
+                identityScopeButton("Switch to debug-identity-A", scope: "debug-identity-A", for: scope)
+                identityScopeButton("Switch to debug-identity-B", scope: "debug-identity-B", for: scope)
+            } footer: {
+                Text(
+                    verbatim: """
+                    Debug only. The scope stays where you put it until the app is relaunched, \
+                    so it no longer describes the Apple account this device is signed in to. \
+                    Nothing is uploaded from an invented scope — its namespace never bootstraps.
+                    """
+                )
+            }
+        }
+    }
+
+    private func identityScopeButton(
+        _ title: String,
+        scope newScope: String,
+        for identityScope: CredentialIdentityScope
+    ) -> some View {
+        HStack {
+            Button {
+                // Announcing, so the observers that reload and import run —
+                // exactly what a resolution does.
+                identityScope.setFixedScope(newScope)
+            } label: {
+                Label {
+                    Text(verbatim: title)
+                } icon: {
+                    Image(systemName: "arrow.triangle.swap")
+                }
+            }
+            .disabled(identityScope.current == newScope)
+            Spacer()
         }
     }
     #endif
