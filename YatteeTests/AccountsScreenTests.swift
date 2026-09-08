@@ -244,7 +244,7 @@ private final class DeletionOrderStore: AccountCredentialsManager {
     }
 
     func migrateCredential(forAccountID _: UUID, fromScope _: String) -> Bool { true }
-    func deleteCredential(forAccountID _: UUID, inScope _: String) {}
+    func deleteCredential(forAccountID _: UUID, inScope _: String) -> Bool { true }
     func resyncCredentialsWithCurrentSetting() {}
     func setUsername(_: String, for _: Account) {}
     func username(for _: Account) -> String? { nil }

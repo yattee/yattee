@@ -88,11 +88,29 @@ final class LocalNamespaceImporter {
                 // Decision 5: the account was deliberately deleted under this
                 // identity, so the local copy is not resurrected — and its
                 // secret goes with it rather than outliving the record.
+                //
+                // Held to the same per-item atomicity as an import: the local
+                // record is the only thing that names the secret being deleted,
+                // so pruning it over a Keychain failure would orphan that
+                // secret permanently. Left in place, the next sweep refuses the
+                // account again and retries the deletion.
                 refused.insert(account.id)
+
+                var deleted = true
                 for store in credentialStores(account) {
-                    store.deleteCredential(forAccountID: account.id, inScope: local)
+                    let storeDeleted = store.deleteCredential(forAccountID: account.id, inScope: local)
+                    deleted = deleted && storeDeleted
                 }
-                pruneable.insert(account.id)
+
+                if deleted {
+                    pruneable.insert(account.id)
+                } else {
+                    LoggingService.shared.warning(
+                        "A refused account's credential could not be deleted — leaving it for the next sweep",
+                        category: .keychain,
+                        details: "accountID=\(account.id)"
+                    )
+                }
 
             case .imported, .mergedIntoExisting:
                 // Per-item atomicity: the local record is only dropped once its
@@ -165,7 +183,7 @@ final class LocalNamespaceImporter {
             LoggingService.shared.info(
                 "Imported the signed-out account namespace into the active identity",
                 category: .general,
-                details: "imported=\(pruneable.count - refused.count), refused=\(refused.count)"
+                details: "imported=\(pruneable.subtracting(refused).count), refused=\(refused.count)"
             )
         }
         return didChange

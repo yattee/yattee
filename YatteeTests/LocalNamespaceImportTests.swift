@@ -160,6 +160,100 @@ struct LocalNamespaceImportTests {
         #expect(harness.storedAccounts(in: localScope).isEmpty)
     }
 
+    // MARK: - Keychain failures
+
+    @Test("A credential the Keychain refuses to move keeps the account local until it can")
+    func aFailedCredentialMoveIsRetriedUntilItSettles() async throws {
+        let flaky = FlakyCredentialsManager()
+        let harness = Harness(startingScope: CredentialIdentityScope.localScope, credentialStore: flaky)
+        let account = harness.accounts.addAccount(instanceID: UUID(), displayName: "Main")
+        defer { harness.cleanUp(account.id) }
+
+        try await harness.flip(to: "identity-A")
+
+        // The record is in both namespaces: imported under the identity, and
+        // still local because the secret it names has not moved. That is what
+        // brings the sweep back — pruning here would orphan `local|<id>` with
+        // nothing left to say it exists.
+        #expect(flaky.migrateCalls == 1)
+        #expect(harness.accounts.account(id: account.id)?.displayName == "Main")
+        #expect(harness.storedAccounts(in: localScope).map(\.id) == [account.id])
+
+        // The retry converges: the collision rule reads the record it imported
+        // last time as one this identity already holds, so nothing duplicates.
+        flaky.refusesEverything = false
+        #expect(harness.importer.sweepIfNeeded())
+
+        #expect(flaky.migrateCalls == 2)
+        #expect(harness.accounts.accounts.map(\.id) == [account.id])
+        #expect(harness.accounts.pendingUploads == [account.id])
+        #expect(harness.storedAccounts(in: localScope).isEmpty)
+    }
+
+    @Test("A refused account whose secret cannot be deleted is refused again rather than forgotten")
+    func aFailedTombstoneDeletionIsRetried() async throws {
+        let flaky = FlakyCredentialsManager()
+        let harness = Harness(startingScope: CredentialIdentityScope.localScope, credentialStore: flaky)
+        let deleted = UUID()
+        defer { harness.cleanUp(deleted) }
+
+        harness.seed("identity-A") { $0.applyRemoteTombstone(deleted) }
+        harness.accounts.applySyncedAccount(Account(id: deleted, instanceID: UUID()))
+
+        try await harness.flip(to: "identity-A")
+
+        #expect(flaky.deleteCalls == 1)
+        #expect(harness.accounts.account(id: deleted) == nil)
+        #expect(harness.storedAccounts(in: localScope).map(\.id) == [deleted])
+
+        flaky.refusesEverything = false
+        #expect(harness.importer.sweepIfNeeded())
+
+        #expect(flaky.deleteCalls == 2)
+        #expect(harness.accounts.account(id: deleted) == nil)
+        #expect(harness.accounts.pendingUploads.isEmpty)
+        #expect(harness.storedAccounts(in: localScope).isEmpty)
+    }
+
+    @Test("A login identifier with no credential beside it still moves before the record is pruned")
+    func aUsernameWithoutACredentialMoves() async throws {
+        let harness = Harness(startingScope: CredentialIdentityScope.localScope)
+        let account = harness.accounts.addAccount(instanceID: UUID(), displayName: "Never signed in")
+        harness.credentials.setUsername("btest1", for: account)
+        defer { harness.cleanUp(account.id) }
+
+        try await harness.flip(to: "identity-A")
+
+        #expect(harness.credentials.username(for: account) == "btest1")
+        #expect(harness.rawUsername(scope: localScope, accountID: account.id) == nil)
+        #expect(harness.storedAccounts(in: localScope).isEmpty)
+    }
+
+    @Test("A redundant copy takes its login identifier with it")
+    func aRedundantCopyClearsTheLocalUsername() async throws {
+        let harness = Harness(startingScope: CredentialIdentityScope.localScope)
+        let accountID = UUID()
+        defer { harness.cleanUp(accountID) }
+
+        harness.seed("identity-A") { $0.applySyncedAccount(Account(id: accountID, instanceID: UUID())) }
+        harness.seedCredential("identity-secret", accountID: accountID, scope: "identity-A")
+        harness.seedUsername("identity-login", accountID: accountID, scope: "identity-A")
+
+        harness.accounts.applySyncedAccount(Account(id: accountID, instanceID: UUID()))
+        harness.seedCredential("local-secret", accountID: accountID, scope: localScope)
+        harness.seedUsername("local-login", accountID: accountID, scope: localScope)
+
+        try await harness.flip(to: "identity-A")
+
+        // The identity's own sign-in wins, and nothing of the redundant copy is
+        // left under the namespace being abandoned.
+        #expect(harness.rawCredential(scope: "identity-A", accountID: accountID) == "identity-secret")
+        #expect(harness.rawUsername(scope: "identity-A", accountID: accountID) == "identity-login")
+        #expect(harness.rawCredential(scope: localScope, accountID: accountID) == nil)
+        #expect(harness.rawUsername(scope: localScope, accountID: accountID) == nil)
+        #expect(harness.storedAccounts(in: localScope).isEmpty)
+    }
+
     // MARK: - Context
 
     @Test("A context chosen while signed out is dropped when the identity has one")
@@ -386,7 +480,10 @@ private final class Harness {
 
     private let store: KeychainCredentialStore
 
-    init(startingScope: String?) {
+    /// - Parameter credentialStore: replaces the real, Keychain-backed store the
+    ///   importer is given, for the failures a live Keychain cannot be made to
+    ///   produce on demand.
+    init(startingScope: String?, credentialStore substitute: (any AccountCredentialsManager)? = nil) {
         let defaults = UserDefaults(suiteName: "yattee.tests.\(UUID().uuidString)")!
         // Unique per run so a crashed run's leftovers can never be read back.
         let service = "com.yattee.tests.\(UUID().uuidString)"
@@ -415,7 +512,7 @@ private final class Harness {
         self.importer = LocalNamespaceImporter(
             accountsManager: accounts,
             identityScope: scope,
-            credentialStores: { _ in [credentials] }
+            credentialStores: { _ in [substitute ?? credentials] }
         )
 
         accounts.onNamespaceActivated = { [weak self] in
@@ -460,6 +557,14 @@ private final class Harness {
         store.set(
             value,
             forKey: KeychainCredentialStore.credentialKey(scope: scope, accountID: accountID),
+            synchronizable: false
+        )
+    }
+
+    func seedUsername(_ value: String, accountID: UUID, scope: String) {
+        store.set(
+            value,
+            forKey: KeychainCredentialStore.usernameKey(scope: scope, accountID: accountID),
             synchronizable: false
         )
     }
@@ -545,7 +650,8 @@ private final class TestCredentialsManager: AccountCredentialsManager {
         credentials.migrateCredential(forAccountID: accountID, fromScope: sourceScope)
     }
 
-    func deleteCredential(forAccountID accountID: UUID, inScope scope: String) {
+    @discardableResult
+    func deleteCredential(forAccountID accountID: UUID, inScope scope: String) -> Bool {
         credentials.deleteCredential(forAccountID: accountID, inScope: scope)
     }
 
@@ -561,4 +667,53 @@ private final class TestCredentialsManager: AccountCredentialsManager {
     func deleteLegacyCredentialIfOwned(for account: Account) {
         credentials.deleteLegacyCredentialIfOwned(for: account)
     }
+}
+
+/// A credential store that can be told to refuse the two operations the sweep's
+/// per-item atomicity rests on.
+///
+/// The real Keychain cannot be made to fail a delete on demand — `SecItemDelete`
+/// against a key that exists and is accessible succeeds — so the failure branch
+/// is exercised through the protocol the importer actually talks to. What the
+/// engine does when it *can* complete the move is
+/// `AccountKeychainCredentials`' own tests' subject, driven against a live
+/// Keychain by the rest of this suite.
+@MainActor
+@Observable
+private final class FlakyCredentialsManager: AccountCredentialsManager {
+    var refusesEverything = true
+    private(set) var migrateCalls = 0
+    private(set) var deleteCalls = 0
+
+    var loggedInAccountIDs: Set<UUID> { [] }
+    var isScopeResolved: Bool { true }
+
+    func setCredential(_: String, for _: Account) {}
+    func credential(for _: Account) -> String? { nil }
+    func deleteCredential(for _: Account) {}
+    func deleteCredential(forAccountID _: UUID) {}
+    func resyncCredentialsWithCurrentSetting() {}
+    func setUsername(_: String, for _: Account) {}
+    func username(for _: Account) -> String? { nil }
+    func isLoggedIn(for _: Account) -> Bool { false }
+    func refreshLoginStatus(for _: Account) {}
+
+    @discardableResult
+    func migrateCredential(forAccountID _: UUID, fromScope _: String) -> Bool {
+        migrateCalls += 1
+        return !refusesEverything
+    }
+
+    @discardableResult
+    func deleteCredential(forAccountID _: UUID, inScope _: String) -> Bool {
+        deleteCalls += 1
+        return !refusesEverything
+    }
+
+    func hasAdoptableLegacyCredential(for _: Account) -> Bool { false }
+
+    @discardableResult
+    func adoptLegacyCredential(for _: Account) -> Bool { false }
+
+    func deleteLegacyCredentialIfOwned(for _: Account) {}
 }

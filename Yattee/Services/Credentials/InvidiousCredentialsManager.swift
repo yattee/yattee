@@ -314,7 +314,8 @@ extension InvidiousCredentialsManager: AccountCredentialsManager {
         accountCredentials.migrateCredential(forAccountID: accountID, fromScope: sourceScope)
     }
 
-    func deleteCredential(forAccountID accountID: UUID, inScope scope: String) {
+    @discardableResult
+    func deleteCredential(forAccountID accountID: UUID, inScope scope: String) -> Bool {
         accountCredentials.deleteCredential(forAccountID: accountID, inScope: scope)
     }
 

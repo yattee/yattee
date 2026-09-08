@@ -238,9 +238,12 @@ struct DeveloperSettingsView: View {
     /// do the rest — reload the account namespace, sweep the signed-out one
     /// into it, refresh statuses.
     ///
-    /// Nothing can be uploaded from an invented scope: every send is gated on
-    /// that namespace's bootstrap having completed, which needs a real zone
-    /// fetch under a real identity and so never happens for one of these.
+    /// Account sync is suspended for the rest of the launch before the first
+    /// switch, and stays suspended. The namespaces are invented but the private
+    /// database is the device's real one, so an activation under a made-up scope
+    /// would bootstrap it out of the genuine zone and upload the results back
+    /// stamped with a name no Apple account answers to. The barrier is in the
+    /// coordinator, not in this caption.
     @ViewBuilder
     private var identityScopeSimulatorSection: some View {
         if let scope = appEnvironment?.credentialIdentityScope {
@@ -266,7 +269,9 @@ struct DeveloperSettingsView: View {
                     verbatim: """
                     Debug only. The scope stays where you put it until the app is relaunched, \
                     so it no longer describes the Apple account this device is signed in to. \
-                    Nothing is uploaded from an invented scope — its namespace never bootstraps.
+                    Switching suspends account iCloud sync — no fetching, no uploading — \
+                    for the rest of the launch, so a made-up identity can never reach the \
+                    real zone. Relaunch to sync again.
                     """
                 )
             }
@@ -280,6 +285,12 @@ struct DeveloperSettingsView: View {
     ) -> some View {
         HStack {
             Button {
+                // Suspended first, and for good: the scope change is announced
+                // synchronously, so a coordinator told afterwards could already
+                // have activated against the real database under a name that
+                // belongs to nobody.
+                appEnvironment?.accountSyncCoordinator.enterDebugScopeSimulation()
+
                 // Announcing, so the observers that reload and import run —
                 // exactly what a resolution does.
                 identityScope.setFixedScope(newScope)

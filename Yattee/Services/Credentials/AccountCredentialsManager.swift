@@ -61,9 +61,10 @@ protocol AccountCredentialsManager: AnyObject, Observable {
     /// current one, for a record being imported out of the `local` namespace
     /// when an Apple account claims it.
     ///
-    /// - Returns: `true` when `sourceScope` no longer holds anything for this
-    ///   account. `false` means the move failed and left the source intact, so
-    ///   the record it belongs to must stay where it is and be retried.
+    /// - Returns: `true` only when `sourceScope` holds nothing for this account
+    ///   any more — credential and username both. `false` means something is
+    ///   still keyed to the source, so the record it belongs to must stay where
+    ///   it is: that record is what brings the retry.
     @discardableResult
     func migrateCredential(forAccountID accountID: UUID, fromScope sourceScope: String) -> Bool
 
@@ -73,7 +74,11 @@ protocol AccountCredentialsManager: AnyObject, Observable {
     /// refused because this identity already tombstoned the account has to take
     /// the secret with it, and that secret is keyed by the scope being left
     /// rather than the one in force.
-    func deleteCredential(forAccountID accountID: UUID, inScope scope: String)
+    ///
+    /// - Returns: whether that scope is now free of the account, on the same
+    ///   terms as `migrateCredential(forAccountID:fromScope:)`.
+    @discardableResult
+    func deleteCredential(forAccountID accountID: UUID, inScope scope: String) -> Bool
 
     // MARK: - Legacy adoption
 

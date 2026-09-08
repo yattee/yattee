@@ -224,11 +224,12 @@ final class AccountKeychainCredentials {
     /// the source left completely untouched on any failure so the next sweep can
     /// try again.
     ///
-    /// - Returns: `true` when `sourceScope` no longer owes this account
-    ///   anything — the credential moved, the target already held one and the
-    ///   source copy was redundant, or there was never one to move. `false`
-    ///   means the source is exactly as it was, and the caller must not prune
-    ///   the record that points at it.
+    /// - Returns: `true` only when `sourceScope` really holds nothing for this
+    ///   account any more: the target credential verified (or there was never
+    ///   one to move), the source items are gone, and the username pair is
+    ///   settled the same way. `false` means something is still keyed to the
+    ///   source, so the caller must not prune the record that points at it —
+    ///   that record is the only thing that will bring a retry back here.
     @discardableResult
     func migrateCredential(forAccountID accountID: UUID, fromScope sourceScope: String) -> Bool {
         guard let scope = currentScope() else { return false }
@@ -241,21 +242,28 @@ final class AccountKeychainCredentials {
         guard let secret = store.value(forKey: sourceKey) else {
             // An account that was never signed in under the source scope. Its
             // username still moves — it is what the sign-in sheet prefills —
-            // and there is nothing left for a retry to recover, so the record
-            // may be pruned.
-            migrateUsername(forAccountID: accountID, from: sourceScope, to: scope)
+            // and the record may only be pruned once that move is settled too.
             loginsByScope[sourceScope]?.remove(accountID)
-            return true
+            return migrateUsername(forAccountID: accountID, from: sourceScope, to: scope)
         }
 
         // Decision 5: a credential already stored under the current identity was
         // written by a sign-in this Apple account actually made, so the copy
         // being migrated is redundant rather than a replacement.
         if store.value(forKey: targetKey) != nil {
-            migrateUsername(forAccountID: accountID, from: sourceScope, to: scope)
-            store.delete(key: sourceKey)
-            loginsByScope[sourceScope]?.remove(accountID)
+            let usernameSettled = migrateUsername(forAccountID: accountID, from: sourceScope, to: scope)
+            let sourceCleared = removed(key: sourceKey)
             loginsByScope[scope, default: []].insert(accountID)
+            if sourceCleared { loginsByScope[sourceScope]?.remove(accountID) }
+
+            guard usernameSettled, sourceCleared else {
+                LoggingService.shared.error(
+                    "A redundant \(credentialNoun) could not be cleared out of the namespace being left",
+                    category: .keychain,
+                    details: "accountID=\(accountID), from=\(sourceScope)"
+                )
+                return false
+            }
 
             LoggingService.shared.info(
                 "Dropped a \(credentialNoun) made redundant by one already held under this identity",
@@ -304,9 +312,14 @@ final class AccountKeychainCredentials {
             return false
         }
 
-        migrateUsername(forAccountID: accountID, from: sourceScope, to: scope)
-        store.delete(key: sourceKey)
+        let usernameSettled = migrateUsername(forAccountID: accountID, from: sourceScope, to: scope)
+        let sourceCleared = removed(key: sourceKey)
 
+        // Recorded on the strength of the verified copy, not of the cleanup
+        // that follows it. A retry after a failed deletion takes the
+        // already-has-a-credential path above, which never looks at markers —
+        // so a marker left unwritten here would describe a copy that has moved
+        // and never be corrected.
         if wasAdopted {
             // The marker describes where the adopted copy now lives, or the
             // deletion that retires the unscoped item would no longer recognise
@@ -326,8 +339,22 @@ final class AccountKeychainCredentials {
             )
         }
 
-        loginsByScope[sourceScope]?.remove(accountID)
         loginsByScope[scope, default: []].insert(accountID)
+        if sourceCleared { loginsByScope[sourceScope]?.remove(accountID) }
+
+        guard usernameSettled, sourceCleared else {
+            // The credential is safely under this identity, but something is
+            // still filed under the one being left. Reporting success would
+            // prune the record that names it and strand that item forever, so
+            // the sweep is told to come back: the retry finds the target
+            // credential in place and only has the leftovers to clear.
+            LoggingService.shared.error(
+                "A moved \(credentialNoun) left something behind in the namespace being left",
+                category: .keychain,
+                details: "accountID=\(accountID), from=\(sourceScope)"
+            )
+            return false
+        }
 
         LoggingService.shared.info(
             "Moved a \(credentialNoun) into the current identity",
@@ -339,20 +366,51 @@ final class AccountKeychainCredentials {
 
     /// Moves the username item, which is a convenience rather than a secret.
     ///
-    /// Never fails the migration around it: a credential is what a session
-    /// depends on, and a username that could not be copied costs a prefilled
-    /// field. The source is deleted only once the target really holds one.
-    private func migrateUsername(forAccountID accountID: UUID, from sourceScope: String, to scope: String) {
+    /// Counts towards the migration's success all the same. Not because a
+    /// prefilled field is worth a retry, but because the record being imported
+    /// is the only thing that ever brings the sweep back to this key: prune it
+    /// while `<source>|<id>#username` still exists and that item is orphaned for
+    /// good, under a namespace nothing will read again.
+    ///
+    /// - Returns: whether the source scope is done with this account's username
+    ///   — nothing to move, or the target holds one and the source item is gone.
+    private func migrateUsername(forAccountID accountID: UUID, from sourceScope: String, to scope: String) -> Bool {
         let sourceKey = KeychainCredentialStore.usernameKey(scope: sourceScope, accountID: accountID)
-        guard let username = store.value(forKey: sourceKey) else { return }
+        guard let username = store.value(forKey: sourceKey) else { return true }
 
         let targetKey = KeychainCredentialStore.usernameKey(scope: scope, accountID: accountID)
         if store.value(forKey: targetKey) == nil {
             store.addIfAbsent(username, forKey: targetKey, synchronizable: shouldSyncToiCloud)
         }
 
-        guard store.value(forKey: targetKey) != nil else { return }
-        store.delete(key: sourceKey)
+        guard store.value(forKey: targetKey) != nil else {
+            LoggingService.shared.error(
+                "A login identifier could not be moved into the current identity",
+                category: .keychain,
+                details: "accountID=\(accountID), from=\(sourceScope)"
+            )
+            return false
+        }
+        return removed(key: sourceKey)
+    }
+
+    /// Deletes a Keychain item, reading "there was nothing there" as done.
+    ///
+    /// Every caller here is clearing a key out of a namespace being left, and
+    /// for that question an absent item and a deleted one are the same answer.
+    /// Anything else is a real failure the sweep has to retry — the item would
+    /// otherwise outlive the record that knows to come back for it.
+    private func removed(key: String) -> Bool {
+        let status = store.delete(key: key)
+        guard status == errSecSuccess || status == errSecItemNotFound else {
+            LoggingService.shared.error(
+                "Could not delete a Keychain item",
+                category: .keychain,
+                details: "status=\(store.describe(status))"
+            )
+            return false
+        }
+        return true
     }
 
     /// Deletes an account's credential and username under a scope that is not
@@ -362,26 +420,51 @@ final class AccountKeychainCredentials {
     /// deliberately deleted is never imported, and the secret it was keyed to
     /// goes with the record rather than sitting under a namespace nothing will
     /// read again.
-    func deleteCredential(forAccountID accountID: UUID, inScope scope: String) {
-        store.delete(key: KeychainCredentialStore.credentialKey(scope: scope, accountID: accountID))
-        store.delete(key: KeychainCredentialStore.usernameKey(scope: scope, accountID: accountID))
-        loginsByScope[scope]?.remove(accountID)
-
-        // Its marker described a copy that no longer exists. Keyed by instance,
-        // and only a migrated account can have adopted anything, so the account
-        // ID is the instance to name here.
-        markers.removeMarker(
-            service: store.service,
-            instanceID: accountID,
-            accountID: accountID,
-            scope: scope
+    ///
+    /// - Returns: whether that scope now holds nothing for the account. `false`
+    ///   keeps the local record where it is: it is the only thing that brings a
+    ///   sweep back to these keys, so pruning it over a failed deletion would
+    ///   strand the secret it refused.
+    @discardableResult
+    func deleteCredential(forAccountID accountID: UUID, inScope scope: String) -> Bool {
+        let credentialCleared = removed(
+            key: KeychainCredentialStore.credentialKey(scope: scope, accountID: accountID)
         )
+        let usernameCleared = removed(
+            key: KeychainCredentialStore.usernameKey(scope: scope, accountID: accountID)
+        )
+
+        if credentialCleared {
+            loginsByScope[scope]?.remove(accountID)
+
+            // Its marker described a copy that no longer exists. Keyed by
+            // instance, and only a migrated account can have adopted anything,
+            // so the account ID is the instance to name here. Kept while the
+            // copy is still there: it is the only record of where that secret
+            // came from, and the retry that deletes it still needs it.
+            markers.removeMarker(
+                service: store.service,
+                instanceID: accountID,
+                accountID: accountID,
+                scope: scope
+            )
+        }
+
+        guard credentialCleared, usernameCleared else {
+            LoggingService.shared.error(
+                "A refused import's \(credentialNoun) could not be deleted — leaving it for the next sweep",
+                category: .keychain,
+                details: "accountID=\(accountID), scope=\(scope)"
+            )
+            return false
+        }
 
         LoggingService.shared.info(
             "Deleted a \(credentialNoun) left behind by a refused import",
             category: .keychain,
             details: "accountID=\(accountID), scope=\(scope)"
         )
+        return true
     }
 
     // MARK: - Username
