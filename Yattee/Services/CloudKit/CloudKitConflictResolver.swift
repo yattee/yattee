@@ -341,6 +341,10 @@ actor CloudKitConflictResolver {
     /// - Last write wins based on updatedAt timestamp — the same rule
     ///   `DataManager.upsertChannelNotificationSettings` applies on arrival, so a
     ///   record that wins the upload is never refused by the other device.
+    /// - An exact tie keeps the server value and needs no deterministic
+    ///   tiebreaker: unlike accounts and data contexts, no writer stamps these
+    ///   settings with a fixed epoch date, so a tie is an accident of the clock
+    ///   rather than something migration produces on every device.
     /// - Preserve server recordChangeTag
     func resolveChannelNotificationSettingsConflict(
         local: CKRecord,

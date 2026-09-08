@@ -197,7 +197,7 @@ struct CloudKitSyncTests {
             #expect(resolved["updatedAt"] as? Date == Date(timeIntervalSince1970: 2_000))
         }
 
-        @Test("A local record that only repeats the server value leaves it untouched")
+        @Test("Equal timestamps keep the server value")
         @MainActor
         func equalTimestampsKeepServerValue() async throws {
             let mapper = CloudKitSyncTests.makeMapper()
