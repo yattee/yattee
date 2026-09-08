@@ -388,6 +388,17 @@ final class AccountKeychainCredentials {
 
         let targetKey = KeychainCredentialStore.credentialKey(scope: scope, accountID: accountID)
 
+        // Equality with the marker's fingerprint is taken as proof that this
+        // value *is* the legacy secret, however it got here — so it is treated
+        // as adopted and kept device-local. That rests on both supported
+        // backends minting a fresh secret for every login: Invidious issues a
+        // per-session SID, and a Piped JWT differs per issue through its `iat`.
+        // Two separate logins therefore cannot collide on one value, so a match
+        // can only be the adopted copy rather than a sign-in that happens to
+        // look like it. A future backend that can hand back an identical
+        // credential for a separate login breaks that reasoning and needs a
+        // different discriminator here — the fingerprint alone would then
+        // misread a genuine login as adopted and keep it off iCloud Keychain.
         if let stored = store.value(forKey: targetKey),
            markers.hasAdopted(
                service: store.service,
