@@ -202,6 +202,10 @@ struct DeveloperSettingsView: View {
                 } label: {
                     Label(String(localized: "settings.advanced.data.resetICloud"), systemImage: "icloud.slash")
                 }
+                // The reset promises the local data comes back. With sync off
+                // nothing would put it there, so the offer is withdrawn rather
+                // than made and broken.
+                .disabled(appEnvironment?.cloudKitSync.isSyncEnabled != true)
                 Spacer()
             }
         }

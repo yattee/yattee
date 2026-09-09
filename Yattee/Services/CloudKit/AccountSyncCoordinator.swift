@@ -73,6 +73,15 @@ final class AccountSyncCoordinator {
     /// enough to remove it.
     var onAccountDeleted: (@MainActor (UUID, Account?) -> Void)?
 
+    /// Called whenever the accounts in memory are readable for the current
+    /// identity — the state in which this coordinator can say what they owe.
+    ///
+    /// Anything that had to be refused during the reload gap gets its second
+    /// chance here rather than waiting for the next launch. Fired on every
+    /// announcement, not only on the transition, so a listener that cares must
+    /// be idempotent and cheap to refuse.
+    var onAccountsBecameReadable: (@MainActor () -> Void)?
+
     // MARK: - Identity
 
     /// Bumped on every observed change of identity. Async work captures it and
@@ -234,9 +243,19 @@ final class AccountSyncCoordinator {
 
         guard !isApplyingStagedChanges else { return }
         guard let namespace, isManagerLoaded(for: namespace) else { return }
+
+        // Announced before the staging check below returns: the accounts being
+        // readable is the news, and it is news whether or not anything is
+        // staged.
+        onAccountsBecameReadable?()
+
         guard !store.stagedChanges(in: namespace).isEmpty else { return }
 
-        Task { await activate() }
+        // Detached: this observer runs inside the sync-engine delegate's
+        // callback tree when `handleFetchedChanges` applies account records and
+        // posts `.accountsDidChange`, and an unstructured task would inherit
+        // that scope — where a call back into the engine is a trap.
+        Task.detached { [weak self] in await self?.activate() }
     }
 
     // MARK: - Engine attachment
@@ -777,12 +796,14 @@ final class AccountSyncCoordinator {
         // empty belongs to the identity actually signed in.
         guard !debugSimulationActive, let namespace else { return false }
 
-        store.clearStagedChanges(in: namespace)
-
-        // Same fence as `uploadEverything()`, for the same reason: during the
-        // reload gap the outbox in memory is still the previous identity's, and
-        // emptying it would drop uploads the purge said nothing about.
+        // Fenced before anything is destroyed, the way `uploadEverything()` is:
+        // during the reload gap the accounts in memory are still the previous
+        // identity's, and dropping their staging and their outbox here would
+        // answer this purge with someone else's data. The purge is answered
+        // again when they arrive.
         guard isManagerLoaded(for: namespace) else { return false }
+
+        store.clearStagedChanges(in: namespace)
         accountsManager.clearPendingUploads()
         return true
     }

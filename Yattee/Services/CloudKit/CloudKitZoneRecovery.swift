@@ -45,6 +45,72 @@ enum ZoneDeletionResponse: String, Sendable {
     }
 }
 
+/// When the marker for a recovery may be retired.
+enum ZoneRecoveryRetirement: Sendable {
+    /// Only once the engine has serialized the state the recovery registered,
+    /// so anything interrupted in between is redone on the next launch.
+    case whenStatePersists
+
+    /// As soon as the recovery's own durable half has been done.
+    case immediately
+}
+
+extension ZoneDeletionResponse {
+    /// The lifecycle this response's marker follows.
+    ///
+    /// The two do not share one, because being redone does not cost them the
+    /// same thing.
+    ///
+    /// A re-seed only adds: registering the same records twice collapses in the
+    /// engine's state, and marking the account outbox dirty is a set union. It
+    /// can therefore afford to be held until the engine has actually written
+    /// the work down, and to be repeated for as long as it has not.
+    ///
+    /// A discard removes, and a replay removes more than it was asked to: it
+    /// drops every pending change the engine holds *now*, including work
+    /// registered after the purge was answered — an account added while the app
+    /// kept running, a category switched back on, a re-run of `setupSyncEngine`.
+    /// Its durable half — this identity's staged records and its account outbox
+    /// — is the answer the purge actually needs, and it is complete the moment
+    /// that half succeeds. So the marker goes then, and the engine-state
+    /// clearing beside it is one-shot.
+    var retirement: ZoneRecoveryRetirement {
+        switch self {
+        case .reseed: .whenStatePersists
+        case .discard: .immediately
+        }
+    }
+}
+
+/// Counts sync-engine state updates as they are delivered, off the main actor.
+///
+/// A state update is handed to the delegate on the engine's own thread and only
+/// then hops to the main actor. An update delivered *before* a recovery
+/// registered its work can still run its main-actor body after — the recovery
+/// holds the main actor while it registers — and the serialization it carries
+/// predates that work entirely. Retiring a marker on one of those would forget
+/// work the engine has not written down. Counting at delivery is what tells the
+/// two apart.
+final class ZoneRecoveryDeliveryCounter: @unchecked Sendable {
+    private let lock = NSLock()
+    private var count: UInt64 = 0
+
+    /// Records a delivery and returns its sequence number.
+    func next() -> UInt64 {
+        lock.lock()
+        defer { lock.unlock() }
+        count += 1
+        return count
+    }
+
+    /// How many deliveries have happened so far.
+    var current: UInt64 {
+        lock.lock()
+        defer { lock.unlock() }
+        return count
+    }
+}
+
 /// One category of local data a re-seed publishes.
 enum ReseedCategory: String, CaseIterable, Sendable {
     case accounts
@@ -99,6 +165,10 @@ final class CloudKitZoneRecoveryMarker {
     /// and only waiting for the engine to serialize its state.
     private var awaitingStatePersistence = false
 
+    /// How many state updates the engine had delivered when the work was
+    /// registered. Only a later one can carry it.
+    private var armedAfterDelivery: UInt64 = 0
+
     init(defaults: UserDefaults = .standard, key: String = "cloudKitZoneNeedsReseed") {
         self.defaults = defaults
         self.key = key
@@ -115,14 +185,29 @@ final class CloudKitZoneRecoveryMarker {
         awaitingStatePersistence = false
     }
 
-    /// Says the recovery is fully registered with the engine, so the next
+    /// Says the recovery is fully registered with the engine, so a *later*
     /// serialization of that state may retire the marker.
     ///
     /// Deliberately separate from `begin`: a recovery that could not register
     /// everything — accounts belonging to an identity that has not loaded yet —
     /// keeps its marker and is redone on the next launch.
-    func readyToClear() {
+    ///
+    /// - Parameter sequence: the number of state updates delivered so far. An
+    ///   update already delivered when this is called was serialized before the
+    ///   work was registered, however late its main-actor half runs.
+    func readyToClear(afterDelivery sequence: UInt64) {
         awaitingStatePersistence = true
+        armedAfterDelivery = sequence
+    }
+
+    /// Retires the marker now, without waiting for the engine to write anything
+    /// down.
+    ///
+    /// For the response whose answer is its own durable half — see
+    /// ``ZoneRecoveryRetirement``. Redoing that one would destroy work that was
+    /// registered after it, so it is not held open for a redo.
+    func retireNow() {
+        clear()
     }
 
     /// Retires the marker once the engine has persisted the state the recovery
@@ -130,10 +215,29 @@ final class CloudKitZoneRecoveryMarker {
     ///
     /// State updates arrive for every other reason too, and one of those must
     /// not retire a marker whose work has not been redone — that is exactly the
-    /// state a relaunch after an interrupted recovery starts in.
-    func stateDidPersist() {
-        guard awaitingStatePersistence else { return }
+    /// state a relaunch after an interrupted recovery starts in. Nor may one
+    /// that was already on its way when the work was registered: it is carrying
+    /// a serialization taken before any of it existed.
+    ///
+    /// - Parameter sequence: the delivery number of the state update being
+    ///   handled, taken when the engine handed it over.
+    func stateDidPersist(deliveredAt sequence: UInt64) {
+        guard awaitingStatePersistence, sequence > armedAfterDelivery else { return }
+        clear()
+    }
+
+    /// Forgets the marker entirely, without treating its work as done.
+    ///
+    /// For the Apple account moving underneath us: the marker names a decision
+    /// about *that* identity's zone, and replaying it against the next one's
+    /// namespace answers a wipe that never happened there.
+    func forget() {
+        clear()
+    }
+
+    private func clear() {
         awaitingStatePersistence = false
+        armedAfterDelivery = 0
         defaults.removeObject(forKey: key)
     }
 }

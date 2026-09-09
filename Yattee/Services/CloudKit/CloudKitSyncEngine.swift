@@ -53,6 +53,19 @@ private enum ApplyRecordResult {
     case failed
 }
 
+/// Whether the current task is running inside a `CKSyncEngineDelegate`
+/// callback.
+///
+/// CloudKit traps, in release builds, on a call back into the engine from
+/// inside one of its own event callbacks — `fetchChanges()` or `sendChanges()`
+/// — and reads "inside the callback" from exactly this kind of task-local, so a
+/// plain `Task { }` spawned there inherits the trap while a `Task.detached`
+/// escapes it. That is what killed the app a second after the push in the S14
+/// campaign, and it is invisible until it happens on someone's device.
+enum CloudKitDelegateScope {
+    @TaskLocal static var isHandlingEvent = false
+}
+
 /// Main CloudKit sync engine that manages bidirectional sync between local SwiftData and iCloud.
 @MainActor
 @Observable
@@ -132,6 +145,18 @@ final class CloudKitSyncEngine: @unchecked Sendable {
     /// Durable note that the zone was deleted on the server and this device has
     /// not finished answering it.
     private let zoneRecovery = CloudKitZoneRecoveryMarker()
+
+    /// Counts state updates as the engine hands them over, before they reach
+    /// the main actor — see ``ZoneRecoveryDeliveryCounter``.
+    private nonisolated let stateUpdateDeliveries = ZoneRecoveryDeliveryCounter()
+
+    /// Whether the last answer to a zone deletion could not speak for the
+    /// accounts, and is owed a second attempt once they arrive.
+    ///
+    /// Distinct from the marker still being pending: a re-seed that registered
+    /// everything keeps its marker until the engine serializes the work, and
+    /// redoing *that* would only disarm it and start over.
+    private var zoneRecoveryAwaitsAccounts = false
 
     /// UserDefaults key for the record schema version this app last synced with.
     private let lastSchemaVersionKey = "cloudKitLastSchemaVersion"
@@ -233,8 +258,34 @@ final class CloudKitSyncEngine: @unchecked Sendable {
     /// Drives the account category: accounts, migration markers, deletion
     /// tombstones and the selected data context. Set after initialization, and
     /// nil in tests that only exercise the SwiftData categories.
-    var accountSync: AccountSyncCoordinator?
-    
+    var accountSync: AccountSyncCoordinator? {
+        didSet { wireZoneRecoveryRetry() }
+    }
+
+    /// Asks the accounts to say when they become readable again, so a recovery
+    /// that could not speak for them is answered as soon as they arrive.
+    ///
+    /// Without this the marker simply waits: the accounts finish loading, and
+    /// nothing looks at it again until the next `setupSyncEngine()` — which,
+    /// on a device left running, may be the next launch.
+    private func wireZoneRecoveryRetry() {
+        accountSync?.onAccountsBecameReadable = { [weak self] in
+            // Only a recovery that was *refused*, never one that is merely
+            // waiting for the engine to serialize what it registered. This
+            // notification fires for every account edit, and redoing an armed
+            // re-seed on each one would disarm it and start it over.
+            guard let self, self.zoneRecoveryAwaitsAccounts else { return }
+
+            // Detached, not a plain `Task`: the notification behind this is
+            // posted from inside the sync-engine delegate's callback tree when
+            // fetched account records are applied, and an unstructured task
+            // would inherit that scope and carry the recovery back into it.
+            Task.detached { [weak self] in
+                await self?.resumeZoneRecoveryIfNeeded()
+            }
+        }
+    }
+
     // MARK: - Initialization
     
     init(
@@ -413,12 +464,6 @@ final class CloudKitSyncEngine: @unchecked Sendable {
             }
             await accountSync?.activate()
 
-            // A zone deletion noticed in an earlier run may not have been
-            // answered in full — the marker outlives whatever interrupted it,
-            // and this is the first point where the engine exists and the
-            // accounts are loaded, outside any delegate callback.
-            await resumeZoneRecoveryIfNeeded()
-
             if accountChanged {
                 LoggingService.shared.logCloudKit("CloudKit sync engine initialized with new account (fresh sync state)")
             } else {
@@ -430,10 +475,21 @@ final class CloudKitSyncEngine: @unchecked Sendable {
 
             loadDeferredItems()
             updatePendingCount()
-            
+
+            // A zone deletion noticed in an earlier run may not have been
+            // answered in full — the marker outlives whatever interrupted it,
+            // and this is the first point where the engine exists and the
+            // accounts are loaded, outside any delegate callback.
+            //
+            // Deliberately last: everything above puts work *into* the engine —
+            // the buffered changes, the legacy pending-change migration, the
+            // deferred playlist items — and a resumed purge has to be able to
+            // drop what it is not allowed to resend, including all of that.
+            await resumeZoneRecoveryIfNeeded()
+
             // Perform initial sync
             await sync()
-            
+
         } catch {
             LoggingService.shared.logCloudKitError("Failed to setup sync engine", error: error)
             syncError = error
@@ -502,6 +558,13 @@ final class CloudKitSyncEngine: @unchecked Sendable {
 
         // Clear deferred playlist items (they belong to the old account context)
         clearDeferredItems()
+
+        // The zone a recovery was answering belonged to the account being left.
+        // Replayed against the next one's namespace it answers a wipe that
+        // never happened there — and a pending purge would drop that identity's
+        // staged accounts and its outbox on the way in.
+        zoneRecovery.forget()
+        zoneRecoveryAwaitsAccounts = false
 
         // Clear any existing sync engine
         syncEngine = nil
@@ -600,8 +663,29 @@ final class CloudKitSyncEngine: @unchecked Sendable {
         isSyncEnabled && (settingsManager?.syncInstances ?? true)
     }
     
+    /// Fails the build's own tests, and a developer's run, if the engine is
+    /// about to be re-entered from inside one of its delegate callbacks.
+    ///
+    /// Release behaviour is unchanged: CloudKit's own trap is what users would
+    /// meet, and adding a second one here would only change which line the
+    /// crash names. This is here so the trap is met by whoever wrote the call
+    /// instead — a plain `Task { }` in a delegate path is enough to inherit it,
+    /// and nothing about the call site says so.
+    private nonisolated func assertNotInsideDelegateEvent(_ call: String) {
+        #if DEBUG
+        if CloudKitDelegateScope.isHandlingEvent {
+            assertionFailure(
+                "\(call) was reached from inside a CKSyncEngine delegate callback. "
+                    + "Register changes in the engine's state instead, or escape the callback with Task.detached."
+            )
+        }
+        #endif
+    }
+
     /// Manually trigger a full sync.
     func sync() async {
+        assertNotInsideDelegateEvent("sync()")
+
         guard isSyncEnabled, let syncEngine else {
             LoggingService.shared.logCloudKit("Sync skipped: sync disabled or engine not ready")
             return
@@ -1319,6 +1403,8 @@ final class CloudKitSyncEngine: @unchecked Sendable {
     /// Fetch remote changes from CloudKit. Used when the app returns to foreground
     /// to catch any changes that may have been missed (e.g. dropped push notifications).
     func fetchRemoteChanges() async {
+        assertNotInsideDelegateEvent("fetchRemoteChanges()")
+
         guard isSyncEnabled, let syncEngine else {
             if !isSyncEnabled {
                 LoggingService.shared.logCloudKit("fetchRemoteChanges skipped: sync disabled")
@@ -1557,7 +1643,18 @@ final class CloudKitSyncEngine: @unchecked Sendable {
     }
 
     /// Clear all sync state and reset. For testing/debugging only.
+    ///
+    /// Refused while sync is off. Everything after the zone deletion runs
+    /// through `setupSyncEngine()` and `performInitialUpload()`, both of which
+    /// stop at the same disabled toggle — so with sync off this would delete
+    /// the zone, recreate it empty, and then tell the user their local data had
+    /// been re-uploaded into it.
     func resetSync() async throws {
+        guard isSyncEnabled else {
+            LoggingService.shared.logCloudKit("Reset refused: iCloud sync is turned off, nothing would be re-uploaded")
+            throw CloudKitError.syncDisabled
+        }
+
         guard let zoneManager else { return }
 
         // Delete zone (and all records)
@@ -1815,6 +1912,17 @@ final class CloudKitSyncEngine: @unchecked Sendable {
 
 extension CloudKitSyncEngine: CKSyncEngineDelegate {
     nonisolated func handleEvent(_ event: CKSyncEngine.Event, syncEngine: CKSyncEngine) async {
+        // Marks the whole callback tree, so anything that re-enters the engine
+        // from inside it says so in a debug build instead of trapping on
+        // someone's device. Inherited by every plain `Task { }` started below
+        // it — which is precisely the mistake worth catching — and escaped by
+        // `Task.detached`, which is the fix.
+        await CloudKitDelegateScope.$isHandlingEvent.withValue(true) {
+            await handleDelegateEvent(event)
+        }
+    }
+
+    private nonisolated func handleDelegateEvent(_ event: CKSyncEngine.Event) async {
         // Events that require async processing must be awaited directly (not in a fire-and-forget Task)
         // so that CKSyncEngine waits for processing to complete before advancing the sync state token.
         // Otherwise the state is saved before changes are applied, and on next launch CKSyncEngine
@@ -1838,20 +1946,27 @@ extension CloudKitSyncEngine: CKSyncEngineDelegate {
             // what tells staged account records they may be applied.
             await accountSync?.zoneFetchCompleted(zoneID: changes.zoneID, error: changes.error)
 
+        case .stateUpdate(let update):
+            // Numbered here, before the hop to the main actor: a recovery holds
+            // the main actor while it registers its work, so an update handed
+            // over before that can still run its body afterwards — carrying a
+            // serialization in which none of the work exists.
+            let delivery = stateUpdateDeliveries.next()
+            await MainActor.run {
+                let encoder = PropertyListEncoder()
+                let stateSize = (try? encoder.encode(update.stateSerialization))?.count ?? 0
+                LoggingService.shared.logCloudKit("Sync state updated and saved (\(stateSize) bytes)")
+                saveSyncState(update.stateSerialization)
+                // The state just written may be what a zone recovery registered
+                // itself into, so the note that it still owes that work can go
+                // — and not one moment earlier.
+                zoneRecovery.stateDidPersist(deliveredAt: delivery)
+                updatePendingCount()
+            }
+
         default:
             await MainActor.run {
                 switch event {
-                case .stateUpdate(let update):
-                    let encoder = PropertyListEncoder()
-                    let stateSize = (try? encoder.encode(update.stateSerialization))?.count ?? 0
-                    LoggingService.shared.logCloudKit("Sync state updated and saved (\(stateSize) bytes)")
-                    saveSyncState(update.stateSerialization)
-                    // The state just written is what a zone recovery registered
-                    // itself into, so the note that it still owes that work can
-                    // go — and not one moment earlier.
-                    zoneRecovery.stateDidPersist()
-                    updatePendingCount()
-
                 case .accountChange:
                     LoggingService.shared.logCloudKit("iCloud account change event received - reinitializing sync engine")
                     Task.detached { [weak self] in
@@ -2289,10 +2404,12 @@ extension CloudKitSyncEngine: CKSyncEngineDelegate {
     /// Answers a deletion of our zone, using nothing but durable storage and
     /// the engine's own state.
     ///
-    /// Safe to run twice: re-registering pending changes collapses in the
-    /// engine state, and marking the account outbox dirty is idempotent. That
-    /// is what lets an interrupted recovery simply be redone on the next
-    /// launch.
+    /// The two responses are not equally repeatable, and their markers are
+    /// retired on different terms because of it — see ``ZoneRecoveryRetirement``.
+    /// A re-seed only adds, so it is safe to run twice and is held open until
+    /// the engine has written it down. A purge removes, and running it a second
+    /// time would remove work registered in between, so it is retired the
+    /// moment its durable half succeeds.
     private func answerZoneDeletion(_ response: ZoneDeletionResponse) async {
         // Durable first. Everything below can be interrupted, and a relaunch
         // that finds the zone recreated and no marker cannot tell a wiped zone
@@ -2313,32 +2430,53 @@ extension CloudKitSyncEngine: CKSyncEngineDelegate {
             // having created the zone this session and would do nothing, and
             // the engine saves the zone ahead of the records that need it.
             requestZoneRecreation()
-            finish(zoneRecovery, ifComplete: await enqueueFullUpload())
+            finish(response, ifComplete: await enqueueFullUpload())
 
         case .discard:
             LoggingService.shared.logCloudKit(
                 "Zone '\(RecordType.zoneName)' was purged by the account owner - dropping what it held, nothing is resent"
             )
-            finish(zoneRecovery, ifComplete: discardWhatTheZoneHeld())
+            finish(response, ifComplete: discardWhatThePurgedZoneHeld())
         }
     }
 
-    /// Lets the marker be retired once the engine serializes its state — but
-    /// only if the recovery reached every category. The account half can refuse
-    /// while the identity it belongs to has not loaded, and a recovery that
-    /// left the accounts out is one the next launch has to redo.
-    private func finish(_ marker: CloudKitZoneRecoveryMarker, ifComplete complete: Bool) {
+    /// Retires the marker, or arms it to be retired, once the recovery reached
+    /// every category.
+    ///
+    /// The account half can refuse while the identity it belongs to has not
+    /// loaded, and a recovery that left the accounts out is one that has to be
+    /// answered again — by the retry that runs when the accounts arrive, or by
+    /// the next launch.
+    ///
+    /// When it did reach everything, *how* the marker goes depends on the
+    /// response: a re-seed waits for the engine to serialize the work it
+    /// registered, a purge is already done. See ``ZoneRecoveryRetirement``.
+    private func finish(_ response: ZoneDeletionResponse, ifComplete complete: Bool) {
         guard complete else {
+            zoneRecoveryAwaitsAccounts = true
             LoggingService.shared.logCloudKit(
-                "Zone recovery could not reach the account records yet - keeping the marker for the next launch"
+                "Zone recovery could not reach the account records yet - keeping the marker for the accounts to arrive"
             )
             return
         }
-        marker.readyToClear()
+
+        zoneRecoveryAwaitsAccounts = false
+
+        switch response.retirement {
+        case .whenStatePersists:
+            zoneRecovery.readyToClear(afterDelivery: stateUpdateDeliveries.current)
+        case .immediately:
+            zoneRecovery.retireNow()
+        }
     }
 
     /// Re-registers the recovery a previous run recorded but may not have
-    /// finished. Called during setup, outside any delegate callback.
+    /// finished.
+    ///
+    /// Called during setup, and again whenever the accounts this device could
+    /// not speak for become readable. Never from inside a delegate callback:
+    /// the recovery is safe there, but the retry's trigger is a notification
+    /// the delegate tree posts, and the hop out of it is what keeps that true.
     private func resumeZoneRecoveryIfNeeded() async {
         guard let response = zoneRecovery.pending else { return }
 
@@ -2364,15 +2502,33 @@ extension CloudKitSyncEngine: CKSyncEngineDelegate {
     /// - Returns: whether the account category could be cleared too. It cannot
     ///   while the accounts in memory belong to another identity, and a purge
     ///   half-answered has to be answered again.
-    private func discardWhatTheZoneHeld() -> Bool {
+    private func discardWhatThePurgedZoneHeld() -> Bool {
         if let syncEngine {
             let pending = syncEngine.state.pendingRecordZoneChanges
             if !pending.isEmpty {
                 syncEngine.state.remove(pendingRecordZoneChanges: pending)
             }
+
+            // A pending `.saveZone` would put the purged zone back on the next
+            // send — from an earlier `.zoneNotFound`, or from a re-seed this
+            // purge overtook. The zone comes back lazily when the user next
+            // changes something, which is a new decision rather than a resend.
+            let pendingZones = syncEngine.state.pendingDatabaseChanges
+            if !pendingZones.isEmpty {
+                syncEngine.state.remove(pendingDatabaseChanges: pendingZones)
+            }
         }
         pendingChangesBuffer.removeAll()
         clearDeferredItems()
+
+        // Written by a build older than the state-driven engine and consumed by
+        // `migrateLegacyPendingChanges(into:)`. A resumed purge runs after that
+        // migration, so these are normally already spent — but a purge answered
+        // before the migration ever ran would otherwise leave them to be
+        // rediscovered and sent on a later launch.
+        UserDefaults.standard.removeObject(forKey: pendingSaveRecordNamesKey)
+        UserDefaults.standard.removeObject(forKey: pendingDeleteRecordNamesKey)
+
         let accountsCleared = accountSync?.discardWhatTheZoneHeld() ?? true
         updatePendingCount()
         return accountsCleared
@@ -3063,6 +3219,7 @@ enum SyncStatus: Equatable {
 enum CloudKitError: Error, LocalizedError, Sendable {
     case iCloudNotAvailable(status: CKAccountStatus)
     case notAuthenticated
+    case syncDisabled
     case quotaExceeded
     case zoneNotFound
     case recordNotFound
@@ -3079,6 +3236,8 @@ enum CloudKitError: Error, LocalizedError, Sendable {
             "iCloud is not available (status: \(status))"
         case .notAuthenticated:
             "Not signed into iCloud. Sign in to Settings to enable sync."
+        case .syncDisabled:
+            "iCloud sync is turned off. Turn it on before resetting iCloud data."
         case .quotaExceeded:
             "iCloud storage quota exceeded. Free up space in iCloud settings."
         case .zoneNotFound:
