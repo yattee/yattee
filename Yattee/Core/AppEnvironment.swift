@@ -1090,7 +1090,14 @@ final class AppEnvironment {
     /// Only ever reports `credentialMissing` versus `signedIn` — a rejected
     /// credential is something only the server can tell us, so that state is set
     /// by the API layer when a request actually fails.
-    func refreshAccountStatuses() {
+    /// - Parameter preservingUnreachable: leaves an account the server failed to
+    ///   answer for alone. Only the credential-arrival poll passes this: it runs
+    ///   every 15 seconds on behalf of a *different* account, and lifting the
+    ///   outage fallback as a side effect of that would retry a down server four
+    ///   times a minute instead of once, for as long as anything was waiting.
+    ///   Everything else keeps the default, so a real signal — connectivity
+    ///   returning, an account list changing — still lifts it at once.
+    func refreshAccountStatuses(preservingUnreachable: Bool = false) {
         var didChangeFingerprints = false
         defer { if didChangeFingerprints { saveCredentialFingerprints() } }
 
@@ -1127,10 +1134,11 @@ final class AppEnvironment {
             // device replaces it under the same key — and a rejection only
             // applies to the secret that earned it.
             //
-            // `unreachable` is deliberately not preserved here. It is transient,
-            // and it stops reads from reaching the server at all, so keeping it
+            // `unreachable` is normally not preserved here. It is transient, and
+            // it stops reads from reaching the server at all, so keeping it
             // would strand the account: nothing would call out to discover that
-            // the server came back.
+            // the server came back. The credential-arrival poll is the one
+            // caller that has to leave it standing — see the parameter.
             // The secret itself is watched, not just the account: iCloud
             // Keychain can replace it under the same key when the user signs in
             // again elsewhere. The account ID, the context and the status all
@@ -1140,8 +1148,14 @@ final class AppEnvironment {
                 .map { CloudKitIdentity.shortDigest(of: Data($0.utf8)) }
             let previousFingerprint = credentialFingerprints[account.id]
             let didReplaceCredential = previousFingerprint != nil && previousFingerprint != fingerprint
-            credentialFingerprints[account.id] = fingerprint
-            didChangeFingerprints = true
+
+            // Written only when it actually moved: the arrival poll comes
+            // through here every 15 seconds, and a secret that has not changed
+            // should not cost a defaults write each time.
+            if previousFingerprint != fingerprint {
+                credentialFingerprints[account.id] = fingerprint
+                didChangeFingerprints = true
+            }
 
             if didReplaceCredential {
                 LoggingService.shared.info(
@@ -1154,12 +1168,16 @@ final class AppEnvironment {
 
             // A rejection belongs to the credential that earned it. A
             // replacement has not been rejected by anyone.
-            let wasRejected = accountsManager.status(for: account.id) == .credentialRejected
-            if wasRejected, !didReplaceCredential {
+            let status = accountsManager.status(for: account.id)
+            if Self.statusOutlivesKeychainRefresh(
+                status,
+                credentialWasReplaced: didReplaceCredential,
+                preservingUnreachable: preservingUnreachable
+            ) {
                 continue
             }
 
-            if wasRejected {
+            if status == .credentialRejected {
                 LoggingService.shared.info(
                     "The rejected login was replaced — letting the account try again",
                     category: .keychain,
@@ -1171,6 +1189,29 @@ final class AppEnvironment {
         }
 
         waitForArrivingCredentialsIfNeeded()
+    }
+
+    /// Whether a status the Keychain has nothing to say about should stand.
+    ///
+    /// Both verdicts this preserves came from the server, and neither can be
+    /// re-derived from a stored secret — but a secret that was *replaced* voids
+    /// both of them, because whatever the server said, it said it about the
+    /// credential that is no longer there.
+    static func statusOutlivesKeychainRefresh(
+        _ status: AccountStatus,
+        credentialWasReplaced: Bool,
+        preservingUnreachable: Bool
+    ) -> Bool {
+        guard !credentialWasReplaced else { return false }
+
+        switch status {
+        case .credentialRejected:
+            return true
+        case .unreachable:
+            return preservingUnreachable
+        default:
+            return false
+        }
     }
 
     /// Re-reads the Keychain for a couple of minutes while any account is
@@ -1211,10 +1252,18 @@ final class AppEnvironment {
 
                 // The whole verdict rather than a shortened version of it: a
                 // rejection lifts only when the stored secret is a different
-                // one, and that comparison lives in there.
-                self.refreshAccountStatuses()
+                // one, and that comparison lives in there. Another account's
+                // outage fallback is left where it is: this tick is not news
+                // about that server, and cutting its minute of backoff down to
+                // fifteen seconds is not something waiting on a credential
+                // should do.
+                self.refreshAccountStatuses(preservingUnreachable: true)
             }
 
+            // A cancelled poll has already been succeeded — clearing the
+            // reference now would orphan whatever replaced it, leaving a
+            // poller nothing can stop.
+            guard !Task.isCancelled else { return }
             self?.credentialArrivalTask = nil
         }
     }

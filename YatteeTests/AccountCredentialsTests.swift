@@ -751,6 +751,59 @@ struct CredentialReplacementTests {
     }
 }
 
+@Suite("Statuses a Keychain refresh must not overwrite")
+@MainActor
+struct KeychainRefreshStatusPreservationTests {
+    @Test("A rejection stands until the secret behind it is a different one")
+    func rejectionStandsUntilReplaced() {
+        #expect(AppEnvironment.statusOutlivesKeychainRefresh(
+            .credentialRejected, credentialWasReplaced: false, preservingUnreachable: false
+        ) == true)
+        #expect(AppEnvironment.statusOutlivesKeychainRefresh(
+            .credentialRejected, credentialWasReplaced: true, preservingUnreachable: false
+        ) == false)
+    }
+
+    /// The arrival poll ticks every 15 seconds while any account waits on a
+    /// credential. Lifting a *neighbouring* account's outage fallback each time
+    /// would shorten its minute of backoff to fifteen seconds and hammer a
+    /// server that is already down.
+    @Test("An outage fallback survives the credential-arrival poll")
+    func unreachableSurvivesThePoll() {
+        #expect(AppEnvironment.statusOutlivesKeychainRefresh(
+            .unreachable, credentialWasReplaced: false, preservingUnreachable: true
+        ) == true)
+    }
+
+    /// Everything else — connectivity returning, the account list changing — is
+    /// real news, and must lift the fallback at once rather than waiting out the
+    /// timer.
+    @Test("Every other caller still lifts an outage fallback")
+    func unreachableLiftsForEveryoneElse() {
+        #expect(AppEnvironment.statusOutlivesKeychainRefresh(
+            .unreachable, credentialWasReplaced: false, preservingUnreachable: false
+        ) == false)
+    }
+
+    /// A replaced secret voids both verdicts: whatever the server said, it said
+    /// it about a credential that is no longer there.
+    @Test("A replaced credential is owed a fresh verdict either way")
+    func replacementClearsBothVerdicts() {
+        #expect(AppEnvironment.statusOutlivesKeychainRefresh(
+            .unreachable, credentialWasReplaced: true, preservingUnreachable: true
+        ) == false)
+    }
+
+    @Test("A status the Keychain can speak to is never preserved")
+    func keychainDerivedStatusesAreRecomputed() {
+        for status in [AccountStatus.checking, .signedIn, .credentialMissing] {
+            #expect(AppEnvironment.statusOutlivesKeychainRefresh(
+                status, credentialWasReplaced: false, preservingUnreachable: true
+            ) == false)
+        }
+    }
+}
+
 @Suite("Credential identity scope resolution")
 @MainActor
 struct CredentialIdentityScopeTests {
