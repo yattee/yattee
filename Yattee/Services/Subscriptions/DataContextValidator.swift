@@ -204,13 +204,20 @@ final class DataContextValidator {
         }
     }
 
-    /// User-set label, else the stored login identifier, else the host.
-    ///
-    /// The username lives in the Keychain beside the credential rather than in
-    /// synced metadata, so it is only available on a device that is signed in.
+    /// User-set label, else whatever the account falls back to.
     func displayName(for account: Account) -> String {
         if let name = account.displayName, !name.isEmpty { return name }
+        return defaultDisplayName(for: account)
+    }
 
+    /// What the account is called with no user-set label: the stored login
+    /// identifier, else the source's name, else its host.
+    ///
+    /// Device-local by nature. The username lives in the Keychain beside the
+    /// credential rather than in synced metadata, so it is only available on a
+    /// device that is signed in — two devices holding the very same account can
+    /// legitimately fall back to different names for it.
+    func defaultDisplayName(for account: Account) -> String {
         if let username = appEnvironment?
             .accountCredentialsManager(for: account)?
             .username(for: account),
@@ -227,5 +234,19 @@ final class DataContextValidator {
         }
 
         return String(localized: "accounts.status.instanceMissing")
+    }
+
+    /// What a rename field's contents mean once the user is done typing.
+    ///
+    /// `nil` clears the user-set label and hands the account back to
+    /// `defaultDisplayName`. An empty field says that outright — and so does
+    /// typing exactly the name the account already falls back to. The field
+    /// starts prefilled with the label the row is showing, so saving it
+    /// untouched must not turn a *device-local* fallback into a synced label
+    /// that every other device is then made to display.
+    static func renamedDisplayName(_ input: String, fallingBackTo defaultName: String) -> String? {
+        let trimmed = input.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !trimmed.isEmpty, trimmed != defaultName else { return nil }
+        return trimmed
     }
 }

@@ -458,3 +458,100 @@ struct DataContextSwitcherLabelTests {
         )
     }
 }
+
+// MARK: - Rename
+
+@Suite("Account rename")
+@MainActor
+struct AccountRenameTests {
+    private func makeDefaults() -> UserDefaults {
+        UserDefaults(suiteName: "yattee.tests.\(UUID().uuidString)")!
+    }
+
+    private func makeScope() -> CredentialIdentityScope {
+        CredentialIdentityScope(fixedScope: "identity-\(UUID().uuidString)")
+    }
+
+    private func makeFixture() -> (AccountsManager, InstancesManager, DataContextValidator) {
+        let instances = makeTestInstancesManager()
+        let accounts = AccountsManager(
+            identityScope: makeScope(),
+            instancesManager: instances,
+            defaults: makeDefaults()
+        )
+        let validator = DataContextValidator(
+            accountsManager: accounts,
+            instancesManager: instances,
+            toastManager: ToastManager()
+        )
+        return (accounts, instances, validator)
+    }
+
+    @Test("A typed name replaces the fallback")
+    func typedNameIsStored() {
+        #expect(
+            DataContextValidator.renamedDisplayName("  Main i01 ", fallingBackTo: "i01") == "Main i01"
+        )
+    }
+
+    @Test("An empty field clears the label")
+    func emptyClearsTheLabel() {
+        #expect(DataContextValidator.renamedDisplayName("", fallingBackTo: "i01") == nil)
+        #expect(DataContextValidator.renamedDisplayName("   \n ", fallingBackTo: "i01") == nil)
+    }
+
+    @Test("Saving the prefilled fallback untouched sets no name at all")
+    func unchangedFallbackIsNotStored() {
+        // The field starts on the label the row is showing, and that label can
+        // be device-local — the login identifier only exists where the
+        // credential does. Storing it would publish one device's fallback to
+        // every other device as if the user had chosen it.
+        #expect(DataContextValidator.renamedDisplayName("i01", fallingBackTo: "i01") == nil)
+        #expect(
+            DataContextValidator.renamedDisplayName(
+                "utest1@i01.v.yattee.stream",
+                fallingBackTo: "utest1@i01.v.yattee.stream"
+            ) == nil
+        )
+    }
+
+    @Test("The default name ignores the user-set one, and the shown name prefers it")
+    func defaultIgnoresTheUserSetLabel() {
+        let (accounts, instances, validator) = makeFixture()
+        var instance = Instance(type: .invidious, url: URL(string: "https://inv.example.com")!)
+        instance.name = "My Invidious"
+        instances.add(instance)
+
+        let account = accounts.addAccount(instanceID: instance.id)
+
+        #expect(validator.defaultDisplayName(for: account) == "My Invidious")
+        #expect(validator.displayName(for: account) == "My Invidious")
+
+        accounts.updateDisplayName("Main i01", for: account.id)
+        let renamed = accounts.account(id: account.id)!
+
+        #expect(validator.displayName(for: renamed) == "Main i01")
+        // Unchanged: clearing the name has somewhere to go back to.
+        #expect(validator.defaultDisplayName(for: renamed) == "My Invidious")
+    }
+
+    @Test("A rename is queued for upload, and clearing it is queued too")
+    func renameIsQueuedForUpload() {
+        let (accounts, instances, _) = makeFixture()
+        let instance = Instance(type: .invidious, url: URL(string: "https://inv.example.com")!)
+        instances.add(instance)
+
+        let account = accounts.addAccount(instanceID: instance.id)
+        accounts.confirmUpload(account.id)
+        #expect(!accounts.pendingUploads.contains(account.id))
+
+        accounts.updateDisplayName("Main i01", for: account.id)
+        #expect(accounts.pendingUploads.contains(account.id))
+        #expect(accounts.account(id: account.id)?.displayName == "Main i01")
+
+        accounts.confirmUpload(account.id)
+        accounts.updateDisplayName(nil, for: account.id)
+        #expect(accounts.pendingUploads.contains(account.id))
+        #expect(accounts.account(id: account.id)?.displayName == nil)
+    }
+}

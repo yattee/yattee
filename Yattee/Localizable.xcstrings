@@ -319,6 +319,37 @@
         }
       }
     },
+    "accounts.rename" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rename"
+          }
+        }
+      }
+    },
+    "accounts.rename.message %@" : {
+      "comment" : "Rename alert body, naming what an empty field goes back to",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "This name is shown on all your devices. Leave it empty to go back to \"%@\"."
+          }
+        }
+      }
+    },
+    "accounts.rename.title" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rename Account"
+          }
+        }
+      }
+    },
     "accounts.signIn.identityChanged" : {
       "localizations" : {
         "en" : {

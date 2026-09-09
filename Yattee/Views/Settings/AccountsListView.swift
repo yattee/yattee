@@ -36,6 +36,7 @@ struct AccountsListView: View {
 
     @State private var login: AccountsListLogin?
     @State private var pendingRemoval: PendingAccountRemoval?
+    @State private var renameRequest: AccountRenameRequest?
 
     /// Bumped whenever a credential is replaced, purely to re-read the login
     /// identifier the rows display.
@@ -107,6 +108,9 @@ struct AccountsListView: View {
         #if !os(tvOS)
         .presentationCompactAdaptation(.sheet)
         #endif
+        .accountRenameAlert($renameRequest) { accountID, name in
+            appEnvironment?.accountsManager.updateDisplayName(name, for: accountID)
+        }
         .onReceive(NotificationCenter.default.publisher(for: .accountCredentialDidChange)) { _ in
             credentialRevision &+= 1
         }
@@ -276,6 +280,17 @@ struct AccountsListView: View {
             #endif
         }
 
+        // Offered on orphans too: with no source to fall back to, a label of
+        // its own is the only thing that tells one abandoned login from another.
+        Button {
+            renameRequest = makeRenameRequest(for: account, instance: instance)
+        } label: {
+            Label(String(localized: "accounts.rename"), systemImage: "pencil")
+        }
+        #if os(tvOS)
+        .buttonStyle(TVSettingsButtonStyle())
+        #endif
+
         Button(role: .destructive) {
             pendingRemoval = PendingAccountRemoval(
                 id: account.id,
@@ -324,6 +339,28 @@ struct AccountsListView: View {
 
         return appEnvironment?.dataContextValidator.displayName(for: account)
             ?? String(localized: "accounts.orphan.unnamed")
+    }
+
+    /// What the rename field should start on, and what clearing it goes back to.
+    ///
+    /// An orphan is the exception for the same reason `title(for:instance:)`
+    /// is: with no source to resolve through, the validator's last resort is
+    /// the words "Source missing", which is a diagnosis and not a name to
+    /// prefill a field with.
+    private func makeRenameRequest(for account: Account, instance: Instance?) -> AccountRenameRequest {
+        guard instance != nil, let validator = appEnvironment?.dataContextValidator else {
+            return AccountRenameRequest(
+                id: account.id,
+                defaultName: String(localized: "accounts.orphan.unnamed"),
+                initialText: account.displayName ?? ""
+            )
+        }
+
+        return AccountRenameRequest(
+            id: account.id,
+            defaultName: validator.defaultDisplayName(for: account),
+            initialText: validator.displayName(for: account)
+        )
     }
 
     private func status(for account: Account) -> AccountStatus {

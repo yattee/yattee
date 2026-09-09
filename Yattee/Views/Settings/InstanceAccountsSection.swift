@@ -45,6 +45,10 @@ struct InstanceAccountsSection: View {
     /// sharing the Keychain, which is not something to do on one tap.
     @State private var pendingSignOut: Account?
 
+    /// The account a rename was asked for. Like the sign-out above it, held on
+    /// the section rather than the row, and matched back to a row by ID.
+    @State private var renameRequest: AccountRenameRequest?
+
     private var accounts: [Account] {
         appEnvironment?.accountsManager.accounts(forInstance: instance.id) ?? []
     }
@@ -120,6 +124,12 @@ struct InstanceAccountsSection: View {
                 Label(String(localized: "login.signInAgain"), systemImage: "person.badge.key")
             }
 
+            Button {
+                renameRequest = makeRenameRequest(for: account)
+            } label: {
+                Label(String(localized: "accounts.rename"), systemImage: "pencil")
+            }
+
             Button(role: .destructive) {
                 pendingSignOut = account
             } label: {
@@ -151,6 +161,16 @@ struct InstanceAccountsSection: View {
         #if !os(tvOS)
         .presentationCompactAdaptation(.sheet)
         #endif
+        // Attached to the row for the same reason the dialog above it is, and
+        // narrowed to the row that raised it so only one alert is ever live.
+        .accountRenameAlert(
+            Binding(
+                get: { renameRequest?.id == account.id ? renameRequest : nil },
+                set: { if $0 == nil { renameRequest = nil } }
+            )
+        ) { accountID, name in
+            appEnvironment?.accountsManager.updateDisplayName(name, for: accountID)
+        }
 
         #if os(tvOS)
         // tvOS never syncs app Keychain items, so an account that arrived from
@@ -172,6 +192,16 @@ struct InstanceAccountsSection: View {
 
     private func displayName(for account: Account) -> String {
         appEnvironment?.dataContextValidator.displayName(for: account) ?? instance.displayName
+    }
+
+    /// What the rename field starts on, and what clearing it goes back to.
+    private func makeRenameRequest(for account: Account) -> AccountRenameRequest {
+        AccountRenameRequest(
+            id: account.id,
+            defaultName: appEnvironment?.dataContextValidator.defaultDisplayName(for: account)
+                ?? instance.displayName,
+            initialText: displayName(for: account)
+        )
     }
 
     private func status(for account: Account) -> AccountStatus {
