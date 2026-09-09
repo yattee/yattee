@@ -1154,8 +1154,17 @@ final class AppEnvironment {
 
             // A rejection belongs to the credential that earned it. A
             // replacement has not been rejected by anyone.
-            if accountsManager.status(for: account.id) == .credentialRejected, !didReplaceCredential {
+            let wasRejected = accountsManager.status(for: account.id) == .credentialRejected
+            if wasRejected, !didReplaceCredential {
                 continue
+            }
+
+            if wasRejected {
+                LoggingService.shared.info(
+                    "The rejected login was replaced — letting the account try again",
+                    category: .keychain,
+                    details: "accountID=\(account.id)"
+                )
             }
 
             accountsManager.setStatus(.signedIn, for: account.id)
@@ -1165,19 +1174,29 @@ final class AppEnvironment {
     }
 
     /// Re-reads the Keychain for a couple of minutes while any account is
-    /// missing its credential.
+    /// waiting on one.
     ///
     /// iCloud Keychain delivers on its own schedule and announces nothing when
     /// it does, so an account that syncs ahead of its credential — the ordinary
     /// case on a new device — would sit at "sign in required", with reads
     /// falling back to local, until something unrelated happened to recompute
-    /// statuses. Stops as soon as nothing is waiting, and gives up rather than
-    /// polling forever: on tvOS, where app Keychain items never sync at all,
-    /// the wait is permanent by design.
+    /// statuses.
+    ///
+    /// A rejected account is waiting on the very same delivery: the user fixes
+    /// the login on one device, and this one goes on holding a secret the
+    /// server has already refused until the replacement lands. Nobody sitting
+    /// in front of that screen can hurry it along, and without this the account
+    /// stays red until something unrelated recomputes — which is how a
+    /// second device was measured still saying "sign in again" 41 minutes after
+    /// the login had been fixed.
+    ///
+    /// Only the Keychain is re-read; the server is asked nothing. A secret that
+    /// has not changed therefore costs one local lookup a tick and no request.
+    /// Stops as soon as nothing is waiting, and gives up rather than polling
+    /// forever: on tvOS, where app Keychain items never sync at all, the wait
+    /// is permanent by design.
     private func waitForArrivingCredentialsIfNeeded() {
-        let isWaiting = accountsManager.accounts.contains { accountsManager.status(for: $0.id) == .credentialMissing }
-
-        guard isWaiting else {
+        guard isWaitingForCredential else {
             credentialArrivalTask?.cancel()
             credentialArrivalTask = nil
             return
@@ -1188,26 +1207,25 @@ final class AppEnvironment {
         credentialArrivalTask = Task { [weak self] in
             for _ in 0 ..< 8 {
                 try? await Task.sleep(for: .seconds(15))
-                guard !Task.isCancelled, let self else { return }
+                guard !Task.isCancelled, let self, self.isWaitingForCredential else { break }
 
-                let stillWaiting = self.accountsManager.accounts.contains {
-                    self.accountsManager.status(for: $0.id) == .credentialMissing
-                }
-                guard stillWaiting else { break }
-
-                for account in self.accountsManager.accounts
-                where self.accountsManager.status(for: account.id) == .credentialMissing {
-                    guard let credentials = self.accountCredentialsManager(for: account),
-                          credentials.isScopeResolved else { continue }
-
-                    credentials.refreshLoginStatus(for: account)
-                    if credentials.isLoggedIn(for: account) {
-                        self.accountsManager.setStatus(.signedIn, for: account.id)
-                    }
-                }
+                // The whole verdict rather than a shortened version of it: a
+                // rejection lifts only when the stored secret is a different
+                // one, and that comparison lives in there.
+                self.refreshAccountStatuses()
             }
 
             self?.credentialArrivalTask = nil
+        }
+    }
+
+    /// Whether any account is holding out for a credential iCloud Keychain has
+    /// yet to deliver — either none at all, or one to replace what the server
+    /// refused.
+    private var isWaitingForCredential: Bool {
+        accountsManager.accounts.contains {
+            let status = accountsManager.status(for: $0.id)
+            return status == .credentialMissing || status == .credentialRejected
         }
     }
 

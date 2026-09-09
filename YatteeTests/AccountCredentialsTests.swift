@@ -7,6 +7,7 @@
 
 import Testing
 import Foundation
+import Security
 @testable import Yattee
 
 @Suite("Account credential scoping")
@@ -607,6 +608,146 @@ struct LegacyCredentialAdoptionTests {
 
         KeychainCredentialStore(service: service)
             .delete(key: KeychainCredentialStore.legacyKey(instanceID: instanceID))
+    }
+}
+
+@Suite("Credential replacement across devices")
+@MainActor
+struct CredentialReplacementTests {
+    private func makeService() -> String {
+        "com.yattee.tests.\(UUID().uuidString)"
+    }
+
+    private func makeMarkers() -> CredentialAdoptionMarkerStore {
+        CredentialAdoptionMarkerStore(
+            defaults: UserDefaults(suiteName: "yattee.tests.\(UUID().uuidString)")!
+        )
+    }
+
+    /// One item's attributes, asked for in exactly one synchronizable form.
+    ///
+    /// The store deliberately matches both, so a test that wants to know which
+    /// of the two answered has to ask for itself.
+    private func attributes(service: String, key: String, synchronizable: Bool) -> [String: Any]? {
+        let query: [String: Any] = [
+            kSecClass as String: kSecClassGenericPassword,
+            kSecAttrService as String: service,
+            kSecAttrAccount as String: key,
+            kSecAttrSynchronizable as String: synchronizable,
+            kSecReturnAttributes as String: true,
+            kSecMatchLimit as String: kSecMatchLimitOne
+        ]
+
+        var result: AnyObject?
+        guard SecItemCopyMatching(query as CFDictionary, &result) == errSecSuccess else { return nil }
+        return result as? [String: Any]
+    }
+
+    @Test("A credential that arrived from another device wins over a device-local copy")
+    func synchronizableItemAnswersFirst() {
+        let service = makeService()
+        let store = KeychainCredentialStore(service: service)
+        let key = KeychainCredentialStore.credentialKey(scope: "identity-A", accountID: UUID())
+
+        // The sync flag is part of a generic password's primary key, so both of
+        // these land — neither write displaces the other.
+        #expect(store.addIfAbsent("kept-on-this-device", forKey: key, synchronizable: false) == errSecSuccess)
+        #expect(store.addIfAbsent("arrived-from-elsewhere", forKey: key, synchronizable: true) == errSecSuccess)
+
+        #expect(store.value(forKey: key) == "arrived-from-elsewhere")
+
+        store.delete(key: key)
+    }
+
+    @Test("A device-local credential is still read when nothing has arrived")
+    func localItemAnswersWhenAlone() {
+        let service = makeService()
+        let store = KeychainCredentialStore(service: service)
+        let key = KeychainCredentialStore.credentialKey(scope: "identity-A", accountID: UUID())
+
+        #expect(store.addIfAbsent("kept-on-this-device", forKey: key, synchronizable: false) == errSecSuccess)
+        #expect(store.value(forKey: key) == "kept-on-this-device")
+
+        store.delete(key: key)
+    }
+
+    @Test("Replacing a credential writes a new item rather than editing the old one")
+    func replacementReplacesTheItem() {
+        let service = makeService()
+        let store = KeychainCredentialStore(service: service)
+        let key = KeychainCredentialStore.credentialKey(scope: "identity-A", accountID: UUID())
+
+        #expect(store.set("first-secret", forKey: key, synchronizable: true) == errSecSuccess)
+        let created = attributes(service: service, key: key, synchronizable: true)?[
+            kSecAttrCreationDate as String
+        ] as? Date
+
+        #expect(store.set("second-secret", forKey: key, synchronizable: true) == errSecSuccess)
+        #expect(store.value(forKey: key) == "second-secret")
+
+        // A fresh item, not the old one edited. This is the difference between
+        // a sign-in the user's other devices receive and one they never hear
+        // about: an in-place `SecItemUpdate` was measured not to propagate
+        // through iCloud Keychain at all, while a replacement arrived in 15 s.
+        let replaced = attributes(service: service, key: key, synchronizable: true)?[
+            kSecAttrCreationDate as String
+        ] as? Date
+        #expect(created != nil)
+        #expect(replaced != nil)
+        #expect(replaced != created)
+
+        store.delete(key: key)
+    }
+
+    @Test("Replacing a credential retires the twin in the other form")
+    func replacementRetiresTheOtherForm() {
+        let service = makeService()
+        let store = KeychainCredentialStore(service: service)
+        let key = KeychainCredentialStore.credentialKey(scope: "identity-A", accountID: UUID())
+
+        #expect(store.addIfAbsent("kept-on-this-device", forKey: key, synchronizable: false) == errSecSuccess)
+        #expect(store.set("signed-in-again", forKey: key, synchronizable: true) == errSecSuccess)
+
+        #expect(attributes(service: service, key: key, synchronizable: false) == nil)
+        #expect(store.value(forKey: key) == "signed-in-again")
+
+        store.delete(key: key)
+    }
+
+    @Test("A sign-in on another device reaches an account that adopted its legacy login")
+    func adoptedCredentialYieldsToAnArrivingOne() {
+        let service = makeService()
+        let store = KeychainCredentialStore(service: service)
+        let instanceID = UUID()
+        let account = Account.migrated(from: instanceID)
+
+        store.set(
+            "legacy-secret",
+            forKey: KeychainCredentialStore.legacyKey(instanceID: instanceID),
+            synchronizable: false
+        )
+
+        let credentials = AccountKeychainCredentials(
+            service: service,
+            credentialNoun: "credential",
+            identityScope: CredentialIdentityScope(fixedScope: "identity-A"),
+            markers: makeMarkers()
+        )
+        #expect(credentials.adoptLegacyCredential(for: account) == true)
+        #expect(credentials.credential(for: account) == "legacy-secret")
+
+        // The user signs in again on their other device. That credential
+        // arrives as a synchronizable item under the very key the adopted copy
+        // occupies, and the copy is device-local, so both sit there at once.
+        // Reading the stale one is how a rejection the user already fixed
+        // elsewhere would never lift here.
+        let key = KeychainCredentialStore.credentialKey(scope: "identity-A", accountID: account.id)
+        #expect(store.addIfAbsent("signed-in-elsewhere", forKey: key, synchronizable: true) == errSecSuccess)
+
+        #expect(credentials.credential(for: account) == "signed-in-elsewhere")
+
+        credentials.deleteCredential(for: account)
+        store.delete(key: KeychainCredentialStore.legacyKey(instanceID: instanceID))
     }
 }
 

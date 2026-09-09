@@ -48,29 +48,50 @@ struct KeychainCredentialStore: Sendable {
 
     // MARK: - Access
 
-    /// Reads a value, matching both synchronizable forms.
+    /// Reads a value, matching both synchronizable forms — the one that syncs
+    /// first.
     ///
-    /// `SynchronizableAny` is safe for scoped keys — the scope, not the sync
-    /// flag, is what provides identity isolation.
+    /// Matching both is safe for scoped keys: the scope, not the sync flag, is
+    /// what provides identity isolation. The *order* matters though, because
+    /// `kSecAttrSynchronizable` is part of a generic password's primary key, so
+    /// one key can hold two items at once. Legacy adoption writes a
+    /// device-local copy (`adoptLegacyCredential`), and a credential the user
+    /// signed in for on another device arrives beside it as a separate,
+    /// synchronizable item. A single `SynchronizableAny` match may answer with
+    /// either, and answering with the local copy is how a login already fixed
+    /// elsewhere stays invisible here — for as long as the copy exists.
+    ///
+    /// The synced item is the one somebody proved they hold, so it is asked for
+    /// first, and the local copy only answers when nothing arrived.
     func value(forKey key: String) -> String? {
-        let query: [String: Any] = [
+        for synchronizable in [true, false] {
+            var query = itemQuery(key: key, synchronizable: synchronizable)
+            query[kSecReturnData as String] = true
+            query[kSecMatchLimit as String] = kSecMatchLimitOne
+
+            var result: AnyObject?
+            let status = SecItemCopyMatching(query as CFDictionary, &result)
+
+            guard status == errSecSuccess,
+                  let data = result as? Data,
+                  let value = String(data: data, encoding: .utf8)
+            else { continue }
+
+            return value
+        }
+
+        return nil
+    }
+
+    /// The attributes identifying one item: class, service, key and the
+    /// synchronizable form.
+    private func itemQuery(key: String, synchronizable: Any) -> [String: Any] {
+        [
             kSecClass as String: kSecClassGenericPassword,
             kSecAttrService as String: service,
             kSecAttrAccount as String: key,
-            kSecAttrSynchronizable as String: kSecAttrSynchronizableAny,
-            kSecReturnData as String: true,
-            kSecMatchLimit as String: kSecMatchLimitOne
+            kSecAttrSynchronizable as String: synchronizable
         ]
-
-        var result: AnyObject?
-        let status = SecItemCopyMatching(query as CFDictionary, &result)
-
-        guard status == errSecSuccess,
-              let data = result as? Data,
-              let value = String(data: data, encoding: .utf8)
-        else { return nil }
-
-        return value
     }
 
     /// Writes a value **only if the key is currently empty**, returning
@@ -81,13 +102,8 @@ struct KeychainCredentialStore: Sendable {
     /// replacing write would silently overwrite the newer secret.
     @discardableResult
     func addIfAbsent(_ value: String, forKey key: String, synchronizable: Bool) -> OSStatus {
-        let query: [String: Any] = [
-            kSecClass as String: kSecClassGenericPassword,
-            kSecAttrService as String: service,
-            kSecAttrAccount as String: key,
-            kSecAttrSynchronizable as String: synchronizable,
-            kSecValueData as String: Data(value.utf8)
-        ]
+        var query = itemQuery(key: key, synchronizable: synchronizable)
+        query[kSecValueData as String] = Data(value.utf8)
 
         return SecItemAdd(query as CFDictionary, nil)
     }
@@ -100,13 +116,8 @@ struct KeychainCredentialStore: Sendable {
     /// account", which it cannot answer (measured).
     func isSynchronizable(key: String) -> Bool? {
         for synchronizable in [true, false] {
-            let query: [String: Any] = [
-                kSecClass as String: kSecClassGenericPassword,
-                kSecAttrService as String: service,
-                kSecAttrAccount as String: key,
-                kSecAttrSynchronizable as String: synchronizable,
-                kSecMatchLimit as String: kSecMatchLimitOne
-            ]
+            var query = itemQuery(key: key, synchronizable: synchronizable)
+            query[kSecMatchLimit as String] = kSecMatchLimitOne
 
             if SecItemCopyMatching(query as CFDictionary, nil) == errSecSuccess {
                 return synchronizable
@@ -117,17 +128,20 @@ struct KeychainCredentialStore: Sendable {
     }
 
     /// Writes a value, replacing any existing item in either synchronizable form.
+    ///
+    /// Deliberately delete-then-add, and **not** `SecItemUpdate` on the item
+    /// already there. Measured on two devices sharing one Apple account: a
+    /// value written this way reached the other device in 15 s, while a value
+    /// changed in place with `SecItemUpdate` had still not arrived 40 minutes
+    /// later. Replacing the item is what iCloud Keychain propagates, and a
+    /// sign-in the user performs on one device is worth nothing to their other
+    /// ones unless it gets there.
     @discardableResult
     func set(_ value: String, forKey key: String, synchronizable: Bool) -> OSStatus {
         delete(key: key)
 
-        let query: [String: Any] = [
-            kSecClass as String: kSecClassGenericPassword,
-            kSecAttrService as String: service,
-            kSecAttrAccount as String: key,
-            kSecAttrSynchronizable as String: synchronizable,
-            kSecValueData as String: Data(value.utf8)
-        ]
+        var query = itemQuery(key: key, synchronizable: synchronizable)
+        query[kSecValueData as String] = Data(value.utf8)
 
         return SecItemAdd(query as CFDictionary, nil)
     }
@@ -139,14 +153,9 @@ struct KeychainCredentialStore: Sendable {
     /// legacy item is never deleted as a side effect of adoption.
     @discardableResult
     func delete(key: String) -> OSStatus {
-        let query: [String: Any] = [
-            kSecClass as String: kSecClassGenericPassword,
-            kSecAttrService as String: service,
-            kSecAttrAccount as String: key,
-            kSecAttrSynchronizable as String: kSecAttrSynchronizableAny
-        ]
-
-        return SecItemDelete(query as CFDictionary)
+        SecItemDelete(
+            itemQuery(key: key, synchronizable: kSecAttrSynchronizableAny) as CFDictionary
+        )
     }
 
     func describe(_ status: OSStatus) -> String {
