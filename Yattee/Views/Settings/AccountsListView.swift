@@ -349,18 +349,10 @@ struct AccountsListView: View {
     /// prefill a field with.
     private func makeRenameRequest(for account: Account, instance: Instance?) -> AccountRenameRequest {
         guard instance != nil, let validator = appEnvironment?.dataContextValidator else {
-            return AccountRenameRequest(
-                id: account.id,
-                defaultName: String(localized: "accounts.orphan.unnamed"),
-                initialText: account.displayName ?? ""
-            )
+            return .forAccount(account, fallingBackTo: String(localized: "accounts.orphan.unnamed"))
         }
 
-        return AccountRenameRequest(
-            id: account.id,
-            defaultName: validator.defaultDisplayName(for: account),
-            initialText: validator.displayName(for: account)
-        )
+        return .forAccount(account, resolvedBy: validator)
     }
 
     private func status(for account: Account) -> AccountStatus {

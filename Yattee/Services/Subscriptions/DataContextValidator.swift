@@ -239,14 +239,32 @@ final class DataContextValidator {
     /// What a rename field's contents mean once the user is done typing.
     ///
     /// `nil` clears the user-set label and hands the account back to
-    /// `defaultDisplayName`. An empty field says that outright — and so does
-    /// typing exactly the name the account already falls back to. The field
-    /// starts prefilled with the label the row is showing, so saving it
-    /// untouched must not turn a *device-local* fallback into a synced label
-    /// that every other device is then made to display.
-    static func renamedDisplayName(_ input: String, fallingBackTo defaultName: String) -> String? {
+    /// `defaultDisplayName`; anything else is stored as typed.
+    ///
+    /// The question the field cannot answer on its own is what an *untouched*
+    /// save means. The field starts prefilled with the label the row shows, and
+    /// on an account with no user-set label that label is device-local — the
+    /// login identifier only exists where the credential does. Saving it
+    /// unedited must not turn one device's fallback into a synced label every
+    /// other device is then made to display, so that case clears instead.
+    ///
+    /// The test is editedness, never equality with the default: on a second
+    /// device the string that device happens to fall back to is a perfectly
+    /// ordinary name to *choose*, and typing it has to store and sync like any
+    /// other. An unedited save on an account that already carries a label
+    /// re-states that label, which the manager then drops as a no-op — the name
+    /// stays, rather than being silently cleared by a tap that changed nothing.
+    static func renamedDisplayName(
+        _ input: String,
+        prefilledWith prefill: String,
+        hasUserSetLabel: Bool
+    ) -> String? {
         let trimmed = input.trimmingCharacters(in: .whitespacesAndNewlines)
-        guard !trimmed.isEmpty, trimmed != defaultName else { return nil }
+        guard !trimmed.isEmpty else { return nil }
+
+        let wasEdited = trimmed != prefill.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard wasEdited || hasUserSetLabel else { return nil }
+
         return trimmed
     }
 }

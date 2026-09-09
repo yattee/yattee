@@ -490,29 +490,166 @@ struct AccountRenameTests {
     @Test("A typed name replaces the fallback")
     func typedNameIsStored() {
         #expect(
-            DataContextValidator.renamedDisplayName("  Main i01 ", fallingBackTo: "i01") == "Main i01"
+            DataContextValidator.renamedDisplayName(
+                "  Main i01 ",
+                prefilledWith: "i01",
+                hasUserSetLabel: false
+            ) == "Main i01"
         )
     }
 
     @Test("An empty field clears the label")
     func emptyClearsTheLabel() {
-        #expect(DataContextValidator.renamedDisplayName("", fallingBackTo: "i01") == nil)
-        #expect(DataContextValidator.renamedDisplayName("   \n ", fallingBackTo: "i01") == nil)
+        for hasLabel in [true, false] {
+            #expect(
+                DataContextValidator.renamedDisplayName(
+                    "",
+                    prefilledWith: "i01",
+                    hasUserSetLabel: hasLabel
+                ) == nil
+            )
+            #expect(
+                DataContextValidator.renamedDisplayName(
+                    "   \n ",
+                    prefilledWith: "Main i01",
+                    hasUserSetLabel: hasLabel
+                ) == nil
+            )
+        }
     }
 
-    @Test("Saving the prefilled fallback untouched sets no name at all")
+    @Test("Saving an unnamed account's prefill untouched sets no name at all")
     func unchangedFallbackIsNotStored() {
-        // The field starts on the label the row is showing, and that label can
-        // be device-local — the login identifier only exists where the
-        // credential does. Storing it would publish one device's fallback to
-        // every other device as if the user had chosen it.
-        #expect(DataContextValidator.renamedDisplayName("i01", fallingBackTo: "i01") == nil)
+        // The field starts on the label the row is showing, and on an account
+        // with no user-set label that is device-local — the login identifier
+        // only exists where the credential does. Storing it would publish one
+        // device's fallback to every other device as if the user had chosen it.
         #expect(
             DataContextValidator.renamedDisplayName(
-                "utest1@i01.v.yattee.stream",
-                fallingBackTo: "utest1@i01.v.yattee.stream"
+                "i01",
+                prefilledWith: "i01",
+                hasUserSetLabel: false
             ) == nil
         )
+        #expect(
+            DataContextValidator.renamedDisplayName(
+                "  utest1@i01.v.yattee.stream  ",
+                prefilledWith: "utest1@i01.v.yattee.stream",
+                hasUserSetLabel: false
+            ) == nil
+        )
+    }
+
+    @Test("Typing a name that happens to match this device's fallback still stores it")
+    func editedNameEqualToTheDefaultIsStored() {
+        // The rule is editedness, not equality with the default. On a second
+        // device the string that device falls back to is an ordinary name to
+        // choose — and the prefill there is the *synced* label, so typing over
+        // it is a real edit that has to store and sync like any other.
+        #expect(
+            DataContextValidator.renamedDisplayName(
+                "i01",
+                prefilledWith: "Main i01",
+                hasUserSetLabel: true
+            ) == "i01"
+        )
+        // Same on an account with no label yet: the prefill was the fallback
+        // "utest1@…", and the user replaced it with something else entirely.
+        #expect(
+            DataContextValidator.renamedDisplayName(
+                "i01",
+                prefilledWith: "utest1@i01.v.yattee.stream",
+                hasUserSetLabel: false
+            ) == "i01"
+        )
+    }
+
+    @Test("Saving a named account untouched keeps its name rather than clearing it")
+    func unchangedNameIsKept() {
+        // Decided semantics for "Save with no edit" on an account that already
+        // carries a label: re-state the label. The manager drops the write as a
+        // no-op, so the name survives and nothing is queued — an idle tap must
+        // never read as "clear the name".
+        #expect(
+            DataContextValidator.renamedDisplayName(
+                "Main i01",
+                prefilledWith: "Main i01",
+                hasUserSetLabel: true
+            ) == "Main i01"
+        )
+    }
+
+    @Test("Both rename surfaces offer the shown label and fall back to the default")
+    func renameRequestIsBuiltFromTheValidator() {
+        let (accounts, instances, validator) = makeFixture()
+        var instance = Instance(type: .invidious, url: URL(string: "https://inv.example.com")!)
+        instance.name = "My Invidious"
+        instances.add(instance)
+
+        let account = accounts.addAccount(instanceID: instance.id)
+
+        let unnamed = AccountRenameRequest.forAccount(account, resolvedBy: validator)
+        #expect(unnamed.id == account.id)
+        #expect(unnamed.defaultName == validator.defaultDisplayName(for: account))
+        #expect(unnamed.initialText == validator.displayName(for: account))
+        #expect(unnamed.hasUserSetLabel == false)
+
+        accounts.updateDisplayName("Main i01", for: account.id)
+        let renamed = accounts.account(id: account.id)!
+
+        let named = AccountRenameRequest.forAccount(renamed, resolvedBy: validator)
+        // The placeholder stays the *default*, never the label being edited:
+        // clearing the field has to advertise where it lands.
+        #expect(named.defaultName == "My Invidious")
+        #expect(named.initialText == "Main i01")
+        #expect(named.hasUserSetLabel)
+    }
+
+    @Test("An orphan's rename request offers only its own label")
+    func orphanRenameRequestSkipsTheValidator() {
+        let (accounts, instances, _) = makeFixture()
+        let instance = Instance(type: .invidious, url: URL(string: "https://inv.example.com")!)
+        instances.add(instance)
+
+        let account = accounts.addAccount(instanceID: instance.id)
+        let unnamed = AccountRenameRequest.forAccount(account, fallingBackTo: "Unnamed")
+        #expect(unnamed.defaultName == "Unnamed")
+        #expect(unnamed.initialText.isEmpty)
+        #expect(unnamed.hasUserSetLabel == false)
+
+        accounts.updateDisplayName("Abandoned login", for: account.id)
+        let named = AccountRenameRequest.forAccount(
+            accounts.account(id: account.id)!,
+            fallingBackTo: "Unnamed"
+        )
+        #expect(named.initialText == "Abandoned login")
+        #expect(named.hasUserSetLabel)
+    }
+
+    @Test("Re-saving the same name writes nothing")
+    func noOpSaveIsNotWritten() {
+        let (accounts, instances, _) = makeFixture()
+        let instance = Instance(type: .invidious, url: URL(string: "https://inv.example.com")!)
+        instances.add(instance)
+
+        let account = accounts.addAccount(instanceID: instance.id)
+
+        // An untouched save on an account with no label: nil over nil.
+        accounts.confirmUpload(account.id)
+        let untouchedAt = accounts.account(id: account.id)?.updatedAt
+        accounts.updateDisplayName(nil, for: account.id)
+        #expect(!accounts.pendingUploads.contains(account.id))
+        #expect(accounts.account(id: account.id)?.updatedAt == untouchedAt)
+
+        accounts.updateDisplayName("Main i01", for: account.id)
+        accounts.confirmUpload(account.id)
+        let renamedAt = accounts.account(id: account.id)?.updatedAt
+
+        // And on one that carries a label: the same string over itself.
+        accounts.updateDisplayName("Main i01", for: account.id)
+        #expect(!accounts.pendingUploads.contains(account.id))
+        #expect(accounts.account(id: account.id)?.updatedAt == renamedAt)
+        #expect(accounts.account(id: account.id)?.displayName == "Main i01")
     }
 
     @Test("The default name ignores the user-set one, and the shown name prefers it")

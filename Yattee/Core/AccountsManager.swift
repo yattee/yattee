@@ -230,8 +230,16 @@ final class AccountsManager {
         pendingMarkerUploads.insert(instanceID)
     }
 
+    /// Stores the account's user-set label, or clears it with `nil`.
+    ///
+    /// A save that changes nothing is dropped rather than written. The rename
+    /// field is prefilled, so "Save" without an edit is the ordinary way out of
+    /// the alert — and every write here stamps `updatedAt` and queues an
+    /// upload, which under last-write-wins would let that idle tap overwrite a
+    /// peer's genuine rename that has not reached this device yet.
     func updateDisplayName(_ displayName: String?, for accountID: UUID) {
         guard let index = accounts.firstIndex(where: { $0.id == accountID }) else { return }
+        guard accounts[index].displayName != displayName else { return }
         accounts[index].displayName = displayName
         accounts[index].updatedAt = Date()
         pendingUploads.insert(accountID)

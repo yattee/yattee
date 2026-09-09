@@ -195,13 +195,16 @@ struct InstanceAccountsSection: View {
     }
 
     /// What the rename field starts on, and what clearing it goes back to.
+    ///
+    /// The section always has its instance, so the only reason to name the
+    /// fallback here is a missing environment, where the row's own label is
+    /// already the instance's.
     private func makeRenameRequest(for account: Account) -> AccountRenameRequest {
-        AccountRenameRequest(
-            id: account.id,
-            defaultName: appEnvironment?.dataContextValidator.defaultDisplayName(for: account)
-                ?? instance.displayName,
-            initialText: displayName(for: account)
-        )
+        guard let validator = appEnvironment?.dataContextValidator else {
+            return .forAccount(account, fallingBackTo: instance.displayName)
+        }
+
+        return .forAccount(account, resolvedBy: validator)
     }
 
     private func status(for account: Account) -> AccountStatus {
