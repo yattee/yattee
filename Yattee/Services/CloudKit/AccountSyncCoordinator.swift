@@ -737,18 +737,54 @@ final class AccountSyncCoordinator {
 
     /// Registers every account record for upload, for a zone with nothing in it
     /// — first enable, or a zone recreated after being deleted elsewhere.
-    func uploadEverything() {
+    ///
+    /// - Returns: whether the outbox was re-primed. `false` means this device
+    ///   cannot say what its accounts owe right now — the identity is simulated,
+    ///   unresolved, or the accounts in memory still belong to the previous one
+    ///   — and the caller has to come back to it rather than treat the re-seed
+    ///   as done.
+    @discardableResult
+    func uploadEverything() -> Bool {
         // A simulated identity has no zone to fill, and marking its accounts
         // dirty would only leave an outbox nothing can ever settle.
-        guard !debugSimulationActive else { return }
+        guard !debugSimulationActive else { return false }
 
         // Marking everything dirty commits the *in-memory* list to this
         // identity's zone, so it must not run against a snapshot loaded under
         // another one.
-        guard let namespace, isManagerLoaded(for: namespace) else { return }
+        guard let namespace, isManagerLoaded(for: namespace) else { return false }
 
         accountsManager.markAllRecordsForUpload()
         enqueueDirtyRecords()
+        return true
+    }
+
+    /// Drops what this device still owed the zone, and what it had cached from
+    /// it.
+    ///
+    /// For a zone the account owner purged: CloudKit requires that data deleted
+    /// that way is not sent back, and the outbox is exactly a list of records
+    /// to send. The accounts themselves stay — they are this device's own, and
+    /// the purge was about the copy in iCloud — so what is lost is the intent to
+    /// upload them, which the next edit or the next full seed re-creates.
+    ///
+    /// - Returns: whether the outbox was actually emptied, on the same terms as
+    ///   `uploadEverything()` — a caller that has to record the purge as handled
+    ///   must come back to it otherwise.
+    @discardableResult
+    func discardWhatTheZoneHeld() -> Bool {
+        // A simulated identity's zone is nobody's, and the outbox it would
+        // empty belongs to the identity actually signed in.
+        guard !debugSimulationActive, let namespace else { return false }
+
+        store.clearStagedChanges(in: namespace)
+
+        // Same fence as `uploadEverything()`, for the same reason: during the
+        // reload gap the outbox in memory is still the previous identity's, and
+        // emptying it would drop uploads the purge said nothing about.
+        guard isManagerLoaded(for: namespace) else { return false }
+        accountsManager.clearPendingUploads()
+        return true
     }
 
     /// Whether the account manager's in-memory state belongs to the namespace

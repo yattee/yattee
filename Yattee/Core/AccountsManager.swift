@@ -520,6 +520,21 @@ final class AccountsManager {
         save()
     }
 
+    /// Forgets what the server was still owed.
+    ///
+    /// The counterpart to `markAllRecordsForUpload()`, for a zone whose contents
+    /// the account owner purged from iCloud: CloudKit requires that data deleted
+    /// that way is not sent back, and every entry here is a record waiting to be
+    /// sent. Nothing local is deleted — only the intention to upload it, which
+    /// the next edit, or a later full seed, writes again.
+    func clearPendingUploads() {
+        pendingUploads = []
+        pendingDeletions = []
+        pendingMarkerUploads = []
+        pendingContextUpload = false
+        save()
+    }
+
     // MARK: - Upload ordering
 
     /// Whether an instance's marker may be published yet.
