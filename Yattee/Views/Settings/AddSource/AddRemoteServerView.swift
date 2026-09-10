@@ -44,6 +44,10 @@ struct AddRemoteServerView: View {
 
     @State private var uiState: RemoteServerUIState = .initial
     @State private var detectionTask: Task<Void, Never>?
+    /// A detection re-run started from the failed state. Tracked separately from
+    /// `uiState` so the form keeps the error and the fields on screen while the
+    /// retry button itself carries the progress.
+    @State private var isRedetecting = false
 
     // MARK: - URL Entry
 
@@ -94,6 +98,13 @@ struct AddRemoteServerView: View {
         return false
     }
 
+    /// Detection ran and could not identify the server. There is no type to add a
+    /// source with, so the form offers a retry instead of the "Add Source" action.
+    private var hasDetectionFailed: Bool {
+        if case .error = uiState { return true }
+        return false
+    }
+
     /// macOS surfaces toolbar confirmation items from a pushed-in-sheet view
     /// reliably only from macOS 26 onward. On older macOS (and on iOS/tvOS) we
     /// render the "Add Source" action button inline in the form instead, so it
@@ -112,6 +123,11 @@ struct AddRemoteServerView: View {
 
     private var canAdd: Bool {
         guard !urlString.isEmpty else { return false }
+
+        // A source cannot be created without a type, so nothing is addable until
+        // detection succeeded. Without this the button stays enabled-looking after a
+        // failed detection while every tap only re-runs the detection that just failed.
+        guard let detectedType else { return false }
 
         // For detected Yattee Server, require credentials
         if detectedType == .yatteeServer {
@@ -208,7 +224,10 @@ struct AddRemoteServerView: View {
 
             if isFieldsRevealed {
                 serverConfigurationFields
-                if !usesToolbarActionButton {
+
+                if hasDetectionFailed {
+                    retryDetectionSection
+                } else if !usesToolbarActionButton {
                     actionSection
                 }
             }
@@ -426,18 +445,24 @@ struct AddRemoteServerView: View {
 
     @ViewBuilder
     private var serverConfigurationFields: some View {
-        Section {
-            #if os(tvOS)
-            TVSettingsTextField(title: String(localized: "sources.field.nameOptional"), text: $name)
-            #elseif os(macOS)
-            LabeledContent(String(localized: "sources.field.name")) {
-                TextField("", text: $name, prompt: Text(String(localized: "sources.field.nameOptional")))
+        // Naming a server that could not be identified only looks like a form waiting
+        // to be submitted. While detection is failing the form shows the error, any
+        // setting that could fix it, and the retry — the typed name is kept in state
+        // and comes back as soon as detection succeeds.
+        if !hasDetectionFailed {
+            Section {
+                #if os(tvOS)
+                TVSettingsTextField(title: String(localized: "sources.field.nameOptional"), text: $name)
+                #elseif os(macOS)
+                LabeledContent(String(localized: "sources.field.name")) {
+                    TextField("", text: $name, prompt: Text(String(localized: "sources.field.nameOptional")))
+                }
+                #else
+                TextField(String(localized: "sources.field.nameOptional"), text: $name)
+                #endif
+            } header: {
+                Text(String(localized: "sources.header.displayName"))
             }
-            #else
-            TextField(String(localized: "sources.field.nameOptional"), text: $name)
-            #endif
-        } header: {
-            Text(String(localized: "sources.header.displayName"))
         }
 
         // Show detected type badge
@@ -549,10 +574,39 @@ struct AddRemoteServerView: View {
         }
     }
 
+    // MARK: - Retry Detection Section
+
+    /// Replaces the "Add Source" action while detection is failing: there is no
+    /// detected type to add, so the only useful action is running detection again —
+    /// after correcting the address, or after allowing an invalid certificate.
+    private var retryDetectionSection: some View {
+        Section {
+            Button {
+                retryDetection()
+            } label: {
+                if isRedetecting {
+                    HStack {
+                        ProgressView()
+                            .controlSize(.small)
+                        Text(String(localized: "sources.detecting"))
+                    }
+                } else {
+                    Text(String(localized: "sources.retryDetection"))
+                }
+            }
+            .accessibilityIdentifier("addRemoteServer.retryDetectionButton")
+            .disabled(urlString.isEmpty || isRedetecting)
+            #if os(tvOS)
+            .buttonStyle(TVSettingsButtonStyle())
+            #endif
+        }
+    }
+
     // MARK: - Actions
 
     private func handleURLChange() {
         cancelDetection()
+        isRedetecting = false
 
         if isFieldsRevealed || isAwaitingBasicAuth {
             withAnimation {
@@ -590,6 +644,39 @@ struct AddRemoteServerView: View {
 
         detectionTask = Task {
             await performDetection(url: url)
+        }
+    }
+
+    /// Runs detection again from the failed state.
+    ///
+    /// Unlike `startDetection()` this keeps `uiState` on the error, so the fields,
+    /// the message and the button all stay put and only the button switches to a
+    /// progress label. A host that cannot resolve fails almost instantly, so the
+    /// progress state is held for a beat — otherwise a retry that fails the same way
+    /// changes nothing on screen and the button reads as dead.
+    private func retryDetection() {
+        guard !urlString.isEmpty, !isRedetecting else { return }
+
+        guard let url = Instance.normalizeSourceURL(urlString) else {
+            withAnimation {
+                uiState = .error(String(localized: "sources.validation.invalidURL"))
+            }
+            return
+        }
+
+        cancelDetection()
+        isRedetecting = true
+
+        detectionTask = Task {
+            try? await Task.sleep(for: .milliseconds(400))
+
+            if !Task.isCancelled {
+                await performDetection(url: url)
+            }
+
+            await MainActor.run {
+                isRedetecting = false
+            }
         }
     }
 
