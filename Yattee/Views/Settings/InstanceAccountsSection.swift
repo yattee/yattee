@@ -91,8 +91,8 @@ struct InstanceAccountsSection: View {
         VStack(alignment: .leading, spacing: 4) {
             HStack(spacing: 6) {
                 // The same checkmark the switcher marks the selected context
-                // with — the row's menu offers "Use this account" on every
-                // other account, and the row it is missing from has to say why.
+                // with — every other account is offered "Use this account",
+                // and the row it is missing from has to say why.
                 if isCurrentContext(account) {
                     Image(systemName: "checkmark")
                         .font(.caption.weight(.semibold))
@@ -107,35 +107,11 @@ struct InstanceAccountsSection: View {
             AccountStatusBadge(status: status(for: account))
         }
         .frame(maxWidth: .infinity, alignment: .leading)
+        #if !os(tvOS)
         .contextMenu {
-            // Selecting an account from the source that owns it, rather than
-            // hunting for it in the global switcher.
-            if !isCurrentContext(account) {
-                Button {
-                    appEnvironment?.switchDataContext(to: .account(account.id))
-                } label: {
-                    Label(String(localized: "accounts.useThisAccount"), systemImage: "checkmark.circle")
-                }
-            }
-
-            Button {
-                loginTarget = .existing(account)
-            } label: {
-                Label(String(localized: "login.signInAgain"), systemImage: "person.badge.key")
-            }
-
-            Button {
-                renameRequest = makeRenameRequest(for: account)
-            } label: {
-                Label(String(localized: "accounts.rename"), systemImage: "pencil")
-            }
-
-            Button(role: .destructive) {
-                pendingSignOut = account
-            } label: {
-                Label(String(localized: "login.signOutAndRemove"), systemImage: "rectangle.portrait.and.arrow.forward")
-            }
+            rowActions(account)
         }
+        #endif
         // Attached to the row that raised it rather than to the section: a
         // presentation modifier on a `Section` inside a `Form` has no view of
         // its own to present from.
@@ -173,18 +149,68 @@ struct InstanceAccountsSection: View {
         }
 
         #if os(tvOS)
-        // tvOS never syncs app Keychain items, so an account that arrived from
-        // another device is permanently credential-less here until the user
-        // signs in on the Apple TV itself. Offer that directly rather than
-        // leaving a status the user cannot act on.
-        if status(for: account) == .credentialMissing {
+        // A context menu is not reachable on tvOS, and a Form row is a single
+        // focusable unit — so the actions are rows of their own. Without them
+        // the whole account is unreachable here: directional focus walks
+        // straight past a row that is only text.
+        rowActions(account)
+        #endif
+    }
+
+    @ViewBuilder
+    private func rowActions(_ account: Account) -> some View {
+        // Selecting an account from the source that owns it, rather than
+        // hunting for it in the global switcher.
+        if !isCurrentContext(account) {
             Button {
-                loginTarget = .existing(account)
+                appEnvironment?.switchDataContext(to: .account(account.id))
             } label: {
-                Label(String(localized: "accounts.signInOnThisDevice"), systemImage: "person.badge.key")
+                Label(String(localized: "accounts.useThisAccount"), systemImage: "checkmark.circle")
             }
+            #if os(tvOS)
             .buttonStyle(TVSettingsButtonStyle())
+            #endif
         }
+
+        // tvOS never syncs app Keychain items, so an account that arrived from
+        // another device is credential-less here until the user signs in on the
+        // Apple TV itself — which is what this same action does.
+        Button {
+            loginTarget = .existing(account)
+        } label: {
+            #if os(tvOS)
+            Label(
+                String(
+                    localized: status(for: account) == .credentialMissing
+                        ? "accounts.signInOnThisDevice"
+                        : "login.signInAgain"
+                ),
+                systemImage: "person.badge.key"
+            )
+            #else
+            Label(String(localized: "login.signInAgain"), systemImage: "person.badge.key")
+            #endif
+        }
+        #if os(tvOS)
+        .buttonStyle(TVSettingsButtonStyle())
+        #endif
+
+        Button {
+            renameRequest = makeRenameRequest(for: account)
+        } label: {
+            Label(String(localized: "accounts.rename"), systemImage: "pencil")
+        }
+        #if os(tvOS)
+        .buttonStyle(TVSettingsButtonStyle())
+        #endif
+
+        Button(role: .destructive) {
+            pendingSignOut = account
+        } label: {
+            Label(String(localized: "login.signOutAndRemove"), systemImage: "rectangle.portrait.and.arrow.forward")
+        }
+        #if os(tvOS)
+        .buttonStyle(TVSettingsButtonStyle())
         #endif
     }
 
