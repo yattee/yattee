@@ -134,6 +134,88 @@ enum DataContextSwitcherLabels {
     }
 }
 
+// MARK: - Glyph
+
+/// How the switcher's icon reads.
+///
+/// Shared by every presentation of the switcher — the toolbar menu, the
+/// settings row, the tvOS button — so the same account health cannot look
+/// healthy in one of them and not in another.
+enum DataContextSwitcherGlyph {
+    /// Whether the icon should ask to be noticed.
+    ///
+    /// Only the states the user can actually clear: signing in again, turning
+    /// the instance back on, or switching away. A context that is merely still
+    /// resolving is not one of them — badging `checking` would put an
+    /// exclamation mark on every cold launch, before the Keychain has answered.
+    static func needsAttention(_ validity: DataContextValidity) -> Bool {
+        switch validity {
+        case .valid:
+            return false
+        case .removed:
+            return true
+        case let .temporarilyUnavailable(reason):
+            switch reason {
+            case .instanceDisabled, .credentialRejected, .unreachable: return true
+            case .checking, .instancePending, .credentialMissing: return false
+            }
+        }
+    }
+
+    /// The filled glyph says an account is selected; the badge says that
+    /// account cannot be used right now, which is the whole reason the user
+    /// would reach for this control.
+    static func systemImage(for context: DataContext, validity: DataContextValidity) -> String {
+        guard !context.isLocal else { return "person.crop.circle" }
+
+        if needsAttention(validity) { return "person.crop.circle.badge.exclamationmark" }
+        return "person.crop.circle.fill"
+    }
+
+    /// Orange — the colour the settings entry already badges attention with —
+    /// and no tint at all otherwise, so a healthy switcher keeps whatever
+    /// styling the toolbar or the list gives it.
+    static func tint(for context: DataContext, validity: DataContextValidity) -> Color? {
+        guard !context.isLocal, needsAttention(validity) else { return nil }
+        return .orange
+    }
+
+    @MainActor
+    static func systemImage(in appEnvironment: AppEnvironment?) -> String {
+        guard let appEnvironment else { return "person.crop.circle" }
+
+        return systemImage(
+            for: appEnvironment.accountsManager.currentContext,
+            validity: appEnvironment.dataContextValidator.validity
+        )
+    }
+
+    @MainActor
+    static func tint(in appEnvironment: AppEnvironment?) -> Color? {
+        guard let appEnvironment else { return nil }
+
+        return tint(
+            for: appEnvironment.accountsManager.currentContext,
+            validity: appEnvironment.dataContextValidator.validity
+        )
+    }
+}
+
+/// The switcher's icon, health included.
+struct DataContextSwitcherIcon: View {
+    @Environment(\.appEnvironment) private var appEnvironment
+
+    var body: some View {
+        let image = Image(systemName: DataContextSwitcherGlyph.systemImage(in: appEnvironment))
+
+        if let tint = DataContextSwitcherGlyph.tint(in: appEnvironment) {
+            image.foregroundStyle(tint)
+        } else {
+            image
+        }
+    }
+}
+
 // MARK: - Menu
 
 #if !os(tvOS)
@@ -145,25 +227,17 @@ struct DataContextSwitcherMenu: View {
         Menu {
             DataContextSwitcherRows()
         } label: {
-            Label(String(localized: "accounts.switcher.title"), systemImage: icon)
+            Label {
+                Text(String(localized: "accounts.switcher.title"))
+            } icon: {
+                DataContextSwitcherIcon()
+            }
         }
         .help(DataContextSwitcherLabels.title(for: currentContext, in: appEnvironment))
     }
 
     private var currentContext: DataContext {
         appEnvironment?.accountsManager.currentContext ?? .local
-    }
-
-    /// The filled glyph says an account is selected; the badge says that
-    /// account cannot be used right now, which is the whole reason the user
-    /// would reach for this control.
-    private var icon: String {
-        guard !currentContext.isLocal else { return "person.crop.circle" }
-
-        if appEnvironment?.dataContextValidator.unavailability != nil {
-            return "person.crop.circle.badge.exclamationmark"
-        }
-        return "person.crop.circle.fill"
     }
 }
 
@@ -203,7 +277,11 @@ struct DataContextSwitcherSettingsRow: View {
 
     private var rowLabel: some View {
         HStack {
-            Label(String(localized: "accounts.switcher.title"), systemImage: "person.crop.circle")
+            Label {
+                Text(String(localized: "accounts.switcher.title"))
+            } icon: {
+                DataContextSwitcherIcon()
+            }
             Spacer(minLength: 8)
             Text(DataContextSwitcherLabels.title(for: currentContext, in: appEnvironment))
                 .foregroundStyle(.secondary)
@@ -262,10 +340,11 @@ struct DataContextSwitcherButton: View {
         Button {
             showingPicker = true
         } label: {
-            Label(
-                DataContextSwitcherLabels.title(for: currentContext, in: appEnvironment),
-                systemImage: "person.crop.circle"
-            )
+            Label {
+                Text(DataContextSwitcherLabels.title(for: currentContext, in: appEnvironment))
+            } icon: {
+                DataContextSwitcherIcon()
+            }
         }
         .buttonStyle(.bordered)
         .fullScreenCover(isPresented: $showingPicker) {

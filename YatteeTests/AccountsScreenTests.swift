@@ -322,6 +322,45 @@ struct AccountStatusBadgeTests {
     }
 }
 
+// MARK: - Switcher glyph
+
+@Suite("Data context switcher glyph")
+struct DataContextSwitcherGlyphTests {
+    private let account = DataContext.account(UUID())
+
+    @Test("Local data and a signed-in account read differently")
+    func healthyStatesAreToldApart() {
+        #expect(DataContextSwitcherGlyph.systemImage(for: .local, validity: .valid) == "person.crop.circle")
+        #expect(DataContextSwitcherGlyph.systemImage(for: account, validity: .valid) == "person.crop.circle.fill")
+        #expect(DataContextSwitcherGlyph.tint(for: account, validity: .valid) == nil)
+    }
+
+    @Test("A state the user has to act on is badged, in the settings entry's colour")
+    func actionableStatesAreBadged() {
+        let actionable: [DataContextUnavailability] = [.instanceDisabled, .credentialRejected, .unreachable]
+
+        for reason in actionable {
+            let validity = DataContextValidity.temporarilyUnavailable(reason)
+            #expect(
+                DataContextSwitcherGlyph.systemImage(for: account, validity: validity)
+                    == "person.crop.circle.badge.exclamationmark"
+            )
+            #expect(DataContextSwitcherGlyph.tint(for: account, validity: validity) == .orange)
+        }
+    }
+
+    @Test("A context that is still resolving is not a fault")
+    func pendingStatesAreNotBadged() {
+        let pending: [DataContextUnavailability] = [.checking, .instancePending, .credentialMissing]
+
+        for reason in pending {
+            let validity = DataContextValidity.temporarilyUnavailable(reason)
+            #expect(DataContextSwitcherGlyph.systemImage(for: account, validity: validity) == "person.crop.circle.fill")
+            #expect(DataContextSwitcherGlyph.tint(for: account, validity: validity) == nil)
+        }
+    }
+}
+
 // MARK: - Switcher labels
 
 @Suite("Data context switcher labels")
