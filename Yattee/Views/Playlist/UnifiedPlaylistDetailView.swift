@@ -99,6 +99,15 @@ struct UnifiedPlaylistDetailView: View {
     /// The account this playlist belongs to, when it belongs to one.
     @State private var owningAccount: Account?
 
+    /// Whether an account ever read this playlist here, and so whether it is one
+    /// the public endpoint is entitled to describe.
+    ///
+    /// Sticky on purpose, where `owningAccount` is not: a discard clears the
+    /// account, and the notification that says the credentials are readable
+    /// again would then find nothing left to identify this as an account's
+    /// playlist — leaving whatever the discard put on screen there for good.
+    @State private var wasAccountLoaded = false
+
     /// Whether the server lists this playlist publicly, as of the last snapshot.
     @State private var remoteIsListed: Bool?
 
@@ -883,8 +892,17 @@ struct UnifiedPlaylistDetailView: View {
     /// Only for a playlist an account loaded: a public one shows nothing that
     /// a login could make private, and reloading it would be a flash for
     /// nothing.
+    ///
+    /// `wasAccountLoaded` rather than only what is on screen now: these
+    /// notifications come in pairs — the credentials become unreadable, then
+    /// readable again — and the first one is what clears `entries` and
+    /// `owningAccount`. Asking only about those would take the discard and skip
+    /// the recovery, leaving the view on whatever the unreadable window
+    /// produced until the user reloads it by hand.
     private func discardAccountLoadedContentAndReload() {
-        guard case .remote = source, entries != nil || owningAccount != nil else { return }
+        guard case .remote = source,
+              entries != nil || owningAccount != nil || wasAccountLoaded
+        else { return }
 
         // Bumped here rather than only in the reload it starts: the load being
         // superseded has to stop counting at the moment its content is thrown
@@ -984,6 +1002,19 @@ struct UnifiedPlaylistDetailView: View {
         let account = resolveOwningAccount(playlistID: playlistID, instance: resolvedInstance)
         owningAccount = account
 
+        // "Nobody can be named right now" is not the answer "nobody owns it".
+        // While the identity scope is unresolved the account list is empty —
+        // and it drops to unresolved and comes back on its own, on every
+        // activation with iCloud Drive off. Reading an account's playlist from
+        // the public endpoint in that window is not a fallback but a wrong
+        // answer: Invidious replies 404 "Playlist does not exist." to an
+        // unauthenticated read of a *private* playlist, so a playlist that was
+        // on screen a moment ago is reported as gone. Nothing is read until the
+        // scope comes back, which reloads this view.
+        if account == nil, wasAccountLoaded, !appEnvironment.credentialIdentityScope.isResolved {
+            return
+        }
+
         do {
             let fetchedPlaylist: Playlist
 
@@ -992,6 +1023,8 @@ struct UnifiedPlaylistDetailView: View {
                 // The authenticated fetch is the only one that can see a
                 // private playlist — and the only one that names the rows, so
                 // it is also what makes the playlist editable at all.
+                wasAccountLoaded = true
+
                 try await appEnvironment.remotePlaylistsCache.refreshSnapshot(
                     id: playlistID.playlistID,
                     for: account
