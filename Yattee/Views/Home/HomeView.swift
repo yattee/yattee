@@ -32,6 +32,12 @@ struct HomeView: View {
     @State private var channelsCount: Int = 0
     @State private var discoveredDevicesCount: Int = 0
     @State private var feedCache = SubscriptionFeedCache.shared
+    #if os(tvOS)
+    /// Whether the first pass over the Home data has finished. Every section
+    /// reads empty before it does, so the empty state waits for this rather than
+    /// flashing over content that is on its way.
+    @State private var hasLoadedHomeData = false
+    #endif
 
     private var dataManager: DataManager? { appEnvironment?.dataManager }
     private var settingsManager: SettingsManager? { appEnvironment?.settingsManager }
@@ -145,6 +151,13 @@ struct HomeView: View {
         .task {
             await feedCache.loadFromDiskIfNeeded()
             await appEnvironment?.homeInstanceCache.loadFromDiskIfNeeded()
+            #if os(tvOS)
+            // The disk caches are the last of the on-device data to land, so the
+            // empty state is honest from here on. A network refresh below can
+            // still add content later; it must not hold an empty Home behind a
+            // spinner for as long as a request can take.
+            hasLoadedHomeData = true
+            #endif
             await refreshHomeInstanceContent()
         }
         .onChange(of: appEnvironment?.navigationCoordinator.isPlayerExpanded) { _, isExpanded in
@@ -182,7 +195,10 @@ struct HomeView: View {
 
     #if os(tvOS)
     /// True on tvOS when no Home section would render content — prevents a focus trap
-    /// on fresh installs where the detail pane would otherwise be completely empty.
+    /// where the detail pane would otherwise be completely empty.
+    ///
+    /// Each case mirrors what `sectionView(for:)` actually renders: a section with
+    /// nothing to show renders nothing, so it must not count as content here.
     private var isHomeEmpty: Bool {
         let sections = settingsManager?.visibleSections() ?? HomeSectionItem.defaultOrder.filter { HomeSectionItem.defaultVisibility[$0] == true }
         for section in sections {
@@ -197,22 +213,53 @@ struct HomeView: View {
                 if !recentHistory.isEmpty { return false }
             case .downloads:
                 break
-            case .instanceContent, .mediaSource:
-                return false
+            case .instanceContent(let instanceID, let contentType):
+                if hasInstanceContent(instanceID: instanceID, contentType: contentType) { return false }
+            case .mediaSource:
+                // Legacy, stripped on load and rendered as empty.
+                break
             }
         }
         return true
     }
 
+    /// Whether an instance content section has something to render, matching the
+    /// conditions in `instanceContentSection(instanceID:contentType:)`.
+    private func hasInstanceContent(instanceID: UUID, contentType: InstanceContentType) -> Bool {
+        guard let instance = appEnvironment?.instancesManager.instances.first(where: { $0.id == instanceID }),
+              instance.isEnabled,
+              let videos = appEnvironment?.homeInstanceCache.videos(for: instanceID, contentType: contentType) else {
+            return false
+        }
+        return !videos.isEmpty
+    }
+
+    /// Whether any source is configured, read from the same managers the Sources
+    /// screen builds its list from. An empty Home is not the same thing as a
+    /// fresh install: with sources already added, telling the user to add one is
+    /// simply wrong.
+    private var hasConfiguredSources: Bool {
+        let hasInstances = !(appEnvironment?.instancesManager.instances.isEmpty ?? true)
+        let hasMediaSources = !(appEnvironment?.mediaSourcesManager.sources.isEmpty ?? true)
+        return hasInstances || hasMediaSources
+    }
+
     private var emptyHomeView: some View {
         VStack(spacing: 32) {
             VStack(spacing: 12) {
-                Text(String(localized: "home.tvos.empty.title"))
-                    .font(.title2)
-                    .fontWeight(.semibold)
-                Text(String(localized: "home.tvos.empty.message"))
-                    .foregroundStyle(.secondary)
-                    .multilineTextAlignment(.center)
+                if hasConfiguredSources {
+                    // Sources are set up, Home simply has nothing to show yet.
+                    Text(String(localized: "common.noContent"))
+                        .font(.title2)
+                        .fontWeight(.semibold)
+                } else {
+                    Text(String(localized: "home.tvos.empty.title"))
+                        .font(.title2)
+                        .fontWeight(.semibold)
+                    Text(String(localized: "home.tvos.empty.message"))
+                        .foregroundStyle(.secondary)
+                        .multilineTextAlignment(.center)
+                }
             }
             Button {
                 appEnvironment?.navigationCoordinator.selectedSidebarItem = .sources
@@ -225,13 +272,22 @@ struct HomeView: View {
         .padding(60)
         .frame(maxWidth: .infinity, maxHeight: .infinity)
     }
+
+    private var loadingHomeView: some View {
+        ProgressView()
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
+    }
     #endif
 
     @ViewBuilder
     private var mainContent: some View {
         #if os(tvOS)
         if isHomeEmpty {
-            emptyHomeView
+            if hasLoadedHomeData {
+                emptyHomeView
+            } else {
+                loadingHomeView
+            }
         } else {
             ScrollView {
                 LazyVStack(spacing: 0) {
