@@ -1708,7 +1708,7 @@ struct VideoInfoView: View {
                         if bookmarkNote.count > 900 {
                             HStack {
                                 Spacer()
-                                Text("\(bookmarkNote.count)/1000")
+                                Text(verbatim: "\(bookmarkNote.count)/1000")
                                     .font(.caption)
                                     .foregroundStyle(bookmarkNote.count > 1000 ? .red : .secondary)
                                     .monospacedDigit()

@@ -58,6 +58,7 @@ struct PlaylistsListView: View {
     private struct RemotePlaylistDeletion {
         let account: Account
         let playlistID: String
+        let title: String
     }
 
     // View options (persisted)
@@ -88,6 +89,17 @@ struct PlaylistsListView: View {
             gridColumns: $gridColumns,
             maxGridColumns: gridConfig.maxColumns
         )
+    }
+
+    /// The delete confirmation, naming the playlist it is about.
+    ///
+    /// A playlist the server gave no title for falls back to the unnamed
+    /// wording rather than asking about `""`.
+    private var remoteDeletionTitle: String {
+        guard let title = remoteDeletion?.title, !title.isEmpty else {
+            return String(localized: "playlist.remote.delete.confirm")
+        }
+        return String(localized: "playlist.remote.delete.confirm.named \(title)")
     }
 
     /// View options button lives on the leading edge on macOS, trailing elsewhere.
@@ -300,7 +312,7 @@ struct PlaylistsListView: View {
         // Taking a playlist off a server is a very different sentence from
         // deleting a local one, which stays unconfirmed as it always was.
         .confirmationDialog(
-            String(localized: "playlist.remote.delete.confirm"),
+            remoteDeletionTitle,
             isPresented: Binding(
                 get: { remoteDeletion != nil },
                 set: { if !$0 { remoteDeletion = nil } }
@@ -683,7 +695,8 @@ struct PlaylistsListView: View {
                 Button(role: .destructive) {
                     remoteDeletion = RemotePlaylistDeletion(
                         account: account,
-                        playlistID: playlist.id.playlistID
+                        playlistID: playlist.id.playlistID,
+                        title: playlist.title
                     )
                 } label: {
                     Label(String(localized: "playlist.delete"), systemImage: "trash")
@@ -737,7 +750,8 @@ struct PlaylistsListView: View {
                     reset()
                     remoteDeletion = RemotePlaylistDeletion(
                         account: account,
-                        playlistID: playlist.id.playlistID
+                        playlistID: playlist.id.playlistID,
+                        title: playlist.title
                     )
                 }
             ]

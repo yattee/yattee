@@ -192,7 +192,7 @@ struct PlaylistFormSheet: View {
                 HStack {
                     Text(String(localized: "playlist.description.optional"))
                     Spacer()
-                    Text("\(descriptionText.count)/\(maxDescriptionLength)")
+                    Text(verbatim: "\(descriptionText.count)/\(maxDescriptionLength)")
                         .monospacedDigit()
                 }
                 .foregroundStyle(.secondary)
@@ -249,7 +249,7 @@ struct PlaylistFormSheet: View {
                     HStack {
                         Text(String(localized: "playlist.description.optional"))
                         Spacer()
-                        Text("\(descriptionText.count)/\(maxDescriptionLength)")
+                        Text(verbatim: "\(descriptionText.count)/\(maxDescriptionLength)")
                             .monospacedDigit()
                     }
                     .foregroundStyle(.secondary)

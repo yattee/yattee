@@ -165,9 +165,10 @@ struct InstanceLoginView: View {
 
     /// What the first field is called on this backend.
     ///
-    /// Named per backend rather than genericised: Invidious signs in by email,
-    /// and calling that "Username" is how a user ends up typing the wrong thing.
-    /// Every case is spelled out so a backend that gains accounts —
+    /// Named per backend rather than genericised: every backend that has
+    /// accounts signs in by username — Invidious posts one in a form field it
+    /// still calls `email`, but an email is never what it wants. Every case is
+    /// spelled out so a backend that gains accounts —
     /// `AccountCapabilities.supportsAccounts` is what decides that — arrives
     /// here rather than falling through to somebody else's wording.
     private var usernameFieldLabel: String {
@@ -175,7 +176,7 @@ struct InstanceLoginView: View {
         case .piped:
             return String(localized: "login.username")
         case .invidious:
-            return String(localized: "login.email")
+            return String(localized: "login.username")
         case .yatteeServer:
             return String(localized: "login.username")
         case .peertube:

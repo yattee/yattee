@@ -366,10 +366,10 @@ private struct LegacyAccountImportRow: View {
     @ViewBuilder
     private var credentialsFields: some View {
         #if os(tvOS)
-        TVSettingsTextField(title: usernameLabel, text: $state.username)
+        TVSettingsTextField(title: String(localized: "login.username"), text: $state.username)
         TVSettingsTextField(title: String(localized: "login.password"), text: $state.password, isSecure: true)
         #else
-        TextField(usernameLabel, text: $state.username)
+        TextField(String(localized: "login.username"), text: $state.username)
             .textContentType(.username)
             #if os(iOS)
             .textInputAutocapitalization(.never)
@@ -379,15 +379,6 @@ private struct LegacyAccountImportRow: View {
         SecureField(String(localized: "login.password"), text: $state.password)
             .textContentType(.password)
         #endif
-    }
-
-    private var usernameLabel: String {
-        switch item.instanceType {
-        case .invidious:
-            return String(localized: "login.email")
-        default:
-            return String(localized: "login.username")
-        }
     }
 }
 

@@ -181,10 +181,21 @@ struct UnifiedPlaylistDetailView: View {
 
     /// Deleting a server-side playlist takes it off the server, which is a very
     /// different sentence from deleting a local one.
+    ///
+    /// Both name the playlist, and both fall back to the unnamed wording while
+    /// there is no name yet to say.
     private var deleteConfirmationTitle: String {
-        isLocal
-            ? String(localized: "playlist.delete.confirm")
-            : String(localized: "playlist.remote.delete.confirm")
+        let name = title.isEmpty ? cachedHeader?.title ?? "" : title
+
+        guard !name.isEmpty else {
+            return isLocal
+                ? String(localized: "playlist.delete.confirm")
+                : String(localized: "playlist.remote.delete.confirm")
+        }
+
+        return isLocal
+            ? String(localized: "playlist.delete.confirm.named \(name)")
+            : String(localized: "playlist.remote.delete.confirm.named \(name)")
     }
 
     private var navigationTitleText: String {

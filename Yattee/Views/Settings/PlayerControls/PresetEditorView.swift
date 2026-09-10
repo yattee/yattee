@@ -158,7 +158,7 @@ struct PresetEditorView: View {
                     .foregroundStyle(.red)
             }
             Spacer()
-            Text("\(trimmedName.count)/\(LayoutPreset.maxNameLength)")
+            Text(verbatim: "\(trimmedName.count)/\(LayoutPreset.maxNameLength)")
                 .foregroundStyle(
                     trimmedName.count > LayoutPreset.maxNameLength ? .red : .secondary
                 )

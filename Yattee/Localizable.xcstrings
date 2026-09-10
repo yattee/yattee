@@ -5309,9 +5309,21 @@
       "comment" : "Video count label for playlist row",
       "localizations" : {
         "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%lld videos"
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "1 video"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld videos"
+                }
+              }
+            }
           }
         }
       }
@@ -5594,24 +5606,13 @@
         }
       }
     },
-    "login.email" : {
-      "comment" : "Email field label in login form",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Email or Username"
-          }
-        }
-      }
-    },
     "login.error.invalidCredentials" : {
       "comment" : "Error message for invalid login credentials",
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Invalid email or password"
+            "value" : "Invalid username or password"
           }
         }
       }
@@ -8430,6 +8431,17 @@
         }
       }
     },
+    "playlist.delete.confirm.named %@" : {
+      "comment" : "Delete playlist confirmation with the playlist name",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Are you sure you want to delete \"%@\"?"
+          }
+        }
+      }
+    },
     "playlist.description" : {
       "comment" : "Description field label",
       "localizations" : {
@@ -8690,6 +8702,17 @@
         }
       }
     },
+    "playlist.remote.delete.confirm.named %@" : {
+      "comment" : "Delete server-side playlist confirmation with the playlist name",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Delete \"%@\" from your account?"
+          }
+        }
+      }
+    },
     "playlist.remote.delete.error" : {
       "comment" : "Deleting a playlist from the server failed",
       "localizations" : {
@@ -8814,9 +8837,21 @@
     "playlist.videoCount %lld" : {
       "localizations" : {
         "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%lld videos"
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "1 video"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld videos"
+                }
+              }
+            }
           }
         }
       }
@@ -8826,7 +8861,29 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "%lld videos • %@"
+            "value" : "%1$#@videoCount@ • %2$@"
+          },
+          "substitutions" : {
+            "videoCount" : {
+              "argNum" : 1,
+              "formatSpecifier" : "lld",
+              "variations" : {
+                "plural" : {
+                  "one" : {
+                    "stringUnit" : {
+                      "state" : "translated",
+                      "value" : "1 video"
+                    }
+                  },
+                  "other" : {
+                    "stringUnit" : {
+                      "state" : "translated",
+                      "value" : "%arg videos"
+                    }
+                  }
+                }
+              }
+            }
           }
         }
       }
