@@ -78,6 +78,10 @@ final class AppEnvironment {
     /// The context the account-scoped caches currently hold data for.
     @ObservationIgnored private var lastCachedContext: DataContext = .local
 
+    /// The selection behind `lastCachedContext`, kept to tell a move of the
+    /// selection apart from a status flap under an unchanged one.
+    @ObservationIgnored private var lastSelectedContext: DataContext = .local
+
     /// A digest of each account's stored credential, so a replacement arriving
     /// over iCloud Keychain can be told from the same secret being re-read.
     ///
@@ -649,6 +653,7 @@ final class AppEnvironment {
         // Seeded once the statuses it depends on are known, so launching does
         // not look like a change and throw away caches that are still right.
         lastCachedContext = dataContextValidator.effectiveContext
+        lastSelectedContext = accountsManager.currentContext
 
         // Accounts and instances arriving are triggers too, not redundant ones:
         // a context naming an account that has not synced yet — or one whose
@@ -812,10 +817,26 @@ final class AppEnvironment {
         // as a move would throw the caches away several times a day. "Cannot
         // tell yet" is not grounds for anything destructive.
         let effective = dataContextValidator.effectiveContext
-        if effective != lastCachedContext, credentialIdentityScope.isResolved {
+        guard credentialIdentityScope.isResolved else { return }
+
+        let selected = accountsManager.currentContext
+        if effective != lastCachedContext {
             lastCachedContext = effective
-            clearAccountScopedCaches()
+            if selected == lastSelectedContext {
+                // The selection is where it was; only the *reads* moved — a
+                // status flap, an unreachable fallback, a credential arriving.
+                // The data on screen still belongs to the same choice of
+                // account, so it is fenced rather than thrown away: an outage
+                // that flips the status every minute must not leave the user
+                // staring at an empty feed they had cached seconds ago.
+                SubscriptionFeedCache.shared.handleEffectiveContextChange()
+                HomeInstanceCache.shared.clearAllFeeds()
+                remotePlaylistsCache.clearAll()
+            } else {
+                clearAccountScopedCaches()
+            }
         }
+        lastSelectedContext = selected
     }
 
     /// Discards everything cached under an account's previous credential.

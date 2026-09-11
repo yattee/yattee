@@ -73,7 +73,7 @@ final class SubscriptionDestinationMembershipLoader {
         for name: Notification.Name in [.accountCredentialDidChange, .accountsDidChange, .instancesDidChange] {
             observers.append(
                 NotificationCenter.default.addObserver(forName: name, object: nil, queue: .main) { [weak self] _ in
-                    Task { @MainActor in self?.reload() }
+                    MainActor.assumeIsolated { self?.reload() }
                 }
             )
         }
