@@ -525,8 +525,9 @@ struct PlaylistsListView: View {
         .swipeActions(actionsArray: swipeActions(for: item))
         #endif
 
-        // Swipe is iOS-only, so a menu is the only way to reach a server-side
-        // playlist's actions on macOS and tvOS. Local rows keep exactly the
+        #if os(tvOS)
+        // There is no swipe here, so a menu is the only way to reach a
+        // server-side playlist's actions. Local rows keep exactly the
         // affordances they had — and an account that may not change its
         // playlists gets no menu rather than an empty one.
         if case .remote = item, writableAccount != nil {
@@ -536,6 +537,11 @@ struct PlaylistsListView: View {
         } else {
             row
         }
+        #else
+        // Everywhere else the menu hangs off the row's button instead — see
+        // `playlistRow(item:)`.
+        row
+        #endif
     }
 
     // MARK: - Grid Layout
@@ -567,13 +573,31 @@ struct PlaylistsListView: View {
         .zoomTransitionSource(id: item.transitionID)
         .focused($focusedPlaylistID, equals: item.id)
         #else
-        rowContent(for: item)
-            .frame(maxWidth: .infinity, alignment: .leading)
-            .contentShape(Rectangle())
-            .onTapGesture {
-                appEnvironment?.navigationCoordinator.navigate(to: .playlist(source(for: item)))
+        // A button rather than a tap gesture, and the menu hangs off the button
+        // itself: that is what carries a row's actions to the accessibility
+        // layer, exactly as a video row does. A bare shape with a gesture on it
+        // is not a control, offers no `AXShowMenu` and cannot be reached from
+        // the keyboard — and on macOS the menu is the only route to Edit and
+        // Delete, swipe actions being iOS-only.
+        let button = Button {
+            appEnvironment?.navigationCoordinator.navigate(to: .playlist(source(for: item)))
+        } label: {
+            rowContent(for: item)
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .contentShape(Rectangle())
+        }
+        .buttonStyle(.plain)
+        .zoomTransitionSource(id: item.transitionID)
+
+        // Local rows keep exactly the affordances they had, and an account that
+        // may not change its playlists gets no menu rather than an empty one.
+        if case .remote = item, writableAccount != nil {
+            button.contextMenu {
+                rowActions(for: item)
             }
-            .zoomTransitionSource(id: item.transitionID)
+        } else {
+            button
+        }
         #endif
     }
 
@@ -606,12 +630,17 @@ struct PlaylistsListView: View {
             card
         }
         #else
-        let card = cardContent(for: item)
-            .frame(maxHeight: .infinity, alignment: .top)
-            .onTapGesture {
-                appEnvironment?.navigationCoordinator.navigate(to: .playlist(source(for: item)))
-            }
-            .zoomTransitionSource(id: item.transitionID)
+        // A button for the same reason the list row is one: the card's menu is
+        // only reachable by assistive tech and by the keyboard from a control.
+        let card = Button {
+            appEnvironment?.navigationCoordinator.navigate(to: .playlist(source(for: item)))
+        } label: {
+            cardContent(for: item)
+                .frame(maxHeight: .infinity, alignment: .top)
+                .contentShape(Rectangle())
+        }
+        .buttonStyle(.plain)
+        .zoomTransitionSource(id: item.transitionID)
 
         if hasRowActions(item) {
             card.contextMenu {

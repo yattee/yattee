@@ -23,8 +23,25 @@ struct HistoryListView: View {
         /// Whether `video` is real metadata rather than the standing-in
         /// placeholder a bare server ID starts as.
         var isHydrated: Bool
+        /// Whether the metadata fetch was made and could not describe the
+        /// video, as opposed to never having been answered yet.
+        var metadataFailed = false
 
         var id: String { videoID }
+
+        /// The video as the row shows it.
+        ///
+        /// A row whose fetch failed says so instead of standing as its own ID
+        /// for the rest of the session, where nothing told a row still loading
+        /// apart from a dead one. Only the display changes: `video` — what
+        /// plays, and what the queue is handed — is untouched.
+        var displayVideo: Video {
+            guard metadataFailed, !isHydrated else { return video }
+            return .metadataUnavailable(
+                for: videoID,
+                title: String(localized: "home.history.metadataUnavailable")
+            )
+        }
     }
 
     /// The rows on screen, and the same rows' videos beside them.
@@ -534,7 +551,7 @@ struct HistoryListView: View {
     @ViewBuilder
     private func entryRowView(row: HistoryRow, index: Int) -> some View {
         VideoRowView(
-            video: row.video,
+            video: row.displayVideo,
             style: rowStyle,
             watchProgress: row.entry.flatMap { watchProgress(for: $0) },
             customMetadata: remainingMetadata(for: row)
@@ -542,14 +559,7 @@ struct HistoryListView: View {
         .tappableVideo(
             row.video,
             startTime: row.entry?.watchedSeconds,
-            customActions: [
-                VideoContextAction(
-                    String(localized: "home.history.remove"),
-                    systemImage: "trash",
-                    role: .destructive,
-                    action: { remove(row) }
-                )
-            ],
+            customActions: rowActions(for: row),
             context: .history,
             queueSource: historyQueueSource,
             sourceLabel: String(localized: "queue.source.history"),
@@ -563,6 +573,36 @@ struct HistoryListView: View {
         .onDisappear {
             visibleRowIDs.remove(row.videoID)
         }
+    }
+
+    /// What a row offers in its menu: removal always, and a second go at the
+    /// metadata for a row that could not be described.
+    ///
+    /// The retry is the only way back for such a row — a fetch is asked for once
+    /// per load, and the instance that failed to answer may well answer now.
+    private func rowActions(for row: HistoryRow) -> [VideoContextAction] {
+        var actions: [VideoContextAction] = []
+
+        if row.metadataFailed {
+            actions.append(
+                VideoContextAction(
+                    String(localized: "home.history.metadataRetry"),
+                    systemImage: "arrow.clockwise",
+                    action: { retryHydration(row) }
+                )
+            )
+        }
+
+        actions.append(
+            VideoContextAction(
+                String(localized: "home.history.remove"),
+                systemImage: "trash",
+                role: .destructive,
+                action: { remove(row) }
+            )
+        )
+
+        return actions
     }
 
     /// How much of the video is left, when a local entry knows.
@@ -579,21 +619,14 @@ struct HistoryListView: View {
                 VideoGridContent(columns: gridConfig.effectiveColumns) {
                     ForEach(Array(filteredRows.enumerated()), id: \.element.id) { index, row in
                         VideoCardView(
-                            video: row.video,
+                            video: row.displayVideo,
                             watchProgress: row.entry.flatMap { watchProgress(for: $0) },
                             isCompact: gridConfig.isCompactCards
                         )
                         .tappableVideo(
                             row.video,
                             startTime: row.entry?.watchedSeconds,
-                            customActions: [
-                                VideoContextAction(
-                                    String(localized: "home.history.remove"),
-                                    systemImage: "trash",
-                                    role: .destructive,
-                                    action: { remove(row) }
-                                )
-                            ],
+                            customActions: rowActions(for: row),
                             context: .history,
                             queueSource: historyQueueSource,
                             sourceLabel: String(localized: "queue.source.history"),
@@ -832,6 +865,23 @@ struct HistoryListView: View {
         }
     }
 
+    /// Asks again for a row the instance could not describe.
+    ///
+    /// A fetch is only ever made once per row per load, so a row that failed has
+    /// nothing left that would ask for it. The failure is lifted first: the row
+    /// goes back to reading as one still being fetched, which is what it is.
+    private func retryHydration(_ row: HistoryRow) {
+        guard case let .server(account) = displayMode else { return }
+
+        hydrationAttempted.remove(row.videoID)
+
+        if let index = rows.firstIndex(where: { $0.videoID == row.videoID }) {
+            rows[index].metadataFailed = false
+        }
+
+        hydrate(row, account: account)
+    }
+
     /// Asks for one row's metadata, as the row appears.
     ///
     /// The request itself waits its turn: the row joins the queue, and the
@@ -874,10 +924,18 @@ struct HistoryListView: View {
                     if isShowing(accountID: accountID) {
                         apply(video, to: videoID)
                     }
+                } catch is CancellationError {
+                    // A reload took the fetch over; the row is its to ask for.
+                } catch let error as APIError where error == .cancelled {
+                    // The same, one layer down.
                 } catch {
-                    // The row keeps its placeholder. A video the account watched
-                    // is part of its history whether or not this instance can
-                    // describe it right now.
+                    // The row stays — a video the account watched is part of its
+                    // history whether or not this instance can describe it — but
+                    // it says it could not be described rather than standing as
+                    // its own ID with nothing to tell it from one still loading.
+                    if isShowing(accountID: accountID) {
+                        markMetadataUnavailable(videoID)
+                    }
                 }
 
                 // A finished fetch frees its slot for the next row — but only
@@ -916,10 +974,21 @@ struct HistoryListView: View {
 
         rows[index].video = video
         rows[index].isHydrated = true
+        rows[index].metadataFailed = false
 
         if rowVideos.indices.contains(index) {
             rowVideos[index] = video
         }
+    }
+
+    /// Marks a row the instance could not describe.
+    ///
+    /// It stays pending, so a reload owes it another fetch on its own; what
+    /// changes is that until one succeeds the row says it has no metadata
+    /// rather than showing the video ID as if it were a title.
+    private func markMetadataUnavailable(_ videoID: String) {
+        guard let index = rows.firstIndex(where: { $0.videoID == videoID }) else { return }
+        rows[index].metadataFailed = true
     }
 
     // MARK: - Live updates

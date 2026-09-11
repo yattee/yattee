@@ -300,6 +300,7 @@ final class RemotePlaylistsCache {
             self.appliedSnapshotSequence[key] = sequence
             self.snapshots[accountID, default: [:]][id] = snapshot
             self.snapshotFetchDates[accountID, default: [:]][id] = Date()
+            self.carryCountToList(from: snapshot, id: id, for: accountID)
         }
 
         snapshotFetches[key] = task
@@ -310,6 +311,33 @@ final class RemotePlaylistsCache {
         }
 
         try await task.value
+    }
+
+    /// Carries a refetched playlist's video count into the account's list.
+    ///
+    /// The list row counts the playlist's videos, and only `fetchList` rewrites
+    /// the list — so a video added or removed from the detail view left the row
+    /// counting what the playlist held before, until something happened to
+    /// refetch the whole list. Nothing is invented here and no request is
+    /// added: the count is the one the server just answered this snapshot with,
+    /// and a playlist the list does not carry is left out of it rather than
+    /// put in.
+    private func carryCountToList(from snapshot: RemotePlaylistSnapshot, id: String, for accountID: UUID) {
+        guard let index = lists[accountID]?.firstIndex(where: { $0.id.playlistID == id }),
+              let existing = lists[accountID]?[index],
+              existing.videoCount != snapshot.playlist.videoCount
+        else { return }
+
+        lists[accountID]?[index] = Playlist(
+            id: existing.id,
+            title: existing.title,
+            description: existing.description,
+            author: existing.author,
+            videoCount: snapshot.playlist.videoCount,
+            thumbnailURL: existing.thumbnailURL,
+            videos: existing.videos,
+            isLocal: existing.isLocal
+        )
     }
 
     // MARK: - Reconciliation

@@ -1143,6 +1143,29 @@ private struct InvidiousAuthPlaylistVideo: Decodable, Sendable {
     }
 }
 
+// MARK: - Invidious Sentinels
+
+/// Invidious answers with the moment it replied where it has no upload date:
+/// the row comes back as `"published": <now>, "publishedText": "0 seconds
+/// ago"`, which renders as "in 0 seconds" beside a view count of zero. A
+/// publication that has not happened yet is one the instance does not know.
+enum InvidiousSentinel {
+    /// The date and the text Invidious actually has, both dropped where the
+    /// reading is that stamp.
+    ///
+    /// A premiere is left alone: it is scheduled, so its `published` is meant
+    /// to be a date that has not arrived yet.
+    static func published(_ raw: Int64?, text: String?, isUpcoming: Bool) -> (date: Date?, text: String?) {
+        guard let raw else { return (nil, text) }
+
+        let date = Date(timeIntervalSince1970: TimeInterval(raw))
+        if !isUpcoming, RelativeDateFormatter.isStampedNow(date) {
+            return (nil, nil)
+        }
+        return (date, text)
+    }
+}
+
 // MARK: - Invidious Response Models
 
 /// Response from the authenticated feed endpoint.
@@ -1174,14 +1197,20 @@ private struct InvidiousVideo: Decodable, Sendable {
     let premiereTimestamp: Int64?
 
     nonisolated func toVideo(baseURL: URL) -> Video {
-        Video(
+        let publishedReading = InvidiousSentinel.published(
+            published,
+            text: publishedText,
+            isUpcoming: isUpcoming ?? false
+        )
+
+        return Video(
             id: .global(videoId),
             title: title,
             description: description,
             author: Author(id: authorId, name: author),
             duration: TimeInterval(lengthSeconds),
-            publishedAt: published.map { Date(timeIntervalSince1970: TimeInterval($0)) },
-            publishedText: publishedText,
+            publishedAt: publishedReading.date,
+            publishedText: publishedReading.text,
             viewCount: viewCount,
             likeCount: likeCount,
             thumbnails: videoThumbnails?.map { $0.toThumbnail(baseURL: baseURL) } ?? [],
@@ -1246,6 +1275,11 @@ private struct InvidiousVideoDetails: Decodable, Sendable {
     nonisolated func toVideo(baseURL: URL) -> Video {
         // Convert recommended videos, limiting to 12
         let related: [Video]? = recommendedVideos?.prefix(12).map { $0.toVideo(baseURL: baseURL) }
+        let publishedReading = InvidiousSentinel.published(
+            published,
+            text: publishedText,
+            isUpcoming: isUpcoming ?? false
+        )
 
         return Video(
             id: .global(videoId),
@@ -1258,8 +1292,8 @@ private struct InvidiousVideoDetails: Decodable, Sendable {
                 subscriberCount: subscriberCount
             ),
             duration: TimeInterval(lengthSeconds),
-            publishedAt: published.map { Date(timeIntervalSince1970: TimeInterval($0)) },
-            publishedText: publishedText,
+            publishedAt: publishedReading.date,
+            publishedText: publishedReading.text,
             viewCount: viewCount,
             likeCount: likeCount,
             thumbnails: videoThumbnails?.map { $0.toThumbnail(baseURL: baseURL) } ?? [],

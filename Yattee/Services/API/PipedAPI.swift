@@ -819,9 +819,15 @@ enum PipedSentinel {
 
     /// The upload date Piped actually has, or nil for its `-1` sentinel.
     /// Piped sends this field as epoch **milliseconds**.
+    ///
+    /// A stamp of the moment the instance answered is the other reading that
+    /// means nothing — it renders as "in 0 seconds" — and is dropped the same
+    /// way.
     static func uploadedDate(_ raw: Int64?) -> Date? {
         guard let raw, raw >= 0 else { return nil }
-        return Date(timeIntervalSince1970: TimeInterval(raw) / 1000)
+        let date = Date(timeIntervalSince1970: TimeInterval(raw) / 1000)
+        guard !RelativeDateFormatter.isStampedNow(date) else { return nil }
+        return date
     }
 }
 

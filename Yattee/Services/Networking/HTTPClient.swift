@@ -228,6 +228,16 @@ actor HTTPClient {
     ) async throws -> T {
         let data = try await performRaw(request, customHeaders: customHeaders)
 
+        // A body with nothing in it is a failed answer however the status line
+        // reads: instances do answer `200` with zero bytes, and that is not a
+        // response any of these types can be decoded from.
+        guard !data.isEmpty else {
+            Task { @MainActor in
+                LoggingService.shared.error("API returned an empty response body", category: .api)
+            }
+            throw APIError.decodingError("Empty response body")
+        }
+
         do {
             return try decoder.decode(T.self, from: data)
         } catch let error as DecodingError {
