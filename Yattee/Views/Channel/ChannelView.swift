@@ -34,6 +34,10 @@ struct ChannelView: View {
     /// previous one is dropped instead of answering for the channel on screen.
     @State private var subscriptionGeneration = 0
     @State private var showingUnsubscribeConfirmation = false
+    /// What the destination rows know, kept here rather than inside the menu:
+    /// nothing in a platform menu's content is ever given a lifecycle to load
+    /// from.
+    @State private var destinationMembership = SubscriptionDestinationMembershipLoader()
     #if os(tvOS)
     @State private var showingSubscriptionDestinations = false
     #endif
@@ -191,6 +195,15 @@ struct ChannelView: View {
         .background(showInsetBackground ? viewBackgroundColor : .clear)
         .task {
             await loadChannel()
+        }
+        // Asked for here, where the answers arrive before the menu is built:
+        // the rows themselves live inside a platform menu, which runs no
+        // lifecycle of its own, and a mark that is not known by the time the
+        // menu opens is a mark the user never sees.
+        .task(id: channelToSubscribe?.id) {
+            guard let channelToSubscribe,
+                  SubscriptionDestinations.areOffered(in: appEnvironment) else { return }
+            await destinationMembership.load(for: channelToSubscribe, in: appEnvironment)
         }
         .onAppear {
             // Update Handoff activity for this specific channel
@@ -825,7 +838,10 @@ struct ChannelView: View {
             }
             .buttonStyle(.bordered)
             .fullScreenCover(isPresented: $showingSubscriptionDestinations) {
-                SubscriptionDestinationPicker(channel: channelToSubscribe) { context, subscribed in
+                SubscriptionDestinationPicker(
+                    channel: channelToSubscribe,
+                    membership: destinationMembership
+                ) { context, subscribed in
                     destinationDidToggle(context, subscribed: subscribed)
                 }
             }
@@ -1249,7 +1265,10 @@ struct ChannelView: View {
             // never presented there.
             #if !os(tvOS)
             if let channelToSubscribe {
-                SubscriptionDestinationMenu(channel: channelToSubscribe) { context, subscribed in
+                SubscriptionDestinationMenu(
+                    channel: channelToSubscribe,
+                    membership: destinationMembership
+                ) { context, subscribed in
                     destinationDidToggle(context, subscribed: subscribed)
                 }
             }
@@ -1275,6 +1294,7 @@ struct ChannelView: View {
         } label: {
             Image(systemName: channelMenuIcon)
         }
+        .accessibilityLabel(Text(String(localized: "channel.menu.title")))
     }
 
     // MARK: - Subscription Actions
