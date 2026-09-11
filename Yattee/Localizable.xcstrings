@@ -420,6 +420,17 @@
         }
       }
     },
+    "accounts.status.instanceDisabled" : {
+      "comment" : "Status of an account whose source has been switched off",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Source switched off"
+          }
+        }
+      }
+    },
     "accounts.status.instanceMissing" : {
       "localizations" : {
         "en" : {
@@ -922,6 +933,17 @@
         }
       }
     },
+    "channel.menu.title" : {
+      "comment" : "Accessible name of the channel toolbar menu",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Subscription Options"
+          }
+        }
+      }
+    },
     "channel.menu.unsubscribe" : {
       "localizations" : {
         "en" : {
@@ -1000,6 +1022,28 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "The selected account is unavailable. Pick a destination below."
+          }
+        }
+      }
+    },
+    "channel.subscribe.destination.subscribed" : {
+      "comment" : "Toast title after subscribing on a named destination",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Subscribed"
+          }
+        }
+      }
+    },
+    "channel.subscribe.destination.unsubscribed" : {
+      "comment" : "Toast title after unsubscribing on a named destination",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Unsubscribed"
           }
         }
       }
@@ -4288,6 +4332,28 @@
         }
       }
     },
+    "home.history.metadataRetry" : {
+      "comment" : "Context menu item that asks again for a history row's metadata",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Try Again"
+          }
+        }
+      }
+    },
+    "home.history.metadataUnavailable" : {
+      "comment" : "Title for a history row whose video details could not be fetched",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Details unavailable"
+          }
+        }
+      }
+    },
     "home.history.remaining %@" : {
       "localizations" : {
         "en" : {
@@ -5617,6 +5683,39 @@
         }
       }
     },
+    "login.footer.accountUnusable" : {
+      "comment" : "Footer of the account section when a listed account cannot be used and no more specific wording applies",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "An account here cannot be used right now. Its status is shown above."
+          }
+        }
+      }
+    },
+    "login.footer.credentialMissing" : {
+      "comment" : "Footer of the account section when a listed account has no saved login on this device",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "An account here has no saved login on this device yet. Sign in to use it."
+          }
+        }
+      }
+    },
+    "login.footer.credentialRejected" : {
+      "comment" : "Footer of the account section when the server rejected a listed account's login",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The server rejected an account's login. Sign in again to use it."
+          }
+        }
+      }
+    },
     "login.footer.invidiousAccount %@" : {
       "localizations" : {
         "en" : {
@@ -5666,6 +5765,17 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Sign in to your Piped account on %@"
+          }
+        }
+      }
+    },
+    "login.footer.unreachable" : {
+      "comment" : "Footer of the account section when the server cannot be reached",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The server could not be reached, so its accounts cannot be used right now."
           }
         }
       }
@@ -18454,6 +18564,28 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Feed"
+          }
+        }
+      }
+    },
+    "subscriptions.feedUnavailable.description" : {
+      "comment" : "Feed state while the selected account cannot be reached",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The feed will load again once this account is available."
+          }
+        }
+      }
+    },
+    "subscriptions.feedUnavailable.title" : {
+      "comment" : "Feed state while the selected account cannot be reached",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Feed Unavailable"
           }
         }
       }

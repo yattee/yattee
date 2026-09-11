@@ -490,10 +490,77 @@ struct DataContextSwitcherLabelTests {
                 == "inv.example.com"
         )
 
-        // The identifier still adds something the name does not have.
+        // The identifier still adds something the name does not have — the
+        // host it is usually paired with does not.
         #expect(
             DataContextSwitcherLabels.disambiguated("inv.example.com", username: "alice", host: "inv.example.com")
-                == "inv.example.com · alice@inv.example.com"
+                == "inv.example.com · alice"
+        )
+    }
+
+    @Test("A name that already is the identifier and the host is not doubled")
+    func defaultNameIsNotRepeated() {
+        #expect(
+            DataContextSwitcherLabels.disambiguated(
+                "alice@inv.example.com",
+                username: "alice",
+                host: "inv.example.com"
+            ) == "alice@inv.example.com"
+        )
+
+        #expect(
+            DataContextSwitcherLabels.disambiguated(
+                "alice@inv.example.com",
+                username: "alice",
+                host: "inv.example.com",
+                source: "Backup"
+            ) == "alice@inv.example.com · Backup"
+        )
+
+        // The source names nothing the name does not already say.
+        #expect(
+            DataContextSwitcherLabels.disambiguated("Work", username: nil, host: nil, source: "Work") == "Work"
+        )
+    }
+
+    @Test("The same login on two copies of one source is told apart by the source")
+    func duplicateSourceAccountsAreToldApart() {
+        let (accounts, instances, validator) = makeFixture()
+        var first = makeInstance("inv.example.com")
+        first.name = "Invidious"
+        var second = makeInstance("inv.example.com")
+        second.name = "Backup"
+        instances.add(first)
+        instances.add(second)
+
+        let a = accounts.addAccount(instanceID: first.id, displayName: "alice@inv.example.com")
+        let b = accounts.addAccount(instanceID: second.id, displayName: "alice@inv.example.com")
+        accounts.setStatus(.signedIn, for: a.id)
+        accounts.setStatus(.signedIn, for: b.id)
+
+        let usernames = [a.id: "alice", b.id: "alice"]
+
+        let labelA = title(a, accounts, validator, usernames: usernames)
+        let labelB = title(b, accounts, validator, usernames: usernames)
+
+        #expect(labelA == "alice@inv.example.com · Invidious")
+        #expect(labelB == "alice@inv.example.com · Backup")
+        #expect(labelA != labelB)
+    }
+
+    @Test("An account on a switched-off source does not read as signed in")
+    func disabledSourceIsNamedInTheLabel() {
+        let (accounts, instances, validator) = makeFixture()
+        var instance = makeInstance("inv.example.com")
+        instance.isEnabled = false
+        instances.add(instance)
+
+        let account = accounts.addAccount(instanceID: instance.id, displayName: "Work")
+        accounts.setStatus(.signedIn, for: account.id)
+
+        #expect(
+            title(account, accounts, validator)
+                == "Work — \(AccountStatusBadge.text(for: .instanceDisabled))"
         )
     }
 }

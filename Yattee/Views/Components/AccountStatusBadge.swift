@@ -28,19 +28,23 @@ struct AccountStatusBadge: View {
         case .signedIn: String(localized: "accounts.status.signedIn")
         case .credentialMissing: String(localized: "accounts.status.credentialMissing")
         case .credentialRejected: String(localized: "accounts.status.credentialRejected")
+        case .instanceDisabled: String(localized: "accounts.status.instanceDisabled")
         case .unreachable: String(localized: "accounts.status.unreachable")
         }
     }
 
     /// Only the states the user has to act on are coloured. A credential that
     /// never arrived on this device is ordinary — tvOS never receives them at
-    /// all — so it reads as secondary rather than as a fault.
+    /// all — so it reads as secondary rather than as a fault. A switched-off
+    /// source is the user's own doing, and the banner already reads it as
+    /// grey.
     static func color(for status: AccountStatus) -> Color {
         switch status {
         case .checking: .secondary
         case .signedIn: .secondary
         case .credentialMissing: .secondary
         case .credentialRejected: .red
+        case .instanceDisabled: .secondary
         case .unreachable: .orange
         }
     }

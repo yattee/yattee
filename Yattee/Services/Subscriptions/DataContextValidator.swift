@@ -112,6 +112,7 @@ final class DataContextValidator {
             case .checking: return .temporarilyUnavailable(.checking)
             case .credentialMissing: return .temporarilyUnavailable(.credentialMissing)
             case .credentialRejected: return .temporarilyUnavailable(.credentialRejected)
+            case .instanceDisabled: return .temporarilyUnavailable(.instanceDisabled)
             case .unreachable: return .temporarilyUnavailable(.unreachable)
             }
         }

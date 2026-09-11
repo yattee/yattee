@@ -367,6 +367,7 @@ struct UnifiedPlaylistDetailView: View {
             }
             .frame(width: 26, height: 15)
             .clipShape(RoundedRectangle(cornerRadius: 3))
+            .accessibilityHidden(true)
 
             Text(navigationTitleText)
                 .font(.headline)

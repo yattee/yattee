@@ -24,6 +24,11 @@ enum AccountStatus: Hashable, Sendable {
     /// The server rejected the credential. Account-scoped: a rejected login on
     /// one account never disables the instance or its sibling accounts.
     case credentialRejected
+    /// The account's source has been switched off. Not a credential state at
+    /// all — the login is untouched and comes back the moment the source is
+    /// turned on again — but nothing may be read from or written to it
+    /// meanwhile, so no surface may present the account as usable.
+    case instanceDisabled
     /// The server could not be reached. Never invalidates a credential.
     case unreachable
 }
@@ -857,6 +862,20 @@ final class AccountsManager {
     /// data — for as long as iCloud stayed unreachable.
     func status(for accountID: UUID) -> AccountStatus {
         accountStatuses[accountID] ?? (identityScope.isResolved ? .credentialMissing : .checking)
+    }
+
+    /// The status as the user is shown it, which is not the same question.
+    ///
+    /// `status(for:)` answers what the *credential* is doing, and a source the
+    /// user switched off leaves that answer untouched — deliberately, so
+    /// turning the source back on restores whatever the login really was. What
+    /// no list may do is report that answer on its own: an account on a
+    /// disabled source cannot be read from, cannot be written to and is not
+    /// offered by the switcher, so a row saying "Signed in" beside it is the
+    /// app claiming health it will not deliver.
+    func displayStatus(for account: Account) -> AccountStatus {
+        guard instance(for: account)?.isEnabled != false else { return .instanceDisabled }
+        return status(for: account.id)
     }
 
     /// Asked to confirm an auth-shaped failure before anything is concluded

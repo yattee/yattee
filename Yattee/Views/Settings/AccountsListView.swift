@@ -180,7 +180,17 @@ struct AccountsListView: View {
             // mentions it.
             .id(credentialRevision)
         } header: {
-            Text(instance.displayName)
+            HStack(spacing: 6) {
+                Text(instance.displayName)
+
+                // Said for the source as well as on each of its rows: without
+                // it the section reads like a healthy server whose logins
+                // happen to be unusable.
+                if !instance.isEnabled {
+                    Text(String(localized: "sources.status.disabled"))
+                        .foregroundStyle(.secondary)
+                }
+            }
         }
     }
 
@@ -355,8 +365,11 @@ struct AccountsListView: View {
         return .forAccount(account, resolvedBy: validator)
     }
 
+    /// The status the user is shown, not the credential's: a login on a source
+    /// that has been switched off is not usable, whatever the Keychain says,
+    /// and this screen already withholds "Use This Account" from it.
     private func status(for account: Account) -> AccountStatus {
-        accountsManager?.status(for: account.id) ?? .checking
+        accountsManager?.displayStatus(for: account) ?? .checking
     }
 
     /// Asked of the validator rather than recomputed here: an account on a
@@ -374,7 +387,13 @@ struct AccountsListView: View {
     /// What the backend behind this account lets it do. Deliberately a short
     /// sentence rather than a row of glyphs — the difference between two Piped
     /// logins is who they are, not what they support.
+    ///
+    /// Withheld while the source is switched off: none of it can be done until
+    /// the user turns the source back on, and a row promising subscriptions,
+    /// playlists and history directly under "Source switched off" contradicts
+    /// the line above it.
     private func capabilityHints(for account: Account) -> String? {
+        guard status(for: account) != .instanceDisabled else { return nil }
         guard let capabilities = accountsManager?.capabilities(for: account) else { return nil }
 
         var parts: [String] = []

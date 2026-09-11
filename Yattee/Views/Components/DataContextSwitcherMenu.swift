@@ -9,7 +9,7 @@ import SwiftUI
 
 // MARK: - Rows
 
-/// The switchable contexts, as buttons.
+/// The switchable contexts, as rows.
 ///
 /// Shared by every presentation of the switcher so a context that is offered in
 /// one place is offered — and named — identically in all of them.
@@ -23,30 +23,50 @@ struct DataContextSwitcherRows: View {
 
     var body: some View {
         ForEach(validator?.availableContexts ?? [.local], id: \.self) { context in
-            Button {
-                appEnvironment?.switchDataContext(to: context)
-                onSwitch?()
-            } label: {
-                rowLabel(for: context)
-            }
-            #if os(tvOS)
-            .buttonStyle(TVSettingsButtonStyle())
-            #endif
+            row(for: context)
         }
     }
 
     @ViewBuilder
-    private func rowLabel(for context: DataContext) -> some View {
+    private func row(for context: DataContext) -> some View {
+        // A menu row is a single label — a `VStack` inside one renders as
+        // nothing on macOS — so the status travels in the title rather than as
+        // a second line.
         let title = DataContextSwitcherLabels.title(for: context, in: appEnvironment)
 
-        // A menu row is a single label on macOS — a `VStack` inside one renders
-        // as nothing there — so the status travels in the title rather than as
-        // a second line.
-        if isCurrent(context) {
-            Label(title, systemImage: "checkmark")
-        } else {
+        #if os(macOS)
+        // The mark has to be the menu item's own. A `Label`'s `systemImage` is
+        // dropped by a macOS menu row, leaving the selected context
+        // indistinguishable from the rest; a `Toggle` is what SwiftUI renders
+        // as a checked item, mark character included.
+        Toggle(isOn: Binding(
+            get: { isCurrent(context) },
+            set: { isOn in
+                guard isOn else { return }
+                switchTo(context)
+            }
+        )) {
             Text(title)
         }
+        #else
+        Button {
+            switchTo(context)
+        } label: {
+            if isCurrent(context) {
+                Label(title, systemImage: "checkmark")
+            } else {
+                Text(title)
+            }
+        }
+        #if os(tvOS)
+        .buttonStyle(TVSettingsButtonStyle())
+        #endif
+        #endif
+    }
+
+    private func switchTo(_ context: DataContext) {
+        appEnvironment?.switchDataContext(to: context)
+        onSwitch?()
     }
 
     private func isCurrent(_ context: DataContext) -> Bool {
@@ -91,15 +111,18 @@ enum DataContextSwitcherLabels {
 
         var title = name
 
-        if isAmbiguous(name, accountsManager: accountsManager, validator: validator) {
+        let peers = peers(sharing: name, accountsManager: accountsManager, validator: validator)
+        if peers.count > 1 {
             title = disambiguated(
                 name,
-                username: username(account),
-                host: accountsManager.instance(for: account)?.url.host
+                for: account,
+                among: peers,
+                accountsManager: accountsManager,
+                username: username
             )
         }
 
-        let status = accountsManager.status(for: id)
+        let status = accountsManager.displayStatus(for: account)
         guard status != .signedIn else { return title }
 
         return "\(title) — \(AccountStatusBadge.text(for: status))"
@@ -110,27 +133,76 @@ enum DataContextSwitcherLabels {
     /// The identifier comes first: two logins on the *same* instance share a
     /// host, so a host suffix would repeat the server and still leave the user
     /// choosing between two identical rows. The host alone is what is left when
-    /// the identifier is not on this device — tvOS never receives one — and it
-    /// is dropped when the name already carries it.
-    static func disambiguated(_ name: String, username: String?, host: String?) -> String {
-        if let username, !username.isEmpty {
-            guard let host, !host.isEmpty else { return "\(name) · \(username)" }
-            return "\(name) · \(username)@\(host)"
+    /// the identifier is not on this device — tvOS never receives one. Neither
+    /// is repeated when the name already carries it: the default name for an
+    /// account *is* `identifier@host`, so appending it unguarded produced two
+    /// rows reading `X · X`.
+    ///
+    /// The source is the last resort and the only one that can name what two
+    /// logins of the same server user on two copies of the same server differ
+    /// by — the thing the user chose when adding the second source.
+    static func disambiguated(_ name: String, username: String?, host: String?, source: String? = nil) -> String {
+        var parts: [String] = []
+
+        if let username, !username.isEmpty, !name.localizedCaseInsensitiveContains(username) {
+            if let host, !host.isEmpty, !name.localizedCaseInsensitiveContains(host) {
+                parts.append("\(username)@\(host)")
+            } else {
+                parts.append(username)
+            }
+        } else if let host, !host.isEmpty, !name.localizedCaseInsensitiveContains(host) {
+            parts.append(host)
         }
 
-        guard let host, !host.isEmpty, !name.localizedCaseInsensitiveContains(host) else { return name }
-        return "\(name) · \(host)"
+        if let source, !source.isEmpty, name.localizedCaseInsensitiveCompare(source) != .orderedSame {
+            parts.append(source)
+        }
+
+        guard !parts.isEmpty else { return name }
+        return "\(name) · \(parts.joined(separator: " · "))"
+    }
+
+    /// The identifier and the host first, and the source only once they have
+    /// failed: two logins on one server are told apart by who they are, and
+    /// naming the server as well would add a word that is the same on both
+    /// rows. It is when that suffix still collides — the same server user
+    /// signed in on two sources pointing at the same host — that the source is
+    /// the only thing left that differs.
+    @MainActor
+    private static func disambiguated(
+        _ name: String,
+        for account: Account,
+        among peers: [Account],
+        accountsManager: AccountsManager,
+        username: (Account) -> String?
+    ) -> String {
+        func withoutSource(_ peer: Account) -> String {
+            disambiguated(
+                name,
+                username: username(peer),
+                host: accountsManager.instance(for: peer)?.url.host
+            )
+        }
+
+        let own = withoutSource(account)
+        let collides = peers.contains { $0.id != account.id && withoutSource($0) == own }
+        guard collides else { return own }
+
+        return disambiguated(
+            name,
+            username: username(account),
+            host: accountsManager.instance(for: account)?.url.host,
+            source: accountsManager.instance(for: account)?.displayName
+        )
     }
 
     @MainActor
-    private static func isAmbiguous(
-        _ name: String,
+    private static func peers(
+        sharing name: String,
         accountsManager: AccountsManager,
         validator: DataContextValidator
-    ) -> Bool {
-        accountsManager.selectableAccounts
-            .filter { validator.displayName(for: $0) == name }
-            .count > 1
+    ) -> [Account] {
+        accountsManager.selectableAccounts.filter { validator.displayName(for: $0) == name }
     }
 }
 
@@ -202,17 +274,25 @@ enum DataContextSwitcherGlyph {
 }
 
 /// The switcher's icon, health included.
+///
+/// Hidden from assistive technology on purpose: every presentation names the
+/// switcher in words beside it, and an unlabelled `Image` announces its symbol
+/// — a control that read "Account" while healthy started reading
+/// "person.crop.circle.badge.exclamationmark" the moment it badged.
 struct DataContextSwitcherIcon: View {
     @Environment(\.appEnvironment) private var appEnvironment
 
     var body: some View {
         let image = Image(systemName: DataContextSwitcherGlyph.systemImage(in: appEnvironment))
 
-        if let tint = DataContextSwitcherGlyph.tint(in: appEnvironment) {
-            image.foregroundStyle(tint)
-        } else {
-            image
+        Group {
+            if let tint = DataContextSwitcherGlyph.tint(in: appEnvironment) {
+                image.foregroundStyle(tint)
+            } else {
+                image
+            }
         }
+        .accessibilityHidden(true)
     }
 }
 
@@ -233,7 +313,13 @@ struct DataContextSwitcherMenu: View {
                 DataContextSwitcherIcon()
             }
         }
-        .help(DataContextSwitcherLabels.title(for: currentContext, in: appEnvironment))
+        .help(contextTitle)
+        .accessibilityLabel(Text(String(localized: "accounts.switcher.title")))
+        .accessibilityValue(Text(contextTitle))
+    }
+
+    private var contextTitle: String {
+        DataContextSwitcherLabels.title(for: currentContext, in: appEnvironment)
     }
 
     private var currentContext: DataContext {
@@ -261,20 +347,39 @@ struct DataContextSwitcherSettingsRow: View {
         .fullScreenCover(isPresented: $showingPicker) {
             DataContextSwitcherPicker()
         }
+        #elseif os(macOS)
+        // A macOS menu label renders its first text and nothing else — the
+        // trailing name was dropped at every width, leaving the row silent
+        // about which account is selected. So the name is the menu's *own*
+        // label, and the row carries only what names the control.
+        LabeledContent {
+            Menu {
+                DataContextSwitcherRows()
+            } label: {
+                Text(contextTitle)
+                    .lineLimit(1)
+            }
+            .menuStyle(.borderlessButton)
+            .help(contextTitle)
+            .accessibilityLabel(Text(String(localized: "accounts.switcher.title")))
+            .accessibilityValue(Text(contextTitle))
+        } label: {
+            Label {
+                Text(String(localized: "accounts.switcher.title"))
+            } icon: {
+                DataContextSwitcherIcon()
+            }
+        }
         #else
         Menu {
             DataContextSwitcherRows()
         } label: {
             rowLabel
         }
-        #if os(macOS)
-        // Both callers are full-width rows, so the default style's stretching
-        // is wanted here — only its chrome is not.
-        .menuStyle(.borderlessButton)
-        #endif
         #endif
     }
 
+    #if !os(macOS)
     private var rowLabel: some View {
         HStack {
             Label {
@@ -283,10 +388,15 @@ struct DataContextSwitcherSettingsRow: View {
                 DataContextSwitcherIcon()
             }
             Spacer(minLength: 8)
-            Text(DataContextSwitcherLabels.title(for: currentContext, in: appEnvironment))
+            Text(contextTitle)
                 .foregroundStyle(.secondary)
                 .lineLimit(1)
         }
+    }
+    #endif
+
+    private var contextTitle: String {
+        DataContextSwitcherLabels.title(for: currentContext, in: appEnvironment)
     }
 
     private var currentContext: DataContext {
