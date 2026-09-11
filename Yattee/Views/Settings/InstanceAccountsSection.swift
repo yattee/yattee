@@ -77,7 +77,7 @@ struct InstanceAccountsSection: View {
         } header: {
             Text(String(localized: "login.header.account"))
         } footer: {
-            Text(String(localized: accounts.isEmpty ? "login.footer.loginBenefits" : "login.footer.loggedIn"))
+            Text(footerText)
         }
         .onReceive(NotificationCenter.default.publisher(for: .accountCredentialDidChange)) { _ in
             credentialRevision &+= 1
@@ -215,6 +215,45 @@ struct InstanceAccountsSection: View {
     }
 
     // MARK: - Presentation
+
+    /// What the section says under the rows.
+    ///
+    /// Read from the statuses, not from the count: this is the screen the user
+    /// comes to in order to fix a login the server turned down, and a footer
+    /// that only counts accounts tells them, right there, that they are logged
+    /// in. The worst state on the list is the one that gets named — a rejected
+    /// credential is something to act on, and it outranks a server that
+    /// happens to be down.
+    private var footerText: String {
+        guard !accounts.isEmpty else {
+            return String(localized: "login.footer.loginBenefits")
+        }
+
+        // `checking` counts as healthy: it is the absence of an answer, and a
+        // footer that reacted to it would blink a warning at every launch.
+        let unhealthy = accounts.map { status(for: $0) }
+            .filter { $0 != .signedIn && $0 != .checking }
+
+        guard !unhealthy.isEmpty else {
+            return String(localized: "login.footer.loggedIn")
+        }
+
+        if unhealthy.contains(.credentialRejected) {
+            return String(localized: "login.footer.credentialRejected")
+        }
+
+        if unhealthy.contains(.unreachable) {
+            return String(localized: "login.footer.unreachable")
+        }
+
+        if unhealthy.contains(.credentialMissing) {
+            return String(localized: "login.footer.credentialMissing")
+        }
+
+        // A state named after this was written. Saying only that something is
+        // wrong is worth little, but it is true, and the rows above say what.
+        return String(localized: "login.footer.accountUnusable")
+    }
 
     private func displayName(for account: Account) -> String {
         appEnvironment?.dataContextValidator.displayName(for: account) ?? instance.displayName

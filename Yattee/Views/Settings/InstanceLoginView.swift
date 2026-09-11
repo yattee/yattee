@@ -73,7 +73,12 @@ struct InstanceLoginView: View {
                 .accessibilityIdentifier("instance.login.view")
         }
         #if os(macOS)
-        .frame(minWidth: 450, minHeight: 350)
+        // Sized to what the form actually holds: two fields and a button leave
+        // most of a taller sheet empty, and the optional step carries two more
+        // rows than the plain one. The width is what the labels have to fit
+        // in, which matters most where this is pushed on top of the add flow's
+        // own sheet.
+        .frame(minWidth: 480, minHeight: isOptionalStep ? 400 : 300)
         #endif
         #endif
     }
@@ -84,6 +89,19 @@ struct InstanceLoginView: View {
                 #if os(tvOS)
                 TVSettingsTextField(title: usernameFieldLabel, text: $username)
                 TVSettingsTextField(title: String(localized: "login.password"), text: $password, isSecure: true)
+                #elseif os(macOS)
+                LabeledContent(usernameFieldLabel) {
+                    TextField("", text: $username)
+                        .textContentType(.username)
+                        .autocorrectionDisabled()
+                        .accessibilityIdentifier("instance.login.usernameField")
+                }
+
+                LabeledContent(String(localized: "login.password")) {
+                    SecureField("", text: $password)
+                        .textContentType(.password)
+                        .accessibilityIdentifier("instance.login.passwordField")
+                }
                 #else
                 TextField(usernameFieldLabel, text: $username)
                     .textContentType(.username)
@@ -100,7 +118,7 @@ struct InstanceLoginView: View {
             } header: {
                 Text(String(localized: "login.header.credentials"))
             } footer: {
-                Text(footerText)
+                wrappingFooter(footerText)
             }
 
             if let error = errorMessage {
@@ -144,12 +162,16 @@ struct InstanceLoginView: View {
                     .buttonStyle(TVSettingsButtonStyle())
                     #endif
                 } footer: {
-                    Text(String(localized: "login.footer.optionalStep"))
+                    wrappingFooter(String(localized: "login.footer.optionalStep"))
                 }
             }
         }
         #if os(iOS)
         .scrollDismissesKeyboard(.interactively)
+        #endif
+        #if os(macOS)
+        .formStyle(.grouped)
+        .opaqueSettingsFormBackground()
         #endif
         .onAppear {
             // Only ever fills an untouched field: the sheet's body runs again
@@ -162,6 +184,17 @@ struct InstanceLoginView: View {
     }
 
     // MARK: - Computed Properties
+
+    /// A section footer that takes as many lines as it needs.
+    ///
+    /// The sentences here explain what the form is for and that skipping it is
+    /// safe, and the sheet is narrow — narrower still when it is pushed on top
+    /// of the add flow's sheet. Left to lay itself out, macOS keeps the footer
+    /// on one line and cuts the end of it off.
+    private func wrappingFooter(_ text: String) -> some View {
+        Text(text)
+            .fixedSize(horizontal: false, vertical: true)
+    }
 
     /// What the first field is called on this backend.
     ///
