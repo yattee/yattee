@@ -310,6 +310,24 @@ final class SubscriptionFeedCache {
         isLoading = false
     }
 
+    /// Fences whatever is in flight and lets a replacement start, keeping the
+    /// feed that is already here.
+    ///
+    /// For a move between the selected account and local data that the user did
+    /// not make — an unreachable server, an instance switched off. The
+    /// selection has not changed, so what is cached is still that account's own
+    /// feed and it is the only thing standing between the banner and an empty
+    /// screen. Purging it is what left the feed with nothing to fall back to
+    /// and no way to reach a terminal state: the request it emptied the cache
+    /// for is the one that cannot answer.
+    func handleEffectiveContextChange() {
+        LoggingService.shared.info("Subscription reads moved, keeping the cached feed", category: .general)
+        accountGeneration += 1
+        cancelPolling()
+        feedLoadState = .idle
+        isLoading = false
+    }
+
     /// Which login the cache currently holds data for.
     private var accountGeneration = 0
 

@@ -12,6 +12,7 @@ import AppKit
 
 struct SubscriptionsView: View {
     @Environment(\.appEnvironment) private var appEnvironment
+    @Environment(\.scenePhase) private var scenePhase
     @Namespace private var sheetTransition
     #if os(tvOS)
     @FocusState private var focusedVideoID: String?
@@ -25,6 +26,9 @@ struct SubscriptionsView: View {
     /// The effective context the visible subscriptions were loaded for, so a
     /// status change that does not move it does not force a reload.
     @State private var loadedContext: DataContext?
+    /// How many times the feed has been tried again since it last failed on the
+    /// network, so each attempt restarts the wait for the next one.
+    @State private var feedRetryAttempt = 0
     @State private var selectedChannelID: String? = nil
     @State private var errorMessage: String?
     @State private var watchEntriesMap: [String: WatchEntry] = [:]
@@ -173,6 +177,27 @@ struct SubscriptionsView: View {
 
     private var isShowingFullScreenError: Bool {
         displayedFeedError != nil && feedCache.videos.isEmpty
+    }
+
+    /// Whether the feed stopped on a failure the banner is already the answer
+    /// to, and so has nothing of its own to show.
+    ///
+    /// Without this the view falls back through to the spinner it started on
+    /// and stays there for as long as the account is unusable: the request that
+    /// would replace it is the one that cannot be made.
+    private var feedSettledOnAnsweredError: Bool {
+        guard case .error = feedCache.feedLoadState else { return false }
+        return displayedFeedError == nil
+    }
+
+    /// How long a feed that failed on the network waits before trying again.
+    private static let feedRetryInterval: TimeInterval = 60
+
+    /// The failure the feed is currently sitting on, if it is one that trying
+    /// again could answer differently.
+    private var feedRetryToken: Int? {
+        guard case .error(.networkError(_)) = feedCache.feedLoadState else { return nil }
+        return feedRetryAttempt
     }
 
     private var dataManager: DataManager? { appEnvironment?.dataManager }
@@ -515,6 +540,13 @@ struct SubscriptionsView: View {
                         // Synchronous load for local accounts so the sidebar is
                         // present in the first layout pass (avoids layout jump).
                         loadSubscriptions()
+                        // Coming back to a feed that failed while it was away is
+                        // the most likely moment for it to work again.
+                        retryFeedIfNeeded()
+                    }
+                    .onChange(of: scenePhase) { _, phase in
+                        guard phase == .active else { return }
+                        retryFeedIfNeeded()
                     }
                     .task {
                         await loadSubscriptionsAsync()
@@ -544,9 +576,12 @@ struct SubscriptionsView: View {
                     }
                     // Instances count for the same reason: switching one off
                     // moves reads to local without touching the stored context
-                    // or any account status.
+                    // or any account status. And a status that lifts without
+                    // moving reads at all still deserves the attempt the
+                    // failure before it never got.
                     .onReceive(NotificationCenter.default.publisher(for: .accountStatusesDidChange)) { _ in
-                        reloadIfEffectiveContextMoved()
+                        guard !reloadIfEffectiveContextMoved() else { return }
+                        retryFeedIfNeeded()
                     }
                     .onReceive(NotificationCenter.default.publisher(for: .instancesDidChange)) { _ in
                         reloadIfEffectiveContextMoved()
@@ -582,6 +617,17 @@ struct SubscriptionsView: View {
                     } else {
                         LoggingService.shared.debug("Using cached feed, no refresh needed", category: .general)
                     }
+                }
+                // A server that went away comes back without announcing it, and
+                // a feed that failed on the way to it is not watching anything
+                // that would notice — so it asks again on its own, for as long
+                // as the failure is on screen.
+                .task(id: feedRetryToken) {
+                    guard feedRetryToken != nil else { return }
+                    try? await Task.sleep(for: .seconds(Self.feedRetryInterval))
+                    guard !Task.isCancelled else { return }
+                    await loadFeed(forceRefresh: true)
+                    feedRetryAttempt += 1
                 }
                 .onChange(of: selectedChannelID) { _, _ in
                     withAnimation {
@@ -708,6 +754,8 @@ struct SubscriptionsView: View {
                         }
                 }
             }
+        } else if feedSettledOnAnsweredError {
+            feedUnavailableView
         } else if feedCache.hasLoadedOnce {
             gridEmptyView
         } else {
@@ -751,6 +799,8 @@ struct SubscriptionsView: View {
                     gridErrorView(error)
                 } else if !feedCache.videos.isEmpty {
                     gridFeedContent
+                } else if feedSettledOnAnsweredError {
+                    feedUnavailableView
                 } else if feedCache.hasLoadedOnce {
                     gridEmptyView
                 } else {
@@ -1333,6 +1383,21 @@ struct SubscriptionsView: View {
         .padding(.vertical, 40)
     }
 
+    /// Terminal state for a feed that stopped on a failure the banner explains.
+    private var feedUnavailableView: some View {
+        ContentUnavailableView {
+            Label(String(localized: "subscriptions.feedUnavailable.title"), systemImage: "wifi.exclamationmark")
+        } description: {
+            Text(String(localized: "subscriptions.feedUnavailable.description"))
+        } actions: {
+            Button(String(localized: "common.retry")) {
+                Task { await loadFeed(forceRefresh: true) }
+            }
+        }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .padding(.vertical, 40)
+    }
+
     /// Empty state shown when Invidious account is not authenticated.
     private var notAuthenticatedView: some View {
         ContentUnavailableView {
@@ -1377,23 +1442,51 @@ struct SubscriptionsView: View {
 
     /// Loads subscriptions asynchronously from the current provider.
     /// For Invidious, this fetches from the API and creates temporary Subscription objects for UI.
-    private func reloadIfEffectiveContextMoved() {
-        guard appEnvironment?.dataContextValidator.effectiveContext != loadedContext else { return }
-        reloadForContextChange()
+    @discardableResult
+    private func reloadIfEffectiveContextMoved() -> Bool {
+        guard appEnvironment?.dataContextValidator.effectiveContext != loadedContext else { return false }
+        reloadForEffectiveContextChange()
+        return true
     }
 
     /// Drops what is on screen and reloads it for whatever context is current.
     private func reloadForContextChange() {
-        loadedContext = appEnvironment?.dataContextValidator.effectiveContext
         feedCache.handleAccountChange()
         subscriptions = []
         subscriptionsLoaded = false
+        reload()
+    }
+
+    /// Reloads for a move the user did not make — a status lifting or falling,
+    /// an instance switched off — where the selection itself is unchanged.
+    ///
+    /// Keeps what is on screen: the cached feed and the channel list still
+    /// belong to the account that was selected before and still is, and they
+    /// are the fallback the banner is telling the user they are looking at.
+    private func reloadForEffectiveContextChange() {
+        feedCache.handleEffectiveContextChange()
+        reload()
+    }
+
+    private func reload() {
+        loadedContext = appEnvironment?.dataContextValidator.effectiveContext
 
         Task {
             guard let appEnvironment else { return }
             await loadSubscriptionsAsync()
             await feedCache.refresh(using: appEnvironment)
         }
+    }
+
+    /// Tries the feed again when something happened that may have changed the
+    /// answer, and it is sitting on a failure.
+    ///
+    /// The account statuses lift on their own, but a feed that already failed
+    /// has nothing watching for that — it waited for a Retry nobody should have
+    /// to press to find out the server came back.
+    private func retryFeedIfNeeded() {
+        guard case .error = feedCache.feedLoadState, !feedCache.isLoading else { return }
+        Task { await loadFeed(forceRefresh: true) }
     }
 
     private func loadSubscriptionsAsync() async {
