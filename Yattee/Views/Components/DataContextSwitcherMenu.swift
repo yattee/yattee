@@ -153,11 +153,12 @@ enum DataContextSwitcherLabels {
     ///
     /// The identifier comes first: two logins on the *same* instance share a
     /// host, so a host suffix would repeat the server and still leave the user
-    /// choosing between two identical rows. The host alone is what is left when
-    /// the identifier is not on this device — tvOS never receives one. Neither
-    /// is repeated when the name already carries it: the default name for an
-    /// account *is* `identifier@host`, so appending it unguarded produced two
-    /// rows reading `X · X`.
+    /// choosing between two identical rows. The host — the source's title when
+    /// it has one — alone is what is left when the identifier is not on this
+    /// device — tvOS never receives one. Neither is repeated when the name
+    /// already carries it: the default name for an account *is*
+    /// `identifier@host`, so appending it unguarded produced two rows reading
+    /// `X · X`.
     ///
     /// The source is the last resort and the only one that can name what two
     /// logins of the same server user on two copies of the same server differ
@@ -197,11 +198,15 @@ enum DataContextSwitcherLabels {
         accountsManager: AccountsManager,
         username: (Account) -> String?
     ) -> String {
+        // The same short label the default account name is built from — the
+        // source's title, host only as the fallback — or a name that already
+        // reads `user@Title` would fail the "already carries it" guard and
+        // grow a second, longer `user@full.host` suffix.
         func withoutSource(_ peer: Account) -> String {
             disambiguated(
                 name,
                 username: username(peer),
-                host: accountsManager.instance(for: peer)?.url.host
+                host: accountsManager.instance(for: peer)?.shortLabel
             )
         }
 
@@ -212,7 +217,7 @@ enum DataContextSwitcherLabels {
         return disambiguated(
             name,
             username: username(account),
-            host: accountsManager.instance(for: account)?.url.host,
+            host: accountsManager.instance(for: account)?.shortLabel,
             source: accountsManager.instance(for: account)?.displayName
         )
     }

@@ -142,6 +142,13 @@ struct Instance: Identifiable, Codable, Hashable, Sendable {
         name ?? url.host ?? url.absoluteString
     }
 
+    /// The shortest thing that names this source to the user: its title when
+    /// one is set, else its host. What account labels append after the `@`.
+    var shortLabel: String? {
+        if let name, !name.isEmpty { return name }
+        return url.host
+    }
+
     /// Returns the URL string with embedded credentials stripped for safe display in the UI.
     var displayURL: String {
         guard var components = URLComponents(url: url, resolvingAgainstBaseURL: false),

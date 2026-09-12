@@ -260,6 +260,10 @@ final class DataContextValidator {
     /// What the account is called with no user-set label: the stored login
     /// identifier, else the source's name, else its host.
     ///
+    /// After the `@` comes the source's *title* when it has one — the host is
+    /// the fallback, not the name: `arek@nerdvpn.de` reads, while
+    /// `arek@invidious.nerdvpn.de` overflows every menu row it appears in.
+    ///
     /// Device-local by nature. The username lives in the Keychain beside the
     /// credential rather than in synced metadata, so it is only available on a
     /// device that is signed in — two devices holding the very same account can
@@ -269,15 +273,14 @@ final class DataContextValidator {
             .accountCredentialsManager(for: account)?
             .username(for: account),
             !username.isEmpty {
-            if let host = accountsManager.instance(for: account)?.url.host {
-                return "\(username)@\(host)"
+            if let label = accountsManager.instance(for: account)?.shortLabel {
+                return "\(username)@\(label)"
             }
             return username
         }
 
         if let instance = accountsManager.instance(for: account) {
-            if let name = instance.name, !name.isEmpty { return name }
-            return instance.url.host ?? instance.type.displayName
+            return instance.shortLabel ?? instance.type.displayName
         }
 
         return String(localized: "accounts.status.instanceMissing")
