@@ -13,9 +13,9 @@ struct HomeView: View {
     #if !os(tvOS) && !os(macOS)
     @Namespace private var sheetTransition
     #endif
-    /// Deliberately local-only, unlike the playlists screen this shortcut leads
-    /// to: the count is of what is on the device, whatever data context is
-    /// selected. A known inconsistency, kept for now rather than half-solved.
+    /// The device's own playlists. In an account context the card reads the
+    /// remote playlists cache instead — the same store the playlists screen
+    /// this shortcut leads to shows.
     @State private var playlists: [LocalPlaylist] = []
     @State private var bookmarksCount: Int = 0
     @State private var recentBookmarks: [Bookmark] = []
@@ -23,6 +23,14 @@ struct HomeView: View {
     @State private var recentContinueWatching: [WatchEntry] = []
     @State private var historyCount: Int = 0
     @State private var recentHistory: [WatchEntry] = []
+    /// The account's server-side history, when that is what the history screen
+    /// would show. `nil` in local mode — and while the account's first fetch is
+    /// still out, which is what keeps the local numbers off an account's card.
+    @State private var serverHistory: ServerHistorySnapshot?
+    /// Which server-history load the state belongs to. Cancelling is not
+    /// enough on its own: a page that already came back races the switch, and
+    /// its rows would land on a context nobody is looking at any more.
+    @State private var serverHistoryGeneration = 0
     #if !os(tvOS) && !os(macOS)
     @State private var showingSettings = false
     #endif
@@ -39,8 +47,64 @@ struct HomeView: View {
     @State private var hasLoadedHomeData = false
     #endif
 
+    /// What one probe of the account's server history brought back.
+    private struct ServerHistorySnapshot {
+        /// How many entries the probe saw, or `nil` when the fetch failed.
+        var count: Int?
+        /// The probe came back full, so the history goes on past what it saw
+        /// and `count` is a floor, not a total — the server has no count call.
+        var countIsLowerBound = false
+        /// The leading entries, hydrated for the section's rows.
+        var videos: [Video] = []
+    }
+
+    /// How many IDs the server-history probe asks for in its single page.
+    ///
+    /// Large enough that most histories fit and the card shows a real total;
+    /// a history that fills it shows this number as a floor instead. IDs only
+    /// — nothing is hydrated past the section's few rows — so the size costs
+    /// the server one array slice.
+    private static let serverHistoryProbeSize = 500
+
     private var dataManager: DataManager? { appEnvironment?.dataManager }
     private var settingsManager: SettingsManager? { appEnvironment?.settingsManager }
+
+    // MARK: - Context
+
+    /// The account whose data Home is showing, or `nil` when it is the device's.
+    ///
+    /// The *effective* context, so a selected account that cannot be used right
+    /// now shows the local numbers — the same fallback the screens the
+    /// shortcuts lead to make.
+    private var contextAccount: Account? {
+        guard let appEnvironment,
+              case let .account(id) = appEnvironment.dataContextValidator.effectiveContext
+        else { return nil }
+
+        return appEnvironment.accountsManager.account(id: id)
+    }
+
+    /// Whose history the card and the section read — resolved by the same rule
+    /// as the history screen, so the shortcut can never promise a history the
+    /// screen behind it will not show.
+    private var historyDisplayMode: HistoryDisplayMode {
+        guard let appEnvironment else { return .local }
+        let account = contextAccount
+
+        return HistoryDisplayMode.resolve(
+            effectiveContext: appEnvironment.dataContextValidator.effectiveContext,
+            account: account,
+            capabilities: account.flatMap { appEnvironment.accountsManager.capabilities(for: $0) }
+        )
+    }
+
+    /// The account's playlists as last fetched, or `nil` in local mode — read
+    /// live from the same cache the playlists screen shows, so a create or a
+    /// delete there moves this count without a reload.
+    private var remotePlaylists: [Playlist]? {
+        guard let appEnvironment, let account = contextAccount else { return nil }
+        return appEnvironment.remotePlaylistsCache.playlists(for: account.id)
+    }
 
     private var accentColor: Color {
         appEnvironment?.settingsManager.resolvedAccentColor ?? .accentColor
@@ -83,7 +147,25 @@ struct HomeView: View {
         appEnvironment?.settingsManager.listStyle ?? .inset
     }
 
+    #if !os(tvOS)
+    /// Same edge the switcher sits on in Subscriptions/History/Playlists:
+    /// leading on macOS, trailing elsewhere.
+    private var switcherPlacement: ToolbarItemPlacement {
+        #if os(macOS)
+        .navigation
+        #else
+        .primaryAction
+        #endif
+    }
+    #endif
+
     var body: some View {
+        // Split from `chrome` so the modifier chain stays within what the
+        // type-checker will resolve in one expression.
+        dataObservers(chrome)
+    }
+
+    private var chrome: some View {
         mainContent
         #if !os(tvOS)
         .navigationTitle(String(localized: "tabs.home"))
@@ -95,6 +177,11 @@ struct HomeView: View {
         .toolbarTitleDisplayMode(.inlineLarge)
         #endif
         .toolbar {
+            #if !os(tvOS)
+            ToolbarItem(placement: switcherPlacement) {
+                DataContextSwitcherMenu()
+            }
+            #endif
             #if !os(tvOS) && !os(macOS)
             ToolbarItem(placement: .primaryAction) {
                 Button {
@@ -176,18 +263,52 @@ struct HomeView: View {
                 loadData()
             }
         }
+    }
+
+    /// The notification subscriptions, hung on the content as one group.
+    private func dataObservers(_ content: some View) -> some View {
+        content
         .onReceive(NotificationCenter.default.publisher(for: .bookmarksDidChange)) { _ in
             loadBookmarksData()
         }
         .onReceive(NotificationCenter.default.publisher(for: .watchHistoryDidChange)) { _ in
-            loadHistoryData()
+            // The device's own history changed; an account's server history is
+            // told about below, and a local write is not news about it.
+            loadLocalHistoryData()
             loadContinueWatchingData()
+        }
+        // A watch was posted to the account's server history — the count and
+        // the section's front rows just moved.
+        .onReceive(NotificationCenter.default.publisher(for: .serverWatchHistoryDidUpdate)) { _ in
+            if case .server = historyDisplayMode {
+                loadServerHistoryIfNeeded()
+            }
         }
         .onReceive(NotificationCenter.default.publisher(for: .playlistsDidChange)) { _ in
             loadPlaylistsData()
         }
         .onReceive(NotificationCenter.default.publisher(for: .subscriptionsDidChange)) { _ in
             loadChannelsData()
+        }
+        // Selecting another account — or local — changes whose channels count
+        // and feed this is. AppEnvironment already swapped or cleared the
+        // account-scoped caches; this re-reads the counts and, when the feed
+        // section is on Home, refills the feed the clearing just emptied.
+        .onReceive(NotificationCenter.default.publisher(for: .dataContextDidChange)) { _ in
+            loadData()
+            refreshFeedIfNeeded()
+        }
+        // The same, without the context moving: the credential behind the
+        // account was replaced, so the counts may now be someone else's.
+        .onReceive(NotificationCenter.default.publisher(for: .accountCredentialDidChange)) { _ in
+            loadData()
+            refreshFeedIfNeeded()
+        }
+        // A status, an account or an instance changing moves reads between the
+        // account and local without the stored context moving at all.
+        .onReceive(NotificationCenter.default.publisher(for: .accountStatusesDidChange)) { _ in
+            loadData()
+            refreshFeedIfNeeded()
         }
     }
 
@@ -210,7 +331,11 @@ struct HomeView: View {
             case .bookmarks:
                 if !recentBookmarks.isEmpty { return false }
             case .history:
-                if !recentHistory.isEmpty { return false }
+                if case .server = historyDisplayMode {
+                    if !(serverHistory?.videos.isEmpty ?? true) { return false }
+                } else if !recentHistory.isEmpty {
+                    return false
+                }
             case .downloads:
                 break
             case .instanceContent(let instanceID, let contentType):
@@ -638,8 +763,8 @@ struct HomeView: View {
             HomeShortcutCardView(
                 icon: "list.bullet.rectangle",
                 title: String(localized: "home.playlists.title"),
-                count: playlists.count,
-                subtitle: formatCount(playlists.count, singular: "home.count.playlist", plural: "home.count.playlists"),
+                count: playlistsCardCount,
+                subtitle: playlistsCardSubtitle,
                 colorfulColor: HomeShortcutItem.playlists.cardColor
             )
         }
@@ -698,8 +823,8 @@ struct HomeView: View {
             HomeShortcutCardView(
                 icon: "clock",
                 title: String(localized: "home.history.title"),
-                count: historyCount,
-                subtitle: formatCount(historyCount, singular: "home.count.video", plural: "home.count.videos"),
+                count: historyCardCount,
+                subtitle: historyCardSubtitle,
                 colorfulColor: HomeShortcutItem.history.cardColor
             )
         }
@@ -884,7 +1009,7 @@ struct HomeView: View {
             HomeShortcutRowView(
                 icon: "list.bullet.rectangle",
                 title: String(localized: "home.playlists.title"),
-                subtitle: formatCount(playlists.count, singular: "home.count.playlist", plural: "home.count.playlists")
+                subtitle: playlistsCardSubtitle
             )
         }
         .buttonStyle(.plain)
@@ -923,7 +1048,7 @@ struct HomeView: View {
             HomeShortcutRowView(
                 icon: "clock",
                 title: String(localized: "home.history.title"),
-                subtitle: formatCount(historyCount, singular: "home.count.video", plural: "home.count.videos")
+                subtitle: historyCardSubtitle
             )
         }
         .buttonStyle(.plain)
@@ -1022,10 +1147,49 @@ struct HomeView: View {
     }
 
     /// Formats a count with compact notation and proper singular/plural form.
-    private func formatCount(_ count: Int, singular: String.LocalizationValue, plural: String.LocalizationValue) -> String {
-        let formattedCount = CountFormatter.compact(count)
+    ///
+    /// `lowerBound` marks a count the source could only see the start of — a
+    /// server history longer than one probe — and reads "500+ videos".
+    private func formatCount(_ count: Int, singular: String.LocalizationValue, plural: String.LocalizationValue, lowerBound: Bool = false) -> String {
+        let formattedCount = CountFormatter.compact(count) + (lowerBound ? "+" : "")
         let key = count == 1 ? singular : plural
         return String(localized: "\(formattedCount) \(String(localized: key))")
+    }
+
+    // MARK: - Context-Scoped Card Values
+
+    /// What the playlists card counts: the account's server-side list when one
+    /// is selected, the device's own otherwise.
+    private var playlistsCardCount: Int {
+        guard contextAccount != nil else { return playlists.count }
+        return remotePlaylists?.count ?? 0
+    }
+
+    /// An account list that has not come back yet says so rather than showing
+    /// a zero that is really "not asked yet".
+    private var playlistsCardSubtitle: String {
+        if contextAccount != nil, remotePlaylists == nil { return "—" }
+        return formatCount(playlistsCardCount, singular: "home.count.playlist", plural: "home.count.playlists")
+    }
+
+    private var historyCardCount: Int {
+        guard case .server = historyDisplayMode else { return historyCount }
+        return serverHistory?.count ?? 0
+    }
+
+    private var historyCardSubtitle: String {
+        guard case .server = historyDisplayMode else {
+            return formatCount(historyCount, singular: "home.count.video", plural: "home.count.videos")
+        }
+        // Still fetching, or the fetch failed — either way the local number
+        // is not this account's, so the card holds its tongue instead.
+        guard let count = serverHistory?.count else { return "—" }
+        return formatCount(
+            count,
+            singular: "home.count.video",
+            plural: "home.count.videos",
+            lowerBound: serverHistory?.countIsLowerBound == true
+        )
     }
     
     // MARK: - Queue Support
@@ -1103,7 +1267,11 @@ struct HomeView: View {
                 bookmarksSection
             }
         case .history:
-            if !recentHistory.isEmpty {
+            if case .server = historyDisplayMode {
+                if let videos = serverHistory?.videos, !videos.isEmpty {
+                    serverHistorySection(videos: videos)
+                }
+            } else if !recentHistory.isEmpty {
                 historySection
             }
         case .downloads:
@@ -1343,6 +1511,47 @@ struct HomeView: View {
         }
     }
 
+    /// The account's recent server-side history, already hydrated and limited.
+    ///
+    /// Plain video rows, no swipe delete: a server delete belongs to the full
+    /// history screen, which owns the confirmation and the error for it.
+    private func serverHistorySection(videos: [Video]) -> some View {
+        VStack(alignment: .leading, spacing: 0) {
+            sectionHeader(title: "home.recentHistory.title") {
+                appEnvironment?.navigationCoordinator.navigate(to: .history)
+            }
+
+            if sectionLayout == .grid {
+                HomeHorizontalCards(
+                    videos: videos,
+                    queueSource: recentHistoryQueueSource,
+                    sourceLabel: String(localized: "queue.source.history"),
+                    loadMoreVideos: loadMoreRecentHistoryCallback
+                )
+            } else {
+                VideoListContent(listStyle: listStyle) {
+                    ForEach(Array(videos.enumerated()), id: \.element.id) { index, video in
+                        VideoListRow(
+                            isLast: index == videos.count - 1,
+                            rowStyle: .regular,
+                            listStyle: listStyle
+                        ) {
+                            VideoRowView(video: video, style: .regular)
+                                .tappableVideo(
+                                    video,
+                                    queueSource: recentHistoryQueueSource,
+                                    sourceLabel: String(localized: "queue.source.history"),
+                                    videoList: videos,
+                                    videoIndex: index,
+                                    loadMoreVideos: loadMoreRecentHistoryCallback
+                                )
+                        }
+                    }
+                }
+            }
+        }
+    }
+
     #if !os(tvOS)
     private func downloadsSection(downloads: [Download]) -> some View {
         let limitedDownloads = Array(downloads.prefix(sectionItemsLimit))
@@ -1512,6 +1721,24 @@ struct HomeView: View {
 
     private func loadPlaylistsData() {
         playlists = dataManager?.playlists() ?? []
+        refreshRemotePlaylistsIfNeeded()
+    }
+
+    /// Asks for the account's playlist list the first time this context needs
+    /// it. Reads come off the cache live, so the count appears when the fetch
+    /// lands and follows every mutation after — this only has to make sure the
+    /// first fetch happens even when the playlists screen was never opened.
+    private func refreshRemotePlaylistsIfNeeded() {
+        guard let appEnvironment, let account = contextAccount,
+              appEnvironment.remotePlaylistsCache.playlists(for: account.id) == nil
+        else { return }
+
+        Task {
+            // The cache fences by account generation and orders results
+            // itself; a failure simply leaves the count reading "—", and the
+            // playlists screen owns showing the error.
+            try? await appEnvironment.remotePlaylistsCache.refreshList(for: account)
+        }
     }
 
     private func loadBookmarksData() {
@@ -1527,8 +1754,103 @@ struct HomeView: View {
     }
 
     private func loadHistoryData() {
+        loadLocalHistoryData()
+        loadServerHistoryIfNeeded()
+    }
+
+    /// The device's own history alone — what a local write changes. The
+    /// account's is the server's to change, and announced separately.
+    private func loadLocalHistoryData() {
         historyCount = dataManager?.watchHistoryCount() ?? 0
         recentHistory = dataManager?.watchHistory(limit: 50) ?? []
+    }
+
+    /// One probe of the account's server history: the count for the card, the
+    /// leading rows for the section.
+    private func loadServerHistoryIfNeeded() {
+        serverHistoryGeneration += 1
+        let generation = serverHistoryGeneration
+
+        guard case let .server(account) = historyDisplayMode, let appEnvironment else {
+            serverHistory = nil
+            return
+        }
+
+        let limit = sectionItemsLimit
+
+        Task {
+            do {
+                let ids = try await appEnvironment.accountService.watchHistory(
+                    page: 1,
+                    maxResults: Self.serverHistoryProbeSize,
+                    for: account
+                )
+                guard generation == serverHistoryGeneration else { return }
+
+                // The server re-bumps a re-watch rather than duplicating it,
+                // but the rows key a ForEach — deduped rather than trusted.
+                var seen = Set<String>()
+                let uniqueIDs = ids.filter { seen.insert($0).inserted }
+
+                let videos = await hydrateServerHistory(
+                    ids: Array(uniqueIDs.prefix(limit)),
+                    account: account,
+                    using: appEnvironment
+                )
+                guard generation == serverHistoryGeneration else { return }
+
+                serverHistory = ServerHistorySnapshot(
+                    count: uniqueIDs.count,
+                    countIsLowerBound: ids.count >= Self.serverHistoryProbeSize,
+                    videos: videos
+                )
+            } catch {
+                guard generation == serverHistoryGeneration else { return }
+                // Failed is not local: the card shows "—" and no section,
+                // never the device's numbers under an account's name.
+                serverHistory = ServerHistorySnapshot(count: nil)
+            }
+        }
+    }
+
+    /// Rows for the leading server-history IDs, from local data where there is
+    /// some — a video watched on this device is already known in full — and a
+    /// metadata fetch for the rest. Bounded by the section limit, so this is a
+    /// handful of requests at most.
+    ///
+    /// A fetch that fails leaves the row as its ID placeholder rather than
+    /// dropping it: the account watched it, and a history missing rows it
+    /// cannot describe is a wrong history.
+    private func hydrateServerHistory(
+        ids: [String],
+        account: Account,
+        using appEnvironment: AppEnvironment
+    ) async -> [Video] {
+        guard let instance = appEnvironment.accountsManager.instance(for: account) else {
+            return ids.map { Video.metadataPlaceholder(for: $0) }
+        }
+
+        let known: [String: Video] = Dictionary(
+            uniqueKeysWithValues: ids.compactMap { id in
+                dataManager?.watchEntry(for: id).map { (id, $0.toVideo()) }
+            }
+        )
+
+        return await withTaskGroup(of: (Int, Video).self) { group in
+            for (index, id) in ids.enumerated() {
+                group.addTask { @MainActor in
+                    if let video = known[id] { return (index, video) }
+                    let fetched = try? await appEnvironment.contentService.video(id: id, instance: instance)
+                    return (index, fetched ?? .metadataPlaceholder(for: id))
+                }
+            }
+
+            var videos = [Video?](repeating: nil, count: ids.count)
+            for await (index, video) in group {
+                videos[index] = video
+            }
+            return videos.compactMap { $0 }
+        }
     }
 
     private func loadChannelsData() {
@@ -1542,11 +1864,34 @@ struct HomeView: View {
         if let cached = service.cachedSubscriptionCount {
             channelsCount = cached
         } else {
+            // Captured so a fetch that outlives an account switch cannot land
+            // its count on whichever context is selected by the time it returns.
+            let requestContext = appEnvironment?.dataContextValidator.effectiveContext
             Task {
-                if let channels = try? await service.fetchSubscriptions() {
+                if let channels = try? await service.fetchSubscriptions(),
+                   requestContext == appEnvironment?.dataContextValidator.effectiveContext {
                     channelsCount = channels.count
                 }
             }
+        }
+    }
+
+    /// Refills the feed section after an account switch emptied its cache.
+    ///
+    /// Only when Home actually shows the feed: without the section on screen
+    /// there is nothing to refill, and the Subscriptions tab refreshes for
+    /// itself when opened. The validity/loading gate is the same one
+    /// SubscriptionsView uses, so a switch that kept the cache (a status flap
+    /// fencing rather than clearing) does not refetch what is already there.
+    private func refreshFeedIfNeeded() {
+        guard let appEnvironment else { return }
+
+        let sections = settingsManager?.visibleSections() ?? []
+        guard sections.contains(.feed) else { return }
+        guard !feedCache.isCacheValid(using: settingsManager), !feedCache.isLoading else { return }
+
+        Task {
+            await feedCache.refresh(using: appEnvironment)
         }
     }
 
