@@ -187,20 +187,38 @@ final class DataContextValidator {
 
     /// Whether picking this context would land the user somewhere usable.
     ///
-    /// Not the same question as `validity(of:)`: a rejected or unreachable
-    /// account is still a perfectly good thing to switch *to* — that is where
-    /// the user goes to fix it — while a login on a switched-off source is not.
+    /// The line runs between states that heal on their own and states only the
+    /// user can end. An unreachable account may be back in a minute — and
+    /// while the device itself is offline *every* account is unreachable, so
+    /// refusing those would lock the whole switcher — and a context still
+    /// resolving is refused nothing it may turn out to deserve. But a rejected
+    /// or missing credential and a switched-off source stay that way until the
+    /// user acts, in Settings, not here: picking one only lands on the local
+    /// fallback with a banner, so the row is listed — status in its title —
+    /// and refused.
     func isSwitchable(_ context: DataContext) -> Bool {
         switch context {
         case .local:
             return true
 
-        case let .account(id):
-            guard accountsManager.selectableAccounts.contains(where: { $0.id == id }),
-                  let account = accountsManager.account(id: id) else {
+        case .account(let id):
+            guard accountsManager.selectableAccounts.contains(where: { $0.id == id }) else {
                 return false
             }
-            return accountsManager.instance(for: account)?.isEnabled ?? false
+
+            switch validity(of: context) {
+            case .valid:
+                return true
+            case .removed:
+                return false
+            case let .temporarilyUnavailable(reason):
+                switch reason {
+                case .instanceDisabled, .credentialRejected, .credentialMissing:
+                    return false
+                case .checking, .instancePending, .unreachable:
+                    return true
+                }
+            }
         }
     }
 

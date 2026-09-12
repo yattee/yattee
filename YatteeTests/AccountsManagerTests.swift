@@ -726,6 +726,7 @@ struct DataContextValidatorTests {
 
         let (accounts, validator) = makeValidator(instances: instances)
         let usable = accounts.addAccount(instanceID: enabled.id)
+        accounts.setStatus(.signedIn, for: usable.id)
         _ = accounts.addAccount(instanceID: disabled.id)
         _ = accounts.addAccount(instanceID: unsupported.id)
         // An account whose instance has not synced yet has no known
@@ -745,6 +746,7 @@ struct DataContextValidatorTests {
 
         let (accounts, validator) = makeValidator(instances: instances)
         let usable = accounts.addAccount(instanceID: enabled.id)
+        accounts.setStatus(.signedIn, for: usable.id)
         let switchedOff = accounts.addAccount(instanceID: disabled.id)
         accounts.setStatus(.signedIn, for: switchedOff.id)
         accounts.setContext(.account(switchedOff.id))
@@ -762,6 +764,40 @@ struct DataContextValidatorTests {
         #expect(validator.isSwitchable(.local))
         // And the row says why, in the same words the accounts screen uses.
         #expect(accounts.displayStatus(for: switchedOff) == .instanceDisabled)
+    }
+
+    @Test("Only states the user must fix refuse the switch; self-healing ones do not")
+    func unusableAccountsAreRefusedBySwitchability() {
+        let instances = makeTestInstancesManager()
+        let instance = Instance(type: .invidious, url: URL(string: "https://inv-refusal.example.com")!)
+        instances.add(instance)
+        defer { instances.remove(instance) }
+
+        let (accounts, validator) = makeValidator(instances: instances)
+        let account = accounts.addAccount(instanceID: instance.id)
+
+        // A rejected credential stays rejected until the user signs in again —
+        // picking the account would only land on the local fallback.
+        accounts.setStatus(.credentialRejected, for: account.id)
+        #expect(validator.listedContexts.contains(.account(account.id)))
+        #expect(!validator.isSwitchable(.account(account.id)))
+
+        // The same for a credential this device simply does not hold.
+        accounts.setStatus(.credentialMissing, for: account.id)
+        #expect(!validator.isSwitchable(.account(account.id)))
+
+        // A server outage heals on its own — and while the device itself is
+        // offline every account reads unreachable, so refusing these would
+        // lock the whole switcher.
+        accounts.setStatus(.unreachable, for: account.id)
+        #expect(validator.isSwitchable(.account(account.id)))
+
+        // Still resolving is refused nothing it may turn out to deserve.
+        accounts.setStatus(.checking, for: account.id)
+        #expect(validator.isSwitchable(.account(account.id)))
+
+        accounts.setStatus(.signedIn, for: account.id)
+        #expect(validator.isSwitchable(.account(account.id)))
     }
 }
 
