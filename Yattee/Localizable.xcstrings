@@ -18669,10 +18669,24 @@
 
     },
     "subscriptions.notAuthenticated.description" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sign in to this account to see its subscription feed."
+          }
+        }
+      }
     },
     "subscriptions.notAuthenticated.title" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sign In Required"
+          }
+        }
+      }
     },
     "subscriptions.noVideosFromChannel" : {
       "comment" : "Empty state title when no videos from selected channel",
