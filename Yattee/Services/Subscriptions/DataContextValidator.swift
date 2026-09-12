@@ -100,9 +100,10 @@ final class DataContextValidator {
             }
 
             // The account's own status says nothing about the instance being
-            // switched off, and `availableContexts` already hides disabled
-            // instances — a context that stayed valid here would keep sending
-            // requests to a server the user has turned off.
+            // switched off, and the switcher only *lists* a disabled source's
+            // contexts — it refuses to switch to them — so a context that
+            // stayed valid here would keep sending requests to a server the
+            // user has turned off.
             guard instance.isEnabled else {
                 return .temporarilyUnavailable(.instanceDisabled)
             }
@@ -145,17 +146,62 @@ final class DataContextValidator {
 
     // MARK: - Available contexts
 
+    /// Every context the switcher *lists*, usable or not.
+    ///
+    /// A source the user switched off does not make its logins disappear. The
+    /// switcher listing only what can be switched to meant the badge on the
+    /// toolbar icon pointed at a menu the account had dropped out of — the
+    /// selected account included, so the one control that explains the badge
+    /// stopped naming the thing it was badging for. The rows stay, carrying
+    /// their status, and `isSwitchable(_:)` decides which of them can be picked.
+    ///
+    /// The selection is the row that may never be missing, so it is appended
+    /// even when it is no longer among the selectable accounts — as long as the
+    /// account still exists. A context whose account is gone is not listed:
+    /// there is nothing to name it with, and correction handles deletions.
+    var listedContexts: [DataContext] {
+        var contexts: [DataContext] = [.local]
+        contexts += accountsManager.selectableAccounts.map { DataContext.account($0.id) }
+
+        let current = accountsManager.currentContext
+        if case let .account(id) = current,
+           accountsManager.account(id: id) != nil,
+           !contexts.contains(current) {
+            contexts.append(current)
+        }
+
+        return contexts
+    }
+
     /// Every context the user can switch to.
     ///
     /// Includes accounts that are currently signed out: hiding them would make
     /// a temporarily unreachable account look deleted, and the switcher is
-    /// where the user goes to fix exactly that.
+    /// where the user goes to fix exactly that. A disabled source is the one
+    /// exception — nothing may be read from or written to a server the user has
+    /// turned off — and it is expressed by refusing the switch, not by hiding
+    /// the row.
     var availableContexts: [DataContext] {
-        let accountContexts = accountsManager.selectableAccounts
-            .filter { accountsManager.instance(for: $0)?.isEnabled ?? false }
-            .map { DataContext.account($0.id) }
+        listedContexts.filter { isSwitchable($0) }
+    }
 
-        return [.local] + accountContexts
+    /// Whether picking this context would land the user somewhere usable.
+    ///
+    /// Not the same question as `validity(of:)`: a rejected or unreachable
+    /// account is still a perfectly good thing to switch *to* — that is where
+    /// the user goes to fix it — while a login on a switched-off source is not.
+    func isSwitchable(_ context: DataContext) -> Bool {
+        switch context {
+        case .local:
+            return true
+
+        case let .account(id):
+            guard accountsManager.selectableAccounts.contains(where: { $0.id == id }),
+                  let account = accountsManager.account(id: id) else {
+                return false
+            }
+            return accountsManager.instance(for: account)?.isEnabled ?? false
+        }
     }
 
     // MARK: - Correction

@@ -222,7 +222,10 @@ final class CredentialProbeService {
             return .rejected
         case let APIError.httpError(statusCode, _) where statusCode == 401 || statusCode == 403:
             return .rejected
-        case APIError.timeout, APIError.noConnection:
+        case APIError.timeout, APIError.noConnection, APIError.connectionFailed:
+            // A refused connection or an unresolvable host answers the probe no
+            // better than silence does: the question never reached anything
+            // that could judge the credential.
             return .unreachable
         default:
             // Cancellation included: a probe that was torn down never asked the

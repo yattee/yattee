@@ -280,6 +280,14 @@ actor HTTPClient {
             return .timeout
         case .notConnectedToInternet, .networkConnectionLost:
             return .noConnection
+        case .cannotConnectToHost, .cannotFindHost, .dnsLookupFailed:
+            // A server that refuses the connection, or a name that does not
+            // resolve, used to arrive as `unknown` — which nothing classifies,
+            // so an account pointed at a downed instance never went
+            // `unreachable`, never fell back to local data and never got its
+            // retry. It is not the same failure as a timeout, but it deserves
+            // the same treatment.
+            return .connectionFailed(error.localizedDescription)
         case .cancelled:
             return .cancelled
         default:

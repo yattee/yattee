@@ -244,6 +244,36 @@ struct CredentialProbeTests {
         #expect(harness.status == .signedIn)
     }
 
+    @Test("A refused connection marks the account unreachable and lifts again")
+    func refusedConnectionMarksUnreachable() async throws {
+        let harness = ProbeHarness(unreachableRetryInterval: 0.05)
+        defer { harness.tearDown() }
+
+        // A server that answers "no" instantly used to arrive as an unknown
+        // error, which nothing classified: the account went on calling itself
+        // signed in, reads never fell back and no retry was ever scheduled.
+        harness.record(APIError.connectionFailed("Could not connect to the server."))
+        #expect(harness.status == .unreachable)
+
+        // Nothing was learned about the credential, so it rides the same expiry.
+        try await Task.sleep(for: .seconds(0.5))
+        #expect(harness.status == .signedIn)
+
+        // And it is not an auth question: no probe was spent on it.
+        #expect(harness.transportCalls == 0)
+    }
+
+    @Test("A host that does not resolve is unreachable too")
+    func unresolvableHostMarksUnreachable() async throws {
+        let harness = ProbeHarness()
+        defer { harness.tearDown() }
+
+        harness.record(
+            APIError.connectionFailed("A server with the specified hostname could not be found.")
+        )
+        #expect(harness.status == .unreachable)
+    }
+
     // MARK: - What must not be probed
 
     @Test("An instance behind basic auth is never probed")
@@ -463,6 +493,11 @@ struct CredentialProbeTests {
 
         #expect(CredentialProbeService.classify(APIError.timeout) == .unreachable)
         #expect(CredentialProbeService.classify(APIError.noConnection) == .unreachable)
+        // A host that refuses the connection, or does not resolve, answered
+        // nothing about the credential either.
+        #expect(CredentialProbeService.classify(
+            APIError.connectionFailed("Could not connect to the server.")
+        ) == .unreachable)
 
         // A probe that never completed answers nothing.
         #expect(CredentialProbeService.classify(APIError.cancelled) == .indeterminate)

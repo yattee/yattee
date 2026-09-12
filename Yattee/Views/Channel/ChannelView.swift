@@ -1292,7 +1292,11 @@ struct ChannelView: View {
                 }
             }
         } label: {
-            Image(systemName: channelMenuIcon)
+            // A bare Image leaves the menu's accessibility title as the raw SF
+            // Symbol name; a Label carries the localized title to the AX bridge
+            // while `.iconOnly` keeps the toolbar rendering icon-only.
+            Label(String(localized: "channel.menu.title"), systemImage: channelMenuIcon)
+                .labelStyle(.iconOnly)
         }
         .accessibilityLabel(Text(String(localized: "channel.menu.title")))
     }

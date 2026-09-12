@@ -910,9 +910,12 @@ final class AccountsManager {
         // A server that cannot be reached says nothing about the credential.
         // Recorded all the same: the account has to stop reporting itself as
         // usable, or reads never fall back and the user is shown failures
-        // instead of local data.
+        // instead of local data. A host that *refuses* the connection counts:
+        // it is as unreachable as one that never answers, and being told so
+        // instantly rather than after a timeout does not make it a different
+        // verdict.
         switch error {
-        case APIError.timeout, APIError.noConnection:
+        case APIError.timeout, APIError.noConnection, APIError.connectionFailed:
             setStatus(.unreachable, for: account.id)
         case APIError.cancelled:
             return

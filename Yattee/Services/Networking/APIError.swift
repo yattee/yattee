@@ -24,6 +24,16 @@ enum APIError: Error, LocalizedError, Equatable, Sendable {
     /// No network connection available.
     case noConnection
 
+    /// The device is on a network, but the server could not be reached at all:
+    /// the connection was refused, or the host does not resolve.
+    ///
+    /// Distinct from `noConnection`, which says the *device* is offline. A
+    /// refusing or unresolvable host is one server's problem, and everything
+    /// that reacts to it — falling back to local data, retrying later — has to
+    /// stay scoped to that server. Carries the system's own description so the
+    /// user is told which of the two it was.
+    case connectionFailed(String)
+
     /// The request was cancelled.
     case cancelled
 
@@ -72,6 +82,12 @@ enum APIError: Error, LocalizedError, Equatable, Sendable {
             return "Request timed out"
         case .noConnection:
             return "No network connection"
+        case .connectionFailed(let message):
+            // Already the system's localized sentence ("Could not connect to
+            // the server.", "A server with the specified hostname could not be
+            // found."), which names the failure more precisely than a single
+            // fixed string could.
+            return message
         case .cancelled:
             return "Request was cancelled"
         case .serverError(let message):
@@ -106,7 +122,11 @@ enum APIError: Error, LocalizedError, Equatable, Sendable {
     /// Whether this error is likely recoverable by retrying.
     var isRetryable: Bool {
         switch self {
-        case .timeout, .noConnection, .rateLimited:
+        // A refused connection or a failed lookup is the same kind of answer as
+        // a timeout: nothing about the request was wrong, the server simply was
+        // not there for that moment. Restarts and DNS hiccups are exactly what
+        // a second attempt exists for.
+        case .timeout, .noConnection, .connectionFailed, .rateLimited:
             return true
         case .httpError(let statusCode, _):
             return statusCode >= 500 || statusCode == 429
@@ -135,6 +155,8 @@ enum APIError: Error, LocalizedError, Equatable, Sendable {
         case (.decodingError(let lMsg), .decodingError(let rMsg)):
             return lMsg == rMsg
         case (.serverError(let lMsg), .serverError(let rMsg)):
+            return lMsg == rMsg
+        case (.connectionFailed(let lMsg), .connectionFailed(let rMsg)):
             return lMsg == rMsg
         case (.rateLimited(let lRetry), .rateLimited(let rRetry)):
             return lRetry == rRetry

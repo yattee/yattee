@@ -332,7 +332,7 @@ final class InstancesManager {
             switch apiError {
             case .unauthorized:
                 updateStatus(.authFailed, for: instance)
-            case .noConnection, .timeout:
+            case .noConnection, .timeout, .connectionFailed:
                 updateStatus(.offline, for: instance)
             default:
                 // Don't change status for other errors

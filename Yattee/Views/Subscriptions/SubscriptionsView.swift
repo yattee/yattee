@@ -26,8 +26,8 @@ struct SubscriptionsView: View {
     /// The effective context the visible subscriptions were loaded for, so a
     /// status change that does not move it does not force a reload.
     @State private var loadedContext: DataContext?
-    /// How many times the feed has been tried again since it last failed on the
-    /// network, so each attempt restarts the wait for the next one.
+    /// How many times the feed has been tried again since it last stopped on a
+    /// failure that can lift, so each attempt restarts the wait for the next one.
     @State private var feedRetryAttempt = 0
     @State private var selectedChannelID: String? = nil
     @State private var errorMessage: String?
@@ -195,8 +195,16 @@ struct SubscriptionsView: View {
 
     /// The failure the feed is currently sitting on, if it is one that trying
     /// again could answer differently.
+    ///
+    /// A network error always is. So is the Yattee Server the local feed asks
+    /// for while it is only standing in for an account whose server could not
+    /// be reached — that request is not the real answer, and the one that is
+    /// comes back on a status expiry nothing here is watching. An account that
+    /// genuinely has no Yattee Server never arms this: the unavailability it
+    /// gates on is `nil` for a context the user selected themselves.
     private var feedRetryToken: Int? {
-        guard case .error(.networkError(_)) = feedCache.feedLoadState else { return nil }
+        guard feedCache.feedLoadState.warrantsPeriodicRetry(unavailability: contextUnavailability)
+        else { return nil }
         return feedRetryAttempt
     }
 
@@ -622,6 +630,11 @@ struct SubscriptionsView: View {
                 // a feed that failed on the way to it is not watching anything
                 // that would notice — so it asks again on its own, for as long
                 // as the failure is on screen.
+                //
+                // One attempt in flight at a time, and none at all outside the
+                // states above: the id going nil, the fence dropping the state
+                // back to idle, and the view disappearing all cancel this task,
+                // and the next attempt is only armed by the last one finishing.
                 .task(id: feedRetryToken) {
                     guard feedRetryToken != nil else { return }
                     try? await Task.sleep(for: .seconds(Self.feedRetryInterval))

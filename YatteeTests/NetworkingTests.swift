@@ -122,6 +122,18 @@ struct APIErrorTests {
         #expect(error.errorDescription == "Rate limited")
     }
 
+    @Test("Connection failed description is the system's own sentence")
+    func connectionFailedDescription() {
+        // Passed through rather than replaced: "could not connect" and "no such
+        // host" are different things to tell a user, and the OS already says
+        // which one happened.
+        let refused = APIError.connectionFailed("Could not connect to the server.")
+        #expect(refused.errorDescription == "Could not connect to the server.")
+
+        // Emphatically not the offline message: the device's network is fine.
+        #expect(refused.errorDescription != APIError.noConnection.errorDescription)
+    }
+
     @Test("Unknown error description")
     func unknownErrorDescription() {
         let error = APIError.unknown("Something went wrong")
@@ -149,6 +161,10 @@ struct APIErrorTests {
         #expect(APIError.rateLimited(retryAfter: 30) == APIError.rateLimited(retryAfter: 30))
         #expect(APIError.rateLimited(retryAfter: nil) == APIError.rateLimited(retryAfter: nil))
         #expect(APIError.rateLimited(retryAfter: 30) != APIError.rateLimited(retryAfter: 60))
+
+        #expect(APIError.connectionFailed("refused") == APIError.connectionFailed("refused"))
+        #expect(APIError.connectionFailed("refused") != APIError.connectionFailed("no such host"))
+        #expect(APIError.connectionFailed("refused") != APIError.noConnection)
 
         #expect(APIError.unknown("msg") == APIError.unknown("msg"))
         #expect(APIError.unknown("msg1") != APIError.unknown("msg2"))
@@ -179,6 +195,9 @@ struct APIErrorTests {
     func retryableErrors() {
         #expect(APIError.timeout.isRetryable == true)
         #expect(APIError.noConnection.isRetryable == true)
+        // A refused connection is a moment, not a verdict: the server may be
+        // restarting, the lookup may have missed.
+        #expect(APIError.connectionFailed("Could not connect to the server.").isRetryable == true)
         #expect(APIError.rateLimited(retryAfter: 60).isRetryable == true)
         #expect(APIError.httpError(statusCode: 500, message: nil).isRetryable == true)
         #expect(APIError.httpError(statusCode: 429, message: nil).isRetryable == true)
@@ -284,6 +303,80 @@ struct URLBuildingTests {
         let request = try endpoint.urlRequest(baseURL: baseURL)
 
         #expect(request.value(forHTTPHeaderField: "Accept") == "application/json")
+    }
+}
+
+// MARK: - URLError Mapping Tests
+
+/// Fails every request with a prepared `URLError`, so what a test measures is
+/// the client's own mapping and nothing else.
+private final class FailingURLProtocol: URLProtocol, @unchecked Sendable {
+    nonisolated(unsafe) static var failure = URLError(.cannotConnectToHost)
+
+    override class func canInit(with request: URLRequest) -> Bool { true }
+    override class func canonicalRequest(for request: URLRequest) -> URLRequest { request }
+
+    override func startLoading() {
+        client?.urlProtocol(self, didFailWithError: Self.failure)
+    }
+
+    override func stopLoading() {}
+}
+
+@Suite("HTTPClient URLError mapping", .serialized)
+struct URLErrorMappingTests {
+
+    private func mappedError(for code: URLError.Code) async -> APIError? {
+        FailingURLProtocol.failure = URLError(code)
+
+        let configuration = URLSessionConfiguration.ephemeral
+        configuration.protocolClasses = [FailingURLProtocol.self]
+        let client = HTTPClient(session: URLSession(configuration: configuration))
+
+        do {
+            _ = try await client.fetchData(
+                GenericEndpoint.get("/api/v1/stats"),
+                baseURL: URL(string: "https://refusing.example.com")!
+            )
+            return nil
+        } catch let error as APIError {
+            return error
+        } catch {
+            return nil
+        }
+    }
+
+    @Test("A server that refuses or cannot be found maps to connectionFailed")
+    func unreachableHostsMapToConnectionFailed() async {
+        // All three used to fall through to `unknown`, which no status
+        // classifier recognises — so an account pointed at a downed instance
+        // never went unreachable, never fell back to local data and never got
+        // its retry.
+        for code in [URLError.Code.cannotConnectToHost, .cannotFindHost, .dnsLookupFailed] {
+            let error = await mappedError(for: code)
+            guard case .connectionFailed = error else {
+                Issue.record("\(code) mapped to \(String(describing: error)), not connectionFailed")
+                continue
+            }
+        }
+    }
+
+    @Test("The mapping still separates offline, timed out and cancelled")
+    func otherCodesKeepTheirMeaning() async {
+        #expect(await mappedError(for: .timedOut) == .timeout)
+        #expect(await mappedError(for: .notConnectedToInternet) == .noConnection)
+        #expect(await mappedError(for: .networkConnectionLost) == .noConnection)
+        #expect(await mappedError(for: .cancelled) == .cancelled)
+    }
+
+    @Test("Unreachable hosts are recorded against the account, offline is too")
+    @MainActor
+    func mappedErrorsReachTheStatusClassifiers() async throws {
+        let error = try #require(await mappedError(for: .cannotConnectToHost))
+
+        // The whole point of the new case: both classifiers have to see it.
+        #expect(CredentialProbeService.classify(error) == .unreachable)
+        #expect(error.isRetryable)
     }
 }
 

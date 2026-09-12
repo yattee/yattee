@@ -734,6 +734,35 @@ struct DataContextValidatorTests {
 
         #expect(validator.availableContexts == [.local, .account(usable.id)])
     }
+
+    @Test("A switched-off source keeps its rows in the switcher, refused rather than hidden")
+    func disabledSourceStaysListed() {
+        let instances = makeTestInstancesManager()
+        let enabled = Instance(type: .invidious, url: URL(string: "https://inv-listed-a.example.com")!)
+        var disabled = Instance(type: .invidious, url: URL(string: "https://inv-listed-b.example.com")!)
+        for instance in [enabled, disabled] { instances.add(instance) }
+        defer { for instance in [enabled, disabled] { instances.remove(instance) } }
+
+        let (accounts, validator) = makeValidator(instances: instances)
+        let usable = accounts.addAccount(instanceID: enabled.id)
+        let switchedOff = accounts.addAccount(instanceID: disabled.id)
+        accounts.setStatus(.signedIn, for: switchedOff.id)
+        accounts.setContext(.account(switchedOff.id))
+
+        disabled.isEnabled = false
+        instances.update(disabled)
+
+        // The menu still names every context, the selected one included: it is
+        // the control the badged toolbar icon sends the user to.
+        #expect(validator.listedContexts == [.local, .account(usable.id), .account(switchedOff.id)])
+        // What it may not do is offer to switch to it.
+        #expect(validator.availableContexts == [.local, .account(usable.id)])
+        #expect(!validator.isSwitchable(.account(switchedOff.id)))
+        #expect(validator.isSwitchable(.account(usable.id)))
+        #expect(validator.isSwitchable(.local))
+        // And the row says why, in the same words the accounts screen uses.
+        #expect(accounts.displayStatus(for: switchedOff) == .instanceDisabled)
+    }
 }
 
 @Suite("Data context repair", .serialized)

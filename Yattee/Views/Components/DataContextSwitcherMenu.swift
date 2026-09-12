@@ -22,7 +22,7 @@ struct DataContextSwitcherRows: View {
     private var validator: DataContextValidator? { appEnvironment?.dataContextValidator }
 
     var body: some View {
-        ForEach(validator?.availableContexts ?? [.local], id: \.self) { context in
+        ForEach(validator?.listedContexts ?? [.local], id: \.self) { context in
             row(for: context)
         }
     }
@@ -31,7 +31,10 @@ struct DataContextSwitcherRows: View {
     private func row(for context: DataContext) -> some View {
         // A menu row is a single label — a `VStack` inside one renders as
         // nothing on macOS — so the status travels in the title rather than as
-        // a second line.
+        // a second line. A context that cannot be switched to says so there
+        // too: `title(for:in:)` appends the *display* status, which is what
+        // turns a login on a switched-off source into "… — Source switched
+        // off" rather than a row that looks ordinary and does nothing.
         let title = DataContextSwitcherLabels.title(for: context, in: appEnvironment)
 
         #if os(macOS)
@@ -48,6 +51,7 @@ struct DataContextSwitcherRows: View {
         )) {
             Text(title)
         }
+        .disabled(isRefused(context))
         #else
         Button {
             switchTo(context)
@@ -58,6 +62,7 @@ struct DataContextSwitcherRows: View {
                 Text(title)
             }
         }
+        .disabled(isRefused(context))
         #if os(tvOS)
         .buttonStyle(TVSettingsButtonStyle())
         #endif
@@ -65,12 +70,28 @@ struct DataContextSwitcherRows: View {
     }
 
     private func switchTo(_ context: DataContext) {
+        // The row is disabled as well; this is what makes the refusal true on
+        // any presentation where a disabled control can still be activated.
+        guard !isRefused(context) else { return }
+
         appEnvironment?.switchDataContext(to: context)
         onSwitch?()
     }
 
     private func isCurrent(_ context: DataContext) -> Bool {
         appEnvironment?.accountsManager.currentContext == context
+    }
+
+    /// Listed, but not something the user may pick.
+    ///
+    /// The current context is never refused, whatever its source is doing: it
+    /// is already the selection, picking it changes nothing, and a disabled
+    /// macOS menu item is not the place to hang the app's only checkmark. It
+    /// carries its status in the title instead, which is the part that has to
+    /// survive.
+    private func isRefused(_ context: DataContext) -> Bool {
+        guard let validator, !isCurrent(context) else { return false }
+        return !validator.isSwitchable(context)
     }
 }
 
@@ -352,23 +373,13 @@ struct DataContextSwitcherSettingsRow: View {
         // trailing name was dropped at every width, leaving the row silent
         // about which account is selected. So the name is the menu's *own*
         // label, and the row carries only what names the control.
-        LabeledContent {
-            Menu {
-                DataContextSwitcherRows()
-            } label: {
-                Text(contextTitle)
-                    .lineLimit(1)
-            }
-            .menuStyle(.borderlessButton)
-            .help(contextTitle)
-            .accessibilityLabel(Text(String(localized: "accounts.switcher.title")))
-            .accessibilityValue(Text(contextTitle))
-        } label: {
-            Label {
-                Text(String(localized: "accounts.switcher.title"))
-            } icon: {
-                DataContextSwitcherIcon()
-            }
+        // `LabeledContent` overflows rather than compress its label, so at the
+        // sidebar's 140 pt minimum a captioned row (caption + spacing + the
+        // name's floor ≈ 158 pt) juts past both edges. The caption is the one
+        // part the icon already says, so it is the part that goes.
+        ViewThatFits(in: .horizontal) {
+            macOSRow(captioned: true)
+            macOSRow(captioned: false)
         }
         #else
         Menu {
@@ -379,11 +390,58 @@ struct DataContextSwitcherSettingsRow: View {
         #endif
     }
 
+    #if os(macOS)
+    @ViewBuilder private func macOSRow(captioned: Bool) -> some View {
+        LabeledContent {
+            Menu {
+                DataContextSwitcherRows()
+            } label: {
+                Text(contextTitle)
+                    .lineLimit(1)
+                    .truncationMode(.tail)
+            }
+            .menuStyle(.borderlessButton)
+            // The floor must sit on the menu itself: a borderless menu button
+            // lays out its label alone, so a frame inside it never reaches the
+            // row's layout, and the caption would keep its ideal width while
+            // the name shrank to an ellipsis. Out here the menu claims the
+            // width and the caption is what gives way.
+            .frame(minWidth: Self.minimumNameWidth, alignment: .trailing)
+            .layoutPriority(1)
+            .help(contextTitle)
+            .accessibilityLabel(Text(String(localized: "accounts.switcher.title")))
+            .accessibilityValue(Text(contextTitle))
+        } label: {
+            Label {
+                if captioned {
+                    Text(String(localized: "accounts.switcher.title"))
+                        .lineLimit(1)
+                        .truncationMode(.tail)
+                }
+            } icon: {
+                DataContextSwitcherIcon()
+            }
+        }
+    }
+    #endif
+
+    /// What the trailing name may never be squeezed below.
+    ///
+    /// A row this narrow — the macOS sidebar's footer at a dragged-in column
+    /// width — hands the leading label its ideal width first and leaves the
+    /// name whatever is left, and a `Text` will shrink all the way to a lone
+    /// ellipsis before it complains. A floor turns that around: the name keeps
+    /// enough characters to be recognised, and the word naming the control —
+    /// which the icon beside it already says — is what truncates instead.
+    private static let minimumNameWidth: CGFloat = 80
+
     #if !os(macOS)
     private var rowLabel: some View {
         HStack {
             Label {
                 Text(String(localized: "accounts.switcher.title"))
+                    .lineLimit(1)
+                    .truncationMode(.tail)
             } icon: {
                 DataContextSwitcherIcon()
             }
@@ -391,6 +449,8 @@ struct DataContextSwitcherSettingsRow: View {
             Text(contextTitle)
                 .foregroundStyle(.secondary)
                 .lineLimit(1)
+                .truncationMode(.tail)
+                .frame(minWidth: Self.minimumNameWidth, alignment: .trailing)
         }
     }
     #endif

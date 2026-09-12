@@ -37,6 +37,31 @@ enum FeedLoadState: Equatable {
         return error
     }
 
+    /// Whether a feed left in this state should keep asking again on its own.
+    ///
+    /// A network failure is its own reason to try again. `yatteeServerRequired`
+    /// usually is not — an account that genuinely needs a Yattee Server goes on
+    /// needing one, and a timer there would never end and never change
+    /// anything. The exception is the local fallback standing in for a server
+    /// that merely could not be reached: the feed is asking for a Yattee Server
+    /// only because reads moved to local data, and they move back the moment
+    /// the server answers again — silently, on a status that expires with
+    /// nothing on this screen watching for it.
+    ///
+    /// - Parameter unavailability: why the selected context is not the one
+    ///   answering, or `nil` when it is — local data selected by the user is
+    ///   never unavailable, so its Yattee Server request is the real answer.
+    func warrantsPeriodicRetry(unavailability: DataContextUnavailability?) -> Bool {
+        switch self {
+        case .error(.networkError):
+            return true
+        case .error(.yatteeServerRequired):
+            return unavailability == .unreachable
+        default:
+            return false
+        }
+    }
+
     /// Specific error types for feed loading.
     enum FeedLoadError: Equatable {
         case yatteeServerRequired
