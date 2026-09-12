@@ -152,8 +152,6 @@ struct SettingsView: View {
                     }
                     .accessibilityIdentifier("settings.row.accounts")
 
-                    DataContextSwitcherSettingsRow()
-
                     NavigationLink {
                         TVSidebarDetailContainer(systemImage: "icloud", title: String(localized: "settings.icloud.title")) { iCloudSettingsView() }
                     } label: {
@@ -269,8 +267,6 @@ struct SettingsView: View {
                         }
                     }
                     .accessibilityIdentifier("settings.row.accounts")
-
-                    DataContextSwitcherSettingsRow()
                     }
 
                     Section {

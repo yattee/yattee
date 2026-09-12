@@ -123,6 +123,16 @@ struct AccountsListView: View {
             emptyState
         } else {
             Form {
+                // The switcher lives here rather than beside the Accounts row
+                // in Settings: which account is current is this screen's
+                // subject, and the row below names the same account the
+                // checkmarked row further down is marked as.
+                Section {
+                    DataContextSwitcherSettingsRow()
+                } header: {
+                    Text(String(localized: "accounts.switcher.section"))
+                }
+
                 ForEach(groups, id: \.instance.id) { group in
                     instanceSection(group.instance, accounts: group.accounts)
                 }

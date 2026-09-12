@@ -461,6 +461,17 @@
         }
       }
     },
+    "accounts.switcher.section" : {
+      "comment" : "Header of the accounts screen section holding the account switcher",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Current Account"
+          }
+        }
+      }
+    },
     "accounts.switcher.title" : {
       "comment" : "Label of the control that switches the selected account",
       "localizations" : {
