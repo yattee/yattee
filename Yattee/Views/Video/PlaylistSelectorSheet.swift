@@ -295,8 +295,21 @@ struct PlaylistSelectorSheet: View {
         playlists = dataManager?.playlists() ?? []
     }
 
+    /// Whether a tap on a playlist may still start an add.
+    ///
+    /// One add per presentation: after a tap lands, the sheet is only showing
+    /// its checkmark until the auto-dismiss — the same row is still on screen
+    /// and still tappable, so without this a quick double-tap put the video in
+    /// twice. A remote add holds the gate for the whole round-trip; only a
+    /// failure reopens it, since failing is the one way the sheet stays up.
+    private var canStartAdd: Bool {
+        !remoteAddInFlight && addedToPlaylist == nil && addedRemotePlaylist == nil
+    }
+
+    @State private var remoteAddInFlight = false
+
     private func addVideoToPlaylist(_ playlist: LocalPlaylist) {
-        guard let dataManager else { return }
+        guard let dataManager, canStartAdd else { return }
 
         dataManager.addToPlaylist(video, playlist: playlist)
         addedToPlaylist = playlist
@@ -334,7 +347,8 @@ struct PlaylistSelectorSheet: View {
     }
 
     private func addVideo(to playlist: Playlist, on account: Account) async {
-        guard let appEnvironment else { return }
+        guard let appEnvironment, canStartAdd else { return }
+        remoteAddInFlight = true
 
         do {
             try await appEnvironment.remotePlaylistsCache.addVideo(
@@ -355,7 +369,8 @@ struct PlaylistSelectorSheet: View {
             }
         } catch {
             // No dismissal on failure — the sheet is where the user retries, or
-            // picks somewhere else.
+            // picks somewhere else. Retrying means the gate reopens.
+            remoteAddInFlight = false
             appEnvironment.toastManager.showError(
                 String(localized: "playlist.remote.add.error"),
                 subtitle: error.localizedDescription
