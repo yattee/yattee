@@ -262,12 +262,14 @@ struct PlaylistSelectorSheet: View {
                     )
                 } else {
                     ForEach(remotePlaylists) { playlist in
+                        let selection = RemoteSelection(
+                            accountID: account.id,
+                            playlistID: playlist.id.playlistID
+                        )
                         RemotePlaylistSelectionRow(
                             playlist: playlist,
-                            wasAdded: addedRemotePlaylist == RemoteSelection(
-                                accountID: account.id,
-                                playlistID: playlist.id.playlistID
-                            )
+                            wasAdded: addedRemotePlaylist == selection,
+                            isAdding: remoteAddInFlight == selection
                         ) {
                             Task { await addVideo(to: playlist, on: account) }
                         }
@@ -303,10 +305,12 @@ struct PlaylistSelectorSheet: View {
     /// twice. A remote add holds the gate for the whole round-trip; only a
     /// failure reopens it, since failing is the one way the sheet stays up.
     private var canStartAdd: Bool {
-        !remoteAddInFlight && addedToPlaylist == nil && addedRemotePlaylist == nil
+        remoteAddInFlight == nil && addedToPlaylist == nil && addedRemotePlaylist == nil
     }
 
-    @State private var remoteAddInFlight = false
+    /// The row whose add is on the wire, so that row — and only that row — can
+    /// show a spinner where its plus was.
+    @State private var remoteAddInFlight: RemoteSelection?
 
     private func addVideoToPlaylist(_ playlist: LocalPlaylist) {
         guard let dataManager, canStartAdd else { return }
@@ -348,7 +352,10 @@ struct PlaylistSelectorSheet: View {
 
     private func addVideo(to playlist: Playlist, on account: Account) async {
         guard let appEnvironment, canStartAdd else { return }
-        remoteAddInFlight = true
+        remoteAddInFlight = RemoteSelection(
+            accountID: account.id,
+            playlistID: playlist.id.playlistID
+        )
 
         do {
             try await appEnvironment.remotePlaylistsCache.addVideo(
@@ -370,7 +377,7 @@ struct PlaylistSelectorSheet: View {
         } catch {
             // No dismissal on failure — the sheet is where the user retries, or
             // picks somewhere else. Retrying means the gate reopens.
-            remoteAddInFlight = false
+            remoteAddInFlight = nil
             appEnvironment.toastManager.showError(
                 String(localized: "playlist.remote.add.error"),
                 subtitle: error.localizedDescription
@@ -492,6 +499,7 @@ private struct PlaylistSelectionRow: View {
 private struct RemotePlaylistSelectionRow: View {
     let playlist: Playlist
     let wasAdded: Bool
+    let isAdding: Bool
     let onAdd: () -> Void
 
     var body: some View {
@@ -528,8 +536,20 @@ private struct RemotePlaylistSelectionRow: View {
 
                 Spacer()
 
-                Image(systemName: wasAdded ? "checkmark.circle.fill" : "plus.circle")
-                    .foregroundStyle(wasAdded ? .green : .secondary)
+                // The checkmark wins: success replaces the spinner, not the
+                // other way round.
+                if wasAdded {
+                    Image(systemName: "checkmark.circle.fill")
+                        .foregroundStyle(.green)
+                } else if isAdding {
+                    ProgressView()
+                        #if !os(tvOS)
+                        .controlSize(.small)
+                        #endif
+                } else {
+                    Image(systemName: "plus.circle")
+                        .foregroundStyle(.secondary)
+                }
             }
             .contentShape(Rectangle())
         }
