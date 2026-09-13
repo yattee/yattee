@@ -19,6 +19,9 @@ enum SettingsKey: String, CaseIterable {
     case useSeparateDarkAccentColor
     case showWatchedCheckmark
 
+    // Accounts
+    case showAccountPickers
+
     // Playback
     case preferredQuality
     case cellularQuality

@@ -138,6 +138,8 @@ struct AccountsListView: View {
                 }
 
                 orphanSection
+
+                pickerVisibilitySection
             }
             #if os(macOS)
             .formStyle(.grouped)
@@ -217,6 +219,28 @@ struct AccountsListView: View {
                 Text(String(localized: "accounts.orphan.section"))
             } footer: {
                 Text(String(localized: "accounts.orphan.footer"))
+            }
+        }
+    }
+
+    /// Whether the switcher is offered outside this screen at all — the
+    /// toolbar menus, the tvOS buttons, the macOS sidebar row. Lives at the
+    /// bottom of this screen because this screen keeps its own switcher either
+    /// way: turning the pickers off must leave a place to turn them back on.
+    @ViewBuilder
+    private var pickerVisibilitySection: some View {
+        if let settings = appEnvironment?.settingsManager {
+            @Bindable var settings = settings
+
+            Section {
+                Toggle(isOn: $settings.showAccountPickers) {
+                    Label(
+                        String(localized: "accounts.showPickers"),
+                        systemImage: "person.crop.circle.badge.checkmark"
+                    )
+                }
+            } footer: {
+                Text(String(localized: "accounts.showPickers.footer"))
             }
         }
     }

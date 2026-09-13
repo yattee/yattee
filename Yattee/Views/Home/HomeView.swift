@@ -178,8 +178,10 @@ struct HomeView: View {
         #endif
         .toolbar {
             #if !os(tvOS)
-            ToolbarItem(placement: switcherPlacement) {
-                DataContextSwitcherMenu()
+            if settingsManager?.showAccountPickers ?? true {
+                ToolbarItem(placement: switcherPlacement) {
+                    DataContextSwitcherMenu()
+                }
             }
             #endif
             #if !os(tvOS) && !os(macOS)

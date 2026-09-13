@@ -34,6 +34,9 @@ final class SettingsManager {
     var _useSeparateDarkAccentColor: Bool?
     var _showWatchedCheckmark: Bool?
 
+    // Accounts
+    var _showAccountPickers: Bool?
+
     // Playback
     var _preferredQuality: VideoQuality?
     var _cellularQuality: VideoQuality?
@@ -424,6 +427,7 @@ final class SettingsManager {
         _customAccentColorDark = nil
         _useSeparateDarkAccentColor = nil
         _showWatchedCheckmark = nil
+        _showAccountPickers = nil
         _preferredQuality = nil
         _cellularQuality = nil
         _backgroundPlaybackEnabled = nil

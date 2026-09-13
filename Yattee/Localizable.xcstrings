@@ -350,6 +350,28 @@
         }
       }
     },
+    "accounts.showPickers" : {
+      "comment" : "Toggle on the accounts screen controlling whether account switchers appear outside Settings",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Show Account Pickers"
+          }
+        }
+      }
+    },
+    "accounts.showPickers.footer" : {
+      "comment" : "Footer of the account pickers visibility toggle",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Show buttons for switching accounts outside of Settings, such as in toolbars."
+          }
+        }
+      }
+    },
     "accounts.signIn.identityChanged" : {
       "localizations" : {
         "en" : {

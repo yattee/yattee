@@ -427,12 +427,14 @@ struct UnifiedTabView: View {
         VStack(spacing: 0) {
             sidebarList
 
-            Divider()
-            // The window has no toolbar of its own to hang this off, and the
-            // sidebar is the one chrome every tab shares.
-            DataContextSwitcherSettingsRow()
-                .padding(.horizontal, 12)
-                .padding(.vertical, 8)
+            if settingsManager?.showAccountPickers ?? true {
+                Divider()
+                // The window has no toolbar of its own to hang this off, and the
+                // sidebar is the one chrome every tab shares.
+                DataContextSwitcherSettingsRow()
+                    .padding(.horizontal, 12)
+                    .padding(.vertical, 8)
+            }
         }
         #else
         sidebarList

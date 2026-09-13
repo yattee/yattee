@@ -289,7 +289,9 @@ struct HistoryListView: View {
                         }
                     }
 
-                    DataContextSwitcherButton()
+                    if appEnvironment?.settingsManager.showAccountPickers ?? true {
+                        DataContextSwitcherButton()
+                    }
                 }
                 .focusSection()
                 .padding(.horizontal, 48)
@@ -329,8 +331,10 @@ struct HistoryListView: View {
                 ToolbarSpacer(.flexible, placement: .primaryAction)
             }
             #endif
-            ToolbarItem(placement: viewOptionsPlacement) {
-                DataContextSwitcherMenu()
+            if appEnvironment?.settingsManager.showAccountPickers ?? true {
+                ToolbarItem(placement: viewOptionsPlacement) {
+                    DataContextSwitcherMenu()
+                }
             }
             // View options button (always visible)
             ToolbarItem(placement: viewOptionsPlacement) {

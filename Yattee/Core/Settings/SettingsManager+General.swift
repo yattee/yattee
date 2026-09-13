@@ -220,6 +220,21 @@ extension SettingsManager {
         }
     }
 
+    /// Whether the account switcher is offered outside Settings — the toolbar
+    /// menus, the tvOS buttons, the macOS sidebar row. The switcher on the
+    /// accounts settings screen stays regardless: it is where this is turned
+    /// back on. Default is true (visible).
+    var showAccountPickers: Bool {
+        get {
+            if let cached = _showAccountPickers { return cached }
+            return bool(for: .showAccountPickers, default: true)
+        }
+        set {
+            _showAccountPickers = newValue
+            set(newValue, for: .showAccountPickers)
+        }
+    }
+
     // MARK: - Feed Settings
 
     /// Feed cache validity duration in minutes. Default is 30 minutes.
