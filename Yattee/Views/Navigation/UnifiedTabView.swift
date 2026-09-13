@@ -427,7 +427,7 @@ struct UnifiedTabView: View {
         VStack(spacing: 0) {
             sidebarList
 
-            if settingsManager?.showAccountPickers ?? true {
+            if DataContextSwitcherVisibility.showsPickers(in: appEnvironment) {
                 Divider()
                 // The window has no toolbar of its own to hang this off, and the
                 // sidebar is the one chrome every tab shares.

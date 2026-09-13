@@ -289,7 +289,7 @@ struct HistoryListView: View {
                         }
                     }
 
-                    if appEnvironment?.settingsManager.showAccountPickers ?? true {
+                    if DataContextSwitcherVisibility.showsPickers(in: appEnvironment) {
                         DataContextSwitcherButton()
                     }
                 }
@@ -331,7 +331,7 @@ struct HistoryListView: View {
                 ToolbarSpacer(.flexible, placement: .primaryAction)
             }
             #endif
-            if appEnvironment?.settingsManager.showAccountPickers ?? true {
+            if DataContextSwitcherVisibility.showsPickers(in: appEnvironment) {
                 ToolbarItem(placement: viewOptionsPlacement) {
                     DataContextSwitcherMenu()
                 }

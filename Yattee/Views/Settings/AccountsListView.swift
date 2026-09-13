@@ -126,11 +126,16 @@ struct AccountsListView: View {
                 // The switcher lives here rather than beside the Accounts row
                 // in Settings: which account is current is this screen's
                 // subject, and the row below names the same account the
-                // checkmarked row further down is marked as.
-                Section {
-                    DataContextSwitcherSettingsRow()
-                } header: {
-                    Text(String(localized: "accounts.switcher.section"))
+                // checkmarked row further down is marked as. Withheld while
+                // every listed account is an orphan — there is nothing the
+                // switcher could offer besides the local data the app is
+                // already on.
+                if DataContextSwitcherVisibility.showsSwitcher(in: appEnvironment) {
+                    Section {
+                        DataContextSwitcherSettingsRow()
+                    } header: {
+                        Text(String(localized: "accounts.switcher.section"))
+                    }
                 }
 
                 ForEach(groups, id: \.instance.id) { group in
@@ -229,7 +234,8 @@ struct AccountsListView: View {
     /// way: turning the pickers off must leave a place to turn them back on.
     @ViewBuilder
     private var pickerVisibilitySection: some View {
-        if let settings = appEnvironment?.settingsManager {
+        if DataContextSwitcherVisibility.showsSwitcher(in: appEnvironment),
+           let settings = appEnvironment?.settingsManager {
             @Bindable var settings = settings
 
             Section {

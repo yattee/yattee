@@ -229,7 +229,7 @@ struct PlaylistsListView: View {
                 ToolbarSpacer(.flexible, placement: .primaryAction)
             }
             #endif
-            if appEnvironment?.settingsManager.showAccountPickers ?? true {
+            if DataContextSwitcherVisibility.showsPickers(in: appEnvironment) {
                 ToolbarItem(placement: viewOptionsPlacement) {
                     DataContextSwitcherMenu()
                 }
@@ -427,7 +427,7 @@ struct PlaylistsListView: View {
                     Label(String(localized: "viewOptions.title"), systemImage: "slider.horizontal.3")
                 }
 
-                if appEnvironment?.settingsManager.showAccountPickers ?? true {
+                if DataContextSwitcherVisibility.showsPickers(in: appEnvironment) {
                     DataContextSwitcherButton()
                 }
             }

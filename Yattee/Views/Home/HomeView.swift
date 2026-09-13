@@ -178,7 +178,7 @@ struct HomeView: View {
         #endif
         .toolbar {
             #if !os(tvOS)
-            if settingsManager?.showAccountPickers ?? true {
+            if DataContextSwitcherVisibility.showsPickers(in: appEnvironment) {
                 ToolbarItem(placement: switcherPlacement) {
                     DataContextSwitcherMenu()
                 }

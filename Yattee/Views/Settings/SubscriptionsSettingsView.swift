@@ -134,10 +134,12 @@ struct SubscriptionsSettingsView: View {
 
     @ViewBuilder
     private var accountSection: some View {
-        Section {
-            DataContextSwitcherSettingsRow()
-        } footer: {
-            Text(String(localized: "settings.subscriptions.account.footer"))
+        if DataContextSwitcherVisibility.showsSwitcher(in: appEnvironment) {
+            Section {
+                DataContextSwitcherSettingsRow()
+            } footer: {
+                Text(String(localized: "settings.subscriptions.account.footer"))
+            }
         }
     }
 

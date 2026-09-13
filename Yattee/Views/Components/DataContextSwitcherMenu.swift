@@ -232,6 +232,35 @@ enum DataContextSwitcherLabels {
     }
 }
 
+// MARK: - Visibility
+
+/// When the switcher is offered at all.
+///
+/// One rule for every presentation: no switcher until an account exists to
+/// switch to. A user who has never signed in anywhere has only local data, and
+/// a menu offering the one context they are already in is chrome with nothing
+/// to say. Orphans and accounts still waiting for their instance don't count —
+/// neither is a context the switcher would actually list.
+enum DataContextSwitcherVisibility {
+    /// The settings presentations: the accounts screen and the subscriptions
+    /// settings row. Only the existence of an account gates these — they are
+    /// where "Show Account Pickers" is explained and turned back on, so the
+    /// toggle itself must not hide them.
+    @MainActor
+    static func showsSwitcher(in appEnvironment: AppEnvironment?) -> Bool {
+        guard let appEnvironment else { return false }
+        return !appEnvironment.accountsManager.selectableAccounts.isEmpty
+    }
+
+    /// Everything outside Settings: the toolbar menus, the tvOS buttons, the
+    /// macOS sidebar row. Same account rule, plus the user's toggle.
+    @MainActor
+    static func showsPickers(in appEnvironment: AppEnvironment?) -> Bool {
+        guard let appEnvironment else { return false }
+        return appEnvironment.settingsManager.showAccountPickers && showsSwitcher(in: appEnvironment)
+    }
+}
+
 // MARK: - Glyph
 
 /// How the switcher's icon reads.

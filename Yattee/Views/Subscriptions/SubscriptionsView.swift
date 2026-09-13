@@ -492,7 +492,7 @@ struct SubscriptionsView: View {
                 .toolbarTitleDisplayMode(.inlineLarge)
                 #endif
                 .toolbar {
-                    if appEnvironment?.settingsManager.showAccountPickers ?? true {
+                    if DataContextSwitcherVisibility.showsPickers(in: appEnvironment) {
                         ToolbarItem(placement: viewOptionsPlacement) {
                             DataContextSwitcherMenu()
                         }
@@ -909,7 +909,7 @@ struct SubscriptionsView: View {
             }
             .buttonStyle(.bordered)
 
-            if appEnvironment?.settingsManager.showAccountPickers ?? true {
+            if DataContextSwitcherVisibility.showsPickers(in: appEnvironment) {
                 DataContextSwitcherButton()
             }
         }
