@@ -39,6 +39,18 @@ struct PlaylistSelectorSheet: View {
     /// The account a new server-side playlist is being created on.
     @State private var newRemotePlaylistAccount: Account?
 
+    /// Which destination's playlists the sheet is showing.
+    ///
+    /// Seeded from the app's selected data context, but a private copy from
+    /// then on: picking a different account here changes what this sheet
+    /// offers and nothing else — adding a video somewhere is not a decision
+    /// to browse there.
+    @State private var selectedDestination: DataContext = .local
+
+    /// Seed once per presentation; `onAppear` must not stomp a pick the user
+    /// already made if the view reappears.
+    @State private var destinationSeeded = false
+
     private var dataManager: DataManager? { appEnvironment?.dataManager }
 
     /// Every account that can be added to, on every instance — not just the one
@@ -77,45 +89,19 @@ struct PlaylistSelectorSheet: View {
 
                 // Only show playlist options if not from local folder
                 if !video.isFromLocalFolder {
-                    // Create new playlist section
-                    Section {
-                        Button {
-                            showingNewPlaylist = true
-                        } label: {
-                            Label(
-                                String(localized: "playlist.new"),
-                                systemImage: "plus.circle"
-                            )
+                    // One destination shown at a time, picked at the top. No
+                    // picker while local playlists are the only destination
+                    // there is.
+                    if !remoteDestinations.isEmpty {
+                        Section {
+                            destinationPicker
                         }
                     }
 
-                    // Existing playlists
-                    Section {
-                        if playlists.isEmpty {
-                            emptyDestinationsRow(
-                                String(localized: "playlists.selector.empty.local")
-                            )
-                        } else {
-                            ForEach(playlists, id: \.id) { playlist in
-                                PlaylistSelectionRow(
-                                    playlist: playlist,
-                                    video: video,
-                                    wasAdded: addedToPlaylist?.id == playlist.id
-                                ) {
-                                    addVideoToPlaylist(playlist)
-                                }
-                            }
-                        }
-                    } header: {
-                        // Unlabelled while local playlists are the only
-                        // destinations there are.
-                        if !remoteDestinations.isEmpty {
-                            Text(String(localized: "playlist.section.local"))
-                        }
-                    }
-
-                    ForEach(remoteDestinations) { account in
+                    if let account = selectedAccount {
                         remoteSection(for: account)
+                    } else {
+                        localSection
                     }
                 }
             }
@@ -145,6 +131,7 @@ struct PlaylistSelectorSheet: View {
             }
             .onAppear {
                 loadPlaylists()
+                seedDestination()
             }
             .task {
                 await refreshRemotePlaylists()
@@ -176,7 +163,82 @@ struct PlaylistSelectorSheet: View {
         #endif
     }
 
-    // MARK: - Remote Sections
+    // MARK: - Destination Picker
+
+    /// The account whose playlists are on show, when the pick is not local.
+    ///
+    /// Resolved against the *eligible* accounts, so a login that stops
+    /// qualifying mid-presentation quietly falls back to the local list
+    /// instead of a section that could only fail.
+    private var selectedAccount: Account? {
+        guard case let .account(id) = selectedDestination else { return nil }
+        return remoteDestinations.first { $0.id == id }
+    }
+
+    private var destinationPicker: some View {
+        Picker(String(localized: "accounts.switcher.title"), selection: $selectedDestination) {
+            Text(DataContextSwitcherLabels.title(for: .local, in: appEnvironment))
+                .tag(DataContext.local)
+
+            ForEach(remoteDestinations) { account in
+                Text(DataContextSwitcherLabels.title(for: .account(account.id), in: appEnvironment))
+                    .tag(DataContext.account(account.id))
+            }
+        }
+        #if os(tvOS)
+        // A tvOS Menu dismisses the presentation it sits in; inline rows are
+        // the presentation that survives.
+        .pickerStyle(.inline)
+        #else
+        .pickerStyle(.menu)
+        #endif
+    }
+
+    /// The pick the sheet opens on: the account the app is browsing as, when
+    /// that account is somewhere a video can be put — otherwise local, which
+    /// always is.
+    private func seedDestination() {
+        guard !destinationSeeded else { return }
+        destinationSeeded = true
+
+        guard let current = appEnvironment?.accountsManager.currentContext,
+              case let .account(id) = current,
+              remoteDestinations.contains(where: { $0.id == id })
+        else { return }
+
+        selectedDestination = current
+    }
+
+    // MARK: - Sections
+
+    private var localSection: some View {
+        Section {
+            Button {
+                showingNewPlaylist = true
+            } label: {
+                Label(
+                    String(localized: "playlist.new"),
+                    systemImage: "plus.circle"
+                )
+            }
+
+            if playlists.isEmpty {
+                emptyDestinationsRow(
+                    String(localized: "playlists.selector.empty.local")
+                )
+            } else {
+                ForEach(playlists, id: \.id) { playlist in
+                    PlaylistSelectionRow(
+                        playlist: playlist,
+                        video: video,
+                        wasAdded: addedToPlaylist?.id == playlist.id
+                    ) {
+                        addVideoToPlaylist(playlist)
+                    }
+                }
+            }
+        }
+    }
 
     @ViewBuilder
     private func remoteSection(for account: Account) -> some View {
@@ -218,8 +280,6 @@ struct PlaylistSelectorSheet: View {
                     #endif
                     .frame(maxWidth: .infinity)
             }
-        } header: {
-            Text(sectionTitle(for: account))
         }
     }
 
@@ -229,19 +289,6 @@ struct PlaylistSelectorSheet: View {
         Text(text)
             .font(.subheadline)
             .foregroundStyle(.secondary)
-    }
-
-    /// The account's name, and the host it lives on when the name does not
-    /// already carry it (a login shows up as `user@host`).
-    private func sectionTitle(for account: Account) -> String {
-        guard let appEnvironment else { return "" }
-
-        let name = appEnvironment.dataContextValidator.displayName(for: account)
-        guard let host = appEnvironment.accountsManager.instance(for: account)?.url.host,
-              !name.localizedCaseInsensitiveContains(host)
-        else { return name }
-
-        return "\(name) · \(host)"
     }
 
     private func loadPlaylists() {
