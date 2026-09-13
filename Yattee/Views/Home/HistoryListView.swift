@@ -331,11 +331,15 @@ struct HistoryListView: View {
                 ToolbarSpacer(.flexible, placement: .primaryAction)
             }
             #endif
+            // No switcher on macOS: the sidebar row is the one persistent
+            // switcher surface there.
+            #if !os(macOS)
             if DataContextSwitcherVisibility.showsPickers(in: appEnvironment) {
                 ToolbarItem(placement: viewOptionsPlacement) {
                     DataContextSwitcherMenu()
                 }
             }
+            #endif
             // View options button (always visible)
             ToolbarItem(placement: viewOptionsPlacement) {
                 Button {

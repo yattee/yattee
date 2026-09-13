@@ -147,17 +147,6 @@ struct HomeView: View {
         appEnvironment?.settingsManager.listStyle ?? .inset
     }
 
-    #if !os(tvOS)
-    /// Same edge the switcher sits on in Subscriptions/History/Playlists:
-    /// leading on macOS, trailing elsewhere.
-    private var switcherPlacement: ToolbarItemPlacement {
-        #if os(macOS)
-        .navigation
-        #else
-        .primaryAction
-        #endif
-    }
-    #endif
 
     var body: some View {
         // Split from `chrome` so the modifier chain stays within what the
@@ -177,9 +166,11 @@ struct HomeView: View {
         .toolbarTitleDisplayMode(.inlineLarge)
         #endif
         .toolbar {
-            #if !os(tvOS)
+            // No switcher on macOS: the sidebar row is the one persistent
+            // switcher surface there.
+            #if !os(tvOS) && !os(macOS)
             if DataContextSwitcherVisibility.showsPickers(in: appEnvironment) {
-                ToolbarItem(placement: switcherPlacement) {
+                ToolbarItem(placement: .primaryAction) {
                     DataContextSwitcherMenu()
                 }
             }
