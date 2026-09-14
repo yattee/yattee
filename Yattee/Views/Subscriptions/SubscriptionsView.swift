@@ -906,12 +906,18 @@ struct SubscriptionsView: View {
     #if os(tvOS)
     private var tvOSViewOptionsButton: some View {
         HStack(spacing: 16) {
+            // The sidebar is too narrow for both buttons' full titles, and
+            // tvOS wraps them into tall two-line lozenges before truncating.
+            // The account name is the label worth keeping whole, so this
+            // button keeps only its icon and the name gets the width.
             Button {
                 showViewOptions = true
             } label: {
                 Label(String(localized: "viewOptions.title"), systemImage: "slider.horizontal.3")
+                    .labelStyle(.iconOnly)
             }
             .buttonStyle(.bordered)
+            .accessibilityLabel(Text(String(localized: "viewOptions.title")))
 
             if DataContextSwitcherVisibility.showsPickers(in: appEnvironment) {
                 DataContextSwitcherButton()

@@ -63,9 +63,6 @@ struct DataContextSwitcherRows: View {
             }
         }
         .disabled(isRefused(context))
-        #if os(tvOS)
-        .buttonStyle(TVSettingsButtonStyle())
-        #endif
         #endif
     }
 
@@ -387,20 +384,15 @@ struct DataContextSwitcherMenu: View {
 /// A settings row naming the current context, with the switcher attached.
 struct DataContextSwitcherSettingsRow: View {
     @Environment(\.appEnvironment) private var appEnvironment
-    #if os(tvOS)
-    @State private var showingPicker = false
-    #endif
 
     var body: some View {
         #if os(tvOS)
-        Button {
-            showingPicker = true
+        // The same menu the Subscriptions, History and Playlists headers use:
+        // one click, options in place, rather than a full-screen round trip.
+        Menu {
+            DataContextSwitcherRows()
         } label: {
             rowLabel
-        }
-        .buttonStyle(TVSettingsButtonStyle())
-        .fullScreenCover(isPresented: $showingPicker) {
-            DataContextSwitcherPicker()
         }
         #elseif os(macOS)
         // A macOS menu label renders its first text and nothing else — the
@@ -498,61 +490,28 @@ struct DataContextSwitcherSettingsRow: View {
     }
 }
 
-// MARK: - tvOS picker
+// MARK: - tvOS button
 
 #if os(tvOS)
-/// The tvOS switcher, presented in a `fullScreenCover`: menus are unusable
-/// there, and a sheet is a card too small to read.
-struct DataContextSwitcherPicker: View {
-    @Environment(\.appEnvironment) private var appEnvironment
-    @Environment(\.dismiss) private var dismiss
-
-    var body: some View {
-        ZStack {
-            Color.black.ignoresSafeArea()
-
-            VStack(alignment: .leading, spacing: 24) {
-                Text(String(localized: "accounts.switcher.title"))
-                    .font(.title2.bold())
-
-                ScrollView {
-                    VStack(alignment: .leading, spacing: 12) {
-                        DataContextSwitcherRows {
-                            dismiss()
-                        }
-                    }
-                }
-
-                Button(String(localized: "common.close")) {
-                    dismiss()
-                }
-                .buttonStyle(TVSettingsButtonStyle())
-            }
-            .frame(maxWidth: 900)
-            .padding(.horizontal, 80)
-            .padding(.vertical, 60)
-        }
-    }
-}
-
-/// The button that presents the picker, for placing beside other tvOS controls.
+/// The switcher for placing beside other tvOS controls: a menu, like the
+/// menu-style pickers in Settings, so switching is one click instead of a
+/// full-screen round trip.
 struct DataContextSwitcherButton: View {
     @Environment(\.appEnvironment) private var appEnvironment
-    @State private var showingPicker = false
 
     var body: some View {
-        Button {
-            showingPicker = true
+        Menu {
+            DataContextSwitcherRows()
         } label: {
             Label {
+                // One line always: beside other header buttons the name would
+                // wrap into a tall two-line lozenge before it truncates.
                 Text(DataContextSwitcherLabels.title(for: currentContext, in: appEnvironment))
+                    .lineLimit(1)
+                    .truncationMode(.tail)
             } icon: {
                 DataContextSwitcherIcon()
             }
-        }
-        .buttonStyle(.bordered)
-        .fullScreenCover(isPresented: $showingPicker) {
-            DataContextSwitcherPicker()
         }
     }
 
