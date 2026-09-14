@@ -386,14 +386,14 @@ struct SubscriptionsView: View {
                 ZStack {
                     #if os(tvOS)
                     HStack(alignment: .top, spacing: 24) {
-                        if showSidebar && subscriptionsLoaded && subscriptions.count > 1 {
+                        if showSidebar && subscriptionsLoaded && !subscriptions.isEmpty {
                             tvOSChannelsSidebar
                                 .frame(width: max(geometry.size.width * 0.28, 360), alignment: .leading)
                                 .focusSection()
                         }
 
                         VStack(alignment: .leading, spacing: 16) {
-                            if !showSidebar || subscriptions.count <= 1 {
+                            if !showSidebar || subscriptions.isEmpty {
                                 tvOSViewOptionsButton
                             }
 
@@ -1120,7 +1120,7 @@ struct SubscriptionsView: View {
         #elseif os(iOS)
         return isIPadRegular && showSidebar && subscriptionsLoaded && subscriptions.count > 1
         #elseif os(tvOS)
-        return showSidebar && subscriptionsLoaded && subscriptions.count > 1
+        return showSidebar && subscriptionsLoaded && !subscriptions.isEmpty
         #else
         return false
         #endif
