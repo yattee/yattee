@@ -73,6 +73,10 @@ private final class ScriptedSubscriptionProvider: SubscriptionProvider {
     }
 
     var cachedSubscriptionCount: Int? { subscribed.count }
+
+    var cachedSubscriptions: [Channel]? {
+        subscribed.map { Channel(id: .global($0), name: $0) }
+    }
 }
 
 /// Hands out the scripted providers instead of building ones that would need a

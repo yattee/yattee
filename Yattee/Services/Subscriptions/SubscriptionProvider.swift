@@ -40,6 +40,10 @@ protocol SubscriptionProvider: Sendable {
     /// Returns nil when the provider hasn't populated its cache yet.
     var cachedSubscriptionCount: Int? { get }
 
+    /// The subscribed channels known without a network fetch.
+    /// Returns nil when the provider hasn't populated its cache yet.
+    var cachedSubscriptions: [Channel]? { get }
+
     /// Refreshes the local cache of subscriptions from the remote source.
     /// For local provider, this is a no-op.
     func refreshCache() async throws

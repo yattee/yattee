@@ -26,6 +26,7 @@ struct UnifiedTabView: View {
     @State private var searchPath = NavigationPath()
     @State private var channelPaths: [String: NavigationPath] = [:]
     @State private var playlistPaths: [UUID: NavigationPath] = [:]
+    @State private var remotePlaylistPaths: [String: NavigationPath] = [:]
     @State private var mediaSourcePaths: [UUID: NavigationPath] = [:]
     @State private var instancePaths: [UUID: NavigationPath] = [:]
     @State private var bookmarksPath = NavigationPath()
@@ -355,6 +356,7 @@ struct UnifiedTabView: View {
     @State private var searchPath = NavigationPath()
     @State private var channelPaths: [String: NavigationPath] = [:]
     @State private var playlistPaths: [UUID: NavigationPath] = [:]
+    @State private var remotePlaylistPaths: [String: NavigationPath] = [:]
     @State private var mediaSourcePaths: [UUID: NavigationPath] = [:]
     @State private var instancePaths: [UUID: NavigationPath] = [:]
     @State private var bookmarksPath = NavigationPath()
@@ -549,7 +551,7 @@ struct UnifiedTabView: View {
             }
         case .channel:
             channelContent(for: selection)
-        case .playlist:
+        case .playlist, .remotePlaylist:
             playlistContent(for: selection)
         case .mediaSource, .instance:
             sourceContent(for: selection)
@@ -583,6 +585,7 @@ struct UnifiedTabView: View {
     @State private var searchPath = NavigationPath()
     @State private var channelPaths: [String: NavigationPath] = [:]
     @State private var playlistPaths: [UUID: NavigationPath] = [:]
+    @State private var remotePlaylistPaths: [String: NavigationPath] = [:]
     @State private var instancePaths: [UUID: NavigationPath] = [:]
     @State private var mediaSourcePaths: [UUID: NavigationPath] = [:]
     @State private var bookmarksPath = NavigationPath()
@@ -675,6 +678,8 @@ struct UnifiedTabView: View {
             channelPaths[channelID] = NavigationPath()
         case let .playlist(id, _):
             playlistPaths[id] = NavigationPath()
+        case .remotePlaylist:
+            remotePlaylistPaths[item.id] = NavigationPath()
         case let .instance(id, _, _):
             instancePaths[id] = NavigationPath()
         case let .mediaSource(id, _, _):
@@ -934,7 +939,11 @@ extension UnifiedTabView {
             dataManager: appEnvironment.dataManager,
             settingsManager: appEnvironment.settingsManager,
             mediaSourcesManager: appEnvironment.mediaSourcesManager,
-            instancesManager: appEnvironment.instancesManager
+            instancesManager: appEnvironment.instancesManager,
+            accountsManager: appEnvironment.accountsManager,
+            subscriptionService: appEnvironment.subscriptionService,
+            remotePlaylistsCache: appEnvironment.remotePlaylistsCache,
+            contextValidator: appEnvironment.dataContextValidator
         )
     }
 
@@ -951,6 +960,8 @@ extension UnifiedTabView {
             channelPaths[selection.id, default: NavigationPath()].append(destination)
         case .playlist(let id, _):
             playlistPaths[id, default: NavigationPath()].append(destination)
+        case .remotePlaylist:
+            remotePlaylistPaths[selection.id, default: NavigationPath()].append(destination)
         case .mediaSource(let id, _, _):
             mediaSourcePaths[id, default: NavigationPath()].append(destination)
         case .instance(let id, _, _):
@@ -1047,20 +1058,38 @@ extension UnifiedTabView {
 
     @ViewBuilder
     func playlistContent(for item: SidebarItem) -> some View {
-        if case .playlist(let id, _) = item {
+        switch item {
+        case .playlist(let id, _):
             NavigationStack(path: playlistPathBinding(for: id)) {
                 UnifiedPlaylistDetailView(source: .local(id))
                     .withNavigationDestinations()
             }
             .id(item.id)
+        case .remotePlaylist(let id, let title, let accountID):
+            NavigationStack(path: remotePlaylistPathBinding(for: item)) {
+                // No instance passed: the detail view resolves it from the
+                // account, same as SidebarItem.navigationDestination().
+                UnifiedPlaylistDetailView(source: .remote(id, instance: nil, title: title, accountID: accountID))
+                    .withNavigationDestinations()
+            }
+            .id(item.id)
+        default:
+            EmptyView()
         }
+    }
+
+    func remotePlaylistPathBinding(for item: SidebarItem) -> Binding<NavigationPath> {
+        Binding(
+            get: { remotePlaylistPaths[item.id] ?? NavigationPath() },
+            set: { remotePlaylistPaths[item.id] = $0 }
+        )
     }
 
     @ViewBuilder
     func playlistLabel(for item: SidebarItem) -> some View {
-        if case .playlist(_, let title) = item {
+        if item.isPlaylist {
             Label {
-                Text(title)
+                Text(item.title)
             } icon: {
                 SidebarPlaylistIcon(url: sidebarManager.thumbnailURL(for: item))
             }

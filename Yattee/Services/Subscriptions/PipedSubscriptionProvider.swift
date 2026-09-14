@@ -139,6 +139,10 @@ final class PipedSubscriptionProvider: SubscriptionProvider {
         cachePopulated ? cachedChannels.count : nil
     }
 
+    var cachedSubscriptions: [Channel]? {
+        cachePopulated ? cachedChannels : nil
+    }
+
     // MARK: - Private Helpers
 
     /// Gets the authenticated Piped instance and auth token from account settings.

@@ -14,15 +14,37 @@ import Combine
 final class SidebarManager {
     // MARK: - Published Items
 
-    /// Channel items for the Channels section.
-    private(set) var channelItems: [SidebarItem] = []
+    /// Channel items for the Channels section, following the data context the
+    /// same way the Subscriptions screen does: local subscriptions under the
+    /// local context, the account's server subscriptions under an account one.
+    var channelItems: [SidebarItem] {
+        if case .account = effectiveContext { return remoteChannelItems }
+        return localChannelItems
+    }
 
-    /// Playlist items for the Collections section.
-    ///
-    /// Local playlists only, whatever data context is selected — the playlists
-    /// screen follows the context but the sidebar does not. A known
-    /// inconsistency, kept for now rather than half-solved.
-    private(set) var playlistItems: [SidebarItem] = []
+    /// Playlist items for the Playlists section, following the data context the
+    /// same way the Playlists screen does. Remote lists are read live from the
+    /// cache so a create/rename/delete made anywhere shows up here too.
+    var playlistItems: [SidebarItem] {
+        if case let .account(accountID) = effectiveContext {
+            guard var playlists = remotePlaylistsCache?.playlists(for: accountID) else { return [] }
+            if settingsManager?.sidebarPlaylistsLimitEnabled ?? false {
+                let maxPlaylists = settingsManager?.sidebarMaxPlaylists ?? SettingsManager.defaultSidebarMaxPlaylists
+                playlists = Array(playlists.prefix(maxPlaylists))
+            }
+            return playlists.map { SidebarItem.from(remotePlaylist: $0, accountID: accountID) }
+        }
+        return localPlaylistItems
+    }
+
+    /// The local halves behind the computed sections above.
+    private var localChannelItems: [SidebarItem] = []
+    private var localPlaylistItems: [SidebarItem] = []
+
+    /// The current account's server subscriptions, rebuilt from the provider
+    /// cache — providers are not observable, so this is notification-driven.
+    private var remoteChannelItems: [SidebarItem] = []
+    private var remoteChannelAvatars: [String: URL] = [:]
 
     /// Media source items for the Media Sources section.
     private(set) var mediaSourceItems: [SidebarItem] = []
@@ -45,7 +67,22 @@ final class SidebarManager {
     private weak var settingsManager: SettingsManager?
     private weak var mediaSourcesManager: MediaSourcesManager?
     private weak var instancesManager: InstancesManager?
+    private weak var accountsManager: AccountsManager?
+    private weak var subscriptionService: SubscriptionService?
+    private weak var remotePlaylistsCache: RemotePlaylistsCache?
+    private weak var contextValidator: DataContextValidator?
     private var cancellables = Set<AnyCancellable>()
+
+    /// The context the sections follow — the same fallback the data screens
+    /// apply, so an unavailable account leaves the sidebar on local data too.
+    private var effectiveContext: DataContext {
+        contextValidator?.effectiveContext ?? accountsManager?.currentContext ?? .local
+    }
+
+    /// One fetch per account per visit: a cold cache triggers a load, a failed
+    /// one stays empty until the context is switched again.
+    private var attemptedChannelFetches: Set<UUID> = []
+    private var attemptedPlaylistFetches: Set<UUID> = []
     
     // MARK: - Cached Data (to avoid repeated DB queries during layout)
     
@@ -63,12 +100,20 @@ final class SidebarManager {
         dataManager: DataManager,
         settingsManager: SettingsManager,
         mediaSourcesManager: MediaSourcesManager? = nil,
-        instancesManager: InstancesManager? = nil
+        instancesManager: InstancesManager? = nil,
+        accountsManager: AccountsManager? = nil,
+        subscriptionService: SubscriptionService? = nil,
+        remotePlaylistsCache: RemotePlaylistsCache? = nil,
+        contextValidator: DataContextValidator? = nil
     ) {
         self.dataManager = dataManager
         self.settingsManager = settingsManager
         self.mediaSourcesManager = mediaSourcesManager
         self.instancesManager = instancesManager
+        self.accountsManager = accountsManager
+        self.subscriptionService = subscriptionService
+        self.remotePlaylistsCache = remotePlaylistsCache
+        self.contextValidator = contextValidator
         loadData()
     }
 
@@ -81,8 +126,14 @@ final class SidebarManager {
         loadSources()
     }
 
-    /// Loads channel items from subscriptions.
+    /// Loads channel items from subscriptions — the local store always, plus
+    /// the account provider's cache when an account context is selected.
     private func loadChannels() {
+        loadLocalChannels()
+        refreshRemoteChannels()
+    }
+
+    private func loadLocalChannels() {
         guard let dataManager else { return }
 
         // Cache subscriptions for use in avatarURL(for:)
@@ -111,12 +162,81 @@ final class SidebarManager {
 
         // Apply limit (if enabled) and convert to sidebar items
         if limitEnabled {
-            channelItems = sortedSubscriptions
+            localChannelItems = sortedSubscriptions
                 .prefix(maxChannels)
                 .map { SidebarItem.from(subscription: $0) }
         } else {
-            channelItems = sortedSubscriptions
+            localChannelItems = sortedSubscriptions
                 .map { SidebarItem.from(subscription: $0) }
+        }
+    }
+
+    /// Rebuilds the remote channel items from the current account provider's
+    /// cache, fetching once when the cache is cold.
+    private func refreshRemoteChannels() {
+        guard case let .account(accountID) = effectiveContext,
+              let subscriptionService,
+              let provider = subscriptionService.provider(for: .account(accountID))
+        else {
+            remoteChannelItems = []
+            remoteChannelAvatars = [:]
+            return
+        }
+
+        guard let channels = provider.cachedSubscriptions else {
+            remoteChannelItems = []
+            remoteChannelAvatars = [:]
+            fetchRemoteChannelsOnce(accountID: accountID)
+            return
+        }
+
+        // Alphabetical regardless of the sidebar sort setting: server
+        // subscriptions carry neither a subscribed-at nor a last-upload date.
+        var sorted = channels.sorted {
+            $0.name.localizedCaseInsensitiveCompare($1.name) == .orderedAscending
+        }
+
+        if settingsManager?.sidebarChannelsLimitEnabled ?? true {
+            let maxChannels = settingsManager?.sidebarMaxChannels ?? SettingsManager.defaultSidebarMaxChannels
+            sorted = Array(sorted.prefix(maxChannels))
+        }
+
+        remoteChannelItems = sorted.map { SidebarItem.from(channel: $0) }
+        remoteChannelAvatars = channels.reduce(into: [:]) { map, channel in
+            map[channel.id.channelID] = channel.thumbnailURL
+        }
+    }
+
+    private func fetchRemoteChannelsOnce(accountID: UUID) {
+        guard let subscriptionService,
+              !attemptedChannelFetches.contains(accountID) else { return }
+        attemptedChannelFetches.insert(accountID)
+
+        Task { [weak self] in
+            // The service guards the fetch with its own generation counter, so
+            // a result landing after a context switch is discarded there.
+            _ = try? await subscriptionService.fetchSubscriptions()
+            guard let self, case .account(accountID) = self.effectiveContext else { return }
+            self.refreshRemoteChannels()
+        }
+    }
+
+    /// Warms the remote playlists cache for the current account once; the
+    /// computed `playlistItems` reads the cache live, so nothing to apply here.
+    private func fetchRemotePlaylistsIfNeeded() {
+        guard case let .account(accountID) = effectiveContext,
+              let remotePlaylistsCache,
+              remotePlaylistsCache.playlists(for: accountID) == nil,
+              let accountsManager,
+              let account = accountsManager.account(id: accountID),
+              let instance = accountsManager.instance(for: account),
+              instance.type.accountCapabilities.supportsPlaylistReads,
+              !attemptedPlaylistFetches.contains(accountID)
+        else { return }
+        attemptedPlaylistFetches.insert(accountID)
+
+        Task {
+            try? await remotePlaylistsCache.refreshList(for: account)
         }
     }
 
@@ -141,13 +261,15 @@ final class SidebarManager {
 
         // Apply limit if enabled
         if limitEnabled {
-            playlistItems = sortedPlaylists
+            localPlaylistItems = sortedPlaylists
                 .prefix(maxPlaylists)
                 .map { SidebarItem.from(playlist: $0) }
         } else {
-            playlistItems = sortedPlaylists
+            localPlaylistItems = sortedPlaylists
                 .map { SidebarItem.from(playlist: $0) }
         }
+
+        fetchRemotePlaylistsIfNeeded()
     }
 
     /// Loads instance and media source items with sorting and limiting.
@@ -258,6 +380,18 @@ final class SidebarManager {
                 self?.loadData()
             }
             .store(in: &cancellables)
+
+        NotificationCenter.default.publisher(for: .dataContextDidChange)
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] _ in
+                // A fresh visit deserves a fresh attempt, even at a cache that
+                // failed to fill last time.
+                self?.attemptedChannelFetches.removeAll()
+                self?.attemptedPlaylistFetches.removeAll()
+                self?.refreshRemoteChannels()
+                self?.fetchRemotePlaylistsIfNeeded()
+            }
+            .store(in: &cancellables)
     }
 
     // MARK: - Channel Data Access
@@ -273,7 +407,12 @@ final class SidebarManager {
     func avatarURL(for item: SidebarItem) -> URL? {
         guard case .channel(let channelID, _, _) = item else { return nil }
 
-        let directURL = cachedSubscriptions.first { $0.channelID == channelID }?.avatarURL
+        let directURL: URL?
+        if case .account = effectiveContext {
+            directURL = remoteChannelAvatars[channelID]
+        } else {
+            directURL = cachedSubscriptions.first { $0.channelID == channelID }?.avatarURL
+        }
 
         return AvatarURLBuilder.avatarURL(
             channelID: channelID,
@@ -288,16 +427,29 @@ final class SidebarManager {
     /// Returns video count for a playlist sidebar item.
     /// Uses cached playlists to avoid repeated DB queries during layout.
     func videoCount(for item: SidebarItem) -> Int {
-        guard case .playlist(let id, _) = item else { return 0 }
-
-        return cachedPlaylists.first { $0.id == id }?.videoCount ?? 0
+        switch item {
+        case .playlist(let id, _):
+            return cachedPlaylists.first { $0.id == id }?.videoCount ?? 0
+        case .remotePlaylist(let id, _, let accountID):
+            return remotePlaylistsCache?.playlists(for: accountID)?
+                .first { $0.id == id }?.videoCount ?? 0
+        default:
+            return 0
+        }
     }
 
     /// Returns thumbnail URL for a playlist sidebar item.
     /// Uses cached playlists to avoid repeated DB queries during layout.
     func thumbnailURL(for item: SidebarItem) -> URL? {
-        guard case .playlist(let id, _) = item else { return nil }
-        return cachedPlaylists.first { $0.id == id }?.thumbnailURL
+        switch item {
+        case .playlist(let id, _):
+            return cachedPlaylists.first { $0.id == id }?.thumbnailURL
+        case .remotePlaylist(let id, _, let accountID):
+            return remotePlaylistsCache?.playlists(for: accountID)?
+                .first { $0.id == id }?.thumbnailURL
+        default:
+            return nil
+        }
     }
 }
 

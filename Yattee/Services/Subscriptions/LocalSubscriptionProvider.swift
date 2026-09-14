@@ -26,7 +26,12 @@ final class LocalSubscriptionProvider: SubscriptionProvider {
     // MARK: - SubscriptionProvider
 
     func fetchSubscriptions() async throws -> [Channel] {
-        // Convert Subscription models to Channel models
+        subscriptionChannels()
+    }
+
+    /// Converts Subscription models to Channel models, synchronously — the
+    /// store is local, so there is nothing to await.
+    private func subscriptionChannels() -> [Channel] {
         dataManager.subscriptions().map { subscription in
             Channel(
                 id: ChannelID(source: subscription.contentSource, channelID: subscription.channelID),
@@ -66,5 +71,10 @@ final class LocalSubscriptionProvider: SubscriptionProvider {
 
     var cachedSubscriptionCount: Int? {
         dataManager.subscriptionCount
+    }
+
+    var cachedSubscriptions: [Channel]? {
+        // Local data needs no cache warm-up — the store is always readable.
+        subscriptionChannels()
     }
 }

@@ -24,6 +24,11 @@ enum SidebarItem: Hashable, Identifiable {
     // MARK: - Dynamic Playlist Items
     case playlist(id: UUID, title: String)
 
+    /// A server-side playlist of the account the data context is on.
+    /// `accountID` names the account it was listed for, which is what makes
+    /// the detail view treat it as owned (editable).
+    case remotePlaylist(id: PlaylistID, title: String, accountID: UUID)
+
     // MARK: - Dynamic Media Source Items
     case mediaSource(id: UUID, name: String, type: MediaSourceType)
 
@@ -61,6 +66,8 @@ enum SidebarItem: Hashable, Identifiable {
             return "channel-\(source.provider)-\(channelID)"
         case .playlist(let id, _):
             return "playlist-\(id.uuidString)"
+        case .remotePlaylist(let id, _, let accountID):
+            return "remote-playlist-\(accountID.uuidString)-\(id.id)"
         case .mediaSource(let id, _, _):
             return "mediasource-\(id.uuidString)"
         case .instance(let id, _, _):
@@ -104,6 +111,8 @@ enum SidebarItem: Hashable, Identifiable {
             return name
         case .playlist(_, let title):
             return title
+        case .remotePlaylist(_, let title, _):
+            return title
         case .mediaSource(_, let name, _):
             return name
         case .instance(_, let name, _):
@@ -143,7 +152,7 @@ enum SidebarItem: Hashable, Identifiable {
             return "antenna.radiowaves.left.and.right"
         case .channel:
             return "person.circle"
-        case .playlist:
+        case .playlist, .remotePlaylist:
             return "list.bullet.rectangle"
         case .mediaSource(_, _, let type):
             return type.systemImage
@@ -179,6 +188,9 @@ enum SidebarItem: Hashable, Identifiable {
             return .channel(channelID, source)
         case .playlist(let id, let title):
             return .playlist(.local(id, title: title))
+        case .remotePlaylist(let id, let title, let accountID):
+            // No instance here: the detail view resolves it from the account.
+            return .playlist(.remote(id, instance: nil, title: title, accountID: accountID))
         case .mediaSource(let id, _, _):
             return .mediaSource(id)
         case .instance:
@@ -221,8 +233,10 @@ enum SidebarItem: Hashable, Identifiable {
 
     /// Whether this is a dynamic playlist item.
     var isPlaylist: Bool {
-        if case .playlist = self { return true }
-        return false
+        switch self {
+        case .playlist, .remotePlaylist: return true
+        default: return false
+        }
     }
 
     /// Whether this is a dynamic media source item.
@@ -253,6 +267,20 @@ extension SidebarItem {
     /// Creates a SidebarItem from a LocalPlaylist.
     static func from(playlist: LocalPlaylist) -> SidebarItem {
         .playlist(id: playlist.id, title: playlist.title)
+    }
+
+    /// Creates a SidebarItem from a server account's Channel.
+    static func from(channel: Channel) -> SidebarItem {
+        .channel(
+            channelID: channel.id.channelID,
+            name: channel.name,
+            source: channel.id.source
+        )
+    }
+
+    /// Creates a SidebarItem from a server account's Playlist.
+    static func from(remotePlaylist playlist: Playlist, accountID: UUID) -> SidebarItem {
+        .remotePlaylist(id: playlist.id, title: playlist.title, accountID: accountID)
     }
 
     /// Creates a SidebarItem from a MediaSource.

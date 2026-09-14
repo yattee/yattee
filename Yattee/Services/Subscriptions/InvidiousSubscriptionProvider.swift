@@ -139,6 +139,10 @@ final class InvidiousSubscriptionProvider: SubscriptionProvider {
         cachePopulated ? cachedChannels.count : nil
     }
 
+    var cachedSubscriptions: [Channel]? {
+        cachePopulated ? cachedChannels : nil
+    }
+
     // MARK: - Private Helpers
 
     /// Gets the authenticated Invidious instance and session ID from account settings.
