@@ -389,21 +389,33 @@ final class SubscriptionFeedCache {
             return
         }
 
-        let generation = beginRequest()
-
-        // The *effective* context, so an account still waiting on its instance
-        // or credential falls back to local rather than reporting
-        // notAuthenticated while the subscriptions list already shows local data.
-        let context = appEnvironment.dataContextValidator.effectiveContext
-        let backend = appEnvironment.feedBackend(for: context)
-        LoggingService.shared.debug("Starting feed refresh for \(backend)", category: .general)
-
         // Use a detached task to prevent SwiftUI from cancelling the request
         // when @State properties change during the refresh operation.
         // This is necessary because loadSubscriptionsAsync() updates @State
         // before feedCache.refresh() completes, which can cause SwiftUI to
         // cancel the parent task.
+        //
+        // The generation and context are read *inside* the detached body, not
+        // before it: the hop onto it is a suspension point, and a context
+        // handler running in that gap bumps the generation and resets
+        // `isLoading`. A request dispatched with the pre-hop generation is
+        // fenced out on arrival, and the fenced return deliberately leaves
+        // `isLoading` alone — with nothing current owning it, the flag stayed
+        // true and every later refresh was skipped as "already loading",
+        // leaving a spinner nothing would ever finish. Reading at dispatch
+        // time means the request that sets `isLoading` always carries the
+        // generation that is current at that moment, so its completion is the
+        // one that resets it.
         await Task.detached { @MainActor in
+            let generation = self.beginRequest()
+
+            // The *effective* context, so an account still waiting on its instance
+            // or credential falls back to local rather than reporting
+            // notAuthenticated while the subscriptions list already shows local data.
+            let context = appEnvironment.dataContextValidator.effectiveContext
+            let backend = appEnvironment.feedBackend(for: context)
+            LoggingService.shared.debug("Starting feed refresh for \(backend)", category: .general)
+
             switch backend {
             case .local:
                 await self.refreshLocalAccount(using: appEnvironment, generation: generation)
@@ -783,6 +795,7 @@ final class SubscriptionFeedCache {
                         appEnvironment.dataManager.updateLastVideoPublishedDates(from: serverVideos)
                         prefetchDeArrow(for: serverVideos, using: appEnvironment)
                     }
+                    guard generation == accountGeneration else { return }
                     feedLoadState = .ready
                     isLoading = false
                     return
@@ -818,7 +831,11 @@ final class SubscriptionFeedCache {
             )
         }
 
-        // Show whatever we have
+        // Show whatever we have — unless the login this poller was working for
+        // has been fenced out meanwhile: then the state belongs to whatever
+        // request the switch started, and a stale ".ready" here would end its
+        // spinner early or let a duplicate refresh through.
+        guard generation == accountGeneration else { return }
         feedLoadState = .ready
         isLoading = false
     }
