@@ -38,6 +38,12 @@ struct AccountsListView: View {
     @State private var pendingRemoval: PendingAccountRemoval?
     @State private var renameRequest: AccountRenameRequest?
 
+    #if os(tvOS)
+    /// The account whose actions dialog is up. tvOS only: everywhere else the
+    /// row grows a context menu instead of a press target.
+    @State private var actionsAccountID: UUID?
+    #endif
+
     /// Bumped whenever a credential is replaced, purely to re-read the login
     /// identifier the rows display.
     ///
@@ -255,6 +261,38 @@ struct AccountsListView: View {
 
     @ViewBuilder
     private func accountRow(_ account: Account, instance: Instance?) -> some View {
+        #if os(tvOS)
+        // One focusable row per account: pressing it raises the actions as a
+        // dialog. Spelling them out as sibling rows made every account four
+        // rows tall, which is a lot of clicking past on a remote.
+        Button {
+            actionsAccountID = account.id
+        } label: {
+            rowContent(account, instance: instance)
+        }
+        .buttonStyle(TVSettingsButtonStyle())
+        .confirmationDialog(
+            title(for: account, instance: instance),
+            isPresented: Binding(
+                // By ID: a label edit arriving from another device while the
+                // dialog is up would otherwise close it.
+                get: { actionsAccountID == account.id },
+                set: { if !$0 { actionsAccountID = nil } }
+            ),
+            titleVisibility: .visible
+        ) {
+            rowActions(account, instance: instance)
+            Button(String(localized: "common.cancel"), role: .cancel) {}
+        }
+        #else
+        rowContent(account, instance: instance)
+            .contextMenu {
+                rowActions(account, instance: instance)
+            }
+        #endif
+    }
+
+    private func rowContent(_ account: Account, instance: Instance?) -> some View {
         VStack(alignment: .leading, spacing: 4) {
             HStack(spacing: 6) {
                 // The same checkmark the switcher marks the selected context
@@ -289,17 +327,6 @@ struct AccountsListView: View {
             }
         }
         .frame(maxWidth: .infinity, alignment: .leading)
-        #if !os(tvOS)
-        .contextMenu {
-            rowActions(account, instance: instance)
-        }
-        #endif
-
-        #if os(tvOS)
-        // A context menu is not reachable on tvOS, and a Form row is a single
-        // focusable unit — so the actions are rows of their own.
-        rowActions(account, instance: instance)
-        #endif
     }
 
     @ViewBuilder
@@ -311,9 +338,6 @@ struct AccountsListView: View {
                 } label: {
                     Label(String(localized: "accounts.useThisAccount"), systemImage: "checkmark.circle")
                 }
-                #if os(tvOS)
-                .buttonStyle(TVSettingsButtonStyle())
-                #endif
             }
 
             Button {
@@ -325,9 +349,6 @@ struct AccountsListView: View {
             } label: {
                 Label(String(localized: "login.signInAgain"), systemImage: "person.badge.key")
             }
-            #if os(tvOS)
-            .buttonStyle(TVSettingsButtonStyle())
-            #endif
         }
 
         // Offered on orphans too: with no source to fall back to, a label of
@@ -337,9 +358,6 @@ struct AccountsListView: View {
         } label: {
             Label(String(localized: "accounts.rename"), systemImage: "pencil")
         }
-        #if os(tvOS)
-        .buttonStyle(TVSettingsButtonStyle())
-        #endif
 
         Button(role: .destructive) {
             pendingRemoval = PendingAccountRemoval(
@@ -353,9 +371,6 @@ struct AccountsListView: View {
                 systemImage: instance == nil ? "trash" : "rectangle.portrait.and.arrow.forward"
             )
         }
-        #if os(tvOS)
-        .buttonStyle(TVSettingsButtonStyle())
-        #endif
     }
 
     private func loginSheet(_ login: AccountsListLogin) -> some View {

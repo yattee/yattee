@@ -49,6 +49,12 @@ struct InstanceAccountsSection: View {
     /// the section rather than the row, and matched back to a row by ID.
     @State private var renameRequest: AccountRenameRequest?
 
+    #if os(tvOS)
+    /// The account whose actions dialog is up. tvOS only: everywhere else the
+    /// row grows a context menu instead of a press target.
+    @State private var actionsAccountID: UUID?
+    #endif
+
     private var accounts: [Account] {
         appEnvironment?.accountsManager.accounts(forInstance: instance.id) ?? []
     }
@@ -88,6 +94,76 @@ struct InstanceAccountsSection: View {
 
     @ViewBuilder
     private func accountRow(_ account: Account) -> some View {
+        rowBase(account)
+            // Attached to the row that raised it rather than to the section: a
+            // presentation modifier on a `Section` inside a `Form` has no view of
+            // its own to present from.
+            .confirmationDialog(
+                String(localized: "accounts.remove.confirm.title \(displayName(for: account))"),
+                isPresented: Binding(
+                    // By ID: a label edit arriving from another device while the
+                    // dialog is up would otherwise close it.
+                    get: { pendingSignOut?.id == account.id },
+                    set: { if !$0 { pendingSignOut = nil } }
+                ),
+                titleVisibility: .visible
+            ) {
+                Button(String(localized: "common.remove"), role: .destructive) {
+                    confirmSignOut()
+                }
+                Button(String(localized: "common.cancel"), role: .cancel) {
+                    pendingSignOut = nil
+                }
+            } message: {
+                Text(String(localized: "accounts.remove.confirm.message"))
+            }
+            #if !os(tvOS)
+            .presentationCompactAdaptation(.sheet)
+            #endif
+            // Attached to the row for the same reason the dialog above it is, and
+            // narrowed to the row that raised it so only one alert is ever live.
+            .accountRenameAlert(
+                Binding(
+                    get: { renameRequest?.id == account.id ? renameRequest : nil },
+                    set: { if $0 == nil { renameRequest = nil } }
+                )
+            ) { accountID, name in
+                appEnvironment?.accountsManager.updateDisplayName(name, for: accountID)
+            }
+    }
+
+    @ViewBuilder
+    private func rowBase(_ account: Account) -> some View {
+        #if os(tvOS)
+        // One focusable row per account: pressing it raises the actions as a
+        // dialog. Spelling them out as sibling rows made every account four
+        // rows tall, which is a lot of clicking past on a remote.
+        Button {
+            actionsAccountID = account.id
+        } label: {
+            rowContent(account)
+        }
+        .buttonStyle(TVSettingsButtonStyle())
+        .confirmationDialog(
+            displayName(for: account),
+            isPresented: Binding(
+                get: { actionsAccountID == account.id },
+                set: { if !$0 { actionsAccountID = nil } }
+            ),
+            titleVisibility: .visible
+        ) {
+            rowActions(account)
+            Button(String(localized: "common.cancel"), role: .cancel) {}
+        }
+        #else
+        rowContent(account)
+            .contextMenu {
+                rowActions(account)
+            }
+        #endif
+    }
+
+    private func rowContent(_ account: Account) -> some View {
         VStack(alignment: .leading, spacing: 4) {
             HStack(spacing: 6) {
                 // The same checkmark the switcher marks the selected context
@@ -107,54 +183,6 @@ struct InstanceAccountsSection: View {
             AccountStatusBadge(status: status(for: account))
         }
         .frame(maxWidth: .infinity, alignment: .leading)
-        #if !os(tvOS)
-        .contextMenu {
-            rowActions(account)
-        }
-        #endif
-        // Attached to the row that raised it rather than to the section: a
-        // presentation modifier on a `Section` inside a `Form` has no view of
-        // its own to present from.
-        .confirmationDialog(
-            String(localized: "accounts.remove.confirm.title \(displayName(for: account))"),
-            isPresented: Binding(
-                // By ID: a label edit arriving from another device while the
-                // dialog is up would otherwise close it.
-                get: { pendingSignOut?.id == account.id },
-                set: { if !$0 { pendingSignOut = nil } }
-            ),
-            titleVisibility: .visible
-        ) {
-            Button(String(localized: "common.remove"), role: .destructive) {
-                confirmSignOut()
-            }
-            Button(String(localized: "common.cancel"), role: .cancel) {
-                pendingSignOut = nil
-            }
-        } message: {
-            Text(String(localized: "accounts.remove.confirm.message"))
-        }
-        #if !os(tvOS)
-        .presentationCompactAdaptation(.sheet)
-        #endif
-        // Attached to the row for the same reason the dialog above it is, and
-        // narrowed to the row that raised it so only one alert is ever live.
-        .accountRenameAlert(
-            Binding(
-                get: { renameRequest?.id == account.id ? renameRequest : nil },
-                set: { if $0 == nil { renameRequest = nil } }
-            )
-        ) { accountID, name in
-            appEnvironment?.accountsManager.updateDisplayName(name, for: accountID)
-        }
-
-        #if os(tvOS)
-        // A context menu is not reachable on tvOS, and a Form row is a single
-        // focusable unit — so the actions are rows of their own. Without them
-        // the whole account is unreachable here: directional focus walks
-        // straight past a row that is only text.
-        rowActions(account)
-        #endif
     }
 
     @ViewBuilder
@@ -167,9 +195,6 @@ struct InstanceAccountsSection: View {
             } label: {
                 Label(String(localized: "accounts.useThisAccount"), systemImage: "checkmark.circle")
             }
-            #if os(tvOS)
-            .buttonStyle(TVSettingsButtonStyle())
-            #endif
         }
 
         // tvOS never syncs app Keychain items, so an account that arrived from
@@ -191,27 +216,18 @@ struct InstanceAccountsSection: View {
             Label(String(localized: "login.signInAgain"), systemImage: "person.badge.key")
             #endif
         }
-        #if os(tvOS)
-        .buttonStyle(TVSettingsButtonStyle())
-        #endif
 
         Button {
             renameRequest = makeRenameRequest(for: account)
         } label: {
             Label(String(localized: "accounts.rename"), systemImage: "pencil")
         }
-        #if os(tvOS)
-        .buttonStyle(TVSettingsButtonStyle())
-        #endif
 
         Button(role: .destructive) {
             pendingSignOut = account
         } label: {
             Label(String(localized: "login.signOutAndRemove"), systemImage: "rectangle.portrait.and.arrow.forward")
         }
-        #if os(tvOS)
-        .buttonStyle(TVSettingsButtonStyle())
-        #endif
     }
 
     // MARK: - Presentation
