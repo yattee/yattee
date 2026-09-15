@@ -176,16 +176,50 @@ struct PlaylistSelectorSheet: View {
     }
 
     private var destinationPicker: some View {
-        Picker(String(localized: "accounts.switcher.title"), selection: $selectedDestination) {
-            Text(DataContextSwitcherLabels.title(for: .local, in: appEnvironment))
-                .tag(DataContext.local)
-
-            ForEach(remoteDestinations) { account in
-                Text(DataContextSwitcherLabels.title(for: .account(account.id), in: appEnvironment))
-                    .tag(DataContext.account(account.id))
+        #if os(tvOS)
+        // A tvOS menu picker shows only its value; the name of the control has
+        // to be the row's own, so the menu's label is the whole labelled row —
+        // the same shape as the settings switcher row.
+        Menu {
+            destinationOptions
+        } label: {
+            HStack {
+                Text(String(localized: "accounts.switcher.title"))
+                Spacer(minLength: 8)
+                Text(DataContextSwitcherLabels.title(for: selectedDestination, in: appEnvironment))
+                    .foregroundStyle(.secondary)
+                    .lineLimit(1)
+                    .truncationMode(.tail)
             }
         }
+        #else
+        Picker(String(localized: "accounts.switcher.title"), selection: $selectedDestination) {
+            destinationOptions
+        }
         .pickerStyle(.menu)
+        #endif
+    }
+
+    #if os(tvOS)
+    /// The same choices, hosted by the labelled menu: a picker inside a menu
+    /// renders as checkmarked items.
+    private var destinationOptions: some View {
+        Picker(selection: $selectedDestination) {
+            destinationOptionRows
+        } label: {}
+    }
+    #else
+    private var destinationOptions: some View { destinationOptionRows }
+    #endif
+
+    @ViewBuilder private var destinationOptionRows: some View {
+        Text(DataContextSwitcherLabels.title(for: .local, in: appEnvironment))
+            .tag(DataContext.local)
+
+        ForEach(remoteDestinations) { account in
+            Text(DataContextSwitcherLabels.title(for: .account(account.id), in: appEnvironment))
+                .tag(DataContext.account(account.id))
+        }
     }
 
     /// The pick the sheet opens on: the account the app is browsing as, when
