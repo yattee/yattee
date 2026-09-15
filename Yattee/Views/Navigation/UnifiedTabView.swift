@@ -73,9 +73,13 @@ struct UnifiedTabView: View {
             // is the one surface every tab shares, so the switcher lives here
             // rather than on each screen's toolbar.
             if DataContextSwitcherVisibility.showsPickers(in: appEnvironment) {
+                // The bottom bar pins over the list without a background of its
+                // own, so sidebar rows scrolled to the end show through the
+                // switcher. A pill of its own keeps what's beneath it blurred.
                 DataContextSwitcherSettingsRow()
-                    .padding(.horizontal, 8)
-                    .padding(.vertical, 4)
+                    .padding(.horizontal, 14)
+                    .padding(.vertical, 10)
+                    .sidebarBottomBarPill()
             }
         }
         .iOS26TabFeatures(shouldShowAccessory: shouldShowAccessory, settingsManager: appEnvironment?.settingsManager)
@@ -313,6 +317,17 @@ struct UnifiedTabView: View {
     }
 
     private var settingsManager: SettingsManager? { appEnvironment?.settingsManager }
+}
+
+private extension View {
+    @ViewBuilder
+    func sidebarBottomBarPill() -> some View {
+        if #available(iOS 26, *) {
+            glassEffect(.regular, in: .capsule)
+        } else {
+            background(.regularMaterial, in: Capsule())
+        }
+    }
 }
 
 // iOS 26.1+ Tab Features
