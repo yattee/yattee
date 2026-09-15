@@ -68,6 +68,16 @@ struct UnifiedTabView: View {
             sidebarSections
         }
         .tabViewStyle(.sidebarAdaptable)
+        .tabViewSidebarBottomBar {
+            // Same chrome the macOS sidebar hangs below its list: the sidebar
+            // is the one surface every tab shares, so the switcher lives here
+            // rather than on each screen's toolbar.
+            if DataContextSwitcherVisibility.showsPickers(in: appEnvironment) {
+                DataContextSwitcherSettingsRow()
+                    .padding(.horizontal, 8)
+                    .padding(.vertical, 4)
+            }
+        }
         .iOS26TabFeatures(shouldShowAccessory: shouldShowAccessory, settingsManager: appEnvironment?.settingsManager)
         .zoomTransitionNamespace(zoomTransition)
         .zoomTransitionsEnabled(zoomTransitionsEnabled)
