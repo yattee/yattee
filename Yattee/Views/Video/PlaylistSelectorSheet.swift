@@ -239,15 +239,28 @@ struct PlaylistSelectorSheet: View {
 
     // MARK: - Sections
 
+    /// The "New Playlist" row's label. tvOS lays a `Label`'s icon nearly
+    /// against its title at this size, so the gap is spelled out there.
+    private var newPlaylistLabel: some View {
+        #if os(tvOS)
+        HStack(spacing: 20) {
+            Image(systemName: "plus.circle")
+            Text(String(localized: "playlist.new"))
+        }
+        #else
+        Label(
+            String(localized: "playlist.new"),
+            systemImage: "plus.circle"
+        )
+        #endif
+    }
+
     private var localSection: some View {
         Section {
             Button {
                 showingNewPlaylist = true
             } label: {
-                Label(
-                    String(localized: "playlist.new"),
-                    systemImage: "plus.circle"
-                )
+                newPlaylistLabel
             }
 
             if playlists.isEmpty {
@@ -274,10 +287,7 @@ struct PlaylistSelectorSheet: View {
             Button {
                 newRemotePlaylistAccount = account
             } label: {
-                Label(
-                    String(localized: "playlist.new"),
-                    systemImage: "plus.circle"
-                )
+                newPlaylistLabel
             }
 
             if let remotePlaylists = appEnvironment?.remotePlaylistsCache.playlists(for: account.id) {
