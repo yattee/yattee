@@ -18439,6 +18439,16 @@
         }
       }
     },
+    "subscriptions.account.local.device" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Yattee (This Device)"
+          }
+        }
+      }
+    },
     "subscriptions.account.pipedInstance %@" : {
       "localizations" : {
         "en" : {

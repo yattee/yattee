@@ -99,7 +99,7 @@ enum DataContextSwitcherLabels {
     /// The context's name, plus whatever the user needs to tell it apart.
     @MainActor
     static func title(for context: DataContext, in appEnvironment: AppEnvironment?) -> String {
-        guard let appEnvironment else { return String(localized: "subscriptions.account.local") }
+        guard let appEnvironment else { return String(localized: "subscriptions.account.local.device") }
 
         return title(
             for: context,

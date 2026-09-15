@@ -259,14 +259,23 @@ final class DataContextValidator {
     func displayName(for context: DataContext) -> String {
         switch context {
         case .local:
-            return String(localized: "subscriptions.account.local")
+            return localContextName
 
         case let .account(id):
             guard let account = accountsManager.account(id: id) else {
-                return String(localized: "subscriptions.account.local")
+                return localContextName
             }
             return displayName(for: account)
         }
+    }
+
+    /// "(iCloud)" only when the data actually syncs; otherwise it lives on
+    /// this device alone and the label says so.
+    var localContextName: String {
+        if appEnvironment?.settingsManager.iCloudSyncEnabled == true {
+            return String(localized: "subscriptions.account.local")
+        }
+        return String(localized: "subscriptions.account.local.device")
     }
 
     /// User-set label, else whatever the account falls back to.
