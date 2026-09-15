@@ -185,13 +185,7 @@ struct PlaylistSelectorSheet: View {
                     .tag(DataContext.account(account.id))
             }
         }
-        #if os(tvOS)
-        // A tvOS Menu dismisses the presentation it sits in; inline rows are
-        // the presentation that survives.
-        .pickerStyle(.inline)
-        #else
         .pickerStyle(.menu)
-        #endif
     }
 
     /// The pick the sheet opens on: the account the app is browsing as, when
