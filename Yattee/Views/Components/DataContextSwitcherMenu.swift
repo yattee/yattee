@@ -414,6 +414,11 @@ struct DataContextSwitcherSidebarRow: View {
                     .truncationMode(.tail)
             }
         }
+        // The sidebar bottom bar hosts the menu's label in a UIKit button that
+        // keeps its first rendering: switching accounts moved the checkmark
+        // but the pill kept naming the old context. Recreating the menu when
+        // the name changes is the part SwiftUI won't do on its own here.
+        .id(contextTitle)
         .accessibilityLabel(Text(String(localized: "accounts.switcher.title")))
         .accessibilityValue(Text(contextTitle))
     }
