@@ -76,10 +76,11 @@ struct UnifiedTabView: View {
                 // The bottom bar pins over the list without a background of its
                 // own, so sidebar rows scrolled to the end show through the
                 // switcher. A pill of its own keeps what's beneath it blurred.
-                DataContextSwitcherSettingsRow()
+                DataContextSwitcherSidebarRow()
                     .padding(.horizontal, 14)
                     .padding(.vertical, 10)
                     .sidebarBottomBarPill()
+                    .frame(maxWidth: .infinity)
             }
         }
         .iOS26TabFeatures(shouldShowAccessory: shouldShowAccessory, settingsManager: appEnvironment?.settingsManager)

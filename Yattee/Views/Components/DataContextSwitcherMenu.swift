@@ -395,6 +395,39 @@ struct DataContextSwitcherMenu: View {
 
 #endif
 
+#if os(iOS)
+/// The iPad sidebar pill's presentation: just the icon and the current
+/// account's name, centered. The pill's placement already says what the
+/// control is, so the "Account" caption the settings rows carry is dropped;
+/// assistive technology still gets it as the label.
+struct DataContextSwitcherSidebarRow: View {
+    @Environment(\.appEnvironment) private var appEnvironment
+
+    var body: some View {
+        Menu {
+            DataContextSwitcherRows()
+        } label: {
+            HStack(spacing: 6) {
+                DataContextSwitcherIcon()
+                Text(contextTitle)
+                    .lineLimit(1)
+                    .truncationMode(.tail)
+            }
+        }
+        .accessibilityLabel(Text(String(localized: "accounts.switcher.title")))
+        .accessibilityValue(Text(contextTitle))
+    }
+
+    private var contextTitle: String {
+        DataContextSwitcherLabels.title(for: currentContext, in: appEnvironment)
+    }
+
+    private var currentContext: DataContext {
+        appEnvironment?.accountsManager.currentContext ?? .local
+    }
+}
+#endif
+
 /// A settings row naming the current context, with the switcher attached.
 struct DataContextSwitcherSettingsRow: View {
     @Environment(\.appEnvironment) private var appEnvironment
