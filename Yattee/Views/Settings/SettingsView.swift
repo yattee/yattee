@@ -31,10 +31,18 @@ struct SettingsView: View {
     // MARK: - macOS Settings
 
     #if os(macOS)
+    /// Accounts stays out of the list until a source that can hold one exists
+    /// (or an account survives its source and needs cleaning up).
+    private var visibleSections: [SettingsSection] {
+        SettingsSection.allCases.filter {
+            $0 != .accounts || AccountsListView.showsSettingsEntry(in: appEnvironment)
+        }
+    }
+
     private var macOSSettings: some View {
         NavigationSplitView {
             VStack(spacing: 0) {
-                List(SettingsSection.allCases, selection: $selectedSection) { section in
+                List(visibleSections, selection: $selectedSection) { section in
                     HStack {
                         Label(section.title, systemImage: section.icon)
 
@@ -138,19 +146,21 @@ struct SettingsView: View {
                     }
                     .accessibilityIdentifier("settings.row.sources")
 
-                    NavigationLink {
-                        AccountsListView()
-                    } label: {
-                        HStack {
-                            Label(String(localized: "accounts.title"), systemImage: "person.crop.circle")
-                            Spacer()
-                            if AccountsListView.needsAttention(in: appEnvironment) {
-                                Image(systemName: "exclamationmark.circle.fill")
-                                    .foregroundStyle(.orange)
+                    if AccountsListView.showsSettingsEntry(in: appEnvironment) {
+                        NavigationLink {
+                            AccountsListView()
+                        } label: {
+                            HStack {
+                                Label(String(localized: "accounts.title"), systemImage: "person.crop.circle")
+                                Spacer()
+                                if AccountsListView.needsAttention(in: appEnvironment) {
+                                    Image(systemName: "exclamationmark.circle.fill")
+                                        .foregroundStyle(.orange)
+                                }
                             }
                         }
+                        .accessibilityIdentifier("settings.row.accounts")
                     }
-                    .accessibilityIdentifier("settings.row.accounts")
 
                     NavigationLink {
                         TVSidebarDetailContainer(systemImage: "icloud", title: String(localized: "settings.icloud.title")) { iCloudSettingsView() }
@@ -254,19 +264,21 @@ struct SettingsView: View {
                     }
                     .accessibilityIdentifier("settings.row.sources")
 
-                    NavigationLink {
-                        AccountsListView()
-                    } label: {
-                        HStack {
-                            Label(String(localized: "accounts.title"), systemImage: "person.crop.circle")
-                            Spacer()
-                            if AccountsListView.needsAttention(in: appEnvironment) {
-                                Image(systemName: "exclamationmark.circle.fill")
-                                    .foregroundStyle(.orange)
+                    if AccountsListView.showsSettingsEntry(in: appEnvironment) {
+                        NavigationLink {
+                            AccountsListView()
+                        } label: {
+                            HStack {
+                                Label(String(localized: "accounts.title"), systemImage: "person.crop.circle")
+                                Spacer()
+                                if AccountsListView.needsAttention(in: appEnvironment) {
+                                    Image(systemName: "exclamationmark.circle.fill")
+                                        .foregroundStyle(.orange)
+                                }
                             }
                         }
+                        .accessibilityIdentifier("settings.row.accounts")
                     }
-                    .accessibilityIdentifier("settings.row.accounts")
                     }
 
                     Section {

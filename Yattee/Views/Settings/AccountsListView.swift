@@ -466,6 +466,20 @@ struct AccountsListView: View {
         return parts.joined(separator: " · ")
     }
 
+    /// Whether Settings should offer the entry at all.
+    ///
+    /// With no Invidious/Piped source added there is nothing this screen can
+    /// do but explain itself, so the row waits for the first account-capable
+    /// source. Existing accounts keep it visible regardless — an orphan whose
+    /// source was deleted can only be cleaned up from here.
+    @MainActor
+    static func showsSettingsEntry(in appEnvironment: AppEnvironment?) -> Bool {
+        guard let appEnvironment else { return false }
+
+        return appEnvironment.instancesManager.hasAccountCapableInstances
+            || !appEnvironment.accountsManager.accounts.isEmpty
+    }
+
     /// Whether the settings entry should carry an attention badge.
     ///
     /// Both states the user can only clear from this screen: an orphan nothing
