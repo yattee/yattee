@@ -725,6 +725,7 @@ final class SubscriptionFeedCache {
                 "Yattee Server feed failed: \(error.localizedDescription)",
                 category: .general
             )
+            guard generation == accountGeneration else { return }
             feedLoadState = .error(.networkError(error.localizedDescription))
             isLoading = false
         }
@@ -802,6 +803,7 @@ final class SubscriptionFeedCache {
                 }
 
                 // Update progress UI
+                guard generation == accountGeneration else { return }
                 feedLoadState = .partiallyLoaded(
                     readyCount: status.readyCount,
                     pendingCount: status.pendingCount,
