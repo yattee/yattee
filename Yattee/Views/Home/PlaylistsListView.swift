@@ -9,6 +9,9 @@ import SwiftUI
 
 struct PlaylistsListView: View {
     @Environment(\.appEnvironment) private var appEnvironment
+    #if os(iOS)
+    @Environment(\.horizontalSizeClass) private var horizontalSizeClass
+    #endif
     @Namespace private var sheetTransition
     @State private var localPlaylists: [LocalPlaylist] = []
     @State private var searchText = ""
@@ -229,10 +232,11 @@ struct PlaylistsListView: View {
                 ToolbarSpacer(.flexible, placement: .primaryAction)
             }
             #endif
-            // No switcher on macOS: the sidebar row is the one persistent
-            // switcher surface there.
+            // No switcher wherever a sidebar shows one: the macOS sidebar row
+            // and the iPad sidebar's bottom bar are the persistent switcher
+            // surfaces there, so the toolbar menu is compact-width-only.
             #if !os(macOS)
-            if DataContextSwitcherVisibility.showsPickers(in: appEnvironment) {
+            if DataContextSwitcherVisibility.showsToolbarPickers(in: appEnvironment, horizontalSizeClass: horizontalSizeClass) {
                 ToolbarItem(placement: viewOptionsPlacement) {
                     DataContextSwitcherMenu()
                 }

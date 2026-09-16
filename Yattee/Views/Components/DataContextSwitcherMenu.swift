@@ -256,6 +256,20 @@ enum DataContextSwitcherVisibility {
         guard let appEnvironment else { return false }
         return appEnvironment.settingsManager.showAccountPickers && showsSwitcher(in: appEnvironment)
     }
+
+    #if os(iOS)
+    /// The iOS toolbar menus: same rule again, minus the regular widths, where
+    /// the sidebar layout already pins the switcher in its bottom bar — a
+    /// toolbar button there would say the same thing twice, the way macOS
+    /// toolbars already leave it to the sidebar row.
+    @MainActor
+    static func showsToolbarPickers(
+        in appEnvironment: AppEnvironment?,
+        horizontalSizeClass: UserInterfaceSizeClass?
+    ) -> Bool {
+        horizontalSizeClass == .compact && showsPickers(in: appEnvironment)
+    }
+    #endif
 }
 
 // MARK: - Glyph

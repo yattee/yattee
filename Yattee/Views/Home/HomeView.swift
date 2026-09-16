@@ -9,6 +9,9 @@ import SwiftUI
 
 struct HomeView: View {
     @Environment(\.appEnvironment) private var appEnvironment
+    #if os(iOS)
+    @Environment(\.horizontalSizeClass) private var horizontalSizeClass
+    #endif
     @Environment(\.scenePhase) private var scenePhase
     #if !os(tvOS) && !os(macOS)
     @Namespace private var sheetTransition
@@ -166,10 +169,11 @@ struct HomeView: View {
         .toolbarTitleDisplayMode(.inlineLarge)
         #endif
         .toolbar {
-            // No switcher on macOS: the sidebar row is the one persistent
-            // switcher surface there.
+            // No switcher wherever a sidebar shows one: the macOS sidebar row
+            // and the iPad sidebar's bottom bar are the persistent switcher
+            // surfaces there, so the toolbar menu is compact-width-only.
             #if !os(tvOS) && !os(macOS)
-            if DataContextSwitcherVisibility.showsPickers(in: appEnvironment) {
+            if DataContextSwitcherVisibility.showsToolbarPickers(in: appEnvironment, horizontalSizeClass: horizontalSizeClass) {
                 ToolbarItem(placement: .primaryAction) {
                     DataContextSwitcherMenu()
                 }

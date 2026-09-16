@@ -9,6 +9,9 @@ import SwiftUI
 
 struct HistoryListView: View {
     @Environment(\.appEnvironment) private var appEnvironment
+    #if os(iOS)
+    @Environment(\.horizontalSizeClass) private var horizontalSizeClass
+    #endif
     @Namespace private var sheetTransition
 
     /// One row, from whichever history the screen is reading.
@@ -331,10 +334,11 @@ struct HistoryListView: View {
                 ToolbarSpacer(.flexible, placement: .primaryAction)
             }
             #endif
-            // No switcher on macOS: the sidebar row is the one persistent
-            // switcher surface there.
+            // No switcher wherever a sidebar shows one: the macOS sidebar row
+            // and the iPad sidebar's bottom bar are the persistent switcher
+            // surfaces there, so the toolbar menu is compact-width-only.
             #if !os(macOS)
-            if DataContextSwitcherVisibility.showsPickers(in: appEnvironment) {
+            if DataContextSwitcherVisibility.showsToolbarPickers(in: appEnvironment, horizontalSizeClass: horizontalSizeClass) {
                 ToolbarItem(placement: viewOptionsPlacement) {
                     DataContextSwitcherMenu()
                 }
