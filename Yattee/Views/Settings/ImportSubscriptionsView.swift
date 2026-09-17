@@ -2,7 +2,8 @@
 //  ImportSubscriptionsView.swift
 //  Yattee
 //
-//  View for importing subscriptions from an Invidious or Piped instance to local storage.
+//  View for importing subscriptions from an Invidious or Piped instance into a
+//  chosen destination: the local store, or another logged-in account.
 //
 
 import SwiftUI
@@ -17,6 +18,13 @@ struct ImportSubscriptionsView: View {
     @State private var isLoading = true
     @State private var error: Error?
     @State private var showAddAllConfirmation = false
+
+    @State private var selectedDestination: DataContext = .local
+    @State private var destinationSeeded = false
+    /// Channels with a subscribe in flight, so a slow server write cannot be
+    /// double-tapped into two requests.
+    @State private var pendingChannelIDs: Set<String> = []
+    @State private var isAddingAll = false
 
     // MARK: - Accessibility Identifiers
 
@@ -36,6 +44,7 @@ struct ImportSubscriptionsView: View {
             "import.subscriptions.subscribed.\(channelID)"
         }
         static let addAllButton = "import.subscriptions.addAll"
+        static let destinationPicker = "import.subscriptions.destination"
     }
 
     // MARK: - Body
@@ -57,6 +66,7 @@ struct ImportSubscriptionsView: View {
                         } label: {
                             Label(String(localized: "import.subscriptions.addAll"), systemImage: "plus.circle")
                         }
+                        .disabled(isAddingAll)
                         .accessibilityIdentifier(AccessibilityID.addAllButton)
                     }
                 }
@@ -72,7 +82,13 @@ struct ImportSubscriptionsView: View {
             }
             .presentationCompactAdaptation(.sheet)
             .task {
+                seedDestination()
                 await loadSubscriptions()
+            }
+            // Re-asked per destination: the marks describe where the channels
+            // would be added, not where they came from.
+            .task(id: selectedDestination) {
+                await refreshSubscribedChannelIDs()
             }
     }
 
@@ -128,13 +144,57 @@ struct ImportSubscriptionsView: View {
 
     private var listView: some View {
         List {
-            ForEach(channels) { channel in
-                subscriptionRow(channel)
-                    .accessibilityIdentifier(AccessibilityID.row(channel.id.channelID))
+            if destinations.count > 1 {
+                Section {
+                    destinationPicker
+                        .accessibilityIdentifier(AccessibilityID.destinationPicker)
+                }
+            }
+
+            Section {
+                ForEach(channels) { channel in
+                    subscriptionRow(channel)
+                        .accessibilityIdentifier(AccessibilityID.row(channel.id.channelID))
+                }
             }
         }
         .opaqueSettingsFormBackground()
         .accessibilityIdentifier(AccessibilityID.list)
+    }
+
+    // MARK: - Destination Picker
+
+    private var destinationPicker: some View {
+        #if os(tvOS)
+        // A tvOS menu picker shows only its value; the name of the control has
+        // to be the row's own — the same shape as the playlist selector's.
+        Menu {
+            Picker(selection: $selectedDestination) {
+                destinationOptionRows
+            } label: {}
+        } label: {
+            HStack {
+                Text(String(localized: "accounts.switcher.title"))
+                Spacer(minLength: 8)
+                Text(DataContextSwitcherLabels.title(for: selectedDestination, in: appEnvironment))
+                    .foregroundStyle(.secondary)
+                    .lineLimit(1)
+                    .truncationMode(.tail)
+            }
+        }
+        #else
+        Picker(String(localized: "accounts.switcher.title"), selection: $selectedDestination) {
+            destinationOptionRows
+        }
+        .pickerStyle(.menu)
+        #endif
+    }
+
+    @ViewBuilder private var destinationOptionRows: some View {
+        ForEach(destinations, id: \.self) { context in
+            Text(DataContextSwitcherLabels.title(for: context, in: appEnvironment))
+                .tag(context)
+        }
     }
 
     // MARK: - Row View
@@ -190,6 +250,8 @@ struct ImportSubscriptionsView: View {
                     .foregroundStyle(.green)
                     .imageScale(.large)
                     .accessibilityIdentifier(AccessibilityID.subscribedIndicator(channel.id.channelID))
+            } else if pendingChannelIDs.contains(channel.id.channelID) {
+                ProgressView()
             } else {
                 Button {
                     addSubscription(channel)
@@ -198,6 +260,7 @@ struct ImportSubscriptionsView: View {
                         .imageScale(.large)
                 }
                 .buttonStyle(.borderless)
+                .disabled(isAddingAll)
                 .accessibilityIdentifier(AccessibilityID.addButton(channel.id.channelID))
             }
         }
@@ -210,7 +273,36 @@ struct ImportSubscriptionsView: View {
         channels.filter { !subscribedChannelIDs.contains($0.id.channelID) }
     }
 
+    /// The account whose list is being imported. Its context is not offered as
+    /// a destination — every channel is already subscribed there.
+    private var sourceAccountContext: DataContext? {
+        guard let appEnvironment,
+              let account = appEnvironment.account(forInstance: instance) else { return nil }
+        return .account(account.id)
+    }
+
+    /// Where the channels can be added: the same destinations a subscribe menu
+    /// offers, minus the source itself.
+    private var destinations: [DataContext] {
+        SubscriptionDestinations.available(in: appEnvironment)
+            .filter { $0 != sourceAccountContext }
+    }
+
     // MARK: - Actions
+
+    /// Opens on the account being browsed when it is a valid target, otherwise
+    /// local — which always is.
+    private func seedDestination() {
+        guard !destinationSeeded else { return }
+        destinationSeeded = true
+
+        guard let current = appEnvironment?.accountsManager.currentContext,
+              !current.isLocal,
+              destinations.contains(current)
+        else { return }
+
+        selectedDestination = current
+    }
 
     private func loadSubscriptions() async {
         guard let appEnvironment,
@@ -235,11 +327,6 @@ struct ImportSubscriptionsView: View {
 
             channels = fetchedChannels.sorted { $0.name.localizedCaseInsensitiveCompare($1.name) == .orderedAscending }
 
-            // Get already-subscribed channel IDs
-            subscribedChannelIDs = Set(
-                appEnvironment.dataManager.subscriptions().map(\.channelID)
-            )
-
             isLoading = false
         } catch {
             self.error = error
@@ -247,28 +334,103 @@ struct ImportSubscriptionsView: View {
         }
     }
 
+    /// Marks the rows already subscribed on the selected destination.
+    private func refreshSubscribedChannelIDs() async {
+        guard let service = appEnvironment?.subscriptionService else { return }
+
+        subscribedChannelIDs = []
+
+        let destination = selectedDestination
+        let ids = await service.subscribedChannelIDs(in: destination)
+
+        guard destination == selectedDestination else { return }
+        subscribedChannelIDs = ids ?? []
+    }
+
     private func addSubscription(_ channel: Channel) {
-        guard let dataManager = appEnvironment?.dataManager else { return }
+        guard let appEnvironment else { return }
 
-        dataManager.subscribe(to: channel)
-        subscribedChannelIDs.insert(channel.id.channelID)
+        let destination = selectedDestination
+        let channelID = channel.id.channelID
+        pendingChannelIDs.insert(channelID)
 
-        appEnvironment?.toastManager.showSuccess(String(localized: "import.subscriptions.added.title"))
+        Task {
+            defer { pendingChannelIDs.remove(channelID) }
+
+            do {
+                try await appEnvironment.subscriptionService.subscribe(to: channel, in: destination)
+            } catch SubscriptionProviderError.alreadySubscribed {
+                // The mark below is the only correction needed.
+            } catch {
+                appEnvironment.toastManager.showError(
+                    String(localized: "channel.subscribe.error.title"),
+                    subtitle: error.localizedDescription
+                )
+                return
+            }
+
+            if destination == selectedDestination {
+                subscribedChannelIDs.insert(channelID)
+            }
+
+            appEnvironment.toastManager.showSuccess(
+                String(localized: "import.subscriptions.added.title"),
+                subtitle: DataContextSwitcherLabels.title(for: destination, in: appEnvironment)
+            )
+        }
     }
 
     private func addAllSubscriptions() {
-        guard let dataManager = appEnvironment?.dataManager else { return }
+        guard let appEnvironment else { return }
 
+        let destination = selectedDestination
         let toAdd = unsubscribedChannels
-        for channel in toAdd {
-            dataManager.subscribe(to: channel)
-            subscribedChannelIDs.insert(channel.id.channelID)
-        }
+        isAddingAll = true
 
-        appEnvironment?.toastManager.showSuccess(
-            String(localized: "import.subscriptions.added.title"),
-            subtitle: String(localized: "import.subscriptions.count.subtitle \(toAdd.count)")
-        )
+        Task {
+            defer { isAddingAll = false }
+
+            var added = 0
+            var failed = 0
+
+            // Serially: a server destination gets one request at a time, not a
+            // burst the size of someone's subscription list.
+            for channel in toAdd {
+                let channelID = channel.id.channelID
+                pendingChannelIDs.insert(channelID)
+                defer { pendingChannelIDs.remove(channelID) }
+
+                do {
+                    try await appEnvironment.subscriptionService.subscribe(to: channel, in: destination)
+                    added += 1
+                } catch SubscriptionProviderError.alreadySubscribed {
+                    added += 1
+                } catch {
+                    failed += 1
+                    LoggingService.shared.error(
+                        "Failed to import subscription \(channelID): \(error.localizedDescription)",
+                        category: .general
+                    )
+                    continue
+                }
+
+                if destination == selectedDestination {
+                    subscribedChannelIDs.insert(channelID)
+                }
+            }
+
+            if failed > 0 {
+                appEnvironment.toastManager.showError(
+                    String(localized: "channel.subscribe.error.title"),
+                    subtitle: String(localized: "import.subscriptions.count.subtitle \(added)")
+                )
+            } else {
+                appEnvironment.toastManager.showSuccess(
+                    String(localized: "import.subscriptions.added.title"),
+                    subtitle: String(localized: "import.subscriptions.count.subtitle \(added)")
+                )
+            }
+        }
     }
 
     // MARK: - Errors

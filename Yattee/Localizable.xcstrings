@@ -5474,7 +5474,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "No subscriptions found on this Invidious instance."
+            "value" : "No subscriptions found on this instance."
           }
         }
       }

@@ -338,6 +338,25 @@ final class SubscriptionService {
         }
     }
 
+    /// The channel IDs subscribed on a named destination, for marking rows in
+    /// bulk flows like the instance import view.
+    ///
+    /// A cold server destination fetches its list once to answer. Nil when the
+    /// destination has no provider, the fetch failed, or the logins were
+    /// replaced while it was in flight — none of which may be shown as "not
+    /// subscribed anywhere".
+    func subscribedChannelIDs(in context: DataContext) async -> Set<String>? {
+        guard let provider = provider(for: context) else { return nil }
+
+        let generation = providerGeneration
+        if provider.cachedSubscriptions == nil {
+            try? await provider.refreshCache()
+        }
+
+        guard generation == providerGeneration else { return nil }
+        return provider.cachedSubscriptions.map { Set($0.map(\.id.channelID)) }
+    }
+
     /// Synchronously fetches subscriptions for local provider.
     /// Returns nil if the current provider is not local (requires async fetch).
     func fetchSubscriptionsSync() -> [Channel]? {
