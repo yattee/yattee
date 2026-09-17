@@ -5548,6 +5548,17 @@
     "Initializing player..." : {
 
     },
+    "instance.browse.copyURL" : {
+      "comment" : "Menu item to copy the browsed instance's URL",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Copy URL"
+          }
+        }
+      }
+    },
     "instance.browse.edit %@" : {
       "comment" : "Menu item to edit the browsed instance, with its name",
       "localizations" : {
@@ -5569,6 +5580,17 @@
         }
       }
     },
+    "instance.browse.openInBrowser" : {
+      "comment" : "Menu item to open the browsed instance's URL in the browser",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Open in Browser"
+          }
+        }
+      }
+    },
     "instance.browse.remove %@" : {
       "comment" : "Menu item to remove the browsed instance, with its name",
       "localizations" : {
@@ -5586,6 +5608,17 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Search this instance"
+          }
+        }
+      }
+    },
+    "instance.browse.signOut %@" : {
+      "comment" : "Menu item to sign out and remove an account, with its name",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sign Out %@"
           }
         }
       }

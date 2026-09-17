@@ -10,6 +10,7 @@ import SwiftUI
 struct InstanceBrowseView: View {
     @Environment(\.appEnvironment) private var appEnvironment
     @Environment(\.dismiss) private var dismiss
+    @Environment(\.openURL) private var openURL
 
     let instance: Instance
     let initialTab: BrowseTab?
@@ -54,6 +55,12 @@ struct InstanceBrowseView: View {
     @State private var showViewOptions = false
     @State private var showEditInstance = false
     @State private var showRemoveConfirmation = false
+
+    // Account actions raised from the three-dots menu. Same shapes as the
+    // edit sheet's accounts section: a nil-account login target means
+    // "create one", and the sign-out is held until its confirmation.
+    @State private var loginTarget: AccountLoginTarget?
+    @State private var pendingSignOut: Account?
     @State private var viewWidth: CGFloat = 0
     @State private var watchEntriesMap: [String: WatchEntry] = [:]
     @State private var hasInitializedTab = false
@@ -129,10 +136,53 @@ struct InstanceBrowseView: View {
         )
     }
 
-    /// Shared content of the three-dots menu: instance management on top,
-    /// view options below.
+    /// All accounts on this instance, in the accounts submenu.
+    private var instanceAccounts: [Account] {
+        appEnvironment?.accountsManager.accounts(forInstance: instance.id) ?? []
+    }
+
+    /// The account this screen's authenticated tabs actually use.
+    private var effectiveAccount: Account? {
+        appEnvironment?.account(forInstance: instance)
+    }
+
+    private func accountDisplayName(_ account: Account) -> String {
+        appEnvironment?.dataContextValidator.displayName(for: account) ?? instance.displayName
+    }
+
+    /// Shared content of the three-dots menu: refresh and accounts on top,
+    /// link actions and instance management below, view options last.
     @ViewBuilder
     private var instanceMenuContent: some View {
+        Button {
+            Task { await startContentLoad(forceRefresh: true) }
+        } label: {
+            Label(String(localized: "common.refresh"), systemImage: "arrow.clockwise")
+        }
+
+        if instance.supportsAuthentication {
+            Divider()
+            accountsMenuContent
+        }
+
+        #if !os(tvOS)
+        Divider()
+
+        Button {
+            copyInstanceURL()
+        } label: {
+            Label(String(localized: "instance.browse.copyURL"), systemImage: "doc.on.doc")
+        }
+
+        Button {
+            openURL(instance.url)
+        } label: {
+            Label(String(localized: "instance.browse.openInBrowser"), systemImage: "safari")
+        }
+        #endif
+
+        Divider()
+
         Button {
             showEditInstance = true
         } label: {
@@ -152,6 +202,66 @@ struct InstanceBrowseView: View {
         } label: {
             Label(String(localized: "viewOptions.title"), systemImage: "slider.horizontal.3")
         }
+    }
+
+    /// Sign-in entry when nobody is signed in; otherwise an accounts submenu
+    /// that switches the data context, adds a login, or signs the current one
+    /// out. Switching goes through the global context — the same semantics as
+    /// the switcher — which this view already reacts to.
+    @ViewBuilder
+    private var accountsMenuContent: some View {
+        if instanceAccounts.isEmpty {
+            Button {
+                loginTarget = .newAccount
+            } label: {
+                Label(String(localized: "login.loginToAccount"), systemImage: "person.badge.plus")
+            }
+        } else {
+            Menu {
+                ForEach(instanceAccounts) { account in
+                    Button {
+                        appEnvironment?.switchDataContext(to: .account(account.id))
+                    } label: {
+                        if account.id == effectiveAccount?.id {
+                            Label(accountDisplayName(account), systemImage: "checkmark")
+                        } else {
+                            Text(accountDisplayName(account))
+                        }
+                    }
+                    .disabled(account.id == effectiveAccount?.id)
+                }
+
+                Divider()
+
+                Button {
+                    loginTarget = .newAccount
+                } label: {
+                    Label(String(localized: "accounts.addAccount"), systemImage: "person.badge.plus")
+                }
+
+                if let active = effectiveAccount {
+                    Button(role: .destructive) {
+                        pendingSignOut = active
+                    } label: {
+                        Label(
+                            String(localized: "instance.browse.signOut \(accountDisplayName(active))"),
+                            systemImage: "rectangle.portrait.and.arrow.forward"
+                        )
+                    }
+                }
+            } label: {
+                Label(String(localized: "accounts.title"), systemImage: "person.crop.circle")
+            }
+        }
+    }
+
+    private func copyInstanceURL() {
+        #if os(iOS)
+        UIPasteboard.general.string = instance.url.absoluteString
+        #elseif os(macOS)
+        NSPasteboard.general.clearContents()
+        NSPasteboard.general.setString(instance.url.absoluteString, forType: .string)
+        #endif
     }
 
     /// View options button lives on the leading edge on macOS, trailing elsewhere.
@@ -465,6 +575,36 @@ struct InstanceBrowseView: View {
             if let accounts = InstanceDeletionDisclosure.message(for: instance, in: appEnvironment) {
                 Text(accounts)
             }
+        }
+        #if os(tvOS)
+        .fullScreenCover(item: $loginTarget) { target in
+            InstanceLoginView(instance: instance, initialUsername: storedUsername(for: target)) { credential, username in
+                storeLogin(credential: credential, username: username, target: target)
+            }
+        }
+        #else
+        .sheet(item: $loginTarget) { target in
+            InstanceLoginView(instance: instance, initialUsername: storedUsername(for: target)) { credential, username in
+                storeLogin(credential: credential, username: username, target: target)
+            }
+        }
+        #endif
+        .confirmationDialog(
+            String(localized: "accounts.remove.confirm.title \(pendingSignOut.map(accountDisplayName) ?? instance.displayName)"),
+            isPresented: Binding(
+                get: { pendingSignOut != nil },
+                set: { if !$0 { pendingSignOut = nil } }
+            ),
+            titleVisibility: .visible
+        ) {
+            Button(String(localized: "common.remove"), role: .destructive) {
+                confirmSignOut()
+            }
+            Button(String(localized: "common.cancel"), role: .cancel) {
+                pendingSignOut = nil
+            }
+        } message: {
+            Text(String(localized: "accounts.remove.confirm.message"))
         }
         .task {
             // Initialize search view model
@@ -1359,6 +1499,32 @@ struct InstanceBrowseView: View {
     private func refreshLoginState() {
         guard instance.supportsAuthentication else { return }
         isLoggedIn = appEnvironment?.isSignedIn(to: instance) ?? false
+    }
+
+    /// Files a successful login against an account, mirroring the edit sheet.
+    @discardableResult
+    private func storeLogin(credential: String, username: String, target: AccountLoginTarget) -> Bool {
+        guard let appEnvironment else { return false }
+        return AccountSignInHandler(appEnvironment: appEnvironment, instance: instance)
+            .storeLogin(credential: credential, username: username, target: target)
+    }
+
+    /// The identifier an existing account last signed in with, when this device
+    /// holds it. A new account has nobody to name yet.
+    private func storedUsername(for target: AccountLoginTarget) -> String? {
+        guard let account = target.account else { return nil }
+        return appEnvironment?.accountCredentialsManager(for: account)?.username(for: account)
+    }
+
+    private func confirmSignOut() {
+        guard let appEnvironment, let account = pendingSignOut else { return }
+        defer { pendingSignOut = nil }
+
+        // Re-resolved rather than trusted: the dialog can outlive the account,
+        // which another device may have deleted while it was up.
+        guard let account = appEnvironment.accountsManager.account(id: account.id) else { return }
+
+        appEnvironment.signOutAndRemoveAccount(account)
     }
 
     private func loadWatchEntries() {
