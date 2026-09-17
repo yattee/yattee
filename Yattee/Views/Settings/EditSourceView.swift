@@ -121,39 +121,6 @@ private struct EditRemoteServerContent: View {
                 #endif
             }
 
-            if instance.supportsHTTPBasicAuthProxy {
-                Section {
-                    #if os(tvOS)
-                    TVSettingsTextField(title: String(localized: "sources.field.username"), text: $basicAuthUsername)
-                    TVSettingsTextField(title: String(localized: "sources.field.password"), text: $basicAuthPassword, isSecure: true)
-                    #elseif os(macOS)
-                    LabeledContent(String(localized: "sources.field.username")) {
-                        TextField("", text: $basicAuthUsername)
-                            .textContentType(.username)
-                            .autocorrectionDisabled()
-                    }
-                    LabeledContent(String(localized: "sources.field.password")) {
-                        SecureField("", text: $basicAuthPassword)
-                            .textContentType(.password)
-                    }
-                    #else
-                    TextField(String(localized: "sources.field.username"), text: $basicAuthUsername)
-                        .textContentType(.username)
-                        #if os(iOS)
-                        .textInputAutocapitalization(.never)
-                        #endif
-                        .autocorrectionDisabled()
-
-                    SecureField(String(localized: "sources.field.password"), text: $basicAuthPassword)
-                        .textContentType(.password)
-                    #endif
-                } header: {
-                    Text(String(localized: instance.type == .yatteeServer ? "sources.header.auth" : "sources.header.basicAuth"))
-                } footer: {
-                    Text(String(localized: instance.type == .yatteeServer ? "sources.footer.yatteeServerAuth" : "sources.footer.basicAuth"))
-                }
-            }
-
             if instance.type == .yatteeServer {
                 // Server Info Section
                 Section {
@@ -249,6 +216,33 @@ private struct EditRemoteServerContent: View {
             }
 
             Section {
+                if instance.supportsHTTPBasicAuthProxy {
+                    #if os(tvOS)
+                    TVSettingsTextField(title: String(localized: "sources.field.username"), text: $basicAuthUsername)
+                    TVSettingsTextField(title: String(localized: "sources.field.password"), text: $basicAuthPassword, isSecure: true)
+                    #elseif os(macOS)
+                    LabeledContent(String(localized: "sources.field.username")) {
+                        TextField("", text: $basicAuthUsername)
+                            .textContentType(.username)
+                            .autocorrectionDisabled()
+                    }
+                    LabeledContent(String(localized: "sources.field.password")) {
+                        SecureField("", text: $basicAuthPassword)
+                            .textContentType(.password)
+                    }
+                    #else
+                    TextField(String(localized: "sources.field.username"), text: $basicAuthUsername)
+                        .textContentType(.username)
+                        #if os(iOS)
+                        .textInputAutocapitalization(.never)
+                        #endif
+                        .autocorrectionDisabled()
+
+                    SecureField(String(localized: "sources.field.password"), text: $basicAuthPassword)
+                        .textContentType(.password)
+                    #endif
+                }
+
                 #if os(tvOS)
                 TVSettingsToggle(
                     title: String(localized: "sources.field.allowInvalidCertificates"),
@@ -260,7 +254,13 @@ private struct EditRemoteServerContent: View {
             } header: {
                 Text(String(localized: "sources.header.security"))
             } footer: {
-                Text(String(localized: "sources.footer.allowInvalidCertificates"))
+                if instance.supportsHTTPBasicAuthProxy {
+                    Text(String(localized: instance.type == .yatteeServer ? "sources.footer.yatteeServerAuth" : "sources.footer.basicAuth"))
+                    + Text(verbatim: "\n\n")
+                    + Text(String(localized: "sources.footer.allowInvalidCertificates"))
+                } else {
+                    Text(String(localized: "sources.footer.allowInvalidCertificates"))
+                }
             }
 
             if instance.supportsVideoProxying {
