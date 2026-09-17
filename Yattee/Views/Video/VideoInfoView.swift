@@ -108,6 +108,7 @@ struct VideoInfoView: View {
     // Video details cache - stores full video details loaded from API
     @State private var loadedVideoDetails: [String: Video] = [:]
     @State private var isLoadingVideoDetails = false
+    @State private var videoDetailsLoadError: String?
     /// Combined video list including originally loaded videos and extended videos from continuation
     private var allVideos: [Video]? {
         guard let originalList = videoQueueContext?.videoList else { return nil }
@@ -131,6 +132,14 @@ struct VideoInfoView: View {
     private var displayedVideo: Video? {
         guard let base = baseVideo else { return nil }
         return loadedVideoDetails[base.id.videoID] ?? base
+    }
+
+    /// Whether the displayed video is only an ID standing in for metadata
+    /// (a server-history row whose hydration failed), so a failed details
+    /// fetch leaves nothing worth rendering.
+    private var displayedVideoIsPlaceholder: Bool {
+        guard let video = displayedVideo else { return false }
+        return video.author.name.isEmpty && video.thumbnails.isEmpty
     }
 
     private var accentColor: Color {
@@ -251,10 +260,12 @@ struct VideoInfoView: View {
 
     var body: some View {
         Group {
-            if isLoadingInitialVideo {
+            if isLoadingInitialVideo || (displayedVideoIsPlaceholder && isLoadingVideoDetails) {
                 ProgressView()
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
             } else if let error = initialVideoLoadError {
+                videoLoadErrorView(error)
+            } else if let error = videoDetailsLoadError, displayedVideoIsPlaceholder {
                 videoLoadErrorView(error)
             } else if displayedVideo != nil {
                 videoContent
@@ -326,6 +337,7 @@ struct VideoInfoView: View {
             comments = []
             commentsState = .idle
             commentsContinuation = nil
+            videoDetailsLoadError = nil
             scrollViewID = UUID() // Reset scroll position
             // Don't reset scrollOffset here - let the new scroll view report its geometry
             // Resetting to 0 causes the blur to jump to an incorrect position briefly
@@ -775,7 +787,9 @@ struct VideoInfoView: View {
     }
     #endif
 
-    /// Error view shown when video fails to load (videoID init mode only).
+    /// Error view shown when the video fails to load — either the initial
+    /// fetch in videoID mode, or the details fetch for a placeholder video
+    /// that has no metadata of its own to fall back on.
     @ViewBuilder
     private func videoLoadErrorView(_ message: String) -> some View {
         ContentUnavailableView {
@@ -786,6 +800,7 @@ struct VideoInfoView: View {
             Button(String(localized: "common.retry")) {
                 Task {
                     await loadInitialVideoIfNeeded()
+                    await loadVideoDetails()
                 }
             }
         }
@@ -2168,6 +2183,7 @@ struct VideoInfoView: View {
             }
 
             isLoadingVideoDetails = true
+            videoDetailsLoadError = nil
             do {
                 // Use extractURL method - just use the video part
                 let (fullVideo, _, _) = try await contentService.extractURL(originalURL, instance: instance)
@@ -2176,7 +2192,9 @@ struct VideoInfoView: View {
                 loadedVideoDetails[videoID] = fullVideo
                 CachedChannelData.cacheAuthor(fullVideo.author)
             } catch {
-                // Fail silently - use partial video data we have
+                // Use the partial video data we have; the body surfaces the
+                // error only when the video is a bare placeholder.
+                videoDetailsLoadError = error.localizedDescription
             }
             isLoadingVideoDetails = false
             return
@@ -2191,6 +2209,7 @@ struct VideoInfoView: View {
         }
 
         isLoadingVideoDetails = true
+        videoDetailsLoadError = nil
 
         do {
             let fullVideo = try await contentService.video(
@@ -2202,7 +2221,9 @@ struct VideoInfoView: View {
             loadedVideoDetails[videoID] = fullVideo
             CachedChannelData.cacheAuthor(fullVideo.author)
         } catch {
-            // Fail silently - just use the partial video data we have
+            // Use the partial video data we have; the body surfaces the
+            // error only when the video is a bare placeholder.
+            videoDetailsLoadError = error.localizedDescription
         }
 
         isLoadingVideoDetails = false
