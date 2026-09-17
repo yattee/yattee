@@ -5548,12 +5548,34 @@
     "Initializing player..." : {
 
     },
+    "instance.browse.edit %@" : {
+      "comment" : "Menu item to edit the browsed instance, with its name",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Edit %@"
+          }
+        }
+      }
+    },
     "instance.browse.noVideos" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "No videos available from this instance"
+          }
+        }
+      }
+    },
+    "instance.browse.remove %@" : {
+      "comment" : "Menu item to remove the browsed instance, with its name",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Remove %@"
           }
         }
       }

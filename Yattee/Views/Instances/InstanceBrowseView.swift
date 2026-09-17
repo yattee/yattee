@@ -9,6 +9,7 @@ import SwiftUI
 
 struct InstanceBrowseView: View {
     @Environment(\.appEnvironment) private var appEnvironment
+    @Environment(\.dismiss) private var dismiss
 
     let instance: Instance
     let initialTab: BrowseTab?
@@ -51,6 +52,8 @@ struct InstanceBrowseView: View {
     
     // View options UI state
     @State private var showViewOptions = false
+    @State private var showEditInstance = false
+    @State private var showRemoveConfirmation = false
     @State private var viewWidth: CGFloat = 0
     @State private var watchEntriesMap: [String: WatchEntry] = [:]
     @State private var hasInitializedTab = false
@@ -126,6 +129,31 @@ struct InstanceBrowseView: View {
         )
     }
 
+    /// Shared content of the three-dots menu: instance management on top,
+    /// view options below.
+    @ViewBuilder
+    private var instanceMenuContent: some View {
+        Button {
+            showEditInstance = true
+        } label: {
+            Label(String(localized: "instance.browse.edit \(instance.displayName)"), systemImage: "pencil")
+        }
+
+        Button(role: .destructive) {
+            showRemoveConfirmation = true
+        } label: {
+            Label(String(localized: "instance.browse.remove \(instance.displayName)"), systemImage: "trash")
+        }
+
+        Divider()
+
+        Button {
+            showViewOptions = true
+        } label: {
+            Label(String(localized: "viewOptions.title"), systemImage: "slider.horizontal.3")
+        }
+    }
+
     /// View options button lives on the leading edge on macOS, trailing elsewhere.
     private var viewOptionsPlacement: ToolbarItemPlacement {
         #if os(macOS)
@@ -165,10 +193,10 @@ struct InstanceBrowseView: View {
                         tvOSFiltersMenu
                     }
 
-                    Button {
-                        showViewOptions = true
+                    Menu {
+                        instanceMenuContent
                     } label: {
-                        Label(String(localized: "viewOptions.title"), systemImage: "slider.horizontal.3")
+                        Label(String(localized: "common.more"), systemImage: "ellipsis")
                     }
                 }
                 .focusSection()
@@ -345,12 +373,12 @@ struct InstanceBrowseView: View {
         .navigationTitle(instance.displayName)
         .toolbarTitleDisplayMode(.inlineLarge)
         .toolbar {
-            // View options first so it is the leftmost navigation item on macOS.
+            // Instance menu first so it is the leftmost navigation item on macOS.
             ToolbarItem(placement: viewOptionsPlacement) {
-                Button {
-                    showViewOptions = true
+                Menu {
+                    instanceMenuContent
                 } label: {
-                    Label(String(localized: "viewOptions.title"), systemImage: "slider.horizontal.3")
+                    Label(String(localized: "common.more"), systemImage: "ellipsis")
                 }
                 .liquidGlassTransitionSource(id: "instanceBrowseViewOptions", in: sheetTransition)
                 #if os(macOS)
@@ -409,6 +437,35 @@ struct InstanceBrowseView: View {
                 .liquidGlassSheetContent(sourceID: "instanceBrowseViewOptions", in: sheetTransition)
         }
         #endif
+        #if os(tvOS)
+        .fullScreenCover(isPresented: $showEditInstance) {
+            TVSidebarDetailContainer(systemImage: "pencil.circle", title: String(localized: "sources.editSource")) {
+                EditSourceView(source: .remoteServer(instance))
+            }
+            .background(Color.black.ignoresSafeArea())
+        }
+        #else
+        .sheet(isPresented: $showEditInstance) {
+            EditSourceView(source: .remoteServer(instance))
+        }
+        #endif
+        .confirmationDialog(
+            String(localized: "sources.delete.confirmation.single \(instance.displayName)"),
+            isPresented: $showRemoveConfirmation,
+            titleVisibility: .visible
+        ) {
+            Button(String(localized: "common.delete"), role: .destructive) {
+                appEnvironment?.removeInstance(instance)
+                dismiss()
+            }
+            Button(String(localized: "common.cancel"), role: .cancel) {}
+        } message: {
+            // The same cascade runs from here as from Settings, so the same
+            // logins go with it.
+            if let accounts = InstanceDeletionDisclosure.message(for: instance, in: appEnvironment) {
+                Text(accounts)
+            }
+        }
         .task {
             // Initialize search view model
             if let appEnvironment {
