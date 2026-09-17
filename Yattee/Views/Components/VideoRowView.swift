@@ -70,6 +70,15 @@ struct VideoRowView: View {
     }
     #endif
 
+    private var accessibilityLabelText: String {
+        var parts = [video.displayTitle(using: appEnvironment?.deArrowBrandingProvider), video.author.name]
+        let duration = video.formattedDuration
+        if !duration.isEmpty {
+            parts.append(duration)
+        }
+        return parts.joined(separator: ", ")
+    }
+
     var body: some View {
         HStack(alignment: .top, spacing: 12) {
             // Index number (for playlists)
@@ -94,7 +103,7 @@ struct VideoRowView: View {
         }
         .contentShape(Rectangle())
         .accessibilityIdentifier("video.row.\(video.id.videoID)")
-        .accessibilityLabel("video.row.\(video.id.videoID)")
+        .accessibilityLabel(accessibilityLabelText)
     }
     
     @ViewBuilder
