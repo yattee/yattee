@@ -126,6 +126,11 @@ extension SettingsManager {
     /// dynamic platform color that resolves per trait environment, so all consumers
     /// (root tint and direct readers) adapt to light/dark automatically.
     var resolvedAccentColor: Color {
+        #if os(tvOS)
+        // tvOS keeps the system default accent; user-picked colors (possibly
+        // synced from iOS via iCloud) must never override it.
+        return .accentColor
+        #else
         let light = resolvedLightAccentColor
         guard useSeparateDarkAccentColor else { return light }
         let dark = resolvedDarkAccentColor
@@ -138,6 +143,7 @@ extension SettingsManager {
         return Color(uiColor: UIColor { traits in
             UIColor(traits.userInterfaceStyle == .dark ? dark : light)
         })
+        #endif
         #endif
     }
 
