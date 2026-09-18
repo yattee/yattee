@@ -58,6 +58,11 @@ struct Instance: Identifiable, Codable, Hashable, Sendable {
     /// The base URL of the instance.
     let url: URL
 
+    /// Optional URL of the web frontend, when it differs from the API URL
+    /// (Piped serves its API and frontend from separate hosts). Used for
+    /// browser-facing actions (open in browser, copy link) — never for API calls.
+    var frontendURL: URL?
+
     /// Optional user-defined name for this instance.
     var name: String?
 
@@ -102,6 +107,7 @@ struct Instance: Identifiable, Codable, Hashable, Sendable {
         id: UUID = UUID(),
         type: InstanceType,
         url: URL,
+        frontendURL: URL? = nil,
         name: String? = nil,
         isEnabled: Bool = true,
         dateAdded: Date = Date(),
@@ -113,6 +119,7 @@ struct Instance: Identifiable, Codable, Hashable, Sendable {
         self.id = id
         self.type = type
         self.url = url
+        self.frontendURL = frontendURL
         self.name = name
         self.isEnabled = isEnabled
         self.dateAdded = dateAdded
@@ -127,6 +134,7 @@ struct Instance: Identifiable, Codable, Hashable, Sendable {
         id = try container.decode(UUID.self, forKey: .id)
         type = try container.decode(InstanceType.self, forKey: .type)
         url = try container.decode(URL.self, forKey: .url)
+        frontendURL = try container.decodeIfPresent(URL.self, forKey: .frontendURL)
         name = try container.decodeIfPresent(String.self, forKey: .name)
         isEnabled = try container.decode(Bool.self, forKey: .isEnabled)
         dateAdded = try container.decode(Date.self, forKey: .dateAdded)
@@ -158,6 +166,12 @@ struct Instance: Identifiable, Codable, Hashable, Sendable {
         components.user = nil
         components.password = nil
         return components.url?.absoluteString ?? url.absoluteString
+    }
+
+    /// The URL browser-facing actions should use: the web frontend when one is
+    /// configured, else the API URL.
+    var browseURL: URL {
+        frontendURL ?? url
     }
 
     var contentSource: ContentSource {

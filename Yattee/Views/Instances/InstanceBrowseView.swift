@@ -175,7 +175,7 @@ struct InstanceBrowseView: View {
         }
 
         Button {
-            openURL(instance.url)
+            openURL(instance.browseURL)
         } label: {
             Label(String(localized: "instance.browse.openInBrowser"), systemImage: "safari")
         }
@@ -257,10 +257,10 @@ struct InstanceBrowseView: View {
 
     private func copyInstanceURL() {
         #if os(iOS)
-        UIPasteboard.general.string = instance.url.absoluteString
+        UIPasteboard.general.string = instance.browseURL.absoluteString
         #elseif os(macOS)
         NSPasteboard.general.clearContents()
-        NSPasteboard.general.setString(instance.url.absoluteString, forType: .string)
+        NSPasteboard.general.setString(instance.browseURL.absoluteString, forType: .string)
         #endif
     }
 

@@ -36,6 +36,10 @@ private struct EditRemoteServerContent: View {
     @State private var allowInvalidCertificates: Bool
     @State private var proxiesVideos: Bool
 
+    // Piped serves its API and web frontend from separate hosts; browser-facing
+    // actions (open in browser, copy link) use this URL when set.
+    @State private var frontendURLString: String
+
     // HTTP Basic Auth credentials (for any instance type behind a reverse proxy;
     // required for Yattee Server, optional for Invidious/Piped/PeerTube).
     @State private var basicAuthUsername: String = ""
@@ -66,6 +70,7 @@ private struct EditRemoteServerContent: View {
         _isEnabled = State(initialValue: instance.isEnabled)
         _allowInvalidCertificates = State(initialValue: instance.allowInvalidCertificates)
         _proxiesVideos = State(initialValue: instance.proxiesVideos)
+        _frontendURLString = State(initialValue: instance.frontendURL?.absoluteString ?? "")
     }
 
     var body: some View {
@@ -119,6 +124,27 @@ private struct EditRemoteServerContent: View {
                 TextField(String(localized: "sources.field.name"), text: $name)
                 Toggle(String(localized: "sources.field.enabled"), isOn: $isEnabled)
                 #endif
+            }
+
+            if instance.type == .piped {
+                Section {
+                    #if os(tvOS)
+                    TVSettingsTextField(title: String(localized: "sources.field.frontendURL"), text: $frontendURLString)
+                    #elseif os(macOS)
+                    LabeledContent(String(localized: "sources.field.frontendURL")) {
+                        TextField("", text: $frontendURLString)
+                            .autocorrectionDisabled()
+                    }
+                    #else
+                    TextField(String(localized: "sources.field.frontendURL"), text: $frontendURLString)
+                        .textContentType(.URL)
+                        .keyboardType(.URL)
+                        .textInputAutocapitalization(.never)
+                        .autocorrectionDisabled()
+                    #endif
+                } footer: {
+                    Text(String(localized: "sources.footer.frontendURL"))
+                }
             }
 
             if instance.type == .yatteeServer {
@@ -464,6 +490,11 @@ private struct EditRemoteServerContent: View {
         updated.isEnabled = isEnabled
         updated.allowInvalidCertificates = allowInvalidCertificates
         updated.proxiesVideos = proxiesVideos
+
+        if instance.type == .piped {
+            let trimmed = frontendURLString.trimmingCharacters(in: .whitespacesAndNewlines)
+            updated.frontendURL = trimmed.isEmpty ? nil : Instance.normalizeSourceURL(trimmed)
+        }
 
         // Save / clear HTTP Basic Auth credentials. Yattee Server never auto-clears
         // (credentials are required and the user re-enters to overwrite). Piped never

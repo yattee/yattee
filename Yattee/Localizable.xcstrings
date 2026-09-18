@@ -16794,6 +16794,17 @@
         }
       }
     },
+    "sources.field.frontendURL" : {
+      "comment" : "Field label for optional Piped web frontend URL",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Frontend URL"
+          }
+        }
+      }
+    },
     "sources.field.name" : {
       "comment" : "Field label for source name",
       "localizations" : {
@@ -17021,6 +17032,17 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Select a folder from Files app to add to your sources."
+          }
+        }
+      }
+    },
+    "sources.footer.frontendURL" : {
+      "comment" : "Footer text explaining the optional Piped web frontend URL",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Optional. Piped often serves its web frontend from a different address than the API. When set, it is used for opening this instance in the browser and copying its link. Leave empty to use the API URL."
           }
         }
       }
