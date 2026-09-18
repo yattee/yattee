@@ -10053,6 +10053,16 @@
         }
       }
     },
+    "settings.advanced.debug.buildDate" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Build Date"
+          }
+        }
+      }
+    },
     "settings.advanced.debug.buildNumber" : {
       "localizations" : {
         "en" : {

@@ -108,6 +108,7 @@ struct AboutView: View {
         SettingsFormSection("settings.about.versionInfo") {
             versionInfoRow(label: String(localized: "settings.advanced.debug.appVersion"), value: appVersion)
             versionInfoRow(label: String(localized: "settings.advanced.debug.buildNumber"), value: buildNumber)
+            versionInfoRow(label: String(localized: "settings.advanced.debug.buildDate"), value: buildDate)
             versionInfoRow(label: String(localized: "settings.advanced.debug.osVersion"), value: osVersion)
         }
     }
@@ -205,6 +206,13 @@ struct AboutView: View {
 
     private var buildNumber: String {
         Bundle.main.object(forInfoDictionaryKey: "CFBundleVersion") as? String ?? "Unknown"
+    }
+
+    private var buildDate: String {
+        guard let executableURL = Bundle.main.executableURL,
+              let date = (try? executableURL.resourceValues(forKeys: [.contentModificationDateKey]))?.contentModificationDate
+        else { return "Unknown" }
+        return date.formatted(date: .abbreviated, time: .shortened)
     }
 
     private var osVersion: String {
