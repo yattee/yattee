@@ -1173,7 +1173,7 @@ struct VideoInfoView: View {
 
                 // Share button
                 if let video = displayedVideo {
-                    ShareLink(item: video.shareURL) {
+                    ShareLink(item: appEnvironment?.shareURL(for: video) ?? video.shareURL) {
                         #if os(macOS)
                         Label(String(localized: "video.share"), systemImage: "square.and.arrow.up")
                             .font(.body)

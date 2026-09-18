@@ -580,6 +580,27 @@ extension SettingsManager {
         }
     }
 
+    // MARK: - Sharing Settings
+
+    /// Whether share links to YouTube videos point at the active instance's
+    /// web watch page instead of youtube.com. Default is true.
+    /// Videos the active instance can't serve keep their original URL.
+    /// This is a local-only setting (not synced to iCloud).
+    var privacyFrontendSharingEnabled: Bool {
+        get {
+            if let cached = _privacyFrontendSharingEnabled { return cached }
+            // Default to true if not set
+            if localDefaults.object(forKey: "privacyFrontendSharingEnabled") == nil {
+                return true
+            }
+            return localDefaults.bool(forKey: "privacyFrontendSharingEnabled")
+        }
+        set {
+            _privacyFrontendSharingEnabled = newValue
+            localDefaults.set(newValue, forKey: "privacyFrontendSharingEnabled")
+        }
+    }
+
     // MARK: - Link Action Settings
 
     /// Default action when opening links from share extension or URL schemes.

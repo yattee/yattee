@@ -203,6 +203,9 @@ final class SettingsManager {
     // Handoff settings
     var _handoffEnabled: Bool?
 
+    // Sharing settings
+    var _privacyFrontendSharingEnabled: Bool?
+
     // Remote Control settings
     var _remoteControlCustomDeviceName: String?
     var _remoteControlHideWhenBackgrounded: Bool?
@@ -541,6 +544,7 @@ final class SettingsManager {
         _queueAutoPlayNext = nil
         _queueAutoPlayCountdown = nil
         _handoffEnabled = nil
+        _privacyFrontendSharingEnabled = nil
         _defaultLinkAction = nil
         _remoteControlCustomDeviceName = nil
         _remoteControlHideWhenBackgrounded = nil

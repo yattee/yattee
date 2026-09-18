@@ -10,6 +10,8 @@
 import SwiftUI
 
 struct PlayerPillButtonView: View {
+    @Environment(\.appEnvironment) private var appEnvironment
+
     let configuration: ControlButtonConfiguration
     let isPlaying: Bool
     let hasNext: Bool
@@ -199,7 +201,7 @@ struct PlayerPillButtonView: View {
     private var shareButton: some View {
         Group {
             if let video {
-                ShareLink(item: video.shareURL) {
+                ShareLink(item: appEnvironment?.shareURL(for: video) ?? video.shareURL) {
                     genericButtonLabel
                 }
                 .buttonStyle(.plain)

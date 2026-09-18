@@ -280,7 +280,7 @@ struct VideoContextMenuContent: View {
 
         // Share
         #if !os(tvOS)
-        ShareLink(item: video.shareURL) {
+        ShareLink(item: appEnvironment?.shareURL(for: video) ?? video.shareURL) {
             Label(String(localized: "video.context.share"), systemImage: "square.and.arrow.up")
         }
         #endif

@@ -191,7 +191,7 @@ struct VideoSwipeActionsModifier: ViewModifier {
     private func shareVideo() {
         #if os(iOS)
         let activityVC = UIActivityViewController(
-            activityItems: [video.shareURL],
+            activityItems: [appEnvironment?.shareURL(for: video) ?? video.shareURL],
             applicationActivities: nil
         )
         if let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
@@ -217,7 +217,7 @@ struct VideoSwipeActionsModifier: ViewModifier {
         #elseif os(macOS)
         let pasteboard = NSPasteboard.general
         pasteboard.clearContents()
-        pasteboard.setString(video.shareURL.absoluteString, forType: .string)
+        pasteboard.setString((appEnvironment?.shareURL(for: video) ?? video.shareURL).absoluteString, forType: .string)
         #endif
     }
 

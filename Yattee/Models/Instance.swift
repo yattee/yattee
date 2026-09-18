@@ -174,6 +174,18 @@ struct Instance: Identifiable, Codable, Hashable, Sendable {
         frontendURL ?? url
     }
 
+    /// Base URL of the web watch page for building shareable YouTube links,
+    /// when this instance has one: Invidious serves its frontend at the API
+    /// URL, Piped needs the separately configured frontend URL (its API host
+    /// has no watch pages), and Yattee Server has no web frontend at all.
+    var watchPageBaseURL: URL? {
+        switch type {
+        case .invidious: return frontendURL ?? url
+        case .piped: return frontendURL
+        case .peertube, .yatteeServer: return nil
+        }
+    }
+
     var contentSource: ContentSource {
         type.contentSource(for: url)
     }

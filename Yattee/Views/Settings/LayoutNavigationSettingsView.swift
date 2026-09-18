@@ -22,6 +22,7 @@ struct LayoutNavigationSettingsView: View {
                 #else
                 VideoActionsSection(settings: settings)
                 LinkActionSection(settings: settings)
+                SharingSection(settings: settings)
                 ClipboardSection(settings: settings)
                 #endif
                 #if os(iOS)
@@ -142,6 +143,32 @@ private struct LinkActionSection: View {
         }
     }
 }
+
+// MARK: - Sharing Section
+
+#if !os(tvOS)
+private struct SharingSection: View {
+    @Environment(\.appEnvironment) private var appEnvironment
+    @Bindable var settings: SettingsManager
+
+    /// Shown only when a source with a web watch page exists — without one
+    /// the toggle can't change anything.
+    private var hasPrivacyFrontendSource: Bool {
+        appEnvironment?.instancesManager.enabledInstances.contains { $0.watchPageBaseURL != nil } ?? false
+    }
+
+    var body: some View {
+        if hasPrivacyFrontendSource {
+            SettingsFormSection("settings.behavior.sharing.header", footer: "settings.behavior.privacyFrontendSharing.footer") {
+                Toggle(
+                    String(localized: "settings.behavior.privacyFrontendSharing"),
+                    isOn: $settings.privacyFrontendSharingEnabled
+                )
+            }
+        }
+    }
+}
+#endif
 
 // MARK: - Clipboard Section
 

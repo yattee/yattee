@@ -670,7 +670,7 @@ struct MacOSControlsSectionRenderer: View {
     @ViewBuilder
     private var shareButton: some View {
         if let video = actions.currentVideo {
-            ShareLink(item: video.shareURL) {
+            ShareLink(item: appEnvironment?.shareURL(for: video) ?? video.shareURL) {
                 buttonLabel(systemImage: "square.and.arrow.up")
             }
             .buttonStyle(buttonStyleForContext)

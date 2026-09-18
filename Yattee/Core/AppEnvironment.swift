@@ -756,6 +756,28 @@ final class AppEnvironment {
         }
     }
 
+    // MARK: - Sharing
+
+    /// URL for sharing a video, honoring the privacy-frontend sharing setting.
+    ///
+    /// When enabled, YouTube videos are shared as links to the active
+    /// instance's web watch page. Videos the active instance doesn't serve
+    /// (PeerTube, extracted sources) and instances without a web frontend
+    /// keep the video's original share URL.
+    func shareURL(for video: Video) -> URL {
+        guard settingsManager.privacyFrontendSharingEnabled,
+              case .global(let provider) = video.id.source,
+              provider == ContentSource.youtubeProvider,
+              let base = instancesManager.activeInstance?.watchPageBaseURL,
+              var components = URLComponents(url: base, resolvingAgainstBaseURL: false)
+        else {
+            return video.shareURL
+        }
+        components.path += "/watch"
+        components.queryItems = [URLQueryItem(name: "v", value: video.id.videoID)]
+        return components.url ?? video.shareURL
+    }
+
     // MARK: - Notifications
 
     /// Ensures the notification infrastructure is enabled (system permission + master toggle + background refresh).

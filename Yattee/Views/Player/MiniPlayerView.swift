@@ -572,7 +572,7 @@ struct MiniPlayerView: View {
     @ViewBuilder
     private func shareButton(config: ControlButtonConfiguration) -> some View {
         if let video = currentVideo {
-            ShareLink(item: video.shareURL) {
+            ShareLink(item: appEnvironment?.shareURL(for: video) ?? video.shareURL) {
                 Image(systemName: "square.and.arrow.up")
                     .font(isTabAccessory ? .title3 : .title2)
                     .frame(width: 32, height: 32)

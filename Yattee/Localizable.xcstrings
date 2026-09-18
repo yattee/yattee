@@ -11598,6 +11598,26 @@
         }
       }
     },
+    "settings.behavior.privacyFrontendSharing" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Use Privacy Frontend URLs When Sharing"
+          }
+        }
+      }
+    },
+    "settings.behavior.privacyFrontendSharing.footer" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Share links to YouTube videos point to the current source's watch page instead of youtube.com. Videos the current source can't open keep their original link."
+          }
+        }
+      }
+    },
     "settings.behavior.searchHistoryLimit" : {
       "comment" : "Label for search history limit picker",
       "localizations" : {
@@ -11638,6 +11658,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "%lld queries"
+          }
+        }
+      }
+    },
+    "settings.behavior.sharing.header" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sharing"
           }
         }
       }

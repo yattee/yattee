@@ -11,6 +11,8 @@ import SwiftUI
 
 /// Renders a horizontal row of control buttons based on layout configuration.
 struct ControlsSectionRenderer: View {
+    @Environment(\.appEnvironment) private var appEnvironment
+
     let section: LayoutSection
     let actions: PlayerControlsActions
     let globalSettings: GlobalLayoutSettings
@@ -925,7 +927,7 @@ struct ControlsSectionRenderer: View {
     @ViewBuilder
     private var shareButton: some View {
         if let video = actions.currentVideo {
-            ShareLink(item: video.shareURL) {
+            ShareLink(item: appEnvironment?.shareURL(for: video) ?? video.shareURL) {
                 buttonContent(systemImage: "square.and.arrow.up", tint: .white)
             }
         }
