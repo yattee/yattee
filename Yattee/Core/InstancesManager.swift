@@ -299,9 +299,19 @@ final class InstancesManager {
             // Extracted content requires Yattee Server (yt-dlp)
             return yatteeServerInstances.first
         case .global, .federated:
-            // YouTube content - prefer Yattee Server, fall back to other YouTube-capable instances
-            return enabledYatteeServerInstances.first
-                ?? enabledInstances.first(where: \.isYouTubeInstance)
+            // YouTube content - prefer Yattee Server (the active one if it is one),
+            // then the active instance, then any other YouTube-capable instance
+            let active = activeInstance
+            if let active, active.isYatteeServerInstance {
+                return active
+            }
+            if let yatteeServer = enabledYatteeServerInstances.first {
+                return yatteeServer
+            }
+            if let active, active.isYouTubeInstance {
+                return active
+            }
+            return enabledInstances.first(where: \.isYouTubeInstance)
         }
     }
 
