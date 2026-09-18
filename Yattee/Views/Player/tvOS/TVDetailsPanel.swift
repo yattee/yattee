@@ -134,7 +134,8 @@ struct TVDetailsPanel: View {
             if let description = video?.description, !description.isEmpty {
                 TVScrollableDescription(
                     description: description,
-                    isScrollLocked: $isDescriptionScrollLocked
+                    isScrollLocked: $isDescriptionScrollLocked,
+                    overlaysDarkBackground: true
                 )
                 .padding(.top, isDescriptionScrollLocked ? 24 : 8)
             }
@@ -310,6 +311,9 @@ struct TVScrollableDescription: View {
     let description: String
     @Binding var isScrollLocked: Bool
     var showsHeader: Bool = true
+    /// The player details panel always sits over a dark backdrop, so it keeps
+    /// white text; regular pages use adaptive colors for the light scheme.
+    var overlaysDarkBackground: Bool = false
 
     @FocusState private var isFocused: Bool
     @State private var scrollOffset: CGFloat = 0
@@ -328,7 +332,7 @@ struct TVScrollableDescription: View {
         } label: {
             descriptionContent
         }
-        .buttonStyle(TVDescriptionButtonStyle(isFocused: isFocused, isLocked: isScrollLocked))
+        .buttonStyle(TVDescriptionButtonStyle(isFocused: isFocused, isLocked: isScrollLocked, overlaysDarkBackground: overlaysDarkBackground))
         .focused($isFocused)
         .onMoveCommand { direction in
             guard isScrollLocked else { return }
@@ -363,14 +367,14 @@ struct TVScrollableDescription: View {
                 HStack {
                     Text("player.description")
                         .font(.headline)
-                        .foregroundStyle(.white.opacity(0.7))
+                        .foregroundStyle(overlaysDarkBackground ? AnyShapeStyle(.white.opacity(0.7)) : AnyShapeStyle(.secondary))
 
                     Spacer()
 
                     if isFocused {
                         Text(isScrollLocked ? "player.description.scrollToClose" : "player.description.clickToExpand")
                             .font(.callout)
-                            .foregroundStyle(.white.opacity(0.5))
+                            .foregroundStyle(overlaysDarkBackground ? AnyShapeStyle(.white.opacity(0.5)) : AnyShapeStyle(.tertiary))
                     }
                 }
             }
@@ -384,7 +388,7 @@ struct TVScrollableDescription: View {
                 .overlay(alignment: .topLeading) {
                     Text(description)
                         .font(.body)
-                        .foregroundStyle(.white.opacity(0.9))
+                        .foregroundStyle(overlaysDarkBackground ? AnyShapeStyle(.white.opacity(0.9)) : AnyShapeStyle(.primary))
                         .lineLimit(nil)
                         .fixedSize(horizontal: false, vertical: true)
                         .multilineTextAlignment(.leading)
@@ -402,17 +406,22 @@ struct TVScrollableDescription: View {
 struct TVDescriptionButtonStyle: ButtonStyle {
     let isFocused: Bool
     let isLocked: Bool
+    var overlaysDarkBackground: Bool = false
+
+    private var highlightColor: Color {
+        overlaysDarkBackground ? .white : .primary
+    }
 
     func makeBody(configuration: Configuration) -> some View {
         configuration.label
             .padding(16)
             .background(
                 RoundedRectangle(cornerRadius: 12)
-                    .fill(isFocused ? (isLocked ? .white.opacity(0.2) : .white.opacity(0.1)) : .clear)
+                    .fill(isFocused ? (isLocked ? highlightColor.opacity(0.2) : highlightColor.opacity(0.1)) : .clear)
             )
             .overlay(
                 RoundedRectangle(cornerRadius: 12)
-                    .stroke(isLocked ? .white.opacity(0.5) : .clear, lineWidth: 2)
+                    .stroke(isLocked ? highlightColor.opacity(0.5) : .clear, lineWidth: 2)
             )
             .scaleEffect(configuration.isPressed ? 0.98 : 1.0)
             .animation(.easeInOut(duration: 0.1), value: configuration.isPressed)
