@@ -134,7 +134,15 @@ struct TVPlayerView: View {
                         .padding(.horizontal, 200)
                         .padding(.vertical, 80)
                 }
+                // Covers don't inherit the environment applied below.
+                .environment(\.colorScheme, .dark)
             }
+            // The player always sits over dark video, and its overlays
+            // (details panel, quality/queue panels) hardcode white text.
+            // Under the light color scheme, system controls (segmented
+            // picker, bordered buttons) and materials would otherwise
+            // render light-mode styles that are unreadable there.
+            .environment(\.colorScheme, .dark)
     }
 
     // MARK: - Quality Panel Content
