@@ -1137,11 +1137,8 @@ struct TVFailureButtonStyle: ButtonStyle {
 
     func makeBody(configuration: Configuration) -> some View {
         configuration.label
-            .glassBackground(
-                isFocused ? .tinted(.white.opacity(0.25)) : .regular,
-                in: .capsule,
-                fallback: isFocused ? .ultraThickMaterial : .ultraThinMaterial
-            )
+            .foregroundStyle(isFocused ? Color.black : .white)
+            .modifier(TVFocusBackground(isFocused: isFocused, shape: .capsule))
             .scaleEffect(configuration.isPressed ? 0.95 : (isFocused ? 1.08 : 1.0))
             .animation(.easeInOut(duration: 0.15), value: isFocused)
             .animation(.easeInOut(duration: 0.1), value: configuration.isPressed)

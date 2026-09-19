@@ -345,6 +345,29 @@ private struct TVActionButtonLabel: View {
 
 // MARK: - Button Styles
 
+/// Focus background for the player controls. Materials render nearly transparent
+/// over the video layer on A8 hardware (Apple TV HD), so the focused state must
+/// be a solid fill — a material-only difference is invisible there.
+struct TVFocusBackground: ViewModifier {
+    let isFocused: Bool
+    let shape: GlassShape
+
+    func body(content: Content) -> some View {
+        if isFocused {
+            switch shape {
+            case .rect(let cornerRadius):
+                content.background(Color.white.opacity(0.92), in: RoundedRectangle(cornerRadius: cornerRadius))
+            case .capsule:
+                content.background(Color.white.opacity(0.92), in: Capsule())
+            case .circle:
+                content.background(Color.white.opacity(0.92), in: Circle())
+            }
+        } else {
+            content.glassBackground(.regular, in: shape, fallback: .ultraThinMaterial, colorScheme: .light)
+        }
+    }
+}
+
 /// Button style for action buttons (settings, info, transport, queue).
 /// Width is adaptive so localized labels fit when revealed on focus.
 struct TVActionButtonStyle: ButtonStyle {
@@ -357,12 +380,7 @@ struct TVActionButtonStyle: ButtonStyle {
             .minimumScaleFactor(0.8)
             .padding(.horizontal, 20)
             .frame(minWidth: 100, minHeight: 80)
-            .glassBackground(
-                isFocused ? .tinted(.white.opacity(0.35)) : .regular,
-                in: .rect(cornerRadius: 12),
-                fallback: isFocused ? .ultraThickMaterial : .ultraThinMaterial,
-                colorScheme: .light
-            )
+            .modifier(TVFocusBackground(isFocused: isFocused, shape: .rect(cornerRadius: 12)))
             .scaleEffect(configuration.isPressed ? 0.95 : (isFocused ? 1.05 : 1.0))
             .animation(.easeInOut(duration: 0.15), value: isFocused)
             .animation(.easeInOut(duration: 0.1), value: configuration.isPressed)
@@ -377,11 +395,9 @@ struct TVTransportButtonStyle: ButtonStyle {
 
     func makeBody(configuration: Configuration) -> some View {
         let size: CGFloat = isPrimary ? 88 : 72
-        let style: GlassStyle = isFocused ? .tinted(.white.opacity(0.35)) : .regular
-        let fallback: GlassFallbackMaterial = isFocused ? .ultraThickMaterial : .ultraThinMaterial
         return configuration.label
             .frame(width: size, height: size)
-            .glassBackground(style, in: .circle, fallback: fallback, colorScheme: .light)
+            .modifier(TVFocusBackground(isFocused: isFocused, shape: .circle))
             .foregroundStyle(isFocused ? Color.black : .white)
             .scaleEffect(configuration.isPressed ? 0.92 : (isFocused ? 1.08 : 1.0))
             .animation(.easeInOut(duration: 0.15), value: isFocused)
@@ -397,12 +413,7 @@ struct TVCloseButtonStyle: ButtonStyle {
         configuration.label
             .foregroundStyle(isFocused ? Color.black : .white)
             .frame(width: 64, height: 64)
-            .glassBackground(
-                isFocused ? .tinted(.white.opacity(0.35)) : .regular,
-                in: .circle,
-                fallback: isFocused ? .ultraThickMaterial : .ultraThinMaterial,
-                colorScheme: .light
-            )
+            .modifier(TVFocusBackground(isFocused: isFocused, shape: .circle))
             .scaleEffect(configuration.isPressed ? 0.92 : (isFocused ? 1.08 : 1.0))
             .animation(.easeInOut(duration: 0.15), value: isFocused)
             .animation(.easeInOut(duration: 0.1), value: configuration.isPressed)
