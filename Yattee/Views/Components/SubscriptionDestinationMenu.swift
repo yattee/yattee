@@ -367,8 +367,6 @@ struct SubscriptionDestinationPicker: View {
 
     var body: some View {
         ZStack {
-            Color.black.ignoresSafeArea()
-
             VStack(alignment: .leading, spacing: 24) {
                 Text(String(localized: "channel.menu.subscribeOn"))
                     .font(.title2.bold())
@@ -395,6 +393,8 @@ struct SubscriptionDestinationPicker: View {
             .padding(.horizontal, 80)
             .padding(.vertical, 60)
         }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .tvFullScreenCoverBackground()
     }
 }
 #endif

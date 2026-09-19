@@ -1989,9 +1989,7 @@ struct VideoInfoView: View {
                         }
                     }
                 }
-                #if os(tvOS)
-                .background(Color.black.ignoresSafeArea())
-                #endif
+                .tvFullScreenCoverBackground()
                 .navigationTitle(String(localized: "videoInfo.section.comments"))
                 #if os(iOS)
                 .navigationBarTitleDisplayMode(.inline)

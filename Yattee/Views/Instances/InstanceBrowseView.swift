@@ -552,7 +552,7 @@ struct InstanceBrowseView: View {
             TVSidebarDetailContainer(systemImage: "pencil.circle", title: String(localized: "sources.editSource")) {
                 EditSourceView(source: .remoteServer(instance))
             }
-            .background(Color.black.ignoresSafeArea())
+            .tvFullScreenCoverBackground()
         }
         #else
         .sheet(isPresented: $showEditInstance) {

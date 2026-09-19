@@ -54,7 +54,7 @@ struct InstanceLoginView: View {
             formContent
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
-        .background(Color.black.ignoresSafeArea())
+        .tvFullScreenCoverBackground()
         .accessibilityIdentifier("instance.login.view")
         #else
         NavigationStack {

@@ -182,11 +182,9 @@ struct YatteeApp: App {
                 .fullScreenCover(isPresented: $showingICloudProgress) {
                     ICloudSyncProgressView()
                         .appEnvironment(appEnvironment)
-                        #if os(tvOS)
                         // tvOS full screen covers have a transparent background,
                         // letting the view below leak through.
-                        .background(Color.black.ignoresSafeArea())
-                        #endif
+                        .tvFullScreenCoverBackground()
                 }
                 #endif
                 #if os(tvOS)
@@ -202,7 +200,7 @@ struct YatteeApp: App {
                         }
                         .appEnvironment(appEnvironment)
                     }
-                    .background(Color.black.ignoresSafeArea())
+                    .tvFullScreenCoverBackground()
                 }
                 #else
                 .sheet(isPresented: $showingLegacyAccountsImport) {
