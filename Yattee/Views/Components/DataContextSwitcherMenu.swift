@@ -294,7 +294,7 @@ enum DataContextSwitcherGlyph {
             return true
         case let .temporarilyUnavailable(reason):
             switch reason {
-            case .instanceDisabled, .credentialRejected, .unreachable: return true
+            case .instanceDisabled, .accountInactive, .credentialRejected, .unreachable: return true
             case .checking, .instancePending, .credentialMissing: return false
             }
         }

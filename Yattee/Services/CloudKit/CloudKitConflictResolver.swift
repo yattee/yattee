@@ -401,6 +401,12 @@ actor CloudKitConflictResolver {
 
         if localWins {
             resolved["displayName"] = local["displayName"]
+            // A local record built before the field existed carries no value;
+            // clearing the server's would flip the account back to active, so
+            // absence leaves the server copy standing.
+            if local["isActive"] != nil {
+                resolved["isActive"] = local["isActive"]
+            }
             resolved["updatedAt"] = local["updatedAt"]
         }
 

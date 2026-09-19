@@ -19,6 +19,10 @@ enum DataContextUnavailability: Hashable, Sendable {
     /// the user can turn the instance back on — but nothing may be served from
     /// or written to a server they have disabled.
     case instanceDisabled
+    /// The user set the account itself to inactive. Same shape as a disabled
+    /// instance: the selection is kept, the credential is untouched, and
+    /// nothing may be served from or written to an account they switched off.
+    case accountInactive
     /// No credential on this device yet. On tvOS this never resolves on its own
     /// — app Keychain items are not synced there — so the UI offers a local
     /// sign-in rather than implying a wait.
@@ -108,12 +112,19 @@ final class DataContextValidator {
                 return .temporarilyUnavailable(.instanceDisabled)
             }
 
+            // Like the disabled source above: not a credential state, and the
+            // selection is kept so activating the account restores it.
+            guard account.isActive else {
+                return .temporarilyUnavailable(.accountInactive)
+            }
+
             switch accountsManager.status(for: id) {
             case .signedIn: return .valid
             case .checking: return .temporarilyUnavailable(.checking)
             case .credentialMissing: return .temporarilyUnavailable(.credentialMissing)
             case .credentialRejected: return .temporarilyUnavailable(.credentialRejected)
             case .instanceDisabled: return .temporarilyUnavailable(.instanceDisabled)
+            case .inactive: return .temporarilyUnavailable(.accountInactive)
             case .unreachable: return .temporarilyUnavailable(.unreachable)
             }
         }
@@ -163,9 +174,15 @@ final class DataContextValidator {
         var contexts: [DataContext] = [.local]
         contexts += accountsManager.selectableAccounts.map { DataContext.account($0.id) }
 
+        // An inactive account is the exception to "the selection is always
+        // listed": the user set it aside, and deactivating the selected
+        // account switches to local anyway — this covers the window where
+        // another device's deactivation has arrived ahead of its context
+        // switch.
         let current = accountsManager.currentContext
         if case let .account(id) = current,
-           accountsManager.account(id: id) != nil,
+           let account = accountsManager.account(id: id),
+           account.isActive,
            !contexts.contains(current) {
             contexts.append(current)
         }
@@ -213,7 +230,7 @@ final class DataContextValidator {
                 return false
             case let .temporarilyUnavailable(reason):
                 switch reason {
-                case .instanceDisabled, .credentialRejected, .credentialMissing:
+                case .instanceDisabled, .accountInactive, .credentialRejected, .credentialMissing:
                     return false
                 case .checking, .instancePending, .unreachable:
                     return true

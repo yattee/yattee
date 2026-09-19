@@ -29,6 +29,7 @@ struct AccountStatusBadge: View {
         case .credentialMissing: String(localized: "accounts.status.credentialMissing")
         case .credentialRejected: String(localized: "accounts.status.credentialRejected")
         case .instanceDisabled: String(localized: "accounts.status.instanceDisabled")
+        case .inactive: String(localized: "accounts.status.inactive")
         case .unreachable: String(localized: "accounts.status.unreachable")
         }
     }
@@ -45,6 +46,7 @@ struct AccountStatusBadge: View {
         case .credentialMissing: .secondary
         case .credentialRejected: .red
         case .instanceDisabled: .secondary
+        case .inactive: .secondary
         case .unreachable: .orange
         }
     }

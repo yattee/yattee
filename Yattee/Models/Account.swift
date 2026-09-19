@@ -28,6 +28,14 @@ struct Account: Identifiable, Codable, Hashable, Sendable {
     /// User-set label. The only name that syncs.
     var displayName: String?
 
+    /// Whether the user wants this account in use at all.
+    ///
+    /// Deactivating is deliberately not a credential state: the login stays in
+    /// the Keychain untouched, and reactivating restores whatever it really
+    /// was. While inactive the account cannot be switched to and the selection
+    /// falls back to local — the account-level twin of a switched-off source.
+    var isActive: Bool
+
     let dateAdded: Date
 
     /// Bumped on every user edit — supplies the ordering for conflict
@@ -38,14 +46,29 @@ struct Account: Identifiable, Codable, Hashable, Sendable {
         id: UUID = UUID(),
         instanceID: UUID,
         displayName: String? = nil,
+        isActive: Bool = true,
         dateAdded: Date = Date(),
         updatedAt: Date = Date()
     ) {
         self.id = id
         self.instanceID = instanceID
         self.displayName = displayName
+        self.isActive = isActive
         self.dateAdded = dateAdded
         self.updatedAt = updatedAt
+    }
+
+    /// Decoded by hand for one reason: accounts persisted before `isActive`
+    /// existed carry no such key, and they are all active — that was the only
+    /// state there was.
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        id = try container.decode(UUID.self, forKey: .id)
+        instanceID = try container.decode(UUID.self, forKey: .instanceID)
+        displayName = try container.decodeIfPresent(String.self, forKey: .displayName)
+        isActive = try container.decodeIfPresent(Bool.self, forKey: .isActive) ?? true
+        dateAdded = try container.decode(Date.self, forKey: .dateAdded)
+        updatedAt = try container.decode(Date.self, forKey: .updatedAt)
     }
 
     /// The account synthesized for an instance that was signed in before

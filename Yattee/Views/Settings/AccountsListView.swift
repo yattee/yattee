@@ -359,6 +359,21 @@ struct AccountsListView: View {
             Label(String(localized: "accounts.rename"), systemImage: "pencil")
         }
 
+        // Not offered on an orphan: with no source there is nothing an active
+        // account could do that an inactive one cannot.
+        if instance != nil {
+            Button {
+                appEnvironment?.accountsManager.updateIsActive(!account.isActive, for: account.id)
+            } label: {
+                Label(
+                    String(localized: account.isActive ? "accounts.deactivate" : "accounts.activate"),
+                    systemImage: account.isActive
+                        ? "person.crop.circle.badge.minus"
+                        : "person.crop.circle.badge.checkmark"
+                )
+            }
+        }
+
         Button(role: .destructive) {
             pendingRemoval = PendingAccountRemoval(
                 id: account.id,

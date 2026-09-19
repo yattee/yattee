@@ -909,6 +909,7 @@ final class CloudKitRecordMapper {
         record["accountID"] = account.id.uuidString as CKRecordValue
         record["instanceID"] = account.instanceID.uuidString as CKRecordValue
         record["displayName"] = account.displayName as CKRecordValue?
+        record["isActive"] = (account.isActive ? Int64(1) : Int64(0)) as CKRecordValue
         record["dateAdded"] = account.dateAdded as CKRecordValue
         record["updatedAt"] = account.updatedAt as CKRecordValue
 
@@ -961,6 +962,9 @@ final class CloudKitRecordMapper {
             id: accountID,
             instanceID: instanceID,
             displayName: record["displayName"] as? String,
+            // Absent on records written before the field existed, and every
+            // such account is active — that was the only state there was.
+            isActive: ((record["isActive"] as? Int64) ?? 1) == 1,
             dateAdded: dateAdded,
             updatedAt: updatedAt
         )

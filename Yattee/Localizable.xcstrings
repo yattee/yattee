@@ -140,6 +140,17 @@
     "1.2M subscribers" : {
 
     },
+    "accounts.activate" : {
+      "comment" : "Action putting an inactive account back in use",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Activate"
+          }
+        }
+      }
+    },
     "accounts.addAccount" : {
       "localizations" : {
         "en" : {
@@ -190,6 +201,17 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Current"
+          }
+        }
+      }
+    },
+    "accounts.deactivate" : {
+      "comment" : "Action setting an account inactive without signing it out",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Deactivate"
           }
         }
       }
@@ -435,6 +457,17 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Sign in again"
+          }
+        }
+      }
+    },
+    "accounts.status.inactive" : {
+      "comment" : "Status of an account the user set to inactive",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Inactive"
           }
         }
       }
@@ -18155,6 +18188,17 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "All Channels"
+          }
+        }
+      }
+    },
+    "subscriptions.banner.accountInactive" : {
+      "comment" : "Banner shown while the selected account cannot be used yet",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "This account is set to inactive. Showing local data."
           }
         }
       }

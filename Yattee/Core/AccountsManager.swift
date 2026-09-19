@@ -29,6 +29,11 @@ enum AccountStatus: Hashable, Sendable {
     /// turned on again — but nothing may be read from or written to it
     /// meanwhile, so no surface may present the account as usable.
     case instanceDisabled
+    /// The user set the account itself to inactive. Like `instanceDisabled`
+    /// this is not a credential state — the login is untouched and comes back
+    /// the moment the account is activated again — and only `displayStatus`
+    /// ever reports it.
+    case inactive
     /// The server could not be reached. Never invalidates a credential.
     case unreachable
 }
@@ -189,9 +194,11 @@ final class AccountsManager {
     /// Accounts that can be selected as the current context right now.
     ///
     /// Excludes accounts still waiting for their instance: showing a context
-    /// the app cannot actually resolve would be a dead end.
+    /// the app cannot actually resolve would be a dead end. Inactive accounts
+    /// are excluded too — the user set them aside, and the pickers must not
+    /// keep offering what was deliberately switched off.
     var selectableAccounts: [Account] {
-        accounts.filter { capabilities(for: $0)?.isSelectableContext == true }
+        accounts.filter { $0.isActive && capabilities(for: $0)?.isSelectableContext == true }
     }
 
     /// Accounts whose instance is gone.
@@ -250,6 +257,31 @@ final class AccountsManager {
         pendingUploads.insert(accountID)
         save()
         NotificationCenter.default.post(name: .accountsDidChange, object: nil)
+    }
+
+    /// Sets whether the account is active, syncing the change like a rename.
+    ///
+    /// A write that changes nothing is dropped for the same reason
+    /// `updateDisplayName` drops one: every real write stamps `updatedAt`, and
+    /// under last-write-wins an idle stamp would overwrite a peer's genuine
+    /// edit that has not arrived yet.
+    func updateIsActive(_ isActive: Bool, for accountID: UUID) {
+        guard let index = accounts.firstIndex(where: { $0.id == accountID }) else { return }
+        guard accounts[index].isActive != isActive else { return }
+        accounts[index].isActive = isActive
+        accounts[index].updatedAt = Date()
+        pendingUploads.insert(accountID)
+        save()
+        NotificationCenter.default.post(name: .accountsDidChange, object: nil)
+
+        // Deactivating the selected account moves the selection to local — as
+        // a real choice, not a repair: the user just said "stop using this",
+        // and unlike a deletion there is no ambiguity for a sibling to settle.
+        // Publishing it keeps every device's selection off the account the
+        // user set aside.
+        if !isActive, storedContext.context == .account(accountID) {
+            setContext(.local)
+        }
     }
 
     /// Removes an account and everything keyed to it.
@@ -417,6 +449,7 @@ final class AccountsManager {
         refreshStatusesForRepair?()
 
         let sibling = accounts(forInstance: instanceID)
+            .filter(\.isActive)
             .filter { status(for: $0.id) == .signedIn }
             .filter { capabilities(for: $0)?.isSelectableContext == true }
             // Ordered so the answer does not depend on which order the accounts
@@ -875,6 +908,7 @@ final class AccountsManager {
     /// app claiming health it will not deliver.
     func displayStatus(for account: Account) -> AccountStatus {
         guard instance(for: account)?.isEnabled != false else { return .instanceDisabled }
+        guard account.isActive else { return .inactive }
         return status(for: account.id)
     }
 
@@ -1195,8 +1229,13 @@ final class AccountsManager {
         // path, so it is marked dirty and ordered by `updatedAt` like any other
         // change — nothing else about the record is taken.
         if let existing = self.account(id: account.id) {
-            if account.updatedAt > existing.updatedAt, account.displayName != existing.displayName {
-                updateDisplayName(account.displayName, for: account.id)
+            if account.updatedAt > existing.updatedAt {
+                if account.displayName != existing.displayName {
+                    updateDisplayName(account.displayName, for: account.id)
+                }
+                if account.isActive != existing.isActive {
+                    updateIsActive(account.isActive, for: account.id)
+                }
             }
             return .mergedIntoExisting
         }

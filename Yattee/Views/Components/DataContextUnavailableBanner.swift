@@ -40,6 +40,7 @@ struct DataContextUnavailableBanner: View {
         case .checking: "clock"
         case .instancePending: "clock"
         case .instanceDisabled: "server.rack"
+        case .accountInactive: "person.crop.circle.badge.minus"
         case .credentialMissing: "person.badge.key"
         case .credentialRejected: "exclamationmark.triangle.fill"
         case .unreachable: "wifi.exclamationmark"
@@ -50,6 +51,7 @@ struct DataContextUnavailableBanner: View {
         switch reason {
         case .checking, .instancePending: .secondary
         case .instanceDisabled: .secondary
+        case .accountInactive: .secondary
         case .credentialMissing: .secondary
         case .credentialRejected: .red
         case .unreachable: .orange
@@ -61,6 +63,7 @@ struct DataContextUnavailableBanner: View {
         case .checking: String(localized: "subscriptions.banner.checking")
         case .instancePending: String(localized: "subscriptions.banner.instancePending")
         case .instanceDisabled: String(localized: "subscriptions.banner.instanceDisabled")
+        case .accountInactive: String(localized: "subscriptions.banner.accountInactive")
         case .credentialMissing: String(localized: "subscriptions.banner.credentialMissing")
         case .credentialRejected: String(localized: "subscriptions.banner.credentialRejected")
         case .unreachable: String(localized: "subscriptions.banner.unreachable")
