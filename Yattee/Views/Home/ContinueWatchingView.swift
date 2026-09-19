@@ -12,6 +12,7 @@ struct ContinueWatchingView: View {
     @Namespace private var sheetTransition
     #if os(tvOS)
     @FocusState private var focusedVideoID: String?
+    @State private var lastFocusedVideoID: String?
     #endif
     @State private var watchHistory: [WatchEntry] = []
 
@@ -173,12 +174,39 @@ struct ContinueWatchingView: View {
             loadHistory()
         }
         #if os(tvOS)
-        .onChange(of: inProgressEntries.first?.videoID, initial: true) { _, newValue in
+        .onChange(of: inProgressEntries.first?.videoID, initial: true) { oldValue, newValue in
             // Work around tvOS ScrollView + prefersDefaultFocus bug: set initial focus
             // to the first video after LazyVGrid has time to materialize cells.
-            guard let newValue else { return }
+            // Only on first population — later list changes are handled below.
+            guard let newValue, oldValue == nil else { return }
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.15) {
                 focusedVideoID = newValue
+            }
+        }
+        .onChange(of: focusedVideoID) { _, newValue in
+            if let newValue {
+                lastFocusedVideoID = newValue
+            }
+        }
+        .onChange(of: inProgressEntries.map(\.videoID)) { oldIDs, newIDs in
+            // When the focused video is removed (marked watched / removed from
+            // history), move focus to the entry that took its place, or the
+            // previous one if it was last — otherwise focus is lost entirely.
+            guard let removed = lastFocusedVideoID,
+                  !newIDs.contains(removed),
+                  !newIDs.isEmpty else { return }
+            let oldIndex = oldIDs.firstIndex(of: removed) ?? 0
+            let target = newIDs[min(oldIndex, newIDs.count - 1)]
+            LoggingService.shared.info("Continue Watching: focused entry \(removed) removed, refocusing \(target)")
+            // The context menu's dismissal restores focus to the (now removed)
+            // source view after our first assert lands, so re-assert until the
+            // focus engine actually takes the new target.
+            for delay in [0.2, 0.7, 1.4] {
+                DispatchQueue.main.asyncAfter(deadline: .now() + delay) {
+                    if focusedVideoID == nil {
+                        focusedVideoID = target
+                    }
+                }
             }
         }
         #endif
