@@ -1242,14 +1242,13 @@ struct ChannelView: View {
     /// Toolbar menu for subscribe/unsubscribe and notification actions
     private var channelMenu: some View {
         Menu {
-            // Subscribe/Unsubscribe button
+            // Subscribe/Unsubscribe button, naming the account it writes to —
+            // the same answer "Subscribe On…" would give for the same target.
             Button {
                 toggleSubscription()
             } label: {
                 Label(
-                    isSubscribed
-                        ? String(localized: "channel.menu.unsubscribe")
-                        : String(localized: "channel.menu.subscribe"),
+                    mainSubscribeTitle,
                     systemImage: isSubscribed ? "person.fill.xmark" : "person.badge.plus"
                 )
             }
@@ -1308,6 +1307,24 @@ struct ChannelView: View {
     /// Local always may. A server account may only while it is usable: a
     /// subscribe that cannot reach its account must be refused rather than
     /// land in local data the user did not choose.
+    /// "Subscribe - Yattee iCloud" rather than a bare "Subscribe" — but only
+    /// while there is more than one place the write could land. With a single
+    /// destination the name answers a question nobody has.
+    private var mainSubscribeTitle: String {
+        guard let appEnvironment, SubscriptionDestinations.areOffered(in: appEnvironment) else {
+            return String(localized: isSubscribed ? "channel.menu.unsubscribe" : "channel.menu.subscribe")
+        }
+
+        let key: String.LocalizationValue = isSubscribed
+            ? "channel.menu.unsubscribe.withAccount"
+            : "channel.menu.subscribe.withAccount"
+        let title = DataContextSwitcherLabels.title(
+            for: appEnvironment.accountsManager.currentContext,
+            in: appEnvironment
+        )
+        return String(format: String(localized: key), title)
+    }
+
     private var allowsCurrentContextMutation: Bool {
         guard let appEnvironment else { return false }
         guard !appEnvironment.accountsManager.currentContext.isLocal else { return true }
@@ -1316,13 +1333,28 @@ struct ChannelView: View {
 
     /// The channel as it must be stored: the id carries the source this view
     /// was opened for, which an extracted channel does not report itself.
+    ///
+    /// Before the load answers, the cached header stands in — the id is already
+    /// known and the header carries the name a subscription stores — so
+    /// "Subscribe On…" is usable as soon as the main button is, not only once
+    /// the channel request finishes. External channels keep waiting: their real
+    /// id only exists after extraction.
     private var channelToSubscribe: Channel? {
-        guard let channel else { return nil }
+        if let channel {
+            return Channel(
+                id: ChannelID(source: source, channelID: channel.id.channelID),
+                name: channel.name,
+                subscriberCount: channel.subscriberCount,
+                thumbnailURL: channel.thumbnailURL
+            )
+        }
+
+        guard !isExternalChannel, let cachedHeader, !cachedHeader.name.isEmpty else { return nil }
         return Channel(
-            id: ChannelID(source: source, channelID: channel.id.channelID),
-            name: channel.name,
-            subscriberCount: channel.subscriberCount,
-            thumbnailURL: channel.thumbnailURL
+            id: ChannelID(source: source, channelID: channelID),
+            name: cachedHeader.name,
+            subscriberCount: cachedHeader.subscriberCount,
+            thumbnailURL: cachedHeader.thumbnailURL
         )
     }
 
@@ -1349,13 +1381,47 @@ struct ChannelView: View {
             }
 
             isSubscribed = true
+            noteMainButtonToggled(subscribed: true)
             refreshSubscription()
+            showSubscriptionToast(subscribed: true)
         } catch {
             appEnvironment?.toastManager.showError(
                 String(localized: "channel.subscribe.error.title"),
                 subtitle: error.localizedDescription
             )
         }
+    }
+
+    /// The same toast a destination row shows, for the main button's write:
+    /// title says what happened, subtitle names the account it landed on —
+    /// under the same rule as the menu label, only when there is more than one
+    /// account it could have landed on.
+    private func showSubscriptionToast(subscribed: Bool) {
+        guard let appEnvironment else { return }
+
+        let subtitle: String? = SubscriptionDestinations.areOffered(in: appEnvironment)
+            ? DataContextSwitcherLabels.title(
+                for: appEnvironment.accountsManager.currentContext,
+                in: appEnvironment
+            )
+            : nil
+
+        appEnvironment.toastManager.showSuccess(
+            String(
+                localized: subscribed
+                    ? "channel.subscribe.destination.subscribed"
+                    : "channel.subscribe.destination.unsubscribed"
+            ),
+            subtitle: subtitle
+        )
+    }
+
+    /// The main button wrote to the currently selected context; the destination
+    /// row naming that context still carries the mark from before the write, so
+    /// it is told — otherwise its next tap does the opposite of what it shows.
+    private func noteMainButtonToggled(subscribed: Bool) {
+        guard let context = appEnvironment?.accountsManager.currentContext else { return }
+        destinationMembership.noteToggled(context, subscribed: subscribed)
     }
 
     /// A destination row toggled something. Only the account on screen changes
@@ -1385,6 +1451,8 @@ struct ChannelView: View {
             do {
                 try await appEnvironment?.subscriptionService.unsubscribe(from: channel.id.channelID)
                 isSubscribed = false
+                noteMainButtonToggled(subscribed: false)
+                showSubscriptionToast(subscribed: false)
             } catch {
                 appEnvironment?.toastManager.showError(
                     String(localized: "channel.unsubscribe.error.title"),

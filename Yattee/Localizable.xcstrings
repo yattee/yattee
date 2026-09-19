@@ -952,6 +952,17 @@
         }
       }
     },
+    "channel.menu.subscribe.withAccount" : {
+      "comment" : "Menu item; %@ is the account or destination the subscribe writes to",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Subscribe - %@"
+          }
+        }
+      }
+    },
     "channel.menu.subscribeOn" : {
       "comment" : "Submenu listing the accounts a channel can be subscribed on",
       "localizations" : {
@@ -980,6 +991,17 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Unsubscribe"
+          }
+        }
+      }
+    },
+    "channel.menu.unsubscribe.withAccount" : {
+      "comment" : "Menu item; %@ is the account or destination the unsubscribe writes to",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Unsubscribe - %@"
           }
         }
       }

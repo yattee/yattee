@@ -85,6 +85,14 @@ final class SubscriptionDestinationMembershipLoader {
 
     func isSubscribed(on context: DataContext) -> Bool? { membership.isSubscribed(on: context) }
 
+    /// The main subscribe button wrote to `context` behind these rows' back;
+    /// without being told, the row for that context keeps the mark from before
+    /// the write — and a tap on it would then do the opposite of what the mark
+    /// promises.
+    func noteToggled(_ context: DataContext, subscribed: Bool) {
+        membership.record(subscribed, for: context, generation: membership.generation)
+    }
+
     func isBusy(_ context: DataContext) -> Bool { busy.contains(context) }
 
     /// Asks about `channel`, from a place the SwiftUI lifecycle reaches.
