@@ -108,7 +108,7 @@ enum SidebarMainItem: String, CaseIterable, Codable, Identifiable, Sendable {
     /// Whether this item is required and cannot be hidden.
     var isRequired: Bool {
         switch self {
-        case .search, .home:
+        case .search, .home, .settings:
             return true
         default:
             return false
