@@ -636,12 +636,20 @@ final class PlayerService {
     /// Reconciles sleep prevention with what is actually on screen: display sleep
     /// is only prevented when a video track is rendered. Audio-only playback
     /// lets the screen sleep normally.
+    ///
+    /// tvOS is the exception: idle there means screensaver and then device sleep,
+    /// which suspends the app, stops playback, and powers the TV off over CEC.
+    /// Audio-only playback must keep the idle timer disabled as well.
     private func updateSleepPrevention() {
+        #if os(tvOS)
+        sleepPreventionService.preventSleep()
+        #else
         if state.currentStream?.isAudioOnly == true {
             sleepPreventionService.allowSleep()
         } else {
             sleepPreventionService.preventSleep()
         }
+        #endif
     }
 
     /// Pauses playback.
