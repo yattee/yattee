@@ -238,13 +238,15 @@ struct VideoInfoView: View {
         videoQueueContext?.sourceLabel ?? displayedVideo?.title ?? ""
     }
     
-    /// Thumbnail width - larger for carousel on iOS
-    private var thumbnailWidth: CGFloat {
-        #if os(iOS)
-        return videoQueueContext != nil ? 280 : 240
-        #else
-        return 240
-        #endif
+    /// Maximum thumbnail width - full card width on iPhone, capped on iPad/macOS
+    private var thumbnailMaxWidth: CGFloat { 640 }
+
+    /// Explicit thumbnail width for a given card width. Sized explicitly (not via
+    /// aspectRatio fit) because the carousel's LazyHStack proposes its ideal height
+    /// back to the cards, and that ideal is driven by the loaded image's native
+    /// size - small thumbnails would shrink the card instead of scaling up.
+    private func thumbnailWidth(forCardWidth cardWidth: CGFloat) -> CGFloat {
+        min(max(cardWidth - 32, 0), thumbnailMaxWidth)
     }
     
     /// Dynamic label for the play button - shows "Continue at XX:XX" if video has meaningful progress
@@ -483,12 +485,13 @@ struct VideoInfoView: View {
                 let extraTopPadding: CGFloat = 150
 
                 let blurOffset: CGFloat = -max(scrollOffset + safeAreaTop, 0) - extraTopPadding
+                let bgHeight = headerBackgroundHeight(for: geometry.size.width)
 
                 Color.clear
-                    .frame(height: headerBackgroundHeight + extraTopPadding)
+                    .frame(height: bgHeight + extraTopPadding)
                     .frame(maxWidth: .infinity)
                     .background(alignment: .bottom) {
-                        blurredThumbnailBackground
+                        blurredThumbnailBackground(height: bgHeight)
                     }
                     .clipped()
                     .offset(y: blurOffset)
@@ -498,7 +501,7 @@ struct VideoInfoView: View {
                 ScrollView {
                     VStack(alignment: .leading, spacing: 0) {
                         // Header with thumbnail, title, and channel
-                        headerSection
+                        headerSection(cardWidth: geometry.size.width)
 
                         // Action buttons
                         actionButtons
@@ -847,19 +850,19 @@ struct VideoInfoView: View {
 
     // MARK: - Header Section
 
-    private var headerSection: some View {
+    private func headerSection(cardWidth: CGFloat) -> some View {
         VStack(alignment: .center, spacing: 0) {
             #if os(iOS)
             if videoQueueContext != nil, let videos = allVideos, !videos.isEmpty {
                 // iOS with queue: full-width carousel with peek thumbnails
-                thumbnailCarousel
+                thumbnailCarousel(cardWidth: cardWidth)
             } else {
                 // iOS without queue or empty queue: just the thumbnail
-                singleVideoCard
+                singleVideoCard(cardWidth: cardWidth)
             }
             #else
             // Non-iOS platforms: just the thumbnail
-            singleVideoCard
+            singleVideoCard(cardWidth: cardWidth)
             #endif
         }
         .padding(.top)
@@ -867,30 +870,30 @@ struct VideoInfoView: View {
 
     /// Blurred thumbnail background for ambient effect behind the header
     @ViewBuilder
-    private var blurredThumbnailBackground: some View {
+    private func blurredThumbnailBackground(height: CGFloat) -> some View {
         BlurredImageBackground(
             url: displayedVideo.flatMap { appEnvironment?.deArrowBrandingProvider.thumbnailURL(for: $0) } ?? displayedVideo?.reliableThumbnailURL,
             videoID: displayedVideo?.id.videoID,
             blurRadius: BlurredImageBackground.platformBlurRadius,
             scale: 1.8,
             gradientColor: headerBackgroundColor,
-            contentOpacity: blurredBackgroundOpacity
+            contentOpacity: blurredBackgroundOpacity(headerHeight: height)
         )
-        .frame(height: headerBackgroundHeight)
+        .frame(height: height)
     }
 
     /// Calculated height for the blurred background based on content
-    private var headerBackgroundHeight: CGFloat {
+    private func headerBackgroundHeight(for containerWidth: CGFloat) -> CGFloat {
         // Thumbnail height + title area + channel area + padding
         let titleHeight: CGFloat = 50  // Title with line limit 2
         let channelHeight: CGFloat = 60 // Avatar + name + subscribers
         let padding: CGFloat = 60      // Top and bottom padding
-        return thumbnailHeight + titleHeight + channelHeight + padding
+        return thumbnailHeight(for: containerWidth) + titleHeight + channelHeight + padding
     }
 
     /// Opacity for the blurred background that fades as user scrolls down
-    private var blurredBackgroundOpacity: Double {
-        let fadeDistance = headerBackgroundHeight * 0.5  // Fade 2x faster to hide hard edge before it's visible
+    private func blurredBackgroundOpacity(headerHeight: CGFloat) -> Double {
+        let fadeDistance = headerHeight * 0.5  // Fade 2x faster to hide hard edge before it's visible
         let progress = min(max(scrollOffset / fadeDistance, 0), 1)
         return 1.0 - progress
     }
@@ -908,11 +911,12 @@ struct VideoInfoView: View {
     
     /// Single video card without carousel (used when no queue context or non-iOS)
     @ViewBuilder
-    private var singleVideoCard: some View {
+    private func singleVideoCard(cardWidth: CGFloat) -> some View {
         if let video = displayedVideo {
-            videoCard(for: video, isLoadingMore: false, showTitle: true, isCurrent: true)
+            // No outer horizontal padding - the card pads its own content,
+            // matching the carousel cards which are laid out full-bleed.
+            videoCard(for: video, cardWidth: cardWidth, isLoadingMore: false, showTitle: true, isCurrent: true)
                 .frame(maxWidth: .infinity)
-                .padding(.horizontal)
         }
     }
     
@@ -925,7 +929,7 @@ struct VideoInfoView: View {
     /// Full-width thumbnail carousel with peek effect (iOS only)
     /// Uses horizontal ScrollView with scrollTargetBehavior for native gesture handling
     @ViewBuilder
-    private var thumbnailCarousel: some View {
+    private func thumbnailCarousel(cardWidth: CGFloat) -> some View {
         #if os(iOS)
         ScrollViewReader { proxy in
             ScrollView(.horizontal, showsIndicators: false) {
@@ -942,7 +946,7 @@ struct VideoInfoView: View {
                             // the card named after a string of characters under
                             // the real channel and description.
                             let titleVideo = video.hasPlaceholderTitle ? (detailedVideo ?? video) : video
-                            videoCard(for: titleVideo, thumbnailFrom: detailedVideo, authorFrom: detailedVideo, isLoadingMore: isLoadingMoreVideos && isCurrent, showTitle: true, isCurrent: isCurrent)
+                            videoCard(for: titleVideo, cardWidth: cardWidth, thumbnailFrom: detailedVideo, authorFrom: detailedVideo, isLoadingMore: isLoadingMoreVideos && isCurrent, showTitle: true, isCurrent: isCurrent)
                                 .opacity(isCurrent ? 1.0 : peekOpacity)
                                 .containerRelativeFrame(.horizontal)
                                 .id(index)
@@ -958,7 +962,7 @@ struct VideoInfoView: View {
                         
                         // Placeholder for loading more
                         if videoQueueContext?.canLoadMore == true {
-                            videoCardPlaceholder(isLoading: isLoadingMoreVideos)
+                            videoCardPlaceholder(isLoading: isLoadingMoreVideos, cardWidth: cardWidth)
                                 .opacity(peekOpacity)
                                 .containerRelativeFrame(.horizontal)
                                 .id("load-more-placeholder")
@@ -992,9 +996,9 @@ struct VideoInfoView: View {
         #endif
     }
     
-    /// Height of thumbnail based on width and 16:9 aspect ratio
-    private var thumbnailHeight: CGFloat {
-        thumbnailWidth * 9 / 16
+    /// Height of thumbnail based on available width (minus horizontal padding), capped, and 16:9 aspect ratio
+    private func thumbnailHeight(for containerWidth: CGFloat) -> CGFloat {
+        thumbnailWidth(forCardWidth: containerWidth) * 9 / 16
     }
     
     /// A single video card with thumbnail, title, and channel info
@@ -1005,10 +1009,11 @@ struct VideoInfoView: View {
     ///   - isLoadingMore: Whether to show loading overlay for continuation loading
     ///   - showTitle: Whether to show the title and channel (animates in/out)
     ///   - isCurrent: Whether this is the currently selected video (thumbnail tap plays video)
-    private func videoCard(for video: Video, thumbnailFrom: Video? = nil, authorFrom: Video? = nil, isLoadingMore: Bool, showTitle: Bool, isCurrent: Bool) -> some View {
+    private func videoCard(for video: Video, cardWidth: CGFloat, thumbnailFrom: Video? = nil, authorFrom: Video? = nil, isLoadingMore: Bool, showTitle: Bool, isCurrent: Bool) -> some View {
         let thumbnailSource = thumbnailFrom ?? video
         let deArrowURL = appEnvironment?.deArrowBrandingProvider.thumbnailURL(for: thumbnailSource)
         let thumbnailURLs = [deArrowURL].compactMap { $0 } + thumbnailSource.thumbnailURLsByQuality
+        let thumbWidth = thumbnailWidth(forCardWidth: cardWidth)
         return VStack(spacing: 12) {
             // Thumbnail with loading overlay
             ZStack {
@@ -1034,31 +1039,36 @@ struct VideoInfoView: View {
                     }
                 }
                 .aspectRatio(16/9, contentMode: .fit)
-                .frame(width: thumbnailWidth)
 
                 // Loading overlay when fetching more videos (continuation)
                 if isLoadingMore {
                     RoundedRectangle(cornerRadius: 8)
                         .fill(.black.opacity(0.4))
-                        .frame(width: thumbnailWidth)
-                        .aspectRatio(16/9, contentMode: .fit)
-                    
+
                     ProgressView()
                         .tint(.white)
                 }
             }
+            // Explicit size - see thumbnailWidth(forCardWidth:) for why aspectRatio
+            // fit can't be trusted here
+            .frame(width: thumbWidth, height: thumbWidth * 9 / 16)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .padding(.horizontal)
             .onTapGesture {
                 if isCurrent {
                     playVideo()
                 }
             }
             
-            // Title
+            // Title - full card width so long titles fit more characters per line.
+            // Always reserves two lines of height so carousel cards don't shift
+            // vertically when swiping between short and long titles.
             Text(video.displayTitle(using: appEnvironment?.deArrowBrandingProvider))
                 .font(.headline)
-                .lineLimit(2)
-                .multilineTextAlignment(.center)
-                .frame(width: thumbnailWidth)
+                .lineLimit(2, reservesSpace: true)
+                .multilineTextAlignment(.leading)
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .padding(.horizontal)
                 .opacity(showTitle ? 1.0 : 0.0)
             
             // Channel row (horizontal) - only tappable if we have real channel info
@@ -1076,6 +1086,8 @@ struct VideoInfoView: View {
                     channelRowContent(for: authorVideo)
                 }
             }
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .padding(.horizontal)
             .opacity(showTitle ? 1.0 : 0.0)
         }
     }
@@ -1113,51 +1125,54 @@ struct VideoInfoView: View {
     }
 
     /// Placeholder card shown when loading more videos
-    private func videoCardPlaceholder(isLoading: Bool) -> some View {
-        VStack(spacing: 12) {
+    private func videoCardPlaceholder(isLoading: Bool, cardWidth: CGFloat) -> some View {
+        let thumbWidth = thumbnailWidth(forCardWidth: cardWidth)
+        return VStack(alignment: .leading, spacing: 12) {
             // Thumbnail placeholder
             ZStack {
                 RoundedRectangle(cornerRadius: 8)
                     .fill(.quaternary)
-                    .aspectRatio(16/9, contentMode: .fit)
-                    .frame(width: thumbnailWidth)
-                
+
                 if isLoading {
                     ProgressView()
                         .tint(.secondary)
                 }
             }
-            
+            .frame(width: thumbWidth, height: thumbWidth * 9 / 16)
+
             // Title placeholder
-            VStack(spacing: 8) {
+            VStack(alignment: .leading, spacing: 8) {
                 RoundedRectangle(cornerRadius: 4)
                     .fill(.quaternary)
-                    .frame(width: thumbnailWidth * 0.8, height: 16)
-                
+                    .frame(width: 220, height: 16)
+
                 RoundedRectangle(cornerRadius: 4)
                     .fill(.quaternary)
-                    .frame(width: thumbnailWidth * 0.5, height: 12)
+                    .frame(width: 140, height: 12)
             }
-            
+
             // Channel placeholder
-            VStack(spacing: 4) {
+            HStack(spacing: 10) {
                 // Avatar placeholder (circle)
                 Circle()
                     .fill(.quaternary)
-                    .frame(width: 56, height: 56)
-                
-                // Name placeholder
-                RoundedRectangle(cornerRadius: 4)
-                    .fill(.quaternary)
-                    .frame(width: thumbnailWidth * 0.4, height: 14)
-                
-                // Subscriber count placeholder
-                RoundedRectangle(cornerRadius: 4)
-                    .fill(.quaternary)
-                    .frame(width: thumbnailWidth * 0.25, height: 12)
+                    .frame(width: 40, height: 40)
+
+                VStack(alignment: .leading, spacing: 4) {
+                    // Name placeholder
+                    RoundedRectangle(cornerRadius: 4)
+                        .fill(.quaternary)
+                        .frame(width: 110, height: 14)
+
+                    // Subscriber count placeholder
+                    RoundedRectangle(cornerRadius: 4)
+                        .fill(.quaternary)
+                        .frame(width: 70, height: 12)
+                }
             }
         }
-        .frame(width: thumbnailWidth)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .padding(.horizontal)
     }
 
     // MARK: - Action Buttons
@@ -1264,8 +1279,9 @@ struct VideoInfoView: View {
         #if !os(macOS)
         .fontWeight(.semibold)
         #endif
+        // Leading-aligned to line up with the thumbnail/title column on wide screens
         .frame(maxWidth: 400)
-        .frame(maxWidth: .infinity)
+        .frame(maxWidth: .infinity, alignment: .leading)
         .padding(.horizontal)
         .padding(.vertical, 12)
     }
