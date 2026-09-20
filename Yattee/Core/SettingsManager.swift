@@ -217,6 +217,8 @@ final class SettingsManager {
     #if !os(tvOS)
     var _thumbnailTapAction: VideoTapAction?
     var _textAreaTapAction: VideoTapAction?
+    var _videoInfoActionsLayout: VideoInfoActionsLayout?
+    var _videoInfoPrimaryAction: VideoInfoPrimaryAction?
     #endif
 
     // Video tap action (tvOS only)
@@ -551,6 +553,8 @@ final class SettingsManager {
         #if !os(tvOS)
         _thumbnailTapAction = nil
         _textAreaTapAction = nil
+        _videoInfoActionsLayout = nil
+        _videoInfoPrimaryAction = nil
         #endif
         #if os(tvOS)
         _tvOSVideoTapAction = nil

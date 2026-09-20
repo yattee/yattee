@@ -16105,6 +16105,66 @@
         }
       }
     },
+    "settings.videoInfo.actions.footer" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Toolbar keeps the primary action in the navigation bar and moves the remaining actions to the ⋯ menu."
+          }
+        }
+      }
+    },
+    "settings.videoInfo.actions.header" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Video Info"
+          }
+        }
+      }
+    },
+    "settings.videoInfo.actionsLayout" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Actions"
+          }
+        }
+      }
+    },
+    "settings.videoInfo.actionsLayout.buttons" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Buttons"
+          }
+        }
+      }
+    },
+    "settings.videoInfo.actionsLayout.toolbar" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Toolbar"
+          }
+        }
+      }
+    },
+    "settings.videoInfo.primaryAction" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Primary Action"
+          }
+        }
+      }
+    },
     "settings.youtubeEnhancements.deArrow.footer" : {
       "localizations" : {
         "en" : {
@@ -19482,6 +19542,26 @@
         }
       }
     },
+    "videoInfo.playTip.message" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tap the thumbnail to start playing this video."
+          }
+        }
+      }
+    },
+    "videoInfo.playTip.title" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tap to Play"
+          }
+        }
+      }
+    },
     "videoInfo.progress" : {
       "comment" : "Watch progress label",
       "localizations" : {
@@ -19577,6 +19657,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Source"
+          }
+        }
+      }
+    },
+    "videoInfo.toolbar.moreActions" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "More Actions"
           }
         }
       }

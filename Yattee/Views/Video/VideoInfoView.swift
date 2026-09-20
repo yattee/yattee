@@ -7,6 +7,9 @@
 
 import SwiftUI
 import NukeUI
+#if !os(tvOS)
+import TipKit
+#endif
 
 /// Initialization mode for VideoInfoView - either a loaded video or just an ID to fetch.
 enum VideoInfoInitMode: Sendable {
@@ -297,7 +300,33 @@ struct VideoInfoView: View {
         #if os(iOS)
         .navigationBarTitleDisplayMode(.inline)
         #endif
+        #if !os(tvOS)
+        .toolbar {
+            if usesToolbarActions, displayedVideo != nil {
+                ToolbarItem(placement: .primaryAction) {
+                    toolbarActionView(primaryAction, inMenu: false)
+                }
+                #if os(iOS)
+                if #available(iOS 26, *) {
+                    ToolbarSpacer(.fixed, placement: .primaryAction)
+                }
+                #endif
+                ToolbarItem(placement: .primaryAction) {
+                    Menu {
+                        ForEach(VideoInfoPrimaryAction.allCases.filter { $0 != primaryAction }, id: \.self) { action in
+                            toolbarActionView(action, inMenu: true)
+                        }
+                    } label: {
+                        Label(String(localized: "videoInfo.toolbar.moreActions"), systemImage: "ellipsis")
+                    }
+                }
+            }
+        }
+        #endif
         .onAppear {
+            #if !os(tvOS)
+            VideoInfoPlayThumbnailTip.isToolbarLayout = showsThumbnailPlayTip
+            #endif
             // Initialize current index from queue context
             if currentVideoIndex == nil, let context = videoQueueContext {
                 currentVideoIndex = context.videoIndex
@@ -503,8 +532,12 @@ struct VideoInfoView: View {
                         // Header with thumbnail, title, and channel
                         headerSection(cardWidth: geometry.size.width)
 
-                        // Action buttons
-                        actionButtons
+                        // Action buttons (inline layout only; toolbar layout puts them in the nav bar)
+                        if !usesToolbarActions {
+                            actionButtons
+                        } else {
+                            Spacer().frame(height: 12)
+                        }
 
                         // Bookmark details section (only show if bookmarked)
                         if isBookmarked, let bookmark = currentBookmark {
@@ -1056,9 +1089,15 @@ struct VideoInfoView: View {
             .padding(.horizontal)
             .onTapGesture {
                 if isCurrent {
+                    #if !os(tvOS)
+                    VideoInfoPlayThumbnailTip().invalidate(reason: .actionPerformed)
+                    #endif
                     playVideo()
                 }
             }
+            #if !os(tvOS)
+            .modifier(VideoInfoPlayThumbnailTipModifier(enabled: isCurrent && showsThumbnailPlayTip))
+            #endif
             
             // Title - full card width so long titles fit more characters per line.
             // Always reserves two lines of height so carousel cards don't shift
@@ -1286,7 +1325,84 @@ struct VideoInfoView: View {
         .padding(.vertical, 12)
     }
 
+    // MARK: - Toolbar Actions (iOS/macOS)
+
     #if !os(tvOS)
+    /// True when the user chose the toolbar layout in Layout & Navigation settings.
+    private var usesToolbarActions: Bool {
+        appEnvironment?.settingsManager.videoInfoActionsLayout == .toolbar
+    }
+
+    /// The action pinned to the toolbar; every other action lives in the ellipsis menu.
+    private var primaryAction: VideoInfoPrimaryAction {
+        appEnvironment?.settingsManager.videoInfoPrimaryAction ?? .play
+    }
+
+    /// The hero thumbnail is the only play affordance when the toolbar layout is active
+    /// and Play isn't the pinned action, so show the one-time "tap to play" tip.
+    private var showsThumbnailPlayTip: Bool {
+        usesToolbarActions && primaryAction != .play
+    }
+
+    /// One toolbar action rendered either as a standalone toolbar item or as a menu row.
+    /// The same Label works in both places: the toolbar shows the icon, the menu shows icon + text.
+    @ViewBuilder
+    private func toolbarActionView(_ action: VideoInfoPrimaryAction, inMenu: Bool) -> some View {
+        switch action {
+        case .play:
+            Button(action: playVideo) {
+                Label(inMenu ? playButtonLabel : String(localized: "video.context.play"), systemImage: "play.fill")
+            }
+        case .download:
+            toolbarDownloadAction
+        case .share:
+            if let video = displayedVideo {
+                ShareLink(item: appEnvironment?.shareURL(for: video) ?? video.shareURL) {
+                    Label(String(localized: "video.share"), systemImage: "square.and.arrow.up")
+                }
+            }
+        case .addToPlaylist:
+            Button {
+                showingPlaylistSheet = true
+            } label: {
+                Label(String(localized: "video.context.addToPlaylist"), systemImage: "text.badge.plus")
+            }
+        case .bookmark:
+            Button(action: toggleBookmark) {
+                Label(
+                    isBookmarked ? String(localized: "video.removeBookmark") : String(localized: "video.bookmark"),
+                    systemImage: isBookmarked ? "bookmark.fill" : "bookmark"
+                )
+            }
+        }
+    }
+
+    /// Download action for the toolbar/menu, mirroring `verticalDownloadActionButton` states.
+    @ViewBuilder
+    private var toolbarDownloadAction: some View {
+        let isDownloaded = download?.status == .completed
+        let isDownloading = displayedVideo.flatMap { downloadManager?.isDownloading($0.id) } ?? false
+
+        if isDownloaded {
+            Button(role: .destructive) {
+                showingRemoveDownloadConfirmation = true
+            } label: {
+                Label(String(localized: "video.downloaded"), systemImage: "checkmark.circle.fill")
+            }
+        } else if isDownloading || isEnqueuingDownload {
+            Button {} label: {
+                Label(String(localized: "video.downloading"), systemImage: "arrow.down.circle.dotted")
+            }
+            .disabled(true)
+        } else if let video = displayedVideo {
+            Button {
+                startDownload(for: video)
+            } label: {
+                Label(String(localized: "video.download"), systemImage: "arrow.down.circle")
+            }
+        }
+    }
+
     /// Vertical download action button with four states: default, enqueueing, downloading, downloaded
     @ViewBuilder
     private var verticalDownloadActionButton: some View {

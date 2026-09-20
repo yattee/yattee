@@ -661,6 +661,39 @@ extension SettingsManager {
             localDefaults.set(newValue.rawValue, forKey: "textAreaTapAction")
         }
     }
+
+    /// Where the video info view shows its actions. Default is the toolbar.
+    var videoInfoActionsLayout: VideoInfoActionsLayout {
+        get {
+            if let cached = _videoInfoActionsLayout { return cached }
+            guard let rawValue = localDefaults.string(forKey: "videoInfoActionsLayout"),
+                  let layout = VideoInfoActionsLayout(rawValue: rawValue) else {
+                return .toolbar
+            }
+            return layout
+        }
+        set {
+            _videoInfoActionsLayout = newValue
+            localDefaults.set(newValue.rawValue, forKey: "videoInfoActionsLayout")
+        }
+    }
+
+    /// Action pinned to the video info toolbar (toolbar layout only). Default is download
+    /// because the hero thumbnail already plays on tap.
+    var videoInfoPrimaryAction: VideoInfoPrimaryAction {
+        get {
+            if let cached = _videoInfoPrimaryAction { return cached }
+            guard let rawValue = localDefaults.string(forKey: "videoInfoPrimaryAction"),
+                  let action = VideoInfoPrimaryAction(rawValue: rawValue) else {
+                return .download
+            }
+            return action
+        }
+        set {
+            _videoInfoPrimaryAction = newValue
+            localDefaults.set(newValue.rawValue, forKey: "videoInfoPrimaryAction")
+        }
+    }
     #endif
 
     // MARK: - Video Tap Action (tvOS only)

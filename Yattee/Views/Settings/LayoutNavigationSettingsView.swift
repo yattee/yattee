@@ -21,6 +21,7 @@ struct LayoutNavigationSettingsView: View {
                 TVVideoActionsSection(settings: settings)
                 #else
                 VideoActionsSection(settings: settings)
+                VideoInfoActionsSection(settings: settings)
                 LinkActionSection(settings: settings)
                 SharingSection(settings: settings)
                 ClipboardSection(settings: settings)
@@ -218,6 +219,38 @@ private struct VideoActionsSection: View {
                 Label(String(localized: "settings.appearance.swipeActions"), systemImage: "hand.draw")
             }
             #endif
+        }
+    }
+}
+#endif
+
+// MARK: - Video Info Actions Section
+
+#if !os(tvOS)
+private struct VideoInfoActionsSection: View {
+    @Bindable var settings: SettingsManager
+
+    var body: some View {
+        SettingsFormSection("settings.videoInfo.actions.header", footer: "settings.videoInfo.actions.footer") {
+            Picker(
+                String(localized: "settings.videoInfo.actionsLayout"),
+                selection: $settings.videoInfoActionsLayout
+            ) {
+                ForEach(VideoInfoActionsLayout.allCases, id: \.self) { layout in
+                    Text(layout.displayName).tag(layout)
+                }
+            }
+
+            if settings.videoInfoActionsLayout == .toolbar {
+                Picker(
+                    String(localized: "settings.videoInfo.primaryAction"),
+                    selection: $settings.videoInfoPrimaryAction
+                ) {
+                    ForEach(VideoInfoPrimaryAction.allCases, id: \.self) { action in
+                        Text(action.displayName).tag(action)
+                    }
+                }
+            }
         }
     }
 }

@@ -6,6 +6,9 @@
 //
 
 import SwiftUI
+#if !os(tvOS)
+import TipKit
+#endif
 import Combine
 import CloudKit
 import Nuke
@@ -59,6 +62,11 @@ struct YatteeApp: App {
     init() {
         // Configure Nuke image loading pipeline
         ImageLoadingService.shared.configure()
+
+        #if !os(tvOS)
+        // TipKit: one-time hints such as the video info "tap thumbnail to play" tip
+        try? Tips.configure([.displayFrequency(.immediate), .datastoreLocation(.applicationDefault)])
+        #endif
 
         // Register background tasks early — Apple requires BGTaskScheduler.register()
         // to be called during the app launch sequence, before the run loop starts.

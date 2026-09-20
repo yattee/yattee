@@ -426,6 +426,49 @@ enum VideoTapAction: String, CaseIterable, Codable {
     }
 }
 
+// MARK: - Video Info Actions
+
+/// Where the video info view shows its actions (Play, Download, Share, Add to Playlist, Bookmark).
+enum VideoInfoActionsLayout: String, CaseIterable, Codable {
+    /// Inline button rows below the header.
+    case buttons
+    /// Primary action in the toolbar; the rest in an ellipsis menu (default).
+    case toolbar
+
+    var displayName: String {
+        switch self {
+        case .buttons:
+            return String(localized: "settings.videoInfo.actionsLayout.buttons")
+        case .toolbar:
+            return String(localized: "settings.videoInfo.actionsLayout.toolbar")
+        }
+    }
+}
+
+/// The action pinned to the video info toolbar when `VideoInfoActionsLayout.toolbar` is active.
+enum VideoInfoPrimaryAction: String, CaseIterable, Codable {
+    case play
+    case download
+    case share
+    case addToPlaylist
+    case bookmark
+
+    var displayName: String {
+        switch self {
+        case .play:
+            return String(localized: "video.context.play")
+        case .download:
+            return String(localized: "video.download")
+        case .share:
+            return String(localized: "video.share")
+        case .addToPlaylist:
+            return String(localized: "video.context.addToPlaylist")
+        case .bookmark:
+            return String(localized: "video.bookmark")
+        }
+    }
+}
+
 // MARK: - Resume Action
 
 /// Action to perform when starting a partially watched video.
