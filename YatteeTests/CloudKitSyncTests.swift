@@ -217,4 +217,70 @@ struct CloudKitSyncTests {
             #expect(resolved["notificationsEnabled"] as? Int64 == 1)
         }
     }
+
+    // MARK: - Record Names
+
+    @Suite("Record Names")
+    struct RecordNameTests {
+
+        private static let zone = CKRecordZone(zoneName: RecordType.zoneName)
+        private static let extracted = SourceScope.from(
+            sourceRawValue: "extracted", globalProvider: nil, instanceURLString: nil, externalExtractor: "media_source_webdav"
+        )
+
+        /// A WebDAV media-source ID: the full path, far past CloudKit's limit.
+        private static let longVideoID = String(repeating: "Ted Lasso S04E05 Riches of Embarrassment 1080p ATVP WEB-DL/", count: 6) + "episode.mkv"
+
+        @Test("Short IDs keep their verbatim record name")
+        func shortIDVerbatim() {
+            let name = SyncableRecordType.watchEntry(videoID: "abc123", scope: Self.extracted).recordID(in: Self.zone).recordName
+            #expect(name == "watch-abc123@extracted:media_source_webdav")
+            #expect(SyncableRecordType.isHashedBareID(SyncableRecordType.extractBareID(from: String(name.dropFirst(6)))) == false)
+        }
+
+        @Test("Over-long IDs fall back to a digest that fits CloudKit's limit")
+        func longIDHashed() {
+            let verbatim = "watch-\(Self.longVideoID)\(Self.extracted.recordNameSuffix)"
+            #expect(verbatim.utf8.count > SyncableRecordType.maxRecordNameLength)
+
+            let recordID = SyncableRecordType.watchEntry(videoID: Self.longVideoID, scope: Self.extracted).recordID(in: Self.zone)
+            let name = recordID.recordName
+            #expect(name.utf8.count <= SyncableRecordType.maxRecordNameLength)
+            #expect(name.hasPrefix("watch-sha256-"))
+            #expect(name.hasSuffix("@extracted:media_source_webdav"))
+
+            let bareID = SyncableRecordType.extractBareID(from: String(name.dropFirst(6)))
+            #expect(SyncableRecordType.isHashedBareID(bareID))
+            #expect(SyncableRecordType.entityID(Self.longVideoID, matchesBareID: bareID))
+            #expect(SyncableRecordType.entityID(Self.longVideoID + "x", matchesBareID: bareID) == false)
+        }
+
+        @Test("Digest names are stable and distinct per ID and scope")
+        func digestStable() {
+            let a = SyncableRecordType.bookmark(videoID: Self.longVideoID, scope: Self.extracted).recordID(in: Self.zone).recordName
+            let b = SyncableRecordType.bookmark(videoID: Self.longVideoID, scope: Self.extracted).recordID(in: Self.zone).recordName
+            let other = SyncableRecordType.bookmark(videoID: Self.longVideoID + "2", scope: Self.extracted).recordID(in: Self.zone).recordName
+            #expect(a == b)
+            #expect(a != other)
+        }
+
+        @Test("The mapper round-trips a long-ID watch entry without throwing")
+        @MainActor
+        func mapperLongID() {
+            let entry = WatchEntry(
+                videoID: Self.longVideoID,
+                sourceRawValue: "extracted",
+                title: "Video",
+                authorName: "Channel",
+                authorID: "ch1",
+                duration: 10,
+                watchedSeconds: 5,
+                isLive: false
+            )
+            entry.externalExtractor = "media_source_webdav"
+            let record = CloudKitSyncTests.makeMapper().toCKRecord(watchEntry: entry)
+            #expect(record.recordID.recordName.hasPrefix("watch-sha256-"))
+            #expect(record["videoID"] as? String == Self.longVideoID)
+        }
+    }
 }

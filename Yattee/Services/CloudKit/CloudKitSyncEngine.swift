@@ -2092,38 +2092,51 @@ extension CloudKitSyncEngine: CKSyncEngineDelegate {
     /// Bare-ID lookups can return an entity from a different source scope when
     /// IDs collide across sources; these helpers match on the mapper-derived
     /// record name so the right entity is merged, materialized, or deleted.
+    /// Entities whose ID corresponds to a bare ID parsed from a record name.
+    /// A verbatim bare ID is an indexed lookup; a digest (an ID too long to
+    /// embed in the record name) has to be matched against every entity.
+    private func candidates<Entity>(
+        for bareID: String,
+        exact: (String) -> [Entity],
+        all: () -> [Entity],
+        id: (Entity) -> String
+    ) -> [Entity] {
+        guard SyncableRecordType.isHashedBareID(bareID) else { return exact(bareID) }
+        return all().filter { SyncableRecordType.entityID(id($0), matchesBareID: bareID) }
+    }
+
     private func localSubscription(matching recordName: String, channelID: String, in dataManager: DataManager) -> Subscription? {
-        dataManager.subscriptions(forChannelID: channelID).first {
+        candidates(for: channelID, exact: dataManager.subscriptions(forChannelID:), all: dataManager.subscriptions, id: \.channelID).first {
             recordMapper.toCKRecord(subscription: $0).recordID.recordName == recordName
         }
     }
 
     private func localWatchEntry(matching recordName: String, videoID: String, in dataManager: DataManager) -> WatchEntry? {
-        dataManager.watchEntries(forVideoID: videoID).first {
+        candidates(for: videoID, exact: dataManager.watchEntries(forVideoID:), all: dataManager.allWatchEntries, id: \.videoID).first {
             recordMapper.toCKRecord(watchEntry: $0).recordID.recordName == recordName
         }
     }
 
     private func localBookmark(matching recordName: String, videoID: String, in dataManager: DataManager) -> Bookmark? {
-        dataManager.bookmarks(forVideoID: videoID).first {
+        candidates(for: videoID, exact: dataManager.bookmarks(forVideoID:), all: dataManager.allBookmarks, id: \.videoID).first {
             recordMapper.toCKRecord(bookmark: $0).recordID.recordName == recordName
         }
     }
 
     private func localRecentChannel(matching recordName: String, channelID: String, in dataManager: DataManager) -> RecentChannel? {
-        dataManager.recentChannelEntries(forChannelID: channelID).first {
+        candidates(for: channelID, exact: dataManager.recentChannelEntries(forChannelID:), all: dataManager.allRecentChannels, id: \.channelID).first {
             recordMapper.toCKRecord(recentChannel: $0).recordID.recordName == recordName
         }
     }
 
     private func localRecentPlaylist(matching recordName: String, playlistID: String, in dataManager: DataManager) -> RecentPlaylist? {
-        dataManager.recentPlaylistEntries(forPlaylistID: playlistID).first {
+        candidates(for: playlistID, exact: dataManager.recentPlaylistEntries(forPlaylistID:), all: dataManager.allRecentPlaylists, id: \.playlistID).first {
             recordMapper.toCKRecord(recentPlaylist: $0).recordID.recordName == recordName
         }
     }
 
     private func localChannelNotificationSettings(matching recordName: String, channelID: String, in dataManager: DataManager) -> ChannelNotificationSettings? {
-        dataManager.allChannelNotificationSettings(forChannelID: channelID).first {
+        candidates(for: channelID, exact: dataManager.allChannelNotificationSettings(forChannelID:), all: dataManager.allChannelNotificationSettings, id: \.channelID).first {
             recordMapper.toCKRecord(channelNotificationSettings: $0).recordID.recordName == recordName
         }
     }

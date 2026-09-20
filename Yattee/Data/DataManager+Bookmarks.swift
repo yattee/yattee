@@ -130,6 +130,12 @@ extension DataManager {
         return (try? modelContext.fetch(descriptor)) ?? []
     }
 
+    /// Gets every bookmark, for lookups that cannot go through the
+    /// video-ID index (CloudKit record names that carry a digest of the ID).
+    func allBookmarks() -> [Bookmark] {
+        (try? modelContext.fetch(FetchDescriptor<Bookmark>())) ?? []
+    }
+
     /// Deletes a single bookmark without queueing a CloudKit deletion.
     /// Used by CloudKitSyncEngine when applying remote deletions.
     func deleteBookmark(_ bookmark: Bookmark) {

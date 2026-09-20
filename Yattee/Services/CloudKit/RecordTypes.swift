@@ -6,6 +6,7 @@
 //
 
 import CloudKit
+import CryptoKit
 import Foundation
 
 /// CloudKit record type names and constants.
@@ -131,6 +132,43 @@ enum SyncableRecordType: Sendable {
         }
     }
 
+    /// CloudKit rejects record names longer than this with a fatal
+    /// `CKException` at `CKRecord.ID` construction time.
+    static let maxRecordNameLength = 255
+
+    /// Marks a bare-ID component that is a digest of the real ID rather than
+    /// the ID itself. Extracted-source video IDs can be full file paths, which
+    /// blow past the record name limit when embedded verbatim.
+    static let hashedIDPrefix = "sha256-"
+
+    /// The bare-ID component used in place of `id` when the verbatim name
+    /// would be too long. Deterministic, so every device derives the same
+    /// record name for the same entity.
+    static func hashedBareID(for id: String) -> String {
+        let digest = SHA256.hash(data: Data(id.utf8))
+        return hashedIDPrefix + digest.map { String(format: "%02x", $0) }.joined()
+    }
+
+    /// Whether a bare ID parsed out of a record name is a digest, in which
+    /// case the real ID must be recovered by matching local entities.
+    static func isHashedBareID(_ bareID: String) -> Bool {
+        bareID.hasPrefix(hashedIDPrefix) && bareID.count == hashedIDPrefix.count + 64
+    }
+
+    /// Whether an entity ID corresponds to the bare-ID component parsed from
+    /// a record name, whichever form (verbatim or digest) that component took.
+    static func entityID(_ id: String, matchesBareID bareID: String) -> Bool {
+        isHashedBareID(bareID) ? hashedBareID(for: id) == bareID : id == bareID
+    }
+
+    /// Builds a scoped record name, falling back to a digest of the ID when
+    /// the verbatim form would exceed CloudKit's limit.
+    private static func scopedRecordName(prefix: String, id: String, scope: SourceScope) -> String {
+        let verbatim = "\(prefix)\(id)\(scope.recordNameSuffix)"
+        guard verbatim.utf8.count > maxRecordNameLength else { return verbatim }
+        return "\(prefix)\(hashedBareID(for: id))\(scope.recordNameSuffix)"
+    }
+
     /// Extracts the bare ID from a record name by stripping the scope suffix.
     static func extractBareID(from value: String) -> String {
         for prefix in ["@global:", "@federated:", "@extracted:"] {
@@ -147,11 +185,11 @@ enum SyncableRecordType: Sendable {
 
         switch self {
         case .subscription(let channelID, let scope):
-            recordName = "sub-\(channelID)\(scope.recordNameSuffix)"
+            recordName = Self.scopedRecordName(prefix: "sub-", id: channelID, scope: scope)
         case .watchEntry(let videoID, let scope):
-            recordName = "watch-\(videoID)\(scope.recordNameSuffix)"
+            recordName = Self.scopedRecordName(prefix: "watch-", id: videoID, scope: scope)
         case .bookmark(let videoID, let scope):
-            recordName = "bookmark-\(videoID)\(scope.recordNameSuffix)"
+            recordName = Self.scopedRecordName(prefix: "bookmark-", id: videoID, scope: scope)
         case .localPlaylist(let id):
             recordName = "playlist-\(id.uuidString)"
         case .localPlaylistItem(let id):
@@ -159,9 +197,9 @@ enum SyncableRecordType: Sendable {
         case .searchHistory(let id):
             recordName = "search-\(id.uuidString)"
         case .recentChannel(let channelID, let scope):
-            recordName = "recent-channel-\(channelID)\(scope.recordNameSuffix)"
+            recordName = Self.scopedRecordName(prefix: "recent-channel-", id: channelID, scope: scope)
         case .recentPlaylist(let playlistID, let scope):
-            recordName = "recent-playlist-\(playlistID)\(scope.recordNameSuffix)"
+            recordName = Self.scopedRecordName(prefix: "recent-playlist-", id: playlistID, scope: scope)
         case .appSettings:
             recordName = "settings-singleton"
         case .instance(let id):
@@ -169,7 +207,7 @@ enum SyncableRecordType: Sendable {
         case .mediaSource(let id):
             recordName = "source-\(id.uuidString)"
         case .channelNotificationSettings(let channelID, let scope):
-            recordName = "channel-notif-\(channelID)\(scope.recordNameSuffix)"
+            recordName = Self.scopedRecordName(prefix: "channel-notif-", id: channelID, scope: scope)
         case .controlsPreset(let id):
             recordName = "controls-\(id.uuidString)"
         case .account(let id):
