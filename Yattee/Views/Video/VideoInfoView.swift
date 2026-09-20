@@ -41,6 +41,7 @@ struct VideoInfoView: View {
     @State private var loadMoreError: String?
     
     @State private var isBookmarked = false
+    @State private var showingErrorDetailsSheet = false
     @State private var showingPlaylistSheet = false
     @State private var showingCommentsSheet = false
     @State private var showingRemoveBookmarkAlert = false
@@ -181,6 +182,15 @@ struct VideoInfoView: View {
         guard !isLoadingVideoDetails else { return true }
         guard let description = displayedVideo?.description else { return false }
         return !description.isEmpty
+    }
+
+    /// Whether to surface a failed details fetch inline. The card still
+    /// renders from list metadata, but description/stats/related never
+    /// arrived — without this the sections just silently disappear.
+    private var shouldShowDetailsErrorSection: Bool {
+        guard !isLoadingVideoDetails, videoDetailsLoadError != nil,
+              let base = baseVideo else { return false }
+        return loadedVideoDetails[base.id.videoID] == nil
     }
 
     /// Whether the stats section should be visible.
@@ -382,6 +392,11 @@ struct VideoInfoView: View {
                 PlaylistSelectorSheet(video: video)
             }
         }
+        #if !os(tvOS)
+        .sheet(isPresented: $showingErrorDetailsSheet) {
+            ErrorDetailsSheet(errorMessage: videoDetailsLoadError ?? initialVideoLoadError ?? "Unknown error")
+        }
+        #endif
         #if os(tvOS)
         .fullScreenCover(isPresented: $showingCommentsSheet) {
             commentsSheetContent
@@ -494,6 +509,15 @@ struct VideoInfoView: View {
                                 .padding(.horizontal)
 
                             bookmarkDetailsSection(bookmark)
+                        }
+
+                        // Details fetch failed - show error with retry instead of
+                        // silently hiding the description/stats sections
+                        if shouldShowDetailsErrorSection {
+                            Divider()
+                                .padding(.horizontal)
+
+                            detailsErrorSection
                         }
 
                         // Description section (collapsible) - only show if description available
@@ -739,6 +763,12 @@ struct VideoInfoView: View {
                                 .padding(.horizontal)
                                 .padding(.vertical, 16)
                         }
+                    } else if shouldShowDetailsErrorSection {
+                        detailsErrorSection
+
+                        Divider()
+                            .padding(.horizontal)
+                            .padding(.vertical, 16)
                     }
 
                     if !isDescriptionScrollLocked {
@@ -803,6 +833,14 @@ struct VideoInfoView: View {
                     await loadVideoDetails()
                 }
             }
+
+            #if !os(tvOS)
+            Button {
+                showingErrorDetailsSheet = true
+            } label: {
+                Label(String(localized: "player.error.button"), systemImage: "info.circle")
+            }
+            #endif
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
     }
@@ -1754,6 +1792,46 @@ struct VideoInfoView: View {
                 .fontWeight(.medium)
         }
         .frame(maxWidth: .infinity, alignment: .leading)
+    }
+
+    // MARK: - Details Error Section
+
+    /// Inline error shown when the details fetch failed but the video card
+    /// still renders from list metadata (e.g. deleted/unavailable video).
+    private var detailsErrorSection: some View {
+        VStack(spacing: 12) {
+            Label(String(localized: "video.error.title"), systemImage: "exclamationmark.triangle")
+                .font(.headline)
+                .foregroundStyle(.secondary)
+
+            if let error = videoDetailsLoadError {
+                Text(error)
+                    .font(.subheadline)
+                    .foregroundStyle(.secondary)
+                    .multilineTextAlignment(.center)
+            }
+
+            HStack(spacing: 12) {
+                Button(String(localized: "common.retry")) {
+                    Task {
+                        await loadVideoDetails()
+                    }
+                }
+                .buttonStyle(.bordered)
+
+                #if !os(tvOS)
+                Button {
+                    showingErrorDetailsSheet = true
+                } label: {
+                    Label(String(localized: "player.error.button"), systemImage: "info.circle")
+                }
+                .buttonStyle(.bordered)
+                #endif
+            }
+        }
+        .frame(maxWidth: .infinity)
+        .padding(.horizontal)
+        .padding(.vertical, 16)
     }
 
     // MARK: - Description Section

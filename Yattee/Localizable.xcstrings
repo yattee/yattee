@@ -19135,7 +19135,15 @@
       }
     },
     "video.error.title" : {
-
+      "comment" : "Title shown when a video fails to load",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Failed to Load Video"
+          }
+        }
+      }
     },
     "video.navigation.next" : {
       "comment" : "Accessibility label for next video button",
