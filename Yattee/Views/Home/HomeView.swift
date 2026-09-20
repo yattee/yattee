@@ -335,6 +335,10 @@ struct HomeView: View {
                 }
             case .downloads:
                 break
+            case .remoteServers:
+                if !homeRemoteServers.isEmpty { return false }
+            case .fileSources:
+                if !homeFileSources.isEmpty { return false }
             case .instanceContent(let instanceID, let contentType):
                 if hasInstanceContent(instanceID: instanceID, contentType: contentType) { return false }
             case .mediaSource:
@@ -1279,6 +1283,14 @@ struct HomeView: View {
             #else
             EmptyView()
             #endif
+        case .remoteServers:
+            if !homeRemoteServers.isEmpty {
+                remoteServersSection
+            }
+        case .fileSources:
+            if !homeFileSources.isEmpty {
+                fileSourcesSection
+            }
         case .instanceContent(let instanceID, let contentType):
             instanceContentSection(instanceID: instanceID, contentType: contentType)
         case .mediaSource:
@@ -1287,6 +1299,141 @@ struct HomeView: View {
             // unreachable in practice. Rendered as empty for defense-in-depth.
             EmptyView()
         }
+    }
+
+    // MARK: - Sources Sections
+
+    /// Enabled remote servers in the Sources screen's order.
+    private var homeRemoteServers: [Instance] {
+        let instances = appEnvironment?.instancesManager.enabledInstances ?? []
+        return appEnvironment?.sourcesSettings.sorted(instances) ?? instances
+    }
+
+    /// Enabled file sources in the Sources screen's order.
+    private var homeFileSources: [MediaSource] {
+        let sources = appEnvironment?.mediaSourcesManager.enabledSources ?? []
+        return appEnvironment?.sourcesSettings.sorted(sources) ?? sources
+    }
+
+    private var remoteServersSection: some View {
+        VStack(alignment: .leading, spacing: 0) {
+            sectionHeader(title: "sources.section.remoteServers") {
+                appEnvironment?.navigationCoordinator.navigate(to: .mediaSources)
+            }
+
+            VideoListContent(listStyle: listStyle) {
+                let instances = homeRemoteServers
+                ForEach(Array(instances.enumerated()), id: \.element.id) { index, instance in
+                    SourceListRow(isLast: index == instances.count - 1, listStyle: listStyle) {
+                        Button {
+                            appEnvironment?.navigationCoordinator.navigate(to: .instanceBrowse(instance))
+                        } label: {
+                            homeSourceRow(
+                                systemImage: instance.type.systemImage,
+                                name: instance.displayName,
+                                detail: "\(instance.type.displayName) - \(instance.url.host ?? instance.url.absoluteString)"
+                            )
+                        }
+                        #if os(macOS)
+                        .buttonStyle(.plain)
+                        #elseif os(tvOS)
+                        .buttonStyle(TVHomeRowButtonStyle())
+                        #else
+                        .foregroundStyle(.primary)
+                        #endif
+                    }
+                }
+            }
+        }
+    }
+
+    private var fileSourcesSection: some View {
+        VStack(alignment: .leading, spacing: 0) {
+            sectionHeader(title: "sources.section.fileSources") {
+                appEnvironment?.navigationCoordinator.navigate(to: .mediaSources)
+            }
+
+            VideoListContent(listStyle: listStyle) {
+                let sources = homeFileSources
+                ForEach(Array(sources.enumerated()), id: \.element.id) { index, source in
+                    let needsPassword = appEnvironment?.mediaSourcesManager.needsPassword(for: source) ?? false
+                    SourceListRow(isLast: index == sources.count - 1, listStyle: listStyle) {
+                        Button {
+                            if needsPassword {
+                                // The browser can't open without credentials; the
+                                // Sources screen holds the edit flow that fixes it.
+                                appEnvironment?.navigationCoordinator.navigate(to: .mediaSources)
+                            } else {
+                                appEnvironment?.navigationCoordinator.navigate(to: .mediaBrowser(source, path: "/"))
+                            }
+                        } label: {
+                            homeSourceRow(
+                                systemImage: source.type.systemImage,
+                                name: source.name,
+                                detail: "\(source.type.displayName) - \(source.urlDisplayString)",
+                                needsPassword: needsPassword
+                            )
+                        }
+                        #if os(macOS)
+                        .buttonStyle(.plain)
+                        #elseif os(tvOS)
+                        .buttonStyle(TVHomeRowButtonStyle())
+                        #else
+                        .foregroundStyle(.primary)
+                        #endif
+                    }
+                }
+            }
+        }
+    }
+
+    /// Row content matching the Sources screen's listing.
+    private func homeSourceRow(systemImage: String, name: String, detail: String, needsPassword: Bool = false) -> some View {
+        #if os(tvOS)
+        let rowSpacing: CGFloat = 24
+        #else
+        let rowSpacing: CGFloat = 12
+        #endif
+        #if os(macOS)
+        let iconFont: Font = .title3
+        let iconFrameWidth: CGFloat = 24
+        let titleFont: Font = .body
+        #else
+        let iconFont: Font = .title2
+        let iconFrameWidth: CGFloat = 32
+        let titleFont: Font = .headline
+        #endif
+        return HStack(spacing: rowSpacing) {
+            Image(systemName: systemImage)
+                .font(iconFont)
+                .foregroundStyle(.tint)
+                .frame(width: iconFrameWidth)
+
+            VStack(alignment: .leading, spacing: 2) {
+                Text(name)
+                    .font(titleFont)
+                    .foregroundStyle(.primary)
+
+                Text(detail)
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+
+                if needsPassword {
+                    Label(String(localized: "sources.status.authRequired"), systemImage: "key.fill")
+                        .font(.caption2)
+                        .foregroundStyle(.orange)
+                }
+            }
+
+            Spacer()
+
+            #if !os(macOS)
+            Image(systemName: "chevron.right")
+                .font(.caption)
+                .foregroundStyle(.tertiary)
+            #endif
+        }
+        .contentShape(Rectangle())
     }
 
     private var continueWatchingSection: some View {

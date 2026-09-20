@@ -434,6 +434,12 @@ enum HomeSectionItem: Codable, Hashable, Identifiable, Sendable {
     case bookmarks
     case history
     case downloads
+    /// All enabled remote servers, listed like the Sources screen; tapping one
+    /// opens its browse view.
+    case remoteServers
+    /// All enabled file sources (WebDAV, SMB, local folders), listed like the
+    /// Sources screen; tapping one opens its file browser.
+    case fileSources
     case instanceContent(instanceID: UUID, contentType: InstanceContentType)
     /// Legacy, decode-only. Media sources are shortcuts-only now — a media-source
     /// "section" was just a browse link. Kept so existing saved `homeSectionOrder`
@@ -449,6 +455,8 @@ enum HomeSectionItem: Codable, Hashable, Identifiable, Sendable {
         case .bookmarks: return "bookmarks"
         case .history: return "history"
         case .downloads: return "downloads"
+        case .remoteServers: return "remoteServers"
+        case .fileSources: return "fileSources"
         case .instanceContent(let instanceID, let contentType):
             return "instance_\(instanceID.uuidString)_\(contentType.rawValue)"
         case .mediaSource(let sourceID):
@@ -459,18 +467,18 @@ enum HomeSectionItem: Codable, Hashable, Identifiable, Sendable {
     /// Default order for sections.
     static var defaultOrder: [HomeSectionItem] {
         #if os(tvOS)
-        [.continueWatching, .feed, .bookmarks, .history]
+        [.continueWatching, .feed, .bookmarks, .history, .remoteServers, .fileSources]
         #else
-        [.continueWatching, .feed, .bookmarks, .history, .downloads]
+        [.continueWatching, .feed, .bookmarks, .history, .downloads, .remoteServers, .fileSources]
         #endif
     }
 
     /// Default visibility for sections (only continue watching on by default).
     static var defaultVisibility: [HomeSectionItem: Bool] {
         #if os(tvOS)
-        [.continueWatching: true, .feed: false, .bookmarks: false, .history: false]
+        [.continueWatching: true, .feed: false, .bookmarks: false, .history: false, .remoteServers: false, .fileSources: false]
         #else
-        [.continueWatching: true, .feed: false, .bookmarks: false, .history: false, .downloads: false]
+        [.continueWatching: true, .feed: false, .bookmarks: false, .history: false, .downloads: false, .remoteServers: false, .fileSources: false]
         #endif
     }
 
@@ -483,6 +491,8 @@ enum HomeSectionItem: Codable, Hashable, Identifiable, Sendable {
         case .bookmarks: return "bookmark.fill"
         case .history: return "clock.arrow.circlepath"
         case .downloads: return "arrow.down.circle.fill"
+        case .remoteServers: return "server.rack"
+        case .fileSources: return "externaldrive.connected.to.line.below"
         case .instanceContent(_, let contentType):
             return contentType.icon
         case .mediaSource:
@@ -499,6 +509,8 @@ enum HomeSectionItem: Codable, Hashable, Identifiable, Sendable {
         case .bookmarks: return String(localized: "home.section.bookmarks")
         case .history: return String(localized: "home.section.history")
         case .downloads: return String(localized: "home.section.downloads")
+        case .remoteServers: return String(localized: "sources.section.remoteServers")
+        case .fileSources: return String(localized: "sources.section.fileSources")
         case .instanceContent(_, let contentType):
             return contentType.localizedTitle
         case .mediaSource:
@@ -521,6 +533,8 @@ enum HomeSectionItem: Codable, Hashable, Identifiable, Sendable {
         case bookmarks
         case history
         case downloads
+        case remoteServers
+        case fileSources
         case instanceContent
         case mediaSource
     }
@@ -539,6 +553,10 @@ enum HomeSectionItem: Codable, Hashable, Identifiable, Sendable {
             try container.encode(SectionType.history, forKey: .type)
         case .downloads:
             try container.encode(SectionType.downloads, forKey: .type)
+        case .remoteServers:
+            try container.encode(SectionType.remoteServers, forKey: .type)
+        case .fileSources:
+            try container.encode(SectionType.fileSources, forKey: .type)
         case .instanceContent(let instanceID, let contentType):
             try container.encode(SectionType.instanceContent, forKey: .type)
             try container.encode(instanceID, forKey: .instanceID)
@@ -564,6 +582,10 @@ enum HomeSectionItem: Codable, Hashable, Identifiable, Sendable {
             self = .history
         case .downloads:
             self = .downloads
+        case .remoteServers:
+            self = .remoteServers
+        case .fileSources:
+            self = .fileSources
         case .instanceContent:
             let instanceID = try container.decode(UUID.self, forKey: .instanceID)
             let contentType = try container.decode(InstanceContentType.self, forKey: .contentType)
