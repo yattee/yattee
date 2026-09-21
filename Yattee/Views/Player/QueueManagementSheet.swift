@@ -16,26 +16,6 @@ struct QueueManagementSheet: View {
     /// nil, falls back to `@Environment(\.dismiss)`.
     var onDismiss: (() -> Void)?
 
-    #if os(tvOS)
-    /// Identifies which row should receive focus when the inline panel appears.
-    /// Necessary because tvOS doesn't auto-focus an inline overlay the way it
-    /// does for `fullScreenCover`.
-    enum InlinePanelFocus: Hashable {
-        case history(String)
-        case nowPlaying
-        case upNext(String)
-    }
-
-    @FocusState var inlinePanelFocus: InlinePanelFocus?
-
-    private var inlinePanelInitialFocusTarget: InlinePanelFocus? {
-        if let first = history.first { return .history(first.id) }
-        if playerState?.currentVideo != nil { return .nowPlaying }
-        if let first = queue.first { return .upNext(first.id) }
-        return nil
-    }
-    #endif
-
     private func performDismiss() {
         if let onDismiss {
             onDismiss()
@@ -98,11 +78,6 @@ struct QueueManagementSheet: View {
                 .ignoresSafeArea()
         )
         .onExitCommand { performDismiss() }
-        .onAppear {
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.45) {
-                inlinePanelFocus = inlinePanelInitialFocusTarget
-            }
-        }
     }
     #endif
 
@@ -199,113 +174,13 @@ struct QueueManagementSheet: View {
 
     #if os(tvOS)
     private var tvOSQueueListView: some View {
-        ScrollViewReader { proxy in
-            ScrollView {
-                VStack(alignment: .leading, spacing: 24) {
-                    if !history.isEmpty {
-                        sectionHeader(
-                            String(localized: "queue.section.previously"),
-                            count: history.count
-                        )
-                        VStack(spacing: 20) {
-                            ForEach(Array(history.enumerated()), id: \.element.id) { index, historyItem in
-                                QueueItemRow(
-                                    queuedVideo: historyItem,
-                                    index: nil,
-                                    isCurrentlyPlaying: false,
-                                    onRemove: { },
-                                    onTap: { playFromHistory(at: index) }
-                                )
-                                .focused($inlinePanelFocus, equals: .history(historyItem.id))
-                            }
-                        }
-                    }
-
-                    if let currentVideo = playerState?.currentVideo {
-                        sectionHeader(String(localized: "queue.section.nowPlaying"))
-                            .id("now-playing")
-
-                        let nowPlayingItem = QueuedVideo(
-                            video: currentVideo,
-                            stream: playerState?.currentStream,
-                            queueSource: nil
-                        )
-                        QueueItemRow(
-                            queuedVideo: nowPlayingItem,
-                            index: nil,
-                            isCurrentlyPlaying: true,
-                            onRemove: { },
-                            onTap: { }
-                        )
-                        .focused($inlinePanelFocus, equals: .nowPlaying)
-                    }
-
-                    if !queue.isEmpty {
-                        sectionHeader(
-                            String(localized: "queue.section.upNext"),
-                            count: queue.count
-                        )
-                        VStack(spacing: 20) {
-                            ForEach(Array(queue.enumerated()), id: \.element.id) { index, queuedVideo in
-                                QueueItemRow(
-                                    queuedVideo: queuedVideo,
-                                    index: index + 1,
-                                    isCurrentlyPlaying: false,
-                                    onRemove: {
-                                        withAnimation {
-                                            queueManager?.removeFromQueue(id: queuedVideo.id)
-                                        }
-                                    },
-                                    onTap: { playVideo(at: index) }
-                                )
-                                .focused($inlinePanelFocus, equals: .upNext(queuedVideo.id))
-                            }
-
-                            if hasMoreItems {
-                                HStack {
-                                    Spacer()
-                                    if isLoadingMore {
-                                        ProgressView().controlSize(.small)
-                                    } else {
-                                        Button {
-                                            Task { try? await queueManager?.loadMoreQueueItems() }
-                                        } label: {
-                                            Text(String(localized: "queue.sheet.loadMore"))
-                                                .font(.subheadline)
-                                                .foregroundStyle(.tint)
-                                        }
-                                    }
-                                    Spacer()
-                                }
-                                .padding(.top, 12)
-                            }
-                        }
-                    }
-                }
-                .padding(.horizontal, 80)
-                .padding(.vertical, 24)
+        TVQueueListView(
+            autoFocusOnAppear: true,
+            onDidSelectVideo: {
+                navigationCoordinator?.isMiniPlayerQueueSheetPresented = false
+                performDismiss()
             }
-            .onAppear {
-                DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-                    proxy.scrollTo("now-playing", anchor: .center)
-                }
-            }
-        }
-    }
-
-    @ViewBuilder
-    private func sectionHeader(_ title: String, count: Int? = nil) -> some View {
-        HStack {
-            Text(title.uppercased())
-                .font(.caption)
-                .foregroundStyle(.secondary)
-            Spacer()
-            if let count {
-                Text(String(localized: "queue.section.count \(count)"))
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
-            }
-        }
+        )
     }
     #endif
 
@@ -357,21 +232,6 @@ struct QueueManagementSheet: View {
         playerState.queueMode = modes[nextIndex]
     }
 
-    // MARK: - Actions
-
-    #if os(tvOS)
-    private func playVideo(at index: Int) {
-        QueuePlaybackActions.playVideo(at: index, appEnvironment: appEnvironment)
-        navigationCoordinator?.isMiniPlayerQueueSheetPresented = false
-        performDismiss()
-    }
-
-    private func playFromHistory(at index: Int) {
-        QueuePlaybackActions.playFromHistory(at: index, appEnvironment: appEnvironment)
-        navigationCoordinator?.isMiniPlayerQueueSheetPresented = false
-        performDismiss()
-    }
-    #endif
 }
 
 #Preview {

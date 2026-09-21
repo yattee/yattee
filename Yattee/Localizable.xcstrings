@@ -7577,6 +7577,17 @@
         }
       }
     },
+    "panel.settings.duplicatePreset" : {
+      "comment" : "tvOS button duplicating the active preset so it can be edited",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Duplicate Preset to Edit"
+          }
+        }
+      }
+    },
     "panel.settings.elements.header" : {
       "comment" : "Details panel page editor section header",
       "localizations" : {
@@ -7639,6 +7650,28 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Corner shows the video in the top corner with pages in a side column and below the video. The standard layout is used automatically when the window is too narrow."
+          }
+        }
+      }
+    },
+    "panel.settings.moveDown" : {
+      "comment" : "tvOS page editor button moving the page later in the order",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Move Down"
+          }
+        }
+      }
+    },
+    "panel.settings.moveUp" : {
+      "comment" : "tvOS page editor button moving the page earlier in the order",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Move Up"
           }
         }
       }
@@ -15122,6 +15155,17 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Visibility"
+          }
+        }
+      }
+    },
+    "settings.playerPanels.title" : {
+      "comment" : "tvOS settings row for the player details panel pages",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Player Panels"
           }
         }
       }

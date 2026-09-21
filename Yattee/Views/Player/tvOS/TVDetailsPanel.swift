@@ -10,21 +10,26 @@ import SwiftUI
 import NukeUI
 
 /// Details panel that slides up from the bottom showing video information.
+/// Pages come from the active tvOS preset's panel settings; the tracks page
+/// is not offered on tvOS (the quality panel covers it).
 struct TVDetailsPanel: View {
     let video: Video?
-    let initialTab: TVDetailsTab
+    let initialPage: PanelPageType
     let onDismiss: () -> Void
 
     @Environment(\.appEnvironment) private var appEnvironment
 
-    /// Tab selection for Info / Comments.
-    @State private var selectedTab: TVDetailsTab
+    /// Currently selected page.
+    @State private var selectedPage: PanelPageType
 
-    init(video: Video?, initialTab: TVDetailsTab = .info, onDismiss: @escaping () -> Void) {
+    /// Active preset's panel settings; refreshed from the layout service.
+    @State private var panelSettings: PanelSettings = PanelSettings.cached
+
+    init(video: Video?, initialPage: PanelPageType = .info, onDismiss: @escaping () -> Void) {
         self.video = video
-        self.initialTab = initialTab
+        self.initialPage = initialPage
         self.onDismiss = onDismiss
-        _selectedTab = State(initialValue: initialTab)
+        _selectedPage = State(initialValue: initialPage)
     }
 
     /// Focus state for interactive elements.
@@ -33,36 +38,68 @@ struct TVDetailsPanel: View {
     /// Whether description scroll is locked (prevents focus from leaving description).
     @State private var isDescriptionScrollLocked = false
 
-    /// Comments state
-    @State private var comments: [Comment] = []
-    @State private var commentsState: CommentsLoadState = .idle
-    @State private var commentsContinuation: String?
+    private var playerState: PlayerState? { appEnvironment?.playerService.state }
+
+    // MARK: - Page Visibility
+
+    /// Config enables a page; runtime hides pages with nothing to show.
+    private func isRuntimeVisible(_ pageType: PanelPageType) -> Bool {
+        switch pageType {
+        case .info:
+            return true
+        case .comments:
+            return video?.supportsComments == true
+                && playerState?.commentsState != .disabled
+        case .related:
+            return !(video?.relatedVideos ?? []).isEmpty
+        case .chapters:
+            return !(playerState?.chapters ?? []).isEmpty
+        case .queue:
+            return appEnvironment?.settingsManager.queueEnabled ?? true
+        case .tracks:
+            // The tvOS quality panel covers tracks; never offered here.
+            return false
+        }
+    }
+
+    /// Enabled pages that currently have content, in configured order.
+    /// Falls back to Info so the panel is never empty.
+    private var visiblePages: [PanelPageType] {
+        let pages = panelSettings.enabledPages()
+            .map(\.pageType)
+            .filter { isRuntimeVisible($0) }
+        return pages.isEmpty ? [.info] : pages
+    }
+
+    /// The page to render: the selection when visible, else the first page.
+    private var effectivePage: PanelPageType {
+        let pages = visiblePages
+        return pages.contains(selectedPage) ? selectedPage : (pages.first ?? .info)
+    }
 
     var body: some View {
+        let pages = visiblePages
+
         VStack(spacing: 0) {
-            // Tab picker (hidden when description scroll is locked)
-            if !isDescriptionScrollLocked {
-                Picker("", selection: $selectedTab) {
-                    Text("player.tab.info").tag(TVDetailsTab.info)
-                    if video?.supportsComments == true {
-                        Text("player.tab.comments").tag(TVDetailsTab.comments)
-                    }
-                }
-                .pickerStyle(.segmented)
-                .padding(.horizontal, 40)
-                .padding(.top, 40)
-                .padding(.bottom, 20)
-                .focused($focusedItem, equals: .tabPicker)
-                .transition(.opacity.combined(with: .move(edge: .top)))
+            // Page switcher (hidden when description scroll is locked)
+            if pages.count >= 2, !isDescriptionScrollLocked {
+                pageSwitcher(pages: pages)
+                    .transition(.opacity.combined(with: .move(edge: .top)))
             }
 
-            // Content based on selected tab
+            // Content for the selected page
             Group {
-                switch selectedTab {
-                case .info:
+                switch effectivePage {
+                case .info, .tracks:
                     infoContent
                 case .comments:
                     commentsContent
+                case .related:
+                    TVRelatedPanelList(video: video, onDidSelectVideo: onDismiss)
+                case .chapters:
+                    TVChaptersPanelList()
+                case .queue:
+                    TVQueueListView(horizontalPadding: 0)
                 }
             }
             .padding(.horizontal, 40)
@@ -87,28 +124,88 @@ struct TVDetailsPanel: View {
         .onAppear {
             focusedItem = .tabPicker
         }
-        .onChange(of: selectedTab) { _, newTab in
-            // Reset scroll lock when switching tabs
+        .task {
+            await reloadPanelSettings()
+        }
+        .onReceive(NotificationCenter.default.publisher(for: .playerControlsActivePresetDidChange)) { _ in
+            Task { await reloadPanelSettings() }
+        }
+        .onReceive(NotificationCenter.default.publisher(for: .playerControlsPresetsDidChange)) { _ in
+            Task { await reloadPanelSettings() }
+        }
+        .onChange(of: selectedPage) { _, _ in
+            // Reset scroll lock when switching pages
             if isDescriptionScrollLocked {
                 isDescriptionScrollLocked = false
             }
-            // Reset comments state when switching to comments tab
-            if newTab == .comments && commentsState == .idle {
-                // Comments will load via TVCommentsListView's .task
-            }
         }
-        .onChange(of: video?.supportsComments) { _, supportsComments in
-            // If current video doesn't support comments, switch to info tab
-            if supportsComments == false && selectedTab == .comments {
-                selectedTab = .info
+        .onChange(of: video?.id) { _, _ in
+            // New video: fall back to the first configured page.
+            if let first = visiblePages.first {
+                selectedPage = first
             }
         }
     }
 
+    // MARK: - Page Switcher
+
+    @ViewBuilder
+    private func pageSwitcher(pages: [PanelPageType]) -> some View {
+        // Segmented control fits up to 4 pages in the half-screen panel;
+        // above that a focusable button row keeps labels legible.
+        if pages.count <= 4 {
+            Picker("", selection: $selectedPage) {
+                ForEach(pages, id: \.self) { page in
+                    Text(page.displayName).tag(page)
+                }
+            }
+            .pickerStyle(.segmented)
+            .padding(.horizontal, 40)
+            .padding(.top, 40)
+            .padding(.bottom, 20)
+            .focused($focusedItem, equals: .tabPicker)
+        } else {
+            HStack(spacing: 12) {
+                ForEach(pages, id: \.self) { page in
+                    Button {
+                        selectedPage = page
+                    } label: {
+                        Label(page.displayName, systemImage: page.systemImage)
+                            .font(.callout)
+                            .labelStyle(.titleOnly)
+                    }
+                    .buttonStyle(TVPageSwitcherButtonStyle(isSelected: effectivePage == page))
+                    .focused($focusedItem, equals: .pageButton(page))
+                }
+            }
+            .frame(maxWidth: .infinity)
+            .padding(.horizontal, 40)
+            .padding(.top, 40)
+            .padding(.bottom, 20)
+            .focusSection()
+        }
+    }
+
+    // MARK: - Panel Settings
+
+    private func reloadPanelSettings() async {
+        guard let service = appEnvironment?.playerControlsLayoutService else { return }
+        let layout = await service.activeLayout()
+        let settings = layout.effectivePanelSettings
+        panelSettings = settings
+        PanelSettings.cached = settings
+    }
+
     // MARK: - Info Content
 
+    private var infoSettings: InfoPageSettings {
+        panelSettings.configuration(for: .info)?.infoSettings ?? InfoPageSettings()
+    }
+
     private var infoContent: some View {
-        VStack(spacing: 0) {
+        let settings = infoSettings
+
+        return VStack(spacing: 0) {
             // Top section with title, channel, stats (hidden when description expanded)
             if !isDescriptionScrollLocked {
                 VStack(alignment: .leading, spacing: 24) {
@@ -120,10 +217,14 @@ struct TVDetailsPanel: View {
                         .foregroundStyle(.white)
 
                     // Channel info row
-                    channelRow
+                    if settings.effectiveShowChannelRow {
+                        channelRow
+                    }
 
                     // Stats row
-                    statsRow
+                    if settings.effectiveShowStatsRow {
+                        statsRow
+                    }
                 }
                 .padding(.vertical, 16)
                 .fixedSize(horizontal: false, vertical: true)
@@ -131,7 +232,8 @@ struct TVDetailsPanel: View {
             }
 
             // Description - expands to fill when locked
-            if let description = video?.description, !description.isEmpty {
+            if settings.effectiveShowDescription,
+               let description = video?.description, !description.isEmpty {
                 TVScrollableDescription(
                     description: description,
                     isScrollLocked: $isDescriptionScrollLocked,
@@ -265,13 +367,8 @@ struct TVDetailsPanel: View {
     private var commentsContent: some View {
         ScrollView {
             if let videoID = video?.id.videoID {
-                TVCommentsListView(
-                    videoID: videoID,
-                    comments: $comments,
-                    commentsState: $commentsState,
-                    commentsContinuation: $commentsContinuation
-                )
-                .padding(.vertical, 16)
+                TVCommentsListView(videoID: videoID)
+                    .padding(.vertical, 16)
             } else {
                 Text(String(localized: "comments.unavailable"))
                     .font(.body)
@@ -292,17 +389,35 @@ struct TVDetailsPanel: View {
 
 // MARK: - Supporting Types
 
-/// Tabs for the details panel.
-enum TVDetailsTab: String, CaseIterable {
-    case info
-    case comments
-}
-
 /// Focus items for the details panel.
 enum TVDetailsFocusItem: Hashable {
     case tabPicker
+    case pageButton(PanelPageType)
     case channelButton
     case description
+}
+
+/// Button style for the page switcher row used when more than four pages are
+/// enabled. Solid focus fill (materials are invisible over video on Apple TV
+/// HD); the selected page keeps a subtle persistent fill.
+struct TVPageSwitcherButtonStyle: ButtonStyle {
+    let isSelected: Bool
+    @Environment(\.isFocused) private var isFocused
+
+    func makeBody(configuration: Configuration) -> some View {
+        configuration.label
+            .foregroundStyle(isFocused ? Color.black : (isSelected ? .white : .white.opacity(0.6)))
+            .lineLimit(1)
+            .padding(.horizontal, 18)
+            .padding(.vertical, 10)
+            .background(
+                Capsule()
+                    .fill(isFocused ? Color.white.opacity(0.92) : (isSelected ? Color.white.opacity(0.2) : .clear))
+            )
+            .scaleEffect(configuration.isPressed ? 0.95 : (isFocused ? 1.05 : 1.0))
+            .animation(.easeInOut(duration: 0.15), value: isFocused)
+            .animation(.easeInOut(duration: 0.1), value: configuration.isPressed)
+    }
 }
 
 /// Scrollable description view with click-to-lock scrolling.
@@ -430,19 +545,22 @@ struct TVDescriptionButtonStyle: ButtonStyle {
 
 /// tvOS comments list with focusable comment rows.
 /// Each comment is focusable to allow one-by-one navigation.
+/// Backed by the unified `PlayerState` comments loader shared with iOS/macOS,
+/// so a page opened here reuses (and feeds) the same fetched comments.
 struct TVCommentsListView: View {
     let videoID: String
-    @Binding var comments: [Comment]
-    @Binding var commentsState: CommentsLoadState
-    @Binding var commentsContinuation: String?
 
     @Environment(\.appEnvironment) private var appEnvironment
 
     private var contentService: ContentService? { appEnvironment?.contentService }
     private var instancesManager: InstancesManager? { appEnvironment?.instancesManager }
+    private var playerState: PlayerState? { appEnvironment?.playerService.state }
+
+    private var comments: [Comment] { playerState?.comments ?? [] }
+    private var commentsState: CommentsLoadState { playerState?.commentsState ?? .idle }
 
     private var canLoadMore: Bool {
-        commentsContinuation != nil && commentsState == .loaded
+        playerState?.commentsContinuation != nil && commentsState == .loaded
     }
 
     var body: some View {
@@ -544,39 +662,15 @@ struct TVCommentsListView: View {
     }
 
     private func loadComments() async {
-        guard commentsState == .idle else { return }
-        guard let contentService, let instancesManager else { return }
-        guard let instance = instancesManager.enabledInstances.first(where: \.isYouTubeInstance) else { return }
-
-        commentsState = .loading
-
-        do {
-            let page = try await contentService.comments(videoID: videoID, instance: instance, continuation: nil)
-            comments = page.comments
-            commentsContinuation = page.continuation
-            commentsState = .loaded
-        } catch let error as APIError where error == .commentsDisabled {
-            commentsState = .disabled
-        } catch {
-            commentsState = .error
-        }
+        guard commentsState == .idle || commentsState == .error else { return }
+        guard let playerState, let contentService, let instancesManager else { return }
+        await playerState.loadComments(contentService: contentService, instancesManager: instancesManager)
     }
 
     private func loadMoreComments() async {
         guard canLoadMore else { return }
-        guard let contentService, let instancesManager else { return }
-        guard let instance = instancesManager.enabledInstances.first(where: \.isYouTubeInstance) else { return }
-
-        commentsState = .loadingMore
-
-        do {
-            let page = try await contentService.comments(videoID: videoID, instance: instance, continuation: commentsContinuation)
-            comments.append(contentsOf: page.comments)
-            commentsContinuation = page.continuation
-            commentsState = .loaded
-        } catch {
-            commentsState = .loaded
-        }
+        guard let playerState, let contentService, let instancesManager else { return }
+        await playerState.loadMoreComments(contentService: contentService, instancesManager: instancesManager)
     }
 }
 
