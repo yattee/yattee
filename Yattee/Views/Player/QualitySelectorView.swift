@@ -64,6 +64,10 @@ struct QualitySelectorView: View {
     /// the tvOS half-screen panel). When nil, falls back to `@Environment(\.dismiss)`.
     var onDismiss: (() -> Void)?
 
+    /// Embedded inside a container (details panel tracks page): no close
+    /// toolbar item, no sheet detents, and no minimum frame.
+    var isEmbedded: Bool = false
+
     #if os(tvOS)
     /// Bound to the first focusable row so we can programmatically pull focus
     /// into the panel on appear (the system doesn't auto-focus an inline
@@ -207,7 +211,8 @@ struct QualitySelectorView: View {
         onRateChanged: ((PlaybackRate) -> Void)? = nil,
         onLockToggled: ((Bool) -> Void)? = nil,
         onAudioModeToggled: ((Bool) -> Void)? = nil,
-        onDismiss: (() -> Void)? = nil
+        onDismiss: (() -> Void)? = nil,
+        isEmbedded: Bool = false
     ) {
         self.streams = streams
         self.captions = captions
@@ -238,6 +243,7 @@ struct QualitySelectorView: View {
         self.onLockToggled = onLockToggled
         self.onAudioModeToggled = onAudioModeToggled
         self.onDismiss = onDismiss
+        self.isEmbedded = isEmbedded
     }
 
     // MARK: - Body
@@ -272,18 +278,24 @@ struct QualitySelectorView: View {
             }
         }
         #else
-        NavigationStack {
-            stackRoot
+        if isEmbedded {
+            NavigationStack {
+                stackRoot
+            }
+        } else {
+            NavigationStack {
+                stackRoot
+            }
+            #if os(iOS)
+            // Rest at a taller-than-medium detent so the general section (playback
+            // speed / audio mode / lock) at the bottom of the scroll view is
+            // visible without dragging the sheet up to `.large`.
+            .presentationDetents([.fraction(0.6), .large])
+            #endif
+            #if os(macOS)
+            .frame(minWidth: 450, minHeight: 500)
+            #endif
         }
-        #if os(iOS)
-        // Rest at a taller-than-medium detent so the general section (playback
-        // speed / audio mode / lock) at the bottom of the scroll view is
-        // visible without dragging the sheet up to `.large`.
-        .presentationDetents([.fraction(0.6), .large])
-        #endif
-        #if os(macOS)
-        .frame(minWidth: 450, minHeight: 500)
-        #endif
         #endif
     }
 
@@ -327,7 +339,9 @@ struct QualitySelectorView: View {
         #endif
         #if !os(tvOS)
         .toolbar {
-            sheetCloseToolbarItem { performDismiss() }
+            if !isEmbedded {
+                sheetCloseToolbarItem { performDismiss() }
+            }
         }
         #endif
         .navigationDestination(for: QualitySelectorDestination.self) { destination in

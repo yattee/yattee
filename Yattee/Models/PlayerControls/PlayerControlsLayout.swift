@@ -38,6 +38,9 @@ struct PlayerControlsLayout: Codable, Hashable, Sendable {
     /// field still decode.
     var wideLayoutPanelAlignment: FloatingPanelSide?
 
+    /// Details panel pages configuration. Optional for backward compatibility.
+    var panelSettings: PanelSettings?
+
 
     // MARK: - Initialization
 
@@ -59,7 +62,8 @@ struct PlayerControlsLayout: Codable, Hashable, Sendable {
         progressBarSettings: ProgressBarSettings = .default,
         gesturesSettings: GesturesSettings? = nil,
         playerPillSettings: PlayerPillSettings? = nil,
-        miniPlayerSettings: MiniPlayerSettings? = nil
+        miniPlayerSettings: MiniPlayerSettings? = nil,
+        panelSettings: PanelSettings? = nil
     ) {
         self.topSection = topSection
         self.centerSettings = centerSettings
@@ -69,6 +73,7 @@ struct PlayerControlsLayout: Codable, Hashable, Sendable {
         self.gesturesSettings = gesturesSettings
         self.playerPillSettings = playerPillSettings
         self.miniPlayerSettings = miniPlayerSettings
+        self.panelSettings = panelSettings
     }
 
     // MARK: - Gesture Settings
@@ -90,6 +95,13 @@ struct PlayerControlsLayout: Codable, Hashable, Sendable {
     /// Returns the effective mini player settings, using defaults if not set.
     var effectiveMiniPlayerSettings: MiniPlayerSettings {
         miniPlayerSettings ?? .default
+    }
+
+    // MARK: - Panel Settings
+
+    /// Returns the effective details panel settings, using defaults if not set.
+    var effectivePanelSettings: PanelSettings {
+        panelSettings ?? .default
     }
 
     // MARK: - Defaults

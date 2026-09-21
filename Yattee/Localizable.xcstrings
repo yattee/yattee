@@ -7434,6 +7434,50 @@
         }
       }
     },
+    "panel.page.info" : {
+      "comment" : "Details panel page name",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Info"
+          }
+        }
+      }
+    },
+    "panel.page.queue" : {
+      "comment" : "Details panel page name",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Queue"
+          }
+        }
+      }
+    },
+    "panel.page.related" : {
+      "comment" : "Details panel page name",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Related"
+          }
+        }
+      }
+    },
+    "panel.page.tracks" : {
+      "comment" : "Details panel page name",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tracks"
+          }
+        }
+      }
+    },
     "peertube.explore.added" : {
       "localizations" : {
         "en" : {

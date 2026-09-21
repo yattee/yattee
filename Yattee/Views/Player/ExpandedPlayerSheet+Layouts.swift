@@ -512,6 +512,17 @@ extension ExpandedPlayerSheet {
                                     panelExpandOffset = 0
                                     videoYOffset = 0
                                 }
+                            },
+                            onRequestExpand: { [self] in
+                                // Comments pill routed to the comments page:
+                                // expand the panel to fullscreen
+                                guard !isPanelExpanded else { return }
+                                withAnimation(.spring(response: 0.3, dampingFraction: 1.0)) {
+                                    isPanelExpanded = true
+                                    panelExpandOffset = 0
+                                    panelDragOffset = 0
+                                    videoYOffset = 0
+                                }
                             }
                         )
                         .frame(height: {

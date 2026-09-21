@@ -51,8 +51,6 @@ struct ExpandedPlayerSheet: View {
     @State var panelExpandOffset: CGFloat = 0
     /// Whether to use compact panel (no description) - animated state
     @State var useCompactPanel: Bool = false
-    @State var showFormattedDate = false
-    @State var showOriginalTitle = false
     /// Track if we're in widescreen layout for status bar hiding
     @State private var isInWideScreenLayout = false
     /// Active player controls layout from preset (loaded once, updated on notification)
@@ -190,7 +188,6 @@ struct ExpandedPlayerSheet: View {
                 scrollPosition: $scrollPosition,
                 isPanelExpanded: $isPanelExpanded,
                 panelExpandOffset: $panelExpandOffset,
-                showOriginalTitle: $showOriginalTitle,
                 isThumbnailFrozen: $isThumbnailFrozen,
                 displayedThumbnailURL: $displayedThumbnailURL,
                 displayedThumbnailImage: $displayedThumbnailImage,
@@ -765,7 +762,6 @@ private struct PlayerEventHandlersModifier: ViewModifier {
     @Binding var scrollPosition: ScrollPosition
     @Binding var isPanelExpanded: Bool
     @Binding var panelExpandOffset: CGFloat
-    @Binding var showOriginalTitle: Bool
     @Binding var isThumbnailFrozen: Bool
     @Binding var displayedThumbnailURL: URL?
     @Binding var displayedThumbnailImage: Image?
@@ -835,7 +831,6 @@ private struct PlayerEventHandlersModifier: ViewModifier {
             isPanelExpanded = false
             panelExpandOffset = 0
         }
-        showOriginalTitle = false
         stopAutoplayCountdown()
         isAutoplayCancelled = false
 

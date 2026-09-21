@@ -22,9 +22,11 @@ struct PortraitDetailsPanel: View {
     var onDragChanged: ((CGFloat) -> Void)?
     var onDragEnded: ((CGFloat, CGFloat) -> Void)?
     var onDragCancelled: (() -> Void)?
+    /// Asks the host to expand the panel (comments pill → comments page).
+    var onRequestExpand: (() -> Void)?
     @GestureState private var isDraggingHandle: Bool = false
     @State private var isCommentsExpanded: Bool = false
-    @State private var showFormattedDate = false
+    @State private var selectedPage: PanelPageType = .info
     @State private var scrollOffset: CGFloat = 0
     @State private var scrollToTopTrigger: Bool = false
     @State private var showQueueSheet: Bool = false
@@ -36,16 +38,12 @@ struct PortraitDetailsPanel: View {
     private var playerState: PlayerState? { playerService?.state }
     private var isPanelDragging: Bool { appEnvironment?.navigationCoordinator.isPanelDragging ?? false }
 
-    // Read video and dislikeCount from playerState for reactive updates
+    // Read video from playerState for reactive updates
     private var video: Video? { playerState?.currentVideo }
-    private var dislikeCount: Int? { playerState?.dislikeCount }
 
     // Comments helpers
     private var comments: [Comment] { playerState?.comments ?? [] }
     private var commentsState: CommentsLoadState { playerState?.commentsState ?? .idle }
-
-    // Video details helpers
-    private var videoDetailsState: VideoDetailsLoadState { playerState?.videoDetailsState ?? .idle }
 
     // Queue helpers
     private var queue: [QueuedVideo] { playerState?.queue ?? [] }
@@ -76,6 +74,17 @@ struct PortraitDetailsPanel: View {
         !(video?.description ?? "").isEmpty
     }
 
+    // Panel pages configuration
+    private var panelSettings: PanelSettings {
+        playerControlsLayout.effectivePanelSettings
+    }
+
+    /// Whether the comments pill should route to the comments page instead of
+    /// the overlay.
+    private var isCommentsPageAvailable: Bool {
+        panelSettings.isPageEnabled(.comments) && !(video?.isFromMediaSource ?? true)
+    }
+
     /// Whether any pills are currently visible in the overlay
     private var hasPillsVisible: Bool {
         let hasCommentsPill = commentsState == .loaded && !comments.isEmpty && shouldShowCommentsPill
@@ -86,16 +95,6 @@ struct PortraitDetailsPanel: View {
     private var hasExpandedCommentsPill: Bool {
         let hasCommentsPill = commentsState == .loaded && !comments.isEmpty && shouldShowCommentsPill
         return hasCommentsPill && shouldShowPlayerPill && !isCommentsPillAlwaysCollapsed && hasVideoDescription
-    }
-
-    /// Returns the first enabled Yattee Server instance URL, if any.
-    private var yatteeServerURL: URL? {
-        appEnvironment?.instancesManager.yatteeServerInstances.first { $0.isEnabled }?.url
-    }
-
-    /// Returns the DeArrow title if available and enabled, otherwise the original title.
-    private func displayTitle(for video: Video) -> String {
-        appEnvironment?.deArrowBrandingProvider.title(for: video) ?? video.title
     }
 
     // MARK: - Drag Handle
@@ -139,53 +138,34 @@ struct PortraitDetailsPanel: View {
     var body: some View {
         if let video {
             ZStack(alignment: .top) {
-                // Scrollable content (extends to top, scrolls under drag handle)
-                ScrollViewReader { proxy in
-                    ScrollView {
-                        VStack(alignment: .leading, spacing: 0) {
-                            // Anchor for scroll-to-top
-                            Color.clear
-                                .frame(height: 0)
-                                .id("panelTop")
-
-                            // Top padding so content isn't initially obscured by drag handle
-                            Color.clear
-                                .frame(height: 10)
-
-                            videoInfo(video)
-
-                            Divider()
-                                .padding(.horizontal)
-
-                            infoTabSection(video)
+                // Unified page content (page bar + selected page)
+                PlayerPanelContentView(
+                    panelSettings: panelSettings,
+                    selectedPage: $selectedPage,
+                    context: PanelPageContext(
+                        appEnvironment: appEnvironment,
+                        video: video,
+                        accentColor: accentColor,
+                        onChannelTap: onChannelTap
+                    ),
+                    scrollConfig: PanelScrollConfig(
+                        topInset: 6,
+                        bottomInset: hasVideoDescription ? 80 : 50,
+                        scrollOffsetChanged: { offset in
+                            scrollOffset = offset
+                        },
+                        scrollToTopTrigger: scrollToTopTrigger,
+                        isScrollDisabled: isDraggingHandle,
+                        onOverscrollDragChanged: { offset in
+                            onDragChanged?(offset)
+                        },
+                        onOverscrollDragEnded: { offset, predicted in
+                            onDragEnded?(offset, predicted)
                         }
-                    }
-                    .background(Color(.systemBackground))
-                    .background {
-                        // UIKit gesture handler for smooth overscroll-to-collapse
-                        OverscrollGestureView(
-                            isEnabled: !isDraggingHandle,
-                            onDragChanged: { offset in
-                                onDragChanged?(offset)
-                            },
-                            onDragEnded: { offset, predicted in
-                                onDragEnded?(offset, predicted)
-                            }
-                        )
-                    }
-                    .scrollDisabled(isDraggingHandle)
-                    .onScrollGeometryChange(for: CGFloat.self) { geometry in
-                        geometry.contentOffset.y
-                    } action: { _, newValue in
-                        // Update scrollOffset for pills visibility
-                        scrollOffset = max(0, newValue)
-                    }
-                    .onChange(of: scrollToTopTrigger) { _, _ in
-                        withAnimation(.easeInOut(duration: 0.3)) {
-                            proxy.scrollTo("panelTop", anchor: .top)
-                        }
-                    }
-                }
+                    ),
+                    pageBarTopPadding: 14
+                )
+                .background(Color(.systemBackground))
                 .overlay(alignment: .bottom) {
                     bottomFadeOverlay
                 }
@@ -244,10 +224,35 @@ struct PortraitDetailsPanel: View {
                         .allowsHitTesting(pillsOverlayOpacity > 0.01)
                 }
             }
-            // Expanded comments overlay
+            // Expanded comments overlay (only when the comments page is not
+            // available; the pill then falls back to the overlay path)
             .overlay {
-                let expanded = isCommentsExpanded
-                ExpandedCommentsView(
+                if !isCommentsPageAvailable {
+                    expandedCommentsOverlay(video: video)
+                }
+            }
+            .animation(.smooth(duration: 0.3), value: isCommentsExpanded)
+            .onChange(of: video.id) { _, _ in
+                isCommentsExpanded = false
+            }
+            .onChange(of: isCommentsExpanded) { _, newValue in
+                appEnvironment?.navigationCoordinator.isCommentsExpanded = newValue
+            }
+            .sheet(isPresented: $showQueueSheet) {
+                QueueManagementSheet()
+            }
+            .sheet(isPresented: $showPlaylistSheet) {
+                if let currentVideo = playerState?.currentVideo {
+                    PlaylistSelectorSheet(video: currentVideo)
+                }
+            }
+        }
+    }
+
+    @ViewBuilder
+    private func expandedCommentsOverlay(video: Video) -> some View {
+        let expanded = isCommentsExpanded
+        ExpandedCommentsView(
                     videoID: video.id.videoID,
                     onClose: collapseComments,
                     onDismissGestureEnded: handleCommentsDismissGestureEnded,
@@ -277,23 +282,6 @@ struct PortraitDetailsPanel: View {
                             }
                     }
                 )
-            }
-            .animation(.smooth(duration: 0.3), value: isCommentsExpanded)
-            .onChange(of: video.id) { _, _ in
-                isCommentsExpanded = false
-            }
-            .onChange(of: isCommentsExpanded) { _, newValue in
-                appEnvironment?.navigationCoordinator.isCommentsExpanded = newValue
-            }
-            .sheet(isPresented: $showQueueSheet) {
-                QueueManagementSheet()
-            }
-            .sheet(isPresented: $showPlaylistSheet) {
-                if let currentVideo = playerState?.currentVideo {
-                    PlaylistSelectorSheet(video: currentVideo)
-                }
-            }
-        }
     }
 
     // MARK: - Pills Overlay
@@ -479,57 +467,15 @@ struct PortraitDetailsPanel: View {
         }
     }
 
-    // MARK: - Video Info
-
-    private func videoInfo(_ video: Video) -> some View {
-        VStack(alignment: .leading, spacing: 8) {
-            // Title - full width (shows DeArrow title if available)
-            Text(displayTitle(for: video))
-                .font(.title3)
-                .fontWeight(.semibold)
-                .lineLimit(3)
-
-            // Stats row - only show for non-media-source videos
-            if !video.isFromMediaSource {
-                VideoStatsRow(
-                    playerState: playerState,
-                    showFormattedDate: $showFormattedDate,
-                    returnYouTubeDislikeEnabled: settingsManager?.returnYouTubeDislikeEnabled ?? false
-                )
-            }
-
-            // Channel row with context menu
-            VideoChannelRow(
-                author: video.author,
-                source: video.id.source,
-                yatteeServerURL: yatteeServerURL,
-                onChannelTap: onChannelTap,
-                video: video,
-                accentColor: accentColor,
-                showSubscriberCount: !video.isFromMediaSource,
-                isLoadingDetails: playerState?.videoDetailsState == .loading
-            )
-        }
-        .padding(.horizontal, 12)
-        .padding(.vertical, 8)
-    }
-
-    // MARK: - Info Tab Section
-
-    private func infoTabSection(_ video: Video) -> some View {
-        let hasDescription = !(video.description ?? "").isEmpty
-
-        return VStack(alignment: .leading, spacing: 12) {
-            descriptionContent(video.description ?? "")
-
-            // Reduced bottom spacer when no description
-            Spacer()
-                .frame(height: hasDescription ? 80 : 50)
-        }
-        .padding(.vertical)
-    }
-
     private func expandComments() {
+        if isCommentsPageAvailable {
+            // Route to the comments page and ask the host to expand the panel
+            withAnimation(.smooth(duration: 0.3)) {
+                selectedPage = .comments
+            }
+            onRequestExpand?()
+            return
+        }
         withAnimation(.smooth(duration: 0.3)) {
             isCommentsExpanded = true
         }
@@ -546,27 +492,6 @@ struct PortraitDetailsPanel: View {
         let dismissThreshold: CGFloat = 30
         if finalOffset >= dismissThreshold {
             collapseComments()
-        }
-    }
-
-    private func descriptionContent(_ description: String) -> some View {
-        VStack(alignment: .leading, spacing: 8) {
-            if !description.isEmpty {
-                Text(DescriptionText.attributed(description, linkColor: accentColor))
-                    .font(.subheadline)
-                    .foregroundStyle(.secondary)
-                    .tint(accentColor)
-                    .padding(.horizontal)
-                    .handleTimestampLinks(using: playerService)
-            } else if videoDetailsState == .loading {
-                HStack {
-                    Spacer()
-                    ProgressView()
-                    Spacer()
-                }
-                .padding()
-            }
-            // No description text removed - let panel shrink instead
         }
     }
 }

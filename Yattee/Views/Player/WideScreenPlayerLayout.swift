@@ -360,11 +360,6 @@ struct WideScreenPlayerLayout<PlayerContent: View>: View {
             playerControlsLayout: playerControlsLayout
         )
     }
-
-    /// Returns the first enabled Yattee Server instance URL, if any.
-    private var yatteeServerURL: URL? {
-        appEnvironment?.instancesManager.yatteeServerInstances.first { $0.isEnabled }?.url
-    }
 }
 
 #endif

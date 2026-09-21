@@ -223,6 +223,48 @@ struct ExpandedCommentsView: View {
 
     @ViewBuilder
     private var commentsContent: some View {
+        CommentsListContent(videoID: videoID)
+    }
+
+    @ViewBuilder
+    private var closeButton: some View {
+        Button(action: onClose) {
+            Image(systemName: isDismissThresholdReached ? "chevron.down" : "xmark")
+                .font(.system(size: 18, weight: .semibold))
+                .foregroundStyle(isDismissThresholdReached ? .white : .primary)
+                .frame(width: 32, height: 32)
+                .padding(10)
+                .contentShape(Circle())
+        }
+        .buttonStyle(.plain)
+        .glassBackground(
+            isDismissThresholdReached ? .tinted(.blue) : .regular,
+            in: .circle,
+            fallback: isDismissThresholdReached ? .ultraThinMaterial : .thinMaterial
+        )
+        .contentShape(Circle())
+        .animation(.easeInOut(duration: 0.15), value: isDismissThresholdReached)
+    }
+}
+
+// MARK: - Comments List Content
+
+/// Comments list states and rows driven by `PlayerState`, shared between the
+/// expanded comments overlay and the details panel comments page.
+struct CommentsListContent: View {
+    @Environment(\.appEnvironment) private var appEnvironment
+
+    let videoID: String
+
+    private var playerState: PlayerState? { appEnvironment?.playerService.state }
+    private var contentService: ContentService? { appEnvironment?.contentService }
+    private var instancesManager: InstancesManager? { appEnvironment?.instancesManager }
+
+    private var comments: [Comment] { playerState?.comments ?? [] }
+    private var commentsState: CommentsLoadState { playerState?.commentsState ?? .idle }
+    private var videoSource: ContentSource? { playerState?.currentVideo?.id.source }
+
+    var body: some View {
         switch commentsState {
         case .idle, .loading:
             HStack {
@@ -305,26 +347,6 @@ struct ExpandedCommentsView: View {
                 }
             }
         }
-    }
-
-    @ViewBuilder
-    private var closeButton: some View {
-        Button(action: onClose) {
-            Image(systemName: isDismissThresholdReached ? "chevron.down" : "xmark")
-                .font(.system(size: 18, weight: .semibold))
-                .foregroundStyle(isDismissThresholdReached ? .white : .primary)
-                .frame(width: 32, height: 32)
-                .padding(10)
-                .contentShape(Circle())
-        }
-        .buttonStyle(.plain)
-        .glassBackground(
-            isDismissThresholdReached ? .tinted(.blue) : .regular,
-            in: .circle,
-            fallback: isDismissThresholdReached ? .ultraThinMaterial : .thinMaterial
-        )
-        .contentShape(Circle())
-        .animation(.easeInOut(duration: 0.15), value: isDismissThresholdReached)
     }
 
     private func loadComments() async {
