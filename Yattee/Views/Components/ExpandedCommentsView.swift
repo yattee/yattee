@@ -329,73 +329,12 @@ struct ExpandedCommentsView: View {
 
     private func loadComments() async {
         guard let playerState, let contentService, let instancesManager else { return }
-
-        // Don't load comments for non-YouTube videos
-        guard let video = playerState.currentVideo, video.supportsComments else {
-            playerState.commentsState = .disabled
-            return
-        }
-
-        // Capture the video ID we're loading comments for
-        let requestedVideoID = videoID
-
-        guard let instance = instancesManager.instance(for: video) else { return }
-
-        playerState.commentsState = .loading
-
-        do {
-            let page = try await contentService.comments(videoID: videoID, instance: instance, continuation: nil)
-
-            // Validate player is still on the same video
-            guard !Task.isCancelled,
-                  playerState.currentVideo?.id.videoID == requestedVideoID else { return }
-
-            playerState.comments = page.comments
-            playerState.commentsContinuation = page.continuation
-            playerState.commentsState = .loaded
-        } catch let error as APIError where error == .commentsDisabled {
-            guard !Task.isCancelled,
-                  playerState.currentVideo?.id.videoID == requestedVideoID else { return }
-            playerState.commentsState = .disabled
-        } catch {
-            guard !Task.isCancelled,
-                  playerState.currentVideo?.id.videoID == requestedVideoID else { return }
-            playerState.commentsState = .error
-        }
+        await playerState.loadComments(contentService: contentService, instancesManager: instancesManager)
     }
 
     private func loadMoreComments() async {
         guard let playerState, let contentService, let instancesManager else { return }
-        guard let continuation = playerState.commentsContinuation else { return }
-
-        // Don't load more comments for non-YouTube videos
-        guard let video = playerState.currentVideo, video.supportsComments else {
-            return
-        }
-
-        // Capture the video ID we're loading comments for
-        let requestedVideoID = videoID
-
-        guard let instance = instancesManager.instance(for: video) else { return }
-
-        playerState.commentsState = .loadingMore
-
-        do {
-            let page = try await contentService.comments(videoID: videoID, instance: instance, continuation: continuation)
-
-            // Validate player is still on the same video
-            guard !Task.isCancelled,
-                  playerState.currentVideo?.id.videoID == requestedVideoID else { return }
-
-            playerState.comments.append(contentsOf: page.comments)
-            playerState.commentsContinuation = page.continuation
-            playerState.commentsState = .loaded
-        } catch {
-            guard !Task.isCancelled,
-                  playerState.currentVideo?.id.videoID == requestedVideoID else { return }
-            // Don't change state to error on load more failure
-            playerState.commentsState = .loaded
-        }
+        await playerState.loadMoreComments(contentService: contentService, instancesManager: instancesManager)
     }
 }
 

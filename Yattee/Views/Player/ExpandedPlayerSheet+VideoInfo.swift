@@ -77,46 +77,10 @@ extension ExpandedPlayerSheet {
             return
         }
 
-        guard let video = playerState.currentVideo,
-              let contentService = appEnvironment?.contentService,
+        guard let contentService = appEnvironment?.contentService,
               let instancesManager = appEnvironment?.instancesManager else { return }
 
-        // Capture video ID at start for validation after async call
-        let requestedVideoID = video.id
-
-        // Don't load comments for non-YouTube videos
-        guard video.supportsComments else {
-            playerState.commentsState = .disabled
-            return
-        }
-
-        guard let instance = instancesManager.instance(for: video) else { return }
-
-        playerState.commentsState = .loading
-
-        do {
-            let page = try await contentService.comments(
-                videoID: video.id.videoID,
-                instance: instance,
-                continuation: nil
-            )
-
-            // Validate video hasn't changed and task wasn't cancelled
-            guard !Task.isCancelled,
-                  playerState.currentVideo?.id == requestedVideoID else { return }
-
-            playerState.comments = page.comments
-            playerState.commentsContinuation = page.continuation
-            playerState.commentsState = .loaded
-        } catch let error as APIError where error == .commentsDisabled {
-            guard !Task.isCancelled,
-                  playerState.currentVideo?.id == requestedVideoID else { return }
-            playerState.commentsState = .disabled
-        } catch {
-            guard !Task.isCancelled,
-                  playerState.currentVideo?.id == requestedVideoID else { return }
-            playerState.commentsState = .error
-        }
+        await playerState.loadComments(contentService: contentService, instancesManager: instancesManager)
     }
 
     // MARK: - DeArrow Title Helpers

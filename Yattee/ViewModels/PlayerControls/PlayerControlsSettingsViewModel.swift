@@ -638,29 +638,6 @@ final class PlayerControlsSettingsViewModel {
         }
     }
 
-    // MARK: - Wide Layout Panel Settings
-
-    /// Current wide layout panel alignment from active preset, or default.
-    var wideLayoutPanelAlignment: FloatingPanelSide {
-        activePreset?.layout.effectiveWideLayoutPanelAlignment ?? .right
-    }
-
-    /// Synchronously updates the wide layout panel alignment with immediate UI feedback.
-    /// - Parameter alignment: The new panel alignment.
-    func syncWideLayoutPanelAlignment(_ alignment: FloatingPanelSide) {
-        guard var preset = activePreset, !preset.isBuiltIn else {
-            error = "Cannot edit built-in presets. Duplicate it first."
-            return
-        }
-
-        var layout = preset.layout
-        layout.wideLayoutPanelAlignment = alignment
-        preset = preset.withUpdatedLayout(layout)
-        self.activePreset = preset
-
-        queueDebouncedSave(preset: preset)
-    }
-
     /// Synchronously updates the pill visibility with immediate UI feedback.
     /// - Parameter visibility: The new visibility mode.
     func syncPillVisibility(_ visibility: PillVisibility) {

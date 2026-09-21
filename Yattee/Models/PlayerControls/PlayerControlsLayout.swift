@@ -33,8 +33,9 @@ struct PlayerControlsLayout: Codable, Hashable, Sendable {
     /// Mini player settings. Optional for backward compatibility.
     var miniPlayerSettings: MiniPlayerSettings?
 
-    /// Wide layout panel alignment. Optional for backward compatibility.
-    /// When nil, uses the global setting from SettingsManager.
+    /// Unused: the player reads the panel side from SettingsManager
+    /// (`floatingDetailsPanelSide`). Kept only so old presets that saved this
+    /// field still decode.
     var wideLayoutPanelAlignment: FloatingPanelSide?
 
 
@@ -89,13 +90,6 @@ struct PlayerControlsLayout: Codable, Hashable, Sendable {
     /// Returns the effective mini player settings, using defaults if not set.
     var effectiveMiniPlayerSettings: MiniPlayerSettings {
         miniPlayerSettings ?? .default
-    }
-
-    // MARK: - Wide Layout Panel Settings
-
-    /// Returns the effective wide layout panel alignment, using right as default if not set.
-    var effectiveWideLayoutPanelAlignment: FloatingPanelSide {
-        wideLayoutPanelAlignment ?? .left
     }
 
     // MARK: - Defaults

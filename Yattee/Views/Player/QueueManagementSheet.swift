@@ -45,8 +45,7 @@ struct QueueManagementSheet: View {
     }
 
     private var queueManager: QueueManager? { appEnvironment?.queueManager }
-    private var playerService: PlayerService? { appEnvironment?.playerService }
-    private var playerState: PlayerState? { playerService?.state }
+    private var playerState: PlayerState? { appEnvironment?.playerService.state }
     private var navigationCoordinator: NavigationCoordinator? { appEnvironment?.navigationCoordinator }
 
     private var queue: [QueuedVideo] { playerState?.queue ?? [] }
@@ -54,7 +53,6 @@ struct QueueManagementSheet: View {
     private var isLoadingMore: Bool { queueManager?.isLoadingMore ?? false }
     private var hasMoreItems: Bool { queueManager?.hasMoreItems() ?? false }
     private var queueSourceLabel: String? { queueManager?.currentQueueSourceLabel }
-    private var listStyle: VideoListStyle { appEnvironment?.settingsManager.listStyle ?? .inset }
 
     var body: some View {
         #if os(tvOS)
@@ -192,7 +190,10 @@ struct QueueManagementSheet: View {
         // padding inside the half-screen panel.
         tvOSQueueListView
         #else
-        iosQueueListView
+        QueueListView(onPlay: {
+            navigationCoordinator?.isMiniPlayerQueueSheetPresented = false
+            performDismiss()
+        })
         #endif
     }
 
@@ -308,158 +309,6 @@ struct QueueManagementSheet: View {
     }
     #endif
 
-    private var iosQueueListView: some View {
-        ScrollViewReader { proxy in
-            List {
-                // History section - show previously played videos
-                if !history.isEmpty {
-                    Section {
-                        ForEach(Array(history.enumerated()), id: \.element.id) { index, historyItem in
-                            QueueItemRow(
-                                queuedVideo: historyItem,
-                                index: nil,  // History items don't show numbers
-                                isCurrentlyPlaying: false,
-                                onRemove: { },
-                                onTap: {
-                                    playFromHistory(at: index)
-                                }
-                            )
-                            #if os(tvOS)
-                            .focused($inlinePanelFocus, equals: .history(historyItem.id))
-                            // Zero the grouped style's built-in row insets
-                            // (which are asymmetric in a half-screen panel) and
-                            // apply our own symmetric padding directly to the
-                            // row content.
-                            .padding(.horizontal, 40)
-                            .listRowInsets(EdgeInsets())
-                            #endif
-                        }
-                    } header: {
-                        HStack {
-                            Text(String(localized: "queue.section.previously"))
-                            Spacer()
-                            Text(String(localized: "queue.section.count \(history.count)"))
-                                .font(.caption)
-                                .foregroundStyle(.secondary)
-                        }
-                    }
-                }
-
-                // Now Playing section - show the currently playing video from playerState
-                if let currentVideo = playerState?.currentVideo {
-                    Section {
-                        // Create a temporary QueuedVideo for display
-                        let nowPlayingItem = QueuedVideo(
-                            video: currentVideo,
-                            stream: playerState?.currentStream,
-                            queueSource: nil
-                        )
-                        QueueItemRow(
-                            queuedVideo: nowPlayingItem,
-                            index: nil,  // Now playing shows waveform, not a number
-                            isCurrentlyPlaying: true,
-                            onRemove: { },
-                            onTap: { }
-                        )
-                        #if os(tvOS)
-                        .focused($inlinePanelFocus, equals: .nowPlaying)
-                        .listRowInsets(EdgeInsets(top: 6, leading: 40, bottom: 6, trailing: 40))
-                        #endif
-                    } header: {
-                        nowPlayingHeader
-                    }
-                    .id("now-playing")
-                }
-
-                // Up Next section - show all queued videos
-                if !queue.isEmpty {
-                    Section {
-                        ForEach(Array(queue.enumerated()), id: \.element.id) { index, queuedVideo in
-                            QueueItemRow(
-                                queuedVideo: queuedVideo,
-                                index: index + 1, // +1 because "Now Playing" is shown as position 1
-                                isCurrentlyPlaying: false,
-                                onRemove: {
-                                    withAnimation {
-                                        queueManager?.removeFromQueue(id: queuedVideo.id)
-                                    }
-                                },
-                                onTap: {
-                                    playVideo(at: index)
-                                }
-                            )
-                            #if os(tvOS)
-                            .focused($inlinePanelFocus, equals: .upNext(queuedVideo.id))
-                            // Zero the grouped style's built-in row insets
-                            // (which are asymmetric in a half-screen panel) and
-                            // apply our own symmetric padding directly to the
-                            // row content.
-                            .padding(.horizontal, 40)
-                            .listRowInsets(EdgeInsets())
-                            #endif
-                        }
-                        .onMove { source, destination in
-                            guard let fromIndex = source.first else { return }
-                            queueManager?.moveQueueItem(from: fromIndex, to: destination)
-                        }
-
-                        // Load more indicator
-                        if hasMoreItems {
-                            HStack {
-                                Spacer()
-                                if isLoadingMore {
-                                    ProgressView()
-                                        .controlSize(.small)
-                                } else {
-                                    Button {
-                                        Task {
-                                            try? await queueManager?.loadMoreQueueItems()
-                                        }
-                                    } label: {
-                                        Text(String(localized: "queue.sheet.loadMore"))
-                                            .font(.subheadline)
-                                            .foregroundStyle(.tint)
-                                    }
-                                }
-                                Spacer()
-                            }
-                            .listRowBackground(Color.clear)
-                        }
-                    } header: {
-                        HStack {
-                            Text(String(localized: "queue.section.upNext"))
-                            Spacer()
-                            Text(String(localized: "queue.section.count \(queue.count)"))
-                                .font(.caption)
-                                .foregroundStyle(.secondary)
-                        }
-                    }
-                }
-            }
-            #if os(tvOS)
-            .listStyle(.grouped)
-            #elseif os(iOS)
-            .if(listStyle == .plain, then: { view in
-                view.listStyle(.plain)
-            }, else: { view in
-                view.listStyle(.insetGrouped)
-            })
-            #endif
-            .onAppear {
-                // Scroll to now playing section (no animation for instant positioning)
-                DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-                    proxy.scrollTo("now-playing", anchor: .center)
-                }
-            }
-        }
-    }
-
-    /// Header for Now Playing section
-    @ViewBuilder
-    private var nowPlayingHeader: some View {
-        Text(String(localized: "queue.section.nowPlaying"))
-    }
-
     /// Menu for selecting queue mode (shuffle, repeat, etc.)
     @ViewBuilder
     private var queueModeMenu: some View {
@@ -510,85 +359,19 @@ struct QueueManagementSheet: View {
 
     // MARK: - Actions
 
+    #if os(tvOS)
     private func playVideo(at index: Int) {
-        guard let playerService, let playerState else { return }
-        guard index < queue.count else { return }
-        let queuedVideo = queue[index]
-
-        // Push current video to history before switching (skip if incognito or history disabled)
-        if let currentVideo = playerState.currentVideo,
-           appEnvironment?.settingsManager.incognitoModeEnabled != true,
-           appEnvironment?.settingsManager.saveWatchHistory != false {
-            let currentItem = QueuedVideo(
-                video: currentVideo,
-                stream: playerState.currentStream,
-                audioStream: playerState.currentAudioStream,
-                startTime: playerState.currentTime
-            )
-            playerState.pushToHistory(currentItem)
-        }
-
-        // Remove played video and all before it from queue, pushing them to history
-        for _ in 0..<index {
-            if let item = playerState.queue.first,
-               appEnvironment?.settingsManager.incognitoModeEnabled != true,
-               appEnvironment?.settingsManager.saveWatchHistory != false {
-                playerState.pushToHistory(item)
-            }
-            queueManager?.removeFromQueue(at: 0)
-        }
-        // Remove the one we're about to play
-        queueManager?.removeFromQueue(at: 0)
-
-        // Play the selected video (always from beginning for queue items)
-        // Prefer downloaded content over pre-loaded network streams
-        Task {
-            await playerService.playPreferringDownloaded(
-                video: queuedVideo.video,
-                fallbackStream: queuedVideo.stream,
-                fallbackAudioStream: queuedVideo.audioStream,
-                startTime: 0
-            )
-        }
+        QueuePlaybackActions.playVideo(at: index, appEnvironment: appEnvironment)
         navigationCoordinator?.isMiniPlayerQueueSheetPresented = false
         performDismiss()
     }
 
     private func playFromHistory(at index: Int) {
-        guard let playerService, let playerState else { return }
-        guard index < history.count else { return }
-        let historyItem = history[index]
-
-        // Push current video to front of queue
-        if let currentVideo = playerState.currentVideo {
-            playerState.insertNext(currentVideo, stream: playerState.currentStream, audioStream: playerState.currentAudioStream)
-        }
-
-        // Push all items after this in history to front of queue (in reverse order)
-        // so they become "up next" in correct order
-        let itemsAfter = Array(history[(index + 1)...])
-        for item in itemsAfter.reversed() {
-            playerState.insertNext(item.video, stream: item.stream, audioStream: item.audioStream, captions: item.captions)
-        }
-
-        // Remove this item and all after it from history
-        for _ in index..<history.count {
-            _ = playerState.retreatQueue()
-        }
-
-        // Play the selected history item
-        // Prefer downloaded content over stored network streams
-        Task {
-            await playerService.playPreferringDownloaded(
-                video: historyItem.video,
-                fallbackStream: historyItem.stream,
-                fallbackAudioStream: historyItem.audioStream,
-                startTime: historyItem.startTime
-            )
-        }
+        QueuePlaybackActions.playFromHistory(at: index, appEnvironment: appEnvironment)
         navigationCoordinator?.isMiniPlayerQueueSheetPresented = false
         performDismiss()
     }
+    #endif
 }
 
 #Preview {

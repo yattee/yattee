@@ -540,6 +540,75 @@ final class PlayerState {
         commentsContinuation = nil
     }
 
+    // MARK: - Comments Loading
+
+    /// Loads the first page of comments for the current video.
+    /// Single loader shared by the player sheet preload and the comments overlay retry.
+    func loadComments(contentService: ContentService, instancesManager: InstancesManager) async {
+        guard let video = currentVideo else { return }
+
+        // Don't load comments for non-YouTube videos
+        guard video.supportsComments else {
+            commentsState = .disabled
+            return
+        }
+
+        guard let instance = instancesManager.instance(for: video) else { return }
+
+        // Capture video ID at start for validation after async call
+        let requestedVideoID = video.id
+        commentsState = .loading
+
+        do {
+            let page = try await contentService.comments(
+                videoID: video.id.videoID,
+                instance: instance,
+                continuation: nil
+            )
+
+            // Validate video hasn't changed and task wasn't cancelled
+            guard !Task.isCancelled, currentVideo?.id == requestedVideoID else { return }
+
+            comments = page.comments
+            commentsContinuation = page.continuation
+            commentsState = .loaded
+        } catch let error as APIError where error == .commentsDisabled {
+            guard !Task.isCancelled, currentVideo?.id == requestedVideoID else { return }
+            commentsState = .disabled
+        } catch {
+            guard !Task.isCancelled, currentVideo?.id == requestedVideoID else { return }
+            commentsState = .error
+        }
+    }
+
+    /// Loads the next page of comments using the stored continuation token.
+    func loadMoreComments(contentService: ContentService, instancesManager: InstancesManager) async {
+        guard let continuation = commentsContinuation else { return }
+        guard let video = currentVideo, video.supportsComments else { return }
+        guard let instance = instancesManager.instance(for: video) else { return }
+
+        let requestedVideoID = video.id
+        commentsState = .loadingMore
+
+        do {
+            let page = try await contentService.comments(
+                videoID: video.id.videoID,
+                instance: instance,
+                continuation: continuation
+            )
+
+            guard !Task.isCancelled, currentVideo?.id == requestedVideoID else { return }
+
+            comments.append(contentsOf: page.comments)
+            commentsContinuation = page.continuation
+            commentsState = .loaded
+        } catch {
+            guard !Task.isCancelled, currentVideo?.id == requestedVideoID else { return }
+            // Don't change state to error on load more failure
+            commentsState = .loaded
+        }
+    }
+
     /// Adds a video to the end of the queue.
     func addToQueue(_ video: Video, stream: Stream? = nil, audioStream: Stream? = nil, captions: [Caption] = [], queueSource: QueueSource? = nil) {
         queue.append(QueuedVideo(video: video, stream: stream, audioStream: audioStream, captions: captions, queueSource: queueSource))
