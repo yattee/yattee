@@ -95,6 +95,7 @@ struct WideScreenPlayerLayout<PlayerContent: View>: View {
         withAnimation(.easeInOut(duration: 0.3)) {
             isPanelVisible.toggle()
             settingsManager?.landscapeDetailsPanelVisible = isPanelVisible
+            settingsManager?.detailsPanelLastVisible = isPanelVisible
         }
     }
 
@@ -102,6 +103,7 @@ struct WideScreenPlayerLayout<PlayerContent: View>: View {
     private func hidePanel() {
         isPanelVisible = false
         settingsManager?.landscapeDetailsPanelVisible = false
+        settingsManager?.detailsPanelLastVisible = false
     }
 
     /// Get safe area insets from window scene (geometry reader insets are 0 when .ignoresSafeArea is used)
@@ -296,6 +298,14 @@ struct WideScreenPlayerLayout<PlayerContent: View>: View {
             // Persist panel width changes to settings
             settingsManager?.floatingDetailsPanelWidth = newWidth
         }
+        .onChange(of: settingsManager?.landscapeDetailsPanelVisible) { _, newValue in
+            // External writes (e.g. the preset's default visibility applied
+            // after the async layout load) must reach the local state too.
+            guard let newValue, newValue != isPanelVisible else { return }
+            withAnimation(.easeInOut(duration: 0.3)) {
+                isPanelVisible = newValue
+            }
+        }
         .ignoresSafeArea(.all)
         #if os(iOS)
         .persistentSystemOverlays(.hidden)
@@ -337,6 +347,7 @@ struct WideScreenPlayerLayout<PlayerContent: View>: View {
                     // Pinning - ensure panel is visible first
                     isPanelVisible = true
                     settingsManager?.landscapeDetailsPanelVisible = true
+                    settingsManager?.detailsPanelLastVisible = true
 
                     // Animate panscan to zero and pin concurrently for smooth transition
                     appEnvironment?.navigationCoordinator.animatePanscanToZero(completion: nil)

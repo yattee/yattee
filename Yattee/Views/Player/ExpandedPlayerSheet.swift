@@ -353,11 +353,13 @@ struct ExpandedPlayerSheet: View {
                     isPanelExpanded = false
                     panelExpandOffset = 0
 
-                    // Reset panel state to orientation defaults
+                    // Reset panel state to the preset's default visibility
                     if newValue {
-                        // Entering landscape: reset to hidden/unpinned
-                        appEnvironment?.settingsManager.landscapeDetailsPanelVisible = false
-                        appEnvironment?.settingsManager.landscapeDetailsPanelPinned = false
+                        // Entering landscape: apply the preset's default
+                        applyPanelDefaultVisibility(
+                            playerControlsLayout.effectivePanelSettings,
+                            settingsManager: appEnvironment?.settingsManager
+                        )
                         // Portrait panel doesn't exist in wide layout - clear flag so gesture handler allows pinch
                         navigationCoordinator?.isPortraitPanelVisible = false
                     }
@@ -371,13 +373,19 @@ struct ExpandedPlayerSheet: View {
                 isInWideScreenLayout = wideScreen
                 #if os(iOS)
                 previousIsLandscape = wideScreen
-                // Reset panel state on fresh player open (prevents stale state from previous session)
-                appEnvironment?.settingsManager.landscapeDetailsPanelVisible = false
-                appEnvironment?.settingsManager.landscapeDetailsPanelPinned = false
                 if wideScreen {
                     navigationCoordinator?.isPortraitPanelVisible = false
                 }
                 #endif
+                // Provisional pass on fresh player open (prevents stale panel
+                // state from a previous session). Uses the cached settings;
+                // loadPlayerControlsLayout re-applies the authoritative value.
+                if navigationCoordinator?.hasAppliedPanelDefaultVisibility != true {
+                    applyPanelDefaultVisibility(
+                        PanelSettings.cached,
+                        settingsManager: appEnvironment?.settingsManager
+                    )
+                }
             }
         }
         .animation(.spring(response: 0.3, dampingFraction: 0.7), value: commentsState == .loaded && !comments.isEmpty)
@@ -883,7 +891,35 @@ private struct PlayerEventHandlersModifier: ViewModifier {
             playerControlsLayout = layout
             GlobalLayoutSettings.cached = layout.globalSettings
             MiniPlayerSettings.cached = layout.effectiveMiniPlayerSettings
+            PanelSettings.cached = layout.effectivePanelSettings
+
+            // Apply the preset's default panel visibility once per expanded
+            // player session, now that the authoritative settings are loaded.
+            if navigationCoordinator?.hasAppliedPanelDefaultVisibility != true {
+                applyPanelDefaultVisibility(
+                    layout.effectivePanelSettings,
+                    settingsManager: appEnvironment?.settingsManager
+                )
+                navigationCoordinator?.hasAppliedPanelDefaultVisibility = true
+            }
         }
+    }
+}
+
+/// Applies the preset's default details panel visibility for a fresh
+/// panel mount. "Hidden" mirrors the historical reset (unpinned too);
+/// the other modes leave the pinned state as persisted.
+@MainActor
+private func applyPanelDefaultVisibility(_ settings: PanelSettings, settingsManager: SettingsManager?) {
+    guard let settingsManager else { return }
+    switch settings.effectiveDefaultVisibility {
+    case .hidden:
+        settingsManager.landscapeDetailsPanelVisible = false
+        settingsManager.landscapeDetailsPanelPinned = false
+    case .visible:
+        settingsManager.landscapeDetailsPanelVisible = true
+    case .remember:
+        settingsManager.landscapeDetailsPanelVisible = settingsManager.detailsPanelLastVisible
     }
 }
 

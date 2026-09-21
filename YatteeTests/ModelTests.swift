@@ -603,27 +603,6 @@ struct HomeTabTests {
     }
 }
 
-// MARK: - PlayerInfoTab Tests
-
-@Suite("PlayerInfoTab Tests")
-struct PlayerInfoTabTests {
-
-    @Test("All cases exist")
-    func allCases() {
-        let cases = PlayerInfoTab.allCases
-        #expect(cases.contains(.description))
-        #expect(cases.contains(.comments))
-        #expect(cases.count == 2)
-    }
-
-    @Test("Titles are not empty")
-    func titles() {
-        for tab in PlayerInfoTab.allCases {
-            #expect(!tab.title.isEmpty)
-        }
-    }
-}
-
 // MARK: - SearchResultType Tests
 
 @Suite("SearchResultType Tests")

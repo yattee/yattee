@@ -182,6 +182,7 @@ final class SettingsManager {
     var _floatingDetailsPanelWidth: CGFloat?
     var _landscapeDetailsPanelVisible: Bool?
     var _landscapeDetailsPanelPinned: Bool?
+    var _detailsPanelLastVisible: Bool?
 
     // Notification settings
     var _backgroundNotificationsEnabled: Bool?
@@ -532,6 +533,7 @@ final class SettingsManager {
         _floatingDetailsPanelWidth = nil
         _landscapeDetailsPanelVisible = nil
         _landscapeDetailsPanelPinned = nil
+        _detailsPanelLastVisible = nil
         _backgroundNotificationsEnabled = nil
         _defaultNotificationsForNewChannels = nil
         _lastBackgroundCheck = nil

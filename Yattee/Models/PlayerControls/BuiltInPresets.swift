@@ -11,7 +11,7 @@ extension LayoutPreset {
     /// Bump this version whenever any built-in preset definition changes.
     /// On launch, the app compares this against the last-applied version
     /// and replaces stale built-in presets with fresh copies from code.
-    static let builtInPresetsVersion = 8
+    static let builtInPresetsVersion = 9
 
     // MARK: - Built-in Preset IDs
 
@@ -131,7 +131,8 @@ extension LayoutPreset {
             progressBarSettings: ProgressBarSettings(),
             gesturesSettings: gesturesSettings,
             playerPillSettings: playerPillSettings,
-            miniPlayerSettings: miniPlayerSettings
+            miniPlayerSettings: miniPlayerSettings,
+            panelSettings: .default
         )
     }
 
@@ -192,7 +193,8 @@ extension LayoutPreset {
             progressBarSettings: ProgressBarSettings(),
             gesturesSettings: nil,
             playerPillSettings: nil,
-            miniPlayerSettings: MiniPlayerSettings()
+            miniPlayerSettings: MiniPlayerSettings(),
+            panelSettings: .default
         )
     }
 
@@ -285,7 +287,8 @@ extension LayoutPreset {
             progressBarSettings: progressBarSettings,
             gesturesSettings: gesturesSettings,
             playerPillSettings: playerPillSettings,
-            miniPlayerSettings: miniPlayerSettings
+            miniPlayerSettings: miniPlayerSettings,
+            panelSettings: .default
         )
     }
 
@@ -336,7 +339,8 @@ extension LayoutPreset {
             progressBarSettings: progressBarSettings,
             gesturesSettings: nil,
             playerPillSettings: nil,
-            miniPlayerSettings: MiniPlayerSettings()
+            miniPlayerSettings: MiniPlayerSettings(),
+            panelSettings: .default
         )
     }
 

@@ -7434,6 +7434,39 @@
         }
       }
     },
+    "panel.defaultVisibility.hidden" : {
+      "comment" : "Details panel default visibility option",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hidden"
+          }
+        }
+      }
+    },
+    "panel.defaultVisibility.remember" : {
+      "comment" : "Details panel default visibility option",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Remember Last"
+          }
+        }
+      }
+    },
+    "panel.defaultVisibility.visible" : {
+      "comment" : "Details panel default visibility option",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Visible"
+          }
+        }
+      }
+    },
     "panel.page.info" : {
       "comment" : "Details panel page name",
       "localizations" : {
@@ -7474,6 +7507,116 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Tracks"
+          }
+        }
+      }
+    },
+    "panel.settings.defaultVisibility" : {
+      "comment" : "Details panel settings picker label",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "When Player Opens"
+          }
+        }
+      }
+    },
+    "panel.settings.defaultVisibility.footer" : {
+      "comment" : "Details panel settings picker footer",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "How the details panel appears when the player opens. Remember Last restores the panel if it was visible last time."
+          }
+        }
+      }
+    },
+    "panel.settings.elements.header" : {
+      "comment" : "Details panel page editor section header",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Elements"
+          }
+        }
+      }
+    },
+    "panel.settings.info.showChannelRow" : {
+      "comment" : "Info page element toggle",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Channel"
+          }
+        }
+      }
+    },
+    "panel.settings.info.showDescription" : {
+      "comment" : "Info page element toggle",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Description"
+          }
+        }
+      }
+    },
+    "panel.settings.info.showStatsRow" : {
+      "comment" : "Info page element toggle",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Statistics"
+          }
+        }
+      }
+    },
+    "panel.settings.page.enabled" : {
+      "comment" : "Details panel page editor toggle",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Show Page"
+          }
+        }
+      }
+    },
+    "panel.settings.page.lastEnabled.footer" : {
+      "comment" : "Details panel page editor footer",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "At least one page must stay enabled."
+          }
+        }
+      }
+    },
+    "panel.settings.pages.header" : {
+      "comment" : "Details panel settings section header",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pages"
+          }
+        }
+      }
+    },
+    "panel.settings.pages.footer" : {
+      "comment" : "Details panel settings section footer",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pages appear in this order. The page bar shows when at least two pages are enabled; pages without content hide automatically."
           }
         }
       }
@@ -14238,6 +14381,17 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Delete"
+          }
+        }
+      }
+    },
+    "settings.playerControls.detailsPanel" : {
+      "comment" : "Player controls settings row",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Details Panel"
           }
         }
       }

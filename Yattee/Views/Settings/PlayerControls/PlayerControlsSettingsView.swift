@@ -398,6 +398,24 @@ private struct LayoutSectionsSection: View {
                 )
             }
             .disabled(!viewModel.canEditActivePreset)
+
+            // The details panel exists in the iOS and macOS players.
+            #if os(iOS) || os(macOS)
+            NavigationLink {
+                PanelSettingsView(viewModel: viewModel)
+            } label: {
+                HStack {
+                    Label(
+                        String(localized: "settings.playerControls.detailsPanel"),
+                        systemImage: "sidebar.trailing"
+                    )
+                    Spacer()
+                    Text("\(viewModel.enabledPanelPageCount)")
+                        .foregroundStyle(.secondary)
+                }
+            }
+            .disabled(!viewModel.canEditActivePreset)
+            #endif
         } header: {
             Text(String(localized: "settings.playerControls.layoutSections"))
         } footer: {

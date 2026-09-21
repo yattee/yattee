@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import SwiftUI
 
 // MARK: - Panel Page Type
 
@@ -77,10 +78,22 @@ enum PanelLayoutMode: String, Codable, Sendable {
 // MARK: - Default Visibility
 
 /// Default panel visibility when the player opens on iPad/macOS.
-enum PanelDefaultVisibility: String, Codable, Sendable {
+enum PanelDefaultVisibility: String, Codable, CaseIterable, Sendable {
     case hidden
     case visible
     case remember
+
+    /// Localized name for the settings picker.
+    var displayName: String {
+        switch self {
+        case .hidden:
+            return String(localized: "panel.defaultVisibility.hidden")
+        case .visible:
+            return String(localized: "panel.defaultVisibility.visible")
+        case .remember:
+            return String(localized: "panel.defaultVisibility.remember")
+        }
+    }
 }
 
 // MARK: - Per-Page Settings
@@ -288,6 +301,12 @@ struct PanelSettings: Codable, Hashable, Sendable {
         self.showPageBarLabels = showPageBarLabels
     }
 
+    /// In-memory cache of the active preset's panel settings, refreshed by the
+    /// player whenever the layout loads. Lets synchronous appear paths (e.g.
+    /// default-visibility resets) read the last known value before the async
+    /// layout fetch completes.
+    nonisolated(unsafe) static var cached: PanelSettings = .default
+
     static let `default` = PanelSettings(pages: [
         PanelPageConfiguration(pageType: .info, region: .belowVideo),
         PanelPageConfiguration(pageType: .comments, region: .belowVideo),
@@ -326,6 +345,36 @@ struct PanelSettings: Codable, Hashable, Sendable {
     /// Whether a page type is enabled in this configuration.
     func isPageEnabled(_ pageType: PanelPageType) -> Bool {
         enabledPages().contains { $0.pageType == pageType }
+    }
+
+    /// The stored configuration for a page type, if present.
+    func configuration(for pageType: PanelPageType) -> PanelPageConfiguration? {
+        normalizedPages.first { $0.pageType == pageType }
+    }
+
+    // MARK: - Mutations (settings UI)
+
+    /// Replaces the stored pages with the normalized list so mutations by
+    /// index operate on the same list the UI displays.
+    mutating func normalize() {
+        pages = normalizedPages
+    }
+
+    mutating func setEnabled(_ isEnabled: Bool, for pageType: PanelPageType) {
+        normalize()
+        guard let index = pages.firstIndex(where: { $0.pageType == pageType }) else { return }
+        pages[index].isEnabled = isEnabled
+    }
+
+    mutating func movePages(fromOffsets source: IndexSet, toOffset destination: Int) {
+        normalize()
+        pages.move(fromOffsets: source, toOffset: destination)
+    }
+
+    mutating func updateSettings(_ newSettings: PanelPageSettings?, for pageType: PanelPageType) {
+        normalize()
+        guard let index = pages.firstIndex(where: { $0.pageType == pageType }) else { return }
+        pages[index].settings = newSettings
     }
 
     private enum CodingKeys: String, CodingKey {

@@ -61,7 +61,20 @@ final class NavigationCoordinator {
     var nowPlaying: Video?
 
     /// Whether the mini player is expanded to full screen.
-    var isPlayerExpanded = false
+    var isPlayerExpanded = false {
+        didSet {
+            // Each expanded player session applies the preset's default panel
+            // visibility once; closing the player arms the next application.
+            if !isPlayerExpanded {
+                hasAppliedPanelDefaultVisibility = false
+            }
+        }
+    }
+
+    /// Whether the current expanded player session already applied the active
+    /// preset's default details panel visibility. Lives here (not view @State)
+    /// so window-mode switches and layout re-mounts don't re-apply it.
+    var hasAppliedPanelDefaultVisibility = false
 
     /// Whether the mini player queue sheet is showing.
     var isMiniPlayerQueueSheetPresented = false

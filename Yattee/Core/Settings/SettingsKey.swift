@@ -132,6 +132,7 @@ enum SettingsKey: String, CaseIterable {
     case floatingDetailsPanelWidth // Resizable panel width in wide layout
     case landscapeDetailsPanelVisible
     case landscapeDetailsPanelPinned
+    case detailsPanelLastVisible // Last user-set visibility, for the "remember" default
 
     // Player Controls
     case activeControlsPresetID
@@ -167,6 +168,7 @@ enum SettingsKey: String, CaseIterable {
              // Player details panel — iOS/iPadOS only, different on other platforms
              .floatingDetailsPanelSide, .floatingDetailsPanelWidth,
              .landscapeDetailsPanelVisible, .landscapeDetailsPanelPinned,
+             .detailsPanelLastVisible,
              // Video swipe actions — touch-gesture feature
              .videoSwipeActionOrder, .videoSwipeActionVisibility:
             return true

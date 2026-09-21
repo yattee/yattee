@@ -277,6 +277,19 @@ extension SettingsManager {
         }
     }
 
+    /// Last user-set details panel visibility, restored when the active
+    /// preset's default visibility is "remember".
+    var detailsPanelLastVisible: Bool {
+        get {
+            if let cached = _detailsPanelLastVisible { return cached }
+            return bool(for: .detailsPanelLastVisible, default: false)
+        }
+        set {
+            _detailsPanelLastVisible = newValue
+            set(newValue, for: .detailsPanelLastVisible)
+        }
+    }
+
     /// Whether the details panel is pinned in landscape layout.
     /// Default is false (floating mode).
     var landscapeDetailsPanelPinned: Bool {

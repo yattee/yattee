@@ -790,6 +790,84 @@ final class PlayerControlsSettingsViewModel {
         queueDebouncedSave(preset: preset)
     }
 
+    // MARK: - Details Panel Settings
+
+    /// Current details panel settings from active preset, or default.
+    var panelSettings: PanelSettings {
+        activePreset?.layout.effectivePanelSettings ?? .default
+    }
+
+    /// Ordered pages list for the settings UI (includes disabled pages).
+    var panelPages: [PanelPageConfiguration] {
+        panelSettings.normalizedPages
+    }
+
+    /// Number of enabled panel pages.
+    var enabledPanelPageCount: Int {
+        panelSettings.enabledPages().count
+    }
+
+    /// Current default panel visibility.
+    var panelDefaultVisibility: PanelDefaultVisibility {
+        panelSettings.effectiveDefaultVisibility
+    }
+
+    /// Synchronously updates the default panel visibility.
+    func syncPanelDefaultVisibility(_ visibility: PanelDefaultVisibility) {
+        updatePanelSettingsSync { settings in
+            settings.defaultVisibility = visibility
+        }
+    }
+
+    /// Enables or disables a panel page. The last enabled page cannot be
+    /// disabled — the panel always needs at least one page.
+    func setPanelPageEnabled(_ pageType: PanelPageType, isEnabled: Bool) {
+        if !isEnabled {
+            let enabled = panelSettings.enabledPages()
+            if enabled.count <= 1, enabled.first?.pageType == pageType {
+                return
+            }
+        }
+        updatePanelSettingsSync { settings in
+            settings.setEnabled(isEnabled, for: pageType)
+        }
+    }
+
+    /// Moves pages within the panel page order.
+    func movePanelPages(fromOffsets source: IndexSet, toOffset destination: Int) {
+        updatePanelSettingsSync { settings in
+            settings.movePages(fromOffsets: source, toOffset: destination)
+        }
+    }
+
+    /// Synchronously updates the info page element toggles.
+    func updatePanelInfoSettingsSync(_ mutation: (inout InfoPageSettings) -> Void) {
+        updatePanelSettingsSync { settings in
+            var info = settings.configuration(for: .info)?.infoSettings ?? InfoPageSettings()
+            mutation(&info)
+            settings.updateSettings(.info(info), for: .info)
+        }
+    }
+
+    /// Synchronously updates details panel settings with immediate UI feedback.
+    /// Saves are debounced to avoid rapid disk writes.
+    /// - Parameter mutation: A closure that mutates the panel settings.
+    func updatePanelSettingsSync(_ mutation: (inout PanelSettings) -> Void) {
+        guard var preset = activePreset, !preset.isBuiltIn else {
+            error = "Cannot edit built-in presets. Duplicate it first."
+            return
+        }
+
+        var layout = preset.layout
+        var settings = layout.effectivePanelSettings
+        mutation(&settings)
+        layout.panelSettings = settings
+        preset = preset.withUpdatedLayout(layout)
+        self.activePreset = preset
+
+        queueDebouncedSave(preset: preset)
+    }
+
     // MARK: - System Controls & Volume
 
     /// Current system controls mode from active preset, or default.
