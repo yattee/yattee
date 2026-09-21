@@ -2181,6 +2181,16 @@ final class PlayerService {
                 let stream = try await createStreamForMediaSource(video: video, url: originalURL, extractor: extractor)
                 return (video, [stream], [], [])
             }
+
+            // Direct media (a file mpv plays as-is): rebuild the stream from the
+            // URL. A probe fills in the format/size for opaque CDN links; if it
+            // fails (offline, expired token) still hand mpv the URL and let it
+            // report the real error.
+            if extractor == DirectMediaHelper.provider {
+                let probe = await DirectMediaProbe.probe(originalURL)
+                let stream = DirectMediaHelper.createStream(from: originalURL, probe: probe)
+                return (video, [stream], [], [])
+            }
         }
 
         guard let instance = try await findInstance(for: video) else {

@@ -754,6 +754,12 @@ struct OpenLinkFormView: View {
             return (video, [stream])
 
         case .externalVideo, nil:
+            // A file mpv plays as-is needs no extraction
+            if let probe = await DirectMediaProbe.probe(url) {
+                let video = DirectMediaHelper.createVideo(from: url, probe: probe)
+                let stream = DirectMediaHelper.createStream(from: url, probe: probe)
+                return (video, [stream])
+            }
             // External URL - use Yattee Server
             guard let instance = appEnvironment.instancesManager.yatteeServerInstance else {
                 throw OpenLinkError.noYatteeServer
@@ -896,6 +902,12 @@ struct OpenLinkFormView: View {
             return (video, [stream], [], [])
 
         case .externalVideo, nil:
+            // A file mpv plays as-is needs no extraction, no captions/storyboards
+            if let probe = await DirectMediaProbe.probe(url) {
+                let video = DirectMediaHelper.createVideo(from: url, probe: probe)
+                let stream = DirectMediaHelper.createStream(from: url, probe: probe)
+                return (video, [stream], [], [])
+            }
             // External URL - use Yattee Server (doesn't support storyboards)
             guard let instance = appEnvironment.instancesManager.yatteeServerInstance else {
                 throw OpenLinkError.noYatteeServer

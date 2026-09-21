@@ -59,6 +59,18 @@ struct ExternalVideoView: View {
         isLoading = true
         errorMessage = nil
 
+        // A file mpv can play as-is (debrid/CDN download links with an opaque
+        // path) needs no extraction and no Yattee Server.
+        if let probe = await DirectMediaProbe.probe(url) {
+            let video = DirectMediaHelper.createVideo(from: url, probe: probe)
+            let stream = DirectMediaHelper.createStream(from: url, probe: probe)
+            await MainActor.run {
+                shouldDismissWhenPlayerExpands = true
+                appEnvironment.playerService.openVideo(video, stream: stream)
+            }
+            return
+        }
+
         // Find a Yattee Server instance
         guard let instance = appEnvironment.instancesManager.yatteeServerInstance else {
             errorMessage = String(localized: "externalVideo.noYatteeServer")

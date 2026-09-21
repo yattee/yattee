@@ -58,8 +58,12 @@ enum DirectMediaHelper {
     // MARK: - Video/Stream Creation
 
     /// Creates a Video model from a direct media URL.
-    static func createVideo(from url: URL) -> Video {
-        let filename = url.lastPathComponent
+    /// - Parameters:
+    ///   - url: The media URL.
+    ///   - probe: What `DirectMediaProbe` learned about the URL, when the path
+    ///     itself carries no filename (debrid/CDN links with an opaque ID).
+    static func createVideo(from url: URL, probe: DirectMediaProbeResult? = nil) -> Video {
+        let filename = probe?.filename ?? url.lastPathComponent
         let title = (filename as NSString).deletingPathExtension
         let host = url.host ?? "Direct Media"
 
@@ -77,17 +81,29 @@ enum DirectMediaHelper {
             viewCount: nil,
             likeCount: nil,
             thumbnails: [],
-            isLive: isStreamingURL(url), // Treat HLS/DASH as potentially live
+            isLive: isStreamingURL(url) || isStreamingType(probe?.mimeType), // Treat HLS/DASH as potentially live
             isUpcoming: false,
             scheduledStartTime: nil
         )
     }
 
     /// Creates a Stream from a direct media URL.
-    static func createStream(from url: URL) -> Stream {
-        let pathExtension = url.pathExtension.lowercased()
+    /// - Parameters:
+    ///   - url: The media URL.
+    ///   - probe: What `DirectMediaProbe` learned about the URL; supplies the
+    ///     format, MIME type and size when the path has no extension.
+    static func createStream(from url: URL, probe: DirectMediaProbeResult? = nil) -> Stream {
+        let probedExtension = probe?.filename.map { ($0 as NSString).pathExtension.lowercased() } ?? ""
+        let pathExtension = allExtensions.contains(url.pathExtension.lowercased())
+            ? url.pathExtension.lowercased()
+            : (probedExtension.isEmpty ? url.pathExtension.lowercased() : probedExtension)
+        let probedType = probe?.mimeType
         let isAudio = isAudioURL(url)
+            || audioExtensions.contains(probedExtension)
+            || (probedType?.hasPrefix("audio/") ?? false)
         let isStreaming = isStreamingURL(url)
+            || streamingExtensions.contains(probedExtension)
+            || isStreamingType(probedType)
 
         return Stream(
             url: url,
@@ -96,10 +112,10 @@ enum DirectMediaHelper {
             videoCodec: isAudio ? nil : "unknown",
             audioCodec: "unknown",
             bitrate: nil,
-            fileSize: nil,
+            fileSize: probe?.contentLength,
             isAudioOnly: isAudio,
             isLive: isStreaming,
-            mimeType: mimeType(for: pathExtension),
+            mimeType: mimeType(for: pathExtension) ?? probedType,
             audioLanguage: nil,
             audioTrackName: nil,
             isOriginalAudio: true,
@@ -108,10 +124,19 @@ enum DirectMediaHelper {
         )
     }
 
+    /// Whether a server-reported media type is an HLS or DASH manifest.
+    static func isStreamingType(_ mimeType: String?) -> Bool {
+        guard let mimeType else { return false }
+        return [
+            "application/vnd.apple.mpegurl", "application/x-mpegurl",
+            "audio/mpegurl", "audio/x-mpegurl", "application/dash+xml"
+        ].contains(mimeType.lowercased())
+    }
+
     // MARK: - MIME Type Mapping
 
     /// Returns the MIME type for a file extension.
-    private static func mimeType(for extension: String) -> String? {
+    static func mimeType(for extension: String) -> String? {
         switch `extension` {
         case "mp4", "m4v":
             return "video/mp4"

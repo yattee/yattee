@@ -755,6 +755,19 @@ struct YatteeApp: App {
 
     /// Download an external video from a deep link.
     private func downloadExternalVideoFromDeepLink(url: URL) async {
+        // A file mpv plays as-is can be downloaded straight from its URL
+        if let probe = await DirectMediaProbe.probe(url) {
+            let video = DirectMediaHelper.createVideo(from: url, probe: probe)
+            let stream = DirectMediaHelper.createStream(from: url, probe: probe)
+            await MainActor.run {
+                deepLinkVideo = video
+                deepLinkStreams = [stream]
+                deepLinkCaptions = []
+                showingDeepLinkDownloadSheet = true
+            }
+            return
+        }
+
         guard let instance = appEnvironment.instancesManager.yatteeServerInstance else {
             // No Yattee Server - fall back to open
             appEnvironment.navigationCoordinator.navigate(to: .externalVideo(url))
