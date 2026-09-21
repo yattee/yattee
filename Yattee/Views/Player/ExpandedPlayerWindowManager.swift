@@ -176,7 +176,11 @@ final class ExpandedPlayerWindowManager: NSObject {
 
         // Lock manual resize to the video aspect ratio. Seeded with the real ratio
         // when known (else 16:9); updated as soon as the real ratio is known.
-        Self.applyAspectRatioConstraint(seedAspect, to: window)
+        // Corner layout (already active on a window re-mount, e.g. switching
+        // from the inline overlay) keeps the window unconstrained.
+        if appEnvironment.navigationCoordinator.isCornerLayoutActive != true {
+            Self.applyAspectRatioConstraint(seedAspect, to: window)
+        }
 
         // Force the intended size. Assigning `contentViewController` above resizes
         // the window to the hosting controller's fitting size — and the lightweight
@@ -588,6 +592,17 @@ final class ExpandedPlayerWindowManager: NSObject {
         Self.applyAspectRatioConstraint(aspectRatio, to: window)
     }
 
+    /// Removes the window's aspect-ratio resize constraint so it resizes
+    /// freely. Used by the corner layout, where the window frames the whole
+    /// video-plus-panels arrangement rather than the video alone. The size
+    /// floor stays enforced by `windowWillResize(_:to:)`.
+    func unlockAspectRatio() {
+        guard let window = playerWindow else { return }
+        pendingFullScreenAspectRatio = nil
+        window.contentAspectRatio = .zero
+        LoggingService.shared.debug("unlockAspectRatio (corner layout)", category: .player)
+    }
+
     // MARK: - Private Helpers
 
     /// Sets `contentAspectRatio` and a ratio-consistent minimum content size on
@@ -813,6 +828,8 @@ extension ExpandedPlayerWindowManager: NSWindowDelegate {
             // exactly what the aspect-change handler would have done windowed.
             if let ratio = pendingFullScreenAspectRatio {
                 pendingFullScreenAspectRatio = nil
+                // Corner layout keeps the window unconstrained.
+                guard appEnvironment?.navigationCoordinator.isCornerLayoutActive != true else { return }
                 Self.applyAspectRatioConstraint(ratio, to: window)
                 if appEnvironment?.settingsManager.playerSheetAutoResize == true {
                     resizeToFitAspectRatio(ratio, animated: false)

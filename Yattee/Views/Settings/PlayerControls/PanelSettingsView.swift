@@ -14,9 +14,22 @@ struct PanelSettingsView: View {
 
     // Local state for immediate UI updates
     @State private var defaultVisibility: PanelDefaultVisibility = .hidden
+    @State private var layoutMode: PanelLayoutMode = .stacked
+
+    /// Corner layout exists on iPad and macOS only.
+    static var supportsCornerLayout: Bool {
+        #if os(macOS)
+        return true
+        #else
+        return UIDevice.current.userInterfaceIdiom == .pad
+        #endif
+    }
 
     var body: some View {
         List {
+            if Self.supportsCornerLayout {
+                layoutSection
+            }
             visibilitySection
             pagesSection
         }
@@ -37,6 +50,28 @@ struct PanelSettingsView: View {
         }
         .onChange(of: viewModel.activePreset?.id) { _, _ in
             syncLocalState()
+        }
+    }
+
+    // MARK: - Layout Section
+
+    private var layoutSection: some View {
+        Section {
+            Picker(
+                String(localized: "panel.settings.layoutMode"),
+                selection: $layoutMode
+            ) {
+                ForEach(PanelLayoutMode.allCases, id: \.self) { mode in
+                    Text(mode.displayName).tag(mode)
+                }
+            }
+            .disabled(!viewModel.canEditActivePreset)
+            .onChange(of: layoutMode) { _, newValue in
+                guard newValue != viewModel.panelLayoutMode else { return }
+                viewModel.syncPanelLayoutMode(newValue)
+            }
+        } footer: {
+            Text(String(localized: "panel.settings.layoutMode.footer"))
         }
     }
 
@@ -92,10 +127,15 @@ struct PanelSettingsView: View {
             HStack {
                 Label(page.pageType.displayName, systemImage: page.pageType.systemImage)
                 Spacer()
-                Text(page.isEnabled
-                    ? String(localized: "common.on")
-                    : String(localized: "common.off"))
-                    .foregroundStyle(.secondary)
+                if page.isEnabled, layoutMode == .corner, Self.supportsCornerLayout {
+                    Text(page.region.displayName)
+                        .foregroundStyle(.secondary)
+                } else {
+                    Text(page.isEnabled
+                        ? String(localized: "common.on")
+                        : String(localized: "common.off"))
+                        .foregroundStyle(.secondary)
+                }
             }
         }
     }
@@ -104,6 +144,7 @@ struct PanelSettingsView: View {
 
     private func syncLocalState() {
         defaultVisibility = viewModel.panelDefaultVisibility
+        layoutMode = viewModel.panelLayoutMode
     }
 }
 

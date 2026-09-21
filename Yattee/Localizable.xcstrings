@@ -7467,6 +7467,28 @@
         }
       }
     },
+    "panel.layoutMode.corner" : {
+      "comment" : "Details panel layout mode option",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Corner"
+          }
+        }
+      }
+    },
+    "panel.layoutMode.stacked" : {
+      "comment" : "Details panel layout mode option",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Standard"
+          }
+        }
+      }
+    },
     "panel.page.info" : {
       "comment" : "Details panel page name",
       "localizations" : {
@@ -7507,6 +7529,28 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Tracks"
+          }
+        }
+      }
+    },
+    "panel.region.belowVideo" : {
+      "comment" : "Corner layout region option",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Below Video"
+          }
+        }
+      }
+    },
+    "panel.region.primary" : {
+      "comment" : "Corner layout region option",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Side Column"
           }
         }
       }
@@ -7577,6 +7621,28 @@
         }
       }
     },
+    "panel.settings.layoutMode" : {
+      "comment" : "Details panel layout mode picker label",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Layout"
+          }
+        }
+      }
+    },
+    "panel.settings.layoutMode.footer" : {
+      "comment" : "Details panel layout mode footer",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Corner shows the video in the top corner with pages in a side column and below the video. The standard layout is used automatically when the window is too narrow."
+          }
+        }
+      }
+    },
     "panel.settings.page.enabled" : {
       "comment" : "Details panel page editor toggle",
       "localizations" : {
@@ -7595,6 +7661,28 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "At least one page must stay enabled."
+          }
+        }
+      }
+    },
+    "panel.settings.page.region" : {
+      "comment" : "Corner layout page region picker label",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Location"
+          }
+        }
+      }
+    },
+    "panel.settings.page.region.footer" : {
+      "comment" : "Corner layout page region footer",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Where this page appears in the corner layout."
           }
         }
       }

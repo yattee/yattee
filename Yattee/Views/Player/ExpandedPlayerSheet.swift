@@ -294,6 +294,9 @@ struct ExpandedPlayerSheet: View {
     private var playerContent: some View {
         GeometryReader { geometry in
             let wideScreen = isWideScreenLayout(size: geometry.size)
+            #if os(iOS) || os(macOS)
+            let cornerActive = isCornerLayout(size: geometry.size)
+            #endif
 
             ZStack(alignment: .top) {
                 // Full-screen background - prevents content leaking during aspect ratio animation
@@ -310,10 +313,17 @@ struct ExpandedPlayerSheet: View {
                     Color.black.ignoresSafeArea(.all)
                 } else if wideScreen {
                     if let video = playerState?.currentVideo {
-                        // Widescreen layout with floating panel
-                        // Must ignore safe area to get full screen geometry
-                        wideScreenContent(video: video)
-                            .ignoresSafeArea(.all)
+                        if cornerActive {
+                            // Corner layout: video top-left with panel regions.
+                            // Laid out within the safe area (black background
+                            // extends beneath it).
+                            cornerContent(video: video)
+                        } else {
+                            // Widescreen layout with floating panel
+                            // Must ignore safe area to get full screen geometry
+                            wideScreenContent(video: video)
+                                .ignoresSafeArea(.all)
+                        }
                     } else {
                         // Widescreen loading state - just show black with spinner
                         Color.black
@@ -337,6 +347,11 @@ struct ExpandedPlayerSheet: View {
                 // Disable animations during layout switch to prevent position interpolation
                 transaction.animation = nil
             }
+            #if os(iOS) || os(macOS)
+            .onChange(of: cornerActive) { _, newValue in
+                navigationCoordinator?.isCornerLayoutActive = newValue
+            }
+            #endif
             .onChange(of: wideScreen) { _, newValue in
                 isInWideScreenLayout = newValue
                 #if os(iOS)
@@ -371,6 +386,9 @@ struct ExpandedPlayerSheet: View {
             }
             .onAppear {
                 isInWideScreenLayout = wideScreen
+                #if os(iOS) || os(macOS)
+                navigationCoordinator?.isCornerLayoutActive = cornerActive
+                #endif
                 #if os(iOS)
                 previousIsLandscape = wideScreen
                 if wideScreen {
@@ -988,6 +1006,11 @@ private struct PlayerMacOSEventHandlersModifier: ViewModifier {
 
     var playerState: PlayerState? { appEnvironment?.playerService.state }
 
+    /// Corner layout resizes the window freely: no aspect lock, no auto-fit.
+    private var isCornerLayoutActive: Bool {
+        appEnvironment?.navigationCoordinator.isCornerLayoutActive == true
+    }
+
     func body(content: Content) -> some View {
         content
             .onChange(of: playerState?.showDebugOverlay) { _, isVisible in
@@ -1003,12 +1026,30 @@ private struct PlayerMacOSEventHandlersModifier: ViewModifier {
             .onChange(of: playerState?.currentVideo?.id) { oldValue, newValue in
                 handleVideoChangeForResize(oldValue: oldValue, newValue: newValue)
             }
+            .onChange(of: appEnvironment?.navigationCoordinator.isCornerLayoutActive) { _, isCorner in
+                handleCornerLayoutChange(isCorner: isCorner == true)
+            }
             .onAppear {
                 handleMacOSAppear()
             }
     }
 
+    /// Entering corner mode drops the window's aspect-ratio constraint so it
+    /// resizes freely; leaving it restores the lock (and auto-fit, when on)
+    /// exactly as the aspect-change handler would have applied it.
+    private func handleCornerLayoutChange(isCorner: Bool) {
+        if isCorner {
+            ExpandedPlayerWindowManager.shared.unlockAspectRatio()
+        } else if let aspectRatio = playerState?.videoAspectRatio, aspectRatio > 0 {
+            ExpandedPlayerWindowManager.shared.lockAspectRatio(aspectRatio)
+            if appEnvironment?.settingsManager.playerSheetAutoResize == true {
+                ExpandedPlayerWindowManager.shared.resizeToFitAspectRatio(aspectRatio, animated: true)
+            }
+        }
+    }
+
     private func handleAspectRatioChange(oldValue: Double?, newValue: Double?) {
+        guard !isCornerLayoutActive else { return }
         // nil while a video is loaded means audio-only playback (no video
         // track reports a size) — fall back to the standard 16:9 instead of
         // keeping the previous video's ratio.
@@ -1039,6 +1080,7 @@ private struct PlayerMacOSEventHandlersModifier: ViewModifier {
     }
 
     private func handleVideoChangeForResize(oldValue: Video.ID?, newValue: Video.ID?) {
+        guard !isCornerLayoutActive else { return }
         guard oldValue != nil, newValue != nil else { return }
         guard appEnvironment?.settingsManager.playerSheetAutoResize == true else { return }
 
@@ -1054,6 +1096,7 @@ private struct PlayerMacOSEventHandlersModifier: ViewModifier {
     }
 
     private func handleMacOSAppear() {
+        guard !isCornerLayoutActive else { return }
         guard let aspectRatio = playerState?.videoAspectRatio, aspectRatio > 0 else { return }
 
         // Lock aspect ratio for manual resize unconditionally.

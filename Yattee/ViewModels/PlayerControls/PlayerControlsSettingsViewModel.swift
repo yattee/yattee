@@ -819,6 +819,25 @@ final class PlayerControlsSettingsViewModel {
         }
     }
 
+    /// Current panel layout mode (iPad/macOS).
+    var panelLayoutMode: PanelLayoutMode {
+        panelSettings.effectiveLayoutMode
+    }
+
+    /// Synchronously updates the panel layout mode.
+    func syncPanelLayoutMode(_ mode: PanelLayoutMode) {
+        updatePanelSettingsSync { settings in
+            settings.layoutMode = mode
+        }
+    }
+
+    /// Synchronously updates a page's corner-layout region assignment.
+    func setPanelPageRegion(_ region: PanelRegion, for pageType: PanelPageType) {
+        updatePanelSettingsSync { settings in
+            settings.setRegion(region, for: pageType)
+        }
+    }
+
     /// Enables or disables a panel page. The last enabled page cannot be
     /// disabled — the panel always needs at least one page.
     func setPanelPageEnabled(_ pageType: PanelPageType, isEnabled: Bool) {

@@ -67,6 +67,7 @@ final class NavigationCoordinator {
             // visibility once; closing the player arms the next application.
             if !isPlayerExpanded {
                 hasAppliedPanelDefaultVisibility = false
+                isCornerLayoutActive = false
             }
         }
     }
@@ -75,6 +76,11 @@ final class NavigationCoordinator {
     /// preset's default details panel visibility. Lives here (not view @State)
     /// so window-mode switches and layout re-mounts don't re-apply it.
     var hasAppliedPanelDefaultVisibility = false
+
+    /// Whether the expanded player currently resolves to the corner layout
+    /// (iPad/macOS). Drives macOS window aspect-lock gating, which lives in a
+    /// different view than the layout resolver.
+    var isCornerLayoutActive = false
 
     /// Whether the mini player queue sheet is showing.
     var isMiniPlayerQueueSheetPresented = false

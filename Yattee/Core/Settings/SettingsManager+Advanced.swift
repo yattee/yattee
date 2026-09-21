@@ -290,6 +290,23 @@ extension SettingsManager {
         }
     }
 
+    /// Default side column width in the corner player layout.
+    static let defaultCornerPanelColumnWidth: CGFloat = 380
+
+    /// Width of the side column in the corner player layout (iPad/macOS).
+    /// User can resize via drag gesture. Persisted across sessions.
+    var cornerPanelColumnWidth: CGFloat {
+        get {
+            if let cached = _cornerPanelColumnWidth { return cached }
+            let value = double(for: .cornerPanelColumnWidth)
+            return value > 0 ? CGFloat(value) : Self.defaultCornerPanelColumnWidth
+        }
+        set {
+            _cornerPanelColumnWidth = newValue
+            set(Double(newValue), for: .cornerPanelColumnWidth)
+        }
+    }
+
     /// Whether the details panel is pinned in landscape layout.
     /// Default is false (floating mode).
     var landscapeDetailsPanelPinned: Bool {

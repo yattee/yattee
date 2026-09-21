@@ -61,18 +61,38 @@ enum PanelPageType: String, Codable, CaseIterable, Sendable {
 /// Region a page is assigned to in the corner layout.
 /// `primary` is the right column in corner mode and the only panel elsewhere;
 /// the assignment is ignored outside corner mode.
-enum PanelRegion: String, Codable, Sendable {
+enum PanelRegion: String, Codable, CaseIterable, Sendable {
     case primary
     case belowVideo
+
+    /// Localized name for the settings picker.
+    var displayName: String {
+        switch self {
+        case .primary:
+            return String(localized: "panel.region.primary")
+        case .belowVideo:
+            return String(localized: "panel.region.belowVideo")
+        }
+    }
 }
 
 // MARK: - Layout Mode
 
 /// How the details panel is laid out on iPad/macOS.
 /// Corner mode automatically falls back to stacked when the window is narrow.
-enum PanelLayoutMode: String, Codable, Sendable {
+enum PanelLayoutMode: String, Codable, CaseIterable, Sendable {
     case stacked
     case corner
+
+    /// Localized name for the settings picker.
+    var displayName: String {
+        switch self {
+        case .stacked:
+            return String(localized: "panel.layoutMode.stacked")
+        case .corner:
+            return String(localized: "panel.layoutMode.corner")
+        }
+    }
 }
 
 // MARK: - Default Visibility
@@ -375,6 +395,12 @@ struct PanelSettings: Codable, Hashable, Sendable {
         normalize()
         guard let index = pages.firstIndex(where: { $0.pageType == pageType }) else { return }
         pages[index].settings = newSettings
+    }
+
+    mutating func setRegion(_ region: PanelRegion, for pageType: PanelPageType) {
+        normalize()
+        guard let index = pages.firstIndex(where: { $0.pageType == pageType }) else { return }
+        pages[index].region = region
     }
 
     private enum CodingKeys: String, CodingKey {

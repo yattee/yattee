@@ -16,6 +16,11 @@ extension ExpandedPlayerSheet {
     /// Minimum width required to show widescreen layout with floating panel.
     static let minWidthForWidescreen: CGFloat = 700
 
+    /// Minimum width required for the corner layout; below this the corner
+    /// preset setting falls back to the stacked widescreen layout (Split View,
+    /// narrow windows).
+    static let minWidthForCornerLayout: CGFloat = 900
+
     // MARK: - Layout Detection
 
     /// Check if widescreen layout should be used based on available size.
@@ -30,6 +35,21 @@ extension ExpandedPlayerSheet {
         return false // tvOS uses different layout
         #endif
     }
+
+    #if os(iOS) || os(macOS)
+    /// Whether the corner layout should be used for the given size: iPad/macOS
+    /// only, opted into via the preset's panel settings, wide enough, and in a
+    /// widescreen orientation. Evaluated per layout pass so window resizes and
+    /// Split View changes fall back automatically.
+    func isCornerLayout(size: CGSize) -> Bool {
+        #if os(iOS)
+        guard UIDevice.current.userInterfaceIdiom == .pad else { return false }
+        #endif
+        return playerControlsLayout.effectivePanelSettings.effectiveLayoutMode == .corner
+            && size.width >= Self.minWidthForCornerLayout
+            && isWideScreenLayout(size: size)
+    }
+    #endif
 
     // MARK: - Download Action Handler
 
@@ -1273,6 +1293,36 @@ extension ExpandedPlayerSheet {
                 self.toggleFullscreen()
                 #endif
             }
+        )
+    }
+
+    // MARK: - Corner Content
+
+    /// Corner layout: video top-left, side column, optional below-video
+    /// region. Reuses `playerAreaForWidescreen` so the MPV hosting path is
+    /// identical to the stacked layout — only the container size differs.
+    @ViewBuilder
+    func cornerContent(video: Video) -> some View {
+        CornerPlayerLayout(
+            playerControlsLayout: playerControlsLayout,
+            playerContent: { onTogglePanel, isPanelVisible, width, height in
+                // isPanelPinned=true keeps the controls visible alongside the
+                // panel regions (corner regions behave like a pinned panel).
+                playerAreaForWidescreen(
+                    onTogglePanel: onTogglePanel,
+                    isPanelVisible: isPanelVisible,
+                    isPanelPinned: true,
+                    panelSide: .right,
+                    onHidePanel: {},
+                    leadingSafeArea: 0,
+                    trailingSafeArea: 0,
+                    fullWidth: width,
+                    fullHeight: height
+                )
+            },
+            onChannelTap: video.author.hasRealChannelInfo ? {
+                navigationCoordinator?.navigateToChannel(for: video, collapsePlayer: true)
+            } : nil
         )
     }
 

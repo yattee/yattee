@@ -160,4 +160,18 @@ struct PanelSettingsTests {
         settings.setEnabled(true, for: .comments)
         #expect(settings.pages.map(\.pageType) == PanelSettings.default.pages.map(\.pageType))
     }
+
+    @Test("Region assignment and layout mode round-trip through Codable")
+    func regionAndLayoutModeRoundTrip() throws {
+        var settings = PanelSettings.default
+        settings.layoutMode = .corner
+        settings.setRegion(.belowVideo, for: .related)
+        #expect(settings.configuration(for: .related)?.region == .belowVideo)
+        #expect(settings.enabledPages(in: .primary).map(\.pageType) == [.chapters, .queue])
+
+        let data = try JSONEncoder().encode(settings)
+        let decoded = try JSONDecoder().decode(PanelSettings.self, from: data)
+        #expect(decoded.effectiveLayoutMode == .corner)
+        #expect(decoded.configuration(for: .related)?.region == .belowVideo)
+    }
 }
