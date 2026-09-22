@@ -769,7 +769,13 @@ final class ExpandedPlayerWindowManager {
         let statusBarController = StatusBarVisibilityController()
 
         // Create the expanded player view with status bar controller in environment
-        let expandedView = ExpandedPlayerSheet()
+        // Seed the portrait panel state before the first frame so the preset's
+        // default visibility doesn't animate a video position jump on expand.
+        let initialPanelVisible = ExpandedPlayerSheet.initialPortraitPanelVisibility(
+            settingsManager: appEnvironment.settingsManager
+        )
+        LoggingService.shared.logPlayer("[ExpandedPlayerWindowManager] show: initialPortraitPanelVisible=\(initialPanelVisible), defaultVisibility=\(PanelSettings.cached.effectiveDefaultVisibility)")
+        let expandedView = ExpandedPlayerSheet(initialPortraitPanelVisible: initialPanelVisible)
             .appEnvironment(appEnvironment)
             .environment(\.statusBarVisibilityController, statusBarController)
 

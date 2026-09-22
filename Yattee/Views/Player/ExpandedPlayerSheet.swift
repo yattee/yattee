@@ -35,6 +35,26 @@ struct ExpandedPlayerSheet: View {
     /// Temporarily hide controls during fullscreen transition to avoid animation glitch
     @State var hideControlsDuringTransition: Bool = false
 
+    /// Resolves the preset's default panel visibility for the portrait panel
+    /// from the cached settings, so creators of this view can seed the initial
+    /// state BEFORE the first frame — applying it in onAppear animates a
+    /// visible top-to-center video jump during player expansion.
+    @MainActor
+    static func initialPortraitPanelVisibility(settingsManager: SettingsManager?) -> Bool {
+        switch PanelSettings.cached.effectiveDefaultVisibility {
+        case .hidden:
+            return false
+        case .visible:
+            return true
+        case .remember:
+            return settingsManager?.detailsPanelLastVisible ?? false
+        }
+    }
+
+    init(initialPortraitPanelVisible: Bool = true) {
+        _isPortraitPanelVisible = State(initialValue: initialPortraitPanelVisible)
+    }
+
     // MARK: - Panel Drag State
 
     /// Current drag offset when dismissing panel (positive = dragging down)
@@ -194,6 +214,8 @@ struct ExpandedPlayerSheet: View {
                 isAutoplayCancelled: $isAutoplayCancelled,
                 pendingScrollToTopOnHeightChange: $pendingScrollToTopOnHeightChange,
                 playerControlsLayout: $playerControlsLayout,
+                isPortraitPanelVisible: $isPortraitPanelVisible,
+                isInWideScreenLayout: isInWideScreenLayout,
                 stopAutoplayCountdown: stopAutoplayCountdown,
                 startAutoplayCountdown: startAutoplayCountdown,
                 startPreloadingComments: startPreloadingComments,
@@ -399,10 +421,23 @@ struct ExpandedPlayerSheet: View {
                 // state from a previous session). Uses the cached settings;
                 // loadPlayerControlsLayout re-applies the authoritative value.
                 if navigationCoordinator?.hasAppliedPanelDefaultVisibility != true {
-                    applyPanelDefaultVisibility(
+                    let visible = applyPanelDefaultVisibility(
                         PanelSettings.cached,
                         settingsManager: appEnvironment?.settingsManager
                     )
+                    #if os(iOS) || os(macOS)
+                    LoggingService.shared.logPlayer("[ExpandedPlayerSheet] onAppear provisional apply: visible=\(visible), state=\(isPortraitPanelVisible), wideScreen=\(wideScreen)")
+                    // No animation: this is the opening state, not a user
+                    // toggle — animating it here slides the video mid-expand.
+                    var transaction = Transaction()
+                    transaction.disablesAnimations = true
+                    withTransaction(transaction) {
+                        isPortraitPanelVisible = visible
+                    }
+                    if !wideScreen {
+                        navigationCoordinator?.isPortraitPanelVisible = visible
+                    }
+                    #endif
                 }
             }
         }
@@ -794,6 +829,8 @@ private struct PlayerEventHandlersModifier: ViewModifier {
     @Binding var isAutoplayCancelled: Bool
     @Binding var pendingScrollToTopOnHeightChange: Bool
     @Binding var playerControlsLayout: PlayerControlsLayout
+    @Binding var isPortraitPanelVisible: Bool
+    let isInWideScreenLayout: Bool
 
     let stopAutoplayCountdown: () -> Void
     let startAutoplayCountdown: () -> Void
@@ -914,10 +951,21 @@ private struct PlayerEventHandlersModifier: ViewModifier {
             // Apply the preset's default panel visibility once per expanded
             // player session, now that the authoritative settings are loaded.
             if navigationCoordinator?.hasAppliedPanelDefaultVisibility != true {
-                applyPanelDefaultVisibility(
+                let visible = applyPanelDefaultVisibility(
                     layout.effectivePanelSettings,
                     settingsManager: appEnvironment?.settingsManager
                 )
+                #if os(iOS) || os(macOS)
+                LoggingService.shared.logPlayer("[ExpandedPlayerSheet] authoritative apply: visible=\(visible), state=\(isPortraitPanelVisible), wideScreen=\(isInWideScreenLayout)")
+                var transaction = Transaction()
+                transaction.disablesAnimations = true
+                withTransaction(transaction) {
+                    isPortraitPanelVisible = visible
+                }
+                if !isInWideScreenLayout {
+                    navigationCoordinator?.isPortraitPanelVisible = visible
+                }
+                #endif
                 navigationCoordinator?.hasAppliedPanelDefaultVisibility = true
             }
         }
@@ -926,18 +974,25 @@ private struct PlayerEventHandlersModifier: ViewModifier {
 
 /// Applies the preset's default details panel visibility for a fresh
 /// panel mount. "Hidden" mirrors the historical reset (unpinned too);
-/// the other modes leave the pinned state as persisted.
+/// the other modes leave the pinned state as persisted. Returns the
+/// resolved visibility so callers can mirror it into the portrait
+/// panel state, which lives in view @State rather than settings.
 @MainActor
-private func applyPanelDefaultVisibility(_ settings: PanelSettings, settingsManager: SettingsManager?) {
-    guard let settingsManager else { return }
+@discardableResult
+private func applyPanelDefaultVisibility(_ settings: PanelSettings, settingsManager: SettingsManager?) -> Bool {
+    guard let settingsManager else { return true }
     switch settings.effectiveDefaultVisibility {
     case .hidden:
         settingsManager.landscapeDetailsPanelVisible = false
         settingsManager.landscapeDetailsPanelPinned = false
+        return false
     case .visible:
         settingsManager.landscapeDetailsPanelVisible = true
+        return true
     case .remember:
-        settingsManager.landscapeDetailsPanelVisible = settingsManager.detailsPanelLastVisible
+        let lastVisible = settingsManager.detailsPanelLastVisible
+        settingsManager.landscapeDetailsPanelVisible = lastVisible
+        return lastVisible
     }
 }
 

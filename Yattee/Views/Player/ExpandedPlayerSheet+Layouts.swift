@@ -385,6 +385,7 @@ extension ExpandedPlayerSheet {
                                     panelRevealOffset = 0
                                     isPortraitPanelVisible = true
                                     navigationCoordinator?.isPortraitPanelVisible = true
+                                    appEnvironment?.settingsManager.detailsPanelLastVisible = true
                                     // Match video position from reveal formula
                                     let revealProgress = min(1.0, -currentRevealOffset / pinnedPanelHeight)
                                     let maxVideoOffset = centerY - topY
@@ -508,6 +509,7 @@ extension ExpandedPlayerSheet {
                                         withTransaction(transaction) {
                                             isPortraitPanelVisible = false
                                             navigationCoordinator?.isPortraitPanelVisible = false
+                                            appEnvironment?.settingsManager.detailsPanelLastVisible = false
                                             isCommentsExpanded = false
                                             navigationCoordinator?.isCommentsExpanded = false
                                             navigationCoordinator?.commentsFrame = .zero
@@ -648,6 +650,7 @@ extension ExpandedPlayerSheet {
             isPortraitPanelVisible = newValue
         }
         navigationCoordinator?.isPortraitPanelVisible = newValue
+        appEnvironment?.settingsManager.detailsPanelLastVisible = newValue
     }
 
     /// Hide floating panel with animation
@@ -656,6 +659,7 @@ extension ExpandedPlayerSheet {
             isPortraitPanelVisible = false
         }
         navigationCoordinator?.isPortraitPanelVisible = false
+        appEnvironment?.settingsManager.detailsPanelLastVisible = false
 
         // Reset main window transform when hiding panel to fix safe area clipping (iOS only)
         #if os(iOS)
@@ -853,6 +857,7 @@ extension ExpandedPlayerSheet {
                             isPortraitPanelVisible.toggle()
                         }
                         navigationCoordinator?.isPortraitPanelVisible = isPortraitPanelVisible
+                        appEnvironment?.settingsManager.detailsPanelLastVisible = isPortraitPanelVisible
                     },
                     onShowSettings: { [self] in
                         showingQualitySheet = true
@@ -1125,6 +1130,7 @@ extension ExpandedPlayerSheet {
                         isPortraitPanelVisible.toggle()
                     }
                     navigationCoordinator?.isPortraitPanelVisible = isPortraitPanelVisible
+                    appEnvironment?.settingsManager.detailsPanelLastVisible = isPortraitPanelVisible
                     // Re-enable controls after animation completes (0.35s)
                     // Controls will still be hidden (forceInitialHidden) until user taps
                     DispatchQueue.main.asyncAfter(deadline: .now() + 0.35) {

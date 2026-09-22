@@ -64,7 +64,11 @@ struct ContentView: View {
             if isInlinePlayerOverlayActive(appEnvironment: appEnvironment) {
                 ZStack {
                     Color.black
-                    ExpandedPlayerSheet()
+                    ExpandedPlayerSheet(
+                        initialPortraitPanelVisible: ExpandedPlayerSheet.initialPortraitPanelVisibility(
+                            settingsManager: appEnvironment.settingsManager
+                        )
+                    )
                 }
                 .ignoresSafeArea()
                 .transition(.opacity)

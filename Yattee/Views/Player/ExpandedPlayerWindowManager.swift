@@ -850,6 +850,7 @@ extension ExpandedPlayerWindowManager: NSWindowDelegate {
 /// its player window renders, and removes the perceptible "dead gap" between the
 /// click and the window appearing.
 private struct ExpandedPlayerWindowRoot: View {
+    @Environment(\.appEnvironment) private var appEnvironment
     @State private var showFullPlayer = false
 
     var body: some View {
@@ -859,7 +860,11 @@ private struct ExpandedPlayerWindowRoot: View {
             Color.black
 
             if showFullPlayer {
-                ExpandedPlayerSheet()
+                ExpandedPlayerSheet(
+                    initialPortraitPanelVisible: ExpandedPlayerSheet.initialPortraitPanelVisibility(
+                        settingsManager: appEnvironment?.settingsManager
+                    )
+                )
             } else {
                 ProgressView()
                     .controlSize(.large)
