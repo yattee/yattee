@@ -11,6 +11,7 @@ import SwiftUI
 
 struct ChaptersPanelPage: View {
     let context: PanelPageContext
+    var settings: ChaptersPageSettings = ChaptersPageSettings()
     var scrollConfig: PanelScrollConfig = PanelScrollConfig()
 
     private var appEnvironment: AppEnvironment? { context.appEnvironment }
@@ -29,6 +30,7 @@ struct ChaptersPanelPage: View {
                         chapter: chapter,
                         isActive: isChapterActive(chapter),
                         storyboard: storyboard,
+                        showThumbnail: settings.effectiveShowThumbnails,
                         onTap: {
                             Task {
                                 await playerService?.seek(to: chapter.startTime)
@@ -41,7 +43,9 @@ struct ChaptersPanelPage: View {
             .padding(.top, 8)
         }
         .task(id: context.video.id) {
-            await preloadChapterSheets()
+            if settings.effectiveShowThumbnails {
+                await preloadChapterSheets()
+            }
         }
     }
 

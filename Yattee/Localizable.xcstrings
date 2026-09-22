@@ -1494,6 +1494,17 @@
         }
       }
     },
+    "common.badge.new" : {
+      "comment" : "Badge shown next to recently added items",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "NEW"
+          }
+        }
+      }
+    },
     "common.cancel" : {
       "localizations" : {
         "en" : {
@@ -7588,6 +7599,17 @@
         }
       }
     },
+    "panel.settings.comments.showAvatars" : {
+      "comment" : "Comments page element toggle",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Author Avatars"
+          }
+        }
+      }
+    },
     "panel.settings.elements.header" : {
       "comment" : "Details panel page editor section header",
       "localizations" : {
@@ -7676,6 +7698,28 @@
         }
       }
     },
+    "panel.settings.pageBarLabels" : {
+      "comment" : "Details panel page bar labels toggle",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Page Bar Labels"
+          }
+        }
+      }
+    },
+    "panel.settings.pageBarLabels.footer" : {
+      "comment" : "Details panel page bar labels footer",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Show a name next to each page icon. With labels off, only the selected page shows its name."
+          }
+        }
+      }
+    },
     "panel.settings.page.enabled" : {
       "comment" : "Details panel page editor toggle",
       "localizations" : {
@@ -7716,6 +7760,39 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Where this page appears in the corner layout."
+          }
+        }
+      }
+    },
+    "panel.settings.queue.showHistory" : {
+      "comment" : "Queue page element toggle",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Previously Played"
+          }
+        }
+      }
+    },
+    "panel.settings.queue.showHistory.footer" : {
+      "comment" : "Queue page element toggle footer",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Show videos played earlier in this session above the queue."
+          }
+        }
+      }
+    },
+    "panel.settings.showThumbnails" : {
+      "comment" : "Details panel page element toggle",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Thumbnails"
           }
         }
       }

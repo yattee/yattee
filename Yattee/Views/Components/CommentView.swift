@@ -15,6 +15,7 @@ struct CommentView: View {
     let videoID: String?
     let source: ContentSource?
     let isReply: Bool
+    let showAvatar: Bool
 
     @State private var replies: [Comment] = []
     @State private var isLoadingReplies = false
@@ -26,18 +27,21 @@ struct CommentView: View {
     private var navigationCoordinator: NavigationCoordinator? { appEnvironment?.navigationCoordinator }
     private var accentColor: Color { appEnvironment?.settingsManager.resolvedAccentColor ?? .accentColor }
 
-    init(comment: Comment, videoID: String? = nil, source: ContentSource? = nil, isReply: Bool = false) {
+    init(comment: Comment, videoID: String? = nil, source: ContentSource? = nil, isReply: Bool = false, showAvatar: Bool = true) {
         self.comment = comment
         self.videoID = videoID
         self.source = source
         self.isReply = isReply
+        self.showAvatar = showAvatar
     }
 
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
             HStack(alignment: .top, spacing: 12) {
                 // Author avatar
-                authorAvatar
+                if showAvatar {
+                    authorAvatar
+                }
 
                 VStack(alignment: .leading, spacing: 4) {
                     // Author name and badges
@@ -224,7 +228,7 @@ struct CommentView: View {
             if showReplies {
                 VStack(alignment: .leading, spacing: 0) {
                     ForEach(replies) { reply in
-                        CommentView(comment: reply, source: source, isReply: true)
+                        CommentView(comment: reply, source: source, isReply: true, showAvatar: showAvatar)
                             .padding(.leading, 44)
 
                         if reply.id != replies.last?.id {

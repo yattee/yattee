@@ -11,6 +11,7 @@ import SwiftUI
 
 struct RelatedPanelPage: View {
     let context: PanelPageContext
+    var settings: RelatedPageSettings = RelatedPageSettings()
     var scrollConfig: PanelScrollConfig = PanelScrollConfig()
 
     private var relatedVideos: [Video] { context.video.relatedVideos ?? [] }
@@ -22,7 +23,11 @@ struct RelatedPanelPage: View {
             } else {
                 LazyVStack(spacing: 12) {
                     ForEach(Array(relatedVideos.enumerated()), id: \.element.id) { index, relatedVideo in
-                        VideoRowView(video: relatedVideo, style: .regular)
+                        VideoRowView(
+                            video: relatedVideo,
+                            style: .regular,
+                            showThumbnail: settings.effectiveShowThumbnails
+                        )
                             .tappableVideo(
                                 relatedVideo,
                                 queueSource: .manual,
@@ -34,7 +39,9 @@ struct RelatedPanelPage: View {
 
                         if index < relatedVideos.count - 1 {
                             Divider()
-                                .padding(.leading, VideoRowStyle.regular.thumbnailWidth + 12)
+                                .padding(.leading, settings.effectiveShowThumbnails
+                                    ? VideoRowStyle.regular.thumbnailWidth + 12
+                                    : 0)
                         }
                     }
                 }

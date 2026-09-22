@@ -255,6 +255,7 @@ struct CommentsListContent: View {
     @Environment(\.appEnvironment) private var appEnvironment
 
     let videoID: String
+    var showAvatars: Bool = true
 
     private var playerState: PlayerState? { appEnvironment?.playerService.state }
     private var contentService: ContentService? { appEnvironment?.contentService }
@@ -318,7 +319,7 @@ struct CommentsListContent: View {
             } else {
                 LazyVStack(alignment: .leading, spacing: 0) {
                     ForEach(comments) { comment in
-                        CommentView(comment: comment, videoID: videoID, source: videoSource)
+                        CommentView(comment: comment, videoID: videoID, source: videoSource, showAvatar: showAvatars)
                             .onAppear {
                                 if comment.id == comments.last?.id,
                                    playerState?.commentsContinuation != nil,

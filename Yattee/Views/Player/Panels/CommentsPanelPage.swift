@@ -11,6 +11,7 @@ import SwiftUI
 
 struct CommentsPanelPage: View {
     let context: PanelPageContext
+    var settings: CommentsPageSettings = CommentsPageSettings()
     var scrollConfig: PanelScrollConfig = PanelScrollConfig()
 
     private var appEnvironment: AppEnvironment? { context.appEnvironment }
@@ -18,8 +19,11 @@ struct CommentsPanelPage: View {
 
     var body: some View {
         PanelPageScrollView(config: scrollConfig) {
-            CommentsListContent(videoID: context.video.id.videoID)
-                .padding(.horizontal)
+            CommentsListContent(
+                videoID: context.video.id.videoID,
+                showAvatars: settings.effectiveShowAvatars
+            )
+            .padding(.horizontal)
         }
         .task(id: context.video.id) {
             // Opening the page is an explicit request; load even when the

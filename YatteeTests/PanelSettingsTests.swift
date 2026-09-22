@@ -50,6 +50,45 @@ struct PanelSettingsTests {
         #expect(info?.effectiveShowChannelRow == true)
     }
 
+    @Test("Per-page element settings round-trip for every page type")
+    func perPageSettingsRoundTrip() throws {
+        var settings = PanelSettings.default
+        settings.updateSettings(.comments(CommentsPageSettings(showAvatars: false)), for: .comments)
+        settings.updateSettings(.related(RelatedPageSettings(showThumbnails: false)), for: .related)
+        settings.updateSettings(.chapters(ChaptersPageSettings(showThumbnails: false)), for: .chapters)
+        settings.updateSettings(.queue(QueuePageSettings(showHistory: false)), for: .queue)
+        settings.updateSettings(
+            .tracks(TracksPageSettings(showQuality: false, showSubtitles: false)),
+            for: .tracks
+        )
+
+        let decoded = try roundTrip(settings)
+        #expect(decoded == settings)
+        #expect(decoded.configuration(for: .comments)?.commentsSettings.effectiveShowAvatars == false)
+        #expect(decoded.configuration(for: .related)?.relatedSettings.effectiveShowThumbnails == false)
+        #expect(decoded.configuration(for: .chapters)?.chaptersSettings.effectiveShowThumbnails == false)
+        #expect(decoded.configuration(for: .queue)?.queueSettings.effectiveShowHistory == false)
+
+        let tracks = try #require(decoded.configuration(for: .tracks)?.tracksSettings)
+        #expect(tracks.effectiveShowQuality == false)
+        #expect(tracks.effectiveShowSubtitles == false)
+        // Unset fields keep their effective defaults
+        #expect(tracks.effectiveShowAudio == true)
+        #expect(tracks.effectiveShowRate == true)
+    }
+
+    @Test("Typed accessors fall back to defaults for mismatched payloads")
+    func typedAccessorFallbacks() {
+        // An info payload read through the comments accessor yields defaults.
+        let page = PanelPageConfiguration(
+            pageType: .comments,
+            settings: .info(InfoPageSettings(showStatsRow: false))
+        )
+        #expect(page.commentsSettings.effectiveShowAvatars == true)
+        #expect(page.queueSettings.effectiveShowHistory == true)
+        #expect(page.tracksSettings.effectiveShowQuality == true)
+    }
+
     // MARK: - Backward Compatibility
 
     @Test("Layout without panelSettings decodes and falls back to default")

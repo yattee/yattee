@@ -78,7 +78,11 @@ extension QualitySelectorView {
             #endif
         }
         .onAppear {
-            selectedTab = initialTab
+            // Fall back to the first visible tab when the requested one is
+            // hidden by the tracks page section settings.
+            selectedTab = availableTabs.contains(initialTab)
+                ? initialTab
+                : (availableTabs.first ?? .video)
         }
     }
 
@@ -90,13 +94,15 @@ extension QualitySelectorView {
         // tvOS: each row is its own rounded card with vertical spacing so the
         // system focus hover effect has clean bounds (no clipped dividers).
         VStack(spacing: 8) {
-            mediaSelectionRow(
-                destination: .video,
-                label: String(localized: "player.quality.video"),
-                systemImage: "film",
-                value: currentVideoDisplayValue
-            )
-            .focused($inlinePanelInitialFocus)
+            if availableTabs.contains(.video) {
+                mediaSelectionRow(
+                    destination: .video,
+                    label: String(localized: "player.quality.video"),
+                    systemImage: "film",
+                    value: currentVideoDisplayValue
+                )
+                .focused($inlinePanelInitialFocus)
+            }
             if availableTabs.contains(.audio) {
                 mediaSelectionRow(
                     destination: .audio,
@@ -116,14 +122,18 @@ extension QualitySelectorView {
         }
         #else
         VStack(spacing: 0) {
-            mediaSelectionRow(
-                destination: .video,
-                label: String(localized: "player.quality.video"),
-                systemImage: "film",
-                value: currentVideoDisplayValue
-            )
+            if availableTabs.contains(.video) {
+                mediaSelectionRow(
+                    destination: .video,
+                    label: String(localized: "player.quality.video"),
+                    systemImage: "film",
+                    value: currentVideoDisplayValue
+                )
+            }
             if availableTabs.contains(.audio) {
-                Divider()
+                if availableTabs.contains(.video) {
+                    Divider()
+                }
                 mediaSelectionRow(
                     destination: .audio,
                     label: String(localized: "stream.audio"),
@@ -132,7 +142,9 @@ extension QualitySelectorView {
                 )
             }
             if availableTabs.contains(.subtitles) {
-                Divider()
+                if availableTabs.contains(.video) || availableTabs.contains(.audio) {
+                    Divider()
+                }
                 mediaSelectionRow(
                     destination: .subtitles,
                     label: String(localized: "stream.subtitles"),
@@ -334,15 +346,19 @@ extension QualitySelectorView {
         #if os(tvOS)
         // tvOS rows are styled individually to match the Settings rows.
         VStack(spacing: 8) {
-            playbackSpeedRow
+            if visibleSections.effectiveShowRate {
+                playbackSpeedRow
+            }
 
             audioModeRow
         }
         #else
         VStack(spacing: 0) {
-            playbackSpeedRow
+            if visibleSections.effectiveShowRate {
+                playbackSpeedRow
 
-            Divider()
+                Divider()
+            }
 
             audioModeRow
 

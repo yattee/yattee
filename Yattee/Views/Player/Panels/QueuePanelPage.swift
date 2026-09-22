@@ -11,10 +11,11 @@ import SwiftUI
 
 struct QueuePanelPage: View {
     let context: PanelPageContext
+    var settings: QueuePageSettings = QueuePageSettings()
     var bottomInset: CGFloat = 0
 
     var body: some View {
-        QueueListView()
+        QueueListView(showHistory: settings.effectiveShowHistory)
             .safeAreaPadding(.bottom, bottomInset)
     }
 }

@@ -868,6 +868,63 @@ final class PlayerControlsSettingsViewModel {
         }
     }
 
+    /// Synchronously updates the comments page element toggles.
+    func updatePanelCommentsSettingsSync(_ mutation: (inout CommentsPageSettings) -> Void) {
+        updatePanelSettingsSync { settings in
+            var comments = settings.configuration(for: .comments)?.commentsSettings ?? CommentsPageSettings()
+            mutation(&comments)
+            settings.updateSettings(.comments(comments), for: .comments)
+        }
+    }
+
+    /// Synchronously updates the related page element toggles.
+    func updatePanelRelatedSettingsSync(_ mutation: (inout RelatedPageSettings) -> Void) {
+        updatePanelSettingsSync { settings in
+            var related = settings.configuration(for: .related)?.relatedSettings ?? RelatedPageSettings()
+            mutation(&related)
+            settings.updateSettings(.related(related), for: .related)
+        }
+    }
+
+    /// Synchronously updates the chapters page element toggles.
+    func updatePanelChaptersSettingsSync(_ mutation: (inout ChaptersPageSettings) -> Void) {
+        updatePanelSettingsSync { settings in
+            var chapters = settings.configuration(for: .chapters)?.chaptersSettings ?? ChaptersPageSettings()
+            mutation(&chapters)
+            settings.updateSettings(.chapters(chapters), for: .chapters)
+        }
+    }
+
+    /// Synchronously updates the queue page element toggles.
+    func updatePanelQueueSettingsSync(_ mutation: (inout QueuePageSettings) -> Void) {
+        updatePanelSettingsSync { settings in
+            var queue = settings.configuration(for: .queue)?.queueSettings ?? QueuePageSettings()
+            mutation(&queue)
+            settings.updateSettings(.queue(queue), for: .queue)
+        }
+    }
+
+    /// Synchronously updates the tracks page element toggles.
+    func updatePanelTracksSettingsSync(_ mutation: (inout TracksPageSettings) -> Void) {
+        updatePanelSettingsSync { settings in
+            var tracks = settings.configuration(for: .tracks)?.tracksSettings ?? TracksPageSettings()
+            mutation(&tracks)
+            settings.updateSettings(.tracks(tracks), for: .tracks)
+        }
+    }
+
+    /// Whether the page bar shows labels next to icons.
+    var panelShowPageBarLabels: Bool {
+        panelSettings.effectiveShowPageBarLabels
+    }
+
+    /// Synchronously updates the page bar labels setting.
+    func syncPanelShowPageBarLabels(_ showLabels: Bool) {
+        updatePanelSettingsSync { settings in
+            settings.showPageBarLabels = showLabels
+        }
+    }
+
     /// Synchronously updates details panel settings with immediate UI feedback.
     /// Saves are debounced to avoid rapid disk writes.
     /// - Parameter mutation: A closure that mutates the panel settings.

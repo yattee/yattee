@@ -107,19 +107,19 @@ struct PlayerPanelContentView: View {
             )
             .id(PanelPageType.info)
         case .comments:
-            CommentsPanelPage(context: context, scrollConfig: scrollConfig)
+            CommentsPanelPage(context: context, settings: page.commentsSettings, scrollConfig: scrollConfig)
                 .id(PanelPageType.comments)
         case .related:
-            RelatedPanelPage(context: context, scrollConfig: scrollConfig)
+            RelatedPanelPage(context: context, settings: page.relatedSettings, scrollConfig: scrollConfig)
                 .id(PanelPageType.related)
         case .chapters:
-            ChaptersPanelPage(context: context, scrollConfig: scrollConfig)
+            ChaptersPanelPage(context: context, settings: page.chaptersSettings, scrollConfig: scrollConfig)
                 .id(PanelPageType.chapters)
         case .queue:
-            QueuePanelPage(context: context, bottomInset: scrollConfig.bottomInset)
+            QueuePanelPage(context: context, settings: page.queueSettings, bottomInset: scrollConfig.bottomInset)
                 .id(PanelPageType.queue)
         case .tracks:
-            TracksPanelPage(context: context, bottomInset: scrollConfig.bottomInset)
+            TracksPanelPage(context: context, settings: page.tracksSettings, bottomInset: scrollConfig.bottomInset)
                 .id(PanelPageType.tracks)
         }
     }

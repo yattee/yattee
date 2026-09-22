@@ -19,6 +19,14 @@ struct PanelPageEditorView: View {
     @State private var showDescription: Bool = true
     @State private var showStatsRow: Bool = true
     @State private var showChannelRow: Bool = true
+    @State private var showAvatars: Bool = true
+    @State private var showRelatedThumbnails: Bool = true
+    @State private var showChapterThumbnails: Bool = true
+    @State private var showHistory: Bool = true
+    @State private var showQuality: Bool = true
+    @State private var showAudio: Bool = true
+    @State private var showSubtitles: Bool = true
+    @State private var showRate: Bool = true
 
     private var configuration: PanelPageConfiguration? {
         viewModel.panelSettings.configuration(for: pageType)
@@ -37,8 +45,19 @@ struct PanelPageEditorView: View {
                 regionSection
             }
 
-            if pageType == .info {
+            switch pageType {
+            case .info:
                 infoElementsSection
+            case .comments:
+                commentsElementsSection
+            case .related:
+                relatedElementsSection
+            case .chapters:
+                chaptersElementsSection
+            case .queue:
+                queueElementsSection
+            case .tracks:
+                tracksElementsSection
             }
         }
         .navigationTitle(pageType.displayName)
@@ -136,10 +155,149 @@ struct PanelPageEditorView: View {
         .disabled(!viewModel.canEditActivePreset)
     }
 
+    // MARK: - Comments Elements Section
+
+    private var commentsElementsSection: some View {
+        Section {
+            Toggle(
+                String(localized: "panel.settings.comments.showAvatars"),
+                isOn: $showAvatars
+            )
+            .onChange(of: showAvatars) { _, newValue in
+                guard newValue != commentsSettings.effectiveShowAvatars else { return }
+                viewModel.updatePanelCommentsSettingsSync { $0.showAvatars = newValue }
+            }
+        } header: {
+            Text(String(localized: "panel.settings.elements.header"))
+        }
+        .disabled(!viewModel.canEditActivePreset)
+    }
+
+    // MARK: - Related Elements Section
+
+    private var relatedElementsSection: some View {
+        Section {
+            Toggle(
+                String(localized: "panel.settings.showThumbnails"),
+                isOn: $showRelatedThumbnails
+            )
+            .onChange(of: showRelatedThumbnails) { _, newValue in
+                guard newValue != relatedSettings.effectiveShowThumbnails else { return }
+                viewModel.updatePanelRelatedSettingsSync { $0.showThumbnails = newValue }
+            }
+        } header: {
+            Text(String(localized: "panel.settings.elements.header"))
+        }
+        .disabled(!viewModel.canEditActivePreset)
+    }
+
+    // MARK: - Chapters Elements Section
+
+    private var chaptersElementsSection: some View {
+        Section {
+            Toggle(
+                String(localized: "panel.settings.showThumbnails"),
+                isOn: $showChapterThumbnails
+            )
+            .onChange(of: showChapterThumbnails) { _, newValue in
+                guard newValue != chaptersSettings.effectiveShowThumbnails else { return }
+                viewModel.updatePanelChaptersSettingsSync { $0.showThumbnails = newValue }
+            }
+        } header: {
+            Text(String(localized: "panel.settings.elements.header"))
+        }
+        .disabled(!viewModel.canEditActivePreset)
+    }
+
+    // MARK: - Queue Elements Section
+
+    private var queueElementsSection: some View {
+        Section {
+            Toggle(
+                String(localized: "panel.settings.queue.showHistory"),
+                isOn: $showHistory
+            )
+            .onChange(of: showHistory) { _, newValue in
+                guard newValue != queueSettings.effectiveShowHistory else { return }
+                viewModel.updatePanelQueueSettingsSync { $0.showHistory = newValue }
+            }
+        } header: {
+            Text(String(localized: "panel.settings.elements.header"))
+        } footer: {
+            Text(String(localized: "panel.settings.queue.showHistory.footer"))
+        }
+        .disabled(!viewModel.canEditActivePreset)
+    }
+
+    // MARK: - Tracks Elements Section
+
+    private var tracksElementsSection: some View {
+        Section {
+            Toggle(
+                String(localized: "player.quality.video"),
+                isOn: $showQuality
+            )
+            .onChange(of: showQuality) { _, newValue in
+                guard newValue != tracksSettings.effectiveShowQuality else { return }
+                viewModel.updatePanelTracksSettingsSync { $0.showQuality = newValue }
+            }
+
+            Toggle(
+                String(localized: "stream.audio"),
+                isOn: $showAudio
+            )
+            .onChange(of: showAudio) { _, newValue in
+                guard newValue != tracksSettings.effectiveShowAudio else { return }
+                viewModel.updatePanelTracksSettingsSync { $0.showAudio = newValue }
+            }
+
+            Toggle(
+                String(localized: "stream.subtitles"),
+                isOn: $showSubtitles
+            )
+            .onChange(of: showSubtitles) { _, newValue in
+                guard newValue != tracksSettings.effectiveShowSubtitles else { return }
+                viewModel.updatePanelTracksSettingsSync { $0.showSubtitles = newValue }
+            }
+
+            Toggle(
+                String(localized: "controls.button.speed"),
+                isOn: $showRate
+            )
+            .onChange(of: showRate) { _, newValue in
+                guard newValue != tracksSettings.effectiveShowRate else { return }
+                viewModel.updatePanelTracksSettingsSync { $0.showRate = newValue }
+            }
+        } header: {
+            Text(String(localized: "panel.settings.elements.header"))
+        }
+        .disabled(!viewModel.canEditActivePreset)
+    }
+
     // MARK: - Helpers
 
     private var infoSettings: InfoPageSettings {
         configuration?.infoSettings ?? InfoPageSettings()
+    }
+
+    private var commentsSettings: CommentsPageSettings {
+        configuration?.commentsSettings ?? CommentsPageSettings()
+    }
+
+    private var relatedSettings: RelatedPageSettings {
+        configuration?.relatedSettings ?? RelatedPageSettings()
+    }
+
+    private var chaptersSettings: ChaptersPageSettings {
+        configuration?.chaptersSettings ?? ChaptersPageSettings()
+    }
+
+    private var queueSettings: QueuePageSettings {
+        configuration?.queueSettings ?? QueuePageSettings()
+    }
+
+    private var tracksSettings: TracksPageSettings {
+        configuration?.tracksSettings ?? TracksPageSettings()
     }
 
     private func syncLocalState() {
@@ -149,6 +307,15 @@ struct PanelPageEditorView: View {
         showDescription = info.effectiveShowDescription
         showStatsRow = info.effectiveShowStatsRow
         showChannelRow = info.effectiveShowChannelRow
+        showAvatars = commentsSettings.effectiveShowAvatars
+        showRelatedThumbnails = relatedSettings.effectiveShowThumbnails
+        showChapterThumbnails = chaptersSettings.effectiveShowThumbnails
+        showHistory = queueSettings.effectiveShowHistory
+        let tracks = tracksSettings
+        showQuality = tracks.effectiveShowQuality
+        showAudio = tracks.effectiveShowAudio
+        showSubtitles = tracks.effectiveShowSubtitles
+        showRate = tracks.effectiveShowRate
     }
 }
 

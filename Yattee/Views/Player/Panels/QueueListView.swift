@@ -116,6 +116,9 @@ struct QueueListView: View {
     /// Called after a row tap starts playback (the host dismisses itself).
     var onPlay: (() -> Void)? = nil
 
+    /// When false, hides the previously-played section (queue page setting).
+    var showHistory: Bool = true
+
     private var queueManager: QueueManager? { appEnvironment?.queueManager }
     private var playerState: PlayerState? { appEnvironment?.playerService.state }
 
@@ -129,7 +132,7 @@ struct QueueListView: View {
         ScrollViewReader { proxy in
             List {
                 // History section - show previously played videos
-                if !history.isEmpty {
+                if showHistory, !history.isEmpty {
                     Section {
                         ForEach(Array(history.enumerated()), id: \.element.id) { index, historyItem in
                             QueueItemRow(

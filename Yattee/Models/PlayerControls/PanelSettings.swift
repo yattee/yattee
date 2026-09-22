@@ -37,6 +37,22 @@ enum PanelPageType: String, Codable, CaseIterable, Sendable {
         }
     }
 
+    /// The panel settings version when this page type was added.
+    /// Used for showing "NEW" badges on recently added pages.
+    var versionAdded: Int {
+        // All initial pages shipped together; bump for future page types.
+        return 1
+    }
+
+    /// Pages added after this version show a "NEW" badge in settings.
+    /// Raise it together with the release that introduces a new page type.
+    static let newBadgeThresholdVersion = 1
+
+    /// Whether this page should carry a "NEW" badge in settings.
+    var isRecentlyAdded: Bool {
+        versionAdded > Self.newBadgeThresholdVersion
+    }
+
     /// SF Symbol used in the page bar and settings.
     var systemImage: String {
         switch self {
@@ -165,6 +181,11 @@ struct TracksPageSettings: Codable, Hashable, Sendable {
     var showAudio: Bool?
     var showSubtitles: Bool?
     var showRate: Bool?
+
+    var effectiveShowQuality: Bool { showQuality ?? true }
+    var effectiveShowAudio: Bool { showAudio ?? true }
+    var effectiveShowSubtitles: Bool { showSubtitles ?? true }
+    var effectiveShowRate: Bool { showRate ?? true }
 }
 
 /// Typed per-page settings payload. Uses the same discriminator pattern as
@@ -271,6 +292,36 @@ struct PanelPageConfiguration: Codable, Hashable, Sendable, Identifiable {
     var infoSettings: InfoPageSettings {
         if case .info(let settings) = settings { return settings }
         return InfoPageSettings()
+    }
+
+    /// Comments page settings when set, defaults otherwise.
+    var commentsSettings: CommentsPageSettings {
+        if case .comments(let settings) = settings { return settings }
+        return CommentsPageSettings()
+    }
+
+    /// Related page settings when set, defaults otherwise.
+    var relatedSettings: RelatedPageSettings {
+        if case .related(let settings) = settings { return settings }
+        return RelatedPageSettings()
+    }
+
+    /// Chapters page settings when set, defaults otherwise.
+    var chaptersSettings: ChaptersPageSettings {
+        if case .chapters(let settings) = settings { return settings }
+        return ChaptersPageSettings()
+    }
+
+    /// Queue page settings when set, defaults otherwise.
+    var queueSettings: QueuePageSettings {
+        if case .queue(let settings) = settings { return settings }
+        return QueuePageSettings()
+    }
+
+    /// Tracks page settings when set, defaults otherwise.
+    var tracksSettings: TracksPageSettings {
+        if case .tracks(let settings) = settings { return settings }
+        return TracksPageSettings()
     }
 
     private enum CodingKeys: String, CodingKey {

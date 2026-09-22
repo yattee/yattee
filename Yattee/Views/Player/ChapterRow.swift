@@ -11,6 +11,7 @@ struct ChapterRow: View {
     let chapter: VideoChapter
     let isActive: Bool
     let storyboard: Storyboard?
+    var showThumbnail: Bool = true
     let onTap: () -> Void
 
     @State private var thumbnail: PlatformImage?
@@ -19,29 +20,9 @@ struct ChapterRow: View {
         Button(action: onTap) {
             HStack(spacing: 12) {
                 // Thumbnail from storyboard
-                Group {
-                    if let thumbnail {
-                        #if os(macOS)
-                        Image(nsImage: thumbnail)
-                            .resizable()
-                            .aspectRatio(contentMode: .fill)
-                        #else
-                        Image(uiImage: thumbnail)
-                            .resizable()
-                            .aspectRatio(contentMode: .fill)
-                        #endif
-                    } else {
-                        Rectangle()
-                            .fill(.quaternary)
-                            .overlay {
-                                Image(systemName: "film")
-                                    .foregroundStyle(.secondary)
-                            }
-                    }
+                if showThumbnail {
+                    thumbnailContent
                 }
-                .frame(width: 80, height: 45)
-                .clipShape(RoundedRectangle(cornerRadius: 4))
-
                 // Info
                 VStack(alignment: .leading, spacing: 4) {
                     Text(chapter.title)
@@ -69,8 +50,35 @@ struct ChapterRow: View {
         .buttonStyle(.plain)
         .listRowBackground(isActive ? Color.accentColor.opacity(0.1) : nil)
         .task {
-            await loadThumbnail()
+            if showThumbnail {
+                await loadThumbnail()
+            }
         }
+    }
+
+    private var thumbnailContent: some View {
+        Group {
+            if let thumbnail {
+                #if os(macOS)
+                Image(nsImage: thumbnail)
+                    .resizable()
+                    .aspectRatio(contentMode: .fill)
+                #else
+                Image(uiImage: thumbnail)
+                    .resizable()
+                    .aspectRatio(contentMode: .fill)
+                #endif
+            } else {
+                Rectangle()
+                    .fill(.quaternary)
+                    .overlay {
+                        Image(systemName: "film")
+                            .foregroundStyle(.secondary)
+                    }
+            }
+        }
+        .frame(width: 80, height: 45)
+        .clipShape(RoundedRectangle(cornerRadius: 4))
     }
 
     private func loadThumbnail() async {

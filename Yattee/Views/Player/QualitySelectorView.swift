@@ -68,6 +68,10 @@ struct QualitySelectorView: View {
     /// toolbar item, no sheet detents, and no minimum frame.
     var isEmbedded: Bool = false
 
+    /// Section visibility from the tracks page preset settings. Defaults show
+    /// everything, so the standalone sheet is unaffected.
+    var visibleSections: TracksPageSettings = TracksPageSettings()
+
     #if os(tvOS)
     /// Bound to the first focusable row so we can programmatically pull focus
     /// into the panel on appear (the system doesn't auto-focus an inline
@@ -115,16 +119,22 @@ struct QualitySelectorView: View {
 
     // MARK: - Computed Properties
 
-    /// Available tabs based on streams
+    /// Available tabs based on streams and the tracks page section settings
     var availableTabs: [QualitySelectorTab] {
-        var tabs: [QualitySelectorTab] = [.video]
-        if (hasVideoOnlyStreams && !audioStreams.isEmpty) || embeddedAudioTracks.count > 1 {
+        var tabs: [QualitySelectorTab] = []
+        if visibleSections.effectiveShowQuality {
+            tabs.append(.video)
+        }
+        if visibleSections.effectiveShowAudio,
+           (hasVideoOnlyStreams && !audioStreams.isEmpty) || embeddedAudioTracks.count > 1 {
             tabs.append(.audio)
         }
-        if !captions.isEmpty || !embeddedSubtitleTracks.isEmpty || canLoadExternalSubtitles {
+        if visibleSections.effectiveShowSubtitles,
+           !captions.isEmpty || !embeddedSubtitleTracks.isEmpty || canLoadExternalSubtitles {
             tabs.append(.subtitles)
         }
-        return tabs
+        // The selector never renders with zero tabs; fall back to video.
+        return tabs.isEmpty ? [.video] : tabs
     }
 
     /// Whether the "Load subtitle from file…" row is available: media-source
@@ -212,7 +222,8 @@ struct QualitySelectorView: View {
         onLockToggled: ((Bool) -> Void)? = nil,
         onAudioModeToggled: ((Bool) -> Void)? = nil,
         onDismiss: (() -> Void)? = nil,
-        isEmbedded: Bool = false
+        isEmbedded: Bool = false,
+        visibleSections: TracksPageSettings = TracksPageSettings()
     ) {
         self.streams = streams
         self.captions = captions
@@ -244,6 +255,7 @@ struct QualitySelectorView: View {
         self.onAudioModeToggled = onAudioModeToggled
         self.onDismiss = onDismiss
         self.isEmbedded = isEmbedded
+        self.visibleSections = visibleSections
     }
 
     // MARK: - Body

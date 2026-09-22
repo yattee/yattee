@@ -11,6 +11,7 @@ import SwiftUI
 
 struct TracksPanelPage: View {
     let context: PanelPageContext
+    var settings: TracksPageSettings = TracksPageSettings()
     var bottomInset: CGFloat = 0
 
     private var appEnvironment: AppEnvironment? { context.appEnvironment }
@@ -84,7 +85,8 @@ struct TracksPanelPage: View {
                         await playerService.setAudioMode(enabled)
                     }
                 },
-                isEmbedded: true
+                isEmbedded: true,
+                visibleSections: settings
             )
             .safeAreaPadding(.bottom, bottomInset)
         }

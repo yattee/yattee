@@ -15,6 +15,7 @@ struct PanelSettingsView: View {
     // Local state for immediate UI updates
     @State private var defaultVisibility: PanelDefaultVisibility = .hidden
     @State private var layoutMode: PanelLayoutMode = .stacked
+    @State private var showPageBarLabels: Bool = true
 
     /// Corner layout exists on iPad and macOS only.
     static var supportsCornerLayout: Bool {
@@ -31,6 +32,7 @@ struct PanelSettingsView: View {
                 layoutSection
             }
             visibilitySection
+            pageBarSection
             pagesSection
         }
         .navigationTitle(String(localized: "settings.playerControls.detailsPanel"))
@@ -57,6 +59,11 @@ struct PanelSettingsView: View {
 
     private var layoutSection: some View {
         Section {
+            PanelLayoutSchematic(mode: layoutMode)
+                .frame(maxWidth: .infinity)
+                .padding(.vertical, 4)
+                .listRowBackground(Color.clear)
+
             Picker(
                 String(localized: "panel.settings.layoutMode"),
                 selection: $layoutMode
@@ -97,6 +104,24 @@ struct PanelSettingsView: View {
         }
     }
 
+    // MARK: - Page Bar Section
+
+    private var pageBarSection: some View {
+        Section {
+            Toggle(
+                String(localized: "panel.settings.pageBarLabels"),
+                isOn: $showPageBarLabels
+            )
+            .disabled(!viewModel.canEditActivePreset)
+            .onChange(of: showPageBarLabels) { _, newValue in
+                guard newValue != viewModel.panelShowPageBarLabels else { return }
+                viewModel.syncPanelShowPageBarLabels(newValue)
+            }
+        } footer: {
+            Text(String(localized: "panel.settings.pageBarLabels.footer"))
+        }
+    }
+
     // MARK: - Pages Section
 
     private var pagesSection: some View {
@@ -126,6 +151,14 @@ struct PanelSettingsView: View {
         } label: {
             HStack {
                 Label(page.pageType.displayName, systemImage: page.pageType.systemImage)
+                if page.pageType.isRecentlyAdded {
+                    Text(String(localized: "common.badge.new"))
+                        .font(.caption2.weight(.bold))
+                        .foregroundStyle(.white)
+                        .padding(.horizontal, 5)
+                        .padding(.vertical, 2)
+                        .background(Capsule().fill(.tint))
+                }
                 Spacer()
                 if page.isEnabled, layoutMode == .corner, Self.supportsCornerLayout {
                     Text(page.region.displayName)
@@ -145,6 +178,66 @@ struct PanelSettingsView: View {
     private func syncLocalState() {
         defaultVisibility = viewModel.panelDefaultVisibility
         layoutMode = viewModel.panelLayoutMode
+        showPageBarLabels = viewModel.panelShowPageBarLabels
+    }
+}
+
+// MARK: - Layout Schematic
+
+/// Small diagram of the player window for the layout mode picker: the video
+/// area plus where the details panel regions sit in each mode.
+private struct PanelLayoutSchematic: View {
+    let mode: PanelLayoutMode
+
+    private let cornerRadius: CGFloat = 4
+
+    var body: some View {
+        HStack(spacing: 3) {
+            if mode == .corner {
+                VStack(spacing: 3) {
+                    videoBlock
+                    panelBlock
+                        .frame(height: 26)
+                }
+            } else {
+                videoBlock
+            }
+
+            panelBlock
+                .frame(width: 44)
+        }
+        .padding(6)
+        .frame(width: 180, height: 110)
+        .background {
+            RoundedRectangle(cornerRadius: 8)
+                .fill(.quaternary.opacity(0.4))
+        }
+        .animation(.easeInOut(duration: 0.25), value: mode)
+    }
+
+    private var videoBlock: some View {
+        RoundedRectangle(cornerRadius: cornerRadius)
+            .fill(.secondary)
+            .overlay {
+                Image(systemName: "play.fill")
+                    .font(.caption)
+                    .foregroundStyle(.background)
+            }
+    }
+
+    private var panelBlock: some View {
+        RoundedRectangle(cornerRadius: cornerRadius)
+            .fill(.quaternary)
+            .overlay {
+                VStack(alignment: .leading, spacing: 3) {
+                    ForEach(0..<3, id: \.self) { _ in
+                        Capsule()
+                            .fill(.secondary.opacity(0.5))
+                            .frame(height: 3)
+                    }
+                }
+                .padding(6)
+            }
     }
 }
 
