@@ -199,15 +199,17 @@ final class LoggingService: Sendable {
         #if DEBUG
         if UserDefaults.standard.bool(forKey: "loggingEnabled") {
             let fullMessage = details.map { "\(message) - \($0)" } ?? message
+            // .public: without it os_log masks the text as <private> when the
+            // process isn't attached to Xcode (e.g. syslog capture over USB).
             switch level {
             case .debug:
-                osLogger.debug("[\(category.rawValue)] \(fullMessage)")
+                osLogger.debug("[\(category.rawValue, privacy: .public)] \(fullMessage, privacy: .public)")
             case .info:
-                osLogger.info("[\(category.rawValue)] \(fullMessage)")
+                osLogger.info("[\(category.rawValue, privacy: .public)] \(fullMessage, privacy: .public)")
             case .warning:
-                osLogger.warning("[\(category.rawValue)] \(fullMessage)")
+                osLogger.warning("[\(category.rawValue, privacy: .public)] \(fullMessage, privacy: .public)")
             case .error:
-                osLogger.error("[\(category.rawValue)] \(fullMessage)")
+                osLogger.error("[\(category.rawValue, privacy: .public)] \(fullMessage, privacy: .public)")
             }
         }
         #endif

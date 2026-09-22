@@ -237,7 +237,12 @@ extension ExpandedPlayerSheet {
         // videoYOffset is a @State that we animate explicitly for smooth drag release animation.
         // Base positions are computed, then videoYOffset is added.
         let topY = videoAreaHeight / 2  // Video centered in video area (above panel)
-        let centerY = screenHeight / 2  // Video centered when panel hidden
+        // Video center when the panel is hidden, in content-area coordinates:
+        // full-screen center shifted up by the top safe area. NOT screenHeight/2 —
+        // top and bottom insets differ (the player window adds extra bottom
+        // inset), so animating to screenHeight/2 and then flipping to the hidden
+        // base position causes a visible jump of (bottom - top) / 2 points.
+        let hiddenVideoY = fullScreenHeight / 2 - safeAreaInsets.top
 
         let videoY: CGFloat = {
             if isPortraitPanelVisible {
@@ -248,10 +253,10 @@ extension ExpandedPlayerSheet {
                 if panelRevealOffset < 0 {
                     // Revealing panel - move video towards top
                     let revealProgress = min(1.0, -panelRevealOffset / pinnedPanelHeight)
-                    return centerY - (centerY - topY) * revealProgress
+                    return hiddenVideoY - (hiddenVideoY - topY) * revealProgress
                 }
                 // Fullscreen: fill entire screen (need to offset for safe area)
-                return fullScreenHeight / 2 + fullscreenPlayerOffset
+                return hiddenVideoY
             }
         }()
 
@@ -388,7 +393,7 @@ extension ExpandedPlayerSheet {
                                     appEnvironment?.settingsManager.detailsPanelLastVisible = true
                                     // Match video position from reveal formula
                                     let revealProgress = min(1.0, -currentRevealOffset / pinnedPanelHeight)
-                                    let maxVideoOffset = centerY - topY
+                                    let maxVideoOffset = hiddenVideoY - topY
                                     videoYOffset = maxVideoOffset * (1.0 - revealProgress)
                                 }
 
@@ -464,8 +469,8 @@ extension ExpandedPlayerSheet {
                                         // Dragging DOWN - existing dismiss logic
                                         panelDragOffset = offset
                                         panelExpandOffset = 0
-                                        // Calculate video offset: interpolate from 0 to (centerY - topY) based on drag
-                                        let maxOffset = centerY - topY
+                                        // Calculate video offset: interpolate from 0 to (hiddenVideoY - topY) based on drag
+                                        let maxOffset = hiddenVideoY - topY
                                         let dragProgress = min(1.0, offset / pinnedPanelHeight)
                                         videoYOffset = maxOffset * dragProgress
                                     }
@@ -475,7 +480,7 @@ extension ExpandedPlayerSheet {
                                 let dismissThreshold: CGFloat = 80
                                 let expandThreshold: CGFloat = -80  // Upward threshold
                                 let targetOffset = pinnedPanelHeight + safeAreaInsets.bottom
-                                let maxVideoOffset = centerY - topY
+                                let maxVideoOffset = hiddenVideoY - topY
 
                                 // Setting isPanelDragging = false activates the .animation modifiers
                                 isPanelDragging = false
@@ -499,11 +504,14 @@ extension ExpandedPlayerSheet {
                                     panelDragOffset = 0
                                     videoYOffset = 0
                                 } else if offset > dismissThreshold || predictedOffset > dismissThreshold * 2 {
-                                    // Dismissing - animate panel sliding off and video to center
-                                    panelDragOffset = targetOffset
-                                    videoYOffset = maxVideoOffset
-                                    // Hide after animation completes - disable animations for cleanup
-                                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.25) {
+                                    // Dismissing - animate panel sliding off and video to center.
+                                    // The hidden-state flip must wait for the spring to finish:
+                                    // a fixed-delay timer fired mid-animation and snapped the
+                                    // video the rest of the way (visible jump on release).
+                                    withAnimation(.spring(response: 0.3, dampingFraction: 1.0), completionCriteria: .logicallyComplete) {
+                                        panelDragOffset = targetOffset
+                                        videoYOffset = maxVideoOffset
+                                    } completion: {
                                         var transaction = Transaction()
                                         transaction.disablesAnimations = true
                                         withTransaction(transaction) {
@@ -514,7 +522,7 @@ extension ExpandedPlayerSheet {
                                             navigationCoordinator?.isCommentsExpanded = false
                                             navigationCoordinator?.commentsFrame = .zero
                                             panelDragOffset = 0
-                                            videoYOffset = 0  // Reset offset (centerY is now the base)
+                                            videoYOffset = 0  // Reset offset (hiddenVideoY is now the base)
                                         }
                                     }
                                 } else {
