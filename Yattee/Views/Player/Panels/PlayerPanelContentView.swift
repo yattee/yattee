@@ -24,21 +24,33 @@ struct PlayerPanelContentView: View {
     /// Extra space above the page bar (e.g. below the portrait drag handle).
     var pageBarTopPadding: CGFloat = 0
 
+    /// Hosts that provide their own page switcher (portrait bottom-row menu)
+    /// hide the top page bar.
+    var showPageBar: Bool = true
+
+    /// Prototype: the info page shows chapters and related as inline sections;
+    /// those pages are then dropped from the page list.
+    var inlineInfoSections: Bool = false
+
     private var appEnvironment: AppEnvironment? { context.appEnvironment }
-    private var playerState: PlayerState? { appEnvironment?.playerService.state }
 
     // MARK: - Page Visibility
 
     /// Config enables a page; runtime hides pages with nothing to show.
-    private func isRuntimeVisible(_ pageType: PanelPageType) -> Bool {
+    static func isRuntimeVisible(
+        _ pageType: PanelPageType,
+        video: Video,
+        appEnvironment: AppEnvironment?
+    ) -> Bool {
+        let playerState = appEnvironment?.playerService.state
         switch pageType {
         case .info:
             return true
         case .comments:
-            return !context.video.isFromMediaSource
+            return !video.isFromMediaSource
                 && playerState?.commentsState != .disabled
         case .related:
-            return !(context.video.relatedVideos ?? []).isEmpty
+            return !(video.relatedVideos ?? []).isEmpty
         case .chapters:
             return !(playerState?.chapters ?? []).isEmpty
         case .queue:
@@ -49,8 +61,26 @@ struct PlayerPanelContentView: View {
     }
 
     /// Enabled pages that currently have content, in configured order.
+    static func visiblePages(
+        panelSettings: PanelSettings,
+        region: PanelRegion?,
+        video: Video,
+        appEnvironment: AppEnvironment?
+    ) -> [PanelPageConfiguration] {
+        panelSettings.enabledPages(in: region).filter {
+            isRuntimeVisible($0.pageType, video: video, appEnvironment: appEnvironment)
+        }
+    }
+
     private var visiblePages: [PanelPageConfiguration] {
-        panelSettings.enabledPages(in: region).filter { isRuntimeVisible($0.pageType) }
+        let pages = Self.visiblePages(
+            panelSettings: panelSettings,
+            region: region,
+            video: context.video,
+            appEnvironment: appEnvironment
+        )
+        guard inlineInfoSections else { return pages }
+        return pages.filter { $0.pageType != .chapters && $0.pageType != .related }
     }
 
     /// The page to render: the selection when visible, else the first page.
@@ -64,7 +94,7 @@ struct PlayerPanelContentView: View {
         let pages = visiblePages
 
         VStack(spacing: 0) {
-            if pages.count >= 2 {
+            if showPageBar, pages.count >= 2 {
                 PanelPageBar(
                     pages: pages,
                     selectedPage: $selectedPage,
@@ -103,7 +133,8 @@ struct PlayerPanelContentView: View {
             InfoPanelPage(
                 context: context,
                 settings: page.infoSettings,
-                scrollConfig: scrollConfig
+                scrollConfig: scrollConfig,
+                inlineSections: inlineInfoSections
             )
             .id(PanelPageType.info)
         case .comments:

@@ -79,10 +79,10 @@ struct PortraitDetailsPanel: View {
         playerControlsLayout.effectivePanelSettings
     }
 
-    /// Whether the comments pill should route to the comments page instead of
-    /// the overlay.
+    /// Prototype: portrait has a single info page with inline sections, so the
+    /// comments pill always opens the comments overlay, never a page.
     private var isCommentsPageAvailable: Bool {
-        panelSettings.isPageEnabled(.comments) && !(video?.isFromMediaSource ?? true)
+        false
     }
 
     /// Whether any pills are currently visible in the overlay
@@ -163,8 +163,11 @@ struct PortraitDetailsPanel: View {
                             onDragEnded?(offset, predicted)
                         }
                     ),
-                    pageBarTopPadding: 14
+                    pageBarTopPadding: 14,
+                    showPageBar: false,
+                    inlineInfoSections: true
                 )
+                .padding(.top, 10)
                 .background(Color(.systemBackground))
                 .overlay(alignment: .bottom) {
                     bottomFadeOverlay

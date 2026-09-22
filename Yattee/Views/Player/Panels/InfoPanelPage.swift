@@ -15,8 +15,13 @@ struct InfoPanelPage: View {
     var settings: InfoPageSettings = InfoPageSettings()
     var scrollConfig: PanelScrollConfig = PanelScrollConfig()
 
+    /// Prototype: collapse the description to a few lines and show chapters
+    /// and related videos as inline sections below it.
+    var inlineSections: Bool = false
+
     @State private var showFormattedDate = false
     @State private var showOriginalTitle = false
+    @State private var isDescriptionExpanded = false
 
     private var appEnvironment: AppEnvironment? { context.appEnvironment }
     private var video: Video { context.video }
@@ -53,9 +58,20 @@ struct InfoPanelPage: View {
                 descriptionContent
                     .padding(.vertical)
             }
+
+            if inlineSections {
+                chaptersSection
+                relatedSection
+            }
         }
         .onChange(of: video.id) { _, _ in
             showOriginalTitle = false
+            isDescriptionExpanded = false
+        }
+        .task(id: context.video.id) {
+            if inlineSections {
+                await preloadChapterSheets()
+            }
         }
     }
 
@@ -108,12 +124,16 @@ struct InfoPanelPage: View {
 
         return VStack(alignment: .leading, spacing: 8) {
             if !description.isEmpty {
-                Text(DescriptionText.attributed(description, linkColor: context.accentColor))
-                    .font(.subheadline)
-                    .foregroundStyle(.secondary)
-                    .tint(context.accentColor)
-                    .padding(.horizontal)
-                    .handleTimestampLinks(using: playerService)
+                if inlineSections {
+                    collapsibleDescription(description)
+                } else {
+                    Text(DescriptionText.attributed(description, linkColor: context.accentColor))
+                        .font(.subheadline)
+                        .foregroundStyle(.secondary)
+                        .tint(context.accentColor)
+                        .padding(.horizontal)
+                        .handleTimestampLinks(using: playerService)
+                }
             } else if videoDetailsState == .loading {
                 HStack {
                     Spacer()
@@ -127,6 +147,168 @@ struct InfoPanelPage: View {
                     .foregroundStyle(.secondary)
                     .padding(.horizontal)
             }
+        }
+    }
+
+    // MARK: - Collapsible Description (prototype)
+
+    private var panelBackground: Color {
+        #if os(iOS)
+        Color(.systemBackground)
+        #else
+        Color(nsColor: .windowBackgroundColor)
+        #endif
+    }
+
+    /// Collapsed: 3 lines with an inline "more" cutting into the end of the
+    /// last line; the whole area is tappable to expand. Expanded: full text
+    /// with working links and a "less" button below.
+    @ViewBuilder
+    private func collapsibleDescription(_ description: String) -> some View {
+        VStack(alignment: .leading, spacing: 8) {
+            Text(DescriptionText.attributed(description, linkColor: context.accentColor))
+                .font(.subheadline)
+                .foregroundStyle(.secondary)
+                .tint(context.accentColor)
+                .lineLimit(isDescriptionExpanded ? nil : 3)
+                .handleTimestampLinks(using: playerService)
+                // Collapsed: let the container tap win over link taps
+                .allowsHitTesting(isDescriptionExpanded)
+                .overlay(alignment: Alignment(horizontal: .trailing, vertical: .lastTextBaseline)) {
+                    if !isDescriptionExpanded {
+                        Text(String(localized: "common.more"))
+                            .font(.subheadline.weight(.semibold))
+                            .foregroundStyle(context.accentColor)
+                            .padding(.leading, 32)
+                            .background(
+                                LinearGradient(
+                                    stops: [
+                                        .init(color: panelBackground.opacity(0), location: 0),
+                                        .init(color: panelBackground, location: 0.4),
+                                        .init(color: panelBackground, location: 1)
+                                    ],
+                                    startPoint: .leading,
+                                    endPoint: .trailing
+                                )
+                            )
+                    }
+                }
+
+            if isDescriptionExpanded {
+                Button {
+                    withAnimation(.easeInOut(duration: 0.2)) {
+                        isDescriptionExpanded = false
+                    }
+                } label: {
+                    Text(String(localized: "common.less"))
+                        .font(.subheadline.weight(.semibold))
+                        .foregroundStyle(context.accentColor)
+                }
+                .buttonStyle(.plain)
+            }
+        }
+        .padding(.horizontal)
+        .contentShape(Rectangle())
+        .onTapGesture {
+            if !isDescriptionExpanded {
+                withAnimation(.easeInOut(duration: 0.2)) {
+                    isDescriptionExpanded = true
+                }
+            }
+        }
+    }
+
+    // MARK: - Inline Sections (prototype)
+
+    private var chapters: [VideoChapter] { playerState?.chapters ?? [] }
+    private var currentTime: TimeInterval { playerState?.currentTime ?? 0 }
+    private var storyboard: Storyboard? { playerState?.preferredStoryboard }
+    private var relatedVideos: [Video] { video.relatedVideos ?? [] }
+
+    @ViewBuilder
+    private func sectionHeader(_ title: String) -> some View {
+        Text(title)
+            .font(.headline)
+            .padding(.horizontal)
+            .padding(.top, 4)
+            .padding(.bottom, 8)
+            .frame(maxWidth: .infinity, alignment: .leading)
+    }
+
+    @ViewBuilder
+    private var chaptersSection: some View {
+        if !chapters.isEmpty {
+            Divider()
+                .padding(.horizontal)
+                .padding(.bottom, 8)
+
+            sectionHeader(String(localized: "player.chapters"))
+
+            LazyVStack(spacing: 0) {
+                ForEach(chapters) { chapter in
+                    ChapterRow(
+                        chapter: chapter,
+                        isActive: isChapterActive(chapter),
+                        storyboard: storyboard,
+                        showThumbnail: true,
+                        onTap: {
+                            Task {
+                                await playerService?.seek(to: chapter.startTime)
+                            }
+                        }
+                    )
+                }
+            }
+            .padding(.horizontal)
+        }
+    }
+
+    @ViewBuilder
+    private var relatedSection: some View {
+        if !relatedVideos.isEmpty {
+            Divider()
+                .padding(.horizontal)
+                .padding(.vertical, 8)
+
+            sectionHeader(String(localized: "videoInfo.section.relatedVideos"))
+
+            LazyVStack(spacing: 12) {
+                ForEach(Array(relatedVideos.enumerated()), id: \.element.id) { index, relatedVideo in
+                    VideoRowView(
+                        video: relatedVideo,
+                        style: .regular,
+                        showThumbnail: true
+                    )
+                    .tappableVideo(
+                        relatedVideo,
+                        queueSource: .manual,
+                        sourceLabel: String(localized: "videoInfo.section.relatedVideos"),
+                        videoList: relatedVideos,
+                        videoIndex: index,
+                        loadMoreVideos: nil
+                    )
+
+                    if index < relatedVideos.count - 1 {
+                        Divider()
+                            .padding(.leading, VideoRowStyle.regular.thumbnailWidth + 12)
+                    }
+                }
+            }
+            .padding(.horizontal)
+        }
+    }
+
+    private func isChapterActive(_ chapter: VideoChapter) -> Bool {
+        let nextChapter = chapters.first { $0.startTime > chapter.startTime }
+        let endTime = nextChapter?.startTime ?? .infinity
+        return currentTime >= chapter.startTime && currentTime < endTime
+    }
+
+    private func preloadChapterSheets() async {
+        guard let storyboard else { return }
+        let service = StoryboardService.shared
+        for chapter in chapters {
+            await service.loadSheet(for: chapter.startTime, from: storyboard)
         }
     }
 }
