@@ -170,12 +170,13 @@ struct PortraitDetailsPanel: View {
                     bottomFadeOverlay
                 }
 
-                // Extended drag hit area overlay - visual handle at top, hit area extends down
+                // Drag handle overlay - hit area limited to the strip above the
+                // page bar so taps on the page tabs reach the buttons underneath
                 VStack(spacing: 0) {
                     dragHandle
-                    Spacer()
+                    Spacer(minLength: 0)
                 }
-                .frame(height: 50)
+                .frame(height: 14)
                 .frame(maxWidth: .infinity)
                 .background(alignment: .top) {
                     LinearGradient(
@@ -184,6 +185,7 @@ struct PortraitDetailsPanel: View {
                         endPoint: .bottom
                     )
                     .frame(height: 25)
+                    .allowsHitTesting(false)
                 }
                 .contentShape(Rectangle())
                 .highPriorityGesture(
