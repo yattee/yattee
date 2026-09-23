@@ -70,9 +70,8 @@ extension ExpandedPlayerSheet {
     func preloadComments() async {
         guard let playerState, playerState.commentsState == .idle else { return }
 
-        // Check if comments pill is disabled in preset settings
-        let pillSettings = playerControlsLayout.effectivePlayerPillSettings
-        guard pillSettings.shouldLoadComments else {
+        // Skip when nothing displays comments (page disabled and pill disabled)
+        guard playerControlsLayout.effectivePanelSettings.shouldLoadComments else {
             playerState.commentsState = .disabled
             return
         }

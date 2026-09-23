@@ -147,11 +147,42 @@ struct InfoPageSettings: Codable, Hashable, Sendable {
     var effectiveShowDescription: Bool { showDescription ?? true }
 }
 
+// MARK: - Comments Pill Mode
+
+/// Controls how the comments pill is displayed in the player.
+/// Stored on the comments page settings (moved from the player pill settings;
+/// `PlayerControlsLayout.effectivePanelSettings` migrates the legacy value).
+enum CommentsPillMode: String, Codable, Hashable, Sendable, CaseIterable {
+    case pill       // Default - shows expanded pill, collapses on scroll
+    case button     // Always show collapsed (button-only)
+    case disabled   // No button/pill visible
+
+    /// Localized display name for settings UI.
+    var displayName: String {
+        switch self {
+        case .pill:
+            return String(localized: "commentsPill.mode.pill")
+        case .button:
+            return String(localized: "commentsPill.mode.button")
+        case .disabled:
+            return String(localized: "commentsPill.mode.disabled")
+        }
+    }
+
+    /// Whether the comments pill should always be collapsed (button mode).
+    var alwaysCollapsed: Bool {
+        self == .button
+    }
+}
+
 /// Element toggles for the comments page.
 struct CommentsPageSettings: Codable, Hashable, Sendable {
     var showAvatars: Bool?
+    /// How the comments pill (portrait/floating panel) is displayed.
+    var pillMode: CommentsPillMode?
 
     var effectiveShowAvatars: Bool { showAvatars ?? true }
+    var effectivePillMode: CommentsPillMode { pillMode ?? .pill }
 }
 
 /// Element toggles for the related videos page.
@@ -416,6 +447,17 @@ struct PanelSettings: Codable, Hashable, Sendable {
     /// Whether a page type is enabled in this configuration.
     func isPageEnabled(_ pageType: PanelPageType) -> Bool {
         enabledPages().contains { $0.pageType == pageType }
+    }
+
+    /// The comments pill mode from the comments page settings.
+    var commentsPillMode: CommentsPillMode {
+        configuration(for: .comments)?.commentsSettings.effectivePillMode ?? .pill
+    }
+
+    /// Whether comments should be loaded from the API: needed by the comments
+    /// page (when enabled) and by the pill (unless disabled).
+    var shouldLoadComments: Bool {
+        isPageEnabled(.comments) || commentsPillMode != .disabled
     }
 
     /// The stored configuration for a page type, if present.

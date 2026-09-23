@@ -91,7 +91,6 @@ private struct PlayerControlsSettingsContent: View {
             )
             LayoutSectionsSection(viewModel: viewModel)
             #if os(iOS)
-            CommentsPillSection(viewModel: viewModel)
             GesturesSectionsSection(viewModel: viewModel)
             #endif
             SystemControlsSection(viewModel: viewModel)
@@ -422,39 +421,6 @@ private struct LayoutSectionsSection: View {
             if !viewModel.canEditActivePreset {
                 Text(String(localized: "settings.playerControls.duplicateToEdit"))
             }
-        }
-    }
-}
-
-// MARK: - Comments Pill Section
-
-private struct CommentsPillSection: View {
-    @Bindable var viewModel: PlayerControlsSettingsViewModel
-
-    // Local state for immediate UI updates
-    @State private var commentsPillMode: CommentsPillMode = .pill
-
-    var body: some View {
-        Section {
-            Picker(
-                String(localized: "commentsPill.mode.title"),
-                selection: $commentsPillMode
-            ) {
-                ForEach(CommentsPillMode.allCases, id: \.self) { mode in
-                    Text(mode.displayName).tag(mode)
-                }
-            }
-            .disabled(!viewModel.canEditActivePreset)
-            .onChange(of: commentsPillMode) { _, newValue in
-                guard newValue != viewModel.commentsPillMode else { return }
-                viewModel.syncCommentsPillMode(newValue)
-            }
-        }
-        .onAppear {
-            commentsPillMode = viewModel.commentsPillMode
-        }
-        .onChange(of: viewModel.activePreset?.id) { _, _ in
-            commentsPillMode = viewModel.commentsPillMode
         }
     }
 }

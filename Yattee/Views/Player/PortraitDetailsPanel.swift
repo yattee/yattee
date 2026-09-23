@@ -72,15 +72,15 @@ struct PortraitDetailsPanel: View {
         !playerPillSettings.buttons.isEmpty
     }
 
-    // Comments pill helpers
+    // Comments pill helpers (mode lives on the comments page settings)
     private var commentsPillMode: CommentsPillMode {
-        playerPillSettings.effectiveCommentsPillMode
+        panelSettings.commentsPillMode
     }
     private var shouldShowCommentsPill: Bool {
-        !hidesCommentsPill && playerPillSettings.shouldShowCommentsPill
+        !hidesCommentsPill && commentsPillMode != .disabled
     }
     private var isCommentsPillAlwaysCollapsed: Bool {
-        playerPillSettings.isCommentsPillAlwaysCollapsed
+        commentsPillMode.alwaysCollapsed
     }
 
     private var hasVideoDescription: Bool {

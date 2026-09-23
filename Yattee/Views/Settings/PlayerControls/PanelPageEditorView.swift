@@ -20,6 +20,7 @@ struct PanelPageEditorView: View {
     @State private var showStatsRow: Bool = true
     @State private var showChannelRow: Bool = true
     @State private var showAvatars: Bool = true
+    @State private var commentsPillMode: CommentsPillMode = .pill
     @State private var showRelatedThumbnails: Bool = true
     @State private var showChapterThumbnails: Bool = true
     @State private var showHistory: Bool = true
@@ -167,6 +168,19 @@ struct PanelPageEditorView: View {
                 guard newValue != commentsSettings.effectiveShowAvatars else { return }
                 viewModel.updatePanelCommentsSettingsSync { $0.showAvatars = newValue }
             }
+
+            Picker(
+                String(localized: "commentsPill.mode.title"),
+                selection: $commentsPillMode
+            ) {
+                ForEach(CommentsPillMode.allCases, id: \.self) { mode in
+                    Text(mode.displayName).tag(mode)
+                }
+            }
+            .onChange(of: commentsPillMode) { _, newValue in
+                guard newValue != commentsSettings.effectivePillMode else { return }
+                viewModel.updatePanelCommentsSettingsSync { $0.pillMode = newValue }
+            }
         } header: {
             Text(String(localized: "panel.settings.elements.header"))
         }
@@ -308,6 +322,7 @@ struct PanelPageEditorView: View {
         showStatsRow = info.effectiveShowStatsRow
         showChannelRow = info.effectiveShowChannelRow
         showAvatars = commentsSettings.effectiveShowAvatars
+        commentsPillMode = commentsSettings.effectivePillMode
         showRelatedThumbnails = relatedSettings.effectiveShowThumbnails
         showChapterThumbnails = chaptersSettings.effectiveShowThumbnails
         showHistory = queueSettings.effectiveShowHistory

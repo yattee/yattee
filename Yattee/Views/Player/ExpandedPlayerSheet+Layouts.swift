@@ -165,13 +165,14 @@ extension ExpandedPlayerSheet {
 
         // Check if expanded comments pill will be visible (needs extra panel height)
         let pillSettings = playerControlsLayout.effectivePlayerPillSettings
+        let commentsPillMode = playerControlsLayout.effectivePanelSettings.commentsPillMode
         let hasCommentsPill = playerState?.commentsState == .loaded &&
             !(playerState?.comments.isEmpty ?? true) &&
-            pillSettings.shouldShowCommentsPill
+            commentsPillMode != .disabled
         let hasExpandedCommentsPill = hasCommentsPill &&
             pillSettings.visibility.isVisible(isWideLayout: false) &&
             !pillSettings.buttons.isEmpty &&
-            !pillSettings.isCommentsPillAlwaysCollapsed
+            !commentsPillMode.alwaysCollapsed
 
         let minPanelHeight: CGFloat = useCompactPanel ? 150 : 200
         // When compact panel but expanded comments pill visible, need taller panel (~250pt)

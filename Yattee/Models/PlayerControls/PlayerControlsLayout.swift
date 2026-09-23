@@ -100,8 +100,18 @@ struct PlayerControlsLayout: Codable, Hashable, Sendable {
     // MARK: - Panel Settings
 
     /// Returns the effective details panel settings, using defaults if not set.
+    /// Migrates the legacy comments pill mode (once stored on the player pill
+    /// settings) into the comments page settings; the migrated value persists
+    /// the first time the panel settings are edited and saved.
     var effectivePanelSettings: PanelSettings {
-        panelSettings ?? .default
+        var settings = panelSettings ?? .default
+        if let legacyMode = playerPillSettings?.commentsPillMode,
+           settings.configuration(for: .comments)?.commentsSettings.pillMode == nil {
+            var comments = settings.configuration(for: .comments)?.commentsSettings ?? CommentsPageSettings()
+            comments.pillMode = legacyMode
+            settings.updateSettings(.comments(comments), for: .comments)
+        }
+        return settings
     }
 
     // MARK: - Defaults

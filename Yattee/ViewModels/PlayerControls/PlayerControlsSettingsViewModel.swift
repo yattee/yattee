@@ -625,19 +625,6 @@ final class PlayerControlsSettingsViewModel {
         playerPillSettings.buttons
     }
 
-    /// Current comments pill mode.
-    var commentsPillMode: CommentsPillMode {
-        playerPillSettings.effectiveCommentsPillMode
-    }
-
-    /// Synchronously updates the comments pill mode with immediate UI feedback.
-    /// - Parameter mode: The new comments pill mode.
-    func syncCommentsPillMode(_ mode: CommentsPillMode) {
-        updatePlayerPillSettingsSync { settings in
-            settings.commentsPillMode = mode
-        }
-    }
-
     /// Synchronously updates the pill visibility with immediate UI feedback.
     /// - Parameter visibility: The new visibility mode.
     func syncPillVisibility(_ visibility: PillVisibility) {

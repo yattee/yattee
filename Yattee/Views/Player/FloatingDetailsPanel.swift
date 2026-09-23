@@ -69,15 +69,15 @@ struct FloatingDetailsPanel: View {
         !playerPillSettings.buttons.isEmpty
     }
 
-    // Comments pill helpers
+    // Comments pill helpers (mode lives on the comments page settings)
     private var commentsPillMode: CommentsPillMode {
-        playerPillSettings.effectiveCommentsPillMode
+        panelSettings.commentsPillMode
     }
     private var shouldShowCommentsPill: Bool {
-        playerPillSettings.shouldShowCommentsPill
+        commentsPillMode != .disabled
     }
     private var isCommentsPillAlwaysCollapsed: Bool {
-        playerPillSettings.isCommentsPillAlwaysCollapsed
+        commentsPillMode.alwaysCollapsed
     }
 
     private var hasVideoDescription: Bool {
