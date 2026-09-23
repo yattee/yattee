@@ -226,7 +226,9 @@ final class PlayerState {
     // MARK: - Time & Progress
 
     /// Current playback time in seconds.
-    var currentTime: TimeInterval = 0
+    var currentTime: TimeInterval = 0 {
+        didSet { updateActiveChapter() }
+    }
 
     /// Total duration in seconds.
     var duration: TimeInterval = 0
@@ -356,11 +358,27 @@ final class PlayerState {
     // MARK: - Chapters
 
     /// Video chapters if available.
-    var chapters: [VideoChapter] = []
+    var chapters: [VideoChapter] = [] {
+        didSet { updateActiveChapter() }
+    }
+
+    /// ID of the chapter containing the current playback time. Stored and
+    /// change-guarded so views highlighting the active chapter observe only
+    /// chapter transitions, not every time-pos tick — reading `currentTime`
+    /// from a panel body re-renders it many times per second during playback.
+    private(set) var activeChapterID: UUID?
 
     /// Current chapter based on playback time.
     var currentChapter: VideoChapter? {
-        chapters.last { $0.startTime <= currentTime }
+        guard let activeChapterID else { return nil }
+        return chapters.first { $0.id == activeChapterID }
+    }
+
+    private func updateActiveChapter() {
+        let id = chapters.last { $0.startTime <= currentTime }?.id
+        if activeChapterID != id {
+            activeChapterID = id
+        }
     }
 
     // MARK: - Storyboards

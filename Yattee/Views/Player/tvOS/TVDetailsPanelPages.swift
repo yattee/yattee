@@ -92,7 +92,6 @@ struct TVChaptersPanelList: View {
     private var playerState: PlayerState? { playerService?.state }
 
     private var chapters: [VideoChapter] { playerState?.chapters ?? [] }
-    private var currentTime: TimeInterval { playerState?.currentTime ?? 0 }
 
     var body: some View {
         ScrollViewReader { proxy in
@@ -124,9 +123,8 @@ struct TVChaptersPanelList: View {
     }
 
     private func isChapterActive(_ chapter: VideoChapter) -> Bool {
-        let nextChapter = chapters.first { $0.startTime > chapter.startTime }
-        let endTime = nextChapter?.startTime ?? .infinity
-        return currentTime >= chapter.startTime && currentTime < endTime
+        // Observes only chapter transitions, not per-tick currentTime updates.
+        playerState?.activeChapterID == chapter.id
     }
 }
 

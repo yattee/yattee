@@ -19,7 +19,6 @@ struct ChaptersPanelPage: View {
     private var playerState: PlayerState? { playerService?.state }
 
     private var chapters: [VideoChapter] { playerState?.chapters ?? [] }
-    private var currentTime: TimeInterval { playerState?.currentTime ?? 0 }
     private var storyboard: Storyboard? { playerState?.preferredStoryboard }
 
     var body: some View {
@@ -50,9 +49,8 @@ struct ChaptersPanelPage: View {
     }
 
     private func isChapterActive(_ chapter: VideoChapter) -> Bool {
-        let nextChapter = chapters.first { $0.startTime > chapter.startTime }
-        let endTime = nextChapter?.startTime ?? .infinity
-        return currentTime >= chapter.startTime && currentTime < endTime
+        // Observes only chapter transitions, not per-tick currentTime updates.
+        playerState?.activeChapterID == chapter.id
     }
 
     private func preloadChapterSheets() async {
