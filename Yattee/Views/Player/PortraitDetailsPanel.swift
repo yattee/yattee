@@ -162,7 +162,7 @@ struct PortraitDetailsPanel: View {
                         onChannelTap: onChannelTap
                     ),
                     scrollConfig: PanelScrollConfig(
-                        topInset: 6,
+                        topInset: 10,
                         bottomInset: hasVideoDescription ? 80 : 50,
                         scrollOffsetChanged: { offset in
                             scrollOffset = offset
@@ -180,7 +180,6 @@ struct PortraitDetailsPanel: View {
                     showPageBar: false,
                     inlineInfoSections: inlineInfoSections
                 )
-                .padding(.top, 10)
                 .background(Color(.systemBackground))
                 .overlay(alignment: .bottom) {
                     bottomFadeOverlay
