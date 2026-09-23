@@ -162,6 +162,11 @@ final class NavigationCoordinator {
     /// inside it must not start the sheet dismiss pan (drag handle conflict).
     var cornerBelowPanelFrame: CGRect = .zero
 
+    /// Panel resize grabber strip frame in screen coordinates — touches inside
+    /// it must not start the sheet dismiss pan (a diagonal resize drag would
+    /// otherwise be cancelled and dismiss the player instead).
+    var panelResizeGrabberFrame: CGRect = .zero
+
     /// Progress bar frame in screen coordinates (for gesture conflict resolution).
     var progressBarFrame: CGRect = .zero
 

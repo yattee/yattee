@@ -11,6 +11,8 @@ import SwiftUI
 
 /// A draggable handle for resizing the panel width.
 struct PanelResizeGrabber: View {
+    @Environment(\.appEnvironment) private var appEnvironment
+
     @Binding var panelWidth: CGFloat
     let minWidth: CGFloat
     let maxWidth: CGFloat
@@ -54,6 +56,22 @@ struct PanelResizeGrabber: View {
                     .frame(width: 4, height: 36)
             }
             .gesture(dragGesture)
+            #if os(iOS)
+            // Publish the strip frame (with slop) so the window-level dismiss
+            // pan never begins from a resize drag — a diagonal start would
+            // otherwise cancel the resize and dismiss the player instead
+            .background {
+                GeometryReader { proxy in
+                    Color.clear
+                        .onChange(of: proxy.frame(in: .global), initial: true) { _, frame in
+                            appEnvironment?.navigationCoordinator.panelResizeGrabberFrame = frame.insetBy(dx: -8, dy: 0)
+                        }
+                        .onDisappear {
+                            appEnvironment?.navigationCoordinator.panelResizeGrabberFrame = .zero
+                        }
+                }
+            }
+            #endif
             #if os(macOS)
             .onHover { hovering in
                 isHovering = hovering

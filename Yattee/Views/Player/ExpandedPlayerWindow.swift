@@ -146,6 +146,8 @@ private final class DragToDismissGestureHandler: NSObject, UIGestureRecognizerDe
     var getPortraitPanelFrame: (() -> CGRect)?
     /// Returns the corner layout below-video panel frame in screen coordinates (blocks dismiss pan)
     var getCornerBelowPanelFrame: (() -> CGRect)?
+    /// Returns the panel resize grabber strip frame in screen coordinates (blocks dismiss pan)
+    var getPanelResizeGrabberFrame: (() -> CGRect)?
     /// Returns whether the portrait panel is currently visible (not hidden off-screen)
     var isPortraitPanelVisible: (() -> Bool)?
     /// Returns the progress bar frame in screen coordinates (for gesture conflict resolution)
@@ -374,6 +376,16 @@ private final class DragToDismissGestureHandler: NSObject, UIGestureRecognizerDe
         if !belowPanelFrame.isEmpty {
             let touchLocation = panGesture.location(in: nil)
             if belowPanelFrame.contains(touchLocation) {
+                return false
+            }
+        }
+
+        // Don't begin dismiss gesture from the panel resize grabber strip —
+        // a diagonal resize drag would otherwise be cancelled mid-resize
+        let grabberFrame = getPanelResizeGrabberFrame?() ?? .zero
+        if !grabberFrame.isEmpty {
+            let touchLocation = panGesture.location(in: nil)
+            if grabberFrame.contains(touchLocation) {
                 return false
             }
         }
@@ -859,6 +871,9 @@ final class ExpandedPlayerWindowManager {
         }
         handler.getCornerBelowPanelFrame = { [weak self] in
             self?.appEnvironment?.navigationCoordinator.cornerBelowPanelFrame ?? .zero
+        }
+        handler.getPanelResizeGrabberFrame = { [weak self] in
+            self?.appEnvironment?.navigationCoordinator.panelResizeGrabberFrame ?? .zero
         }
         handler.isPortraitPanelVisible = { [weak self] in
             self?.appEnvironment?.navigationCoordinator.isPortraitPanelVisible ?? true
