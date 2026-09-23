@@ -16,10 +16,19 @@ struct RelatedPanelPage: View {
 
     private var relatedVideos: [Video] { context.video.relatedVideos ?? [] }
 
+    private var isLoadingDetails: Bool {
+        let state = context.appEnvironment?.playerService.state.videoDetailsState ?? .idle
+        return state == .idle || state == .loading
+    }
+
     var body: some View {
         PanelPageScrollView(config: scrollConfig) {
             if relatedVideos.isEmpty {
-                emptyState
+                if isLoadingDetails {
+                    loadingState
+                } else {
+                    emptyState
+                }
             } else {
                 LazyVStack(spacing: 12) {
                     ForEach(Array(relatedVideos.enumerated()), id: \.element.id) { index, relatedVideo in
@@ -49,6 +58,12 @@ struct RelatedPanelPage: View {
                 .padding(.top, 8)
             }
         }
+    }
+
+    private var loadingState: some View {
+        ProgressView()
+            .frame(maxWidth: .infinity)
+            .padding(.vertical, 32)
     }
 
     private var emptyState: some View {

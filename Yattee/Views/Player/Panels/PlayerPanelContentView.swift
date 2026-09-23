@@ -54,7 +54,11 @@ struct PlayerPanelContentView: View {
             return !video.isFromMediaSource
                 && playerState?.commentsState != .disabled
         case .related:
-            return !(video.relatedVideos ?? []).isEmpty
+            if !(video.relatedVideos ?? []).isEmpty { return true }
+            // Keep the tab while details are still loading (spinner in the
+            // page); hide only once details resolved with no related videos.
+            let detailsState = playerState?.videoDetailsState ?? .idle
+            return detailsState == .idle || detailsState == .loading
         case .chapters:
             return !(playerState?.chapters ?? []).isEmpty
         case .queue:
@@ -76,18 +80,22 @@ struct PlayerPanelContentView: View {
         }
     }
 
-    private var visiblePages: [PanelPageConfiguration] {
-        var pages = Self.visiblePages(
-            panelSettings: panelSettings,
-            region: region,
-            video: context.video,
-            appEnvironment: appEnvironment
-        )
+    /// Enabled pages for this host in configured order, before runtime
+    /// visibility filtering. The selection tracks this list so a page that
+    /// loads late (e.g. related) still wins once its content arrives.
+    private var configuredPages: [PanelPageConfiguration] {
+        var pages = panelSettings.enabledPages(in: region)
         if !excludedPages.isEmpty {
             pages = pages.filter { !excludedPages.contains($0.pageType) }
         }
         guard inlineInfoSections else { return pages }
         return pages.filter { $0.pageType != .chapters && $0.pageType != .related }
+    }
+
+    private var visiblePages: [PanelPageConfiguration] {
+        configuredPages.filter {
+            Self.isRuntimeVisible($0.pageType, video: context.video, appEnvironment: appEnvironment)
+        }
     }
 
     /// The page to render: the selection when visible, else the first page.
@@ -102,9 +110,14 @@ struct PlayerPanelContentView: View {
 
         VStack(spacing: 0) {
             if showPageBar, pages.count >= 2 {
+                // Highlight follows the rendered page (the selection when
+                // visible, else the fallback); taps still set the selection.
                 PanelPageBar(
                     pages: pages,
-                    selectedPage: $selectedPage,
+                    selectedPage: Binding(
+                        get: { effectivePage?.pageType ?? selectedPage },
+                        set: { selectedPage = $0 }
+                    ),
                     accentColor: context.accentColor,
                     showLabels: panelSettings.effectiveShowPageBarLabels
                 )
@@ -118,14 +131,23 @@ struct PlayerPanelContentView: View {
                 Spacer()
             }
         }
+        .onChange(of: configuredPages.map(\.pageType), initial: true) { _, pageTypes in
+            // Snap a selection that isn't configured for this host (e.g. the
+            // host's default page was disabled or reordered away) to the
+            // first configured page.
+            if !pageTypes.contains(selectedPage), let first = pageTypes.first {
+                selectedPage = first
+            }
+        }
         .onChange(of: selectedPage) { _, _ in
             // Each page owns its scroll position; reset the host's offset so
             // pills and the scroll-to-top button start from the top state.
             scrollConfig.scrollOffsetChanged?(0)
         }
         .onChange(of: context.video.id) { _, _ in
-            // New video: fall back to the first configured page.
-            if let first = visiblePages.first?.pageType {
+            // New video: reset to the first configured page (not the runtime
+            // list — related/chapters may not have loaded yet).
+            if let first = configuredPages.first?.pageType {
                 selectedPage = first
             }
         }

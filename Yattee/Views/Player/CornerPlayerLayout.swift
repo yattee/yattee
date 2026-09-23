@@ -95,12 +95,42 @@ struct CornerPlayerLayout<PlayerContent: View>: View {
         playerControlsLayout.effectivePanelSettings
     }
 
+    /// Whether the info page is assigned to (and enabled in) the below-video
+    /// region — the below panel only exists to host it.
+    private var hasBelowVideoInfo: Bool {
+        guard let info = panelSettings.configuration(for: .info) else { return false }
+        return info.isEnabled && info.region == .belowVideo
+    }
+
+    /// Comments assigned below the video render as the portrait panel's
+    /// comments pill (iOS only, and only while the info panel is below —
+    /// the pill lives inside it). Everything else falls back to the column.
+    private var hasBelowVideoComments: Bool {
+        #if os(iOS)
+        guard hasBelowVideoInfo,
+              let comments = panelSettings.configuration(for: .comments) else { return false }
+        return comments.isEnabled && comments.region == .belowVideo
+        #else
+        return false
+        #endif
+    }
+
+    /// Pages the below-video host actually renders. Enabled pages assigned
+    /// `.belowVideo` that it can't host (chapters/related/queue/tracks, or
+    /// comments without the info panel) fall back to the side column instead
+    /// of disappearing.
+    private var belowVideoPageTypes: Set<PanelPageType> {
+        var types: Set<PanelPageType> = []
+        if hasBelowVideoInfo { types.insert(.info) }
+        if hasBelowVideoComments { types.insert(.comments) }
+        return types
+    }
+
     /// Column emptiness is decided at the config level: runtime-empty pages
     /// (no chapters, no related yet) are hidden inside the panel content, not
     /// by collapsing the column — layout jumps during loading would be jarring.
-    /// Info always renders below the video; the side column holds the rest.
     private var hasSideColumn: Bool {
-        panelSettings.enabledPages().contains { $0.pageType != .info }
+        panelSettings.enabledPages().contains { !belowVideoPageTypes.contains($0.pageType) }
     }
 
     /// The info page config drives the below-video panel's element settings.
@@ -132,7 +162,7 @@ struct CornerPlayerLayout<PlayerContent: View>: View {
             let height = max(1, geometry.size.height)
 
             let showsSideColumn = isPanelVisible && hasSideColumn
-            let showsBelowVideo = isPanelVisible && isBelowPanelVisible
+            let showsBelowVideo = isPanelVisible && isBelowPanelVisible && hasBelowVideoInfo
 
             let effectiveColumnWidth = clampColumnWidth(columnWidth, availableWidth: width)
             // Grabber sits on the column's leading edge, inside the column
@@ -229,7 +259,7 @@ struct CornerPlayerLayout<PlayerContent: View>: View {
                         // reveal) via belowPanelDragOffset counting down
                         // from full hide travel.
                         .simultaneousGesture(
-                            (isPanelVisible && !isBelowPanelVisible)
+                            (isPanelVisible && !isBelowPanelVisible && hasBelowVideoInfo)
                                 ? DragGesture()
                                     .onChanged { value in
                                         guard appEnvironment?.navigationCoordinator.isAdjustingPlayerSliders != true else { return }
@@ -347,6 +377,11 @@ struct CornerPlayerLayout<PlayerContent: View>: View {
                let visible = settingsManager?.landscapeDetailsPanelVisible {
                 isPanelVisible = visible
             }
+            // Default the side column to the first configured page (skipping
+            // pages hosted below the video).
+            if let first = panelSettings.enabledPages().first(where: { !belowVideoPageTypes.contains($0.pageType) })?.pageType {
+                primaryPage = first
+            }
         }
         .onChange(of: columnWidth) { _, newWidth in
             settingsManager?.cornerPanelColumnWidth = newWidth
@@ -376,7 +411,7 @@ struct CornerPlayerLayout<PlayerContent: View>: View {
                 playerControlsLayout: playerControlsLayout,
                 onFullscreen: onFullscreen,
                 pillsOverlayOpacity: 1,
-                hidesCommentsPill: true,
+                hidesCommentsPill: !hasBelowVideoComments,
                 inlineInfoSections: false,
                 panelCornerRadius: 0,
                 onDragChanged: { offset in
@@ -485,7 +520,8 @@ struct CornerPlayerLayout<PlayerContent: View>: View {
         }
     }
 
-    /// Side column with tabs for every enabled page except info.
+    /// Side column with tabs for every enabled page the below-video host
+    /// doesn't render.
     @ViewBuilder
     private func sideColumnPanel(video: Video) -> some View {
         PlayerPanelContentView(
@@ -502,7 +538,7 @@ struct CornerPlayerLayout<PlayerContent: View>: View {
                 bottomInset: 16
             ),
             pageBarTopPadding: 8,
-            excludedPages: [.info]
+            excludedPages: belowVideoPageTypes
         )
         .background(panelBackgroundColor.ignoresSafeArea(edges: .bottom))
     }
