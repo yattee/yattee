@@ -106,6 +106,12 @@ struct PlayerControlsLayout: Codable, Hashable, Sendable {
 
     // MARK: - Defaults
 
+    /// Last loaded active layout — lets the expanded player seed its layout
+    /// state synchronously before the async load, so the first frames resolve
+    /// the correct layout (e.g. corner mode) instead of flashing the default.
+    /// Warmed at app start and kept fresh by the expanded player's loads.
+    nonisolated(unsafe) static var cached: PlayerControlsLayout = .default
+
     /// Default layout matching the current hardcoded player controls.
     static let `default`: PlayerControlsLayout = {
         // Top section: spacer, brightness (widescreen), volume, airplay, debug, close

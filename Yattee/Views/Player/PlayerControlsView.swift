@@ -43,6 +43,8 @@ struct PlayerControlsView: View {
     var isPanelVisible: Bool = true
     var panelSide: FloatingPanelSide = .right
     var isPanelPinned: Bool = false
+    /// Corner layout: fullscreen button toggles the panels
+    var isCornerLayout: Bool = false
     /// Safe area padding from layout (when panel is pinned)
     var layoutLeadingSafeArea: CGFloat = 0
     var layoutTrailingSafeArea: CGFloat = 0
@@ -230,6 +232,14 @@ struct PlayerControlsView: View {
                 cancelHideTimer()
             }
         }
+        .onChange(of: isPanelVisible) { oldValue, newValue in
+            // Corner layout: any panel toggle resizes the controls area —
+            // keep the controls hidden while that transition plays
+            if isCornerLayout, oldValue != newValue {
+                showControls = false
+                cancelHideTimer()
+            }
+        }
         .onChange(of: playerState.retryState.exhausted) { _, exhausted in
             // Hide controls when retries are exhausted (retry exhausted overlay takes over)
             if exhausted {
@@ -389,6 +399,7 @@ struct PlayerControlsView: View {
             isOrientationLocked: isOrientationLocked,
             isPanelVisible: isPanelVisible,
             isPanelPinned: isPanelPinned,
+            isCornerLayout: isCornerLayout,
             panelSide: panelSide,
             isIPad: isIPad,
             showVolumeControls: showVolumeControls,
@@ -415,6 +426,10 @@ struct PlayerControlsView: View {
             onTogglePiP: onTogglePiP,
             onToggleFullscreen: onToggleFullscreen,
             onToggleDetailsVisibility: onToggleDetailsVisibility,
+            onHideControls: { [self] in
+                showControls = false
+                cancelHideTimer()
+            },
             onToggleOrientationLock: onToggleOrientationLock,
             onTogglePanel: onTogglePanel,
             onTogglePanscan: onTogglePanscan,
@@ -484,7 +499,11 @@ struct PlayerControlsView: View {
         // bottomExtraPadding handles positioning, so no safe area needed
         // In landscape (widescreen), cap the safe area since home indicator needs less clearance
         let floatingPanelActive = isPanelVisible && !isPanelPinned
-        let needsBottomSafeArea = (isWideScreenLayout || isFullscreen) && !floatingPanelActive
+        // Corner layout with panels visible: the controls frame ends at the
+        // video area mid-screen, so the window's bottom safe area (incl. the
+        // PiP inset) must not push the bottom bar up from the video edge
+        let cornerPanelsActive = isCornerLayout && isPanelVisible
+        let needsBottomSafeArea = (isWideScreenLayout || isFullscreen) && !floatingPanelActive && !cornerPanelsActive
         let bottomSafeArea = isWideScreenLayout ? min(safeArea.bottom, 12) : safeArea.bottom
         let bottomPadding: CGFloat = 2 + (needsBottomSafeArea ? bottomSafeArea : 0)
 

@@ -74,7 +74,10 @@ struct ExpandedPlayerSheet: View {
     /// Track if we're in widescreen layout for status bar hiding
     @State private var isInWideScreenLayout = false
     /// Active player controls layout from preset (loaded once, updated on notification)
-    @State var playerControlsLayout: PlayerControlsLayout = .default
+    // Seeded from the warm cache so the first frames resolve the correct
+    // layout (corner mode) instead of flashing the default stacked layout;
+    // loadPlayerControlsLayout replaces it with the authoritative value.
+    @State var playerControlsLayout: PlayerControlsLayout = PlayerControlsLayout.cached
 
     // MARK: - Autoplay Countdown State
 
@@ -470,8 +473,19 @@ struct ExpandedPlayerSheet: View {
         )
         #if os(iOS)
         .toolbar(.hidden, for: .navigationBar)
-        .playerStatusBarHidden(isInWideScreenLayout || !isPortraitPanelVisible)
-        .persistentSystemOverlays((isInWideScreenLayout || !isPortraitPanelVisible) ? .hidden : .automatic)
+        // Corner layout with panels visible keeps the system status bar and
+        // home indicator; hiding the panels (fullscreen state) hides them so
+        // the video and controls reach the screen edges.
+        .playerStatusBarHidden(
+            navigationCoordinator?.isCornerLayoutActive == true
+                ? !(appEnvironment?.settingsManager.landscapeDetailsPanelVisible ?? true)
+                : (isInWideScreenLayout || !isPortraitPanelVisible)
+        )
+        .persistentSystemOverlays(
+            (navigationCoordinator?.isCornerLayoutActive == true
+                ? !(appEnvironment?.settingsManager.landscapeDetailsPanelVisible ?? true)
+                : (isInWideScreenLayout || !isPortraitPanelVisible)) ? .hidden : .automatic
+        )
         #endif
     }
 
@@ -944,6 +958,7 @@ private struct PlayerEventHandlersModifier: ViewModifier {
         if let service = appEnvironment?.playerControlsLayoutService {
             let layout = await service.activeLayout()
             playerControlsLayout = layout
+            PlayerControlsLayout.cached = layout
             GlobalLayoutSettings.cached = layout.globalSettings
             MiniPlayerSettings.cached = layout.effectiveMiniPlayerSettings
             PanelSettings.cached = layout.effectivePanelSettings

@@ -158,6 +158,10 @@ final class NavigationCoordinator {
     /// Portrait panel frame in screen coordinates (for gesture conflict resolution).
     var portraitPanelFrame: CGRect = .zero
 
+    /// Corner layout below-video panel frame in screen coordinates — touches
+    /// inside it must not start the sheet dismiss pan (drag handle conflict).
+    var cornerBelowPanelFrame: CGRect = .zero
+
     /// Progress bar frame in screen coordinates (for gesture conflict resolution).
     var progressBarFrame: CGRect = .zero
 

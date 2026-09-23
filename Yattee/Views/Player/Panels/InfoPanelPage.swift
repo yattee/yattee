@@ -19,6 +19,15 @@ struct InfoPanelPage: View {
     /// and related videos as inline sections below it.
     var inlineSections: Bool = false
 
+    /// Collapse only while something actually renders below the description —
+    /// with no chapters and no related videos the description stays expanded.
+    /// While details are still loading, keep it collapsed to avoid an
+    /// expand-then-clamp flash when sections arrive.
+    private var usesCollapsedDescription: Bool {
+        inlineSections
+            && (!chapters.isEmpty || !relatedVideos.isEmpty || videoDetailsState == .loading)
+    }
+
     @State private var showFormattedDate = false
     @State private var showOriginalTitle = false
     @State private var isDescriptionExpanded = false
@@ -124,7 +133,7 @@ struct InfoPanelPage: View {
 
         return VStack(alignment: .leading, spacing: 8) {
             if !description.isEmpty {
-                if inlineSections {
+                if usesCollapsedDescription {
                     collapsibleDescription(description)
                 } else {
                     Text(DescriptionText.attributed(description, linkColor: context.accentColor))

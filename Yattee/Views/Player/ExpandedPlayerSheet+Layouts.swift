@@ -1317,8 +1317,18 @@ extension ExpandedPlayerSheet {
     /// identical to the stacked layout — only the container size differs.
     @ViewBuilder
     func cornerContent(video: Video) -> some View {
+        // Seed the panel visibility before the first frame: once the
+        // session's default visibility is applied the setting is the truth;
+        // until then resolve the preset default (same policy the sheet's
+        // applyPanelDefaultVisibility writes moments later).
+        let initialPanelVisible = appEnvironment?.navigationCoordinator.hasAppliedPanelDefaultVisibility == true
+            ? (appEnvironment?.settingsManager.landscapeDetailsPanelVisible ?? true)
+            : Self.initialPortraitPanelVisibility(settingsManager: appEnvironment?.settingsManager)
+
         CornerPlayerLayout(
             playerControlsLayout: playerControlsLayout,
+            initialPanelVisible: initialPanelVisible,
+            initialColumnWidth: appEnvironment?.settingsManager.cornerPanelColumnWidth,
             playerContent: { onTogglePanel, isPanelVisible, width, height in
                 // isPanelPinned=true keeps the controls visible alongside the
                 // panel regions (corner regions behave like a pinned panel).
@@ -1336,7 +1346,12 @@ extension ExpandedPlayerSheet {
             },
             onChannelTap: video.author.hasRealChannelInfo ? {
                 navigationCoordinator?.navigateToChannel(for: video, collapsePlayer: true)
-            } : nil
+            } : nil,
+            onFullscreen: {
+                #if os(iOS)
+                self.toggleFullscreen()
+                #endif
+            }
         )
     }
 
@@ -1558,6 +1573,7 @@ extension ExpandedPlayerSheet {
                     isPanelVisible: isPanelVisible,
                     panelSide: panelSide,
                     isPanelPinned: isPanelPinned,
+                    isCornerLayout: appEnvironment?.navigationCoordinator.isCornerLayoutActive == true,
                     layoutLeadingSafeArea: 0.01, // Non-zero indicates safe areas handled externally
                     layoutTrailingSafeArea: 0.01,
                     onToggleOrientationLock: { [weak appEnvironment] in

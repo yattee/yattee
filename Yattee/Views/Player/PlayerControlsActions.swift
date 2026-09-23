@@ -39,6 +39,10 @@ struct PlayerControlsActions {
     #if os(iOS)
     /// Whether the side panel is pinned (iPad landscape)
     let isPanelPinned: Bool
+
+    /// Whether the corner layout is active: the fullscreen button then
+    /// toggles the panels (hide = fullscreen video, unhide on next press)
+    var isCornerLayout: Bool = false
     #endif
 
     /// Which side the panel is on
@@ -118,6 +122,10 @@ struct PlayerControlsActions {
 
     /// Toggle details visibility (portrait fullscreen)
     var onToggleDetailsVisibility: (() -> Void)?
+
+    /// Hide the controls overlay (corner layout hides them before the
+    /// panel toggle so the controls-resize never plays visibly)
+    var onHideControls: (() -> Void)?
 
     #if os(iOS)
     /// Toggle orientation lock
@@ -263,6 +271,10 @@ struct PlayerControlsActions {
     /// Uses rotation icons when tapping will cause device rotation,
     /// otherwise uses standard fullscreen arrows.
     var fullscreenIcon: String {
+        if isCornerLayout {
+            // Corner layout: reflects the panels state, not orientation
+            return isPanelVisible ? "arrow.up.left.and.arrow.down.right" : "arrow.down.right.and.arrow.up.left"
+        }
         if willRotateOnFullscreenToggle {
             if isFullscreen {
                 // Currently landscape fullscreen, will rotate to portrait
@@ -280,6 +292,14 @@ struct PlayerControlsActions {
     /// Shared fullscreen-tap decision used by the fullscreen button and tap gestures.
     /// Keep in sync with `willRotateOnFullscreenToggle` (icon mirror of this logic).
     func performFullscreenTap() {
+        if isCornerLayout {
+            // Corner layout: hide the controls and toggle the panels —
+            // the controls fade out while the panel transition plays
+            onHideControls?()
+            onTogglePanel?()
+            return
+        }
+
         let isActualWidescreenLayout = isWideScreenLayout && onTogglePanel != nil
 
         if isIPad {
@@ -334,6 +354,11 @@ struct PlayerControlsActions {
 
     /// Whether the fullscreen button should be shown
     var shouldShowFullscreenButton: Bool {
+        // Corner layout: always shown, toggles the panels both ways
+        if isCornerLayout {
+            return onTogglePanel != nil
+        }
+
         // iPad widescreen (true landscape): hidden (can't force rotation)
         let isActualWidescreen = isWideScreenLayout && onTogglePanel != nil
         let showFullscreenButton = !(isIPad && isActualWidescreen)

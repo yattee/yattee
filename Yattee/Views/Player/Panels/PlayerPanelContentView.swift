@@ -32,6 +32,10 @@ struct PlayerPanelContentView: View {
     /// those pages are then dropped from the page list.
     var inlineInfoSections: Bool = false
 
+    /// Pages the host renders elsewhere (e.g. corner layout keeps info below
+    /// the video), removed from this view's page list.
+    var excludedPages: Set<PanelPageType> = []
+
     private var appEnvironment: AppEnvironment? { context.appEnvironment }
 
     // MARK: - Page Visibility
@@ -73,12 +77,15 @@ struct PlayerPanelContentView: View {
     }
 
     private var visiblePages: [PanelPageConfiguration] {
-        let pages = Self.visiblePages(
+        var pages = Self.visiblePages(
             panelSettings: panelSettings,
             region: region,
             video: context.video,
             appEnvironment: appEnvironment
         )
+        if !excludedPages.isEmpty {
+            pages = pages.filter { !excludedPages.contains($0.pageType) }
+        }
         guard inlineInfoSections else { return pages }
         return pages.filter { $0.pageType != .chapters && $0.pageType != .related }
     }

@@ -6530,42 +6530,12 @@
         }
       }
     },
-    "migration.accounts.prompt.review" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Review"
-          }
-        }
-      }
-    },
     "migration.accounts.prompt.title" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Import from Previous App"
-          }
-        }
-      }
-    },
-    "migration.accounts.prompt.title" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Import from Previous App"
-          }
-        }
-      }
-    },
-    "migration.accounts.remove.confirm" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Remove"
           }
         }
       }
@@ -6590,42 +6560,12 @@
         }
       }
     },
-    "migration.accounts.remove.message %@" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "This will remove \"%@\" from the legacy import list. It will not be imported."
-          }
-        }
-      }
-    },
     "migration.accounts.remove.title" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Remove Legacy Account?"
-          }
-        }
-      }
-    },
-    "migration.accounts.remove.title" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Remove Legacy Account?"
-          }
-        }
-      }
-    },
-    "migration.accounts.section" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Accounts"
           }
         }
       }
@@ -6650,42 +6590,12 @@
         }
       }
     },
-    "migration.accounts.title" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Legacy Accounts"
-          }
-        }
-      }
-    },
     "migration.import" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Import"
-          }
-        }
-      }
-    },
-    "migration.import" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Import"
-          }
-        }
-      }
-    },
-    "migration.importing" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Importing..."
           }
         }
       }
@@ -6710,42 +6620,12 @@
         }
       }
     },
-    "migration.sources.footer" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Add these sources from the previous Yattee app. No sign-in is required."
-          }
-        }
-      }
-    },
     "migration.sources.imported.title" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Source Added"
-          }
-        }
-      }
-    },
-    "migration.sources.imported.title" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Source Added"
-          }
-        }
-      }
-    },
-    "migration.sources.remove.title" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Remove Legacy Source?"
           }
         }
       }
@@ -6770,42 +6650,12 @@
         }
       }
     },
-    "migration.sources.section" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Sources"
-          }
-        }
-      }
-    },
     "miniPlayer.addButton.header" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Add Button"
-          }
-        }
-      }
-    },
-    "miniPlayer.addButton.header" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Add Button"
-          }
-        }
-      }
-    },
-    "miniPlayer.buttons.empty" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "No buttons configured"
           }
         }
       }
@@ -6830,26 +6680,6 @@
         }
       }
     },
-    "miniPlayer.buttons.footer" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Customize which buttons appear in the mini player."
-          }
-        }
-      }
-    },
-    "miniPlayer.buttons.header" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Buttons"
-          }
-        }
-      }
-    },
     "miniPlayer.buttons.header" : {
       "localizations" : {
         "en" : {
@@ -6862,19 +6692,6 @@
     },
     "my-server.example.com" : {
 
-    },
-    "my-server.example.com" : {
-
-    },
-    "navigation.sourceNotFound" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Source Not Found"
-          }
-        }
-      }
     },
     "navigation.sourceNotFound" : {
       "localizations" : {
@@ -6892,27 +6709,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "This media source may have been removed."
-          }
-        }
-      }
-    },
-    "navigation.sourceNotFound.description" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "This media source may have been removed."
-          }
-        }
-      }
-    },
-    "notification.action.watch" : {
-      "comment" : "Action button on notification to watch video",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Watch"
           }
         }
       }
@@ -6939,17 +6735,6 @@
         }
       }
     },
-    "notification.multipleChannels %@ %@" : {
-      "comment" : "Multiple channels notification",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "New videos from %1$@ and %2$@"
-          }
-        }
-      }
-    },
     "notification.multipleVideosOneChannel %lld %@" : {
       "comment" : "Multiple videos from one channel",
       "localizations" : {
@@ -6957,28 +6742,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "%1$lld new videos from %2$@"
-          }
-        }
-      }
-    },
-    "notification.multipleVideosOneChannel %lld %@" : {
-      "comment" : "Multiple videos from one channel",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%1$lld new videos from %2$@"
-          }
-        }
-      }
-    },
-    "notification.newVideos.title" : {
-      "comment" : "Notification title for new videos",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "New Videos"
           }
         }
       }
@@ -7005,28 +6768,6 @@
         }
       }
     },
-    "notification.singleVideo %@" : {
-      "comment" : "Notification body for single video",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "New video: %@"
-          }
-        }
-      }
-    },
-    "notification.twoChannels %@ %@" : {
-      "comment" : "Two channels notification",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "New videos from %1$@ and %2$@"
-          }
-        }
-      }
-    },
     "notification.twoChannels %@ %@" : {
       "comment" : "Two channels notification",
       "localizations" : {
@@ -7049,17 +6790,6 @@
         }
       }
     },
-    "notification.videoItem %@ %@" : {
-      "comment" : "Video item: Author: Title",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%1$@: %2$@"
-          }
-        }
-      }
-    },
     "onboarding.cloud.syncing.preparing" : {
       "comment" : "Preparing sync text on iCloud onboarding",
       "localizations" : {
@@ -7067,28 +6797,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Preparing sync..."
-          }
-        }
-      }
-    },
-    "onboarding.cloud.syncing.preparing" : {
-      "comment" : "Preparing sync text on iCloud onboarding",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Preparing sync..."
-          }
-        }
-      }
-    },
-    "onboarding.cloud.syncing.title" : {
-      "comment" : "iCloud syncing title on onboarding",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Syncing Your Data"
           }
         }
       }
@@ -7566,6 +7274,17 @@
         }
       }
     },
+    "panel.settings.comments.showAvatars" : {
+      "comment" : "Comments page element toggle",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Author Avatars"
+          }
+        }
+      }
+    },
     "panel.settings.defaultVisibility" : {
       "comment" : "Details panel settings picker label",
       "localizations" : {
@@ -7595,17 +7314,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Duplicate Preset to Edit"
-          }
-        }
-      }
-    },
-    "panel.settings.comments.showAvatars" : {
-      "comment" : "Comments page element toggle",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Author Avatars"
           }
         }
       }
@@ -7698,28 +7406,6 @@
         }
       }
     },
-    "panel.settings.pageBarLabels" : {
-      "comment" : "Details panel page bar labels toggle",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Page Bar Labels"
-          }
-        }
-      }
-    },
-    "panel.settings.pageBarLabels.footer" : {
-      "comment" : "Details panel page bar labels footer",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Show a name next to each page icon. With labels off, only the selected page shows its name."
-          }
-        }
-      }
-    },
     "panel.settings.page.enabled" : {
       "comment" : "Details panel page editor toggle",
       "localizations" : {
@@ -7764,6 +7450,50 @@
         }
       }
     },
+    "panel.settings.pageBarLabels" : {
+      "comment" : "Details panel page bar labels toggle",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Page Bar Labels"
+          }
+        }
+      }
+    },
+    "panel.settings.pageBarLabels.footer" : {
+      "comment" : "Details panel page bar labels footer",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Show a name next to each page icon. With labels off, only the selected page shows its name."
+          }
+        }
+      }
+    },
+    "panel.settings.pages.footer" : {
+      "comment" : "Details panel settings section footer",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pages appear in this order. The page bar shows when at least two pages are enabled; pages without content hide automatically."
+          }
+        }
+      }
+    },
+    "panel.settings.pages.header" : {
+      "comment" : "Details panel settings section header",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pages"
+          }
+        }
+      }
+    },
     "panel.settings.queue.showHistory" : {
       "comment" : "Queue page element toggle",
       "localizations" : {
@@ -7793,28 +7523,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Thumbnails"
-          }
-        }
-      }
-    },
-    "panel.settings.pages.header" : {
-      "comment" : "Details panel settings section header",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Pages"
-          }
-        }
-      }
-    },
-    "panel.settings.pages.footer" : {
-      "comment" : "Details panel settings section footer",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Pages appear in this order. The page bar shows when at least two pages are enabled; pages without content hide automatically."
           }
         }
       }
@@ -8651,6 +8359,7 @@
       }
     },
     "player.tab.comments" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -8661,6 +8370,7 @@
       }
     },
     "player.tab.info" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -17345,17 +17055,6 @@
         }
       }
     },
-    "sources.field.invidiousInstance" : {
-      "comment" : "Field label for Invidious instance in Yattee Server info",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Invidious"
-          }
-        }
-      }
-    },
     "sources.field.frontendURL" : {
       "comment" : "Field label for optional Piped web frontend URL",
       "localizations" : {
@@ -17363,6 +17062,17 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Frontend URL"
+          }
+        }
+      }
+    },
+    "sources.field.invidiousInstance" : {
+      "comment" : "Field label for Invidious instance in Yattee Server info",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Invidious"
           }
         }
       }

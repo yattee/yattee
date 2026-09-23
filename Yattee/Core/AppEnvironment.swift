@@ -740,6 +740,12 @@ final class AppEnvironment {
     func refreshActiveControlsSettings() async {
         let layout = await playerControlsLayoutService.activeLayout()
         activeControlsCenterSettings = layout.centerSettings
+        // Warm the layout caches so the expanded player resolves the correct
+        // layout (corner mode, panel settings) on its very first frame.
+        PlayerControlsLayout.cached = layout
+        GlobalLayoutSettings.cached = layout.globalSettings
+        MiniPlayerSettings.cached = layout.effectiveMiniPlayerSettings
+        PanelSettings.cached = layout.effectivePanelSettings
     }
 
     /// Updates the HTTP client's User-Agent configuration from current settings.

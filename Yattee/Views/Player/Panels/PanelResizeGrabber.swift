@@ -18,6 +18,9 @@ struct PanelResizeGrabber: View {
     let isPinned: Bool
     @Binding var isDragActive: Bool
 
+    /// Width of the grabber hit area (hosts can narrow it, e.g. corner layout)
+    var hitWidth: CGFloat = PanelResizeGrabber.grabberHitWidth
+
     @State private var isDragging = false
     @State private var dragStartWidth: CGFloat? = nil
     @State private var dragStartLocation: CGFloat? = nil
@@ -26,29 +29,29 @@ struct PanelResizeGrabber: View {
     #endif
 
     /// Width of the grabber hit area
-    private static let grabberHitWidth: CGFloat = 20
+    static let grabberHitWidth: CGFloat = 20
 
     /// Grabber fill color - needs to be visible against both light (pinned) and dark (floating) backgrounds
     private var grabberColor: Color {
-        // When pinned (light background), use a darker gray for visibility
-        // When floating (dark background), use lighter color
-        let baseColor = isPinned ? Color.gray : Color.secondary
+        // Pinned matches the panel drag handle (secondary 0.4);
+        // floating (dark background) stays a bit lighter
         let isActive = isDragging
-        return baseColor.opacity(isActive ? 1.0 : (isPinned ? 0.5 : 0.6))
+        return Color.secondary.opacity(isActive ? 1.0 : (isPinned ? 0.4 : 0.6))
     }
 
     var body: some View {
         // Full-height container for expanded hit area
         Rectangle()
             .fill(Color.clear)
-            .frame(width: Self.grabberHitWidth)
+            .frame(width: hitWidth)
             .frame(maxHeight: .infinity)
             .contentShape(Rectangle())
             .overlay {
-                // Visual pill indicator (centered)
-                RoundedRectangle(cornerRadius: 3)
+                // Visual pill indicator (centered) — sized like the panel
+                // drag handle capsule (36x4), rotated vertical
+                Capsule()
                     .fill(grabberColor)
-                    .frame(width: 6, height: 40)
+                    .frame(width: 4, height: 36)
             }
             .gesture(dragGesture)
             #if os(macOS)

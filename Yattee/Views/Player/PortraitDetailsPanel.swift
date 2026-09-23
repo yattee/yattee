@@ -18,6 +18,19 @@ struct PortraitDetailsPanel: View {
     let onFullscreen: (() -> Void)?
     let pillsOverlayOpacity: CGFloat
 
+    /// Corner layout host: comments live in the side column, so the pill is
+    /// suppressed entirely.
+    var hidesCommentsPill: Bool = false
+
+    /// Portrait inlines chapters/related into the info page; the corner
+    /// layout's below-video host turns this off because those live in the
+    /// side column tabs (the description stays collapsible either way).
+    var inlineInfoSections: Bool = true
+
+    /// Panel clip rounding — the corner layout's below-video host uses 0
+    /// for a plain rectangle.
+    var panelCornerRadius: CGFloat = 16
+
     // Drag gesture callbacks
     var onDragChanged: ((CGFloat) -> Void)?
     var onDragEnded: ((CGFloat, CGFloat) -> Void)?
@@ -64,7 +77,7 @@ struct PortraitDetailsPanel: View {
         playerPillSettings.effectiveCommentsPillMode
     }
     private var shouldShowCommentsPill: Bool {
-        playerPillSettings.shouldShowCommentsPill
+        !hidesCommentsPill && playerPillSettings.shouldShowCommentsPill
     }
     private var isCommentsPillAlwaysCollapsed: Bool {
         playerPillSettings.isCommentsPillAlwaysCollapsed
@@ -165,7 +178,7 @@ struct PortraitDetailsPanel: View {
                     ),
                     pageBarTopPadding: 14,
                     showPageBar: false,
-                    inlineInfoSections: true
+                    inlineInfoSections: inlineInfoSections
                 )
                 .padding(.top, 10)
                 .background(Color(.systemBackground))
@@ -220,7 +233,7 @@ struct PortraitDetailsPanel: View {
                 }
             }
             .background(Color(.systemBackground))
-            .clipShape(RoundedRectangle(cornerRadius: 16))
+            .clipShape(RoundedRectangle(cornerRadius: panelCornerRadius))
             // Pills overlay at bottom
             .overlay {
                 if !isCommentsExpanded {

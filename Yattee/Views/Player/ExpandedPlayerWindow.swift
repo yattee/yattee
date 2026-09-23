@@ -144,6 +144,8 @@ private final class DragToDismissGestureHandler: NSObject, UIGestureRecognizerDe
     var isPanelDragging: (() -> Bool)?
     /// Returns the portrait panel frame in screen coordinates (for gesture conflict resolution)
     var getPortraitPanelFrame: (() -> CGRect)?
+    /// Returns the corner layout below-video panel frame in screen coordinates (blocks dismiss pan)
+    var getCornerBelowPanelFrame: (() -> CGRect)?
     /// Returns whether the portrait panel is currently visible (not hidden off-screen)
     var isPortraitPanelVisible: (() -> Bool)?
     /// Returns the progress bar frame in screen coordinates (for gesture conflict resolution)
@@ -364,6 +366,16 @@ private final class DragToDismissGestureHandler: NSObject, UIGestureRecognizerDe
         // Don't begin dismiss gesture when dragging portrait panel
         if isPanelDragging?() == true {
             return false
+        }
+
+        // Corner layout: don't begin dismiss gesture from inside the
+        // below-video panel — its drag handle hides the panel instead
+        let belowPanelFrame = getCornerBelowPanelFrame?() ?? .zero
+        if !belowPanelFrame.isEmpty {
+            let touchLocation = panGesture.location(in: nil)
+            if belowPanelFrame.contains(touchLocation) {
+                return false
+            }
         }
 
         // When portrait panel is visible, only allow dismiss from player area (above panel)
@@ -844,6 +856,9 @@ final class ExpandedPlayerWindowManager {
         }
         handler.getPortraitPanelFrame = { [weak self] in
             self?.appEnvironment?.navigationCoordinator.portraitPanelFrame ?? .zero
+        }
+        handler.getCornerBelowPanelFrame = { [weak self] in
+            self?.appEnvironment?.navigationCoordinator.cornerBelowPanelFrame ?? .zero
         }
         handler.isPortraitPanelVisible = { [weak self] in
             self?.appEnvironment?.navigationCoordinator.isPortraitPanelVisible ?? true
