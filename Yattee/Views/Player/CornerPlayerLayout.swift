@@ -383,6 +383,11 @@ struct CornerPlayerLayout<PlayerContent: View>: View {
                     .background(panelBackgroundColor.ignoresSafeArea(edges: .bottom))
                     .frame(width: totalColumnWidth)
                     .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topTrailing)
+                    // Toggle only: fade with the video growing over it (and
+                    // back in as it shrinks). Drag hides keep the panel solid
+                    // — the finger drives the edge, the panel is uncovered
+                    .opacity(isPanelVisible ? 1 : 0)
+                    .animation(isPanelDragActive ? nil : .easeInOut(duration: panelToggleDuration), value: panelToggleGeneration)
                     .allowsHitTesting(showsSideColumn)
                     .accessibilityHidden(!showsSideColumn)
                 }
@@ -415,6 +420,8 @@ struct CornerPlayerLayout<PlayerContent: View>: View {
                     .animation(isPanelDragActive ? nil : .spring(response: 0.3, dampingFraction: 0.8), value: isBelowPanelExpanded)
                     .animation(isPanelDragActive ? nil : .spring(response: 0.3, dampingFraction: 0.8), value: belowPanelExpandOffset)
                     .animation(isPanelDragActive ? nil : .spring(response: 0.3, dampingFraction: 1.0), value: playerState?.displayAspectRatio)
+                    // Toggle only: fade with the video (see the column)
+                    .opacity(isPanelVisible ? 1 : 0)
                     .animation(isPanelDragActive ? nil : .easeInOut(duration: panelToggleDuration), value: panelToggleGeneration)
                     .animation(isPanelDragActive ? nil : .spring(response: 0.3, dampingFraction: 1.0), value: sideColumnDragOffset)
                     .zIndex(isBelowPanelRaised ? 2 : 0)
