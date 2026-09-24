@@ -1507,7 +1507,6 @@ extension ExpandedPlayerSheet {
                     }
                 }
                 .frame(width: videoWidth, height: videoHeight)
-                .matchedGeometryEffect(id: "player", in: playerNamespace)
                 .geometryGroup()
                 .clipped()
 

@@ -23,6 +23,8 @@ struct PlayerGestureOverlay: View {
     var isPinchGestureActive: (() -> Bool)? = nil
     /// Returns true if panel drag is active (blocks seek gesture).
     var isPanelDragging: (() -> Bool)? = nil
+    /// Width of the trailing-edge strip reserved for a panel reveal swipe.
+    var trailingEdgeRevealInset: (() -> CGFloat)? = nil
 
     var body: some View {
         GeometryReader { geometry in
@@ -41,7 +43,8 @@ struct PlayerGestureOverlay: View {
                 onSeekGestureChanged: onSeekGestureChanged,
                 onSeekGestureEnded: onSeekGestureEnded,
                 isPinchGestureActive: isPinchGestureActive,
-                isPanelDragging: isPanelDragging
+                isPanelDragging: isPanelDragging,
+                trailingEdgeRevealInset: trailingEdgeRevealInset
             )
         }
         // Always allow hit testing - single tap to toggle controls should work
@@ -65,6 +68,7 @@ private struct GestureRecognizerView: UIViewRepresentable {
     let onSeekGestureEnded: (CGFloat) -> Void
     var isPinchGestureActive: (() -> Bool)? = nil
     var isPanelDragging: (() -> Bool)? = nil
+    var trailingEdgeRevealInset: (() -> CGFloat)? = nil
 
     func makeCoordinator() -> PlayerGestureCoordinator {
         PlayerGestureCoordinator(
@@ -87,6 +91,7 @@ private struct GestureRecognizerView: UIViewRepresentable {
         coordinator.onSeekGestureEnded = onSeekGestureEnded
         coordinator.isPinchGestureActive = isPinchGestureActive
         coordinator.isPanelDragging = isPanelDragging
+        coordinator.trailingEdgeRevealInset = trailingEdgeRevealInset
         coordinator.attach(to: view)
 
         return view
@@ -108,6 +113,7 @@ private struct GestureRecognizerView: UIViewRepresentable {
         coordinator.onSeekGestureEnded = onSeekGestureEnded
         coordinator.isPinchGestureActive = isPinchGestureActive
         coordinator.isPanelDragging = isPanelDragging
+        coordinator.trailingEdgeRevealInset = trailingEdgeRevealInset
     }
 
     static func dismantleUIView(_ uiView: UIView, coordinator: PlayerGestureCoordinator) {

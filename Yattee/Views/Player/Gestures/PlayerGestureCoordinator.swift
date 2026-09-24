@@ -29,6 +29,9 @@ final class PlayerGestureCoordinator: NSObject, UIGestureRecognizerDelegate {
     var isPinchGestureActive: (() -> Bool)?
     /// Returns true if panel drag is active (blocks seek gesture).
     var isPanelDragging: (() -> Bool)?
+    /// Width of the trailing-edge strip reserved for a panel reveal swipe
+    /// (0 = none) — pans starting inside it never become seek gestures.
+    var trailingEdgeRevealInset: (() -> CGFloat)?
 
     /// Called when seek gesture is recognized (after activation threshold).
     var onSeekGestureStarted: (() -> Void)?
@@ -193,6 +196,11 @@ final class PlayerGestureCoordinator: NSObject, UIGestureRecognizerDelegate {
             if isPinchGestureActive?() == true { return false }
             // Block seek gesture if panel drag is active
             if isPanelDragging?() == true { return false }
+            // Leave the trailing screen edge to the panel reveal swipe
+            if let inset = trailingEdgeRevealInset?(), inset > 0 {
+                let location = gestureRecognizer.location(in: gestureRecognizer.view)
+                if location.x >= bounds.width - inset { return false }
+            }
             return isActive && seekSettings.isEnabled && isSeekable
         }
 

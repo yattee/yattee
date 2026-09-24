@@ -23,6 +23,15 @@ struct PanelResizeGrabber: View {
     /// Width of the grabber hit area (hosts can narrow it, e.g. corner layout)
     var hitWidth: CGFloat = PanelResizeGrabber.grabberHitWidth
 
+    /// Overdrag past `minWidth`: reports how far (in points, ≥ 0) the finger
+    /// went beyond the minimum while the width stays clamped — hosts can
+    /// slide the panel off-screen with it. Reported every drag update, so a
+    /// finger coming back above the minimum reports 0 again.
+    var onOverdragChanged: ((CGFloat) -> Void)? = nil
+    /// Release after an overdrag: final overshoot and the predicted overshoot
+    /// (from the drag's projected end location) for flick detection.
+    var onOverdragEnded: ((_ overshoot: CGFloat, _ predictedOvershoot: CGFloat) -> Void)? = nil
+
     @State private var isDragging = false
     @State private var dragStartWidth: CGFloat? = nil
     @State private var dragStartLocation: CGFloat? = nil
@@ -114,8 +123,19 @@ struct PanelResizeGrabber: View {
 
                 let newWidth = startWidth + delta
                 panelWidth = min(max(newWidth, minWidth), maxWidth)
+                onOverdragChanged?(max(0, minWidth - newWidth))
             }
-            .onEnded { _ in
+            .onEnded { value in
+                if let onOverdragEnded,
+                   let startWidth = dragStartWidth,
+                   let startLocation = dragStartLocation {
+                    let overshoot = { (locationX: CGFloat) -> CGFloat in
+                        let locationDelta = locationX - startLocation
+                        let delta = panelSide == .right ? -locationDelta : locationDelta
+                        return max(0, minWidth - (startWidth + delta))
+                    }
+                    onOverdragEnded(overshoot(value.location.x), overshoot(value.predictedEndLocation.x))
+                }
                 dragStartWidth = nil
                 dragStartLocation = nil
                 isDragging = false

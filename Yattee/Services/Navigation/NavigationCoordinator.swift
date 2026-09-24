@@ -167,6 +167,11 @@ final class NavigationCoordinator {
     /// otherwise be cancelled and dismiss the player instead).
     var panelResizeGrabberFrame: CGRect = .zero
 
+    /// Corner layout: width of the trailing screen-edge strip reserved for
+    /// the side column reveal swipe while the column is collapsed (0 when
+    /// not collapsed) — the seek pan must not begin from inside it.
+    var cornerSideColumnEdgeRevealInset: CGFloat = 0
+
     /// Progress bar frame in screen coordinates (for gesture conflict resolution).
     var progressBarFrame: CGRect = .zero
 

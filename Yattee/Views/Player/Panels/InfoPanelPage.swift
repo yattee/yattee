@@ -310,6 +310,7 @@ struct InfoPanelPage: View {
                         VideoRowView(
                             video: relatedVideo,
                             style: .regular,
+                            disableInternalTapHandling: true,
                             showThumbnail: true
                         )
                         .tappableVideo(

@@ -1130,6 +1130,9 @@ struct PlayerControlsView: View {
                 },
                 isPanelDragging: { [weak appEnvironment] in
                     appEnvironment?.navigationCoordinator.isPanelDragging ?? false
+                },
+                trailingEdgeRevealInset: { [weak appEnvironment] in
+                    appEnvironment?.navigationCoordinator.cornerSideColumnEdgeRevealInset ?? 0
                 }
             )
         }

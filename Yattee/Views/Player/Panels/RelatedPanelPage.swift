@@ -35,6 +35,7 @@ struct RelatedPanelPage: View {
                         VideoRowView(
                             video: relatedVideo,
                             style: .regular,
+                            disableInternalTapHandling: true,
                             showThumbnail: settings.effectiveShowThumbnails
                         )
                             .tappableVideo(
