@@ -2271,18 +2271,28 @@ final class MPVClient: @unchecked Sendable {
 
         var flipY: Int32 = 1
         var bufferDepth = depth
+        // Without this, mpv sleeps inside mpv_render_context_render until the
+        // frame's target display time (a full frame duration, ~40ms at 25fps).
+        // That sleep happens inside CAOpenGLLayer.display() and blocks the
+        // main thread's CoreAnimation commits for its whole duration, hitching
+        // UI scrolling during playback. Vsync on the CGL context paces
+        // presentation instead.
+        var blockForTargetTime: Int32 = 0
 
         withUnsafeMutablePointer(to: &fboData) { fboPtr in
             withUnsafeMutablePointer(to: &flipY) { flipPtr in
                 withUnsafeMutablePointer(to: &bufferDepth) { depthPtr in
-                    var params: [mpv_render_param] = [
-                        mpv_render_param(type: MPV_RENDER_PARAM_OPENGL_FBO, data: fboPtr),
-                        mpv_render_param(type: MPV_RENDER_PARAM_FLIP_Y, data: flipPtr),
-                        mpv_render_param(type: MPV_RENDER_PARAM_DEPTH, data: depthPtr),
-                        mpv_render_param(type: MPV_RENDER_PARAM_INVALID, data: nil)
-                    ]
-                    _ = params.withUnsafeMutableBufferPointer { paramsPtr in
-                        mpv_render_context_render(renderContext, paramsPtr.baseAddress)
+                    withUnsafeMutablePointer(to: &blockForTargetTime) { blockPtr in
+                        var params: [mpv_render_param] = [
+                            mpv_render_param(type: MPV_RENDER_PARAM_OPENGL_FBO, data: fboPtr),
+                            mpv_render_param(type: MPV_RENDER_PARAM_FLIP_Y, data: flipPtr),
+                            mpv_render_param(type: MPV_RENDER_PARAM_DEPTH, data: depthPtr),
+                            mpv_render_param(type: MPV_RENDER_PARAM_BLOCK_FOR_TARGET_TIME, data: blockPtr),
+                            mpv_render_param(type: MPV_RENDER_PARAM_INVALID, data: nil)
+                        ]
+                        _ = params.withUnsafeMutableBufferPointer { paramsPtr in
+                            mpv_render_context_render(renderContext, paramsPtr.baseAddress)
+                        }
                     }
                 }
             }
