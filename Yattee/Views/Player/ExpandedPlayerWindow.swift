@@ -17,10 +17,21 @@ import UIKit
 final class StatusBarVisibilityController {
     var isHidden: Bool = false
     weak var viewController: UIViewController?
+    /// Last non-zero status bar height seen — layouts that keep a fixed
+    /// status-bar-sized inset while the bar is hidden (corner layout) read
+    /// it because the safe area reports 0 once the bar is gone.
+    var knownStatusBarHeight: CGFloat = 0
 
     func setHidden(_ hidden: Bool) {
+        rememberStatusBarHeight(
+            viewController?.view.window?.windowScene?.statusBarManager?.statusBarFrame.height ?? 0
+        )
         isHidden = hidden
         viewController?.setNeedsStatusBarAppearanceUpdate()
+    }
+
+    func rememberStatusBarHeight(_ height: CGFloat) {
+        if height > 0 { knownStatusBarHeight = height }
     }
 }
 
@@ -789,8 +800,10 @@ final class ExpandedPlayerWindowManager {
         window.windowLevel = .normal + 1  // Above main content, below fullscreen player
         window.backgroundColor = .clear  // Clear for dismiss gesture; SwiftUI provides background
 
-        // Create status bar controller
+        // Create status bar controller; seed the bar height while the main
+        // UI still shows it (the player may hide it before any layout reads it)
         let statusBarController = StatusBarVisibilityController()
+        statusBarController.rememberStatusBarHeight(windowScene.statusBarManager?.statusBarFrame.height ?? 0)
 
         // Create the expanded player view with status bar controller in environment
         // Seed the portrait panel state before the first frame so the preset's

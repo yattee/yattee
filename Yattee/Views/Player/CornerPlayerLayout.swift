@@ -81,6 +81,11 @@ struct CornerPlayerLayout<PlayerContent: View>: View {
     @State private var belowPanelDragOffset: CGFloat = 0
     @State private var isBelowPanelExpanded = false
     @State private var belowPanelExpandOffset: CGFloat = 0
+    /// The below panel is layered under the video (the video grows over it
+    /// to hide) except while it expands over the video. Flipped only when
+    /// the panel sits at its home geometry — never mid-spring — so the
+    /// z-order swap is never visible.
+    @State private var isBelowPanelRaised = false
     /// Swipe-up-on-video reveal in progress: the panel renders in the shown
     /// layout, positioned by `belowPanelDragOffset` counting down from full
     /// hide travel so it follows the finger.
@@ -102,6 +107,15 @@ struct CornerPlayerLayout<PlayerContent: View>: View {
     /// then interrupts, leaving the video clipped to a shrunken box that
     /// springs back (the "fast swipe" reveal glitch).
     @State private var panelToggleGeneration = 0
+    /// Status bar height captured while the bar is visible. The layout
+    /// ignores the top safe area and pads by this fixed amount instead, so
+    /// hiding the bar in the fullscreen state (safe area → 0) doesn't
+    /// reflow the panels mid-transition; only the video grows into the
+    /// strip.
+    @State private var stableTopInset: CGFloat = 0
+    #if os(iOS)
+    @Environment(\.statusBarVisibilityController) private var statusBarController
+    #endif
 
     /// Trailing screen-edge strip that starts the reveal swipe while the
     /// column is collapsed; drags from anywhere else keep seeking.
@@ -182,15 +196,33 @@ struct CornerPlayerLayout<PlayerContent: View>: View {
     // MARK: - Body
 
     var body: some View {
+        GeometryReader { outer in
+            let liveTopInset = outer.safeAreaInsets.top
+            #if os(iOS)
+            let knownTopInset = statusBarController?.knownStatusBarHeight ?? 0
+            #else
+            let knownTopInset: CGFloat = 0
+            #endif
+            let topInset = liveTopInset > 0 ? liveTopInset : max(stableTopInset, knownTopInset)
+
+            layout(topInset: topInset)
+                .padding(.top, topInset)
+                .ignoresSafeArea(edges: .top)
+                .onChange(of: liveTopInset, initial: true) { _, inset in
+                    if inset > 0 { stableTopInset = inset }
+                }
+        }
+        .background(Color.black.ignoresSafeArea(.all))
+    }
+
+    @ViewBuilder
+    private func layout(topInset: CGFloat) -> some View {
         GeometryReader { geometry in
             let width = max(1, geometry.size.width)
             let height = max(1, geometry.size.height)
 
             let showsSideColumn = isPanelVisible && isSideColumnVisible && hasSideColumn
             let isSideColumnCollapsed = isPanelVisible && !isSideColumnVisible && hasSideColumn
-            // Reveal drag renders the shown layout so the column can follow
-            // the finger while `isSideColumnVisible` is still false.
-            let showsSideColumnLayout = showsSideColumn || (isSideColumnCollapsed && isSideColumnRevealDragActive)
             let showsBelowVideo = isPanelVisible && isBelowPanelVisible && hasBelowVideoInfo
             // What the player actually sees: every region can be dragged
             // away on its own while the panel stays nominally visible.
@@ -202,52 +234,68 @@ struct CornerPlayerLayout<PlayerContent: View>: View {
             let grabberWidth = Self.grabberWidth
             let totalColumnWidth = effectiveColumnWidth + grabberWidth
 
-            // Grabber overdrag past the minimum width slides the column off
-            // the trailing edge; the video grows with the slide so the offset
-            // layout at full travel matches the collapsed layout exactly (the
-            // state flips after the animation without a visible jump).
-            let sideColumnHideTravel = totalColumnWidth + geometry.safeAreaInsets.trailing
-            let sideColumnSlide = showsSideColumnLayout ? min(sideColumnHideTravel, max(0, sideColumnDragOffset)) : 0
-            let videoWidth = showsSideColumnLayout
-                ? max(1, width - totalColumnWidth + min(totalColumnWidth, sideColumnSlide))
-                : width
+            // Panels never move. Both sit at their home positions (column on
+            // the trailing edge, info panel under the shown video) and the
+            // video — layered above them — grows over them to hide and
+            // shrinks back to reveal. Every hide/reveal (button, grabber
+            // overdrag, panel handle, swipe-up/edge-swipe reveal) drives the
+            // video's trailing/bottom edge, never a panel offset.
+            let shownVideoWidth = hasSideColumn ? max(1, width - totalColumnWidth) : width
+
+            // Column hide travel: how far the video's trailing edge grows to
+            // cover the column. `sideColumnDragOffset` counts 0 → travel
+            // while hiding and travel → 0 while revealing. At full travel
+            // the dragged geometry matches the hidden geometry exactly, so
+            // the state flips after the animations cause no visible jump.
+            let sideColumnHideTravel = totalColumnWidth
+            // Column geometry ignores the panel toggle on purpose: the
+            // below panel's home (width + top) follows the column state —
+            // it widens over the column's lower part in lockstep with the
+            // video when the column is dragged away — but must stay put
+            // while the toggle grows the video over everything.
+            let hasSideColumnLayout = hasSideColumn && (isSideColumnVisible || isSideColumnRevealDragActive)
+            let sideColumnSlide = hasSideColumnLayout ? min(sideColumnHideTravel, max(0, sideColumnDragOffset)) : 0
+            let columnVideoWidth = hasSideColumnLayout ? min(width, shownVideoWidth + sideColumnSlide) : width
+            let videoWidth = isPanelVisible ? columnVideoWidth : width
             let shownVideoHeight: CGFloat = {
                 let rawAspectRatio = playerState?.displayAspectRatio ?? (16.0 / 9.0)
                 let aspectRatio = rawAspectRatio > 0 ? rawAspectRatio : (16.0 / 9.0)
-                return max(1, min(videoWidth / aspectRatio, height * Self.maxVideoHeightFraction))
+                return max(1, min(columnVideoWidth / aspectRatio, height * Self.maxVideoHeightFraction))
             }()
-            // Reveal drag renders the shown layout so the panel can follow
-            // the finger while `isBelowPanelVisible` is still false.
+            // Reveal drag renders the shown geometry so the video's bottom
+            // edge can follow the finger while `isBelowPanelVisible` is
+            // still false.
             let showsPanelLayout = showsBelowVideo || (isPanelVisible && isRevealDragActive)
 
-            // Panel travel needed to fully clear the screen (incl. bottom
-            // safe area + the player window's extra PiP inset), and the video
-            // recenter offset that follows the drag — like the portrait
-            // layout's videoYOffset. At full travel the offset video matches
-            // the centered full-height layout exactly, so the state flips
-            // after the hide/reveal animations cause no visible jump.
+            // Below-panel hide travel: the video's bottom edge grows from the
+            // shown height to the physical bottom edge (incl. bottom safe
+            // area + the player window's extra PiP inset). Same offset
+            // convention as the column.
             let bottomInset = geometry.safeAreaInsets.bottom
             let fullColumnHeight = height + bottomInset
-            // With the below panel hidden the video (and its bottom controls)
-            // extends to the physical bottom edge, not the safe-area line.
-            let videoHeight = showsPanelLayout ? shownVideoHeight : fullColumnHeight
             let normalPanelHeight = max(1, fullColumnHeight - shownVideoHeight)
             let panelHideTravel = normalPanelHeight
+            let belowPanelSlide = showsPanelLayout ? min(panelHideTravel, max(0, belowPanelDragOffset)) : 0
+            // With the below panel hidden the video (and its bottom controls)
+            // extends to the physical bottom edge, not the safe-area line.
+            let videoHeight = showsPanelLayout ? min(fullColumnHeight, shownVideoHeight + belowPanelSlide) : fullColumnHeight
+            // Fullscreen state: the status bar is hidden, so the video also
+            // grows up into the fixed status bar strip above the layout.
+            let videoTopExtension: CGFloat = isPanelVisible ? 0 : topInset
 
-            // One shared duration for the whole panel toggle — both panels
-            // and both video dimensions animate in lockstep so the video
-            // corner grows diagonally and everything finishes together.
+            // One shared duration for the whole panel toggle — both video
+            // dimensions animate in lockstep so the video corner grows
+            // diagonally over the panels and everything finishes together.
             // Scaled to the larger travel so the speed stays reasonable.
             let panelExitSpeed: CGFloat = 1400
             let panelToggleDuration = Double(min(max(max(totalColumnWidth, normalPanelHeight) / panelExitSpeed, 0.25), 0.45))
-            let videoDragProgress = showsPanelLayout
-                ? min(1.0, max(0, belowPanelDragOffset) / panelHideTravel)
-                : 0
-            let videoDragYOffset = (fullColumnHeight - shownVideoHeight) / 2 * videoDragProgress
 
             // Portrait-style expand: dragging up grows the panel over the
             // video (expandOffset is negative while dragging up; when
-            // expanded, positive while dragging down to collapse).
+            // expanded, positive while dragging down to collapse). The
+            // panel's home top is the shown video height — the video's live
+            // height only matters for hide/reveal, which never overlap an
+            // expand.
             let panelHeight: CGFloat = {
                 if isBelowPanelExpanded {
                     return max(normalPanelHeight, fullColumnHeight - belowPanelExpandOffset)
@@ -256,270 +304,277 @@ struct CornerPlayerLayout<PlayerContent: View>: View {
             }()
             let panelSpacerHeight: CGFloat = {
                 if isBelowPanelExpanded {
-                    return min(videoHeight, belowPanelExpandOffset)
+                    return min(shownVideoHeight, belowPanelExpandOffset)
                 }
-                return max(0, videoHeight + belowPanelExpandOffset)
+                return max(0, shownVideoHeight + belowPanelExpandOffset)
             }()
 
-            ZStack {
-                Color.black.ignoresSafeArea(.all)
-
-                HStack(spacing: 0) {
-                    ZStack(alignment: .top) {
-                        // Sized from the live (animated) geometry, not the
-                        // target values — during panel toggles the video then
-                        // resizes smoothly through every animation frame
-                        // instead of snapping to the final size.
-                        GeometryReader { videoProxy in
-                            playerContent(
-                                togglePanel,
-                                showsAnyRegion,
-                                max(1, videoProxy.size.width),
-                                max(1, videoProxy.size.height)
-                            )
-                        }
-                        // Height animates with the below-panel timing, width
-                        // with the side-column timing — the inner .animation
-                        // scopes only the height frame. Keyed to gesture/
-                        // visibility state, NOT to derived geometry — appear
-                        // settling must not animate.
-                        .frame(height: videoHeight)
-                        .animation(isPanelDragActive ? nil : .easeInOut(duration: panelToggleDuration), value: panelToggleGeneration)
-                        .frame(width: videoWidth)
-                        .animation(isPanelDragActive ? nil : .easeInOut(duration: panelToggleDuration), value: panelToggleGeneration)
-                        .animation(isPanelDragActive ? nil : .spring(response: 0.3, dampingFraction: 1.0), value: sideColumnDragOffset)
-                        .clipped()
-                        .offset(y: videoDragYOffset)
-                        .animation(isPanelDragActive ? nil : .spring(response: 0.3, dampingFraction: 1.0), value: videoDragYOffset)
-                        // Aspect ratio changes (new video, stream switch)
-                        // resize the video/panel split — animate them
-                        .animation(isPanelDragActive ? nil : .spring(response: 0.3, dampingFraction: 1.0), value: playerState?.displayAspectRatio)
-                        // Swipe up on the video to bring the panel back —
-                        // the panel follows the finger (like the portrait
-                        // reveal) via belowPanelDragOffset counting down
-                        // from full hide travel.
-                        .simultaneousGesture(
-                            (isPanelVisible && !isBelowPanelVisible && hasBelowVideoInfo)
-                                ? DragGesture()
-                                    .onChanged { value in
-                                        guard appEnvironment?.navigationCoordinator.isAdjustingPlayerSliders != true else { return }
-                                        guard value.translation.height < 0 || isRevealDragActive else { return }
-                                        if appEnvironment?.navigationCoordinator.isPanelDragging != true {
-                                            appEnvironment?.navigationCoordinator.isPanelDragging = true
-                                        }
+            ZStack(alignment: .topLeading) {
+                // Side column — pinned to the trailing edge, never moves.
+                // Stays in the hierarchy while hidden (covered by the video)
+                // so its scroll position and loaded content survive toggles.
+                if hasSideColumn, let video {
+                    HStack(spacing: 0) {
+                        PanelResizeGrabber(
+                            panelWidth: $columnWidth,
+                            minWidth: Self.minColumnWidth,
+                            maxWidth: clampColumnWidth(.infinity, availableWidth: width),
+                            panelSide: .right,
+                            isPinned: true,
+                            isDragActive: $isGrabberActive,
+                            hitWidth: grabberWidth,
+                            // A covered grabber must not block the window
+                            // dismiss pan from starting over its strip
+                            publishesFrame: showsSideColumn,
+                            onOverdragChanged: { overshoot in
+                                guard overshoot > 0 || isSideColumnOverdragActive else { return }
+                                if appEnvironment?.navigationCoordinator.isPanelDragging != true {
+                                    appEnvironment?.navigationCoordinator.isPanelDragging = true
+                                }
+                                var transaction = Transaction()
+                                transaction.disablesAnimations = true
+                                withTransaction(transaction) {
+                                    isSideColumnOverdragActive = true
+                                    sideColumnDragOffset = min(sideColumnHideTravel, overshoot)
+                                }
+                            },
+                            onOverdragEnded: { overshoot, predicted in
+                                guard isSideColumnOverdragActive else { return }
+                                isSideColumnOverdragActive = false
+                                appEnvironment?.navigationCoordinator.isPanelDragging = false
+                                if overshoot > 80 || predicted > 160 {
+                                    // Grow the video fully over the column,
+                                    // then flip the collapsed state without
+                                    // animation — like the below panel's
+                                    // hide. `.removed`, not
+                                    // `.logicallyComplete`: flipping while
+                                    // the spring is still registered on the
+                                    // video frame leaves a stale animation
+                                    // that a quick follow-up reveal swipe
+                                    // interrupts, and the release spring
+                                    // then starts from a bogus shrunken
+                                    // rect (video clipped, growing back).
+                                    withAnimation(.spring(response: 0.3, dampingFraction: 1.0), completionCriteria: .removed) {
+                                        sideColumnDragOffset = sideColumnHideTravel
+                                    } completion: {
+                                        // The grabber may have been picked up again
+                                        guard isSideColumnVisible, !isSideColumnOverdragActive,
+                                              sideColumnDragOffset == sideColumnHideTravel else { return }
                                         var transaction = Transaction()
                                         transaction.disablesAnimations = true
                                         withTransaction(transaction) {
-                                            isRevealDragActive = true
-                                            belowPanelDragOffset = min(panelHideTravel, max(0, panelHideTravel + value.translation.height))
+                                            isSideColumnVisible = false
+                                            sideColumnDragOffset = 0
                                         }
                                     }
-                                    .onEnded { value in
-                                        guard isRevealDragActive else { return }
-                                        appEnvironment?.navigationCoordinator.isPanelDragging = false
-                                        if value.translation.height < -80 || value.predictedEndTranslation.height < -160 {
-                                            // Revealing: flip to visible at the
-                                            // current position, then animate home
-                                            var transaction = Transaction()
-                                            transaction.disablesAnimations = true
-                                            withTransaction(transaction) {
-                                                isBelowPanelVisible = true
-                                                isRevealDragActive = false
-                                            }
-                                            withAnimation(.spring(response: 0.3, dampingFraction: 1.0)) {
-                                                belowPanelDragOffset = 0
-                                            }
-                                        } else {
-                                            // Snap back off-screen, then drop the
-                                            // reveal layout without animation
-                                            withAnimation(.spring(response: 0.3, dampingFraction: 1.0), completionCriteria: .removed) {
-                                                belowPanelDragOffset = panelHideTravel
-                                            } completion: {
-                                                // A new reveal drag may have taken over
-                                                guard isRevealDragActive, belowPanelDragOffset == panelHideTravel,
-                                                      appEnvironment?.navigationCoordinator.isPanelDragging != true else { return }
-                                                var transaction = Transaction()
-                                                transaction.disablesAnimations = true
-                                                withTransaction(transaction) {
-                                                    isRevealDragActive = false
-                                                    belowPanelDragOffset = 0
-                                                }
-                                            }
-                                        }
+                                } else {
+                                    withAnimation(.spring(response: 0.3, dampingFraction: 0.8)) {
+                                        sideColumnDragOffset = 0
                                     }
-                                : nil
-                        )
-                        // Swipe in from the trailing screen edge to bring a
-                        // collapsed side column back — the column follows
-                        // the finger via sideColumnDragOffset counting down
-                        // from full travel. Only the edge strip: the seek
-                        // pan is told to skip it, everywhere else seeks.
-                        .simultaneousGesture(
-                            isSideColumnCollapsed
-                                ? DragGesture(coordinateSpace: .local)
-                                    .onChanged { value in
-                                        guard appEnvironment?.navigationCoordinator.isAdjustingPlayerSliders != true else { return }
-                                        guard isSideColumnRevealDragActive
-                                            || (value.startLocation.x >= videoWidth - Self.sideColumnEdgeRevealInset
-                                                && value.translation.width < 0) else { return }
-                                        if appEnvironment?.navigationCoordinator.isPanelDragging != true {
-                                            appEnvironment?.navigationCoordinator.isPanelDragging = true
-                                        }
-                                        var transaction = Transaction()
-                                        transaction.disablesAnimations = true
-                                        withTransaction(transaction) {
-                                            isSideColumnRevealDragActive = true
-                                            sideColumnDragOffset = min(sideColumnHideTravel, max(0, sideColumnHideTravel + value.translation.width))
-                                        }
-                                    }
-                                    .onEnded { value in
-                                        guard isSideColumnRevealDragActive else { return }
-                                        appEnvironment?.navigationCoordinator.isPanelDragging = false
-                                        if value.translation.width < -80 || value.predictedEndTranslation.width < -160 {
-                                            // Revealing: flip to visible at the
-                                            // current position, then animate home
-                                            var transaction = Transaction()
-                                            transaction.disablesAnimations = true
-                                            withTransaction(transaction) {
-                                                isSideColumnVisible = true
-                                                isSideColumnRevealDragActive = false
-                                            }
-                                            withAnimation(.spring(response: 0.3, dampingFraction: 1.0)) {
-                                                sideColumnDragOffset = 0
-                                            }
-                                        } else {
-                                            // Snap back off-screen, then drop the
-                                            // reveal layout without animation
-                                            withAnimation(.spring(response: 0.3, dampingFraction: 1.0), completionCriteria: .removed) {
-                                                sideColumnDragOffset = sideColumnHideTravel
-                                            } completion: {
-                                                // A new reveal drag may have taken over
-                                                guard isSideColumnRevealDragActive, sideColumnDragOffset == sideColumnHideTravel,
-                                                      appEnvironment?.navigationCoordinator.isPanelDragging != true else { return }
-                                                var transaction = Transaction()
-                                                transaction.disablesAnimations = true
-                                                withTransaction(transaction) {
-                                                    isSideColumnRevealDragActive = false
-                                                    sideColumnDragOffset = 0
-                                                }
-                                            }
-                                        }
-                                    }
-                                : nil
-                        )
-                        .frame(maxHeight: .infinity, alignment: .top)
-
-                        if showsPanelLayout, let video {
-                            VStack(spacing: 0) {
-                                Spacer(minLength: 0)
-                                    .frame(height: panelSpacerHeight)
-
-                                belowVideoInfoPanel(video: video, hideTravel: panelHideTravel)
-                                    .frame(width: videoWidth)
-                                    .frame(height: panelHeight)
-                                    .offset(y: belowPanelDragOffset)
+                                }
                             }
-                            .frame(maxHeight: .infinity, alignment: .top)
-                            .animation(isPanelDragActive ? nil : .spring(response: 0.3, dampingFraction: 1.0), value: belowPanelDragOffset)
-                            .animation(isPanelDragActive ? nil : .spring(response: 0.3, dampingFraction: 0.8), value: isBelowPanelExpanded)
-                            .animation(isPanelDragActive ? nil : .spring(response: 0.3, dampingFraction: 0.8), value: belowPanelExpandOffset)
-                            .animation(isPanelDragActive ? nil : .spring(response: 0.3, dampingFraction: 1.0), value: playerState?.displayAspectRatio)
-                            .animation(isPanelDragActive ? nil : .easeInOut(duration: panelToggleDuration), value: panelToggleGeneration)
-                            .animation(isPanelDragActive ? nil : .spring(response: 0.3, dampingFraction: 1.0), value: sideColumnDragOffset)
-                            // Pure slide, no fade — with a fade the panel
-                            // seems to vanish before the side column and the
-                            // video resize, breaking the one-transition feel
-                            .transition(.move(edge: .bottom).animation(.easeInOut(duration: panelToggleDuration)))
-                        }
+                        )
+
+                        sideColumnPanel(video: video)
+                            .frame(width: effectiveColumnWidth)
                     }
-                    .frame(width: videoWidth)
-                    .frame(maxHeight: .infinity, alignment: .top)
+                    // Bottom only — the background must not run under
+                    // the system status bar at the top
+                    .background(panelBackgroundColor.ignoresSafeArea(edges: .bottom))
+                    .frame(width: totalColumnWidth)
+                    .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topTrailing)
+                    .allowsHitTesting(showsSideColumn)
+                    .accessibilityHidden(!showsSideColumn)
+                }
+
+                // Below-video panel — home is directly under the shown video.
+                // Its width follows the column geometry only (it covers the
+                // column's lower part when the column is dragged away, in
+                // lockstep with the video covering the upper part) and stays
+                // put during the panel toggle. Its own handle drag slides it
+                // off the bottom with the video growing in lockstep (the
+                // edges coincide) — a drag on the panel should move the
+                // panel. Raised above the video only while expanded over it;
+                // otherwise the video covers it.
+                if hasBelowVideoInfo, let video {
+                    VStack(spacing: 0) {
+                        Spacer(minLength: 0)
+                            .frame(height: panelSpacerHeight)
+
+                        belowVideoInfoPanel(video: video, hideTravel: panelHideTravel, publishesFrame: showsBelowVideo)
+                            .frame(width: columnVideoWidth)
+                            .frame(height: panelHeight)
+                            .offset(y: belowPanelSlide)
+                    }
+                    .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
                     // Extend into the bottom safe area (incl. the player
                     // window's extra PiP inset) so the panel and its pills
                     // reach the true bottom edge
                     .ignoresSafeArea(edges: .bottom)
+                    .animation(isPanelDragActive ? nil : .spring(response: 0.3, dampingFraction: 1.0), value: belowPanelDragOffset)
+                    .animation(isPanelDragActive ? nil : .spring(response: 0.3, dampingFraction: 0.8), value: isBelowPanelExpanded)
+                    .animation(isPanelDragActive ? nil : .spring(response: 0.3, dampingFraction: 0.8), value: belowPanelExpandOffset)
+                    .animation(isPanelDragActive ? nil : .spring(response: 0.3, dampingFraction: 1.0), value: playerState?.displayAspectRatio)
+                    .animation(isPanelDragActive ? nil : .easeInOut(duration: panelToggleDuration), value: panelToggleGeneration)
+                    .animation(isPanelDragActive ? nil : .spring(response: 0.3, dampingFraction: 1.0), value: sideColumnDragOffset)
+                    .zIndex(isBelowPanelRaised ? 2 : 0)
+                    .allowsHitTesting(showsBelowVideo)
+                    .accessibilityHidden(!showsBelowVideo)
+                }
 
-                    if showsSideColumnLayout, let video {
-                        HStack(spacing: 0) {
-                            PanelResizeGrabber(
-                                panelWidth: $columnWidth,
-                                minWidth: Self.minColumnWidth,
-                                maxWidth: clampColumnWidth(.infinity, availableWidth: width),
-                                panelSide: .right,
-                                isPinned: true,
-                                isDragActive: $isGrabberActive,
-                                hitWidth: grabberWidth,
-                                onOverdragChanged: { overshoot in
-                                    guard overshoot > 0 || isSideColumnOverdragActive else { return }
-                                    if appEnvironment?.navigationCoordinator.isPanelDragging != true {
-                                        appEnvironment?.navigationCoordinator.isPanelDragging = true
-                                    }
+                // Video — layered above the panels; its frame is the only
+                // thing that moves during hide/reveal.
+                // Sized from the live (animated) geometry, not the target
+                // values — during panel toggles the video then resizes
+                // smoothly through every animation frame instead of snapping
+                // to the final size.
+                GeometryReader { videoProxy in
+                    playerContent(
+                        togglePanel,
+                        showsAnyRegion,
+                        max(1, videoProxy.size.width),
+                        max(1, videoProxy.size.height)
+                    )
+                }
+                .frame(width: videoWidth, height: videoHeight + videoTopExtension)
+                .offset(y: -videoTopExtension)
+                // Keyed to gesture/visibility state, NOT to derived geometry —
+                // appear settling must not animate. The drag-offset springs
+                // are what animate releases (the host sheet strips
+                // withAnimation transactions); every state flip happens at
+                // an offset where the derived frame is continuous.
+                .animation(isPanelDragActive ? nil : .easeInOut(duration: panelToggleDuration), value: panelToggleGeneration)
+                .animation(isPanelDragActive ? nil : .spring(response: 0.3, dampingFraction: 1.0), value: sideColumnDragOffset)
+                .animation(isPanelDragActive ? nil : .spring(response: 0.3, dampingFraction: 1.0), value: belowPanelDragOffset)
+                // Aspect ratio changes (new video, stream switch) resize
+                // the video/panel split — animate them
+                .animation(isPanelDragActive ? nil : .spring(response: 0.3, dampingFraction: 1.0), value: playerState?.displayAspectRatio)
+                .clipped()
+                // Swipe up on the video to bring the panel back — the
+                // video's bottom edge follows the finger (like the portrait
+                // reveal) via belowPanelDragOffset counting down from full
+                // hide travel.
+                .simultaneousGesture(
+                    (isPanelVisible && !isBelowPanelVisible && hasBelowVideoInfo)
+                        ? DragGesture()
+                            .onChanged { value in
+                                guard appEnvironment?.navigationCoordinator.isAdjustingPlayerSliders != true else { return }
+                                guard value.translation.height < 0 || isRevealDragActive else { return }
+                                if appEnvironment?.navigationCoordinator.isPanelDragging != true {
+                                    appEnvironment?.navigationCoordinator.isPanelDragging = true
+                                }
+                                var transaction = Transaction()
+                                transaction.disablesAnimations = true
+                                withTransaction(transaction) {
+                                    isRevealDragActive = true
+                                    belowPanelDragOffset = min(panelHideTravel, max(0, panelHideTravel + value.translation.height))
+                                }
+                            }
+                            .onEnded { value in
+                                guard isRevealDragActive else { return }
+                                appEnvironment?.navigationCoordinator.isPanelDragging = false
+                                if value.translation.height < -80 || value.predictedEndTranslation.height < -160 {
+                                    // Revealing: flip to visible at the
+                                    // current position, then animate home
                                     var transaction = Transaction()
                                     transaction.disablesAnimations = true
                                     withTransaction(transaction) {
-                                        isSideColumnOverdragActive = true
-                                        sideColumnDragOffset = min(sideColumnHideTravel, overshoot)
+                                        isBelowPanelVisible = true
+                                        isRevealDragActive = false
                                     }
-                                },
-                                onOverdragEnded: { overshoot, predicted in
-                                    guard isSideColumnOverdragActive else { return }
-                                    isSideColumnOverdragActive = false
-                                    appEnvironment?.navigationCoordinator.isPanelDragging = false
-                                    if overshoot > 80 || predicted > 160 {
-                                        // Slide fully off (video grows with
-                                        // it), then flip the collapsed state
-                                        // without animation — like the
-                                        // below panel's hide. `.removed`, not
-                                        // `.logicallyComplete`: flipping while
-                                        // the spring is still registered on the
-                                        // video frame leaves a stale animation
-                                        // that a quick follow-up reveal swipe
-                                        // interrupts, and the release spring
-                                        // then starts from a bogus shrunken
-                                        // rect (video clipped, growing back).
-                                        withAnimation(.spring(response: 0.3, dampingFraction: 1.0), completionCriteria: .removed) {
-                                            sideColumnDragOffset = sideColumnHideTravel
-                                        } completion: {
-                                            // The grabber may have been picked up again
-                                            guard isSideColumnVisible, !isSideColumnOverdragActive,
-                                                  sideColumnDragOffset == sideColumnHideTravel else { return }
-                                            var transaction = Transaction()
-                                            transaction.disablesAnimations = true
-                                            withTransaction(transaction) {
-                                                isSideColumnVisible = false
-                                                sideColumnDragOffset = 0
-                                            }
+                                    withAnimation(.spring(response: 0.3, dampingFraction: 1.0)) {
+                                        belowPanelDragOffset = 0
+                                    }
+                                } else {
+                                    // Grow back over the panel, then drop the
+                                    // reveal geometry without animation
+                                    withAnimation(.spring(response: 0.3, dampingFraction: 1.0), completionCriteria: .removed) {
+                                        belowPanelDragOffset = panelHideTravel
+                                    } completion: {
+                                        // A new reveal drag may have taken over
+                                        guard isRevealDragActive, belowPanelDragOffset == panelHideTravel,
+                                              appEnvironment?.navigationCoordinator.isPanelDragging != true else { return }
+                                        var transaction = Transaction()
+                                        transaction.disablesAnimations = true
+                                        withTransaction(transaction) {
+                                            isRevealDragActive = false
+                                            belowPanelDragOffset = 0
                                         }
-                                    } else {
-                                        withAnimation(.spring(response: 0.3, dampingFraction: 0.8)) {
+                                    }
+                                }
+                            }
+                        : nil
+                )
+                // Swipe in from the trailing screen edge to bring a
+                // collapsed side column back — the video's trailing edge
+                // follows the finger via sideColumnDragOffset counting down
+                // from full travel. Only the edge strip: the seek pan is
+                // told to skip it, everywhere else seeks.
+                .simultaneousGesture(
+                    isSideColumnCollapsed
+                        ? DragGesture(coordinateSpace: .local)
+                            .onChanged { value in
+                                guard appEnvironment?.navigationCoordinator.isAdjustingPlayerSliders != true else { return }
+                                guard isSideColumnRevealDragActive
+                                    || (value.startLocation.x >= videoWidth - Self.sideColumnEdgeRevealInset
+                                        && value.translation.width < 0) else { return }
+                                if appEnvironment?.navigationCoordinator.isPanelDragging != true {
+                                    appEnvironment?.navigationCoordinator.isPanelDragging = true
+                                }
+                                var transaction = Transaction()
+                                transaction.disablesAnimations = true
+                                withTransaction(transaction) {
+                                    isSideColumnRevealDragActive = true
+                                    sideColumnDragOffset = min(sideColumnHideTravel, max(0, sideColumnHideTravel + value.translation.width))
+                                }
+                            }
+                            .onEnded { value in
+                                guard isSideColumnRevealDragActive else { return }
+                                appEnvironment?.navigationCoordinator.isPanelDragging = false
+                                if value.translation.width < -80 || value.predictedEndTranslation.width < -160 {
+                                    // Revealing: flip to visible at the
+                                    // current position, then animate home
+                                    var transaction = Transaction()
+                                    transaction.disablesAnimations = true
+                                    withTransaction(transaction) {
+                                        isSideColumnVisible = true
+                                        isSideColumnRevealDragActive = false
+                                    }
+                                    withAnimation(.spring(response: 0.3, dampingFraction: 1.0)) {
+                                        sideColumnDragOffset = 0
+                                    }
+                                } else {
+                                    // Grow back over the column, then drop
+                                    // the reveal geometry without animation
+                                    withAnimation(.spring(response: 0.3, dampingFraction: 1.0), completionCriteria: .removed) {
+                                        sideColumnDragOffset = sideColumnHideTravel
+                                    } completion: {
+                                        // A new reveal drag may have taken over
+                                        guard isSideColumnRevealDragActive, sideColumnDragOffset == sideColumnHideTravel,
+                                              appEnvironment?.navigationCoordinator.isPanelDragging != true else { return }
+                                        var transaction = Transaction()
+                                        transaction.disablesAnimations = true
+                                        withTransaction(transaction) {
+                                            isSideColumnRevealDragActive = false
                                             sideColumnDragOffset = 0
                                         }
                                     }
                                 }
-                            )
-
-                            sideColumnPanel(video: video)
-                                .frame(width: effectiveColumnWidth)
-                        }
-                        // Bottom only — the background must not run under
-                        // the system status bar at the top
-                        .background(panelBackgroundColor.ignoresSafeArea(edges: .bottom))
-                        // Overdrag slide: the column keeps its size while its
-                        // layout slot shrinks from the trailing side, so its
-                        // leading edge tracks the growing video; travel into
-                        // the trailing safe area continues as a plain offset.
-                        .offset(x: max(0, sideColumnSlide - totalColumnWidth))
-                        .frame(width: max(0, totalColumnWidth - sideColumnSlide), alignment: .leading)
-                        .animation(isPanelDragActive ? nil : .spring(response: 0.3, dampingFraction: 1.0), value: sideColumnDragOffset)
-                        .transition(.move(edge: .trailing).animation(.easeInOut(duration: panelToggleDuration)))
-                    }
-                }
-                // Container-level animation so panel insert/remove and the
-                // video-area resize play as one transition (the host sheet
-                // strips withAnimation transactions, so key it here)
-                .animation(isPanelDragActive ? nil : .easeInOut(duration: panelToggleDuration), value: panelToggleGeneration)
-                .animation(isPanelDragActive ? nil : .spring(response: 0.3, dampingFraction: 1.0), value: sideColumnDragOffset)
+                            }
+                        : nil
+                )
+                .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
+                // Extend into the bottom safe area (incl. the player
+                // window's extra PiP inset) so the full-height video reaches
+                // the true bottom edge
+                .ignoresSafeArea(edges: .bottom)
+                .zIndex(1)
             }
+            // Container-level animation so the video-area resize plays as
+            // one transition (the host sheet strips withAnimation
+            // transactions, so key it here)
+            .animation(isPanelDragActive ? nil : .easeInOut(duration: panelToggleDuration), value: panelToggleGeneration)
+            .animation(isPanelDragActive ? nil : .spring(response: 0.3, dampingFraction: 1.0), value: sideColumnDragOffset)
             .onChange(of: isSideColumnCollapsed, initial: true) { _, collapsed in
                 appEnvironment?.navigationCoordinator.cornerSideColumnEdgeRevealInset = collapsed ? Self.sideColumnEdgeRevealInset : 0
             }
@@ -554,7 +609,7 @@ struct CornerPlayerLayout<PlayerContent: View>: View {
             // must reach the local state too.
             guard let newValue, newValue != isPanelVisible else { return }
             withAnimation(.easeInOut(duration: 0.25)) {
-                if newValue { restoreDraggedAwayRegions() }
+                if newValue { restoreDraggedAwayRegions() } else { collapseBelowPanelUnderVideo() }
                 isPanelVisible = newValue
                 panelToggleGeneration += 1
             }
@@ -568,7 +623,7 @@ struct CornerPlayerLayout<PlayerContent: View>: View {
     /// pill hidden and no inline chapters/related — those live in the side
     /// column tabs.
     @ViewBuilder
-    private func belowVideoInfoPanel(video: Video, hideTravel: CGFloat) -> some View {
+    private func belowVideoInfoPanel(video: Video, hideTravel: CGFloat, publishesFrame: Bool) -> some View {
         Group {
             #if os(iOS)
             PortraitDetailsPanel(
@@ -590,11 +645,15 @@ struct CornerPlayerLayout<PlayerContent: View>: View {
                             // When expanded, only track drag down to collapse
                             belowPanelExpandOffset = max(0, offset)
                         } else if offset < 0 {
-                            // Dragging UP - expand panel over the video
+                            // Dragging UP - expand panel over the video.
+                            // Raised at home (no hide travel yet), so the
+                            // z-order swap happens with nothing overlapping.
+                            isBelowPanelRaised = true
                             belowPanelExpandOffset = offset
                             belowPanelDragOffset = 0
                         } else {
-                            // Dragging DOWN - dismiss tracking
+                            // Dragging DOWN - the video grows over the panel
+                            isBelowPanelRaised = false
                             belowPanelDragOffset = offset
                             belowPanelExpandOffset = 0
                         }
@@ -604,9 +663,14 @@ struct CornerPlayerLayout<PlayerContent: View>: View {
                     appEnvironment?.navigationCoordinator.isPanelDragging = false
                     if isBelowPanelExpanded {
                         if offset > 80 || predicted > 160 {
-                            withAnimation(.spring(response: 0.3, dampingFraction: 1.0)) {
+                            // Collapse back to home, then drop under the
+                            // video once the spring is fully gone (`.removed`
+                            // — see the hide path below)
+                            withAnimation(.spring(response: 0.3, dampingFraction: 1.0), completionCriteria: .removed) {
                                 isBelowPanelExpanded = false
                                 belowPanelExpandOffset = 0
+                            } completion: {
+                                lowerBelowPanelIfHome()
                             }
                         } else {
                             withAnimation(.spring(response: 0.3, dampingFraction: 0.8)) {
@@ -621,10 +685,10 @@ struct CornerPlayerLayout<PlayerContent: View>: View {
                             belowPanelDragOffset = 0
                         }
                     } else if offset > 80 || predicted > 160 {
-                        // Slide the panel fully off (video recenters via the
-                        // drag-progress offset), then flip the hidden state
-                        // without animation — the offset layout at full
-                        // travel matches the hidden layout exactly. Must wait
+                        // Grow the video fully over the panel, then flip the
+                        // hidden state without animation — the dragged
+                        // geometry at full travel matches the hidden geometry
+                        // exactly. Must wait
                         // for `.removed`: flipping at `.logicallyComplete`
                         // leaves the spring registered on the video frame, and
                         // a quick follow-up reveal swipe that interrupts it
@@ -645,17 +709,21 @@ struct CornerPlayerLayout<PlayerContent: View>: View {
                             }
                         }
                     } else {
-                        withAnimation(.spring(response: 0.3, dampingFraction: 0.8)) {
+                        withAnimation(.spring(response: 0.3, dampingFraction: 0.8), completionCriteria: .removed) {
                             belowPanelDragOffset = 0
                             belowPanelExpandOffset = 0
+                        } completion: {
+                            lowerBelowPanelIfHome()
                         }
                     }
                 },
                 onDragCancelled: {
                     appEnvironment?.navigationCoordinator.isPanelDragging = false
-                    withAnimation(.spring(response: 0.3, dampingFraction: 0.8)) {
+                    withAnimation(.spring(response: 0.3, dampingFraction: 0.8), completionCriteria: .removed) {
                         belowPanelDragOffset = 0
                         belowPanelExpandOffset = 0
+                    } completion: {
+                        lowerBelowPanelIfHome()
                     }
                 }
             )
@@ -678,11 +746,14 @@ struct CornerPlayerLayout<PlayerContent: View>: View {
             #endif
         }
         // Publish the panel frame so the window-level dismiss pan gesture
-        // doesn't begin from touches inside this panel (drag handle conflict)
+        // doesn't begin from touches inside this panel (drag handle conflict).
+        // Not while the video covers the panel — it stays in the hierarchy
+        // hidden, and must not block the pan from starting over the video.
         .background {
             GeometryReader { proxy in
+                let frame = publishesFrame ? proxy.frame(in: .global) : .zero
                 Color.clear
-                    .onChange(of: proxy.frame(in: .global), initial: true) { _, frame in
+                    .onChange(of: frame, initial: true) { _, frame in
                         appEnvironment?.navigationCoordinator.cornerBelowPanelFrame = frame
                     }
                     .onDisappear {
@@ -733,12 +804,30 @@ struct CornerPlayerLayout<PlayerContent: View>: View {
             && ((isSideColumnVisible && hasSideColumn) || (isBelowPanelVisible && hasBelowVideoInfo))
         let show = !showsAnyRegion
         withAnimation(.easeInOut(duration: 0.25)) {
-            if show { restoreDraggedAwayRegions() }
+            if show { restoreDraggedAwayRegions() } else { collapseBelowPanelUnderVideo() }
             isPanelVisible = show
             panelToggleGeneration += 1
             settingsManager?.landscapeDetailsPanelVisible = show
             settingsManager?.detailsPanelLastVisible = show
         }
+    }
+
+    /// Hiding everything grows the video over the below panel, so an
+    /// expanded panel (raised above the video) must drop back to its home
+    /// geometry under the video first.
+    private func collapseBelowPanelUnderVideo() {
+        isBelowPanelExpanded = false
+        belowPanelExpandOffset = 0
+        isBelowPanelRaised = false
+    }
+
+    /// Completion of an expand-collapse / snap-back spring: drop the panel
+    /// under the video once it sits at home again — unless a new drag has
+    /// picked it up meanwhile.
+    private func lowerBelowPanelIfHome() {
+        guard !isBelowPanelExpanded, belowPanelExpandOffset == 0,
+              appEnvironment?.navigationCoordinator.isPanelDragging != true else { return }
+        isBelowPanelRaised = false
     }
 
     /// Showing the panel brings back every region hidden by its own drag

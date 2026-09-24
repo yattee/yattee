@@ -23,6 +23,10 @@ struct PanelResizeGrabber: View {
     /// Width of the grabber hit area (hosts can narrow it, e.g. corner layout)
     var hitWidth: CGFloat = PanelResizeGrabber.grabberHitWidth
 
+    /// Whether the strip frame is published to the dismiss-pan exclusion
+    /// (hosts pass false while the grabber is in the hierarchy but covered).
+    var publishesFrame: Bool = true
+
     /// Overdrag past `minWidth`: reports how far (in points, ≥ 0) the finger
     /// went beyond the minimum while the width stays clamped — hosts can
     /// slide the panel off-screen with it. Reported every drag update, so a
@@ -71,9 +75,10 @@ struct PanelResizeGrabber: View {
             // otherwise cancel the resize and dismiss the player instead
             .background {
                 GeometryReader { proxy in
+                    let frame = publishesFrame ? proxy.frame(in: .global).insetBy(dx: -8, dy: 0) : .zero
                     Color.clear
-                        .onChange(of: proxy.frame(in: .global), initial: true) { _, frame in
-                            appEnvironment?.navigationCoordinator.panelResizeGrabberFrame = frame.insetBy(dx: -8, dy: 0)
+                        .onChange(of: frame, initial: true) { _, frame in
+                            appEnvironment?.navigationCoordinator.panelResizeGrabberFrame = frame
                         }
                         .onDisappear {
                             appEnvironment?.navigationCoordinator.panelResizeGrabberFrame = .zero
