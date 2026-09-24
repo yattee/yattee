@@ -31,6 +31,8 @@ struct InfoPanelPage: View {
     @State private var showFormattedDate = false
     @State private var showOriginalTitle = false
     @State private var isDescriptionExpanded = false
+    @State private var isChaptersCollapsed = false
+    @State private var isRelatedCollapsed = false
 
     private var appEnvironment: AppEnvironment? { context.appEnvironment }
     private var video: Video { context.video }
@@ -76,6 +78,8 @@ struct InfoPanelPage: View {
         .onChange(of: video.id) { _, _ in
             showOriginalTitle = false
             isDescriptionExpanded = false
+            isChaptersCollapsed = false
+            isRelatedCollapsed = false
         }
         .task(id: context.video.id) {
             if inlineSections {
@@ -180,6 +184,7 @@ struct InfoPanelPage: View {
                 .foregroundStyle(.secondary)
                 .tint(context.accentColor)
                 .lineLimit(isDescriptionExpanded ? nil : 3)
+                .frame(maxWidth: .infinity, alignment: .leading)
                 .handleTimestampLinks(using: playerService)
                 // Collapsed: let the container tap win over link taps
                 .allowsHitTesting(isDescriptionExpanded)
@@ -233,14 +238,31 @@ struct InfoPanelPage: View {
     private var storyboard: Storyboard? { playerState?.preferredStoryboard }
     private var relatedVideos: [Video] { video.relatedVideos ?? [] }
 
+    /// Section header that toggles the section's collapsed state on tap.
     @ViewBuilder
-    private func sectionHeader(_ title: String) -> some View {
-        Text(title)
-            .font(.headline)
+    private func sectionHeader(_ title: String, isCollapsed: Binding<Bool>) -> some View {
+        Button {
+            withAnimation(.easeInOut(duration: 0.2)) {
+                isCollapsed.wrappedValue.toggle()
+            }
+        } label: {
+            HStack(spacing: 6) {
+                Text(title)
+                    .font(.headline)
+
+                Image(systemName: "chevron.down")
+                    .font(.caption.weight(.semibold))
+                    .foregroundStyle(.secondary)
+                    .rotationEffect(.degrees(isCollapsed.wrappedValue ? -90 : 0))
+
+                Spacer(minLength: 0)
+            }
             .padding(.horizontal)
             .padding(.top, 4)
             .padding(.bottom, 8)
-            .frame(maxWidth: .infinity, alignment: .leading)
+            .contentShape(Rectangle())
+        }
+        .buttonStyle(.plain)
     }
 
     @ViewBuilder
@@ -250,24 +272,26 @@ struct InfoPanelPage: View {
                 .padding(.horizontal)
                 .padding(.bottom, 8)
 
-            sectionHeader(String(localized: "player.chapters"))
+            sectionHeader(String(localized: "player.chapters"), isCollapsed: $isChaptersCollapsed)
 
-            LazyVStack(spacing: 0) {
-                ForEach(chapters) { chapter in
-                    ChapterRow(
-                        chapter: chapter,
-                        isActive: isChapterActive(chapter),
-                        storyboard: storyboard,
-                        showThumbnail: true,
-                        onTap: {
-                            Task {
-                                await playerService?.seek(to: chapter.startTime)
+            if !isChaptersCollapsed {
+                LazyVStack(spacing: 0) {
+                    ForEach(chapters) { chapter in
+                        ChapterRow(
+                            chapter: chapter,
+                            isActive: isChapterActive(chapter),
+                            storyboard: storyboard,
+                            showThumbnail: true,
+                            onTap: {
+                                Task {
+                                    await playerService?.seek(to: chapter.startTime)
+                                }
                             }
-                        }
-                    )
+                        )
+                    }
                 }
+                .padding(.horizontal)
             }
-            .padding(.horizontal)
         }
     }
 
@@ -278,31 +302,33 @@ struct InfoPanelPage: View {
                 .padding(.horizontal)
                 .padding(.vertical, 8)
 
-            sectionHeader(String(localized: "videoInfo.section.relatedVideos"))
+            sectionHeader(String(localized: "videoInfo.section.relatedVideos"), isCollapsed: $isRelatedCollapsed)
 
-            LazyVStack(spacing: 12) {
-                ForEach(Array(relatedVideos.enumerated()), id: \.element.id) { index, relatedVideo in
-                    VideoRowView(
-                        video: relatedVideo,
-                        style: .regular,
-                        showThumbnail: true
-                    )
-                    .tappableVideo(
-                        relatedVideo,
-                        queueSource: .manual,
-                        sourceLabel: String(localized: "videoInfo.section.relatedVideos"),
-                        videoList: relatedVideos,
-                        videoIndex: index,
-                        loadMoreVideos: nil
-                    )
+            if !isRelatedCollapsed {
+                LazyVStack(spacing: 12) {
+                    ForEach(Array(relatedVideos.enumerated()), id: \.element.id) { index, relatedVideo in
+                        VideoRowView(
+                            video: relatedVideo,
+                            style: .regular,
+                            showThumbnail: true
+                        )
+                        .tappableVideo(
+                            relatedVideo,
+                            queueSource: .manual,
+                            sourceLabel: String(localized: "videoInfo.section.relatedVideos"),
+                            videoList: relatedVideos,
+                            videoIndex: index,
+                            loadMoreVideos: nil
+                        )
 
-                    if index < relatedVideos.count - 1 {
-                        Divider()
-                            .padding(.leading, VideoRowStyle.regular.thumbnailWidth + 12)
+                        if index < relatedVideos.count - 1 {
+                            Divider()
+                                .padding(.leading, VideoRowStyle.regular.thumbnailWidth + 12)
+                        }
                     }
                 }
+                .padding(.horizontal)
             }
-            .padding(.horizontal)
         }
     }
 
