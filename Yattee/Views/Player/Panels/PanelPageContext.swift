@@ -46,6 +46,67 @@ struct PanelScrollConfig {
     var onOverscrollDragEnded: ((CGFloat, CGFloat) -> Void)?
 }
 
+// MARK: - Horizontal Insets
+
+/// Horizontal content insets a host wants on the panel pages. Hosts whose
+/// panel already carries leading chrome (the corner side column's resize
+/// grabber strip) narrow the leading inset so content sits the same distance
+/// from both edges.
+struct PanelHorizontalInsets: Equatable {
+    static let standard: CGFloat = 16
+
+    var leading: CGFloat = PanelHorizontalInsets.standard
+    var trailing: CGFloat = PanelHorizontalInsets.standard
+
+    /// Leading delta relative to the standard inset; List-backed pages
+    /// (queue, tracks) apply it as a scroll content margin since their
+    /// section insets can't be restyled per host.
+    var leadingListAdjustment: CGFloat { leading - Self.standard }
+}
+
+private struct PanelHorizontalInsetsKey: EnvironmentKey {
+    static let defaultValue = PanelHorizontalInsets()
+}
+
+extension EnvironmentValues {
+    var panelHorizontalInsets: PanelHorizontalInsets {
+        get { self[PanelHorizontalInsetsKey.self] }
+        set { self[PanelHorizontalInsetsKey.self] = newValue }
+    }
+}
+
+private struct PanelHorizontalPadding: ViewModifier {
+    @Environment(\.panelHorizontalInsets) private var insets
+
+    func body(content: Content) -> some View {
+        content
+            .padding(.leading, insets.leading)
+            .padding(.trailing, insets.trailing)
+    }
+}
+
+private struct PanelListLeadingMargin: ViewModifier {
+    @Environment(\.panelHorizontalInsets) private var insets
+
+    func body(content: Content) -> some View {
+        content
+            .contentMargins(.leading, insets.leadingListAdjustment, for: .scrollContent)
+    }
+}
+
+extension View {
+    /// Host-configurable replacement for `.padding(.horizontal)` on panel
+    /// page content.
+    func panelHorizontalPadding() -> some View {
+        modifier(PanelHorizontalPadding())
+    }
+
+    /// Shifts List-backed page content by the host's leading inset delta.
+    func panelListLeadingMargin() -> some View {
+        modifier(PanelListLeadingMargin())
+    }
+}
+
 // MARK: - Page Scroll View
 
 /// Shared scroll container used by the scrollable panel pages. Applies the

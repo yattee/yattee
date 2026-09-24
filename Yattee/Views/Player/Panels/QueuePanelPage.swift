@@ -17,6 +17,7 @@ struct QueuePanelPage: View {
     var body: some View {
         QueueListView(showHistory: settings.effectiveShowHistory)
             .safeAreaPadding(.bottom, bottomInset)
+            .panelListLeadingMargin()
     }
 }
 

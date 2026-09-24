@@ -38,7 +38,7 @@ struct ChaptersPanelPage: View {
                     )
                 }
             }
-            .padding(.horizontal)
+            .panelHorizontalPadding()
             .padding(.top, 8)
         }
         .task(id: context.video.id) {

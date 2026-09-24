@@ -54,7 +54,7 @@ struct RelatedPanelPage: View {
                         }
                     }
                 }
-                .padding(.horizontal)
+                .panelHorizontalPadding()
                 .padding(.top, 8)
             }
         }

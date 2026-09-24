@@ -89,6 +89,7 @@ struct TracksPanelPage: View {
                 visibleSections: settings
             )
             .safeAreaPadding(.bottom, bottomInset)
+            .panelListLeadingMargin()
         }
     }
 }

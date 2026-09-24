@@ -64,7 +64,7 @@ struct InfoPanelPage: View {
 
             if settings.effectiveShowDescription {
                 Divider()
-                    .padding(.horizontal)
+                    .panelHorizontalPadding()
 
                 descriptionContent
                     .padding(.vertical)
@@ -126,7 +126,7 @@ struct InfoPanelPage: View {
                 )
             }
         }
-        .padding(.horizontal)
+        .panelHorizontalPadding()
         .padding(.vertical, 8)
     }
 
@@ -144,7 +144,7 @@ struct InfoPanelPage: View {
                         .font(.subheadline)
                         .foregroundStyle(.secondary)
                         .tint(context.accentColor)
-                        .padding(.horizontal)
+                        .panelHorizontalPadding()
                         .handleTimestampLinks(using: playerService)
                 }
             } else if videoDetailsState == .loading {
@@ -158,7 +158,7 @@ struct InfoPanelPage: View {
                 Text(String(localized: "player.noDescription"))
                     .font(.subheadline)
                     .foregroundStyle(.secondary)
-                    .padding(.horizontal)
+                    .panelHorizontalPadding()
             }
         }
     }
@@ -221,7 +221,7 @@ struct InfoPanelPage: View {
                 .buttonStyle(.plain)
             }
         }
-        .padding(.horizontal)
+        .panelHorizontalPadding()
         .contentShape(Rectangle())
         .onTapGesture {
             if !isDescriptionExpanded {
@@ -257,7 +257,7 @@ struct InfoPanelPage: View {
 
                 Spacer(minLength: 0)
             }
-            .padding(.horizontal)
+            .panelHorizontalPadding()
             .padding(.top, 4)
             .padding(.bottom, 8)
             .contentShape(Rectangle())
@@ -269,7 +269,7 @@ struct InfoPanelPage: View {
     private var chaptersSection: some View {
         if !chapters.isEmpty {
             Divider()
-                .padding(.horizontal)
+                .panelHorizontalPadding()
                 .padding(.bottom, 8)
 
             sectionHeader(String(localized: "player.chapters"), isCollapsed: $isChaptersCollapsed)
@@ -290,7 +290,7 @@ struct InfoPanelPage: View {
                         )
                     }
                 }
-                .padding(.horizontal)
+                .panelHorizontalPadding()
             }
         }
     }
@@ -299,7 +299,7 @@ struct InfoPanelPage: View {
     private var relatedSection: some View {
         if !relatedVideos.isEmpty {
             Divider()
-                .padding(.horizontal)
+                .panelHorizontalPadding()
                 .padding(.vertical, 8)
 
             sectionHeader(String(localized: "videoInfo.section.relatedVideos"), isCollapsed: $isRelatedCollapsed)
@@ -327,7 +327,7 @@ struct InfoPanelPage: View {
                         }
                     }
                 }
-                .padding(.horizontal)
+                .panelHorizontalPadding()
             }
         }
     }

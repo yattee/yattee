@@ -15,6 +15,13 @@ struct PanelPageBar: View {
     let accentColor: Color
     var showLabels: Bool = true
 
+    @Environment(\.panelHorizontalInsets) private var insets
+
+    /// Pills sit 4pt closer to the edge than page content (12 vs 16 with the
+    /// standard inset); a host that trims the content inset (corner side
+    /// column) trims the bar the same way so the first pill lines up.
+    private static let pillEdgeOffset: CGFloat = 4
+
     var body: some View {
         ScrollViewReader { proxy in
             ScrollView(.horizontal, showsIndicators: false) {
@@ -24,7 +31,8 @@ struct PanelPageBar: View {
                             .id(page.pageType)
                     }
                 }
-                .padding(.horizontal, 12)
+                .padding(.leading, max(0, insets.leading - Self.pillEdgeOffset))
+                .padding(.trailing, max(0, insets.trailing - Self.pillEdgeOffset))
                 .padding(.vertical, 6)
             }
             .onChange(of: selectedPage) { _, newValue in

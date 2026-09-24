@@ -60,6 +60,10 @@ struct CornerPlayerLayout<PlayerContent: View>: View {
 
     /// Side column width bounds.
     static var minColumnWidth: CGFloat { 280 }
+
+    /// Resize grabber strip on the side column's leading edge — narrow,
+    /// matching the panel drag handle look.
+    static var grabberWidth: CGFloat { 12 }
     static var maxColumnWidthCap: CGFloat { 560 }
     /// Minimum width kept for the video column.
     static var minVideoColumnWidth: CGFloat { 480 }
@@ -167,7 +171,7 @@ struct CornerPlayerLayout<PlayerContent: View>: View {
             let effectiveColumnWidth = clampColumnWidth(columnWidth, availableWidth: width)
             // Grabber sits on the column's leading edge, inside the column
             // background — narrow strip matching the panel drag handle look.
-            let grabberWidth: CGFloat = 12
+            let grabberWidth = Self.grabberWidth
             let totalColumnWidth = effectiveColumnWidth + grabberWidth
 
             let videoWidth = showsSideColumn ? max(1, width - totalColumnWidth) : width
@@ -540,6 +544,13 @@ struct CornerPlayerLayout<PlayerContent: View>: View {
             pageBarTopPadding: 8,
             excludedPages: belowVideoPageTypes
         )
+        // The grabber strip already separates the column from the video;
+        // trim the leading inset so content sits 16pt from the column's
+        // outer edge on both sides instead of grabber + 16 on the left.
+        .environment(\.panelHorizontalInsets, PanelHorizontalInsets(
+            leading: max(0, PanelHorizontalInsets.standard - Self.grabberWidth),
+            trailing: PanelHorizontalInsets.standard
+        ))
         .background(panelBackgroundColor.ignoresSafeArea(edges: .bottom))
     }
 

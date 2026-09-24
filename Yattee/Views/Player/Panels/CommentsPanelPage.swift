@@ -23,7 +23,7 @@ struct CommentsPanelPage: View {
                 videoID: context.video.id.videoID,
                 showAvatars: settings.effectiveShowAvatars
             )
-            .padding(.horizontal)
+            .panelHorizontalPadding()
         }
         .task(id: context.video.id) {
             // Opening the page is an explicit request; load even when the
