@@ -141,6 +141,7 @@ struct PlayerControlsView: View {
     @State private var playNextTapCount = 0
     /// Track safe area to force re-render when it changes
     @State private var currentSafeArea: UIEdgeInsets = .zero
+    @Environment(\.statusBarVisibilityController) private var statusBarController
     /// Active player controls layout from preset (passed from parent to avoid flashing during view recreation)
     var activeLayout: PlayerControlsLayout = .default
     /// Animation trigger for seek backward button
@@ -267,6 +268,18 @@ struct PlayerControlsView: View {
         .onGeometryChange(for: CGSize.self, of: { $0.size }) { _ in
             // Update safe area when geometry changes (rotation)
             currentSafeArea = windowSafeArea
+        }
+        .onChange(of: statusBarController?.isHidden) { _, _ in
+            // The window safe area follows the status bar fade with a delay.
+            // Corner layout keeps its geometry fixed across the toggle, so
+            // no geometry change refreshes the value — poll a few times
+            // instead of keeping a stale status bar height as top padding.
+            currentSafeArea = windowSafeArea
+            for delay in [0.15, 0.4, 0.8] {
+                DispatchQueue.main.asyncAfter(deadline: .now() + delay) {
+                    currentSafeArea = windowSafeArea
+                }
+            }
         }
         .onChange(of: activeLayout.effectiveGesturesSettings.panscanGesture.snapToEnds, initial: true) { _, newValue in
             // Sync panscan snap setting to navigation coordinator (initial: true ensures sync on first render)

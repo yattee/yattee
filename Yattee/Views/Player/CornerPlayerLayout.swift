@@ -444,6 +444,11 @@ struct CornerPlayerLayout<PlayerContent: View>: View {
                     )
                 }
                 .frame(width: videoWidth, height: videoHeight + videoTopExtension)
+                // Clip in the frame's own coordinates, BEFORE the offset —
+                // clipping after it uses the unshifted layout frame and cuts
+                // the top strip (status bar height) off the fullscreen video
+                // and its top controls.
+                .clipped()
                 .offset(y: -videoTopExtension)
                 // Keyed to gesture/visibility state, NOT to derived geometry —
                 // appear settling must not animate. The drag-offset springs
@@ -456,7 +461,6 @@ struct CornerPlayerLayout<PlayerContent: View>: View {
                 // Aspect ratio changes (new video, stream switch) resize
                 // the video/panel split — animate them
                 .animation(isPanelDragActive ? nil : .spring(response: 0.3, dampingFraction: 1.0), value: playerState?.displayAspectRatio)
-                .clipped()
                 // Swipe up on the video to bring the panel back — the
                 // video's bottom edge follows the finger (like the portrait
                 // reveal) via belowPanelDragOffset counting down from full
