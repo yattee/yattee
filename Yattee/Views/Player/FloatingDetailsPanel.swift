@@ -150,6 +150,7 @@ struct FloatingDetailsPanel: View {
         .onChange(of: isCommentsExpanded) { _, newValue in
             // Sync with NavigationCoordinator to block sheet dismiss gesture when comments expanded
             appEnvironment?.navigationCoordinator.isCommentsExpanded = newValue
+        .environment(\.presentationColorScheme, systemColorScheme)
         }
         .onChange(of: maxPanelWidth) { _, _ in
             // Re-clamp width when max width changes (e.g., pinned vs floating)

@@ -17,8 +17,27 @@ struct ResumeSheetData: Identifiable {
 /// View modifier that wraps content in a button that plays a video when tapped.
 /// When queue is enabled and not empty, shows a sheet with queue options.
 /// When queue is empty or disabled, plays the video directly and queues subsequent videos.
+// MARK: - Presentation Color Scheme
+
+/// The real system color scheme, published by hosts that override
+/// `colorScheme` for their own content (the unpinned floating details panel
+/// renders dark over video). Sheets presented from inside such a host use it
+/// so they don't get dark text colors on a light system sheet background.
+private struct PresentationColorSchemeKey: EnvironmentKey {
+    static let defaultValue: ColorScheme? = nil
+}
+
+extension EnvironmentValues {
+    var presentationColorScheme: ColorScheme? {
+        get { self[PresentationColorSchemeKey.self] }
+        set { self[PresentationColorSchemeKey.self] = newValue }
+    }
+}
+
 struct TappableVideoModifier: ViewModifier {
     @Environment(\.appEnvironment) private var appEnvironment
+    @Environment(\.colorScheme) private var colorScheme
+    @Environment(\.presentationColorScheme) private var presentationColorScheme
 
     let video: Video
     var startTime: Double? = nil
@@ -85,6 +104,7 @@ struct TappableVideoModifier: ViewModifier {
         }
         .sheet(isPresented: $showingQueueSheet) {
             QueueActionSheet(video: video, queueSource: queueSource)
+                .environment(\.colorScheme, presentationColorScheme ?? colorScheme)
         }
         .sheet(item: $resumeSheetData) { data in
             ResumeActionSheet(
@@ -93,6 +113,7 @@ struct TappableVideoModifier: ViewModifier {
                 onContinue: { playVideoWithStartTime(data.resumeTime) },
                 onStartOver: { playVideoWithStartTime(0) }
             )
+            .environment(\.colorScheme, presentationColorScheme ?? colorScheme)
         }
         .alert(String(localized: "common.authenticationRequired"), isPresented: $showingPasswordAlert) {
             SecureField(String(localized: "common.password"), text: $passwordInput)
