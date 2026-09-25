@@ -38,9 +38,7 @@ struct OverscrollGestureView: UIViewRepresentable {
 
         // Schedule scroll view discovery after view is in hierarchy
         DispatchQueue.main.async {
-            if let scrollView = Self.findScrollView(from: view) {
-                context.coordinator.gestureHandler.attach(to: scrollView)
-            }
+            Self.attachIfNeeded(from: view, coordinator: context.coordinator)
         }
 
         return view
@@ -56,13 +54,34 @@ struct OverscrollGestureView: UIViewRepresentable {
             return
         }
 
-        // If not attached yet, try again
-        if context.coordinator.gestureHandler.scrollView == nil {
-            DispatchQueue.main.async {
-                if let scrollView = Self.findScrollView(from: uiView) {
-                    context.coordinator.gestureHandler.attach(to: scrollView)
-                }
+        // Attach if not yet attached, or re-attach when the geometric match
+        // changed (the hierarchy is flat under the SwiftUI host, so the
+        // matching scroll view can differ from the one first found)
+        DispatchQueue.main.async {
+            Self.attachIfNeeded(from: uiView, coordinator: context.coordinator)
+        }
+    }
+
+    private static func attachIfNeeded(from view: UIView, coordinator: Coordinator) {
+        guard view.window != nil else { return }
+        // Cheap check first: keep the current scroll view while it still
+        // matches our frame (updateUIView runs on every SwiftUI update)
+        if let attached = coordinator.gestureHandler.scrollView, attached.window != nil {
+            let hostFrame = view.convert(view.bounds, to: nil)
+            let frame = attached.convert(attached.bounds, to: nil)
+            if abs(frame.minX - hostFrame.minX) < 1, abs(frame.minY - hostFrame.minY) < 1,
+               abs(frame.width - hostFrame.width) < 1 {
+                return
             }
+        }
+        guard let scrollView = findScrollView(from: view) else { return }
+        if coordinator.gestureHandler.scrollView !== scrollView {
+            LoggingService.shared.debug(
+                "OverscrollGestureView attach",
+                category: .player,
+                details: "scrollView=\(Unmanaged.passUnretained(scrollView).toOpaque()) frame=\(scrollView.convert(scrollView.bounds, to: nil)) host=\(view.convert(view.bounds, to: nil))"
+            )
+            coordinator.gestureHandler.attach(to: scrollView)
         }
     }
 
@@ -72,10 +91,15 @@ struct OverscrollGestureView: UIViewRepresentable {
 
     // MARK: - Scroll View Discovery
 
-    /// Finds the UIScrollView in the view hierarchy.
-    /// Since .background creates a separate branch, we need to find a common ancestor
-    /// and search all its descendants.
+    /// Finds the UIScrollView this view is the `.background` of.
+    /// `.background` creates a separate branch, and SwiftUI hosts platform
+    /// views in a mostly flat hierarchy, so a common ancestor can hold many
+    /// unrelated scroll views (corner layout: side column pages + below-video
+    /// panel). A background view shares its frame with the view it backs, so
+    /// pick the scroll view whose window frame matches ours best.
     private static func findScrollView(from view: UIView) -> UIScrollView? {
+        let hostFrame = view.convert(view.bounds, to: nil)
+
         // Collect all ancestors
         var ancestors: [UIView] = []
         var current: UIView? = view.superview
@@ -86,16 +110,28 @@ struct OverscrollGestureView: UIViewRepresentable {
 
         // Search from each ancestor level, starting closest
         for ancestor in ancestors {
-            // Collect all scroll views at this level
             var scrollViews: [UIScrollView] = []
             collectScrollViews(in: ancestor, into: &scrollViews)
+            guard !scrollViews.isEmpty else { continue }
 
-            if !scrollViews.isEmpty {
-                // Return the first one that has meaningful content (not a tiny internal scroll view)
-                if let meaningful = scrollViews.first(where: { $0.frame.height > 100 }) {
-                    return meaningful
-                }
-                return scrollViews.first
+            // Best geometric match: smallest frame mismatch against our own
+            // frame, among scroll views that actually overlap it. Ignore tiny
+            // internal scroll views.
+            let candidates = scrollViews.filter { $0.frame.height > 100 }
+            let scored = (candidates.isEmpty ? scrollViews : candidates).compactMap { scrollView -> (UIScrollView, CGFloat)? in
+                let frame = scrollView.convert(scrollView.bounds, to: nil)
+                guard hostFrame.isEmpty || frame.intersects(hostFrame) else { return nil }
+                let mismatch = abs(frame.minX - hostFrame.minX) + abs(frame.minY - hostFrame.minY)
+                    + abs(frame.width - hostFrame.width) + abs(frame.height - hostFrame.height)
+                return (scrollView, mismatch)
+            }
+            if let best = scored.min(by: { $0.1 < $1.1 }) {
+                return best.0
+            }
+            // Nothing overlaps at this level (e.g. not laid out yet) — keep
+            // climbing; fall back to the old behavior at the root.
+            if ancestor === ancestors.last {
+                return candidates.first ?? scrollViews.first
             }
         }
 
