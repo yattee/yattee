@@ -159,8 +159,17 @@ struct PlayerPanelContentView: View {
         case .info:
             InfoPanelPage(
                 context: context,
+    /// The host's scroll config keyed to the current video so pages jump to
+    /// the top when the video changes.
+    private var pageScrollConfig: PanelScrollConfig {
+        var config = scrollConfig
+        config.contentID = AnyHashable(context.video.id)
+        return config
+    }
+
                 settings: page.infoSettings,
                 scrollConfig: scrollConfig,
+        let scrollConfig = pageScrollConfig
                 inlineSections: inlineInfoSections
             )
             .id(PanelPageType.info)

@@ -483,6 +483,9 @@ final class PlayerState {
             commentsContinuation = nil
             // Reset storyboards to prevent previous video's storyboards from appearing
             storyboards = []
+            // Reset chapters so the panel doesn't show the previous video's
+            // chapters while the new one loads
+            chapters = []
         }
         currentVideo = video
         currentStream = stream

@@ -38,6 +38,11 @@ struct PanelScrollConfig {
     /// Toggling this scrolls the page back to the top.
     var scrollToTopTrigger: Bool = false
 
+    /// Identity of the content being shown (the video). When it changes the
+    /// page jumps back to the top without animation so the new title is
+    /// visible. Set by `PlayerPanelContentView`.
+    var contentID: AnyHashable?
+
     /// Disables scrolling (while the portrait drag handle is active).
     var isScrollDisabled: Bool = false
 
@@ -162,6 +167,14 @@ struct PanelPageScrollView<Content: View>: View {
                 withAnimation(.easeInOut(duration: 0.3)) {
                     proxy.scrollTo("panelPageTop", anchor: .top)
                 }
+            }
+            .onChange(of: config.contentID) { _, _ in
+                var transaction = Transaction()
+                transaction.disablesAnimations = true
+                withTransaction(transaction) {
+                    proxy.scrollTo("panelPageTop", anchor: .top)
+                }
+                config.scrollOffsetChanged?(0)
             }
         }
     }
