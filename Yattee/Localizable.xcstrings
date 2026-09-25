@@ -7241,17 +7241,6 @@
         }
       }
     },
-    "panel.page.tracks" : {
-      "comment" : "Details panel page name",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Tracks"
-          }
-        }
-      }
-    },
     "panel.region.belowVideo" : {
       "comment" : "Corner layout region option",
       "localizations" : {

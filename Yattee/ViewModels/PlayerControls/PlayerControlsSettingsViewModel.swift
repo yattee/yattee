@@ -891,15 +891,6 @@ final class PlayerControlsSettingsViewModel {
         }
     }
 
-    /// Synchronously updates the tracks page element toggles.
-    func updatePanelTracksSettingsSync(_ mutation: (inout TracksPageSettings) -> Void) {
-        updatePanelSettingsSync { settings in
-            var tracks = settings.configuration(for: .tracks)?.tracksSettings ?? TracksPageSettings()
-            mutation(&tracks)
-            settings.updateSettings(.tracks(tracks), for: .tracks)
-        }
-    }
-
     /// Whether the page bar shows labels next to icons.
     var panelShowPageBarLabels: Bool {
         panelSettings.effectiveShowPageBarLabels

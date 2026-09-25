@@ -17,7 +17,6 @@ enum PanelPageType: String, Codable, CaseIterable, Sendable {
     case related
     case chapters
     case queue
-    case tracks
 
     /// Localized display name shown in the page bar and settings.
     var displayName: String {
@@ -32,8 +31,6 @@ enum PanelPageType: String, Codable, CaseIterable, Sendable {
             return String(localized: "player.chapters")
         case .queue:
             return String(localized: "panel.page.queue")
-        case .tracks:
-            return String(localized: "panel.page.tracks")
         }
     }
 
@@ -66,8 +63,6 @@ enum PanelPageType: String, Codable, CaseIterable, Sendable {
             return "list.bullet.rectangle"
         case .queue:
             return "list.bullet"
-        case .tracks:
-            return "slider.horizontal.3"
         }
     }
 }
@@ -206,19 +201,6 @@ struct ChaptersPageSettings: Codable, Hashable, Sendable {
     var effectiveShowThumbnails: Bool { showThumbnails ?? true }
 }
 
-/// Element toggles for the tracks page.
-struct TracksPageSettings: Codable, Hashable, Sendable {
-    var showQuality: Bool?
-    var showAudio: Bool?
-    var showSubtitles: Bool?
-    var showRate: Bool?
-
-    var effectiveShowQuality: Bool { showQuality ?? true }
-    var effectiveShowAudio: Bool { showAudio ?? true }
-    var effectiveShowSubtitles: Bool { showSubtitles ?? true }
-    var effectiveShowRate: Bool { showRate ?? true }
-}
-
 /// Typed per-page settings payload. Uses the same discriminator pattern as
 /// `ButtonSettings`; an unknown discriminator from a future app version
 /// decodes to `nil` at the configuration level so the pages array never
@@ -229,7 +211,6 @@ enum PanelPageSettings: Codable, Hashable, Sendable {
     case related(RelatedPageSettings)
     case chapters(ChaptersPageSettings)
     case queue(QueuePageSettings)
-    case tracks(TracksPageSettings)
 
     private enum CodingKeys: String, CodingKey {
         case type
@@ -238,7 +219,6 @@ enum PanelPageSettings: Codable, Hashable, Sendable {
         case related
         case chapters
         case queue
-        case tracks
     }
 
     private enum SettingsType: String, Codable {
@@ -247,7 +227,6 @@ enum PanelPageSettings: Codable, Hashable, Sendable {
         case related
         case chapters
         case queue
-        case tracks
     }
 
     init(from decoder: Decoder) throws {
@@ -265,8 +244,6 @@ enum PanelPageSettings: Codable, Hashable, Sendable {
             self = .chapters(try container.decode(ChaptersPageSettings.self, forKey: .chapters))
         case .queue:
             self = .queue(try container.decode(QueuePageSettings.self, forKey: .queue))
-        case .tracks:
-            self = .tracks(try container.decode(TracksPageSettings.self, forKey: .tracks))
         }
     }
 
@@ -289,9 +266,6 @@ enum PanelPageSettings: Codable, Hashable, Sendable {
         case .queue(let settings):
             try container.encode(SettingsType.queue, forKey: .type)
             try container.encode(settings, forKey: .queue)
-        case .tracks(let settings):
-            try container.encode(SettingsType.tracks, forKey: .type)
-            try container.encode(settings, forKey: .tracks)
         }
     }
 }
@@ -347,12 +321,6 @@ struct PanelPageConfiguration: Codable, Hashable, Sendable, Identifiable {
     var queueSettings: QueuePageSettings {
         if case .queue(let settings) = settings { return settings }
         return QueuePageSettings()
-    }
-
-    /// Tracks page settings when set, defaults otherwise.
-    var tracksSettings: TracksPageSettings {
-        if case .tracks(let settings) = settings { return settings }
-        return TracksPageSettings()
     }
 
     private enum CodingKeys: String, CodingKey {
@@ -415,7 +383,6 @@ struct PanelSettings: Codable, Hashable, Sendable {
         PanelPageConfiguration(pageType: .related, region: .primary),
         PanelPageConfiguration(pageType: .chapters, region: .primary),
         PanelPageConfiguration(pageType: .queue, region: .primary),
-        PanelPageConfiguration(pageType: .tracks, isEnabled: false, region: .primary),
     ])
 
     var effectiveLayoutMode: PanelLayoutMode { layoutMode ?? .stacked }

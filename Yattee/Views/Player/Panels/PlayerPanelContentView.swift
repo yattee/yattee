@@ -63,8 +63,6 @@ struct PlayerPanelContentView: View {
             return !(playerState?.chapters ?? []).isEmpty
         case .queue:
             return appEnvironment?.settingsManager.queueEnabled ?? true
-        case .tracks:
-            return true
         }
     }
 
@@ -178,9 +176,6 @@ struct PlayerPanelContentView: View {
         case .queue:
             QueuePanelPage(context: context, settings: page.queueSettings, bottomInset: scrollConfig.bottomInset)
                 .id(PanelPageType.queue)
-        case .tracks:
-            TracksPanelPage(context: context, settings: page.tracksSettings, bottomInset: scrollConfig.bottomInset)
-                .id(PanelPageType.tracks)
         }
     }
 }

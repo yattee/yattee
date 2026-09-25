@@ -346,19 +346,15 @@ extension QualitySelectorView {
         #if os(tvOS)
         // tvOS rows are styled individually to match the Settings rows.
         VStack(spacing: 8) {
-            if visibleSections.effectiveShowRate {
-                playbackSpeedRow
-            }
+            playbackSpeedRow
 
             audioModeRow
         }
         #else
         VStack(spacing: 0) {
-            if visibleSections.effectiveShowRate {
-                playbackSpeedRow
+            playbackSpeedRow
 
-                Divider()
-            }
+            Divider()
 
             audioModeRow
 

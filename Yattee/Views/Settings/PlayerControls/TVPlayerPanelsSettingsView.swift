@@ -42,9 +42,9 @@ struct TVPlayerPanelsSettingsView: View {
 private struct TVPlayerPanelsContent: View {
     @Bindable var viewModel: PlayerControlsSettingsViewModel
 
-    /// Pages offered on tvOS; tracks is covered by the quality panel.
+    /// Pages offered on tvOS.
     private var tvOSPages: [PanelPageConfiguration] {
-        viewModel.panelPages.filter { $0.pageType != .tracks }
+        viewModel.panelPages
     }
 
     var body: some View {
@@ -143,9 +143,9 @@ private struct TVPanelPageEditorView: View {
         isEnabled && viewModel.enabledPanelPageCount <= 1
     }
 
-    /// Pages as displayed in the tvOS list (tracks hidden).
+    /// Pages as displayed in the tvOS list.
     private var displayedPages: [PanelPageConfiguration] {
-        viewModel.panelPages.filter { $0.pageType != .tracks }
+        viewModel.panelPages
     }
 
     private var displayedIndex: Int? {

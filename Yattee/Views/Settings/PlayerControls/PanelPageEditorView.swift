@@ -24,10 +24,6 @@ struct PanelPageEditorView: View {
     @State private var showRelatedThumbnails: Bool = true
     @State private var showChapterThumbnails: Bool = true
     @State private var showHistory: Bool = true
-    @State private var showQuality: Bool = true
-    @State private var showAudio: Bool = true
-    @State private var showSubtitles: Bool = true
-    @State private var showRate: Bool = true
 
     private var configuration: PanelPageConfiguration? {
         viewModel.panelSettings.configuration(for: pageType)
@@ -57,8 +53,6 @@ struct PanelPageEditorView: View {
                 chaptersElementsSection
             case .queue:
                 queueElementsSection
-            case .tracks:
-                tracksElementsSection
             }
         }
         .navigationTitle(pageType.displayName)
@@ -243,51 +237,6 @@ struct PanelPageEditorView: View {
         .disabled(!viewModel.canEditActivePreset)
     }
 
-    // MARK: - Tracks Elements Section
-
-    private var tracksElementsSection: some View {
-        Section {
-            Toggle(
-                String(localized: "player.quality.video"),
-                isOn: $showQuality
-            )
-            .onChange(of: showQuality) { _, newValue in
-                guard newValue != tracksSettings.effectiveShowQuality else { return }
-                viewModel.updatePanelTracksSettingsSync { $0.showQuality = newValue }
-            }
-
-            Toggle(
-                String(localized: "stream.audio"),
-                isOn: $showAudio
-            )
-            .onChange(of: showAudio) { _, newValue in
-                guard newValue != tracksSettings.effectiveShowAudio else { return }
-                viewModel.updatePanelTracksSettingsSync { $0.showAudio = newValue }
-            }
-
-            Toggle(
-                String(localized: "stream.subtitles"),
-                isOn: $showSubtitles
-            )
-            .onChange(of: showSubtitles) { _, newValue in
-                guard newValue != tracksSettings.effectiveShowSubtitles else { return }
-                viewModel.updatePanelTracksSettingsSync { $0.showSubtitles = newValue }
-            }
-
-            Toggle(
-                String(localized: "controls.button.speed"),
-                isOn: $showRate
-            )
-            .onChange(of: showRate) { _, newValue in
-                guard newValue != tracksSettings.effectiveShowRate else { return }
-                viewModel.updatePanelTracksSettingsSync { $0.showRate = newValue }
-            }
-        } header: {
-            Text(String(localized: "panel.settings.elements.header"))
-        }
-        .disabled(!viewModel.canEditActivePreset)
-    }
-
     // MARK: - Helpers
 
     private var infoSettings: InfoPageSettings {
@@ -310,10 +259,6 @@ struct PanelPageEditorView: View {
         configuration?.queueSettings ?? QueuePageSettings()
     }
 
-    private var tracksSettings: TracksPageSettings {
-        configuration?.tracksSettings ?? TracksPageSettings()
-    }
-
     private func syncLocalState() {
         isEnabled = configuration?.isEnabled ?? true
         region = configuration?.region ?? .primary
@@ -326,11 +271,6 @@ struct PanelPageEditorView: View {
         showRelatedThumbnails = relatedSettings.effectiveShowThumbnails
         showChapterThumbnails = chaptersSettings.effectiveShowThumbnails
         showHistory = queueSettings.effectiveShowHistory
-        let tracks = tracksSettings
-        showQuality = tracks.effectiveShowQuality
-        showAudio = tracks.effectiveShowAudio
-        showSubtitles = tracks.effectiveShowSubtitles
-        showRate = tracks.effectiveShowRate
     }
 }
 

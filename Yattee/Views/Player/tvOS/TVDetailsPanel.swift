@@ -56,9 +56,6 @@ struct TVDetailsPanel: View {
             return !(playerState?.chapters ?? []).isEmpty
         case .queue:
             return appEnvironment?.settingsManager.queueEnabled ?? true
-        case .tracks:
-            // The tvOS quality panel covers tracks; never offered here.
-            return false
         }
     }
 
@@ -90,7 +87,7 @@ struct TVDetailsPanel: View {
             // Content for the selected page
             Group {
                 switch effectivePage {
-                case .info, .tracks:
+                case .info:
                     infoContent
                 case .comments:
                     commentsContent

@@ -57,10 +57,6 @@ struct PanelSettingsTests {
         settings.updateSettings(.related(RelatedPageSettings(showThumbnails: false)), for: .related)
         settings.updateSettings(.chapters(ChaptersPageSettings(showThumbnails: false)), for: .chapters)
         settings.updateSettings(.queue(QueuePageSettings(showHistory: false)), for: .queue)
-        settings.updateSettings(
-            .tracks(TracksPageSettings(showQuality: false, showSubtitles: false)),
-            for: .tracks
-        )
 
         let decoded = try roundTrip(settings)
         #expect(decoded == settings)
@@ -68,13 +64,6 @@ struct PanelSettingsTests {
         #expect(decoded.configuration(for: .related)?.relatedSettings.effectiveShowThumbnails == false)
         #expect(decoded.configuration(for: .chapters)?.chaptersSettings.effectiveShowThumbnails == false)
         #expect(decoded.configuration(for: .queue)?.queueSettings.effectiveShowHistory == false)
-
-        let tracks = try #require(decoded.configuration(for: .tracks)?.tracksSettings)
-        #expect(tracks.effectiveShowQuality == false)
-        #expect(tracks.effectiveShowSubtitles == false)
-        // Unset fields keep their effective defaults
-        #expect(tracks.effectiveShowAudio == true)
-        #expect(tracks.effectiveShowRate == true)
     }
 
     @Test("Typed accessors fall back to defaults for mismatched payloads")
@@ -86,7 +75,6 @@ struct PanelSettingsTests {
         )
         #expect(page.commentsSettings.effectiveShowAvatars == true)
         #expect(page.queueSettings.effectiveShowHistory == true)
-        #expect(page.tracksSettings.effectiveShowQuality == true)
     }
 
     // MARK: - Backward Compatibility
@@ -185,8 +173,6 @@ struct PanelSettingsTests {
         #expect(primary == [.related, .chapters, .queue])
         #expect(belowVideo == [.info, .comments])
         #expect(all == [.info, .comments, .related, .chapters, .queue])
-        // Tracks is disabled by default
-        #expect(!all.contains(.tracks))
     }
 
     // MARK: - Mutations
