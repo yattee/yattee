@@ -7505,6 +7505,50 @@
         }
       }
     },
+    "panel.settings.section.enabled" : {
+      "comment" : "Details panel section editor toggle (iPhone)",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Show Section"
+          }
+        }
+      }
+    },
+    "panel.settings.section.lastEnabled.footer" : {
+      "comment" : "Details panel section editor footer (iPhone)",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "At least one section must stay enabled."
+          }
+        }
+      }
+    },
+    "panel.settings.sections.footer" : {
+      "comment" : "Details panel settings section footer (iPhone)",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sections appear in this order below the video details. Sections without content hide automatically."
+          }
+        }
+      }
+    },
+    "panel.settings.sections.header" : {
+      "comment" : "Details panel settings section header (iPhone)",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sections"
+          }
+        }
+      }
+    },
     "panel.settings.showThumbnails" : {
       "comment" : "Details panel page element toggle",
       "localizations" : {

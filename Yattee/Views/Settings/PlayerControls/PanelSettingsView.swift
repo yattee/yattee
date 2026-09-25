@@ -26,13 +26,18 @@ struct PanelSettingsView: View {
         #endif
     }
 
+    /// iPhone has no page bar: the list configures inline sections instead.
+    private var usesSections: Bool { PanelSettings.isSectionsOnlyDevice }
+
     var body: some View {
         List {
             if Self.supportsCornerLayout {
                 layoutSection
             }
             visibilitySection
-            pageBarSection
+            if !usesSections {
+                pageBarSection
+            }
             pagesSection
         }
         .navigationTitle(String(localized: "settings.playerControls.detailsPanel"))
@@ -133,10 +138,14 @@ struct PanelSettingsView: View {
                 viewModel.movePanelPages(fromOffsets: source, toOffset: destination)
             }
         } header: {
-            Text(String(localized: "panel.settings.pages.header"))
+            Text(usesSections
+                ? String(localized: "panel.settings.sections.header")
+                : String(localized: "panel.settings.pages.header"))
         } footer: {
             if viewModel.canEditActivePreset {
-                Text(String(localized: "panel.settings.pages.footer"))
+                Text(usesSections
+                    ? String(localized: "panel.settings.sections.footer")
+                    : String(localized: "panel.settings.pages.footer"))
             } else {
                 Text(String(localized: "settings.playerControls.duplicateToEdit"))
             }

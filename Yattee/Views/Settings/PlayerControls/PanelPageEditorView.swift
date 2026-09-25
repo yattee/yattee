@@ -34,6 +34,9 @@ struct PanelPageEditorView: View {
         isEnabled && viewModel.enabledPanelPageCount <= 1
     }
 
+    /// iPhone configures inline sections rather than pages.
+    private var usesSections: Bool { PanelSettings.isSectionsOnlyDevice }
+
     var body: some View {
         Form {
             enabledSection
@@ -75,7 +78,9 @@ struct PanelPageEditorView: View {
     private var enabledSection: some View {
         Section {
             Toggle(
-                String(localized: "panel.settings.page.enabled"),
+                usesSections
+                    ? String(localized: "panel.settings.section.enabled")
+                    : String(localized: "panel.settings.page.enabled"),
                 isOn: $isEnabled
             )
             .disabled(!viewModel.canEditActivePreset || isLastEnabledPage)
@@ -85,7 +90,9 @@ struct PanelPageEditorView: View {
             }
         } footer: {
             if isLastEnabledPage {
-                Text(String(localized: "panel.settings.page.lastEnabled.footer"))
+                Text(usesSections
+                    ? String(localized: "panel.settings.section.lastEnabled.footer")
+                    : String(localized: "panel.settings.page.lastEnabled.footer"))
             } else if !viewModel.canEditActivePreset {
                 Text(String(localized: "settings.playerControls.duplicateToEdit"))
             }

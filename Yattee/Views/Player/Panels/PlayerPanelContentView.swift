@@ -28,8 +28,9 @@ struct PlayerPanelContentView: View {
     /// hide the top page bar.
     var showPageBar: Bool = true
 
-    /// Prototype: the info page shows chapters and related as inline sections;
-    /// those pages are then dropped from the page list.
+    /// The info page shows chapters and related as collapsible inline
+    /// sections in configured order; those pages are then dropped from the
+    /// page list (iPhone in every orientation, stacked iPad portrait).
     var inlineInfoSections: Bool = false
 
     /// Pages the host renders elsewhere (e.g. corner layout keeps info below
@@ -87,7 +88,12 @@ struct PlayerPanelContentView: View {
             pages = pages.filter { !excludedPages.contains($0.pageType) }
         }
         guard inlineInfoSections else { return pages }
-        return pages.filter { $0.pageType != .chapters && $0.pageType != .related }
+        return pages.filter { !PanelSettings.inlineSectionTypes.contains($0.pageType) }
+    }
+
+    /// Sections the info page renders inline, in configured order.
+    private var inlineSections: [PanelPageConfiguration] {
+        inlineInfoSections ? panelSettings.inlineSections(in: region) : []
     }
 
     private var visiblePages: [PanelPageConfiguration] {
@@ -153,12 +159,6 @@ struct PlayerPanelContentView: View {
 
     // MARK: - Pages
 
-    @ViewBuilder
-    private func pageContent(_ page: PanelPageConfiguration) -> some View {
-        switch page.pageType {
-        case .info:
-            InfoPanelPage(
-                context: context,
     /// The host's scroll config keyed to the current video so pages jump to
     /// the top when the video changes.
     private var pageScrollConfig: PanelScrollConfig {
@@ -167,10 +167,16 @@ struct PlayerPanelContentView: View {
         return config
     }
 
+    @ViewBuilder
+    private func pageContent(_ page: PanelPageConfiguration) -> some View {
+        let scrollConfig = pageScrollConfig
+        switch page.pageType {
+        case .info:
+            InfoPanelPage(
+                context: context,
                 settings: page.infoSettings,
                 scrollConfig: scrollConfig,
-        let scrollConfig = pageScrollConfig
-                inlineSections: inlineInfoSections
+                inlineSections: inlineSections
             )
             .id(PanelPageType.info)
         case .comments:

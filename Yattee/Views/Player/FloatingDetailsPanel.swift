@@ -89,10 +89,18 @@ struct FloatingDetailsPanel: View {
         playerControlsLayout.effectivePanelSettings
     }
 
+    /// iPhone renders the same single info page with inline sections as the
+    /// portrait panel: no page bar, comments stay on the pill/overlay.
+    private var usesInlineSections: Bool {
+        PanelSettings.isSectionsOnlyDevice
+    }
+
     /// Whether the comments pill should route to the comments page instead of
     /// the overlay.
     private var isCommentsPageAvailable: Bool {
-        panelSettings.isPageEnabled(.comments) && !(video?.isFromMediaSource ?? true)
+        !usesInlineSections
+            && panelSettings.isPageEnabled(.comments)
+            && !(video?.isFromMediaSource ?? true)
     }
 
     /// Whether any pills are currently visible
@@ -142,6 +150,7 @@ struct FloatingDetailsPanel: View {
             }
         }
         .environment(\.colorScheme, isPinned ? systemColorScheme : .dark)
+        .environment(\.presentationColorScheme, systemColorScheme)
         .animation(.easeInOut(duration: 0.25), value: isPinned)
         .onChange(of: video.id) { _, _ in
             // Comments state is managed by parent - just reset local state
@@ -150,7 +159,6 @@ struct FloatingDetailsPanel: View {
         .onChange(of: isCommentsExpanded) { _, newValue in
             // Sync with NavigationCoordinator to block sheet dismiss gesture when comments expanded
             appEnvironment?.navigationCoordinator.isCommentsExpanded = newValue
-        .environment(\.presentationColorScheme, systemColorScheme)
         }
         .onChange(of: maxPanelWidth) { _, _ in
             // Re-clamp width when max width changes (e.g., pinned vs floating)
@@ -216,14 +224,16 @@ struct FloatingDetailsPanel: View {
                     onChannelTap: onChannelTap
                 ),
                 scrollConfig: PanelScrollConfig(
-                    topInset: 8,
+                    topInset: usesInlineSections ? 20 : 8,
                     bottomInset: 80,
                     scrollOffsetChanged: { offset in
                         scrollOffset = offset
                     },
                     scrollToTopTrigger: scrollToTopTrigger
                 ),
-                pageBarTopPadding: 12
+                pageBarTopPadding: 12,
+                showPageBar: !usesInlineSections,
+                inlineInfoSections: usesInlineSections
             )
         }
         .frame(width: clampWidth(panelWidth))

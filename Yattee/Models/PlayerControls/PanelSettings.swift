@@ -411,6 +411,26 @@ struct PanelSettings: Codable, Hashable, Sendable {
         return result
     }
 
+    /// Page types the info page can render as collapsible inline sections
+    /// below the description (iPhone, and the stacked iPad portrait panel).
+    static let inlineSectionTypes: Set<PanelPageType> = [.chapters, .related]
+
+    /// iPhone has no page switcher: every host renders one info page with
+    /// inline sections, so settings talk about "sections" rather than "pages".
+    static var isSectionsOnlyDevice: Bool {
+        #if os(iOS)
+        return UIDevice.current.userInterfaceIdiom == .phone
+        #else
+        return false
+        #endif
+    }
+
+    /// Enabled pages an inline-sections host renders below the video info,
+    /// in configured order, with their per-page element settings.
+    func inlineSections(in region: PanelRegion? = nil) -> [PanelPageConfiguration] {
+        enabledPages(in: region).filter { Self.inlineSectionTypes.contains($0.pageType) }
+    }
+
     /// Whether a page type is enabled in this configuration.
     func isPageEnabled(_ pageType: PanelPageType) -> Bool {
         enabledPages().contains { $0.pageType == pageType }

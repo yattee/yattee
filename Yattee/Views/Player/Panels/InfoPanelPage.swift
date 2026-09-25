@@ -15,17 +15,34 @@ struct InfoPanelPage: View {
     var settings: InfoPageSettings = InfoPageSettings()
     var scrollConfig: PanelScrollConfig = PanelScrollConfig()
 
-    /// Prototype: collapse the description to a few lines and show chapters
-    /// and related videos as inline sections below it.
-    var inlineSections: Bool = false
+    /// Enabled pages rendered as collapsible inline sections below the
+    /// description, in configured order (see `PanelSettings.inlineSections`).
+    /// Empty means the page shows the video info and description only.
+    var inlineSections: [PanelPageConfiguration] = []
 
     /// Collapse only while something actually renders below the description —
-    /// with no chapters and no related videos the description stays expanded.
-    /// While details are still loading, keep it collapsed to avoid an
-    /// expand-then-clamp flash when sections arrive.
+    /// with no section content the description stays expanded. While details
+    /// are still loading, keep it collapsed to avoid an expand-then-clamp
+    /// flash when sections arrive.
     private var usesCollapsedDescription: Bool {
-        inlineSections
-            && (!chapters.isEmpty || !relatedVideos.isEmpty || videoDetailsState == .loading)
+        guard !inlineSections.isEmpty else { return false }
+        return inlineSections.contains { sectionHasContent($0.pageType) }
+            || videoDetailsState == .loading
+    }
+
+    private func sectionHasContent(_ pageType: PanelPageType) -> Bool {
+        switch pageType {
+        case .chapters:
+            return !chapters.isEmpty
+        case .related:
+            return !relatedVideos.isEmpty
+        default:
+            return false
+        }
+    }
+
+    private var chaptersSectionSettings: ChaptersPageSettings? {
+        inlineSections.first { $0.pageType == .chapters }?.chaptersSettings
     }
 
     @State private var showFormattedDate = false
@@ -70,9 +87,8 @@ struct InfoPanelPage: View {
                     .padding(.vertical)
             }
 
-            if inlineSections {
-                chaptersSection
-                relatedSection
+            ForEach(inlineSections) { section in
+                inlineSection(section)
             }
         }
         .onChange(of: video.id) { _, _ in
@@ -82,7 +98,7 @@ struct InfoPanelPage: View {
             isRelatedCollapsed = false
         }
         .task(id: context.video.id) {
-            if inlineSections {
+            if chaptersSectionSettings?.effectiveShowThumbnails == true {
                 await preloadChapterSheets()
             }
         }
@@ -232,11 +248,23 @@ struct InfoPanelPage: View {
         }
     }
 
-    // MARK: - Inline Sections (prototype)
+    // MARK: - Inline Sections
 
     private var chapters: [VideoChapter] { playerState?.chapters ?? [] }
     private var storyboard: Storyboard? { playerState?.preferredStoryboard }
     private var relatedVideos: [Video] { video.relatedVideos ?? [] }
+
+    @ViewBuilder
+    private func inlineSection(_ section: PanelPageConfiguration) -> some View {
+        switch section.pageType {
+        case .chapters:
+            chaptersSection(settings: section.chaptersSettings)
+        case .related:
+            relatedSection(settings: section.relatedSettings)
+        default:
+            EmptyView()
+        }
+    }
 
     /// Section header that toggles the section's collapsed state on tap.
     @ViewBuilder
@@ -266,7 +294,7 @@ struct InfoPanelPage: View {
     }
 
     @ViewBuilder
-    private var chaptersSection: some View {
+    private func chaptersSection(settings: ChaptersPageSettings) -> some View {
         if !chapters.isEmpty {
             Divider()
                 .panelHorizontalPadding()
@@ -281,7 +309,7 @@ struct InfoPanelPage: View {
                             chapter: chapter,
                             isActive: isChapterActive(chapter),
                             storyboard: storyboard,
-                            showThumbnail: true,
+                            showThumbnail: settings.effectiveShowThumbnails,
                             onTap: {
                                 Task {
                                     await playerService?.seek(to: chapter.startTime)
@@ -291,16 +319,17 @@ struct InfoPanelPage: View {
                     }
                 }
                 .panelHorizontalPadding()
+                .padding(.bottom, 8)
             }
         }
     }
 
     @ViewBuilder
-    private var relatedSection: some View {
+    private func relatedSection(settings: RelatedPageSettings) -> some View {
         if !relatedVideos.isEmpty {
             Divider()
                 .panelHorizontalPadding()
-                .padding(.vertical, 8)
+                .padding(.bottom, 8)
 
             sectionHeader(String(localized: "videoInfo.section.relatedVideos"), isCollapsed: $isRelatedCollapsed)
 
@@ -311,7 +340,7 @@ struct InfoPanelPage: View {
                             video: relatedVideo,
                             style: .regular,
                             disableInternalTapHandling: true,
-                            showThumbnail: true
+                            showThumbnail: settings.effectiveShowThumbnails
                         )
                         .tappableVideo(
                             relatedVideo,
@@ -329,6 +358,7 @@ struct InfoPanelPage: View {
                     }
                 }
                 .panelHorizontalPadding()
+                .padding(.bottom, 8)
             }
         }
     }

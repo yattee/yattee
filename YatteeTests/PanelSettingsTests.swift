@@ -50,6 +50,23 @@ struct PanelSettingsTests {
         #expect(info?.effectiveShowChannelRow == true)
     }
 
+    @Test("Inline sections follow the configured page order and enablement")
+    func inlineSectionsFollowOrder() {
+        var settings = PanelSettings.default
+        // Default order: info, comments, related, chapters, queue
+        #expect(settings.inlineSections().map(\.pageType) == [.related, .chapters])
+
+        // Move chapters (index 3) above related (index 2)
+        settings.movePages(fromOffsets: IndexSet(integer: 3), toOffset: 2)
+        #expect(settings.inlineSections().map(\.pageType) == [.chapters, .related])
+
+        settings.setEnabled(false, for: .related)
+        #expect(settings.inlineSections().map(\.pageType) == [.chapters])
+
+        settings.updateSettings(.chapters(ChaptersPageSettings(showThumbnails: false)), for: .chapters)
+        #expect(settings.inlineSections().first?.chaptersSettings.effectiveShowThumbnails == false)
+    }
+
     @Test("Per-page element settings round-trip for every page type")
     func perPageSettingsRoundTrip() throws {
         var settings = PanelSettings.default
