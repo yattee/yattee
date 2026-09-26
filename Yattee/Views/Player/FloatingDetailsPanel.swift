@@ -23,7 +23,6 @@ struct FloatingDetailsPanel: View {
     @Environment(\.colorScheme) private var systemColorScheme
 
     let onPinToggle: () -> Void
-    let onAlignmentToggle: () -> Void
     let isPinned: Bool
     let panelSide: FloatingPanelSide
     let onChannelTap: (() -> Void)?
@@ -93,6 +92,11 @@ struct FloatingDetailsPanel: View {
     /// portrait panel: no page bar, comments stay on the pill/overlay.
     private var usesInlineSections: Bool {
         PanelSettings.isSectionsOnlyDevice
+    }
+
+    /// iPhone is floating-only: no pin button on the grabber.
+    private var showsPinButton: Bool {
+        !PanelSettings.isSectionsOnlyDevice
     }
 
     /// Whether the comments pill should route to the comments page instead of
@@ -189,23 +193,16 @@ struct FloatingDetailsPanel: View {
             isDragActive: $isDragHandleActive
         )
         .overlay(alignment: .center) {
-            PanelPinButton(
-                isPinned: isPinned,
-                panelSide: panelSide,
-                onPinToggle: onPinToggle,
-                isDragHandleActive: $isDragHandleActive
-            )
-            .offset(y: -65)
-            .zIndex(10) // Ensure pin button appears above panel content
-        }
-        .overlay(alignment: .center) {
-            PanelAlignmentButton(
-                panelSide: panelSide,
-                onAlignmentToggle: onAlignmentToggle,
-                isDragHandleActive: $isDragHandleActive
-            )
-            .offset(y: 65)
-            .zIndex(10)
+            if showsPinButton {
+                PanelPinButton(
+                    isPinned: isPinned,
+                    panelSide: panelSide,
+                    onPinToggle: onPinToggle,
+                    isDragHandleActive: $isDragHandleActive
+                )
+                .offset(y: -65)
+                .zIndex(10) // Ensure pin button appears above panel content
+            }
         }
         .zIndex(10) // Ensure grabber overlay appears above panel
     }

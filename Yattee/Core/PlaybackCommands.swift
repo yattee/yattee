@@ -328,9 +328,8 @@ struct PlaybackCommands: Commands {
         // Clear the queue when closing video
         appEnvironment.queueManager.clearQueue()
 
-        // Reset panel state when closing player
+        // Reset panel visibility when closing player
         settingsManager.landscapeDetailsPanelVisible = false
-        settingsManager.landscapeDetailsPanelPinned = false
 
         // Stop player FIRST before dismissing window
         playerService.stop()

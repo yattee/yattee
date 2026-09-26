@@ -7,6 +7,10 @@
 //  - Overlay: Panel floats over full-width player, appears with controls
 //  - Pinned: Player resizes to make room for panel
 //
+//  iPhone uses the overlay mode only, always on the right. iPad/macOS default
+//  to pinned, can unpin with the pin button, and pick the side in the preset's
+//  panel settings.
+//
 
 import SwiftUI
 
@@ -44,9 +48,11 @@ struct WideScreenPlayerLayout<PlayerContent: View>: View {
     private var video: Video? { playerState?.currentVideo }
 
     private var panelSide: FloatingPanelSide {
-        settingsManager?.floatingDetailsPanelSide ?? .left
+        if PanelSettings.isSectionsOnlyDevice { return .right }
+        return playerControlsLayout.effectivePanelSettings.effectiveWideLayoutSide
     }
 
+    /// `landscapeDetailsPanelPinned` already resolves to `false` on iPhone.
     private var isPanelPinned: Bool {
         settingsManager?.landscapeDetailsPanelPinned ?? false
     }
@@ -360,11 +366,6 @@ struct WideScreenPlayerLayout<PlayerContent: View>: View {
                     withAnimation(.easeInOut(duration: 0.3)) {
                         settingsManager?.landscapeDetailsPanelPinned = true
                     }
-                }
-            },
-            onAlignmentToggle: {
-                withAnimation(.easeInOut(duration: 0.3)) {
-                    settingsManager?.floatingDetailsPanelSide = panelSide.opposite
                 }
             },
             isPinned: isPanelPinned,

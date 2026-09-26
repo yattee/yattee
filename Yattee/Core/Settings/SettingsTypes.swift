@@ -322,16 +322,16 @@ enum SponsorBlockCategory: String, CaseIterable, Codable, Sendable {
 
 // MARK: - Floating Panel
 
-/// Which side the floating details panel appears on in widescreen layout.
+/// Which side the details panel appears on in the standard wide layout.
 enum FloatingPanelSide: String, CaseIterable, Codable {
     case left
     case right
 
-    /// The opposite side.
-    var opposite: FloatingPanelSide {
+    /// Localized name for the settings picker.
+    var displayName: String {
         switch self {
-        case .left: return .right
-        case .right: return .left
+        case .left: return String(localized: "panel.side.left")
+        case .right: return String(localized: "panel.side.right")
         }
     }
 

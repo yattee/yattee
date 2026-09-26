@@ -92,9 +92,8 @@ extension ExpandedPlayerSheet {
         // Clear the queue when closing video
         appEnvironment?.queueManager.clearQueue()
 
-        // Reset panel state when closing player
+        // Reset panel visibility when closing player
         appEnvironment?.settingsManager.landscapeDetailsPanelVisible = false
-        appEnvironment?.settingsManager.landscapeDetailsPanelPinned = false
 
         // Stop player FIRST before dismissing window
         // This ensures MPVRenderView and backend are properly cleaned up

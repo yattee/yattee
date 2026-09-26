@@ -999,7 +999,6 @@ private func applyPanelDefaultVisibility(_ settings: PanelSettings, settingsMana
     switch settings.effectiveDefaultVisibility {
     case .hidden:
         settingsManager.landscapeDetailsPanelVisible = false
-        settingsManager.landscapeDetailsPanelPinned = false
         return false
     case .visible:
         settingsManager.landscapeDetailsPanelVisible = true

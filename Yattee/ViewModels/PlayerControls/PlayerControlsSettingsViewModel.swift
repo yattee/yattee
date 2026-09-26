@@ -818,6 +818,18 @@ final class PlayerControlsSettingsViewModel {
         }
     }
 
+    /// Current panel side in the standard wide layout (iPad/macOS).
+    var panelWideLayoutSide: FloatingPanelSide {
+        panelSettings.effectiveWideLayoutSide
+    }
+
+    /// Synchronously updates the panel side in the standard wide layout.
+    func syncPanelWideLayoutSide(_ side: FloatingPanelSide) {
+        updatePanelSettingsSync { settings in
+            settings.wideLayoutSide = side
+        }
+    }
+
     /// Synchronously updates a page's corner-layout region assignment.
     func setPanelPageRegion(_ region: PanelRegion, for pageType: PanelPageType) {
         updatePanelSettingsSync { settings in

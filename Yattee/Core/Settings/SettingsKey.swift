@@ -128,7 +128,6 @@ enum SettingsKey: String, CaseIterable {
     case tvVideoSyncMode
 
     // Details panel
-    case floatingDetailsPanelSide // Landscape only - which side the panel appears on
     case floatingDetailsPanelWidth // Resizable panel width in wide layout
     case landscapeDetailsPanelVisible
     case landscapeDetailsPanelPinned
@@ -167,7 +166,7 @@ enum SettingsKey: String, CaseIterable {
              .sidebarChannelsEnabled, .sidebarMaxChannels, .sidebarChannelSort, .sidebarChannelsLimitEnabled,
              .sidebarPlaylistsEnabled, .sidebarMaxPlaylists, .sidebarPlaylistSort, .sidebarPlaylistsLimitEnabled,
              // Player details panel — iOS/iPadOS only, different on other platforms
-             .floatingDetailsPanelSide, .floatingDetailsPanelWidth,
+             .floatingDetailsPanelWidth,
              .landscapeDetailsPanelVisible, .landscapeDetailsPanelPinned,
              .detailsPanelLastVisible, .cornerPanelColumnWidth,
              // Video swipe actions — touch-gesture feature

@@ -234,19 +234,6 @@ extension SettingsManager {
 
     // MARK: - Details Panel Settings
 
-    /// Which side the floating details panel appears on in landscape layout.
-    /// Default is right side.
-    var floatingDetailsPanelSide: FloatingPanelSide {
-        get {
-            if let cached = _floatingDetailsPanelSide { return cached }
-            return FloatingPanelSide(rawValue: string(for: .floatingDetailsPanelSide) ?? "") ?? .left
-        }
-        set {
-            _floatingDetailsPanelSide = newValue
-            set(newValue.rawValue, for: .floatingDetailsPanelSide)
-        }
-    }
-
     /// Default panel width in wide layout.
     static let defaultFloatingDetailsPanelWidth: CGFloat = 400
 
@@ -307,12 +294,14 @@ extension SettingsManager {
         }
     }
 
-    /// Whether the details panel is pinned in landscape layout.
-    /// Default is false (floating mode).
+    /// Whether the details panel is pinned (side-by-side) in the wide layout.
+    /// iPad/macOS default to pinned; iPhone is floating-only and always
+    /// resolves to `false` regardless of the stored value.
     var landscapeDetailsPanelPinned: Bool {
         get {
+            if PanelSettings.isSectionsOnlyDevice { return false }
             if let cached = _landscapeDetailsPanelPinned { return cached }
-            return bool(for: .landscapeDetailsPanelPinned, default: false)
+            return bool(for: .landscapeDetailsPanelPinned, default: true)
         }
         set {
             _landscapeDetailsPanelPinned = newValue

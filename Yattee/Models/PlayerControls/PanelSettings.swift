@@ -359,16 +359,22 @@ struct PanelSettings: Codable, Hashable, Sendable {
     /// Whether the page bar shows labels next to icons.
     var showPageBarLabels: Bool?
 
+    /// Which side the details panel sits on in the standard wide layout on
+    /// iPad/macOS. iPhone ignores it (always right). Effective default: `.right`.
+    var wideLayoutSide: FloatingPanelSide?
+
     init(
         pages: [PanelPageConfiguration],
         layoutMode: PanelLayoutMode? = nil,
         defaultVisibility: PanelDefaultVisibility? = nil,
-        showPageBarLabels: Bool? = nil
+        showPageBarLabels: Bool? = nil,
+        wideLayoutSide: FloatingPanelSide? = nil
     ) {
         self.pages = pages
         self.layoutMode = layoutMode
         self.defaultVisibility = defaultVisibility
         self.showPageBarLabels = showPageBarLabels
+        self.wideLayoutSide = wideLayoutSide
     }
 
     /// In-memory cache of the active preset's panel settings, refreshed by the
@@ -388,6 +394,7 @@ struct PanelSettings: Codable, Hashable, Sendable {
     var effectiveLayoutMode: PanelLayoutMode { layoutMode ?? .stacked }
     var effectiveDefaultVisibility: PanelDefaultVisibility { defaultVisibility ?? .hidden }
     var effectiveShowPageBarLabels: Bool { showPageBarLabels ?? true }
+    var effectiveWideLayoutSide: FloatingPanelSide { wideLayoutSide ?? .right }
 
     /// Pages the panel should offer, in order. Pass a region to filter for
     /// corner mode; `nil` returns enabled pages from all regions.
@@ -488,6 +495,7 @@ struct PanelSettings: Codable, Hashable, Sendable {
         case layoutMode
         case defaultVisibility
         case showPageBarLabels
+        case wideLayoutSide
     }
 
     init(from decoder: Decoder) throws {
@@ -509,6 +517,7 @@ struct PanelSettings: Codable, Hashable, Sendable {
         layoutMode = try? container.decodeIfPresent(PanelLayoutMode.self, forKey: .layoutMode)
         defaultVisibility = try? container.decodeIfPresent(PanelDefaultVisibility.self, forKey: .defaultVisibility)
         showPageBarLabels = try container.decodeIfPresent(Bool.self, forKey: .showPageBarLabels)
+        wideLayoutSide = try? container.decodeIfPresent(FloatingPanelSide.self, forKey: .wideLayoutSide)
     }
 
     func encode(to encoder: Encoder) throws {
@@ -517,6 +526,7 @@ struct PanelSettings: Codable, Hashable, Sendable {
         try container.encodeIfPresent(layoutMode, forKey: .layoutMode)
         try container.encodeIfPresent(defaultVisibility, forKey: .defaultVisibility)
         try container.encodeIfPresent(showPageBarLabels, forKey: .showPageBarLabels)
+        try container.encodeIfPresent(wideLayoutSide, forKey: .wideLayoutSide)
     }
 }
 

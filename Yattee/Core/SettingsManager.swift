@@ -178,7 +178,6 @@ final class SettingsManager {
     var _tvVideoSyncMode: TVVideoSyncMode?
 
     // Details panel settings
-    var _floatingDetailsPanelSide: FloatingPanelSide?
     var _floatingDetailsPanelWidth: CGFloat?
     var _landscapeDetailsPanelVisible: Bool?
     var _landscapeDetailsPanelPinned: Bool?
@@ -530,7 +529,6 @@ final class SettingsManager {
         _tvMatchDisplayDynamicRange = nil
         _tvAudioDelayMs = nil
         _tvVideoSyncMode = nil
-        _floatingDetailsPanelSide = nil
         _floatingDetailsPanelWidth = nil
         _landscapeDetailsPanelVisible = nil
         _landscapeDetailsPanelPinned = nil

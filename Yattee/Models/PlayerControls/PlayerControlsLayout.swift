@@ -33,11 +33,6 @@ struct PlayerControlsLayout: Codable, Hashable, Sendable {
     /// Mini player settings. Optional for backward compatibility.
     var miniPlayerSettings: MiniPlayerSettings?
 
-    /// Unused: the player reads the panel side from SettingsManager
-    /// (`floatingDetailsPanelSide`). Kept only so old presets that saved this
-    /// field still decode.
-    var wideLayoutPanelAlignment: FloatingPanelSide?
-
     /// Details panel pages configuration. Optional for backward compatibility.
     var panelSettings: PanelSettings?
 

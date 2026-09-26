@@ -7560,6 +7560,39 @@
         }
       }
     },
+    "panel.settings.side" : {
+      "comment" : "Details panel side picker (iPad/macOS standard layout)",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Panel Side"
+          }
+        }
+      }
+    },
+    "panel.side.left" : {
+      "comment" : "Details panel side option",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Left"
+          }
+        }
+      }
+    },
+    "panel.side.right" : {
+      "comment" : "Details panel side option",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Right"
+          }
+        }
+      }
+    },
     "peertube.explore.added" : {
       "localizations" : {
         "en" : {
@@ -19990,26 +20023,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "View Options"
-          }
-        }
-      }
-    },
-    "wideLayoutPanel.alignmentButton.moveLeft" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Move Panel Left"
-          }
-        }
-      }
-    },
-    "wideLayoutPanel.alignmentButton.moveRight" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Move Panel Right"
           }
         }
       }

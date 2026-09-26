@@ -15,6 +15,7 @@ struct PanelSettingsView: View {
     // Local state for immediate UI updates
     @State private var defaultVisibility: PanelDefaultVisibility = .hidden
     @State private var layoutMode: PanelLayoutMode = .stacked
+    @State private var wideLayoutSide: FloatingPanelSide = .right
     @State private var showPageBarLabels: Bool = true
 
     /// Corner layout exists on iPad and macOS only.
@@ -64,7 +65,7 @@ struct PanelSettingsView: View {
 
     private var layoutSection: some View {
         Section {
-            PanelLayoutSchematic(mode: layoutMode)
+            PanelLayoutSchematic(mode: layoutMode, side: wideLayoutSide)
                 .frame(maxWidth: .infinity)
                 .padding(.vertical, 4)
                 .listRowBackground(Color.clear)
@@ -81,6 +82,22 @@ struct PanelSettingsView: View {
             .onChange(of: layoutMode) { _, newValue in
                 guard newValue != viewModel.panelLayoutMode else { return }
                 viewModel.syncPanelLayoutMode(newValue)
+            }
+
+            if layoutMode == .stacked {
+                Picker(
+                    String(localized: "panel.settings.side"),
+                    selection: $wideLayoutSide
+                ) {
+                    ForEach(FloatingPanelSide.allCases, id: \.self) { side in
+                        Text(side.displayName).tag(side)
+                    }
+                }
+                .disabled(!viewModel.canEditActivePreset)
+                .onChange(of: wideLayoutSide) { _, newValue in
+                    guard newValue != viewModel.panelWideLayoutSide else { return }
+                    viewModel.syncPanelWideLayoutSide(newValue)
+                }
             }
         } footer: {
             Text(String(localized: "panel.settings.layoutMode.footer"))
@@ -187,6 +204,7 @@ struct PanelSettingsView: View {
     private func syncLocalState() {
         defaultVisibility = viewModel.panelDefaultVisibility
         layoutMode = viewModel.panelLayoutMode
+        wideLayoutSide = viewModel.panelWideLayoutSide
         showPageBarLabels = viewModel.panelShowPageBarLabels
     }
 }
@@ -197,11 +215,18 @@ struct PanelSettingsView: View {
 /// area plus where the details panel regions sit in each mode.
 private struct PanelLayoutSchematic: View {
     let mode: PanelLayoutMode
+    /// Panel side in the standard layout; the corner column is always right.
+    let side: FloatingPanelSide
 
     private let cornerRadius: CGFloat = 4
 
     var body: some View {
         HStack(spacing: 3) {
+            if mode == .stacked && side == .left {
+                panelBlock
+                    .frame(width: 44)
+            }
+
             if mode == .corner {
                 VStack(spacing: 3) {
                     videoBlock
@@ -212,8 +237,10 @@ private struct PanelLayoutSchematic: View {
                 videoBlock
             }
 
-            panelBlock
-                .frame(width: 44)
+            if mode == .corner || side == .right {
+                panelBlock
+                    .frame(width: 44)
+            }
         }
         .padding(6)
         .frame(width: 180, height: 110)
@@ -222,6 +249,7 @@ private struct PanelLayoutSchematic: View {
                 .fill(.quaternary.opacity(0.4))
         }
         .animation(.easeInOut(duration: 0.25), value: mode)
+        .animation(.easeInOut(duration: 0.25), value: side)
     }
 
     private var videoBlock: some View {
