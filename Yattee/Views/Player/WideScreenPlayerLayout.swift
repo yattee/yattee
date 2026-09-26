@@ -106,14 +106,24 @@ struct WideScreenPlayerLayout<PlayerContent: View>: View {
         settingsManager?.detailsPanelLastVisible = false
     }
 
+    #if os(iOS)
+    /// The app's window, looked up from any foreground scene. Notification
+    /// Center and Control Center move the scene to `.foregroundInactive`, so
+    /// requiring `.foregroundActive` would drop the safe area to zero while
+    /// they are open and make the panel jump to the screen edge.
+    private var foregroundWindow: UIWindow? {
+        let scenes = UIApplication.shared.connectedScenes.compactMap { $0 as? UIWindowScene }
+        let scene = scenes.first { $0.activationState == .foregroundActive }
+            ?? scenes.first { $0.activationState == .foregroundInactive }
+            ?? scenes.first
+        return scene?.windows.first { $0.isKeyWindow } ?? scene?.windows.first
+    }
+    #endif
+
     /// Get safe area insets from window scene (geometry reader insets are 0 when .ignoresSafeArea is used)
     private var windowSafeAreaInsets: EdgeInsets {
         #if os(iOS)
-        guard let windowScene = UIApplication.shared.connectedScenes
-            .compactMap({ $0 as? UIWindowScene })
-            .first(where: { $0.activationState == .foregroundActive }),
-              let window = windowScene.windows.first
-        else { return EdgeInsets() }
+        guard let window = foregroundWindow else { return EdgeInsets() }
         let insets = window.safeAreaInsets
         return EdgeInsets(top: insets.top, leading: insets.left, bottom: insets.bottom, trailing: insets.right)
         #else
@@ -125,11 +135,7 @@ struct WideScreenPlayerLayout<PlayerContent: View>: View {
     /// On macOS, this is not used - geometry reader size is used directly
     private var windowSceneBounds: CGSize {
         #if os(iOS)
-        guard let windowScene = UIApplication.shared.connectedScenes
-            .compactMap({ $0 as? UIWindowScene })
-            .first(where: { $0.activationState == .foregroundActive }),
-              let window = windowScene.windows.first
-        else {
+        guard let window = foregroundWindow else {
             // Fallback to screen bounds
             let screen = UIScreen.main.bounds
             return CGSize(width: max(screen.width, screen.height), height: min(screen.width, screen.height))
