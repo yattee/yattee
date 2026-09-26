@@ -224,7 +224,7 @@ struct FloatingDetailsPanel: View {
                     onChannelTap: onChannelTap
                 ),
                 scrollConfig: PanelScrollConfig(
-                    topInset: usesInlineSections ? 20 : 8,
+                    topInset: 8,
                     bottomInset: 80,
                     scrollOffsetChanged: { offset in
                         scrollOffset = offset
