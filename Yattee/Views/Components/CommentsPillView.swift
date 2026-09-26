@@ -16,13 +16,16 @@ struct CommentsPillView: View {
     var fillWidth: Bool = false
     /// When true, uses smaller sizing for the collapsed state (e.g. on narrow devices).
     var compact: Bool = false
+    /// Whether the expanded pill leads with the author's avatar; when the
+    /// comments avatars setting is off it shows the comments icon instead.
+    var showAvatar: Bool = true
     let onTap: () -> Void
 
     var body: some View {
         Button(action: onTap) {
             HStack(spacing: isCollapsed ? 0 : 12) {
-                // Show icon when collapsed, avatar when expanded
-                if isCollapsed {
+                // Show icon when collapsed (or avatars are off), avatar when expanded
+                if isCollapsed || !showAvatar {
                     collapsedIconView
                 } else {
                     avatarView

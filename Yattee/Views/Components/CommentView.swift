@@ -188,6 +188,19 @@ struct CommentView: View {
 
     // MARK: - Replies Section
 
+    /// Leading inset that lines the replies toggle up with the comment text:
+    /// the avatar column (avatar width + spacing) when avatars show, else
+    /// nothing.
+    private var contentIndent: CGFloat {
+        showAvatar ? 44 : 0
+    }
+
+    /// Leading inset for the nested replies. Without avatars a smaller
+    /// inset still marks the hierarchy.
+    private var repliesIndent: CGFloat {
+        showAvatar ? 44 : 16
+    }
+
     @ViewBuilder
     private var repliesSection: some View {
         VStack(alignment: .leading, spacing: 0) {
@@ -221,7 +234,7 @@ struct CommentView: View {
                 #endif
             }
             .buttonStyle(.plain)
-            .padding(.leading, 44) // Align with comment content (avatar width + spacing)
+            .padding(.leading, contentIndent)
             .padding(.bottom, 8)
 
             // Replies list
@@ -229,11 +242,11 @@ struct CommentView: View {
                 VStack(alignment: .leading, spacing: 0) {
                     ForEach(replies) { reply in
                         CommentView(comment: reply, source: source, isReply: true, showAvatar: showAvatar)
-                            .padding(.leading, 44)
+                            .padding(.leading, repliesIndent)
 
                         if reply.id != replies.last?.id {
                             Divider()
-                                .padding(.leading, 44)
+                                .padding(.leading, repliesIndent)
                         }
                     }
 
@@ -245,7 +258,7 @@ struct CommentView: View {
                                 .padding(.vertical, 8)
                             Spacer()
                         }
-                        .padding(.leading, 44)
+                        .padding(.leading, repliesIndent)
                     } else if repliesContinuation != nil {
                         Button {
                             Task { await loadReplies() }
@@ -262,7 +275,7 @@ struct CommentView: View {
                                 #endif
                         }
                         .buttonStyle(.plain)
-                        .padding(.leading, 44)
+                        .padding(.leading, repliesIndent)
                         .padding(.vertical, 8)
                     }
                 }

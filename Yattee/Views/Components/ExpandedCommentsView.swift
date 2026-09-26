@@ -19,6 +19,8 @@ struct ExpandedCommentsView: View {
     // Panel resize drag callbacks
     var onDragChanged: ((CGFloat) -> Void)? = nil
     var onDragEnded: ((CGFloat, CGFloat) -> Void)? = nil
+    /// Whether comment rows show author avatars (comments page setting).
+    var showAvatars: Bool = true
 
     @State private var showScrollButton = false
     @State private var scrollToTopTrigger: Int = 0
@@ -223,7 +225,7 @@ struct ExpandedCommentsView: View {
 
     @ViewBuilder
     private var commentsContent: some View {
-        CommentsListContent(videoID: videoID)
+        CommentsListContent(videoID: videoID, showAvatars: showAvatars)
     }
 
     @ViewBuilder
