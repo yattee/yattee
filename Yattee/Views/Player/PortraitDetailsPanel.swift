@@ -105,9 +105,15 @@ struct PortraitDetailsPanel: View {
     }
 
     /// Whether comments pill is shown expanded on its own row (above player pill)
+    /// Whether the comments pill currently occupies its own row above the
+    /// player pill. Must track the pill's actual collapse state (including
+    /// collapse on scroll): the bottom fade sizes its touch blocker from
+    /// this, and a stale "expanded" answer swallows taps on the last rows
+    /// of content, e.g. a collapsed section header.
     private var hasExpandedCommentsPill: Bool {
         let hasCommentsPill = commentsState == .loaded && !comments.isEmpty && shouldShowCommentsPill
-        return hasCommentsPill && shouldShowPlayerPill && !isCommentsPillAlwaysCollapsed && hasVideoDescription
+        let isPillCollapsed = scrollOffset > 20 || isCommentsPillAlwaysCollapsed || !hasVideoDescription
+        return hasCommentsPill && shouldShowPlayerPill && !isPillCollapsed
     }
 
     // MARK: - Drag Handle
@@ -274,7 +280,8 @@ struct PortraitDetailsPanel: View {
                     onClose: collapseComments,
                     onDismissGestureEnded: handleCommentsDismissGestureEnded,
                     onDragChanged: onDragChanged,
-                    onDragEnded: onDragEnded
+                    onDragEnded: onDragEnded,
+                    showAvatars: panelSettings.commentsShowAvatars
                 )
                 .clipShape(RoundedRectangle(cornerRadius: 16))
                 .visualEffect { content, proxy in
@@ -326,6 +333,7 @@ struct PortraitDetailsPanel: View {
                         CommentsPillView(
                             comment: firstComment,
                             isCollapsed: false,
+                            showAvatar: panelSettings.commentsShowAvatars,
                             onTap: expandComments
                         )
                     }
@@ -384,6 +392,7 @@ struct PortraitDetailsPanel: View {
                         isCollapsed: isPillCollapsed,
                         fillWidth: !isPillCollapsed,
                         compact: isCompact && isPillCollapsed,
+                        showAvatar: panelSettings.commentsShowAvatars,
                         onTap: expandComments
                     )
                     .frame(maxWidth: isPillCollapsed ? nil : 400)
@@ -394,6 +403,7 @@ struct PortraitDetailsPanel: View {
                         comment: firstComment,
                         isCollapsed: true,
                         compact: isCompact,
+                        showAvatar: panelSettings.commentsShowAvatars,
                         onTap: expandComments
                     )
                 } else {

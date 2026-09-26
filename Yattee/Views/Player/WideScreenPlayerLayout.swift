@@ -101,7 +101,7 @@ struct WideScreenPlayerLayout<PlayerContent: View>: View {
         withAnimation(.easeInOut(duration: 0.3)) {
             isPanelVisible.toggle()
             settingsManager?.landscapeDetailsPanelVisible = isPanelVisible
-            settingsManager?.detailsPanelLastVisible = isPanelVisible
+            settingsManager?.landscapeDetailsPanelLastVisible = isPanelVisible
         }
     }
 
@@ -109,7 +109,7 @@ struct WideScreenPlayerLayout<PlayerContent: View>: View {
     private func hidePanel() {
         isPanelVisible = false
         settingsManager?.landscapeDetailsPanelVisible = false
-        settingsManager?.detailsPanelLastVisible = false
+        settingsManager?.landscapeDetailsPanelLastVisible = false
     }
 
     #if os(iOS)
@@ -359,7 +359,7 @@ struct WideScreenPlayerLayout<PlayerContent: View>: View {
                     // Pinning - ensure panel is visible first
                     isPanelVisible = true
                     settingsManager?.landscapeDetailsPanelVisible = true
-                    settingsManager?.detailsPanelLastVisible = true
+                    settingsManager?.landscapeDetailsPanelLastVisible = true
 
                     // Animate panscan to zero and pin concurrently for smooth transition
                     appEnvironment?.navigationCoordinator.animatePanscanToZero(completion: nil)

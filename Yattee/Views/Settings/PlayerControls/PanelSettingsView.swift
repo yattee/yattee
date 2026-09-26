@@ -13,10 +13,13 @@ struct PanelSettingsView: View {
     @Bindable var viewModel: PlayerControlsSettingsViewModel
 
     // Local state for immediate UI updates
-    @State private var defaultVisibility: PanelDefaultVisibility = .hidden
+    @State private var portraitDefaultVisibility: PanelDefaultVisibility = .visible
+    @State private var landscapeDefaultVisibility: PanelDefaultVisibility = .hidden
     @State private var layoutMode: PanelLayoutMode = .stacked
     @State private var wideLayoutSide: FloatingPanelSide = .right
     @State private var showPageBarLabels: Bool = true
+    @State private var commentsShowAvatars: Bool = true
+    @State private var commentsPillMode: CommentsPillMode = .pill
 
     /// Corner layout exists on iPad and macOS only.
     static var supportsCornerLayout: Bool {
@@ -40,6 +43,9 @@ struct PanelSettingsView: View {
                 pageBarSection
             }
             pagesSection
+            if usesSections {
+                commentsSection
+            }
         }
         .navigationTitle(String(localized: "settings.playerControls.detailsPanel"))
         #if os(iOS)
@@ -106,23 +112,58 @@ struct PanelSettingsView: View {
 
     // MARK: - Visibility Section
 
+    /// macOS has no portrait player layout: only the landscape default.
+    private static var hasPortraitLayout: Bool {
+        #if os(macOS)
+        return false
+        #else
+        return true
+        #endif
+    }
+
     private var visibilitySection: some View {
         Section {
-            Picker(
-                String(localized: "panel.settings.defaultVisibility"),
-                selection: $defaultVisibility
-            ) {
-                ForEach(PanelDefaultVisibility.allCases, id: \.self) { visibility in
-                    Text(visibility.displayName).tag(visibility)
-                }
+            if Self.hasPortraitLayout {
+                visibilityPicker(
+                    String(localized: "panel.settings.defaultVisibility.portrait"),
+                    selection: $portraitDefaultVisibility,
+                    orientation: .portrait
+                )
+                visibilityPicker(
+                    String(localized: "panel.settings.defaultVisibility.landscape"),
+                    selection: $landscapeDefaultVisibility,
+                    orientation: .landscape
+                )
+            } else {
+                visibilityPicker(
+                    String(localized: "panel.settings.defaultVisibility"),
+                    selection: $landscapeDefaultVisibility,
+                    orientation: .landscape
+                )
             }
-            .disabled(!viewModel.canEditActivePreset)
-            .onChange(of: defaultVisibility) { _, newValue in
-                guard newValue != viewModel.panelDefaultVisibility else { return }
-                viewModel.syncPanelDefaultVisibility(newValue)
+        } header: {
+            if Self.hasPortraitLayout {
+                Text(String(localized: "panel.settings.defaultVisibility"))
             }
         } footer: {
             Text(String(localized: "panel.settings.defaultVisibility.footer"))
+        }
+    }
+
+    private func visibilityPicker(
+        _ title: String,
+        selection: Binding<PanelDefaultVisibility>,
+        orientation: PanelOrientation
+    ) -> some View {
+        Picker(title, selection: selection) {
+            ForEach(PanelDefaultVisibility.allCases, id: \.self) { visibility in
+                Text(visibility.displayName).tag(visibility)
+            }
+        }
+        .disabled(!viewModel.canEditActivePreset)
+        .onChange(of: selection.wrappedValue) { _, newValue in
+            guard newValue != viewModel.panelDefaultVisibility(for: orientation) else { return }
+            viewModel.syncPanelDefaultVisibility(newValue, for: orientation)
         }
     }
 
@@ -144,15 +185,82 @@ struct PanelSettingsView: View {
         }
     }
 
+    // MARK: - Comments Section (iPhone)
+
+    /// iPhone never renders a comments page: comments live on the pill and
+    /// overlay, so their settings sit here instead of in the sections list.
+    private var commentsSettings: CommentsPageSettings {
+        viewModel.panelSettings.configuration(for: .comments)?.commentsSettings ?? CommentsPageSettings()
+    }
+
+    private var commentsSection: some View {
+        Section {
+            Picker(
+                String(localized: "commentsPill.mode.title"),
+                selection: $commentsPillMode
+            ) {
+                ForEach(CommentsPillMode.allCases, id: \.self) { mode in
+                    Text(mode.displayName).tag(mode)
+                }
+            }
+            .onChange(of: commentsPillMode) { _, newValue in
+                guard newValue != commentsSettings.effectivePillMode else { return }
+                viewModel.updatePanelCommentsSettingsSync { $0.pillMode = newValue }
+            }
+
+            Toggle(
+                String(localized: "panel.settings.comments.showAvatars"),
+                isOn: $commentsShowAvatars
+            )
+            .onChange(of: commentsShowAvatars) { _, newValue in
+                guard newValue != commentsSettings.effectiveShowAvatars else { return }
+                viewModel.updatePanelCommentsSettingsSync { $0.showAvatars = newValue }
+            }
+        } header: {
+            Text(String(localized: "player.comments"))
+        } footer: {
+            if !viewModel.canEditActivePreset {
+                Text(String(localized: "settings.playerControls.duplicateToEdit"))
+            }
+        }
+        .disabled(!viewModel.canEditActivePreset)
+    }
+
     // MARK: - Pages Section
+
+    /// The pinned page (info) is rendered outside the reorderable list so it
+    /// gets no drag handle and nothing can be dropped above it.
+    private var pinnedPage: PanelPageConfiguration? {
+        viewModel.panelPages.first { $0.pageType == PanelSettings.pinnedPageType }
+    }
+
+    /// Pages the user can reorder: everything but the pinned page and the
+    /// types this device never renders (iPhone: queue).
+    private var reorderablePages: [PanelPageConfiguration] {
+        let hidden = PanelSettings.hiddenSettingsPageTypes
+        return viewModel.panelPages.filter {
+            $0.pageType != PanelSettings.pinnedPageType && !hidden.contains($0.pageType)
+        }
+    }
 
     private var pagesSection: some View {
         Section {
-            ForEach(viewModel.panelPages) { page in
+            if let pinnedPage {
+                pageRow(for: pinnedPage)
+                    .moveDisabled(true)
+            }
+
+            ForEach(reorderablePages) { page in
                 pageRow(for: page)
             }
             .onMove { source, destination in
-                viewModel.movePanelPages(fromOffsets: source, toOffset: destination)
+                // Offsets are relative to the displayed list; the pinned and
+                // hidden pages keep their slots in the stored list.
+                viewModel.movePanelPages(
+                    visible: reorderablePages.map(\.pageType),
+                    fromOffsets: source,
+                    toOffset: destination
+                )
             }
         } header: {
             Text(usesSections
@@ -202,10 +310,13 @@ struct PanelSettingsView: View {
     // MARK: - Helpers
 
     private func syncLocalState() {
-        defaultVisibility = viewModel.panelDefaultVisibility
+        portraitDefaultVisibility = viewModel.panelDefaultVisibility(for: .portrait)
+        landscapeDefaultVisibility = viewModel.panelDefaultVisibility(for: .landscape)
         layoutMode = viewModel.panelLayoutMode
         wideLayoutSide = viewModel.panelWideLayoutSide
         showPageBarLabels = viewModel.panelShowPageBarLabels
+        commentsShowAvatars = commentsSettings.effectiveShowAvatars
+        commentsPillMode = commentsSettings.effectivePillMode
     }
 }
 

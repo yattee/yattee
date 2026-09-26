@@ -45,6 +45,18 @@ struct InfoPanelPage: View {
         inlineSections.first { $0.pageType == .chapters }?.chaptersSettings
     }
 
+    private var relatedSectionSettings: RelatedPageSettings? {
+        inlineSections.first { $0.pageType == .related }?.relatedSettings
+    }
+
+    /// Seeds the description and section collapse state from the configured
+    /// defaults.
+    private func resetSectionCollapseState() {
+        isDescriptionExpanded = settings.effectiveDescriptionExpandedByDefault
+        isChaptersCollapsed = !(chaptersSectionSettings?.effectiveExpandedByDefault ?? true)
+        isRelatedCollapsed = !(relatedSectionSettings?.effectiveExpandedByDefault ?? true)
+    }
+
     @State private var showFormattedDate = false
     @State private var showOriginalTitle = false
     @State private var isDescriptionExpanded = false
@@ -77,7 +89,7 @@ struct InfoPanelPage: View {
     }
 
     var body: some View {
-        PanelPageScrollView(config: scrollConfig) {
+        PanelPageScrollView(config: scrollConfig) { proxy in
             videoInfo
 
             if settings.effectiveShowDescription {
@@ -89,14 +101,20 @@ struct InfoPanelPage: View {
             }
 
             ForEach(inlineSections) { section in
-                inlineSection(section)
+                // One container per section so the scroll anchor is a single
+                // view (the divider + header + rows), not each child.
+                VStack(alignment: .leading, spacing: 0) {
+                    inlineSection(section, scrollProxy: proxy)
+                }
+                .id(Self.sectionScrollID(section.pageType))
             }
         }
         .onChange(of: video.id) { _, _ in
             showOriginalTitle = false
-            isDescriptionExpanded = false
-            isChaptersCollapsed = false
-            isRelatedCollapsed = false
+            resetSectionCollapseState()
+        }
+        .onAppear {
+            resetSectionCollapseState()
         }
         .task(id: context.video.id) {
             if chaptersSectionSettings?.effectiveShowThumbnails == true {
@@ -213,8 +231,9 @@ struct InfoPanelPage: View {
         }
     }
 
-    /// Collapsed: 3 lines with an inline "more" cutting into the end of the
-    /// last line; the whole area is tappable to expand. Expanded: full text
+    /// Collapsed: the configured number of lines with an inline "more"
+    /// cutting into the end of the last line; the whole area is tappable to
+    /// expand. Expanded: full text
     /// with working links and a "less" button below.
     @ViewBuilder
     private func collapsibleDescription(_ description: String) -> some View {
@@ -223,7 +242,7 @@ struct InfoPanelPage: View {
                 .font(.subheadline)
                 .foregroundStyle(.secondary)
                 .tint(context.accentColor)
-                .lineLimit(isDescriptionExpanded ? nil : 3)
+                .lineLimit(isDescriptionExpanded ? nil : settings.effectiveDescriptionCollapsedLines)
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .handleTimestampLinks(using: playerService)
                 // Collapsed: let the container tap win over link taps
@@ -250,9 +269,7 @@ struct InfoPanelPage: View {
 
             if isDescriptionExpanded {
                 Button {
-                    withAnimation(.easeInOut(duration: 0.2)) {
-                        isDescriptionExpanded = false
-                    }
+                    isDescriptionExpanded = false
                 } label: {
                     Text(String(localized: "common.less"))
                         .font(.subheadline.weight(.semibold))
@@ -265,9 +282,7 @@ struct InfoPanelPage: View {
         .contentShape(Rectangle())
         .onTapGesture {
             if !isDescriptionExpanded {
-                withAnimation(.easeInOut(duration: 0.2)) {
-                    isDescriptionExpanded = true
-                }
+                isDescriptionExpanded = true
             }
         }
     }
@@ -278,24 +293,48 @@ struct InfoPanelPage: View {
     private var storyboard: Storyboard? { playerState?.preferredStoryboard }
     private var relatedVideos: [Video] { video.relatedVideos ?? [] }
 
+    /// Scroll anchor for a section: its Divider + header, so scrolling to it
+    /// puts the tapped header at the top of the panel.
+    private static func sectionScrollID(_ pageType: PanelPageType) -> String {
+        "inlineSection-\(pageType.rawValue)"
+    }
+
     @ViewBuilder
-    private func inlineSection(_ section: PanelPageConfiguration) -> some View {
+    private func inlineSection(_ section: PanelPageConfiguration, scrollProxy: ScrollViewProxy) -> some View {
         switch section.pageType {
         case .chapters:
-            chaptersSection(settings: section.chaptersSettings)
+            chaptersSection(settings: section.chaptersSettings, scrollProxy: scrollProxy)
         case .related:
-            relatedSection(settings: section.relatedSettings)
+            relatedSection(settings: section.relatedSettings, scrollProxy: scrollProxy)
         default:
             EmptyView()
         }
     }
 
     /// Section header that toggles the section's collapsed state on tap.
+    /// Expanding also scrolls the section to the top of the panel so the
+    /// revealed content starts right under the tapped header, instead of
+    /// growing below the fold.
     @ViewBuilder
-    private func sectionHeader(_ title: String, isCollapsed: Binding<Bool>) -> some View {
+    private func sectionHeader(
+        _ title: String,
+        isCollapsed: Binding<Bool>,
+        scrollProxy: ScrollViewProxy,
+        scrollID: String
+    ) -> some View {
         Button {
-            withAnimation(.easeInOut(duration: 0.2)) {
+            let expanding = isCollapsed.wrappedValue
+            withAnimation(.easeInOut(duration: 0.25)) {
                 isCollapsed.wrappedValue.toggle()
+            }
+            if expanding {
+                // Next runloop: the expanded content must be laid out before
+                // the scroll view can reach the section's top.
+                DispatchQueue.main.async {
+                    withAnimation(.easeInOut(duration: 0.3)) {
+                        scrollProxy.scrollTo(scrollID, anchor: .top)
+                    }
+                }
             }
         } label: {
             HStack(spacing: 6) {
@@ -318,13 +357,18 @@ struct InfoPanelPage: View {
     }
 
     @ViewBuilder
-    private func chaptersSection(settings: ChaptersPageSettings) -> some View {
+    private func chaptersSection(settings: ChaptersPageSettings, scrollProxy: ScrollViewProxy) -> some View {
         if !chapters.isEmpty {
             Divider()
                 .panelHorizontalPadding()
                 .padding(.bottom, 8)
 
-            sectionHeader(String(localized: "player.chapters"), isCollapsed: $isChaptersCollapsed)
+            sectionHeader(
+                String(localized: "player.chapters"),
+                isCollapsed: $isChaptersCollapsed,
+                scrollProxy: scrollProxy,
+                scrollID: Self.sectionScrollID(.chapters)
+            )
 
             if !isChaptersCollapsed {
                 LazyVStack(spacing: 0) {
@@ -349,13 +393,18 @@ struct InfoPanelPage: View {
     }
 
     @ViewBuilder
-    private func relatedSection(settings: RelatedPageSettings) -> some View {
+    private func relatedSection(settings: RelatedPageSettings, scrollProxy: ScrollViewProxy) -> some View {
         if !relatedVideos.isEmpty {
             Divider()
                 .panelHorizontalPadding()
                 .padding(.bottom, 8)
 
-            sectionHeader(String(localized: "videoInfo.section.relatedVideos"), isCollapsed: $isRelatedCollapsed)
+            sectionHeader(
+                String(localized: "videoInfo.section.relatedVideos"),
+                isCollapsed: $isRelatedCollapsed,
+                scrollProxy: scrollProxy,
+                scrollID: Self.sectionScrollID(.related)
+            )
 
             if !isRelatedCollapsed {
                 LazyVStack(spacing: 12) {

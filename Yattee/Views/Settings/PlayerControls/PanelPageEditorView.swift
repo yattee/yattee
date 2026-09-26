@@ -17,21 +17,25 @@ struct PanelPageEditorView: View {
     @State private var isEnabled: Bool = true
     @State private var region: PanelRegion = .primary
     @State private var showDescription: Bool = true
+    @State private var descriptionExpandedByDefault: Bool = false
+    @State private var descriptionCollapsedLines: Int = InfoPageSettings.defaultDescriptionCollapsedLines
     @State private var showStatsRow: Bool = true
     @State private var showChannelRow: Bool = true
     @State private var showAvatars: Bool = true
     @State private var commentsPillMode: CommentsPillMode = .pill
     @State private var showRelatedThumbnails: Bool = true
+    @State private var relatedExpandedByDefault: Bool = true
     @State private var showChapterThumbnails: Bool = true
+    @State private var chaptersExpandedByDefault: Bool = true
     @State private var showHistory: Bool = true
 
     private var configuration: PanelPageConfiguration? {
         viewModel.panelSettings.configuration(for: pageType)
     }
 
-    /// Whether this is the only enabled page; the last one cannot be disabled.
-    private var isLastEnabledPage: Bool {
-        isEnabled && viewModel.enabledPanelPageCount <= 1
+    /// The pinned page (info) is always first and enabled: no toggle.
+    private var isPinnedPage: Bool {
+        pageType == PanelSettings.pinnedPageType
     }
 
     /// iPhone configures inline sections rather than pages.
@@ -39,7 +43,9 @@ struct PanelPageEditorView: View {
 
     var body: some View {
         Form {
-            enabledSection
+            if !isPinnedPage {
+                enabledSection
+            }
 
             if PanelSettingsView.supportsCornerLayout, viewModel.panelLayoutMode == .corner {
                 regionSection
@@ -83,17 +89,13 @@ struct PanelPageEditorView: View {
                     : String(localized: "panel.settings.page.enabled"),
                 isOn: $isEnabled
             )
-            .disabled(!viewModel.canEditActivePreset || isLastEnabledPage)
+            .disabled(!viewModel.canEditActivePreset)
             .onChange(of: isEnabled) { _, newValue in
                 guard newValue != configuration?.isEnabled else { return }
                 viewModel.setPanelPageEnabled(pageType, isEnabled: newValue)
             }
         } footer: {
-            if isLastEnabledPage {
-                Text(usesSections
-                    ? String(localized: "panel.settings.section.lastEnabled.footer")
-                    : String(localized: "panel.settings.page.lastEnabled.footer"))
-            } else if !viewModel.canEditActivePreset {
+            if !viewModel.canEditActivePreset {
                 Text(String(localized: "settings.playerControls.duplicateToEdit"))
             }
         }
@@ -123,6 +125,7 @@ struct PanelPageEditorView: View {
 
     // MARK: - Info Elements Section
 
+    @ViewBuilder
     private var infoElementsSection: some View {
         Section {
             Toggle(
@@ -153,6 +156,46 @@ struct PanelPageEditorView: View {
             }
         } header: {
             Text(String(localized: "panel.settings.elements.header"))
+        }
+        .disabled(!viewModel.canEditActivePreset)
+
+        if Self.hasInlineSections, showDescription {
+            descriptionSection
+        }
+    }
+
+    /// Collapse behavior of the description on inline-sections hosts (iPhone,
+    /// iPad portrait), where sections below it clamp it to a few lines.
+    private var descriptionSection: some View {
+        Section {
+            Toggle(
+                String(localized: "panel.settings.section.expandedByDefault"),
+                isOn: $descriptionExpandedByDefault
+            )
+            .onChange(of: descriptionExpandedByDefault) { _, newValue in
+                guard newValue != infoSettings.effectiveDescriptionExpandedByDefault else { return }
+                viewModel.updatePanelInfoSettingsSync { $0.descriptionExpandedByDefault = newValue }
+            }
+
+            Stepper(
+                value: $descriptionCollapsedLines,
+                in: InfoPageSettings.descriptionCollapsedLinesRange
+            ) {
+                HStack {
+                    Text(String(localized: "panel.settings.info.descriptionCollapsedLines"))
+                    Spacer()
+                    Text("\(descriptionCollapsedLines)")
+                        .foregroundStyle(.secondary)
+                }
+            }
+            .onChange(of: descriptionCollapsedLines) { _, newValue in
+                guard newValue != infoSettings.effectiveDescriptionCollapsedLines else { return }
+                viewModel.updatePanelInfoSettingsSync { $0.descriptionCollapsedLines = newValue }
+            }
+        } header: {
+            Text(String(localized: "panel.settings.info.description.header"))
+        } footer: {
+            Text(String(localized: "panel.settings.info.description.footer"))
         }
         .disabled(!viewModel.canEditActivePreset)
     }
@@ -200,8 +243,23 @@ struct PanelPageEditorView: View {
                 guard newValue != relatedSettings.effectiveShowThumbnails else { return }
                 viewModel.updatePanelRelatedSettingsSync { $0.showThumbnails = newValue }
             }
+
+            if Self.hasInlineSections {
+                Toggle(
+                    String(localized: "panel.settings.section.expandedByDefault"),
+                    isOn: $relatedExpandedByDefault
+                )
+                .onChange(of: relatedExpandedByDefault) { _, newValue in
+                    guard newValue != relatedSettings.effectiveExpandedByDefault else { return }
+                    viewModel.updatePanelRelatedSettingsSync { $0.expandedByDefault = newValue }
+                }
+            }
         } header: {
             Text(String(localized: "panel.settings.elements.header"))
+        } footer: {
+            if Self.hasInlineSections {
+                Text(String(localized: "panel.settings.section.expandedByDefault.footer"))
+            }
         }
         .disabled(!viewModel.canEditActivePreset)
     }
@@ -218,10 +276,35 @@ struct PanelPageEditorView: View {
                 guard newValue != chaptersSettings.effectiveShowThumbnails else { return }
                 viewModel.updatePanelChaptersSettingsSync { $0.showThumbnails = newValue }
             }
+
+            if Self.hasInlineSections {
+                Toggle(
+                    String(localized: "panel.settings.section.expandedByDefault"),
+                    isOn: $chaptersExpandedByDefault
+                )
+                .onChange(of: chaptersExpandedByDefault) { _, newValue in
+                    guard newValue != chaptersSettings.effectiveExpandedByDefault else { return }
+                    viewModel.updatePanelChaptersSettingsSync { $0.expandedByDefault = newValue }
+                }
+            }
         } header: {
             Text(String(localized: "panel.settings.elements.header"))
+        } footer: {
+            if Self.hasInlineSections {
+                Text(String(localized: "panel.settings.section.expandedByDefault.footer"))
+            }
         }
         .disabled(!viewModel.canEditActivePreset)
+    }
+
+    /// Chapters and related render as collapsible inline sections on iOS
+    /// (iPhone everywhere, iPad portrait); macOS always uses pages.
+    private static var hasInlineSections: Bool {
+        #if os(iOS)
+        return true
+        #else
+        return false
+        #endif
     }
 
     // MARK: - Queue Elements Section
@@ -271,12 +354,16 @@ struct PanelPageEditorView: View {
         region = configuration?.region ?? .primary
         let info = infoSettings
         showDescription = info.effectiveShowDescription
+        descriptionExpandedByDefault = info.effectiveDescriptionExpandedByDefault
+        descriptionCollapsedLines = info.effectiveDescriptionCollapsedLines
         showStatsRow = info.effectiveShowStatsRow
         showChannelRow = info.effectiveShowChannelRow
         showAvatars = commentsSettings.effectiveShowAvatars
         commentsPillMode = commentsSettings.effectivePillMode
         showRelatedThumbnails = relatedSettings.effectiveShowThumbnails
+        relatedExpandedByDefault = relatedSettings.effectiveExpandedByDefault
         showChapterThumbnails = chaptersSettings.effectiveShowThumbnails
+        chaptersExpandedByDefault = chaptersSettings.effectiveExpandedByDefault
         showHistory = queueSettings.effectiveShowHistory
     }
 }

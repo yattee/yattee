@@ -264,16 +264,47 @@ extension SettingsManager {
         }
     }
 
-    /// Last user-set details panel visibility, restored when the active
-    /// preset's default visibility is "remember".
-    var detailsPanelLastVisible: Bool {
+    /// Last user-set portrait panel visibility, restored when the active
+    /// preset's portrait default visibility is "remember". Falls back to the
+    /// legacy shared value from before the per-orientation split.
+    var portraitDetailsPanelLastVisible: Bool {
         get {
-            if let cached = _detailsPanelLastVisible { return cached }
-            return bool(for: .detailsPanelLastVisible, default: false)
+            if let cached = _portraitDetailsPanelLastVisible { return cached }
+            return bool(for: .portraitDetailsPanelLastVisible, default: legacyDetailsPanelLastVisible)
         }
         set {
-            _detailsPanelLastVisible = newValue
-            set(newValue, for: .detailsPanelLastVisible)
+            _portraitDetailsPanelLastVisible = newValue
+            set(newValue, for: .portraitDetailsPanelLastVisible)
+        }
+    }
+
+    /// Last user-set landscape panel visibility, restored when the active
+    /// preset's landscape default visibility is "remember". Falls back to the
+    /// legacy shared value from before the per-orientation split.
+    var landscapeDetailsPanelLastVisible: Bool {
+        get {
+            if let cached = _landscapeDetailsPanelLastVisible { return cached }
+            return bool(for: .landscapeDetailsPanelLastVisible, default: legacyDetailsPanelLastVisible)
+        }
+        set {
+            _landscapeDetailsPanelLastVisible = newValue
+            set(newValue, for: .landscapeDetailsPanelLastVisible)
+        }
+    }
+
+    /// The pre-split shared "remember" value; only read as the fallback for
+    /// the per-orientation values above.
+    private var legacyDetailsPanelLastVisible: Bool {
+        bool(for: .detailsPanelLastVisible, default: false)
+    }
+
+    /// Last user-set visibility for an orientation.
+    func detailsPanelLastVisible(for orientation: PanelOrientation) -> Bool {
+        switch orientation {
+        case .portrait:
+            return portraitDetailsPanelLastVisible
+        case .landscape:
+            return landscapeDetailsPanelLastVisible
         }
     }
 

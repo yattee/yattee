@@ -391,7 +391,7 @@ extension ExpandedPlayerSheet {
                                     panelRevealOffset = 0
                                     isPortraitPanelVisible = true
                                     navigationCoordinator?.isPortraitPanelVisible = true
-                                    appEnvironment?.settingsManager.detailsPanelLastVisible = true
+                                    appEnvironment?.settingsManager.portraitDetailsPanelLastVisible = true
                                     // Match video position from reveal formula
                                     let revealProgress = min(1.0, -currentRevealOffset / pinnedPanelHeight)
                                     let maxVideoOffset = hiddenVideoY - topY
@@ -518,7 +518,7 @@ extension ExpandedPlayerSheet {
                                         withTransaction(transaction) {
                                             isPortraitPanelVisible = false
                                             navigationCoordinator?.isPortraitPanelVisible = false
-                                            appEnvironment?.settingsManager.detailsPanelLastVisible = false
+                                            appEnvironment?.settingsManager.portraitDetailsPanelLastVisible = false
                                             isCommentsExpanded = false
                                             navigationCoordinator?.isCommentsExpanded = false
                                             navigationCoordinator?.commentsFrame = .zero
@@ -659,7 +659,7 @@ extension ExpandedPlayerSheet {
             isPortraitPanelVisible = newValue
         }
         navigationCoordinator?.isPortraitPanelVisible = newValue
-        appEnvironment?.settingsManager.detailsPanelLastVisible = newValue
+        appEnvironment?.settingsManager.portraitDetailsPanelLastVisible = newValue
     }
 
     /// Hide floating panel with animation
@@ -668,7 +668,7 @@ extension ExpandedPlayerSheet {
             isPortraitPanelVisible = false
         }
         navigationCoordinator?.isPortraitPanelVisible = false
-        appEnvironment?.settingsManager.detailsPanelLastVisible = false
+        appEnvironment?.settingsManager.portraitDetailsPanelLastVisible = false
 
         // Reset main window transform when hiding panel to fix safe area clipping (iOS only)
         #if os(iOS)
@@ -866,7 +866,7 @@ extension ExpandedPlayerSheet {
                             isPortraitPanelVisible.toggle()
                         }
                         navigationCoordinator?.isPortraitPanelVisible = isPortraitPanelVisible
-                        appEnvironment?.settingsManager.detailsPanelLastVisible = isPortraitPanelVisible
+                        appEnvironment?.settingsManager.portraitDetailsPanelLastVisible = isPortraitPanelVisible
                     },
                     onShowSettings: { [self] in
                         showingQualitySheet = true
@@ -1139,7 +1139,7 @@ extension ExpandedPlayerSheet {
                         isPortraitPanelVisible.toggle()
                     }
                     navigationCoordinator?.isPortraitPanelVisible = isPortraitPanelVisible
-                    appEnvironment?.settingsManager.detailsPanelLastVisible = isPortraitPanelVisible
+                    appEnvironment?.settingsManager.portraitDetailsPanelLastVisible = isPortraitPanelVisible
                     // Re-enable controls after animation completes (0.35s)
                     // Controls will still be hidden (forceInitialHidden) until user taps
                     DispatchQueue.main.asyncAfter(deadline: .now() + 0.35) {
@@ -1320,11 +1320,11 @@ extension ExpandedPlayerSheet {
     func cornerContent(video: Video) -> some View {
         // Seed the panel visibility before the first frame: once the
         // session's default visibility is applied the setting is the truth;
-        // until then resolve the preset default (same policy the sheet's
-        // applyPanelDefaultVisibility writes moments later).
+        // until then resolve the preset's landscape default (same policy the
+        // sheet's applyPanelDefaultVisibility writes moments later).
         let initialPanelVisible = appEnvironment?.navigationCoordinator.hasAppliedPanelDefaultVisibility == true
             ? (appEnvironment?.settingsManager.landscapeDetailsPanelVisible ?? true)
-            : Self.initialPortraitPanelVisibility(settingsManager: appEnvironment?.settingsManager)
+            : Self.initialPanelVisibility(for: .landscape, settingsManager: appEnvironment?.settingsManager)
 
         CornerPlayerLayout(
             playerControlsLayout: playerControlsLayout,

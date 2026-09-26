@@ -819,7 +819,7 @@ struct CornerPlayerLayout<PlayerContent: View>: View {
             isPanelVisible = show
             panelToggleGeneration += 1
             settingsManager?.landscapeDetailsPanelVisible = show
-            settingsManager?.detailsPanelLastVisible = show
+            settingsManager?.landscapeDetailsPanelLastVisible = show
         }
     }
 

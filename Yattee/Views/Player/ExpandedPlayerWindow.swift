@@ -811,7 +811,7 @@ final class ExpandedPlayerWindowManager {
         let initialPanelVisible = ExpandedPlayerSheet.initialPortraitPanelVisibility(
             settingsManager: appEnvironment.settingsManager
         )
-        LoggingService.shared.logPlayer("[ExpandedPlayerWindowManager] show: initialPortraitPanelVisible=\(initialPanelVisible), defaultVisibility=\(PanelSettings.cached.effectiveDefaultVisibility)")
+        LoggingService.shared.logPlayer("[ExpandedPlayerWindowManager] show: initialPortraitPanelVisible=\(initialPanelVisible), portraitDefaultVisibility=\(PanelSettings.cached.effectiveDefaultVisibility(for: .portrait))")
         let expandedView = ExpandedPlayerSheet(initialPortraitPanelVisible: initialPanelVisible)
             .appEnvironment(appEnvironment)
             .environment(\.statusBarVisibilityController, statusBarController)

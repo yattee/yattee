@@ -108,11 +108,32 @@ enum PanelLayoutMode: String, Codable, CaseIterable, Sendable {
 
 // MARK: - Default Visibility
 
-/// Default panel visibility when the player opens on iPad/macOS.
+/// Which player layout a panel default applies to: portrait (iPhone/iPad
+/// upright) or landscape (wide layout: iPhone/iPad rotated, macOS always).
+enum PanelOrientation: Sendable {
+    case portrait
+    case landscape
+}
+
+/// Default panel visibility when the player opens, configured per
+/// orientation (see `PanelSettings.effectiveDefaultVisibility(for:)`).
 enum PanelDefaultVisibility: String, Codable, CaseIterable, Sendable {
     case hidden
     case visible
     case remember
+
+    /// Resolves the mode to a concrete initial visibility, given the last
+    /// user-set visibility for the same orientation.
+    func resolve(lastVisible: Bool) -> Bool {
+        switch self {
+        case .hidden:
+            return false
+        case .visible:
+            return true
+        case .remember:
+            return lastVisible
+        }
+    }
 
     /// Localized name for the settings picker.
     var displayName: String {
@@ -135,11 +156,22 @@ struct InfoPageSettings: Codable, Hashable, Sendable {
     var showStatsRow: Bool?
     var showChannelRow: Bool?
     var showDescription: Bool?
+    /// Lines shown while the description is collapsed (inline-sections hosts).
     var descriptionCollapsedLines: Int?
+    /// Whether the description starts expanded instead of collapsed.
+    var descriptionExpandedByDefault: Bool?
+
+    static let defaultDescriptionCollapsedLines = 3
+    static let descriptionCollapsedLinesRange = 1...10
 
     var effectiveShowStatsRow: Bool { showStatsRow ?? true }
     var effectiveShowChannelRow: Bool { showChannelRow ?? true }
     var effectiveShowDescription: Bool { showDescription ?? true }
+    var effectiveDescriptionExpandedByDefault: Bool { descriptionExpandedByDefault ?? false }
+    var effectiveDescriptionCollapsedLines: Int {
+        let range = Self.descriptionCollapsedLinesRange
+        return min(max(descriptionCollapsedLines ?? Self.defaultDescriptionCollapsedLines, range.lowerBound), range.upperBound)
+    }
 }
 
 // MARK: - Comments Pill Mode
@@ -183,8 +215,11 @@ struct CommentsPageSettings: Codable, Hashable, Sendable {
 /// Element toggles for the related videos page.
 struct RelatedPageSettings: Codable, Hashable, Sendable {
     var showThumbnails: Bool?
+    /// Whether the inline section (iPhone, iPad portrait) starts expanded.
+    var expandedByDefault: Bool?
 
     var effectiveShowThumbnails: Bool { showThumbnails ?? true }
+    var effectiveExpandedByDefault: Bool { expandedByDefault ?? true }
 }
 
 /// Element toggles for the queue page.
@@ -197,8 +232,11 @@ struct QueuePageSettings: Codable, Hashable, Sendable {
 /// Element toggles for the chapters page.
 struct ChaptersPageSettings: Codable, Hashable, Sendable {
     var showThumbnails: Bool?
+    /// Whether the inline section (iPhone, iPad portrait) starts expanded.
+    var expandedByDefault: Bool?
 
     var effectiveShowThumbnails: Bool { showThumbnails ?? true }
+    var effectiveExpandedByDefault: Bool { expandedByDefault ?? true }
 }
 
 /// Typed per-page settings payload. Uses the same discriminator pattern as
@@ -352,9 +390,19 @@ struct PanelSettings: Codable, Hashable, Sendable {
     /// Layout mode on iPad/macOS. Effective default: `.stacked`.
     var layoutMode: PanelLayoutMode?
 
-    /// Default panel visibility when the player opens. Effective default:
-    /// `.hidden` (today's behavior).
+    /// Legacy single default visibility from before the per-orientation
+    /// split. Still decoded so older presets keep their choice: it seeds both
+    /// orientations until they are set individually. Not written by the UI.
     var defaultVisibility: PanelDefaultVisibility?
+
+    /// Default panel visibility when the player opens in portrait. Effective
+    /// default: the legacy value, else `.visible`.
+    var portraitDefaultVisibility: PanelDefaultVisibility?
+
+    /// Default panel visibility when the player opens in landscape (the wide
+    /// layout, including macOS). Effective default: the legacy value, else
+    /// `.hidden`.
+    var landscapeDefaultVisibility: PanelDefaultVisibility?
 
     /// Whether the page bar shows labels next to icons.
     var showPageBarLabels: Bool?
@@ -367,12 +415,16 @@ struct PanelSettings: Codable, Hashable, Sendable {
         pages: [PanelPageConfiguration],
         layoutMode: PanelLayoutMode? = nil,
         defaultVisibility: PanelDefaultVisibility? = nil,
+        portraitDefaultVisibility: PanelDefaultVisibility? = nil,
+        landscapeDefaultVisibility: PanelDefaultVisibility? = nil,
         showPageBarLabels: Bool? = nil,
         wideLayoutSide: FloatingPanelSide? = nil
     ) {
         self.pages = pages
         self.layoutMode = layoutMode
         self.defaultVisibility = defaultVisibility
+        self.portraitDefaultVisibility = portraitDefaultVisibility
+        self.landscapeDefaultVisibility = landscapeDefaultVisibility
         self.showPageBarLabels = showPageBarLabels
         self.wideLayoutSide = wideLayoutSide
     }
@@ -392,7 +444,27 @@ struct PanelSettings: Codable, Hashable, Sendable {
     ])
 
     var effectiveLayoutMode: PanelLayoutMode { layoutMode ?? .stacked }
-    var effectiveDefaultVisibility: PanelDefaultVisibility { defaultVisibility ?? .hidden }
+
+    /// The default visibility for an orientation: its own value, else the
+    /// legacy single value, else portrait visible / landscape hidden.
+    func effectiveDefaultVisibility(for orientation: PanelOrientation) -> PanelDefaultVisibility {
+        switch orientation {
+        case .portrait:
+            return portraitDefaultVisibility ?? defaultVisibility ?? .visible
+        case .landscape:
+            return landscapeDefaultVisibility ?? defaultVisibility ?? .hidden
+        }
+    }
+
+    /// Sets the default visibility for one orientation.
+    mutating func setDefaultVisibility(_ visibility: PanelDefaultVisibility, for orientation: PanelOrientation) {
+        switch orientation {
+        case .portrait:
+            portraitDefaultVisibility = visibility
+        case .landscape:
+            landscapeDefaultVisibility = visibility
+        }
+    }
     var effectiveShowPageBarLabels: Bool { showPageBarLabels ?? true }
     var effectiveWideLayoutSide: FloatingPanelSide { wideLayoutSide ?? .right }
 
@@ -406,14 +478,27 @@ struct PanelSettings: Codable, Hashable, Sendable {
         }
     }
 
+    /// The page that is always first and always enabled in every layout:
+    /// the video info is the panel's anchor (title under the drag handle,
+    /// collapsible description, comments pill), so it cannot be moved below
+    /// other pages or switched off. Its element toggles remain configurable.
+    static let pinnedPageType: PanelPageType = .info
+
     /// The pages list with any page types this app version knows about but
     /// the stored list is missing appended as disabled, so newly introduced
-    /// pages surface in settings after an update.
+    /// pages surface in settings after an update, and the pinned page forced
+    /// first and enabled (older presets may have stored it elsewhere).
     var normalizedPages: [PanelPageConfiguration] {
         var result = pages
         let known = Set(pages.map(\.pageType))
         for pageType in PanelPageType.allCases where !known.contains(pageType) {
             result.append(PanelPageConfiguration(pageType: pageType, isEnabled: false))
+        }
+
+        if let pinnedIndex = result.firstIndex(where: { $0.pageType == Self.pinnedPageType }) {
+            var pinned = result.remove(at: pinnedIndex)
+            pinned.isEnabled = true
+            result.insert(pinned, at: 0)
         }
         return result
     }
@@ -432,6 +517,14 @@ struct PanelSettings: Codable, Hashable, Sendable {
         #endif
     }
 
+    /// Page types the settings list hides on this device because the panel
+    /// never renders them as pages: iPhone shows only the info page with
+    /// inline sections, so queue has no effect there and comments live on
+    /// the pill/overlay (configured in their own settings group).
+    static var hiddenSettingsPageTypes: Set<PanelPageType> {
+        isSectionsOnlyDevice ? [.queue, .comments] : []
+    }
+
     /// Enabled pages an inline-sections host renders below the video info,
     /// in configured order, with their per-page element settings.
     func inlineSections(in region: PanelRegion? = nil) -> [PanelPageConfiguration] {
@@ -446,6 +539,12 @@ struct PanelSettings: Codable, Hashable, Sendable {
     /// The comments pill mode from the comments page settings.
     var commentsPillMode: CommentsPillMode {
         configuration(for: .comments)?.commentsSettings.effectivePillMode ?? .pill
+    }
+
+    /// Whether comment rows show author avatars (comments page setting),
+    /// honored by the comments page and the pill overlay alike.
+    var commentsShowAvatars: Bool {
+        configuration(for: .comments)?.commentsSettings.effectiveShowAvatars ?? true
     }
 
     /// Whether comments should be loaded from the API: needed by the comments
@@ -467,15 +566,47 @@ struct PanelSettings: Codable, Hashable, Sendable {
         pages = normalizedPages
     }
 
+    /// Enables or disables a page. The pinned page ignores this.
     mutating func setEnabled(_ isEnabled: Bool, for pageType: PanelPageType) {
         normalize()
-        guard let index = pages.firstIndex(where: { $0.pageType == pageType }) else { return }
+        guard pageType != Self.pinnedPageType,
+              let index = pages.firstIndex(where: { $0.pageType == pageType })
+        else { return }
         pages[index].isEnabled = isEnabled
     }
 
+    /// Reorders pages by index in the normalized list. The pinned page snaps
+    /// back to the front afterwards, so moving it (or moving another page
+    /// above it) has no effect.
     mutating func movePages(fromOffsets source: IndexSet, toOffset destination: Int) {
         normalize()
         pages.move(fromOffsets: source, toOffset: destination)
+        normalize()
+    }
+
+    /// Reorders the subset of pages a settings list displays (offsets are
+    /// relative to `visible`, in its current order). Pages the list hides
+    /// keep their slots; the pinned page stays first.
+    mutating func moveVisiblePages(
+        _ visible: [PanelPageType],
+        fromOffsets source: IndexSet,
+        toOffset destination: Int
+    ) {
+        normalize()
+        var reordered = visible
+        reordered.move(fromOffsets: source, toOffset: destination)
+
+        let byType = Dictionary(uniqueKeysWithValues: pages.map { ($0.pageType, $0) })
+        let visibleSet = Set(visible)
+        var next = reordered.makeIterator()
+        pages = pages.map { page in
+            guard visibleSet.contains(page.pageType),
+                  let type = next.next(),
+                  let replacement = byType[type]
+            else { return page }
+            return replacement
+        }
+        normalize()
     }
 
     mutating func updateSettings(_ newSettings: PanelPageSettings?, for pageType: PanelPageType) {
@@ -494,6 +625,8 @@ struct PanelSettings: Codable, Hashable, Sendable {
         case pages
         case layoutMode
         case defaultVisibility
+        case portraitDefaultVisibility
+        case landscapeDefaultVisibility
         case showPageBarLabels
         case wideLayoutSide
     }
@@ -516,6 +649,8 @@ struct PanelSettings: Codable, Hashable, Sendable {
         pages = decodedPages
         layoutMode = try? container.decodeIfPresent(PanelLayoutMode.self, forKey: .layoutMode)
         defaultVisibility = try? container.decodeIfPresent(PanelDefaultVisibility.self, forKey: .defaultVisibility)
+        portraitDefaultVisibility = try? container.decodeIfPresent(PanelDefaultVisibility.self, forKey: .portraitDefaultVisibility)
+        landscapeDefaultVisibility = try? container.decodeIfPresent(PanelDefaultVisibility.self, forKey: .landscapeDefaultVisibility)
         showPageBarLabels = try container.decodeIfPresent(Bool.self, forKey: .showPageBarLabels)
         wideLayoutSide = try? container.decodeIfPresent(FloatingPanelSide.self, forKey: .wideLayoutSide)
     }
@@ -525,6 +660,8 @@ struct PanelSettings: Codable, Hashable, Sendable {
         try container.encode(pages, forKey: .pages)
         try container.encodeIfPresent(layoutMode, forKey: .layoutMode)
         try container.encodeIfPresent(defaultVisibility, forKey: .defaultVisibility)
+        try container.encodeIfPresent(portraitDefaultVisibility, forKey: .portraitDefaultVisibility)
+        try container.encodeIfPresent(landscapeDefaultVisibility, forKey: .landscapeDefaultVisibility)
         try container.encodeIfPresent(showPageBarLabels, forKey: .showPageBarLabels)
         try container.encodeIfPresent(wideLayoutSide, forKey: .wideLayoutSide)
     }

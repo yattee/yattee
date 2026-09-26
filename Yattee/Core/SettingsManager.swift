@@ -181,7 +181,8 @@ final class SettingsManager {
     var _floatingDetailsPanelWidth: CGFloat?
     var _landscapeDetailsPanelVisible: Bool?
     var _landscapeDetailsPanelPinned: Bool?
-    var _detailsPanelLastVisible: Bool?
+    var _portraitDetailsPanelLastVisible: Bool?
+    var _landscapeDetailsPanelLastVisible: Bool?
     var _cornerPanelColumnWidth: CGFloat?
 
     // Notification settings
@@ -532,7 +533,8 @@ final class SettingsManager {
         _floatingDetailsPanelWidth = nil
         _landscapeDetailsPanelVisible = nil
         _landscapeDetailsPanelPinned = nil
-        _detailsPanelLastVisible = nil
+        _portraitDetailsPanelLastVisible = nil
+        _landscapeDetailsPanelLastVisible = nil
         _cornerPanelColumnWidth = nil
         _backgroundNotificationsEnabled = nil
         _defaultNotificationsForNewChannels = nil

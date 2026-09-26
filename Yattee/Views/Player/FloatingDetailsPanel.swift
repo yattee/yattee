@@ -346,7 +346,7 @@ struct FloatingDetailsPanel: View {
             VStack(spacing: 12) {
                 // Expanded comments pill on its own row (when player pill exists and pill not collapsed)
                 if hasCommentsPill, let firstComment = comments.first, shouldShowPlayerPill, !isPillCollapsed {
-                    CommentsPillView(comment: firstComment, isCollapsed: false, onTap: expandComments)
+                    CommentsPillView(comment: firstComment, isCollapsed: false, showAvatar: panelSettings.commentsShowAvatars, onTap: expandComments)
                 }
 
                 ZStack {
@@ -434,7 +434,7 @@ struct FloatingDetailsPanel: View {
         HStack {
             if hasCommentsPill, let firstComment = comments.first {
                 if !shouldShowPlayerPill {
-                    CommentsPillView(comment: firstComment, isCollapsed: isPillCollapsed, onTap: expandComments)
+                    CommentsPillView(comment: firstComment, isCollapsed: isPillCollapsed, showAvatar: panelSettings.commentsShowAvatars, onTap: expandComments)
                 } else if isPillCollapsed {
                     CommentsPillView(comment: firstComment, isCollapsed: true, onTap: expandComments)
                 }
@@ -469,7 +469,8 @@ struct FloatingDetailsPanel: View {
         ExpandedCommentsView(
             videoID: video.id.videoID,
             onClose: collapseComments,
-            onDismissGestureEnded: handleCommentsDismissGestureEnded
+            onDismissGestureEnded: handleCommentsDismissGestureEnded,
+            showAvatars: panelSettings.commentsShowAvatars
         )
         .clipShape(RoundedRectangle(cornerRadius: 16))
         .visualEffect { content, proxy in

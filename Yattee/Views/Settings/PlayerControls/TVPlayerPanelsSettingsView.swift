@@ -138,9 +138,17 @@ private struct TVPanelPageEditorView: View {
         viewModel.panelSettings.configuration(for: pageType)
     }
 
-    /// Whether this is the only enabled page; the last one cannot be disabled.
-    private var isLastEnabledPage: Bool {
-        isEnabled && viewModel.enabledPanelPageCount <= 1
+    /// The pinned page (info) is always first and enabled: no toggle, no
+    /// reordering.
+    private var isPinnedPage: Bool {
+        pageType == PanelSettings.pinnedPageType
+    }
+
+    /// Whether the displayed neighbor above is the pinned page (or there is
+    /// none), which blocks moving up.
+    private var isBelowPinnedPage: Bool {
+        guard let displayedIndex else { return true }
+        return displayedIndex <= 1
     }
 
     /// Pages as displayed in the tvOS list.
@@ -154,35 +162,35 @@ private struct TVPanelPageEditorView: View {
 
     var body: some View {
         List {
-            Section {
-                Toggle(
-                    String(localized: "panel.settings.page.enabled"),
-                    isOn: $isEnabled
-                )
-                .disabled(!viewModel.canEditActivePreset || isLastEnabledPage)
-                .onChange(of: isEnabled) { _, newValue in
-                    guard newValue != configuration?.isEnabled else { return }
-                    viewModel.setPanelPageEnabled(pageType, isEnabled: newValue)
-                }
+            if !isPinnedPage {
+                Section {
+                    Toggle(
+                        String(localized: "panel.settings.page.enabled"),
+                        isOn: $isEnabled
+                    )
+                    .disabled(!viewModel.canEditActivePreset)
+                    .onChange(of: isEnabled) { _, newValue in
+                        guard newValue != configuration?.isEnabled else { return }
+                        viewModel.setPanelPageEnabled(pageType, isEnabled: newValue)
+                    }
 
-                Button {
-                    move(up: true)
-                } label: {
-                    Label(String(localized: "panel.settings.moveUp"), systemImage: "arrow.up")
-                }
-                .disabled(!viewModel.canEditActivePreset || displayedIndex == 0)
+                    Button {
+                        move(up: true)
+                    } label: {
+                        Label(String(localized: "panel.settings.moveUp"), systemImage: "arrow.up")
+                    }
+                    .disabled(!viewModel.canEditActivePreset || isBelowPinnedPage)
 
-                Button {
-                    move(up: false)
-                } label: {
-                    Label(String(localized: "panel.settings.moveDown"), systemImage: "arrow.down")
-                }
-                .disabled(!viewModel.canEditActivePreset || displayedIndex == displayedPages.count - 1)
-            } footer: {
-                if isLastEnabledPage {
-                    Text(String(localized: "panel.settings.page.lastEnabled.footer"))
-                } else if !viewModel.canEditActivePreset {
-                    Text(String(localized: "settings.playerControls.duplicateToEdit"))
+                    Button {
+                        move(up: false)
+                    } label: {
+                        Label(String(localized: "panel.settings.moveDown"), systemImage: "arrow.down")
+                    }
+                    .disabled(!viewModel.canEditActivePreset || displayedIndex == displayedPages.count - 1)
+                } footer: {
+                    if !viewModel.canEditActivePreset {
+                        Text(String(localized: "settings.playerControls.duplicateToEdit"))
+                    }
                 }
             }
 

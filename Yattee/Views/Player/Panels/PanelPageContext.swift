@@ -119,7 +119,19 @@ extension View {
 /// the portrait overscroll gesture when the host provides callbacks.
 struct PanelPageScrollView<Content: View>: View {
     let config: PanelScrollConfig
-    @ViewBuilder let content: Content
+    private let content: (ScrollViewProxy) -> Content
+
+    init(config: PanelScrollConfig, @ViewBuilder content: @escaping () -> Content) {
+        self.config = config
+        self.content = { _ in content() }
+    }
+
+    /// Content that needs to scroll programmatically (e.g. to a section it
+    /// just expanded) receives the scroll proxy.
+    init(config: PanelScrollConfig, @ViewBuilder content: @escaping (ScrollViewProxy) -> Content) {
+        self.config = config
+        self.content = content
+    }
 
     var body: some View {
         ScrollViewReader { proxy in
@@ -140,7 +152,7 @@ struct PanelPageScrollView<Content: View>: View {
                     Color.clear
                         .frame(height: config.topInset)
 
-                    content
+                    content(proxy)
 
                     Spacer()
                         .frame(height: config.bottomInset)

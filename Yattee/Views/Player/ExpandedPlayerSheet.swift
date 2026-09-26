@@ -35,20 +35,20 @@ struct ExpandedPlayerSheet: View {
     /// Temporarily hide controls during fullscreen transition to avoid animation glitch
     @State var hideControlsDuringTransition: Bool = false
 
-    /// Resolves the preset's default panel visibility for the portrait panel
+    /// Resolves the preset's default panel visibility for one orientation
     /// from the cached settings, so creators of this view can seed the initial
     /// state BEFORE the first frame — applying it in onAppear animates a
     /// visible top-to-center video jump during player expansion.
     @MainActor
+    static func initialPanelVisibility(for orientation: PanelOrientation, settingsManager: SettingsManager?) -> Bool {
+        PanelSettings.cached.effectiveDefaultVisibility(for: orientation)
+            .resolve(lastVisible: settingsManager?.detailsPanelLastVisible(for: orientation) ?? false)
+    }
+
+    /// Portrait shorthand for `initialPanelVisibility(for:settingsManager:)`.
+    @MainActor
     static func initialPortraitPanelVisibility(settingsManager: SettingsManager?) -> Bool {
-        switch PanelSettings.cached.effectiveDefaultVisibility {
-        case .hidden:
-            return false
-        case .visible:
-            return true
-        case .remember:
-            return settingsManager?.detailsPanelLastVisible ?? false
-        }
+        initialPanelVisibility(for: .portrait, settingsManager: settingsManager)
     }
 
     init(initialPortraitPanelVisible: Bool = true) {
@@ -281,7 +281,8 @@ struct ExpandedPlayerSheet: View {
                     onClose: collapseComments,
                     onDismissOffsetChanged: handleCommentsDismissOffset,
                     onDismissGestureEnded: handleCommentsDismissGestureEnded,
-                    dismissThreshold: 30
+                    dismissThreshold: 30,
+                    showAvatars: playerControlsLayout.effectivePanelSettings.commentsShowAvatars
                 )
                 .frame(height: max(0, commentsHeight))
                 .clipped()
@@ -519,6 +520,7 @@ struct ExpandedPlayerSheet: View {
                         CommentsPillView(
                             comment: firstComment,
                             isCollapsed: false,
+                            showAvatar: playerControlsLayout.effectivePanelSettings.commentsShowAvatars,
                             onTap: expandComments
                         )
                         .transition(.scale.combined(with: .opacity))
@@ -581,6 +583,7 @@ struct ExpandedPlayerSheet: View {
                         comment: firstComment,
                         isCollapsed: false,
                         fillWidth: true,
+                        showAvatar: playerControlsLayout.effectivePanelSettings.commentsShowAvatars,
                         onTap: expandComments
                     )
                     .frame(maxWidth: 400)
@@ -988,26 +991,20 @@ private struct PlayerEventHandlersModifier: ViewModifier {
 }
 
 /// Applies the preset's default details panel visibility for a fresh
-/// panel mount. "Hidden" mirrors the historical reset (unpinned too);
-/// the other modes leave the pinned state as persisted. Returns the
-/// resolved visibility so callers can mirror it into the portrait
-/// panel state, which lives in view @State rather than settings.
+/// panel mount. The landscape default is written straight to the
+/// persisted landscape state (the wide layouts read it); the portrait
+/// default is returned so callers can mirror it into the portrait panel
+/// state, which lives in view @State rather than settings.
 @MainActor
 @discardableResult
 private func applyPanelDefaultVisibility(_ settings: PanelSettings, settingsManager: SettingsManager?) -> Bool {
     guard let settingsManager else { return true }
-    switch settings.effectiveDefaultVisibility {
-    case .hidden:
-        settingsManager.landscapeDetailsPanelVisible = false
-        return false
-    case .visible:
-        settingsManager.landscapeDetailsPanelVisible = true
-        return true
-    case .remember:
-        let lastVisible = settingsManager.detailsPanelLastVisible
-        settingsManager.landscapeDetailsPanelVisible = lastVisible
-        return lastVisible
-    }
+    settingsManager.landscapeDetailsPanelVisible = settings
+        .effectiveDefaultVisibility(for: .landscape)
+        .resolve(lastVisible: settingsManager.landscapeDetailsPanelLastVisible)
+    return settings
+        .effectiveDefaultVisibility(for: .portrait)
+        .resolve(lastVisible: settingsManager.portraitDetailsPanelLastVisible)
 }
 
 // MARK: - iOS Event Handlers Modifier

@@ -7285,13 +7285,35 @@
         }
       }
     },
+    "panel.settings.defaultVisibility.landscape" : {
+      "comment" : "Details panel default visibility picker for the landscape layout",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Landscape"
+          }
+        }
+      }
+    },
+    "panel.settings.defaultVisibility.portrait" : {
+      "comment" : "Details panel default visibility picker for the portrait layout",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Portrait"
+          }
+        }
+      }
+    },
     "panel.settings.defaultVisibility.footer" : {
       "comment" : "Details panel settings picker footer",
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "How the details panel appears when the player opens. Remember Last restores the panel if it was visible last time."
+            "value" : "How the details panel appears when the player opens, per orientation. Remember Last restores the panel if it was visible the last time in that orientation."
           }
         }
       }
@@ -7314,6 +7336,39 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Elements"
+          }
+        }
+      }
+    },
+    "panel.settings.info.description.footer" : {
+      "comment" : "Details panel info editor description section footer",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "When sections follow the description, it starts collapsed to the chosen number of lines. Tap it to expand."
+          }
+        }
+      }
+    },
+    "panel.settings.info.description.header" : {
+      "comment" : "Details panel info editor description section header",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Description"
+          }
+        }
+      }
+    },
+    "panel.settings.info.descriptionCollapsedLines" : {
+      "comment" : "Details panel info editor stepper label",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Collapsed Lines"
           }
         }
       }
@@ -7402,17 +7457,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Show Page"
-          }
-        }
-      }
-    },
-    "panel.settings.page.lastEnabled.footer" : {
-      "comment" : "Details panel page editor footer",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "At least one page must stay enabled."
           }
         }
       }
@@ -7516,13 +7560,24 @@
         }
       }
     },
-    "panel.settings.section.lastEnabled.footer" : {
-      "comment" : "Details panel section editor footer (iPhone)",
+    "panel.settings.section.expandedByDefault" : {
+      "comment" : "Details panel chapters/related editor toggle",
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "At least one section must stay enabled."
+            "value" : "Expanded by Default"
+          }
+        }
+      }
+    },
+    "panel.settings.section.expandedByDefault.footer" : {
+      "comment" : "Details panel chapters/related editor footer",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Whether the section starts expanded when it appears below the video details. You can still collapse or expand it by tapping its header."
           }
         }
       }

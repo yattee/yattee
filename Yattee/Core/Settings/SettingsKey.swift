@@ -131,7 +131,9 @@ enum SettingsKey: String, CaseIterable {
     case floatingDetailsPanelWidth // Resizable panel width in wide layout
     case landscapeDetailsPanelVisible
     case landscapeDetailsPanelPinned
-    case detailsPanelLastVisible // Last user-set visibility, for the "remember" default
+    case detailsPanelLastVisible // Legacy shared "remember" value (pre-split); read as fallback only
+    case portraitDetailsPanelLastVisible // Last user-set portrait visibility, for the "remember" default
+    case landscapeDetailsPanelLastVisible // Last user-set landscape visibility, for the "remember" default
     case cornerPanelColumnWidth // Corner layout - width of the side column
 
     // Player Controls
@@ -168,7 +170,8 @@ enum SettingsKey: String, CaseIterable {
              // Player details panel — iOS/iPadOS only, different on other platforms
              .floatingDetailsPanelWidth,
              .landscapeDetailsPanelVisible, .landscapeDetailsPanelPinned,
-             .detailsPanelLastVisible, .cornerPanelColumnWidth,
+             .detailsPanelLastVisible, .portraitDetailsPanelLastVisible, .landscapeDetailsPanelLastVisible,
+             .cornerPanelColumnWidth,
              // Video swipe actions — touch-gesture feature
              .videoSwipeActionOrder, .videoSwipeActionVisibility:
             return true

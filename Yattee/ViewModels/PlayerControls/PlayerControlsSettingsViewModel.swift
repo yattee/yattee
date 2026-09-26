@@ -794,15 +794,15 @@ final class PlayerControlsSettingsViewModel {
         panelSettings.enabledPages().count
     }
 
-    /// Current default panel visibility.
-    var panelDefaultVisibility: PanelDefaultVisibility {
-        panelSettings.effectiveDefaultVisibility
+    /// Current default panel visibility for an orientation.
+    func panelDefaultVisibility(for orientation: PanelOrientation) -> PanelDefaultVisibility {
+        panelSettings.effectiveDefaultVisibility(for: orientation)
     }
 
-    /// Synchronously updates the default panel visibility.
-    func syncPanelDefaultVisibility(_ visibility: PanelDefaultVisibility) {
+    /// Synchronously updates the default panel visibility for an orientation.
+    func syncPanelDefaultVisibility(_ visibility: PanelDefaultVisibility, for orientation: PanelOrientation) {
         updatePanelSettingsSync { settings in
-            settings.defaultVisibility = visibility
+            settings.setDefaultVisibility(visibility, for: orientation)
         }
     }
 
@@ -840,12 +840,6 @@ final class PlayerControlsSettingsViewModel {
     /// Enables or disables a panel page. The last enabled page cannot be
     /// disabled — the panel always needs at least one page.
     func setPanelPageEnabled(_ pageType: PanelPageType, isEnabled: Bool) {
-        if !isEnabled {
-            let enabled = panelSettings.enabledPages()
-            if enabled.count <= 1, enabled.first?.pageType == pageType {
-                return
-            }
-        }
         updatePanelSettingsSync { settings in
             settings.setEnabled(isEnabled, for: pageType)
         }
@@ -855,6 +849,14 @@ final class PlayerControlsSettingsViewModel {
     func movePanelPages(fromOffsets source: IndexSet, toOffset destination: Int) {
         updatePanelSettingsSync { settings in
             settings.movePages(fromOffsets: source, toOffset: destination)
+        }
+    }
+
+    /// Reorders the pages a settings list displays; offsets are relative to
+    /// `visible` (see `PanelSettings.moveVisiblePages`).
+    func movePanelPages(visible: [PanelPageType], fromOffsets source: IndexSet, toOffset destination: Int) {
+        updatePanelSettingsSync { settings in
+            settings.moveVisiblePages(visible, fromOffsets: source, toOffset: destination)
         }
     }
 
