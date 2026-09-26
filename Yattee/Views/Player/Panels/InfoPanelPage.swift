@@ -48,6 +48,7 @@ struct InfoPanelPage: View {
     @State private var showFormattedDate = false
     @State private var showOriginalTitle = false
     @State private var isDescriptionExpanded = false
+    @State private var moreLabelSize: CGSize = .zero
     @State private var isChaptersCollapsed = false
     @State private var isRelatedCollapsed = false
 
@@ -179,14 +180,37 @@ struct InfoPanelPage: View {
         }
     }
 
-    // MARK: - Collapsible Description (prototype)
+    // MARK: - Collapsible Description
 
-    private var panelBackground: Color {
-        #if os(iOS)
-        Color(.systemBackground)
-        #else
-        Color(nsColor: .windowBackgroundColor)
-        #endif
+    /// Width of the fade between the last line's text and the "more" label.
+    private static let moreFadeWidth: CGFloat = 40
+
+    /// Alpha mask for the collapsed description: fully visible except the
+    /// end of the last line, which fades out under the "more" label. Masking
+    /// the text (instead of painting a background-colored gradient over it)
+    /// works on any host background, including the floating panel's
+    /// translucent material.
+    private var collapsedDescriptionMask: some View {
+        VStack(spacing: 0) {
+            Rectangle()
+                .fill(.black)
+
+            HStack(spacing: 0) {
+                Rectangle()
+                    .fill(.black)
+
+                LinearGradient(
+                    colors: [.black, .clear],
+                    startPoint: .leading,
+                    endPoint: .trailing
+                )
+                .frame(width: Self.moreFadeWidth)
+
+                Color.clear
+                    .frame(width: moreLabelSize.width)
+            }
+            .frame(height: moreLabelSize.height)
+        }
     }
 
     /// Collapsed: 3 lines with an inline "more" cutting into the end of the
@@ -204,23 +228,23 @@ struct InfoPanelPage: View {
                 .handleTimestampLinks(using: playerService)
                 // Collapsed: let the container tap win over link taps
                 .allowsHitTesting(isDescriptionExpanded)
+                .mask {
+                    if isDescriptionExpanded {
+                        Rectangle()
+                    } else {
+                        collapsedDescriptionMask
+                    }
+                }
                 .overlay(alignment: Alignment(horizontal: .trailing, vertical: .lastTextBaseline)) {
                     if !isDescriptionExpanded {
                         Text(String(localized: "common.more"))
                             .font(.subheadline.weight(.semibold))
                             .foregroundStyle(context.accentColor)
-                            .padding(.leading, 32)
-                            .background(
-                                LinearGradient(
-                                    stops: [
-                                        .init(color: panelBackground.opacity(0), location: 0),
-                                        .init(color: panelBackground, location: 0.4),
-                                        .init(color: panelBackground, location: 1)
-                                    ],
-                                    startPoint: .leading,
-                                    endPoint: .trailing
-                                )
-                            )
+                            .onGeometryChange(for: CGSize.self) { proxy in
+                                proxy.size
+                            } action: { size in
+                                moreLabelSize = size
+                            }
                     }
                 }
 
