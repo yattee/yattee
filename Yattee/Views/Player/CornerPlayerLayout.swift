@@ -134,30 +134,23 @@ struct CornerPlayerLayout<PlayerContent: View>: View {
         playerControlsLayout.effectivePanelSettings
     }
 
-    /// Whether the info page is assigned to (and enabled in) the below-video
-    /// region — the below panel only exists to host it.
+    /// Whether the info page is assigned below the video — the below panel
+    /// only exists to host it. (`effectiveRegion` already clamps to what
+    /// this platform can render; info is always enabled.)
     private var hasBelowVideoInfo: Bool {
-        guard let info = panelSettings.configuration(for: .info) else { return false }
-        return info.isEnabled && info.region == .belowVideo
+        panelSettings.effectiveRegion(for: .info) == .belowVideo
     }
 
     /// Comments assigned below the video render as the portrait panel's
-    /// comments pill (iOS only, and only while the info panel is below —
-    /// the pill lives inside it). Everything else falls back to the column.
+    /// comments pill (iOS only, and only together with the info panel — the
+    /// pill lives inside it; `effectiveRegion` enforces both).
     private var hasBelowVideoComments: Bool {
-        #if os(iOS)
-        guard hasBelowVideoInfo,
-              let comments = panelSettings.configuration(for: .comments) else { return false }
-        return comments.isEnabled && comments.region == .belowVideo
-        #else
-        return false
-        #endif
+        panelSettings.isPageEnabled(.comments)
+            && panelSettings.effectiveRegion(for: .comments) == .belowVideo
     }
 
-    /// Pages the below-video host actually renders. Enabled pages assigned
-    /// `.belowVideo` that it can't host (chapters/related/queue/tracks, or
-    /// comments without the info panel) fall back to the side column instead
-    /// of disappearing.
+    /// Pages the below-video host renders; everything else goes to the side
+    /// column.
     private var belowVideoPageTypes: Set<PanelPageType> {
         var types: Set<PanelPageType> = []
         if hasBelowVideoInfo { types.insert(.info) }

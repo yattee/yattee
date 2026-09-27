@@ -17,6 +17,7 @@ struct PanelSettingsView: View {
     @State private var landscapeDefaultVisibility: PanelDefaultVisibility = .hidden
     @State private var layoutMode: PanelLayoutMode = .stacked
     @State private var wideLayoutSide: FloatingPanelSide = .right
+    @State private var belowVideoContent: PanelBelowVideoContent = .info
     @State private var showPageBarLabels: Bool = true
     @State private var commentsShowAvatars: Bool = true
     @State private var commentsPillMode: CommentsPillMode = .pill
@@ -71,7 +72,11 @@ struct PanelSettingsView: View {
 
     private var layoutSection: some View {
         Section {
-            PanelLayoutSchematic(mode: layoutMode, side: wideLayoutSide)
+            PanelLayoutSchematic(
+                mode: layoutMode,
+                side: wideLayoutSide,
+                showsBelowVideo: belowVideoContent != .nothing
+            )
                 .frame(maxWidth: .infinity)
                 .padding(.vertical, 4)
                 .listRowBackground(Color.clear)
@@ -104,9 +109,25 @@ struct PanelSettingsView: View {
                     guard newValue != viewModel.panelWideLayoutSide else { return }
                     viewModel.syncPanelWideLayoutSide(newValue)
                 }
+            } else {
+                Picker(
+                    String(localized: "panel.settings.belowVideo"),
+                    selection: $belowVideoContent
+                ) {
+                    ForEach(PanelBelowVideoContent.availableCases, id: \.self) { content in
+                        Text(content.displayName).tag(content)
+                    }
+                }
+                .disabled(!viewModel.canEditActivePreset)
+                .onChange(of: belowVideoContent) { _, newValue in
+                    guard newValue != viewModel.panelBelowVideoContent else { return }
+                    viewModel.syncPanelBelowVideoContent(newValue)
+                }
             }
         } footer: {
-            Text(String(localized: "panel.settings.layoutMode.footer"))
+            Text(layoutMode == .corner
+                ? String(localized: "panel.settings.belowVideo.footer")
+                : String(localized: "panel.settings.layoutMode.footer"))
         }
     }
 
@@ -295,7 +316,7 @@ struct PanelSettingsView: View {
                 }
                 Spacer()
                 if page.isEnabled, layoutMode == .corner, Self.supportsCornerLayout {
-                    Text(page.region.displayName)
+                    Text(viewModel.panelSettings.effectiveRegion(for: page.pageType).displayName)
                         .foregroundStyle(.secondary)
                 } else {
                     Text(page.isEnabled
@@ -314,6 +335,8 @@ struct PanelSettingsView: View {
         landscapeDefaultVisibility = viewModel.panelDefaultVisibility(for: .landscape)
         layoutMode = viewModel.panelLayoutMode
         wideLayoutSide = viewModel.panelWideLayoutSide
+        // Clamp to what this platform offers so the picker never shows blank.
+        belowVideoContent = viewModel.panelSettings.effectiveBelowVideoContent
         showPageBarLabels = viewModel.panelShowPageBarLabels
         commentsShowAvatars = commentsSettings.effectiveShowAvatars
         commentsPillMode = commentsSettings.effectivePillMode
@@ -328,6 +351,8 @@ private struct PanelLayoutSchematic: View {
     let mode: PanelLayoutMode
     /// Panel side in the standard layout; the corner column is always right.
     let side: FloatingPanelSide
+    /// Whether the corner layout has an info panel below the video.
+    let showsBelowVideo: Bool
 
     private let cornerRadius: CGFloat = 4
 
@@ -341,8 +366,10 @@ private struct PanelLayoutSchematic: View {
             if mode == .corner {
                 VStack(spacing: 3) {
                     videoBlock
-                    panelBlock
-                        .frame(height: 26)
+                    if showsBelowVideo {
+                        panelBlock
+                            .frame(height: 26)
+                    }
                 }
             } else {
                 videoBlock
@@ -361,6 +388,7 @@ private struct PanelLayoutSchematic: View {
         }
         .animation(.easeInOut(duration: 0.25), value: mode)
         .animation(.easeInOut(duration: 0.25), value: side)
+        .animation(.easeInOut(duration: 0.25), value: showsBelowVideo)
     }
 
     private var videoBlock: some View {

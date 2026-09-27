@@ -7153,6 +7153,39 @@
         }
       }
     },
+    "panel.belowVideo.info" : {
+      "comment" : "Corner layout below-video content option",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Info"
+          }
+        }
+      }
+    },
+    "panel.belowVideo.infoAndComments" : {
+      "comment" : "Corner layout below-video content option",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Info and Comments"
+          }
+        }
+      }
+    },
+    "panel.belowVideo.nothing" : {
+      "comment" : "Corner layout below-video content option",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nothing"
+          }
+        }
+      }
+    },
     "panel.defaultVisibility.hidden" : {
       "comment" : "Details panel default visibility option",
       "localizations" : {
@@ -7259,6 +7292,28 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Side Column"
+          }
+        }
+      }
+    },
+    "panel.settings.belowVideo" : {
+      "comment" : "Corner layout below-video content picker label",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Below Video"
+          }
+        }
+      }
+    },
+    "panel.settings.belowVideo.footer" : {
+      "comment" : "Corner layout below-video content footer",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Corner shows the video in the top corner with pages in a side column. Only the info panel can sit below the video; comments there show as its pill. Related, chapters and queue always use the side column. The standard layout is used automatically when the window is too narrow."
           }
         }
       }
@@ -7457,28 +7512,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Show Page"
-          }
-        }
-      }
-    },
-    "panel.settings.page.region" : {
-      "comment" : "Corner layout page region picker label",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Location"
-          }
-        }
-      }
-    },
-    "panel.settings.page.region.footer" : {
-      "comment" : "Corner layout page region footer",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Where this page appears in the corner layout."
           }
         }
       }

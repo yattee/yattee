@@ -72,11 +72,16 @@ enum PanelPageType: String, Codable, CaseIterable, Sendable {
 /// Region a page is assigned to in the corner layout.
 /// `primary` is the right column in corner mode and the only panel elsewhere;
 /// the assignment is ignored outside corner mode.
+///
+/// The below-video host is the portrait info panel, not a page host: only
+/// `.info` can live there, plus `.comments` as the panel's pill (iOS). Every
+/// other page is clamped to `.primary` by `PanelSettings.normalizedPages`, and
+/// settings expose the choice as one `PanelBelowVideoContent` picker.
 enum PanelRegion: String, Codable, CaseIterable, Sendable {
     case primary
     case belowVideo
 
-    /// Localized name for the settings picker.
+    /// Localized name for the pages list.
     var displayName: String {
         switch self {
         case .primary:
@@ -84,6 +89,36 @@ enum PanelRegion: String, Codable, CaseIterable, Sendable {
         case .belowVideo:
             return String(localized: "panel.region.belowVideo")
         }
+    }
+}
+
+/// What the corner layout shows below the video: the three layouts the
+/// below-video host can actually render. Stored as the info/comments page
+/// regions (see `PanelSettings.belowVideoContent`).
+enum PanelBelowVideoContent: String, CaseIterable, Sendable {
+    /// Video fills the left column; every page sits in the side column.
+    case nothing
+    /// The info panel below the video; comments join the side column.
+    case info
+    /// The info panel with the comments pill below the video (iOS only).
+    case infoAndComments
+
+    /// Localized name for the settings picker.
+    var displayName: String {
+        switch self {
+        case .nothing:
+            return String(localized: "panel.belowVideo.nothing")
+        case .info:
+            return String(localized: "panel.belowVideo.info")
+        case .infoAndComments:
+            return String(localized: "panel.belowVideo.infoAndComments")
+        }
+    }
+
+    /// Options this platform can render: the comments pill lives on the
+    /// iOS portrait panel only.
+    static var availableCases: [PanelBelowVideoContent] {
+        PanelSettings.supportsBelowVideoComments ? allCases : [.nothing, .info]
     }
 }
 
@@ -484,10 +519,27 @@ struct PanelSettings: Codable, Hashable, Sendable {
     /// other pages or switched off. Its element toggles remain configurable.
     static let pinnedPageType: PanelPageType = .info
 
+    /// Page types the below-video host can render: the info panel itself and
+    /// comments as its pill. Other types assigned `.belowVideo` (older
+    /// presets) are clamped back to the side column.
+    static let belowVideoHostablePageTypes: Set<PanelPageType> = [.info, .comments]
+
+    /// Whether this platform renders comments below the video (the comments
+    /// pill on the portrait info panel exists on iOS only).
+    static var supportsBelowVideoComments: Bool {
+        #if os(iOS)
+        return true
+        #else
+        return false
+        #endif
+    }
+
     /// The pages list with any page types this app version knows about but
     /// the stored list is missing appended as disabled, so newly introduced
-    /// pages surface in settings after an update, and the pinned page forced
-    /// first and enabled (older presets may have stored it elsewhere).
+    /// pages surface in settings after an update, the pinned page forced
+    /// first and enabled (older presets may have stored it elsewhere), and
+    /// regions clamped to what the corner layout can host: only info and
+    /// comments may sit below the video, comments only together with info.
     var normalizedPages: [PanelPageConfiguration] {
         var result = pages
         let known = Set(pages.map(\.pageType))
@@ -500,7 +552,57 @@ struct PanelSettings: Codable, Hashable, Sendable {
             pinned.isEnabled = true
             result.insert(pinned, at: 0)
         }
+
+        let infoBelowVideo = result.contains { $0.pageType == .info && $0.region == .belowVideo }
+        for index in result.indices where result[index].region == .belowVideo {
+            let type = result[index].pageType
+            let hostable = Self.belowVideoHostablePageTypes.contains(type)
+                && (type != .comments || infoBelowVideo)
+            if !hostable {
+                result[index].region = .primary
+            }
+        }
         return result
+    }
+
+    /// The stored below-video choice, derived from the info/comments regions.
+    /// Platform-agnostic so presets keep their value across devices; use
+    /// `effectiveBelowVideoContent` for what this device renders.
+    var belowVideoContent: PanelBelowVideoContent {
+        get {
+            guard configuration(for: .info)?.region == .belowVideo else { return .nothing }
+            return configuration(for: .comments)?.region == .belowVideo ? .infoAndComments : .info
+        }
+        set {
+            normalize()
+            let infoRegion: PanelRegion = newValue == .nothing ? .primary : .belowVideo
+            let commentsRegion: PanelRegion = newValue == .infoAndComments ? .belowVideo : .primary
+            for index in pages.indices {
+                switch pages[index].pageType {
+                case .info: pages[index].region = infoRegion
+                case .comments: pages[index].region = commentsRegion
+                default: pages[index].region = .primary
+                }
+            }
+        }
+    }
+
+    /// The below-video content this platform renders: comments fall back to
+    /// the side column where the pill does not exist.
+    var effectiveBelowVideoContent: PanelBelowVideoContent {
+        let stored = belowVideoContent
+        if stored == .infoAndComments, !Self.supportsBelowVideoComments { return .info }
+        return stored
+    }
+
+    /// Where the corner layout actually places a page on this platform.
+    func effectiveRegion(for pageType: PanelPageType) -> PanelRegion {
+        switch (pageType, effectiveBelowVideoContent) {
+        case (.info, .info), (.info, .infoAndComments), (.comments, .infoAndComments):
+            return .belowVideo
+        default:
+            return .primary
+        }
     }
 
     /// Page types the info page can render as collapsible inline sections
@@ -613,12 +715,6 @@ struct PanelSettings: Codable, Hashable, Sendable {
         normalize()
         guard let index = pages.firstIndex(where: { $0.pageType == pageType }) else { return }
         pages[index].settings = newSettings
-    }
-
-    mutating func setRegion(_ region: PanelRegion, for pageType: PanelPageType) {
-        normalize()
-        guard let index = pages.firstIndex(where: { $0.pageType == pageType }) else { return }
-        pages[index].region = region
     }
 
     private enum CodingKeys: String, CodingKey {

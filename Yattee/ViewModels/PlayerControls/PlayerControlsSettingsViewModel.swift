@@ -830,10 +830,15 @@ final class PlayerControlsSettingsViewModel {
         }
     }
 
-    /// Synchronously updates a page's corner-layout region assignment.
-    func setPanelPageRegion(_ region: PanelRegion, for pageType: PanelPageType) {
+    /// What the corner layout shows below the video (stored value).
+    var panelBelowVideoContent: PanelBelowVideoContent {
+        panelSettings.belowVideoContent
+    }
+
+    /// Synchronously updates what the corner layout shows below the video.
+    func syncPanelBelowVideoContent(_ content: PanelBelowVideoContent) {
         updatePanelSettingsSync { settings in
-            settings.setRegion(region, for: pageType)
+            settings.belowVideoContent = content
         }
     }
 

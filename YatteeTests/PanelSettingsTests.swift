@@ -279,17 +279,48 @@ struct PanelSettingsTests {
         #expect(settings.pages.map(\.pageType) == PanelSettings.default.pages.map(\.pageType))
     }
 
-    @Test("Region assignment and layout mode round-trip through Codable")
-    func regionAndLayoutModeRoundTrip() throws {
+    @Test("Below-video content and layout mode round-trip through Codable")
+    func belowVideoContentAndLayoutModeRoundTrip() throws {
         var settings = PanelSettings.default
         settings.layoutMode = .corner
-        settings.setRegion(.belowVideo, for: .related)
-        #expect(settings.configuration(for: .related)?.region == .belowVideo)
-        #expect(settings.enabledPages(in: .primary).map(\.pageType) == [.chapters, .queue])
+        #expect(settings.belowVideoContent == .infoAndComments)
+
+        settings.belowVideoContent = .info
+        #expect(settings.configuration(for: .info)?.region == .belowVideo)
+        #expect(settings.configuration(for: .comments)?.region == .primary)
+        #expect(settings.enabledPages(in: .primary).map(\.pageType) == [.comments, .related, .chapters, .queue])
 
         let data = try JSONEncoder().encode(settings)
         let decoded = try JSONDecoder().decode(PanelSettings.self, from: data)
         #expect(decoded.effectiveLayoutMode == .corner)
-        #expect(decoded.configuration(for: .related)?.region == .belowVideo)
+        #expect(decoded.belowVideoContent == .info)
+
+        settings.belowVideoContent = .nothing
+        #expect(settings.enabledPages(in: .belowVideo).isEmpty)
+        #expect(settings.enabledPages(in: .primary).map(\.pageType) == [.info, .comments, .related, .chapters, .queue])
+    }
+
+    @Test("Pages the below-video host cannot render are clamped to the side column")
+    func unhostableBelowVideoRegionsClamp() {
+        // Older presets could assign any page below the video.
+        var settings = PanelSettings(pages: [
+            PanelPageConfiguration(pageType: .info, region: .primary),
+            PanelPageConfiguration(pageType: .comments, region: .belowVideo),
+            PanelPageConfiguration(pageType: .related, region: .belowVideo),
+            PanelPageConfiguration(pageType: .chapters, region: .belowVideo),
+            PanelPageConfiguration(pageType: .queue, region: .belowVideo),
+        ])
+        #expect(settings.belowVideoContent == .nothing)
+        #expect(settings.enabledPages(in: .belowVideo).isEmpty)
+        #expect(settings.effectiveRegion(for: .related) == .primary)
+
+        // Comments may sit below only together with info.
+        settings.belowVideoContent = .infoAndComments
+        #expect(settings.enabledPages(in: .belowVideo).map(\.pageType) == [.info, .comments])
+        #expect(settings.enabledPages(in: .primary).map(\.pageType) == [.related, .chapters, .queue])
+
+        settings.pages[0].region = .primary
+        #expect(settings.belowVideoContent == .nothing)
+        #expect(settings.effectiveRegion(for: .comments) == .primary)
     }
 }

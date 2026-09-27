@@ -15,7 +15,6 @@ struct PanelPageEditorView: View {
 
     // Local state for immediate UI updates
     @State private var isEnabled: Bool = true
-    @State private var region: PanelRegion = .primary
     @State private var showDescription: Bool = true
     @State private var descriptionExpandedByDefault: Bool = false
     @State private var descriptionCollapsedLines: Int = InfoPageSettings.defaultDescriptionCollapsedLines
@@ -45,10 +44,6 @@ struct PanelPageEditorView: View {
         Form {
             if !isPinnedPage {
                 enabledSection
-            }
-
-            if PanelSettingsView.supportsCornerLayout, viewModel.panelLayoutMode == .corner {
-                regionSection
             }
 
             switch pageType {
@@ -98,28 +93,6 @@ struct PanelPageEditorView: View {
             if !viewModel.canEditActivePreset {
                 Text(String(localized: "settings.playerControls.duplicateToEdit"))
             }
-        }
-    }
-
-    // MARK: - Region Section (corner layout)
-
-    private var regionSection: some View {
-        Section {
-            Picker(
-                String(localized: "panel.settings.page.region"),
-                selection: $region
-            ) {
-                ForEach(PanelRegion.allCases, id: \.self) { region in
-                    Text(region.displayName).tag(region)
-                }
-            }
-            .disabled(!viewModel.canEditActivePreset)
-            .onChange(of: region) { _, newValue in
-                guard newValue != configuration?.region else { return }
-                viewModel.setPanelPageRegion(newValue, for: pageType)
-            }
-        } footer: {
-            Text(String(localized: "panel.settings.page.region.footer"))
         }
     }
 
@@ -351,7 +324,6 @@ struct PanelPageEditorView: View {
 
     private func syncLocalState() {
         isEnabled = configuration?.isEnabled ?? true
-        region = configuration?.region ?? .primary
         let info = infoSettings
         showDescription = info.effectiveShowDescription
         descriptionExpandedByDefault = info.effectiveDescriptionExpandedByDefault
