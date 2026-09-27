@@ -249,26 +249,44 @@ struct PanelSettingsView: View {
 
     // MARK: - Pages Section
 
-    /// The pinned page (info) is rendered outside the reorderable list so it
-    /// gets no drag handle and nothing can be dropped above it.
-    private var pinnedPage: PanelPageConfiguration? {
-        viewModel.panelPages.first { $0.pageType == PanelSettings.pinnedPageType }
+    /// Page types whose slot the user cannot change: the pinned page (info)
+    /// and, in the corner layout with the comments pill below the video,
+    /// comments too, since it is no longer a page in the side column.
+    private var lockedPageTypes: Set<PanelPageType> {
+        var locked: Set<PanelPageType> = [PanelSettings.pinnedPageType]
+        if layoutMode == .corner, Self.supportsCornerLayout,
+           viewModel.panelSettings.effectiveRegion(for: .comments) == .belowVideo {
+            locked.insert(.comments)
+        }
+        return locked
     }
 
-    /// Pages the user can reorder: everything but the pinned page and the
-    /// types this device never renders (iPhone: queue).
-    private var reorderablePages: [PanelPageConfiguration] {
+    /// Locked pages are rendered outside the reorderable list so they get no
+    /// drag handle and nothing can be dropped between or above them.
+    private var lockedPages: [PanelPageConfiguration] {
+        let locked = lockedPageTypes
         let hidden = PanelSettings.hiddenSettingsPageTypes
         return viewModel.panelPages.filter {
-            $0.pageType != PanelSettings.pinnedPageType && !hidden.contains($0.pageType)
+            locked.contains($0.pageType) && !hidden.contains($0.pageType)
+        }
+    }
+
+    /// Pages the user can reorder: everything but the locked pages and the
+    /// types this device never renders (iPhone: queue, comments).
+    private var reorderablePages: [PanelPageConfiguration] {
+        let locked = lockedPageTypes
+        let hidden = PanelSettings.hiddenSettingsPageTypes
+        return viewModel.panelPages.filter {
+            !locked.contains($0.pageType) && !hidden.contains($0.pageType)
         }
     }
 
     private var pagesSection: some View {
         Section {
-            if let pinnedPage {
-                pageRow(for: pinnedPage)
+            ForEach(lockedPages) { page in
+                pageRow(for: page)
                     .moveDisabled(true)
+                    .deleteDisabled(true)
             }
 
             ForEach(reorderablePages) { page in
