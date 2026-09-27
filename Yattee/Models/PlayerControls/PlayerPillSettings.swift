@@ -31,10 +31,26 @@ enum PillVisibility: String, Codable, Hashable, Sendable, CaseIterable {
         }
     }
 
+    /// iPad treats the pill as on/off: both orientations show the video next
+    /// to a panel, the corner layout hosts the portrait panel in landscape,
+    /// and Split View windows make "portrait" mean "narrow" — so an
+    /// orientation split never matches what the user sees.
+    static var isOrientationAgnostic: Bool {
+        #if os(iOS)
+        return UIDevice.current.userInterfaceIdiom == .pad
+        #else
+        return false
+        #endif
+    }
+
+    /// Whether the pill is enabled at all (any mode except `.never`).
+    var isEnabled: Bool { self != .never }
+
     /// Returns whether the pill should be visible for the given layout context.
     /// - Parameter isWideLayout: True if in wide/landscape layout, false for portrait.
     /// - Returns: Whether the pill should be shown.
     func isVisible(isWideLayout: Bool) -> Bool {
+        if Self.isOrientationAgnostic { return isEnabled }
         switch self {
         case .portraitOnly:
             return !isWideLayout

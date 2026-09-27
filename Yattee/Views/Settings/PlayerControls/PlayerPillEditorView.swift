@@ -41,23 +41,39 @@ struct PlayerPillEditorView: View {
 
     private var visibilitySection: some View {
         Section {
-            Picker(
-                String(localized: "pill.visibility.title"),
-                selection: $visibility
-            ) {
-                ForEach(PillVisibility.allCases, id: \.self) { mode in
-                    Text(mode.displayName).tag(mode)
+            if PillVisibility.isOrientationAgnostic {
+                // iPad: on/off only. Any orientation mode from a synced preset
+                // reads as "on"; turning it on stores `.both` so the preset
+                // shows the pill everywhere on iPhone too.
+                Toggle(
+                    String(localized: "pill.visibility.title"),
+                    isOn: Binding(
+                        get: { visibility.isEnabled },
+                        set: { visibility = $0 ? .both : .never }
+                    )
+                )
+                .disabled(!viewModel.canEditActivePreset)
+            } else {
+                Picker(
+                    String(localized: "pill.visibility.title"),
+                    selection: $visibility
+                ) {
+                    ForEach(PillVisibility.allCases, id: \.self) { mode in
+                        Text(mode.displayName).tag(mode)
+                    }
                 }
-            }
-            .disabled(!viewModel.canEditActivePreset)
-            .onChange(of: visibility) { _, newValue in
-                guard newValue != viewModel.pillVisibility else { return }
-                viewModel.syncPillVisibility(newValue)
+                .disabled(!viewModel.canEditActivePreset)
             }
         } header: {
             Text(String(localized: "pill.visibility.header"))
         } footer: {
-            Text(String(localized: "pill.visibility.footer"))
+            Text(String(localized: PillVisibility.isOrientationAgnostic
+                ? "pill.visibility.footer.toggle"
+                : "pill.visibility.footer"))
+        }
+        .onChange(of: visibility) { _, newValue in
+            guard newValue != viewModel.pillVisibility else { return }
+            viewModel.syncPillVisibility(newValue)
         }
     }
 

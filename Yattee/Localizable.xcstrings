@@ -7788,6 +7788,16 @@
         }
       }
     },
+    "pill.visibility.footer.toggle" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Show the player pill in the details panel."
+          }
+        }
+      }
+    },
     "pill.visibility.header" : {
       "localizations" : {
         "en" : {
