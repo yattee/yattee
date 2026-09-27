@@ -28,6 +28,10 @@ struct PlayerPanelContentView: View {
     /// hide the top page bar.
     var showPageBar: Bool = true
 
+    /// Pin toggle rendered before the page pills (wide layout hosts). Keeps
+    /// the bar visible even when only one page is available.
+    var pageBarPinAction: PanelPageBarPinAction? = nil
+
     /// The info page shows chapters and related as collapsible inline
     /// sections in configured order; those pages are then dropped from the
     /// page list (iPhone in every orientation, stacked iPad portrait).
@@ -113,7 +117,7 @@ struct PlayerPanelContentView: View {
         let pages = visiblePages
 
         VStack(spacing: 0) {
-            if showPageBar, pages.count >= 2 {
+            if showPageBar, pages.count >= 2 || pageBarPinAction != nil {
                 // Highlight follows the rendered page (the selection when
                 // visible, else the fallback); taps still set the selection.
                 PanelPageBar(
@@ -123,7 +127,8 @@ struct PlayerPanelContentView: View {
                         set: { selectedPage = $0 }
                     ),
                     accentColor: context.accentColor,
-                    showLabels: panelSettings.effectiveShowPageBarLabels
+                    showLabels: panelSettings.effectiveShowPageBarLabels,
+                    pinAction: pageBarPinAction
                 )
                 .padding(.top, pageBarTopPadding)
             }

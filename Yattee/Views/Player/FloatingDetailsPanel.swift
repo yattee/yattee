@@ -94,9 +94,10 @@ struct FloatingDetailsPanel: View {
         PanelSettings.isSectionsOnlyDevice
     }
 
-    /// iPhone is floating-only: no pin button on the grabber.
-    private var showsPinButton: Bool {
-        !PanelSettings.isSectionsOnlyDevice
+    /// iPhone is floating-only: no pin button in the page bar.
+    private var pageBarPinAction: PanelPageBarPinAction? {
+        guard !PanelSettings.isSectionsOnlyDevice else { return nil }
+        return PanelPageBarPinAction(isPinned: isPinned, toggle: onPinToggle)
     }
 
     /// Whether the comments pill should route to the comments page instead of
@@ -142,7 +143,7 @@ struct FloatingDetailsPanel: View {
         HStack(spacing: 0) {
             // Resize grabber on left when panel is on right side
             if panelSide == .right {
-                grabberWithPinButton
+                grabber
             }
 
             // Main panel content
@@ -150,7 +151,7 @@ struct FloatingDetailsPanel: View {
 
             // Resize grabber on right when panel is on left side
             if panelSide == .left {
-                grabberWithPinButton
+                grabber
             }
         }
         .environment(\.colorScheme, isPinned ? systemColorScheme : .dark)
@@ -183,7 +184,7 @@ struct FloatingDetailsPanel: View {
     }
 
     @ViewBuilder
-    private var grabberWithPinButton: some View {
+    private var grabber: some View {
         PanelResizeGrabber(
             panelWidth: $panelWidth,
             minWidth: Self.minPanelWidth,
@@ -192,18 +193,6 @@ struct FloatingDetailsPanel: View {
             isPinned: isPinned,
             isDragActive: $isDragHandleActive
         )
-        .overlay(alignment: .center) {
-            if showsPinButton {
-                PanelPinButton(
-                    isPinned: isPinned,
-                    panelSide: panelSide,
-                    onPinToggle: onPinToggle,
-                    isDragHandleActive: $isDragHandleActive
-                )
-                .offset(y: -65)
-                .zIndex(10) // Ensure pin button appears above panel content
-            }
-        }
         .zIndex(10) // Ensure grabber overlay appears above panel
     }
 
@@ -230,6 +219,7 @@ struct FloatingDetailsPanel: View {
                 ),
                 pageBarTopPadding: 12,
                 showPageBar: !usesInlineSections,
+                pageBarPinAction: pageBarPinAction,
                 inlineInfoSections: usesInlineSections
             )
         }
