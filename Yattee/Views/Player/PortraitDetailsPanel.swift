@@ -336,6 +336,9 @@ struct PortraitDetailsPanel: View {
                             showAvatar: panelSettings.commentsShowAvatars,
                             onTap: expandComments
                         )
+                        // Wide hosts (iPad corner/stacked panels) would
+                        // stretch the excerpt across the whole panel.
+                        .frame(maxWidth: 600)
                     }
 
                     // Bottom row
