@@ -132,12 +132,12 @@ struct MiniPlayerView: View {
     var body: some View {
         Group {
             #if os(macOS)
-            macOSCapsuleLayout
+            capsuleLayout
             #else
             if isTabAccessory {
                 accessoryLayout
             } else {
-                overlayLayout
+                capsuleLayout
             }
             #endif
         }
@@ -213,65 +213,25 @@ struct MiniPlayerView: View {
         .padding(.vertical, 8)
     }
 
-    // MARK: - Overlay Layout
+    // MARK: - Capsule Layout (macOS + iOS 18 overlay)
 
-    private var overlayLayout: some View {
-        HStack(spacing: 12) {
-            // Video preview - tap for PiP (or expand if PiP unavailable)
-            videoPreviewView
-                .frame(width: 60, height: 34)
-                .clipShape(RoundedRectangle(cornerRadius: 4))
-                .contentShape(Rectangle())
-                .onTapGesture {
-                    handleVideoPreviewTap()
-                }
-
-            // Title/author area - tap to expand player (restores from PiP first if needed)
-            VStack(alignment: .leading, spacing: 2) {
-                MarqueeText(
-                    text: displayTitle,
-                    font: .subheadline,
-                    fontWeight: .medium,
-                    foregroundStyle: .primary
-                )
-
-                authorLine(font: .caption)
-            }
-            .contentShape(Rectangle())
-            .onTapGesture {
-                expandPlayerWithPiPRestore()
-            }
-
-            Spacer()
-                .contentShape(Rectangle())
-                .onTapGesture {
-                    expandPlayerWithPiPRestore()
-                }
-
-            // Dynamic buttons from settings
-            buttonsView
-
-            // Always show close button in overlay layout
-            closeButton
-        }
-        .padding(.horizontal)
-        .padding(.vertical, 8)
-        .background(.ultraThinMaterial)
-        .overlay(alignment: .bottom) {
-            progressLine
-        }
+    /// Preview size for the capsule: slightly larger on iOS for touch.
+    private var capsulePreviewSize: CGSize {
+        #if os(macOS)
+        CGSize(width: 44, height: 26)
+        #else
+        CGSize(width: 56, height: 32)
+        #endif
     }
 
-    // MARK: - macOS Capsule Layout
-
-    #if os(macOS)
-    /// Compact, centered capsule shown in the main window on macOS (Music.app style).
-    /// The expanded player lives in a separate window, so this stays visible alongside it.
-    private var macOSCapsuleLayout: some View {
+    /// Compact, centered capsule (Music.app style). On macOS it floats in the main
+    /// window alongside the separate player window; on iOS 18 (no tab accessory)
+    /// it floats above the tab bar with the same width limit.
+    private var capsuleLayout: some View {
         HStack(spacing: 10) {
             // Video preview - tap for PiP (or expand if PiP unavailable)
             videoPreviewView
-                .frame(width: 44, height: 26)
+                .frame(width: capsulePreviewSize.width, height: capsulePreviewSize.height)
                 .clipShape(RoundedRectangle(cornerRadius: 4))
                 .contentShape(Rectangle())
                 .onTapGesture {
@@ -289,13 +249,19 @@ struct MiniPlayerView: View {
 
                 authorLine(font: .caption)
             }
+            .frame(maxWidth: .infinity, alignment: .leading)
             .contentShape(Rectangle())
             .onTapGesture {
                 expandPlayerWithPiPRestore()
             }
 
-            // Dynamic buttons from settings (includes close by default - no separate close button)
+            // Dynamic buttons from settings (close is part of the preset)
             buttonsView
+
+            // Safety net: keep a way to close when the preset has no close button
+            if !miniPlayerSettings.buttons.contains(where: { $0.buttonType == .close }) {
+                closeButton
+            }
         }
         .padding(.horizontal, 12)
         .padding(.vertical, 6)
@@ -307,7 +273,6 @@ struct MiniPlayerView: View {
         .clipShape(Capsule())
         .shadow(color: .black.opacity(0.25), radius: 8, y: 4)
     }
-    #endif
 
     // MARK: - Shared Components
 

@@ -289,7 +289,10 @@ struct iOS18AdaptiveTabView: View {
                 Spacer()
                 MiniPlayerView()
             }
-            .padding(.bottom, 49)
+            .padding(.horizontal, 16)
+            // Compact width has a bottom tab bar (49pt) to clear; regular width
+            // (sidebarAdaptable) keeps its tabs at the top, so only float above the edge.
+            .padding(.bottom, horizontalSizeClass == .compact ? 49 + 8 : 12)
             // Use move-only transition (no opacity) to prevent thumbnail flash during collapse
             // The opacity transition caused video to appear faded during player sheet dismiss
             .transition(.move(edge: .bottom))
