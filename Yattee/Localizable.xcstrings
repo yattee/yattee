@@ -8284,17 +8284,6 @@
         }
       }
     },
-    "player.noDescription" : {
-      "comment" : "Shown when video has no description",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "No description available"
-          }
-        }
-      }
-    },
     "player.notPlaying" : {
       "comment" : "Placeholder when no video is playing",
       "localizations" : {

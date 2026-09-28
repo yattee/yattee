@@ -92,7 +92,7 @@ struct InfoPanelPage: View {
         PanelPageScrollView(config: scrollConfig) { proxy in
             videoInfo
 
-            if settings.effectiveShowDescription {
+            if showsDescriptionSection {
                 Divider()
                     .panelHorizontalPadding()
 
@@ -167,10 +167,17 @@ struct InfoPanelPage: View {
 
     // MARK: - Description
 
-    private var descriptionContent: some View {
-        let description = video.description ?? ""
+    private var description: String { video.description ?? "" }
 
-        return VStack(alignment: .leading, spacing: 8) {
+    /// Nothing renders below the video info when there is no description and
+    /// nothing is loading — no placeholder, no divider (direct media links).
+    private var showsDescriptionSection: Bool {
+        settings.effectiveShowDescription
+            && (!description.isEmpty || videoDetailsState == .loading)
+    }
+
+    private var descriptionContent: some View {
+        VStack(alignment: .leading, spacing: 8) {
             if !description.isEmpty {
                 if usesCollapsedDescription {
                     collapsibleDescription(description)
@@ -189,11 +196,6 @@ struct InfoPanelPage: View {
                     Spacer()
                 }
                 .padding()
-            } else {
-                Text(String(localized: "player.noDescription"))
-                    .font(.subheadline)
-                    .foregroundStyle(.secondary)
-                    .panelHorizontalPadding()
             }
         }
     }
