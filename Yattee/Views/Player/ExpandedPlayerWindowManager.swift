@@ -176,9 +176,10 @@ final class ExpandedPlayerWindowManager: NSObject {
 
         // Lock manual resize to the video aspect ratio. Seeded with the real ratio
         // when known (else 16:9); updated as soon as the real ratio is known.
-        // Corner layout (already active on a window re-mount, e.g. switching
-        // from the inline overlay) keeps the window unconstrained.
-        if appEnvironment.navigationCoordinator.isCornerLayoutActive != true {
+        // Corner layout with its panels visible (already active on a window
+        // re-mount, e.g. switching from the inline overlay) keeps the window
+        // unconstrained.
+        if !appEnvironment.isCornerPanelLayoutActive {
             Self.applyAspectRatioConstraint(seedAspect, to: window)
         }
 
@@ -599,8 +600,17 @@ final class ExpandedPlayerWindowManager: NSObject {
     func unlockAspectRatio() {
         guard let window = playerWindow else { return }
         pendingFullScreenAspectRatio = nil
-        window.contentAspectRatio = .zero
-        LoggingService.shared.debug("unlockAspectRatio (corner layout)", category: .player)
+        // `aspectRatio` and `resizeIncrements` are mutually exclusive: setting
+        // one resets the other. Assigning a zero aspect ratio does NOT clear the
+        // lock — it leaves AppKit's aspect handler active with a degenerate 0:0
+        // ratio, which makes interactive resize a no-op (the window can't be
+        // resized at all). Resetting the increments to 1×1 is the supported way
+        // to return to free resizing.
+        window.contentResizeIncrements = NSSize(width: 1, height: 1)
+        LoggingService.shared.debug(
+            "unlockAspectRatio (corner layout) aspect=\(window.contentAspectRatio) increments=\(window.contentResizeIncrements)",
+            category: .player
+        )
     }
 
     // MARK: - Private Helpers
@@ -828,14 +838,27 @@ extension ExpandedPlayerWindowManager: NSWindowDelegate {
             // exactly what the aspect-change handler would have done windowed.
             if let ratio = pendingFullScreenAspectRatio {
                 pendingFullScreenAspectRatio = nil
-                // Corner layout keeps the window unconstrained.
-                guard appEnvironment?.navigationCoordinator.isCornerLayoutActive != true else { return }
+                // Corner layout with visible panels keeps the window unconstrained.
+                guard appEnvironment?.isCornerPanelLayoutActive != true else { return }
                 Self.applyAspectRatioConstraint(ratio, to: window)
                 if appEnvironment?.settingsManager.playerSheetAutoResize == true {
                     resizeToFitAspectRatio(ratio, animated: false)
                 }
             }
         }
+    }
+}
+
+// MARK: - Free-Resize Gate
+
+extension AppEnvironment {
+    /// Whether the player window should resize freely instead of following
+    /// the video aspect ratio: the corner layout is resolved AND its panel
+    /// regions are shown, so the window frames video plus panels. Hiding the
+    /// panels in corner mode leaves only the video, which follows the ratio
+    /// lock (and auto-fit) exactly like the stacked layout.
+    var isCornerPanelLayoutActive: Bool {
+        navigationCoordinator.isCornerLayoutActive && settingsManager.landscapeDetailsPanelVisible
     }
 }
 

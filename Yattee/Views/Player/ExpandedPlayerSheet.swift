@@ -875,9 +875,11 @@ private struct PlayerMacOSEventHandlersModifier: ViewModifier {
 
     var playerState: PlayerState? { appEnvironment?.playerService.state }
 
-    /// Corner layout resizes the window freely: no aspect lock, no auto-fit.
+    /// Corner layout with its panels visible resizes the window freely: no
+    /// aspect lock, no auto-fit. With the panels hidden only the video is
+    /// left, so the window follows the ratio lock like the stacked layout.
     private var isCornerLayoutActive: Bool {
-        appEnvironment?.navigationCoordinator.isCornerLayoutActive == true
+        appEnvironment?.isCornerPanelLayoutActive == true
     }
 
     func body(content: Content) -> some View {
@@ -895,7 +897,7 @@ private struct PlayerMacOSEventHandlersModifier: ViewModifier {
             .onChange(of: playerState?.currentVideo?.id) { oldValue, newValue in
                 handleVideoChangeForResize(oldValue: oldValue, newValue: newValue)
             }
-            .onChange(of: appEnvironment?.navigationCoordinator.isCornerLayoutActive) { _, isCorner in
+            .onChange(of: appEnvironment?.isCornerPanelLayoutActive) { _, isCorner in
                 handleCornerLayoutChange(isCorner: isCorner == true)
             }
             .onAppear {
@@ -903,9 +905,10 @@ private struct PlayerMacOSEventHandlersModifier: ViewModifier {
             }
     }
 
-    /// Entering corner mode drops the window's aspect-ratio constraint so it
-    /// resizes freely; leaving it restores the lock (and auto-fit, when on)
-    /// exactly as the aspect-change handler would have applied it.
+    /// Entering corner mode with panels shown drops the window's aspect-ratio
+    /// constraint so it resizes freely; leaving it (stacked layout, or corner
+    /// panels hidden) restores the lock (and auto-fit, when on) exactly as the
+    /// aspect-change handler would have applied it.
     private func handleCornerLayoutChange(isCorner: Bool) {
         if isCorner {
             ExpandedPlayerWindowManager.shared.unlockAspectRatio()
