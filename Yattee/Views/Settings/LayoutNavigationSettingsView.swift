@@ -230,8 +230,17 @@ private struct VideoActionsSection: View {
 private struct VideoInfoActionsSection: View {
     @Bindable var settings: SettingsManager
 
+    /// macOS shows every action in the toolbar; iOS pins one and tucks the rest into the ⋯ menu.
+    private var actionsFooter: LocalizedStringKey {
+        #if os(macOS)
+        "settings.videoInfo.actions.footer.macOS"
+        #else
+        "settings.videoInfo.actions.footer"
+        #endif
+    }
+
     var body: some View {
-        SettingsFormSection("settings.videoInfo.actions.header", footer: "settings.videoInfo.actions.footer") {
+        SettingsFormSection("settings.videoInfo.actions.header", footer: actionsFooter) {
             Picker(
                 String(localized: "settings.videoInfo.actionsLayout"),
                 selection: $settings.videoInfoActionsLayout
@@ -241,6 +250,7 @@ private struct VideoInfoActionsSection: View {
                 }
             }
 
+            #if os(iOS)
             if settings.videoInfoActionsLayout == .toolbar {
                 Picker(
                     String(localized: "settings.videoInfo.primaryAction"),
@@ -251,6 +261,7 @@ private struct VideoInfoActionsSection: View {
                     }
                 }
             }
+            #endif
         }
     }
 }

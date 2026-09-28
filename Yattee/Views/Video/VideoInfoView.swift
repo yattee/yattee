@@ -303,14 +303,36 @@ struct VideoInfoView: View {
         #if !os(tvOS)
         .toolbar {
             if usesToolbarActions, displayedVideo != nil {
+                #if os(macOS)
+                // macOS has room for every action, so show them all as toolbar items.
+                // Explicit items rather than ForEach: a ForEach inside the toolbar builder
+                // is evaluated once and never picks up state changes (bookmark/download icons).
+                ToolbarItem(placement: .primaryAction) {
+                    toolbarActionView(.play, inMenu: false)
+                }
+                // Separate Play from the secondary actions so it gets its own glass pill.
+                if #available(macOS 26, *) {
+                    ToolbarSpacer(.fixed, placement: .primaryAction)
+                }
+                ToolbarItem(placement: .primaryAction) {
+                    toolbarActionView(.download, inMenu: false)
+                }
+                ToolbarItem(placement: .primaryAction) {
+                    toolbarActionView(.share, inMenu: false)
+                }
+                ToolbarItem(placement: .primaryAction) {
+                    toolbarActionView(.addToPlaylist, inMenu: false)
+                }
+                ToolbarItem(placement: .primaryAction) {
+                    toolbarActionView(.bookmark, inMenu: false)
+                }
+                #else
                 ToolbarItem(placement: .primaryAction) {
                     toolbarActionView(primaryAction, inMenu: false)
                 }
-                #if os(iOS)
                 if #available(iOS 26, *) {
                     ToolbarSpacer(.fixed, placement: .primaryAction)
                 }
-                #endif
                 ToolbarItem(placement: .primaryAction) {
                     Menu {
                         ForEach(VideoInfoPrimaryAction.allCases.filter { $0 != primaryAction }, id: \.self) { action in
@@ -320,6 +342,7 @@ struct VideoInfoView: View {
                         Label(String(localized: "videoInfo.toolbar.moreActions"), systemImage: "ellipsis")
                     }
                 }
+                #endif
             }
         }
         #endif
@@ -1334,8 +1357,13 @@ struct VideoInfoView: View {
     }
 
     /// The action pinned to the toolbar; every other action lives in the ellipsis menu.
+    /// macOS shows every action in the toolbar, so the pinned action only matters on iOS.
     private var primaryAction: VideoInfoPrimaryAction {
+        #if os(macOS)
+        .play
+        #else
         appEnvironment?.settingsManager.videoInfoPrimaryAction ?? .play
+        #endif
     }
 
     /// The hero thumbnail is the only play affordance when the toolbar layout is active

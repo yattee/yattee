@@ -16385,6 +16385,16 @@
         }
       }
     },
+    "settings.videoInfo.actions.footer.macOS" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Toolbar shows all actions in the window toolbar instead of buttons below the video."
+          }
+        }
+      }
+    },
     "settings.videoInfo.actions.header" : {
       "localizations" : {
         "en" : {
