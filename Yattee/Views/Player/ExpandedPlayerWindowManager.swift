@@ -56,8 +56,19 @@ final class ExpandedPlayerWindowManager: NSObject {
     /// is parked here and replayed in `windowDidExitFullScreen`.
     private var pendingFullScreenAspectRatio: Double?
 
+    /// True between `windowWillEnterFullScreen` and `windowDidEnterFullScreen`
+    /// on the separate player window. The style mask may not carry
+    /// `.fullScreen` yet at will-enter time, and the corner panels hide right
+    /// then (which re-locks the aspect ratio) — the lock must park instead of
+    /// touching a window mid-transition.
+    private var isPlayerWindowEnteringFullScreen = false
+
+    /// Corner layout panels hidden by entering native fullscreen so the video
+    /// alone fills the screen; restored when fullscreen ends.
+    private var cornerPanelsHiddenForFullScreen = false
+
     private var isPlayerWindowFullScreen: Bool {
-        playerWindow?.styleMask.contains(.fullScreen) ?? false
+        isPlayerWindowEnteringFullScreen || (playerWindow?.styleMask.contains(.fullScreen) ?? false)
     }
 
     // Configuration
@@ -382,6 +393,31 @@ final class ExpandedPlayerWindowManager: NSObject {
 
     /// Toggles native fullscreen on the player window.
     func toggleFullScreen() {
+        guard let target = playerWindow ?? overlayParent else { return }
+
+        // Entering fullscreen from the corner layout: hide the panels first
+        // (the video grows over them inside the current window), and only
+        // then run the fullscreen zoom — the reverse order zooms the whole
+        // video-plus-panels arrangement and then reflows it on screen. The
+        // entering flag is raised now so the aspect re-lock the panel hide
+        // triggers parks instead of auto-fitting the window mid-way.
+        if !target.styleMask.contains(.fullScreen) {
+            if playerWindow != nil { isPlayerWindowEnteringFullScreen = true }
+            if hideCornerPanelsForFullScreen() {
+                DispatchQueue.main.asyncAfter(deadline: .now() + Self.cornerPanelHideDuration) { [weak self] in
+                    self?.performNativeFullScreenToggle()
+                }
+                return
+            }
+        }
+        performNativeFullScreenToggle()
+    }
+
+    /// Time the corner layout takes to animate its panels away (its
+    /// `.easeInOut(duration: 0.25)` plus a beat for the last frame).
+    private static var cornerPanelHideDuration: TimeInterval { 0.3 }
+
+    private func performNativeFullScreenToggle() {
         guard let window = playerWindow else {
             // Inline overlay presentation: the player already fills the main
             // window, so fullscreen is just the window's native toggle. The
@@ -444,6 +480,10 @@ final class ExpandedPlayerWindowManager: NSObject {
 
         // Leave the window fullscreen if the user was fullscreen before the
         // overlay began; only exit a fullscreen entered for the video.
+        // The will-exit observer is already gone, so undo the fullscreen
+        // panel hide here (the next player open re-derives the visibility
+        // from the preset anyway).
+        restoreCornerPanelsAfterFullScreen()
         if parent.styleMask.contains(.fullScreen), !overlayWasFullScreenAtBegin {
             parent.toggleFullScreen(nil)
         }
@@ -468,6 +508,15 @@ final class ExpandedPlayerWindowManager: NSObject {
         let center = NotificationCenter.default
         overlayFullScreenObservers = [
             center.addObserver(
+                forName: NSWindow.willEnterFullScreenNotification,
+                object: parent,
+                queue: .main
+            ) { _ in
+                Task { @MainActor in
+                    ExpandedPlayerWindowManager.shared.hideCornerPanelsForFullScreen()
+                }
+            },
+            center.addObserver(
                 forName: NSWindow.didEnterFullScreenNotification,
                 object: parent,
                 queue: .main
@@ -483,9 +532,43 @@ final class ExpandedPlayerWindowManager: NSObject {
             ) { _ in
                 Task { @MainActor in
                     AppEnvironment.shared.navigationCoordinator.isMacInlinePlayerFullScreen = false
+                    // Mirror of the enter order: the window is back at its
+                    // size first, then the panels slide in.
+                    ExpandedPlayerWindowManager.shared.restoreCornerPanelsAfterFullScreen()
                 }
             },
         ]
+    }
+
+    // MARK: - Corner Panels In Fullscreen
+
+    /// Native fullscreen means "video only": the corner layout's panels hide
+    /// for the fullscreen session (the layout animates them away and the
+    /// video grows over them), and come back on exit if this hid them. The
+    /// preset's remembered ("last visible") state is left untouched, so a
+    /// fullscreen session doesn't change what the next player open shows.
+    /// Returns whether this call hid the panels.
+    @discardableResult
+    func hideCornerPanelsForFullScreen() -> Bool {
+        let appEnvironment = AppEnvironment.shared
+        guard appEnvironment.navigationCoordinator.isCornerLayoutActive,
+              appEnvironment.settingsManager.landscapeDetailsPanelVisible else { return false }
+        cornerPanelsHiddenForFullScreen = true
+        appEnvironment.settingsManager.landscapeDetailsPanelVisible = false
+        LoggingService.shared.debug("ExpandedPlayerWindowManager: hid corner panels for fullscreen", category: .player)
+        return true
+    }
+
+    /// Restores the panels hidden by `hideCornerPanelsForFullScreen`, unless
+    /// the user showed them again while fullscreen (title tap) — then there is
+    /// nothing to undo.
+    func restoreCornerPanelsAfterFullScreen() {
+        guard cornerPanelsHiddenForFullScreen else { return }
+        cornerPanelsHiddenForFullScreen = false
+        let appEnvironment = AppEnvironment.shared
+        guard !appEnvironment.settingsManager.landscapeDetailsPanelVisible else { return }
+        appEnvironment.settingsManager.landscapeDetailsPanelVisible = true
+        LoggingService.shared.debug("ExpandedPlayerWindowManager: restored corner panels after fullscreen", category: .player)
     }
 
     /// Restores a window that was hidden for PiP mode.
@@ -880,8 +963,27 @@ extension ExpandedPlayerWindowManager: NSWindowDelegate {
         return false
     }
 
+    nonisolated func windowWillEnterFullScreen(_: Notification) {
+        MainActor.assumeIsolated {
+            isPlayerWindowEnteringFullScreen = true
+            hideCornerPanelsForFullScreen()
+        }
+    }
+
+    nonisolated func windowDidEnterFullScreen(_: Notification) {
+        MainActor.assumeIsolated {
+            isPlayerWindowEnteringFullScreen = false
+        }
+    }
+
     nonisolated func windowDidExitFullScreen(_ notification: Notification) {
         MainActor.assumeIsolated {
+            isPlayerWindowEnteringFullScreen = false
+            // Mirror of the enter order: the window is back at its size
+            // first, then the panels slide in. Restoring flips
+            // `isCornerPanelLayoutActive` back on, so the aspect-ratio replay
+            // below is skipped (the corner layout then unlocks the ratio).
+            restoreCornerPanelsAfterFullScreen()
             guard let window = playerWindow else { return }
             // Restore the pinned (floating) config that toggleFullScreen
             // dropped so the window could enter primary fullscreen.
