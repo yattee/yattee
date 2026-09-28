@@ -68,6 +68,19 @@ final class ExpandedPlayerWindowManager: NSObject {
     private static let defaultAspectRatio: Double = 16.0 / 9.0
     private static let frameAutosaveName = "ExpandedPlayerWindow"
 
+    /// Aspect-lock change requested while the user is dragging the window.
+    /// Changing `contentAspectRatio`/`contentResizeIncrements` mid-drag makes
+    /// AppKit's resize handler switch modes under the cursor and snap the
+    /// frame, so the change is parked here and applied in
+    /// `windowDidEndLiveResize`. The last request wins.
+    private enum PendingAspectLock { case lock(Double), unlock }
+    private var pendingLiveResizeAspectLock: PendingAspectLock?
+
+    /// Whether the user is currently dragging the player window's edge/corner.
+    var isLiveResizing: Bool {
+        playerWindow?.inLiveResize == true
+    }
+
     var isPresented: Bool {
         playerWindow != nil
     }
@@ -542,6 +555,16 @@ final class ExpandedPlayerWindowManager: NSObject {
             return
         }
 
+        // Never reframe the window under the user's cursor. Auto-fit during a
+        // live drag fights the drag (and, when the fitted size crosses the
+        // corner-layout width threshold, oscillates between layouts every
+        // frame). The user's drag owns the size; drop the fit and only keep
+        // the aspect lock in sync (deferred to the end of the drag).
+        if window.inLiveResize {
+            lockAspectRatio(aspectRatio)
+            return
+        }
+
         // Always update the aspect-ratio lock, even if we end up not resizing here.
         Self.applyAspectRatioConstraint(aspectRatio, to: window)
 
@@ -590,6 +613,10 @@ final class ExpandedPlayerWindowManager: NSObject {
             pendingFullScreenAspectRatio = aspectRatio
             return
         }
+        if window.inLiveResize {
+            pendingLiveResizeAspectLock = .lock(aspectRatio)
+            return
+        }
         Self.applyAspectRatioConstraint(aspectRatio, to: window)
     }
 
@@ -600,6 +627,10 @@ final class ExpandedPlayerWindowManager: NSObject {
     func unlockAspectRatio() {
         guard let window = playerWindow else { return }
         pendingFullScreenAspectRatio = nil
+        if window.inLiveResize {
+            pendingLiveResizeAspectLock = .unlock
+            return
+        }
         // `aspectRatio` and `resizeIncrements` are mutually exclusive: setting
         // one resets the other. Assigning a zero aspect ratio does NOT clear the
         // lock — it leaves AppKit's aspect handler active with a degenerate 0:0
@@ -763,23 +794,48 @@ extension ExpandedPlayerWindowManager: NSWindowDelegate {
             // `contentAspectRatio` to `frameSize`, so we only need to grow an
             // under-sized proposal back up to the minimum while preserving its
             // (already correct) aspect ratio.
-            let aspect = frameSize.height > 0
-                ? frameSize.width / frameSize.height
-                : CGFloat(Self.defaultAspectRatio)
+            let isAspectLocked = (playerWindow?.contentAspectRatio.width ?? 0) > 0
 
-            var height = max(frameSize.height, Self.minHeight)
-            var width = height * aspect
+            var width: CGFloat
+            var height: CGFloat
+            if isAspectLocked {
+                let aspect = frameSize.height > 0
+                    ? frameSize.width / frameSize.height
+                    : CGFloat(Self.defaultAspectRatio)
 
-            // Guard the width floor too (for narrow/portrait videos where the
-            // height minimum alone would leave the window too thin), then rederive
-            // height so the result stays on the proposed aspect ratio.
-            let minWidthFloor = max(Self.minHeight * aspect, 320)
-            if width < minWidthFloor {
-                width = minWidthFloor
-                height = aspect > 0 ? width / aspect : height
+                height = max(frameSize.height, Self.minHeight)
+                width = height * aspect
+
+                // Guard the width floor too (for narrow/portrait videos where the
+                // height minimum alone would leave the window too thin), then rederive
+                // height so the result stays on the proposed aspect ratio.
+                let minWidthFloor = max(Self.minHeight * aspect, 320)
+                if width < minWidthFloor {
+                    width = minWidthFloor
+                    height = aspect > 0 ? width / aspect : height
+                }
+            } else {
+                // Free resize (corner layout): clamp each axis on its own.
+                // Preserving the proposal's ratio here would widen the window
+                // while the user drags only its bottom edge past the floor.
+                width = max(frameSize.width, 320)
+                height = max(frameSize.height, Self.minHeight)
             }
 
             return NSSize(width: width, height: height)
+        }
+    }
+
+    nonisolated func windowDidEndLiveResize(_: Notification) {
+        MainActor.assumeIsolated {
+            guard let pending = pendingLiveResizeAspectLock else { return }
+            pendingLiveResizeAspectLock = nil
+            switch pending {
+            case let .lock(ratio):
+                lockAspectRatio(ratio)
+            case .unlock:
+                unlockAspectRatio()
+            }
         }
     }
 

@@ -914,7 +914,14 @@ private struct PlayerMacOSEventHandlersModifier: ViewModifier {
             ExpandedPlayerWindowManager.shared.unlockAspectRatio()
         } else if let aspectRatio = playerState?.videoAspectRatio, aspectRatio > 0 {
             ExpandedPlayerWindowManager.shared.lockAspectRatio(aspectRatio)
-            if appEnvironment?.settingsManager.playerSheetAutoResize == true {
+            // Auto-fit only when the layout change was not caused by the
+            // user dragging the window. The corner layout resolves from the
+            // window width, so a drag across its threshold flips this handler;
+            // fitting back to the video size mid-drag pushes the width over
+            // the threshold again and the window oscillates between layouts
+            // for the rest of the drag. The user's drag owns the size.
+            if appEnvironment?.settingsManager.playerSheetAutoResize == true,
+               !ExpandedPlayerWindowManager.shared.isLiveResizing {
                 ExpandedPlayerWindowManager.shared.resizeToFitAspectRatio(aspectRatio, animated: true)
             }
         }
