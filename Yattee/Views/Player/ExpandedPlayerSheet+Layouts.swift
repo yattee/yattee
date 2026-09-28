@@ -1749,7 +1749,12 @@ extension ExpandedPlayerSheet {
                     onTitleTap: {
                         onTogglePanel()
                     },
-                    isDetailsPanelVisible: isPanelVisible,
+                    // Only a floating (unpinned) panel covers the video and
+                    // takes the controls with it. Pinned and corner layout
+                    // panels sit beside the video: showing them again (e.g.
+                    // the restore after native fullscreen) must not leave the
+                    // controls hidden with hover unable to bring them back.
+                    isDetailsPanelVisible: isPanelVisible && !isPanelPinned,
                     onRateChanged: { rate in
                         playerState.rate = rate
                         playerService.currentBackend?.rate = Float(rate.rawValue)
