@@ -27,7 +27,7 @@ final class ExpandedPlayerWindowManager: NSObject {
     /// whether the window was already fullscreen before the overlay began (so
     /// collapsing doesn't exit a fullscreen the user had independently).
     private weak var overlayParent: NSWindow?
-    private var overlayFullScreenObservers: [NSObjectProtocol] = []
+    private var overlayWindowObservers: [NSObjectProtocol] = []
     private var overlayToolbarWasVisible: Bool?
     private var overlayWasFullScreenAtBegin = false
     private var isOverlayParentEnteringFullScreen = false
@@ -490,7 +490,7 @@ final class ExpandedPlayerWindowManager: NSObject {
 
         let coordinator = AppEnvironment.shared.navigationCoordinator
         coordinator.isMacInlinePlayerFullScreen = overlayWasFullScreenAtBegin
-        observeOverlayFullScreenTransitions(of: parent)
+        observeOverlayWindowTransitions(of: parent)
 
         // ExpandedPlayerSheet can appear before ContentView's onChange registers
         // the parent window. Re-run the same sizing decision on the next turn so
@@ -512,10 +512,10 @@ final class ExpandedPlayerWindowManager: NSObject {
         guard let parent = overlayParent else { return }
 
         LoggingService.shared.debug("ExpandedPlayerWindowManager: ending inline overlay", category: .player)
-        for observer in overlayFullScreenObservers {
+        for observer in overlayWindowObservers {
             NotificationCenter.default.removeObserver(observer)
         }
-        overlayFullScreenObservers = []
+        overlayWindowObservers = []
 
         // Leave the window fullscreen if the user was fullscreen before the
         // overlay began; only exit a fullscreen entered for the video.
@@ -541,16 +541,15 @@ final class ExpandedPlayerWindowManager: NSObject {
         overlaySizingConstraints = nil
     }
 
-    /// Mirrors the parent window's fullscreen transitions into the coordinator
-    /// flag so the player controls stay in sync with exits the player's button
-    /// doesn't see (Esc, hover-revealed green button, Window menu, Mission
-    /// Control).
-    private func observeOverlayFullScreenTransitions(of parent: NSWindow) {
-        for observer in overlayFullScreenObservers {
+    /// Observes lifecycle events for the main window hosting the inline player.
+    /// Fullscreen events keep the controls in sync, while closing the window
+    /// must end playback just like closing the separate player window does.
+    private func observeOverlayWindowTransitions(of parent: NSWindow) {
+        for observer in overlayWindowObservers {
             NotificationCenter.default.removeObserver(observer)
         }
         let center = NotificationCenter.default
-        overlayFullScreenObservers = [
+        overlayWindowObservers = [
             center.addObserver(
                 forName: NSWindow.willEnterFullScreenNotification,
                 object: parent,
@@ -598,7 +597,36 @@ final class ExpandedPlayerWindowManager: NSObject {
                     ExpandedPlayerWindowManager.shared.applyPendingLiveResizeAspectLock()
                 }
             },
+            center.addObserver(
+                forName: NSWindow.willCloseNotification,
+                object: parent,
+                queue: .main
+            ) { notification in
+                MainActor.assumeIsolated {
+                    guard let window = notification.object as? NSWindow else { return }
+                    ExpandedPlayerWindowManager.shared.handleInlineOverlayParentClose(window)
+                }
+            },
         ]
+    }
+
+    private func handleInlineOverlayParentClose(_ parent: NSWindow) {
+        guard overlayParent === parent else { return }
+
+        LoggingService.shared.debug(
+            "ExpandedPlayerWindowManager: inline overlay parent closing, stopping playback",
+            category: .player
+        )
+
+        let appEnvironment = AppEnvironment.shared
+        appEnvironment.queueManager.clearQueue()
+        appEnvironment.playerService.stop()
+
+        // Remove the observer while the window is still alive, then unmount the
+        // player. A normal inline collapse does not take this path and continues
+        // playback in the mini player.
+        endInlineOverlay()
+        appEnvironment.navigationCoordinator.isPlayerExpanded = false
     }
 
     // MARK: - Corner Panels In Fullscreen
