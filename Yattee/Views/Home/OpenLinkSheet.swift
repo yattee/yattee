@@ -289,7 +289,7 @@ struct OpenLinkFormView: View {
                         )
                     }
                     .buttonStyle(.borderedProminent)
-                    .keyboardShortcut(.defaultAction)
+                    .keyboardShortcut(.return, modifiers: .command)
                     .disabled(!isValidInput)
                 }
             }
