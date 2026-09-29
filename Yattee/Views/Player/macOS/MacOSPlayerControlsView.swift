@@ -127,6 +127,18 @@ struct MacOSPlayerControlsView: View {
         shouldShowControls || playerState.playbackState == .ended || playerState.isFailed
     }
 
+    /// The separate player window always gives its traffic lights to the
+    /// controls overlay. The main window does so only for the inline corner
+    /// layout, where the video occupies the titlebar corner beneath them.
+    private var managesHostWindowTrafficLights: Bool {
+        guard let hostWindow else { return false }
+        if hostWindow === ExpandedPlayerWindowManager.shared.currentPlayerWindow {
+            return true
+        }
+        return appEnvironment?.settingsManager.macPlayerSeparateWindow == false
+            && appEnvironment?.navigationCoordinator.isCornerLayoutActive == true
+    }
+
     /// Whether the hosting window is in native fullscreen. The `isFullscreen`
     /// parameter covers the inline overlay flow, but its key-window half isn't
     /// reactive — check the tracked host window directly as well.
@@ -398,6 +410,14 @@ struct MacOSPlayerControlsView: View {
             if let oldWindow { applyTrafficLightAlpha(1, to: oldWindow, animated: false) }
             setTrafficLightsVisible(shouldShowTrafficLights, animated: false)
         }
+        .onChange(of: managesHostWindowTrafficLights) { wasManaging, isManaging in
+            guard let hostWindow else { return }
+            if isManaging {
+                setTrafficLightsVisible(shouldShowTrafficLights, animated: false)
+            } else if wasManaging {
+                applyTrafficLightAlpha(1, to: hostWindow, animated: false)
+            }
+        }
         .onReceive(NotificationCenter.default.publisher(for: NSWindow.willEnterFullScreenNotification)) { note in
             // In fullscreen the system owns titlebar visibility (hover at the
             // top edge reveals it) — hand the buttons back at full alpha.
@@ -539,12 +559,12 @@ struct MacOSPlayerControlsView: View {
     // MARK: - Traffic Lights
 
     /// Fades the hosting window's traffic-light buttons together with the
-    /// controls overlay, QuickTime-style. Only applies to the dedicated
-    /// separate player window — the inline sheet's parent window keeps its own
-    /// chrome — and never in fullscreen, where the system owns the titlebar.
+    /// controls overlay, QuickTime-style. Applies to the dedicated player
+    /// window and to the main window while it hosts the inline corner layout;
+    /// never in fullscreen, where the system owns the titlebar.
     private func setTrafficLightsVisible(_ visible: Bool, animated: Bool = true) {
         guard let window = hostWindow,
-              window === ExpandedPlayerWindowManager.shared.currentPlayerWindow,
+              managesHostWindowTrafficLights,
               !window.styleMask.contains(.fullScreen) else { return }
         applyTrafficLightAlpha(visible ? 1 : 0, to: window, animated: animated)
     }
