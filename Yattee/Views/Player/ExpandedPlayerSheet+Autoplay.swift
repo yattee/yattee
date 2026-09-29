@@ -176,6 +176,28 @@ extension ExpandedPlayerSheet {
     /// Horizontal carousel of recommended video cards.
     @ViewBuilder
     private func recommendedVideosCarousel(videos: [Video]) -> some View {
+        #if os(macOS)
+        ScrollView(.horizontal) {
+            LazyHStack(spacing: 0) {
+                ForEach(Array(videos.enumerated()), id: \.element.id) { index, video in
+                    Button {
+                        playRecommendedVideo(video)
+                    } label: {
+                        videoPreviewCard(video: video)
+                    }
+                    .buttonStyle(.plain)
+                    .frame(maxWidth: .infinity)
+                    .containerRelativeFrame(.horizontal)
+                    .id(index)
+                }
+            }
+            .scrollTargetLayout()
+        }
+        .scrollPosition(id: $recommendedScrollPosition)
+        .scrollTargetBehavior(.paging)
+        .scrollIndicators(.hidden)
+        .frame(height: 100)
+        #else
         TabView(selection: Binding(
             get: { recommendedScrollPosition ?? 0 },
             set: { recommendedScrollPosition = $0 }
@@ -190,10 +212,9 @@ extension ExpandedPlayerSheet {
                 .tag(index)
             }
         }
-        #if os(iOS) || os(tvOS)
         .tabViewStyle(.page(indexDisplayMode: .never))
-        #endif
         .frame(height: 100)
+        #endif
     }
 
     /// Reusable horizontal video preview card (same style as autoplay countdown).
