@@ -107,6 +107,10 @@ struct ExpandedPlayerSheet: View {
     #if os(iOS)
     /// Track previous orientation to detect changes
     @State private var previousIsLandscape: Bool?
+    /// Foldable hinge partially open (iPhone Duo laptop position): the
+    /// fullscreen portrait layout keeps the video on the upper half and
+    /// moves every control to the lower half.
+    @State var isTabletopHinge = false
     #endif
 
     #if os(iOS) || os(macOS)
@@ -362,6 +366,9 @@ struct ExpandedPlayerSheet: View {
                 // Disable animations during layout switch to prevent position interpolation
                 transaction.animation = nil
             }
+            #if os(iOS)
+            .observeHingeLayout(isTabletop: $isTabletopHinge)
+            #endif
             #if os(iOS) || os(macOS)
             .onChange(of: cornerActive) { _, newValue in
                 navigationCoordinator?.isCornerLayoutActive = newValue

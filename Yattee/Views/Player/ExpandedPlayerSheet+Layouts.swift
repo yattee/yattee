@@ -21,6 +21,12 @@ extension ExpandedPlayerSheet {
     /// narrow windows).
     static let minWidthForCornerLayout: CGFloat = 900
 
+    /// Tabletop (foldable, hinge partially open): vertical room reserved on
+    /// the lower half for the top bar row and for the bottom bar, keeping the
+    /// center controls and side sliders clear of both.
+    static let tabletopTopBarInset: CGFloat = 72
+    static let tabletopBottomBarInset: CGFloat = 96
+
     // MARK: - Layout Detection
 
     /// Check if widescreen layout should be used based on available size.
@@ -150,9 +156,16 @@ extension ExpandedPlayerSheet {
         // Full screen size including safe areas (for portrait fullscreen)
         let safeAreaInsets = geometry.safeAreaInsets
         let fullScreenHeight = max(1, contentHeight + safeAreaInsets.top + safeAreaInsets.bottom)
+        // Displays with a vertical status bar (iPhone Duo exterior) inset the
+        // content horizontally too. With the panel hidden the video and the
+        // controls layer span the full width and shift under the leading
+        // inset, mirroring `fullscreenPlayerOffset` vertically; the controls
+        // pad their edges by the window's horizontal safe area themselves.
+        let fullScreenWidth = max(1, contentWidth + safeAreaInsets.leading + safeAreaInsets.trailing)
         // Use content size for layout, full screen size for portrait fullscreen controls
         let screenHeight = contentHeight
-        let screenWidth = contentWidth
+        let screenWidth = isPortraitPanelVisible ? contentWidth : fullScreenWidth
+        let fullscreenPlayerXOffset: CGFloat = isPortraitPanelVisible ? 0 : -safeAreaInsets.leading
 
         // Reserve minimum space for panel when pinned
         // Dynamic height based on description content
@@ -180,27 +193,41 @@ extension ExpandedPlayerSheet {
 
         let maxVideoHeight = max(1, screenHeight - minPanelHeight)
 
+        // Tabletop (foldable hinge partially open, panel hidden): the upper
+        // half of the screen is the video area, the lower half holds every
+        // control. `layoutHeight` replaces the full screen height wherever the
+        // fullscreen video is fitted and positioned.
+        #if os(iOS)
+        let isTabletop = isTabletopHinge && !isPortraitPanelVisible
+        #else
+        let isTabletop = false
+        #endif
+        let layoutHeight = isTabletop ? fullScreenHeight / 2 : fullScreenHeight
+
         // Calculate fit size (aspect-fit within screen bounds, but capped to show panel)
         let fitHeightFromWidth = screenWidth / aspectRatio
         let fitWidthFromHeight = screenHeight * aspectRatio
         let uncappedFitHeight: CGFloat = fitHeightFromWidth > screenHeight ? screenHeight : fitHeightFromWidth
         let uncappedFitWidth: CGFloat = fitHeightFromWidth > screenHeight ? fitWidthFromHeight : screenWidth
 
-        // Apply max height constraint to leave space for panel
-        let fitHeight = max(1, min(uncappedFitHeight, maxVideoHeight))
+        // Apply max height constraint to leave space for panel (or to the
+        // upper half in tabletop)
+        let fitHeightCap = isTabletop ? min(maxVideoHeight, layoutHeight) : maxVideoHeight
+        let fitHeight = max(1, min(uncappedFitHeight, fitHeightCap))
         let fitWidth = max(1, fitHeight < uncappedFitHeight ? fitHeight * aspectRatio : uncappedFitWidth)
 
         // Calculate fullscreen fit size (aspect-fit within full screen including safe areas)
         let fullscreenFitHeightFromWidth = screenWidth / aspectRatio
-        let fullscreenFitHeight: CGFloat = max(1, fullscreenFitHeightFromWidth > fullScreenHeight ? fullScreenHeight : fullscreenFitHeightFromWidth)
+        let fullscreenFitHeight: CGFloat = max(1, fullscreenFitHeightFromWidth > layoutHeight ? layoutHeight : fullscreenFitHeightFromWidth)
 
         // Calculate fill size (aspect-fill to cover screen)
         let fillHeight: CGFloat = max(1, fitHeightFromWidth >= screenHeight ? fitHeightFromWidth : screenHeight)
         let fillWidth: CGFloat = max(1, fitHeightFromWidth >= screenHeight ? screenWidth : fitWidthFromHeight)
 
         #if os(iOS)
-        // Use UIKit pinch gesture panscan from NavigationCoordinator
-        let panscan = !isPortraitPanelVisible ? (navigationCoordinator?.pinchPanscan ?? 0.0) : 0.0
+        // Use UIKit pinch gesture panscan from NavigationCoordinator.
+        // Tabletop keeps the video fitted to the upper half, no fill.
+        let panscan = !isPortraitPanelVisible && !isTabletop ? (navigationCoordinator?.pinchPanscan ?? 0.0) : 0.0
         #else
         let panscan = 0.0
         #endif
@@ -216,7 +243,7 @@ extension ExpandedPlayerSheet {
 
         // Calculate player height - animates between fit and fullscreen
         // Use full screen height when panel is hidden for immersive controls
-        let playerHeight = !isPortraitPanelVisible ? fullScreenHeight : fitHeight
+        let playerHeight = !isPortraitPanelVisible ? layoutHeight : fitHeight
 
         // Panel height when pinned (capped by maxPanelHeight for widescreen videos without description)
         let naturalPanelHeight = screenHeight - fitHeight
@@ -243,7 +270,7 @@ extension ExpandedPlayerSheet {
         // top and bottom insets differ (the player window adds extra bottom
         // inset), so animating to screenHeight/2 and then flipping to the hidden
         // base position causes a visible jump of (bottom - top) / 2 points.
-        let hiddenVideoY = fullScreenHeight / 2 - safeAreaInsets.top
+        let hiddenVideoY = layoutHeight / 2 - safeAreaInsets.top
 
         let videoY: CGFloat = {
             if isPortraitPanelVisible {
@@ -268,7 +295,7 @@ extension ExpandedPlayerSheet {
             videoWidth: videoWidth,
             videoHeight: videoHeight,
             screenWidth: screenWidth,
-            screenHeight: fullScreenHeight,
+            screenHeight: layoutHeight,
             isFullscreen: !isPortraitPanelVisible,
             showControls: false,
             activeLayout: playerControlsLayout
@@ -309,12 +336,18 @@ extension ExpandedPlayerSheet {
             // When panel visible: video fills the controls area (0 to fitHeight)
             // When fullscreen: video centered on full screen
             // During drag: expand videoAreaHeight so bottom bar moves down with panel
-            videoAreaTop: isPortraitPanelVisible ? 0 : (fullScreenHeight - fullscreenFitHeight) / 2,
-            videoAreaHeight: isPortraitPanelVisible ? draggedControlsHeight : fullscreenFitHeight,
+            // Tabletop: the controls' "video area" is the lower half so the
+            // center controls, sliders and top bar all land below the hinge.
+            // The center zone excludes the top bar row and the bottom bar so
+            // the side sliders don't collide with either.
+            videoAreaTop: isTabletop ? layoutHeight + Self.tabletopTopBarInset : (isPortraitPanelVisible ? 0 : (fullScreenHeight - fullscreenFitHeight) / 2),
+            videoAreaHeight: isTabletop ? layoutHeight - Self.tabletopTopBarInset - Self.tabletopBottomBarInset : (isPortraitPanelVisible ? draggedControlsHeight : fullscreenFitHeight),
             // Pass stable fitHeight for slider sizing (doesn't change during drag)
             // Panel visible or dragging: use fitHeight for stable sizing
             // Fullscreen (after drag completes): pass nil so sliders use geometry.size.height
-            videoFitHeight: (isPortraitPanelVisible || isPanelDragging) ? fitHeight : nil,
+            videoFitHeight: isTabletop ? layoutHeight : ((isPortraitPanelVisible || isPanelDragging) ? fitHeight : nil),
+            isTabletop: isTabletop,
+            horizontalSafeArea: (safeAreaInsets.leading, safeAreaInsets.trailing),
             activeLayout: playerControlsLayout
         )
         .frame(width: screenWidth, height: draggedControlsHeight)
@@ -326,7 +359,7 @@ extension ExpandedPlayerSheet {
 
             // Player positioned based on panel state
             playerView
-                .position(x: screenWidth / 2, y: videoY)
+                .position(x: screenWidth / 2 + fullscreenPlayerXOffset, y: videoY)
                 // Animate video position when not dragging (matches panel animation behavior)
                 .animation(isPanelDragging ? nil : .spring(response: 0.3, dampingFraction: 1.0), value: videoYOffset)
                 .animation(panelRevealOffset != 0 ? nil : .spring(response: 0.3, dampingFraction: 1.0), value: isPortraitPanelVisible)
@@ -344,7 +377,7 @@ extension ExpandedPlayerSheet {
                     // Position exactly like playerView - at videoY with same offset
                     // This ensures controls y=0 aligns with screen y=0
                     controlsLayer
-                        .position(x: screenWidth / 2, y: fullScreenHeight / 2 + fullscreenPlayerOffset)
+                        .position(x: screenWidth / 2 + fullscreenPlayerXOffset, y: fullScreenHeight / 2 + fullscreenPlayerOffset)
                 }
             }
             // Reveal gesture - swipe up to show panel when hidden (simultaneous so taps still work for controls)
@@ -1076,11 +1109,17 @@ extension ExpandedPlayerSheet {
         videoAreaTop: CGFloat = 0,
         videoAreaHeight: CGFloat? = nil,
         videoFitHeight: CGFloat? = nil,
+        isTabletop: Bool = false,
+        horizontalSafeArea: (leading: CGFloat, trailing: CGFloat) = (0, 0),
         activeLayout: PlayerControlsLayout = .default
     ) -> some View {
         // Controls always use full screen dimensions to prevent layout shifts
         let controlsWidth = max(1, screenWidth)
         let controlsHeight = max(1, screenHeight)
+        // Tabletop: controls y=0 is the screen top, so the top bar moves just
+        // below the hinge (the center zone starts one top-bar inset lower),
+        // and the pinch-to-fill is off
+        let topBarOffset: CGFloat = isTabletop ? (videoAreaTop - Self.tabletopTopBarInset + 8) : 0
 
         #if os(iOS)
         if let backend = playerService?.currentBackend,
@@ -1162,6 +1201,8 @@ extension ExpandedPlayerSheet {
                 videoAreaTop: videoAreaTop,
                 videoAreaHeight: videoAreaHeight,
                 videoFitHeight: videoFitHeight,
+                topBarOffset: topBarOffset,
+                horizontalSafeArea: horizontalSafeArea,
                 onVolumeChanged: { [weak appEnvironment] volume in
                     playerService.currentBackend?.volume = volume
                     appEnvironment?.settingsManager.playerVolume = volume
@@ -1201,7 +1242,7 @@ extension ExpandedPlayerSheet {
                     playerService.selectEmbeddedSubtitleTrack(trackID)
                 },
                 panscanValue: navigationCoordinator?.pinchPanscan ?? 0.0,
-                isPanscanAllowed: !isPortraitPanelVisible,
+                isPanscanAllowed: !isPortraitPanelVisible && !isTabletop,
                 onTogglePanscan: { [weak navigationCoordinator] in
                     navigationCoordinator?.togglePanscan()
                 },

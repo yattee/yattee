@@ -67,6 +67,13 @@ struct PlayerControlsView: View {
     var videoAreaHeight: CGFloat? = nil
     /// Video fit height for slider sizing (stable during drag, unlike videoAreaHeight)
     var videoFitHeight: CGFloat? = nil
+    /// Pushes the top bar down from the screen top (tabletop layout on a
+    /// foldable: every control lives on the lower half)
+    var topBarOffset: CGFloat = 0
+    /// Horizontal safe area of the hosting view (leading, trailing) for the
+    /// portrait fullscreen layout, which spans the full window width. Passed
+    /// in because the controls layer itself ignores the safe area.
+    var horizontalSafeArea: (leading: CGFloat, trailing: CGFloat) = (0, 0)
 
     /// Callback when volume changes (value 0.0-1.0)
     var onVolumeChanged: ((Float) -> Void)? = nil
@@ -536,6 +543,13 @@ struct PlayerControlsView: View {
                 // Just use base padding for aesthetics
                 leftPadding = basePadding
                 rightPadding = basePadding
+            } else if horizontalSafeArea.leading > 0 || horizontalSafeArea.trailing > 0 {
+                // Portrait fullscreen (routed through the widescreen branch)
+                // spans the full window width: keep the controls out of the
+                // actual, asymmetric horizontal safe area (vertical status
+                // bar on the iPhone Duo exterior display)
+                leftPadding = basePadding + horizontalSafeArea.leading
+                rightPadding = basePadding + horizontalSafeArea.trailing
             } else {
                 // Panel not visible or not pinned - controls handle all safe areas (symmetric with max)
                 let safeAreaPadding = max(safeArea.left, safeArea.right) + 4
@@ -579,7 +593,7 @@ struct PlayerControlsView: View {
                 // Top bar - aligned to screen top (stays fixed regardless of video area)
                 VStack {
                     topBar
-                        .padding(.top, topPadding)
+                        .padding(.top, topPadding + topBarOffset)
                         .padding(.leading, leftPadding)
                         .padding(.trailing, rightPadding)
                         .applyCornerAdaptationOffset()
