@@ -59,6 +59,9 @@ struct ChannelView: View {
     // UI state for view options
     @State private var showViewOptions = false
     @State private var viewWidth: CGFloat = 0
+    /// Horizontal safe area insets of the outer container (e.g. the iPhone Duo
+    /// exterior display's vertical status bar). The banner extends under them.
+    @State private var horizontalSafeAreaInsets: (leading: CGFloat, trailing: CGFloat) = (0, 0)
     @State private var watchEntriesMap: [String: WatchEntry] = [:]
 
     // Videos tab state
@@ -399,6 +402,9 @@ struct ChannelView: View {
             .onChange(of: geometry.size.width, initial: true) { _, newWidth in
                 viewWidth = newWidth
             }
+            .onChange(of: geometry.safeAreaInsets, initial: true) { _, insets in
+                horizontalSafeAreaInsets = (insets.leading, insets.trailing)
+            }
         }
         .background(viewBackgroundColor)
         .ignoresSafeArea(edges: .top)
@@ -565,6 +571,9 @@ struct ChannelView: View {
             .onChange(of: geometry.size.width, initial: true) { _, newWidth in
                 viewWidth = newWidth
             }
+            .onChange(of: geometry.safeAreaInsets, initial: true) { _, insets in
+                horizontalSafeAreaInsets = (insets.leading, insets.trailing)
+            }
         }
         .background(viewBackgroundColor)
         .ignoresSafeArea(edges: .top)
@@ -702,6 +711,9 @@ struct ChannelView: View {
             .padding(.vertical, 40)
             .onChange(of: geometry.size.width, initial: true) { _, newWidth in
                 viewWidth = newWidth
+            }
+            .onChange(of: geometry.safeAreaInsets, initial: true) { _, insets in
+                horizontalSafeAreaInsets = (insets.leading, insets.trailing)
             }
         }
         .confirmationDialog(
@@ -990,6 +1002,9 @@ struct ChannelView: View {
             .onChange(of: geometry.size.width, initial: true) { _, newWidth in
                 viewWidth = newWidth
             }
+            .onChange(of: geometry.safeAreaInsets, initial: true) { _, insets in
+                horizontalSafeAreaInsets = (insets.leading, insets.trailing)
+            }
         }
     }
     #endif
@@ -1087,16 +1102,23 @@ struct ChannelView: View {
             let pinOffset = (!isRegularSizeClass && scrollOffset < 0) ? scrollOffset : 0
             // Zoom scale for banner and gradient (iPhone only)
             let zoomScale = isRegularSizeClass ? 1 : (1 + max(-scrollOffset / 400, 0))
+            // iPhone: the scroll content is inset by the horizontal safe area, so the
+            // banner is widened to reach under it (iPad/Mac use backgroundExtensionEffect).
+            let bannerLeadingBleed = isRegularSizeClass ? 0 : horizontalSafeAreaInsets.leading
+            let bannerTrailingBleed = isRegularSizeClass ? 0 : horizontalSafeAreaInsets.trailing
+            let bannerWidth = geometry.size.width + bannerLeadingBleed + bannerTrailingBleed
+            // The ZStack centers the wider banner; shift it so each side bleeds by its own inset.
+            let bannerXOffset = (bannerTrailingBleed - bannerLeadingBleed) / 2
 
             ZStack(alignment: .top) {
                 // Banner image
                 // iPad/Mac: static with backgroundExtensionEffect for Liquid Glass sidebar
                 // iPhone: zoom/scale + pinOffset to keep banner fixed at top when pulling down
                 bannerImage(url: bannerURL)
-                    .frame(width: geometry.size.width, height: headerHeight)
+                    .frame(width: bannerWidth, height: headerHeight)
                     .clipped()
                     .scaleEffect(zoomScale, anchor: .top)
-                    .offset(y: pinOffset)
+                    .offset(x: bannerXOffset, y: pinOffset)
                     .modifier(BackgroundExtensionModifier(
                         useBackgroundExtension: isRegularSizeClass
                     ))
@@ -1107,10 +1129,10 @@ struct ChannelView: View {
                     startPoint: .center,
                     endPoint: .bottom
                 )
-                .frame(width: geometry.size.width, height: headerHeight * 0.7)
+                .frame(width: bannerWidth, height: headerHeight * 0.7)
                 .offset(y: headerHeight * 0.3)
                 .scaleEffect(zoomScale, anchor: .top)
-                .offset(y: pinOffset)
+                .offset(x: bannerXOffset, y: pinOffset)
 
                 // Avatar and channel name - pinned to bottom of banner
                 #if os(macOS)
@@ -1159,7 +1181,7 @@ struct ChannelView: View {
                 .offset(y: clampedAvatarY + pinOffset)
                 .opacity(avatarOpacity)
             }
-            .frame(height: headerHeight)
+            .frame(width: geometry.size.width, height: headerHeight)
         }
         .frame(height: headerHeight)
     }
