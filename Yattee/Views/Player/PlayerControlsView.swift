@@ -490,8 +490,12 @@ struct PlayerControlsView: View {
 
     private var controlsOverlay: some View {
         ZStack {
-            // Background fill - extends into safe areas (except during dismiss gesture)
-            if isDismissGestureActive {
+            // Background fill - extends into safe areas (except during dismiss gesture).
+            // Tabletop (`topBarOffset` > 0) keeps every control off the video,
+            // so the video needs no dimming for readability.
+            if topBarOffset > 0 {
+                EmptyView()
+            } else if isDismissGestureActive {
                 Color.black.opacity(0.5)
                     .allowsHitTesting(false)
             } else {
@@ -511,8 +515,10 @@ struct PlayerControlsView: View {
         let safeArea = currentSafeArea
         let basePadding: CGFloat = 12
 
-        // Vertical padding - always apply in widescreen (layout ignores safe area)
-        let topPadding: CGFloat = 2 + (isWideScreenLayout ? safeArea.top + 8 : 0)
+        // Vertical padding - always apply in widescreen (layout ignores safe area).
+        // Tabletop moves the top bar below the hinge (`topBarOffset`), away
+        // from the status bar, so the top safe area must not be added there.
+        let topPadding: CGFloat = 2 + (isWideScreenLayout && topBarOffset == 0 ? safeArea.top + 8 : 0)
 
         // Bottom padding - add safe area when controls are at screen bottom in fullscreen modes
         // When floating panel is visible (isPanelVisible && !isPanelPinned),
@@ -629,7 +635,10 @@ struct PlayerControlsView: View {
                     // Calculate available height for sliders
                     // Use full video area height for sliders (extends into letterbox areas)
                     let sliderBasisHeight = min(effectiveVideoHeight, geometry.size.height)
-                    let baseSliderAreaHeight = sliderBasisHeight - 48 - 100
+                    // Tabletop: the "video area" is the lower half already
+                    // trimmed of the top and bottom bars, so only the icon row
+                    // and a small margin are reserved
+                    let baseSliderAreaHeight = sliderBasisHeight - 48 - (topBarOffset > 0 ? 24 : 100)
                     // When videoFitHeight provided (panel/drag): use stable sizing within video
                     // When nil (fullscreen): target 250pt sliders when there's extra space
                     let isFullscreenWithSpace = videoFitHeight == nil && geometry.size.height > sliderBasisHeight * 1.5
