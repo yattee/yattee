@@ -367,6 +367,9 @@ struct ExpandedPlayerSheet: View {
                 navigationCoordinator?.isCornerLayoutActive = newValue
             }
             #endif
+            .onChange(of: wideScreen, initial: true) { _, newValue in
+                navigationCoordinator?.isWideScreenLayoutActive = newValue
+            }
             .onChange(of: wideScreen) { _, newValue in
                 isInWideScreenLayout = newValue
                 #if os(iOS)

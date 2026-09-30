@@ -68,6 +68,7 @@ final class NavigationCoordinator {
             if !isPlayerExpanded {
                 hasAppliedPanelDefaultVisibility = false
                 isCornerLayoutActive = false
+                isWideScreenLayoutActive = false
             }
         }
     }
@@ -81,6 +82,11 @@ final class NavigationCoordinator {
     /// (iPad/macOS). Drives macOS window aspect-lock gating, which lives in a
     /// different view than the layout resolver.
     var isCornerLayoutActive = false
+
+    /// Whether the expanded player currently resolves to the widescreen
+    /// (landscape) layout. Set from the sheet's layout pass so non-view code
+    /// (remote control state) reads the real layout instead of screen bounds.
+    var isWideScreenLayoutActive = false
 
     /// Whether the mini player queue sheet is showing.
     var isMiniPlayerQueueSheetPresented = false

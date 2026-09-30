@@ -139,12 +139,11 @@ struct WideScreenPlayerLayout<PlayerContent: View>: View {
 
     /// Get full screen bounds from window scene (ignores safe area constraints from parent)
     /// On macOS, this is not used - geometry reader size is used directly
-    private var windowSceneBounds: CGSize {
+    private func windowSceneBounds(fallback: CGSize) -> CGSize {
         #if os(iOS)
         guard let window = foregroundWindow else {
-            // Fallback to screen bounds
-            let screen = UIScreen.main.bounds
-            return CGSize(width: max(screen.width, screen.height), height: min(screen.width, screen.height))
+            // Fallback to the space this view was actually offered
+            return fallback
         }
         // Window frame gives actual size including orientation
         return window.frame.size
@@ -158,7 +157,7 @@ struct WideScreenPlayerLayout<PlayerContent: View>: View {
             // On iOS: Use window bounds to get full size (avoids safe area constraint from parent)
             // On macOS: Use geometry reader size directly (no safe area concerns, window is the source of truth)
             #if os(iOS)
-            let windowBounds = windowSceneBounds
+            let windowBounds = windowSceneBounds(fallback: geometry.size)
             let availableWidth = windowBounds.width
             let availableHeight = windowBounds.height
             let safeAreaLeft = windowSafeAreaInsets.leading
@@ -181,6 +180,13 @@ struct WideScreenPlayerLayout<PlayerContent: View>: View {
             // Detect which side has Dynamic Island based on interface orientation
             // Note: Can't use safe area comparison because both sides have similar values (~62px each)
             #if os(iOS)
+            // TODO: Modernization - This distinguishes landscapeLeft from landscapeRight to locate
+            // the Dynamic Island, which window bounds/size classes cannot express. Read the
+            // orientation from the hosting scene's `effectiveGeometry.interfaceOrientation`
+            // (iOS 26+) instead of the deprecated `UIWindowScene.interfaceOrientation` once the
+            // deployment target allows, and consider `traitCollection.verticalBarEdge` (iOS 27.1)
+            // for the bar-edge question. Global scene lookup should be replaced by the hosting
+            // window (e.g. via a UIViewRepresentable reading `view.window?.windowScene`).
             let interfaceOrientation = UIApplication.shared.connectedScenes
                 .compactMap { $0 as? UIWindowScene }
                 .first?

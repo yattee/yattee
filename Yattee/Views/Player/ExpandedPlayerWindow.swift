@@ -622,11 +622,6 @@ final class ExpandedPlayerWindowManager {
         mainWindow?.subviews.first
     }
 
-    /// Current window height for calculating transforms
-    private var windowHeight: CGFloat {
-        mainWindow?.bounds.height ?? UIScreen.main.bounds.height
-    }
-
     /// Applies scale and corner radius to main window based on progress (0 = normal, 1 = fully scaled)
     func scaleMainWindow(progress: CGFloat) {
         // Capture the presenting view reference on first call
@@ -648,7 +643,7 @@ final class ExpandedPlayerWindowManager {
         let scale = 1 - scaleAmount
 
         // Offset to keep the view centered vertically after scaling
-        let offsetY = (windowHeight * scaleAmount) / 2
+        let offsetY = (presentingView.bounds.height * scaleAmount) / 2
 
         // Apply corner radius proportional to progress
         presentingView.layer.cornerRadius = clampedProgress * scaledCornerRadius
@@ -667,7 +662,7 @@ final class ExpandedPlayerWindowManager {
         let clampedProgress = max(0, min(1, progress))
         let scaleAmount = clampedProgress * maxScaleProgress
         let scale = 1 - scaleAmount
-        let offsetY = (windowHeight * scaleAmount) / 2
+        let offsetY = (presentingView.bounds.height * scaleAmount) / 2
         let cornerRadius = clampedProgress * scaledCornerRadius
         
         UIView.animate(withDuration: duration, delay: 0, usingSpringWithDamping: damping, initialSpringVelocity: 0, options: []) {

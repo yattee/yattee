@@ -86,7 +86,10 @@ final class MPVSoftwareRenderView: UIView {
     
     private func commonInit() {
         backgroundColor = .black
-        contentScaleFactor = UIScreen.main.scale
+        contentScaleFactor = traitCollection.displayScale
+        registerForTraitChanges([UITraitDisplayScale.self]) { (self: MPVSoftwareRenderView, _) in
+            self.contentScaleFactor = self.traitCollection.displayScale
+        }
         
         // Observe app lifecycle
         NotificationCenter.default.addObserver(

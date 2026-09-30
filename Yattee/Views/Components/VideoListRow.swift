@@ -56,6 +56,8 @@ struct VideoListRow<Content: View>: View {
 
     @ViewBuilder let content: () -> Content
 
+    @Environment(\.displayScale) private var displayScale
+
     /// Horizontal padding for row content.
     private let horizontalPadding: CGFloat = 16
 
@@ -91,7 +93,7 @@ struct VideoListRow<Content: View>: View {
         #if os(iOS)
         Rectangle()
             .fill(Color(uiColor: .separator))
-            .frame(height: 1 / UIScreen.main.scale)
+            .frame(height: 1 / displayScale)
             .padding(.leading, dividerLeadingPadding)
         #elseif os(macOS)
         Rectangle()

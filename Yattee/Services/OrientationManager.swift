@@ -55,6 +55,8 @@ final class OrientationManager {
         notifyOrientationChange()
     }
 
+    // TODO: Modernization - Consider adopting `prefersInterfaceOrientationLocked` (iOS 26+)
+    // as the modern replacement for orientation locking via `supportedInterfaceOrientations`.
     /// Returns the supported interface orientations.
     /// When locked, returns only the locked orientation.
     /// Otherwise: iPhone = all except upside-down, iPad = all

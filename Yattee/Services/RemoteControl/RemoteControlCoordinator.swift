@@ -480,8 +480,7 @@ final class RemoteControlCoordinator {
         // Compute fullscreen state (same logic as shouldShowFullscreenButton in PlayerControlsActions)
         #if os(iOS)
         let isIPad = UIDevice.current.userInterfaceIdiom == .pad
-        let screenBounds = UIScreen.main.bounds
-        let isWideScreenLayout = screenBounds.width > screenBounds.height
+        let isWideScreenLayout = navigationCoordinator?.isWideScreenLayoutActive ?? false
         // iPad in widescreen = can't force rotation, so fullscreen toggle not available
         let canToggleFullscreen = !(isIPad && isWideScreenLayout) && state.currentVideo != nil
         let isFullscreen = isWideScreenLayout

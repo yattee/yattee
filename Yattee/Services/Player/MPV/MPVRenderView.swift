@@ -229,7 +229,10 @@ final class MPVRenderView: UIView {
 
     private func commonInit() {
         backgroundColor = .black
-        contentScaleFactor = UIScreen.main.scale
+        contentScaleFactor = traitCollection.displayScale
+        registerForTraitChanges([UITraitDisplayScale.self]) { (self: MPVRenderView, _) in
+            self.contentScaleFactor = self.traitCollection.displayScale
+        }
 
         // Configure EAGL layer
         // Note: retainedBacking=true is required for glReadPixels to work (PiP frame capture).

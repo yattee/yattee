@@ -30,6 +30,8 @@ final class MPVPiPBridge: NSObject {
     private let sampleBufferLayer = AVSampleBufferDisplayLayer()
     private var pipController: AVPictureInPictureController?
     private weak var mpvBackend: MPVBackend?
+    /// The view currently hosting `sampleBufferLayer`; used to reach the scene's screen while PiP is active.
+    private weak var containerView: PlatformView?
 
     /// Whether PiP is currently active.
     var isPiPActive: Bool {
@@ -123,6 +125,7 @@ final class MPVPiPBridge: NSObject {
     ///   - containerView: The view to embed the sample buffer layer in
     func setup(backend: MPVBackend, in containerView: PlatformView) {
         self.mpvBackend = backend
+        self.containerView = containerView
 
         // Configure sample buffer layer
         sampleBufferLayer.frame = containerView.bounds
@@ -283,9 +286,13 @@ final class MPVPiPBridge: NSObject {
                 }
             }
 
-            let screenWidth = UIScreen.main.bounds.width
+            // TODO: Modernization - The UIScreen.main fallback assumes a single display. It is only
+            // reached when the container view has no window scene (e.g. layer detached); consider
+            // returning early there instead of sizing against a screen the layer may not be on.
+            let screenBounds = containerView?.window?.windowScene?.screen.bounds ?? UIScreen.main.bounds
+            let screenWidth = screenBounds.width
             // Calculate height based on aspect ratio, capped to leave room for details
-            let maxHeight = UIScreen.main.bounds.height * 0.6 // Leave 40% for details
+            let maxHeight = screenBounds.height * 0.6 // Leave 40% for details
             let calculatedHeight = screenWidth / aspectRatio
             let height = min(calculatedHeight, maxHeight)
             let width = height < calculatedHeight ? height * aspectRatio : screenWidth
@@ -409,6 +416,7 @@ final class MPVPiPBridge: NSObject {
     /// as the layer must be in a visible window hierarchy.
     func moveLayer(to containerView: PlatformView) {
         sampleBufferLayer.removeFromSuperlayer()
+        self.containerView = containerView
         if let frame = sanitizedGeometry(containerView.bounds, from: "moveLayer(to:)") {
             sampleBufferLayer.frame = frame
         }
