@@ -342,6 +342,9 @@ extension View {
                     MiniPlayerView(isTabAccessory: true)
                 }
                 .tabBarMinimizeBehavior(behavior)
+                // iOS 27 stopped focusing the search field when the search tab is
+                // selected; restore the iOS 26 behavior explicitly.
+                .tabViewSearchActivation(.searchTabSelection)
         } else {
             self
         }
