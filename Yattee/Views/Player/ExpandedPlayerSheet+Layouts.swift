@@ -270,7 +270,19 @@ extension ExpandedPlayerSheet {
         // top and bottom insets differ (the player window adds extra bottom
         // inset), so animating to screenHeight/2 and then flipping to the hidden
         // base position causes a visible jump of (bottom - top) / 2 points.
-        let hiddenVideoY = layoutHeight / 2 - safeAreaInsets.top
+        //
+        // Tabletop: the hidden position is the center of the upper half. This
+        // must follow the hinge, not `isTabletop` (which is false while the
+        // panel is visible): dragging the panel down interpolates the video
+        // towards this point, and using the full-screen center there moved
+        // the video down during the drag, only to snap it back up once the
+        // hidden state flipped to the half-height layout.
+        #if os(iOS)
+        let hiddenLayoutHeight = isTabletopHinge ? fullScreenHeight / 2 : fullScreenHeight
+        #else
+        let hiddenLayoutHeight = fullScreenHeight
+        #endif
+        let hiddenVideoY = hiddenLayoutHeight / 2 - safeAreaInsets.top
 
         let videoY: CGFloat = {
             if isPortraitPanelVisible {
