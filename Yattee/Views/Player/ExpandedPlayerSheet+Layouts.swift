@@ -261,14 +261,15 @@ extension ExpandedPlayerSheet {
         let fullscreenFitHeightFromWidth = screenWidth / aspectRatio
         let fullscreenFitHeight: CGFloat = max(1, fullscreenFitHeightFromWidth > layoutHeight ? layoutHeight : fullscreenFitHeightFromWidth)
 
-        // Calculate fill size (aspect-fill to cover screen)
-        let fillHeight: CGFloat = max(1, fitHeightFromWidth >= screenHeight ? fitHeightFromWidth : screenHeight)
-        let fillWidth: CGFloat = max(1, fitHeightFromWidth >= screenHeight ? screenWidth : fitWidthFromHeight)
+        // Calculate fill size (aspect-fill to cover the video area: the whole
+        // screen, or the upper half in tabletop)
+        let fillAreaHeight = isTabletop ? layoutHeight : screenHeight
+        let fillHeight: CGFloat = max(1, fitHeightFromWidth >= fillAreaHeight ? fitHeightFromWidth : fillAreaHeight)
+        let fillWidth: CGFloat = max(1, fitHeightFromWidth >= fillAreaHeight ? screenWidth : fillAreaHeight * aspectRatio)
 
         #if os(iOS)
         // Use UIKit pinch gesture panscan from NavigationCoordinator.
-        // Tabletop keeps the video fitted to the upper half, no fill.
-        let panscan = !isPortraitPanelVisible && !isTabletop ? (navigationCoordinator?.pinchPanscan ?? 0.0) : 0.0
+        let panscan = !isPortraitPanelVisible ? (navigationCoordinator?.pinchPanscan ?? 0.0) : 0.0
         #else
         let panscan = 0.0
         #endif
@@ -421,11 +422,17 @@ extension ExpandedPlayerSheet {
             // Tabletop: mirror the video across the hinge line into the lower
             // half, like a screen standing on a glossy table. The mirrored
             // frames come from the render view; this only places and fades them.
+            // Clipped to the lower half: a filled (panscanned) video is taller
+            // than the upper half, and its mirror would otherwise spill back
+            // over the hinge onto the video itself.
             if isTabletop, showsTabletopReflection,
                let backend = playerService?.currentBackend as? MPVBackend {
                 let hingeY = layoutHeight - safeAreaInsets.top
                 tabletopReflection(backend: backend, width: videoWidth, height: videoHeight)
-                    .position(x: screenWidth / 2 + fullscreenPlayerXOffset, y: 2 * hingeY - videoY)
+                    .position(x: screenWidth / 2 + fullscreenPlayerXOffset, y: hingeY - videoY)
+                    .frame(width: screenWidth, height: layoutHeight)
+                    .clipped()
+                    .position(x: screenWidth / 2, y: hingeY + layoutHeight / 2)
                     .transition(.opacity)
             }
             #endif
