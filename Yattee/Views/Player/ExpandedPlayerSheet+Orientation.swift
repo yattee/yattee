@@ -38,6 +38,12 @@ extension ExpandedPlayerSheet {
     /// When orientation lock is enabled, locks to the target orientation before rotating
     /// (keeps orientation restricted the entire time, just changes which orientation is allowed).
     func toggleFullscreen() {
+        // Windowing modes that refuse programmatic rotation (iPhone Duo
+        // interior) get the iPad behavior: toggle the details panel instead.
+        guard OrientationManager.shared.canRotateProgrammatically else {
+            togglePortraitDetailsPanel()
+            return
+        }
         guard let windowScene = UIApplication.shared.connectedScenes
             .compactMap({ $0 as? UIWindowScene })
             .first(where: { $0.activationState == .foregroundActive }) else { return }
@@ -51,6 +57,7 @@ extension ExpandedPlayerSheet {
             fromSize: screenBounds.size,
             toSize: isCurrentlyLandscape ? CGSize(width: screenBounds.height, height: screenBounds.width) : nil)
 
+
         if isCurrentlyLandscape {
             // Exit fullscreen → rotate to portrait
             MPVLogging.log("toggleFullscreen: exiting to portrait")
@@ -58,7 +65,9 @@ extension ExpandedPlayerSheet {
             if isOrientationLocked {
                 orientationManager.lock(to: .portrait)
             }
-            windowScene.requestGeometryUpdate(.iOS(interfaceOrientations: .portrait)) { _ in }
+            windowScene.requestGeometryUpdate(.iOS(interfaceOrientations: .portrait)) { [self] error in
+                handleFullscreenRotationFailure(error)
+            }
         } else {
             // Enter fullscreen → rotate to landscape
             let targetOrientation = Self.currentLandscapeInterfaceOrientation()
@@ -68,7 +77,9 @@ extension ExpandedPlayerSheet {
             if isOrientationLocked {
                 orientationManager.lock(to: .landscape)
             }
-            windowScene.requestGeometryUpdate(.iOS(interfaceOrientations: targetOrientation)) { _ in }
+            windowScene.requestGeometryUpdate(.iOS(interfaceOrientations: targetOrientation)) { [self] error in
+                handleFullscreenRotationFailure(error)
+            }
             // After rotation completes, re-lock to the specific landscape orientation
             // Use a delay since completion handler isn't reliable for waiting for rotation
             if isOrientationLocked {
@@ -77,6 +88,36 @@ extension ExpandedPlayerSheet {
                     orientationManager.lockToCurrentOrientation()
                 }
             }
+        }
+    }
+
+    /// A refused `requestGeometryUpdate` means this windowing mode never
+    /// rotates programmatically; remember that and do what the tap was meant
+    /// to do — fill the screen with the video — via the details panel.
+    private func handleFullscreenRotationFailure(_ error: Error) {
+        MPVLogging.log("toggleFullscreen: requestGeometryUpdate failed: \(error.localizedDescription)")
+        guard OrientationManager.shared.noteGeometryUpdateFailure(error) else { return }
+        if appEnvironment?.settingsManager.inAppOrientationLock ?? false {
+            OrientationManager.shared.unlock()
+        }
+        togglePortraitDetailsPanel()
+    }
+
+    /// Fullscreen fallback when rotation isn't available: show/hide the
+    /// portrait details panel, mirroring `onToggleDetailsVisibility`.
+    private func togglePortraitDetailsPanel() {
+        hideControlsDuringTransition = true
+        if !isPortraitPanelVisible {
+            navigationCoordinator?.pinchPanscan = 0
+        }
+        withAnimation(.easeInOut(duration: 0.3)) {
+            isPortraitPanelVisible.toggle()
+        }
+        navigationCoordinator?.isPortraitPanelVisible = isPortraitPanelVisible
+        appEnvironment?.settingsManager.portraitDetailsPanelLastVisible = isPortraitPanelVisible
+        Task { @MainActor in
+            try? await Task.sleep(for: .milliseconds(350))
+            hideControlsDuringTransition = false
         }
     }
 
@@ -93,7 +134,8 @@ extension ExpandedPlayerSheet {
         rotationManager.onLandscapeDetected = { [weak appEnvironment] in
             Task { @MainActor in
                 guard let appEnvironment else { return }
-                guard !appEnvironment.settingsManager.inAppOrientationLock else { return }
+                guard !appEnvironment.settingsManager.inAppOrientationLock,
+                      OrientationManager.shared.canRotateProgrammatically else { return }
 
                 let playerState = appEnvironment.playerService.state
 
@@ -120,7 +162,8 @@ extension ExpandedPlayerSheet {
         rotationManager.onPortraitDetected = { [weak appEnvironment] in
             Task { @MainActor in
                 guard let appEnvironment else { return }
-                guard !appEnvironment.settingsManager.inAppOrientationLock else { return }
+                guard !appEnvironment.settingsManager.inAppOrientationLock,
+                      OrientationManager.shared.canRotateProgrammatically else { return }
 
                 // Request portrait rotation
                 guard let windowScene = UIApplication.shared.connectedScenes
@@ -140,7 +183,8 @@ extension ExpandedPlayerSheet {
         rotationManager.onLandscapeOrientationChanged = { [weak appEnvironment] newOrientation in
             Task { @MainActor in
                 guard let appEnvironment else { return }
-                guard !appEnvironment.settingsManager.inAppOrientationLock else { return }
+                guard !appEnvironment.settingsManager.inAppOrientationLock,
+                      OrientationManager.shared.canRotateProgrammatically else { return }
 
                 guard let windowScene = UIApplication.shared.connectedScenes
                     .compactMap({ $0 as? UIWindowScene })

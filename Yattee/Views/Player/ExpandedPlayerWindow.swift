@@ -114,6 +114,22 @@ private final class ExpandedPlayerHostingController<Content: View>: UIHostingCon
             guard let window = self?.view.window,
                   let scene = window.windowScene else { return }
             window.frame = scene.coordinateSpace.bounds
+        }, completion: { [weak self] _ in
+            // Folding/unfolding the iPhone Duo (and display handoffs in
+            // general) changes the safe area without a rotation; SwiftUI
+            // keeps serving the previous insets to the sheet's GeometryReader
+            // until the hosting controller's safe area is invalidated. Nudge
+            // additionalSafeAreaInsets, the same trick the dismiss path uses
+            // for the main window.
+            guard let self else { return }
+            let originalInsets = self.additionalSafeAreaInsets
+            self.additionalSafeAreaInsets = UIEdgeInsets(
+                top: originalInsets.top + 1,
+                left: originalInsets.left,
+                bottom: originalInsets.bottom,
+                right: originalInsets.right
+            )
+            self.additionalSafeAreaInsets = originalInsets
         })
     }
 

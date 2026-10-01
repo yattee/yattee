@@ -422,6 +422,7 @@ struct PlayerControlsView: View {
             isCornerLayout: isCornerLayout,
             panelSide: panelSide,
             isIPad: isIPad,
+            canRotate: OrientationManager.shared.canRotateProgrammatically,
             showVolumeControls: showVolumeControls,
             showDebugButton: onToggleDebug != nil,
             showCloseButton: onClose != nil,

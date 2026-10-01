@@ -21,6 +21,13 @@ extension ExpandedPlayerSheet {
     /// narrow windows).
     static let minWidthForCornerLayout: CGFloat = 900
 
+    /// Minimum height (safe areas included) for the corner layout on iOS:
+    /// keeps it off tall-phone landscape (iPhone Pro Max is 956×440) while
+    /// the iPhone Duo interior (951×669) and every iPad qualify. The gate is
+    /// size-only — the Duo interior behaves like a small iPad, and the
+    /// exterior display never reaches the width.
+    static let minHeightForCornerLayout: CGFloat = 600
+
     /// Tabletop (foldable, hinge partially open): vertical room reserved on
     /// the lower half for the top bar row and for the bottom bar, keeping the
     /// center controls and side sliders clear of both.
@@ -43,13 +50,15 @@ extension ExpandedPlayerSheet {
     }
 
     #if os(iOS) || os(macOS)
-    /// Whether the corner layout should be used for the given size: iPad/macOS
-    /// only, opted into via the preset's panel settings, wide enough, and in a
-    /// widescreen orientation. Evaluated per layout pass so window resizes and
-    /// Split View changes fall back automatically.
+    /// Whether the corner layout should be used for the given size: opted into
+    /// via the preset's panel settings, large enough (iPad, macOS, iPhone Duo
+    /// interior), and in a widescreen orientation. Evaluated per layout pass
+    /// so window resizes and Split View changes fall back automatically.
+    /// `size` must include the safe areas so the status bar toggling with the
+    /// layout can't feed back into the decision.
     func isCornerLayout(size: CGSize) -> Bool {
         #if os(iOS)
-        guard UIDevice.current.userInterfaceIdiom == .pad else { return false }
+        guard size.height >= Self.minHeightForCornerLayout else { return false }
         #endif
         return playerControlsLayout.effectivePanelSettings.effectiveLayoutMode == .corner
             && size.width >= Self.minWidthForCornerLayout

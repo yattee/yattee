@@ -134,8 +134,8 @@ struct ControlsSectionRenderer: View {
             }
 
         case .orientationLock:
-            // Only on iPhone (not iPad)
-            if !actions.isIPad, actions.onToggleOrientationLock != nil {
+            // Only where rotation is under the app's control (not iPad, not Duo interior)
+            if !actions.usesRotationFreeFullscreen, actions.onToggleOrientationLock != nil {
                 controlButton(
                     systemImage: actions.orientationLockIcon,
                     tint: actions.isOrientationLocked ? .red : .white

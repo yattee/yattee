@@ -8,15 +8,40 @@
 
 #if os(iOS)
 
+import Observation
 import UIKit
 
 /// Provides supported interface orientations.
 /// Supports in-app orientation locking to the current orientation.
 @MainActor
+@Observable
 final class OrientationManager {
     static let shared = OrientationManager()
 
     private init() {}
+
+    /// Whether `requestGeometryUpdate(.iOS(interfaceOrientations:))` is honored
+    /// in the current windowing mode. False on the iPhone Duo interior display,
+    /// where the system refuses programmatic rotation (`UISceneErrorDomain` 101)
+    /// the same way it does for iPad multitasking. Set from the hinge state and
+    /// cleared when a request is refused, so the player falls back to the
+    /// iPad-style details toggle instead of doing nothing.
+    var canRotateProgrammatically = true
+
+    /// `UISceneErrorDomain` code returned when the windowing mode forbids
+    /// programmatic interface orientation changes.
+    static let orientationChangeForbiddenErrorCode = 101
+
+    /// Records a refused rotation request; returns true when the error is the
+    /// windowing-mode refusal (as opposed to a transient failure).
+    @discardableResult
+    func noteGeometryUpdateFailure(_ error: Error) -> Bool {
+        let nsError = error as NSError
+        guard nsError.domain == UISceneErrorDomain,
+              nsError.code == Self.orientationChangeForbiddenErrorCode else { return false }
+        canRotateProgrammatically = false
+        return true
+    }
 
     /// The orientation to lock to when `isLocked` is true.
     /// Updated when orientation lock is enabled to capture current orientation.

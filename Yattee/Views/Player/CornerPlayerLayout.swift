@@ -192,11 +192,17 @@ struct CornerPlayerLayout<PlayerContent: View>: View {
         GeometryReader { outer in
             let liveTopInset = outer.safeAreaInsets.top
             #if os(iOS)
-            let knownTopInset = statusBarController?.knownStatusBarHeight ?? 0
+            // iPhone (Duo interior) never shows the status bar in this
+            // layout, so there is no strip to hold: pad by the live inset
+            // only. Remembering a past inset here would keep the 82pt top
+            // inset seen transiently while unfolding.
+            let holdsStatusBarStrip = UIDevice.current.userInterfaceIdiom == .pad
+            let knownTopInset = holdsStatusBarStrip ? (statusBarController?.knownStatusBarHeight ?? 0) : 0
             #else
+            let holdsStatusBarStrip = true
             let knownTopInset: CGFloat = 0
             #endif
-            let topInset = liveTopInset > 0 ? liveTopInset : max(stableTopInset, knownTopInset)
+            let topInset = liveTopInset > 0 || !holdsStatusBarStrip ? liveTopInset : max(stableTopInset, knownTopInset)
 
             layout(topInset: topInset)
                 .padding(.top, topInset)

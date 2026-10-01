@@ -307,6 +307,18 @@ struct ExpandedPlayerSheet: View {
         .ignoresSafeArea(edges: .bottom)
     }
 
+    #if os(iOS)
+    /// Whether the status bar and home indicator are hidden for the current
+    /// layout state (see the modifier site for the rationale).
+    private var hidesSystemOverlays: Bool {
+        if navigationCoordinator?.isCornerLayoutActive == true {
+            return UIDevice.current.userInterfaceIdiom == .phone
+                || !(appEnvironment?.settingsManager.landscapeDetailsPanelVisible ?? true)
+        }
+        return isInWideScreenLayout || !isPortraitPanelVisible
+    }
+    #endif
+
     // MARK: - Player Content
 
     @ViewBuilder
@@ -314,7 +326,13 @@ struct ExpandedPlayerSheet: View {
         GeometryReader { geometry in
             let wideScreen = isWideScreenLayout(size: geometry.size)
             #if os(iOS) || os(macOS)
-            let cornerActive = isCornerLayout(size: geometry.size)
+            // Gate on the full size including safe areas: the corner layout
+            // shows the status bar, which would otherwise shrink the measured
+            // height and flip the decision back (layout oscillation).
+            let cornerActive = isCornerLayout(size: CGSize(
+                width: geometry.size.width + geometry.safeAreaInsets.leading + geometry.safeAreaInsets.trailing,
+                height: geometry.size.height + geometry.safeAreaInsets.top + geometry.safeAreaInsets.bottom
+            ))
             #endif
 
             ZStack(alignment: .top) {
@@ -480,18 +498,13 @@ struct ExpandedPlayerSheet: View {
         #if os(iOS)
         .toolbar(.hidden, for: .navigationBar)
         // Corner layout with panels visible keeps the system status bar and
-        // home indicator; hiding the panels (fullscreen state) hides them so
-        // the video and controls reach the screen edges.
-        .playerStatusBarHidden(
-            navigationCoordinator?.isCornerLayoutActive == true
-                ? !(appEnvironment?.settingsManager.landscapeDetailsPanelVisible ?? true)
-                : (isInWideScreenLayout || !isPortraitPanelVisible)
-        )
-        .persistentSystemOverlays(
-            (navigationCoordinator?.isCornerLayoutActive == true
-                ? !(appEnvironment?.settingsManager.landscapeDetailsPanelVisible ?? true)
-                : (isInWideScreenLayout || !isPortraitPanelVisible)) ? .hidden : .automatic
-        )
+        // home indicator on iPad (a thin strip); hiding the panels (fullscreen
+        // state) hides them so the video and controls reach the screen edges.
+        // On the iPhone Duo interior the landscape status bar is a ~57pt
+        // column plus top row that would inset the whole layout, so the
+        // corner layout always hides it there.
+        .playerStatusBarHidden(hidesSystemOverlays)
+        .persistentSystemOverlays(hidesSystemOverlays ? .hidden : .automatic)
         #endif
     }
 }

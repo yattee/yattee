@@ -22,7 +22,8 @@ struct PanelSettingsView: View {
     @State private var commentsShowAvatars: Bool = true
     @State private var commentsPillMode: CommentsPillMode = .pill
 
-    /// Corner layout exists on iPad and macOS only.
+    /// Corner layout exists on iPad and macOS, and on a foldable iPhone whose
+    /// interior display is large enough (see `hasHinge`).
     static var supportsCornerLayout: Bool {
         #if os(macOS)
         return true
@@ -31,12 +32,17 @@ struct PanelSettingsView: View {
         #endif
     }
 
+    /// Foldable iPhone: the interior display qualifies for the corner layout.
+    @State private var hasHinge = false
+
+    private var showsLayoutSection: Bool { Self.supportsCornerLayout || hasHinge }
+
     /// iPhone has no page bar: the list configures inline sections instead.
     private var usesSections: Bool { PanelSettings.isSectionsOnlyDevice }
 
     var body: some View {
         List {
-            if Self.supportsCornerLayout {
+            if showsLayoutSection {
                 layoutSection
             }
             visibilitySection
@@ -66,6 +72,7 @@ struct PanelSettingsView: View {
         .onChange(of: viewModel.activePreset?.id) { _, _ in
             syncLocalState()
         }
+        .observeHinge(hasHinge: $hasHinge)
     }
 
     // MARK: - Layout Section

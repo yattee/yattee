@@ -51,6 +51,20 @@ struct PlayerControlsActions {
     #if os(iOS)
     /// Whether running on iPad
     let isIPad: Bool
+
+    /// Whether the system honors programmatic rotation requests. False on the
+    /// iPhone Duo interior display, which then gets the iPad fullscreen
+    /// behavior (details toggle, no rotate glyph, no orientation lock).
+    var canRotate: Bool = true
+
+    /// iPad, or an iPhone windowing mode that can't rotate on request.
+    var usesRotationFreeFullscreen: Bool { isIPad || !canRotate }
+
+    /// Rotation-free fullscreen in a layout without a details toggle: the
+    /// button shows/hides the panel instead, so the icon tracks the panel.
+    var togglesPanelOnFullscreen: Bool {
+        usesRotationFreeFullscreen && onToggleDetailsVisibility == nil && onTogglePanel != nil
+    }
     #endif
 
     /// Whether volume controls should show (mpv mode)
@@ -271,8 +285,9 @@ struct PlayerControlsActions {
     /// Uses rotation icons when tapping will cause device rotation,
     /// otherwise uses standard fullscreen arrows.
     var fullscreenIcon: String {
-        if isCornerLayout {
-            // Corner layout: reflects the panels state, not orientation
+        if isCornerLayout || togglesPanelOnFullscreen {
+            // Corner layout / rotation-free widescreen: reflects the panel
+            // state, not orientation
             return isPanelVisible ? "arrow.up.left.and.arrow.down.right" : "arrow.down.right.and.arrow.up.left"
         }
         if willRotateOnFullscreenToggle {
@@ -302,9 +317,16 @@ struct PlayerControlsActions {
 
         let isActualWidescreenLayout = isWideScreenLayout && onTogglePanel != nil
 
-        if isIPad {
-            // iPad: always toggle details visibility
-            onToggleDetailsVisibility?()
+        if usesRotationFreeFullscreen {
+            // iPad (or no programmatic rotation): toggle details visibility.
+            // The widescreen layout has no details toggle — there fullscreen
+            // means hiding the floating panel, like the corner layout.
+            if let onToggleDetailsVisibility {
+                onToggleDetailsVisibility()
+            } else if togglesPanelOnFullscreen {
+                onHideControls?()
+                onTogglePanel?()
+            }
         } else if isActualWidescreenLayout && isFullscreen && !isWidescreenVideo {
             // iPhone in landscape with portrait video fullscreen: rotate back to portrait
             onToggleFullscreen?()
@@ -320,8 +342,9 @@ struct PlayerControlsActions {
     /// Whether tapping fullscreen will cause device rotation.
     /// Mirrors the logic in `performFullscreenTap()`
     var willRotateOnFullscreenToggle: Bool {
-        // iPad never rotates via fullscreen button
-        guard !isIPad else { return false }
+        // iPad never rotates via fullscreen button; neither does a windowing
+        // mode that refuses programmatic rotation
+        guard !usesRotationFreeFullscreen else { return false }
 
         let isActualWidescreenLayout = isWideScreenLayout && onTogglePanel != nil
 
@@ -359,7 +382,9 @@ struct PlayerControlsActions {
             return onTogglePanel != nil
         }
 
-        // iPad widescreen (true landscape): hidden (can't force rotation)
+        // iPad widescreen (true landscape): hidden (can't force rotation).
+        // Only real iPads: a rotation-free iPhone (Duo interior) with the
+        // panel hidden still needs the button to bring the panel back.
         let isActualWidescreen = isWideScreenLayout && onTogglePanel != nil
         let showFullscreenButton = !(isIPad && isActualWidescreen)
         let hasFullscreenAction = onToggleFullscreen != nil || onToggleDetailsVisibility != nil

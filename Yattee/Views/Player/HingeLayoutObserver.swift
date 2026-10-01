@@ -25,11 +25,34 @@ struct HingeLayoutObserver: ViewModifier {
             content.onHingeChange { _, context in
                 // `hinge` is nil on devices without a hinge and when the view
                 // leaves a hierarchy that provides hinge updates.
+                if let status = context.hinge?.status {
+                    // Interior display (hinge open): the system refuses
+                    // programmatic rotation, so the player must not offer it.
+                    OrientationManager.shared.canRotateProgrammatically = status == .closed
+                }
                 let tabletop = context.hinge?.status == .partiallyOpen
                 guard tabletop != isTabletop else { return }
                 withAnimation(.easeInOut(duration: 0.3)) {
                     isTabletop = tabletop
                 }
+            }
+        } else {
+            content
+        }
+    }
+}
+
+/// Reports whether the device has a hinge at all (foldable iPhone), for UI
+/// that only applies to the interior display, such as the corner layout option.
+private struct HingePresenceObserver: ViewModifier {
+    @Binding var hasHinge: Bool
+
+    func body(content: Content) -> some View {
+        if #available(iOS 27.1, *) {
+            content.onHingeChange { _, context in
+                // nil also when leaving a hinge-providing hierarchy; keep the last value then
+                guard context.hinge != nil else { return }
+                hasHinge = true
             }
         } else {
             content
@@ -43,6 +66,17 @@ extension View {
     func observeHingeLayout(isTabletop: Binding<Bool>) -> some View {
         modifier(HingeLayoutObserver(isTabletop: isTabletop))
     }
+
+    /// Writes whether the device has a hinge. No-op before iOS 27.1.
+    func observeHinge(hasHinge: Binding<Bool>) -> some View {
+        modifier(HingePresenceObserver(hasHinge: hasHinge))
+    }
+}
+
+#else
+
+extension View {
+    func observeHinge(hasHinge: Binding<Bool>) -> some View { self }
 }
 
 #endif
