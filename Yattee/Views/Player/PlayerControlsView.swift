@@ -148,6 +148,11 @@ struct PlayerControlsView: View {
     @State private var playNextTapCount = 0
     /// Track safe area to force re-render when it changes
     @State private var currentSafeArea: UIEdgeInsets = .zero
+    /// Window hosting these controls, captured by `HostWindowReader`. Safe
+    /// area must come from here: a global scene lookup can land on another
+    /// display's window (iPhone Duo exterior with its 84pt status bar inset
+    /// while the player sits on the interior in Split View).
+    @State private var hostWindow: UIWindow?
     @Environment(\.statusBarVisibilityController) private var statusBarController
     /// Active player controls layout from preset (passed from parent to avoid flashing during view recreation)
     var activeLayout: PlayerControlsLayout = .default
@@ -266,6 +271,11 @@ struct PlayerControlsView: View {
             // Sync local controls visibility to playerState for other views to observe
             playerState.controlsVisible = newValue ?? (playerState.playbackState == .paused)
         }
+        .background(HostWindowReader { window in
+            guard window !== hostWindow else { return }
+            hostWindow = window
+            currentSafeArea = windowSafeArea
+        })
         .onAppear {
             // Update safe area on appear to ensure correct layout
             currentSafeArea = windowSafeArea
@@ -394,13 +404,17 @@ struct PlayerControlsView: View {
         UIDevice.current.userInterfaceIdiom == .pad
     }
 
-    /// Get safe area from window (works even when view ignores safe area)
+    /// Get safe area from the hosting window (works even when view ignores
+    /// safe area). Falls back to the active scene's key window until the
+    /// host window is known.
     private var windowSafeArea: UIEdgeInsets {
-        UIApplication.shared.connectedScenes
+        if let hostWindow {
+            return hostWindow.safeAreaInsets
+        }
+        return UIApplication.shared.connectedScenes
             .compactMap { $0 as? UIWindowScene }
-            .first?
-            .windows
-            .first?
+            .first(where: { $0.activationState == .foregroundActive })?
+            .keyWindow?
             .safeAreaInsets ?? .zero
     }
 
@@ -1676,6 +1690,34 @@ private struct SideSliderBackgroundModifier: ViewModifier {
         Color.black
         VerticalSlider(value: $value, range: 0...100)
             .border(Color.red, width: 3)
+    }
+}
+
+/// Reports the `UIWindow` hosting the view, on every window move.
+private struct HostWindowReader: UIViewRepresentable {
+    let onWindow: (UIWindow?) -> Void
+
+    func makeUIView(context: Context) -> WindowObservingView {
+        let view = WindowObservingView()
+        view.isUserInteractionEnabled = false
+        view.onWindow = onWindow
+        return view
+    }
+
+    func updateUIView(_ uiView: WindowObservingView, context: Context) {
+        uiView.onWindow = onWindow
+    }
+
+    final class WindowObservingView: UIView {
+        var onWindow: ((UIWindow?) -> Void)?
+
+        override func didMoveToWindow() {
+            super.didMoveToWindow()
+            let window = self.window
+            DispatchQueue.main.async { [weak self] in
+                self?.onWindow?(window)
+            }
+        }
     }
 }
 
