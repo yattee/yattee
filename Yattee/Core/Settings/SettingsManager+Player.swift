@@ -65,6 +65,19 @@ extension SettingsManager {
             set(newValue, for: .preferPortraitBrowsing)
         }
     }
+
+    /// Whether the iPhone Duo tabletop layout mirrors the video into the lower
+    /// half as a dim reflection below the hinge. Default is `true`.
+    var tabletopReflection: Bool {
+        get {
+            if let cached = _tabletopReflection { return cached }
+            return bool(for: .tabletopReflection, default: true)
+        }
+        set {
+            _tabletopReflection = newValue
+            set(newValue, for: .tabletopReflection)
+        }
+    }
     #endif
 
     #if os(macOS)

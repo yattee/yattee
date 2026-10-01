@@ -34,6 +34,38 @@ extension ExpandedPlayerSheet {
     static let tabletopTopBarInset: CGFloat = 72
     static let tabletopBottomBarInset: CGFloat = 96
 
+    #if os(iOS)
+    /// Reflection strength at the hinge line; it fades to nothing at
+    /// `tabletopReflectionFadeEnd` of the mirrored video height.
+    static let tabletopReflectionOpacity: Double = 0.4
+    static let tabletopReflectionFadeEnd: CGFloat = 0.7
+    /// Softens the mirrored frames so the reflection reads as a glow, not a second video.
+    static let tabletopReflectionBlurRadius: CGFloat = 16
+
+    private var showsTabletopReflection: Bool {
+        guard appEnvironment?.settingsManager.tabletopReflection ?? true,
+              let playerState else { return false }
+        return playerState.isFirstFrameReady && playerState.isBufferReady
+            && playerState.currentStream?.isAudioOnly != true
+            && playerState.pipState != .active
+    }
+
+    /// Mirrored video frames sized like the fitted video, fading out downwards.
+    private func tabletopReflection(backend: MPVBackend, width: CGFloat, height: CGFloat) -> some View {
+        MPVReflectionView(backend: backend)
+            .frame(width: width, height: height)
+            .blur(radius: Self.tabletopReflectionBlurRadius)
+            .mask(
+                LinearGradient(
+                    colors: [.white.opacity(Self.tabletopReflectionOpacity), .clear],
+                    startPoint: .top,
+                    endPoint: UnitPoint(x: 0.5, y: Self.tabletopReflectionFadeEnd)
+                )
+            )
+            .allowsHitTesting(false)
+    }
+    #endif
+
     // MARK: - Layout Detection
 
     /// Check if widescreen layout should be used based on available size.
@@ -384,6 +416,19 @@ extension ExpandedPlayerSheet {
                 // Animate video position when not dragging (matches panel animation behavior)
                 .animation(isPanelDragging ? nil : .spring(response: 0.3, dampingFraction: 1.0), value: videoYOffset)
                 .animation(panelRevealOffset != 0 ? nil : .spring(response: 0.3, dampingFraction: 1.0), value: isPortraitPanelVisible)
+
+            #if os(iOS)
+            // Tabletop: mirror the video across the hinge line into the lower
+            // half, like a screen standing on a glossy table. The mirrored
+            // frames come from the render view; this only places and fades them.
+            if isTabletop, showsTabletopReflection,
+               let backend = playerService?.currentBackend as? MPVBackend {
+                let hingeY = layoutHeight - safeAreaInsets.top
+                tabletopReflection(backend: backend, width: videoWidth, height: videoHeight)
+                    .position(x: screenWidth / 2 + fullscreenPlayerXOffset, y: 2 * hingeY - videoY)
+                    .transition(.opacity)
+            }
+            #endif
 
             // Controls layer - positioned based on panel state
             // When panel visible: positioned to cover from top down to panel

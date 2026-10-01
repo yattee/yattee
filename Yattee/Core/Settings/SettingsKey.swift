@@ -70,6 +70,7 @@ enum SettingsKey: String, CaseIterable {
     case inAppOrientationLock
     case rotateToMatchAspectRatio
     case preferPortraitBrowsing
+    case tabletopReflection
 
     // Home
     case homeShortcutOrder

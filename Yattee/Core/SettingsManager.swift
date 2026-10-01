@@ -78,6 +78,7 @@ final class SettingsManager {
     var _inAppOrientationLock: Bool?
     var _rotateToMatchAspectRatio: Bool?
     var _preferPortraitBrowsing: Bool?
+    var _tabletopReflection: Bool?
     #endif
     #if os(macOS)
     var _macPlayerSeparateWindow: Bool?
@@ -465,6 +466,7 @@ final class SettingsManager {
         _inAppOrientationLock = nil
         _rotateToMatchAspectRatio = nil
         _preferPortraitBrowsing = nil
+        _tabletopReflection = nil
         #endif
         _iCloudSyncEnabled = nil
         _lastSyncTime = nil

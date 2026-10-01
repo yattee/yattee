@@ -13532,6 +13532,39 @@
         }
       }
     },
+    "settings.playback.foldable.header" : {
+      "comment" : "Header for foldable iPhone player settings section",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Foldable"
+          }
+        }
+      }
+    },
+    "settings.playback.foldable.tabletopReflection" : {
+      "comment" : "Toggle for mirroring the video as a reflection below the hinge in the tabletop layout",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Reflection Below Video"
+          }
+        }
+      }
+    },
+    "settings.playback.foldable.tabletopReflection.footer" : {
+      "comment" : "Footer explaining the tabletop reflection option",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "When the phone stands half-open like a laptop, the lower half shows a dim mirrored copy of the video."
+          }
+        }
+      }
+    },
     "settings.playback.macOS.autoResizePlayer" : {
       "comment" : "Toggle for automatically resizing player window to match video aspect ratio",
       "localizations" : {

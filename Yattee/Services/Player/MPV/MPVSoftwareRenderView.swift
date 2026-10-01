@@ -64,6 +64,15 @@ final class MPVSoftwareRenderView: UIView {
     
     /// Callback when view is added to window (for PiP setup)
     var onDidMoveToWindow: ((UIView) -> Void)?
+
+    /// Mirrored copy of every frame for the tabletop reflection (see `MPVRenderView`).
+    let reflectionLayer = MPVReflectionLayer()
+
+    var isReflectionEnabled = false {
+        didSet {
+            if !isReflectionEnabled { reflectionLayer.clear() }
+        }
+    }
     
     /// Dedicated queue for rendering operations
     private let renderQueue = DispatchQueue(label: "stream.yattee.mpv.software-render", qos: .userInitiated)
@@ -434,6 +443,9 @@ final class MPVSoftwareRenderView: UIView {
             DispatchQueue.main.async { [weak self] in
                 guard let self else { return }
                 self.layer.contents = image
+                if self.isReflectionEnabled {
+                    self.reflectionLayer.displayMirrored(image)
+                }
             }
             
             // Notify on first frame rendered

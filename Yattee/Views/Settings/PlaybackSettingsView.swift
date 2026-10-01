@@ -23,6 +23,7 @@ struct PlaybackSettingsView: View {
                 QueueSection(settings: settings)
                 #if os(iOS)
                 OrientationSection(settings: settings)
+                FoldableSection(settings: settings)
                 #endif
             }
         }
@@ -361,6 +362,33 @@ private struct QueueSection: View {
         }
     }
 }
+
+// MARK: - Foldable Section (iOS)
+
+#if os(iOS)
+/// iPhone Duo only: options for the tabletop (laptop-like) player layout.
+private struct FoldableSection: View {
+    @Bindable var settings: SettingsManager
+    @State private var hasHinge = HingeLayoutObserver.forceTabletop
+
+    var body: some View {
+        Group {
+            if hasHinge {
+                SettingsFormSection(
+                    "settings.playback.foldable.header",
+                    footer: "settings.playback.foldable.tabletopReflection.footer"
+                ) {
+                    Toggle(
+                        String(localized: "settings.playback.foldable.tabletopReflection"),
+                        isOn: $settings.tabletopReflection
+                    )
+                }
+            }
+        }
+        .observeHinge(hasHinge: $hasHinge)
+    }
+}
+#endif
 
 // MARK: - Orientation Section (iOS)
 

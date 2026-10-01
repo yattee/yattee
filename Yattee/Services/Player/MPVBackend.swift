@@ -176,6 +176,16 @@ final class MPVBackend: PlayerBackend {
     /// Set by PlayerService to collapse the player sheet.
     var onPiPDidStart: (() -> Void)?
 
+    /// Layer mirroring the rendered frames for the tabletop reflection
+    /// (`MPVReflectionView`). Frames flow only while `setReflectionEnabled(true)`.
+    var reflectionLayer: CALayer? { _playerView?.reflectionLayer }
+
+    func setReflectionEnabled(_ enabled: Bool) {
+        guard let view = _playerView, view.isReflectionEnabled != enabled else { return }
+        MPVLogging.log("MPVBackend.setReflectionEnabled", details: "enabled:\(enabled)")
+        view.isReflectionEnabled = enabled
+    }
+
     /// Pause video rendering (for smooth panscan animation)
     func pauseRendering() {
         MPVLogging.log("MPVBackend.pauseRendering called")

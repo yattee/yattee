@@ -176,6 +176,44 @@ final class MPVRenderView: UIView {
     /// Scale factor for PiP capture (1.0 = full res, 0.5 = half res)
     private let pipCaptureScale: CGFloat = 1.0
 
+    // MARK: - Reflection Capture
+
+    /// Layer that receives a vertically mirrored, quarter-resolution copy of
+    /// every presented frame while `isReflectionEnabled` is set. Hosted by
+    /// `MPVReflectionView` (iPhone Duo tabletop layout); contents are already
+    /// mirrored, so the host applies no transform.
+    let reflectionLayer = MPVReflectionLayer()
+
+    /// Whether to mirror frames into `reflectionLayer` (set by the backend).
+    var isReflectionEnabled = false {
+        didSet {
+            guard isReflectionEnabled != oldValue, !isReflectionEnabled else { return }
+            renderQueue.async { [weak self] in
+                guard let self, let eaglContext else { return }
+                EAGLContext.setCurrent(eaglContext)
+                destroyReflectionCapture()
+            }
+            reflectionLayer.clear()
+        }
+    }
+
+    /// Ring of IOSurface-backed targets so CoreAnimation never reads the
+    /// buffer GL is currently writing.
+    private var reflectionTargets: [ReflectionTarget] = []
+    private var reflectionTargetIndex = 0
+    private var reflectionTextureCache: CVOpenGLESTextureCache?
+    private var reflectionCaptureWidth = 0
+    private var reflectionCaptureHeight = 0
+
+    /// Downscale factor for the reflection; the low resolution doubles as a cheap blur.
+    private let reflectionCaptureScale: CGFloat = 0.25
+
+    private struct ReflectionTarget {
+        let pixelBuffer: CVPixelBuffer
+        let texture: CVOpenGLESTexture
+        var framebuffer: GLuint
+    }
+
     // MARK: - Full Resolution Rendering for PiP
 
     /// Offscreen framebuffer for full-resolution rendering when PiP capture is active.
@@ -379,6 +417,7 @@ final class MPVRenderView: UIView {
             EAGLContext.setCurrent(eaglContext)
             destroyFullResFramebuffer()
             destroyPiPCapture()
+            destroyReflectionCapture()
             destroyFramebufferResources()
         }
         eaglContext = nil
@@ -968,6 +1007,11 @@ final class MPVRenderView: UIView {
                 width: renderWidth, height: renderHeight, success: ctxSet)
         }
 
+        // Mirror the presented frame into the reflection layer if enabled
+        if isReflectionEnabled && mpvHasFrameReady && !isPiPActive {
+            captureFrameForReflection()
+        }
+
         // Capture frame for PiP if enabled
         if captureFramesForPiP && mpvHasFrameReady {
             pipFrameCounter += 1
@@ -1300,6 +1344,118 @@ final class MPVRenderView: UIView {
         DispatchQueue.main.async {
             callback(pixelBuffer, presentationTime)
         }
+    }
+
+    // MARK: - Reflection Capture (Zero-Copy)
+
+    /// Blit the display framebuffer, downscaled and without the usual Y flip,
+    /// into the next IOSurface target and hand it to the reflection layer. GL's
+    /// bottom-left origin lands in the top-left-origin surface upside down,
+    /// which is exactly the mirrored image a reflection needs.
+    private func captureFrameForReflection() {
+        guard EAGLContext.current() === eaglContext, renderWidth > 0, renderHeight > 0 else { return }
+
+        setupReflectionCapture(
+            width: max(1, Int(CGFloat(renderWidth) * reflectionCaptureScale)),
+            height: max(1, Int(CGFloat(renderHeight) * reflectionCaptureScale))
+        )
+        guard !reflectionTargets.isEmpty else { return }
+
+        let target = reflectionTargets[reflectionTargetIndex]
+        reflectionTargetIndex = (reflectionTargetIndex + 1) % reflectionTargets.count
+
+        glBindFramebuffer(GLenum(GL_READ_FRAMEBUFFER), framebuffer)
+        glBindFramebuffer(GLenum(GL_DRAW_FRAMEBUFFER), target.framebuffer)
+        glBlitFramebuffer(
+            0, 0, renderWidth, renderHeight,
+            0, 0, GLint(reflectionCaptureWidth), GLint(reflectionCaptureHeight),
+            GLbitfield(GL_COLOR_BUFFER_BIT),
+            GLenum(GL_LINEAR)
+        )
+        glBindFramebuffer(GLenum(GL_FRAMEBUFFER), framebuffer)
+        glFlush()
+
+        guard let surface = CVPixelBufferGetIOSurface(target.pixelBuffer)?.takeUnretainedValue() else { return }
+        let layer = reflectionLayer
+        DispatchQueue.main.async {
+            layer.display(surface)
+        }
+    }
+
+    private func setupReflectionCapture(width: Int, height: Int) {
+        guard let eaglContext else { return }
+        if width == reflectionCaptureWidth && height == reflectionCaptureHeight && !reflectionTargets.isEmpty {
+            return
+        }
+        destroyReflectionCapture()
+
+        var cache: CVOpenGLESTextureCache?
+        guard CVOpenGLESTextureCacheCreate(kCFAllocatorDefault, nil, eaglContext, nil, &cache) == kCVReturnSuccess,
+              let cache else {
+            LoggingService.shared.warning("MPV Reflection: Failed to create texture cache", category: .mpv)
+            return
+        }
+        reflectionTextureCache = cache
+
+        let attributes: [String: Any] = [
+            kCVPixelBufferPixelFormatTypeKey as String: kCVPixelFormatType_32BGRA,
+            kCVPixelBufferWidthKey as String: width,
+            kCVPixelBufferHeightKey as String: height,
+            kCVPixelBufferIOSurfacePropertiesKey as String: [:] as [String: Any],
+            kCVPixelBufferOpenGLESCompatibilityKey as String: true
+        ]
+
+        var targets: [ReflectionTarget] = []
+        for _ in 0..<3 {
+            var pixelBuffer: CVPixelBuffer?
+            guard CVPixelBufferCreate(kCFAllocatorDefault, width, height, kCVPixelFormatType_32BGRA,
+                                      attributes as CFDictionary, &pixelBuffer) == kCVReturnSuccess,
+                  let pixelBuffer else { break }
+
+            var texture: CVOpenGLESTexture?
+            guard CVOpenGLESTextureCacheCreateTextureFromImage(
+                kCFAllocatorDefault, cache, pixelBuffer, nil, GLenum(GL_TEXTURE_2D), GL_RGBA,
+                GLsizei(width), GLsizei(height), GLenum(GL_BGRA), GLenum(GL_UNSIGNED_BYTE), 0, &texture
+            ) == kCVReturnSuccess, let texture else { break }
+
+            var fbo: GLuint = 0
+            glGenFramebuffers(1, &fbo)
+            glBindFramebuffer(GLenum(GL_FRAMEBUFFER), fbo)
+            glFramebufferTexture2D(GLenum(GL_FRAMEBUFFER), GLenum(GL_COLOR_ATTACHMENT0), GLenum(GL_TEXTURE_2D),
+                                   CVOpenGLESTextureGetName(texture), 0)
+            guard glCheckFramebufferStatus(GLenum(GL_FRAMEBUFFER)) == GL_FRAMEBUFFER_COMPLETE else {
+                glDeleteFramebuffers(1, &fbo)
+                break
+            }
+            targets.append(ReflectionTarget(pixelBuffer: pixelBuffer, texture: texture, framebuffer: fbo))
+        }
+        glBindFramebuffer(GLenum(GL_FRAMEBUFFER), framebuffer)
+
+        guard targets.count == 3 else {
+            LoggingService.shared.warning("MPV Reflection: Failed to create capture targets (\(targets.count)/3)", category: .mpv)
+            reflectionTargets = targets
+            destroyReflectionCapture()
+            return
+        }
+        reflectionTargets = targets
+        reflectionTargetIndex = 0
+        reflectionCaptureWidth = width
+        reflectionCaptureHeight = height
+        LoggingService.shared.debug("MPV Reflection: capture setup \(width)x\(height)", category: .mpv)
+    }
+
+    /// Must run on the render queue with the context current.
+    private func destroyReflectionCapture() {
+        for var target in reflectionTargets where target.framebuffer != 0 {
+            glDeleteFramebuffers(1, &target.framebuffer)
+        }
+        reflectionTargets = []
+        if let cache = reflectionTextureCache {
+            CVOpenGLESTextureCacheFlush(cache, 0)
+        }
+        reflectionTextureCache = nil
+        reflectionCaptureWidth = 0
+        reflectionCaptureHeight = 0
     }
 
 }
