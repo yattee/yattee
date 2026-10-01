@@ -362,6 +362,12 @@ struct ExpandedPlayerSheet: View {
                 standardPlayerContent(geometry: geometry)
                 #endif
             }
+            #if os(iOS)
+            // Applied inside the animation-stripping transaction below so the
+            // hinge-driven tabletop switch still animates the video between
+            // the screen center and the upper half.
+            .animation(.easeInOut(duration: 0.3), value: isTabletopHinge)
+            #endif
             .transaction { transaction in
                 // Disable animations during layout switch to prevent position interpolation
                 transaction.animation = nil
