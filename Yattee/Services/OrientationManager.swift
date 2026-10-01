@@ -26,7 +26,17 @@ final class OrientationManager {
     /// the same way it does for iPad multitasking. Set from the hinge state and
     /// cleared when a request is refused, so the player falls back to the
     /// iPad-style details toggle instead of doing nothing.
-    var canRotateProgrammatically = true
+    /// While false, the in-app orientation lock is suspended as well: the
+    /// system decides the orientation there, so pinning `supportedOrientations`
+    /// only fights the user's physical rotation (Duo hinge open, simulator
+    /// forced tabletop).
+    var canRotateProgrammatically = true {
+        didSet {
+            if !canRotateProgrammatically && isLocked {
+                unlock()
+            }
+        }
+    }
 
     /// `UISceneErrorDomain` code returned when the windowing mode forbids
     /// programmatic interface orientation changes.
@@ -52,7 +62,7 @@ final class OrientationManager {
 
     /// Lock orientation to the current orientation
     func lock() {
-        guard !isLocked else { return }
+        guard !isLocked, canRotateProgrammatically else { return }
         lockedOrientation = currentInterfaceOrientationMask
         isLocked = true
         notifyOrientationChange()
@@ -60,6 +70,7 @@ final class OrientationManager {
 
     /// Lock to a specific orientation
     func lock(to orientation: UIInterfaceOrientationMask) {
+        guard canRotateProgrammatically else { return }
         lockedOrientation = orientation
         isLocked = true
         notifyOrientationChange()
@@ -67,6 +78,7 @@ final class OrientationManager {
 
     /// Re-lock to the current orientation (updates locked orientation even if already locked)
     func lockToCurrentOrientation() {
+        guard canRotateProgrammatically else { return }
         lockedOrientation = currentInterfaceOrientationMask
         isLocked = true
         notifyOrientationChange()

@@ -16,11 +16,24 @@ struct HingeLayoutObserver: ViewModifier {
 
     /// Debug override: launch with `YATTEE_FORCE_TABLETOP=1` to force the
     /// tabletop layout on simulators without a hinge control.
-    private static let forceTabletop = ProcessInfo.processInfo.environment["YATTEE_FORCE_TABLETOP"] == "1"
+    static let forceTabletop = ProcessInfo.processInfo.environment["YATTEE_FORCE_TABLETOP"] == "1"
 
     func body(content: Content) -> some View {
         if Self.forceTabletop {
-            content.onAppear { isTabletop = true }
+            // The override stands in for a half-open hinge, which only exists
+            // on the interior display: folded (exterior, 466×678) keeps the
+            // regular layout, like the real `.closed` state would.
+            content.onGeometryChange(for: Bool.self) { proxy in
+                min(proxy.size.width, proxy.size.height) >= ExpandedPlayerSheet.minHeightForCornerLayout
+            } action: { isInterior in
+                // Mirror the real hinge state: no programmatic rotation (and no
+                // orientation lock) while the hinge is open.
+                OrientationManager.shared.canRotateProgrammatically = !isInterior
+                guard isInterior != isTabletop else { return }
+                withAnimation(.easeInOut(duration: 0.3)) {
+                    isTabletop = isInterior
+                }
+            }
         } else if #available(iOS 27.1, *) {
             content.onHingeChange { _, context in
                 // `hinge` is nil on devices without a hinge and when the view
