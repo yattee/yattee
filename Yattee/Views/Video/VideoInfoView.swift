@@ -552,91 +552,96 @@ struct VideoInfoView: View {
 
                 ScrollView {
                     VStack(alignment: .leading, spacing: 0) {
-                        // Header with thumbnail, title, and channel
+                        // Header with thumbnail, title, and channel. Kept outside the
+                        // re-identified subtree below: recreating the carousel on every
+                        // page change resets its scroll offset (visible on the iPhone
+                        // Duo exterior display, where the restored position was lost).
                         headerSection(cardWidth: geometry.size.width)
 
-                        // Action buttons (inline layout only; toolbar layout puts them in the nav bar)
-                        if !usesToolbarActions {
-                            actionButtons
-                        } else {
-                            Spacer().frame(height: 12)
-                        }
+                        VStack(alignment: .leading, spacing: 0) {
+                            // Action buttons (inline layout only; toolbar layout puts them in the nav bar)
+                            if !usesToolbarActions {
+                                actionButtons
+                            } else {
+                                Spacer().frame(height: 12)
+                            }
 
-                        // Bookmark details section (only show if bookmarked)
-                        if isBookmarked, let bookmark = currentBookmark {
+                            // Bookmark details section (only show if bookmarked)
+                            if isBookmarked, let bookmark = currentBookmark {
+                                Divider()
+                                    .padding(.horizontal)
+
+                                bookmarkDetailsSection(bookmark)
+                            }
+
+                            // Details fetch failed - show error with retry instead of
+                            // silently hiding the description/stats sections
+                            if shouldShowDetailsErrorSection {
+                                Divider()
+                                    .padding(.horizontal)
+
+                                detailsErrorSection
+                            }
+
+                            // Description section (collapsible) - only show if description available
+                            if shouldShowDescriptionSection {
+                                Divider()
+                                    .padding(.horizontal)
+
+                                descriptionSection
+                            }
+
+                            // Original title section - only show when DeArrow title is active
+                            if shouldShowOriginalTitleSection {
+                                Divider()
+                                    .padding(.horizontal)
+
+                                originalTitleSection
+                            }
+
+                            // Stats section (collapsible) - only show if meaningful stats exist
+                            if shouldShowStatsSection {
+                                Divider()
+                                    .padding(.horizontal)
+
+                                statsSection
+                            }
+
                             Divider()
                                 .padding(.horizontal)
 
-                            bookmarkDetailsSection(bookmark)
+                            // Comments section (collapsible)
+                            commentsSection
+
+                            // Related videos section (collapsible, only shown if videos exist)
+                            if let relatedVideos = displayedVideo?.relatedVideos, !relatedVideos.isEmpty {
+                                Divider()
+                                    .padding(.horizontal)
+
+                                relatedVideosSection(relatedVideos)
+                            }
+
+
+                            // Watch history section (only show if entry exists)
+                            if let entry = watchEntry {
+                                Divider()
+                                    .padding(.horizontal)
+
+                                watchHistorySection(entry)
+                            }
+
+                            #if !os(tvOS)
+                            // Download section (only show if downloaded)
+                            if let download = download, download.status == .completed {
+                                Divider()
+                                    .padding(.horizontal)
+
+                                downloadSection(download)
+                            }
+                            #endif
                         }
-
-                        // Details fetch failed - show error with retry instead of
-                        // silently hiding the description/stats sections
-                        if shouldShowDetailsErrorSection {
-                            Divider()
-                                .padding(.horizontal)
-
-                            detailsErrorSection
-                        }
-
-                        // Description section (collapsible) - only show if description available
-                        if shouldShowDescriptionSection {
-                            Divider()
-                                .padding(.horizontal)
-
-                            descriptionSection
-                        }
-
-                        // Original title section - only show when DeArrow title is active
-                        if shouldShowOriginalTitleSection {
-                            Divider()
-                                .padding(.horizontal)
-
-                            originalTitleSection
-                        }
-
-                        // Stats section (collapsible) - only show if meaningful stats exist
-                        if shouldShowStatsSection {
-                            Divider()
-                                .padding(.horizontal)
-
-                            statsSection
-                        }
-
-                        Divider()
-                            .padding(.horizontal)
-
-                        // Comments section (collapsible)
-                        commentsSection
-
-                        // Related videos section (collapsible, only shown if videos exist)
-                        if let relatedVideos = displayedVideo?.relatedVideos, !relatedVideos.isEmpty {
-                            Divider()
-                                .padding(.horizontal)
-
-                            relatedVideosSection(relatedVideos)
-                        }
-
-
-                        // Watch history section (only show if entry exists)
-                        if let entry = watchEntry {
-                            Divider()
-                                .padding(.horizontal)
-
-                            watchHistorySection(entry)
-                        }
-
-                        #if !os(tvOS)
-                        // Download section (only show if downloaded)
-                        if let download = download, download.status == .completed {
-                            Divider()
-                                .padding(.horizontal)
-
-                            downloadSection(download)
-                        }
-                        #endif
+                        .id(currentVideoIndex) // Force re-render when video changes
                     }
-                    .id(currentVideoIndex) // Force re-render when video changes
                 }
                 #if !os(tvOS)
                 .scrollDismissesKeyboard(.interactively)
@@ -1004,7 +1009,7 @@ struct VideoInfoView: View {
                             let titleVideo = video.hasPlaceholderTitle ? (detailedVideo ?? video) : video
                             videoCard(for: titleVideo, cardWidth: cardWidth, thumbnailFrom: detailedVideo, authorFrom: detailedVideo, isLoadingMore: isLoadingMoreVideos && isCurrent, showTitle: true, isCurrent: isCurrent)
                                 .opacity(isCurrent ? 1.0 : peekOpacity)
-                                .containerRelativeFrame(.horizontal)
+                                .frame(width: cardWidth)
                                 .id(index)
                                 .onTapGesture {
                                     if !isCurrent {
@@ -1020,13 +1025,17 @@ struct VideoInfoView: View {
                         if videoQueueContext?.canLoadMore == true {
                             videoCardPlaceholder(isLoading: isLoadingMoreVideos, cardWidth: cardWidth)
                                 .opacity(peekOpacity)
-                                .containerRelativeFrame(.horizontal)
+                                .frame(width: cardWidth)
                                 .id("load-more-placeholder")
                         }
                     }
                 }
                 .scrollTargetLayout()
             }
+            // Pin the viewport to the page width so paging stays aligned even
+            // when the scroll view extends under a horizontal safe area (iPhone
+            // Duo exterior status bar column, landscape notch).
+            .frame(width: cardWidth)
             .scrollTargetBehavior(.viewAligned(limitBehavior: .alwaysByOne))
             .scrollPosition(id: $carouselScrollPosition)
             .onScrollPhaseChange { oldPhase, newPhase in
