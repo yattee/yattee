@@ -4,6 +4,7 @@
 //
 //  TipKit hint that the hero thumbnail plays the video. Shown once, only while the
 //  toolbar action layout is active (the inline layout has an explicit Play button).
+//  When the thumbnail is a carousel over the video's context, it also mentions swiping.
 //
 
 #if !os(tvOS)
@@ -15,12 +16,17 @@ struct VideoInfoPlayThumbnailTip: Tip {
     @Parameter
     static var isToolbarLayout: Bool = false
 
+    /// Whether the thumbnail can be swiped to browse other videos in the context.
+    var canSwipe = false
+
     var title: Text {
         Text(String(localized: "videoInfo.playTip.title"))
     }
 
     var message: Text? {
-        Text(String(localized: "videoInfo.playTip.message"))
+        Text(canSwipe
+             ? String(localized: "videoInfo.playTip.messageWithSwipe")
+             : String(localized: "videoInfo.playTip.message"))
     }
 
     var image: Image? {
@@ -35,10 +41,11 @@ struct VideoInfoPlayThumbnailTip: Tip {
 /// Attaches the play-thumbnail tip to the hero thumbnail when enabled.
 struct VideoInfoPlayThumbnailTipModifier: ViewModifier {
     let enabled: Bool
-    private let tip = VideoInfoPlayThumbnailTip()
+    private let tip: VideoInfoPlayThumbnailTip
 
-    init(enabled: Bool) {
+    init(enabled: Bool, canSwipe: Bool) {
         self.enabled = enabled
+        self.tip = VideoInfoPlayThumbnailTip(canSwipe: canSwipe)
     }
 
     func body(content: Content) -> some View {

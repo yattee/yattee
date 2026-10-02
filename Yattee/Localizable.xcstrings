@@ -19865,6 +19865,16 @@
         }
       }
     },
+    "videoInfo.playTip.messageWithSwipe" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tap the thumbnail to start playing this video. Swipe it left or right to browse other videos from this list."
+          }
+        }
+      }
+    },
     "videoInfo.playTip.title" : {
       "localizations" : {
         "en" : {

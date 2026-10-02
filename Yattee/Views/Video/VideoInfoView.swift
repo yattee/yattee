@@ -1128,7 +1128,7 @@ struct VideoInfoView: View {
                 }
             }
             #if !os(tvOS)
-            .modifier(VideoInfoPlayThumbnailTipModifier(enabled: isCurrent && showsThumbnailPlayTip))
+            .modifier(VideoInfoPlayThumbnailTipModifier(enabled: isCurrent && showsThumbnailPlayTip, canSwipe: canSwipeThumbnails))
             #endif
             
             // Title - full card width so long titles fit more characters per line.
@@ -1379,6 +1379,15 @@ struct VideoInfoView: View {
     /// and Play isn't the pinned action, so show the one-time "tap to play" tip.
     private var showsThumbnailPlayTip: Bool {
         usesToolbarActions && primaryAction != .play
+    }
+
+    /// The hero thumbnail is a swipeable carousel over the queue context (iOS only, see headerSection).
+    private var canSwipeThumbnails: Bool {
+        #if os(iOS)
+        videoQueueContext != nil && (allVideos?.count ?? 0) > 1
+        #else
+        false
+        #endif
     }
 
     /// One toolbar action rendered either as a standalone toolbar item or as a menu row.
