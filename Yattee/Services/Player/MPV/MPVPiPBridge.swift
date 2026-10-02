@@ -73,6 +73,9 @@ final class MPVPiPBridge: NSObject {
     /// Current video aspect ratio (width / height)
     private var videoAspectRatio: CGFloat = 16.0 / 9.0
 
+    /// Set when AVKit begins stopping PiP; used to detect an ignored stop request
+    private var pipStopObserved = false
+
     /// Track whether restore was requested before PiP stopped
     private var restoreWasRequested = false
 
@@ -175,25 +178,7 @@ final class MPVPiPBridge: NSObject {
         sampleBufferLayer.frame = containerView.bounds
         #endif
 
-        // Create content source for sample buffer playback
-        let contentSource = AVPictureInPictureController.ContentSource(
-            sampleBufferDisplayLayer: sampleBufferLayer,
-            playbackDelegate: self
-        )
-
-        // Create PiP controller
-        pipController = AVPictureInPictureController(contentSource: contentSource)
-        pipController?.delegate = self
-
-        // Observe isPictureInPicturePossible changes via KVO
-        // Note: Don't use .initial here - callbacks aren't set up yet when setup() is called.
-        // Use notifyPiPPossibleState() after setting up callbacks.
-        pipPossibleObservation = pipController?.observe(\.isPictureInPicturePossible, options: [.new]) { [weak self] _, change in
-            let isPossible = change.newValue ?? false
-            Task { @MainActor [weak self] in
-                self?.onPiPPossibleChanged?(isPossible)
-            }
-        }
+        createPiPController()
 
         #if os(iOS)
         // Observe app lifecycle to handle background transitions while PiP is active
@@ -550,6 +535,29 @@ final class MPVPiPBridge: NSObject {
         }
     }
 
+    /// Create the PiP controller for `sampleBufferLayer` and observe whether PiP is possible.
+    private func createPiPController() {
+        // Create content source for sample buffer playback
+        let contentSource = AVPictureInPictureController.ContentSource(
+            sampleBufferDisplayLayer: sampleBufferLayer,
+            playbackDelegate: self
+        )
+
+        // Create PiP controller
+        pipController = AVPictureInPictureController(contentSource: contentSource)
+        pipController?.delegate = self
+
+        // Observe isPictureInPicturePossible changes via KVO
+        // Note: Don't use .initial here - callbacks aren't set up yet when setup() is called.
+        // Use notifyPiPPossibleState() after setting up callbacks.
+        pipPossibleObservation = pipController?.observe(\.isPictureInPicturePossible, options: [.new]) { [weak self] _, change in
+            let isPossible = change.newValue ?? false
+            Task { @MainActor [weak self] in
+                self?.onPiPPossibleChanged?(isPossible)
+            }
+        }
+    }
+
     // MARK: - PiP Control
 
     /// Start Picture-in-Picture.
@@ -581,10 +589,50 @@ final class MPVPiPBridge: NSObject {
 
     /// Stop Picture-in-Picture.
     func stopPiP() {
-        pipController?.stopPictureInPicture()
+        guard let controller = pipController else { return }
+        pipStopObserved = false
+        controller.stopPictureInPicture()
         // Layer will be hidden in didStopPictureInPicture delegate
         LoggingService.shared.debug("MPVPiPBridge: Stopping PiP", category: .mpv)
+
+        #if os(macOS)
+        // macOS 27 can ignore a programmatic stop entirely (no delegate calls,
+        // the PiP window stays on screen), e.g. when closing the video from the
+        // mini player. If AVKit hasn't begun stopping shortly after, drop the
+        // controller - releasing it closes the PiP window - and create a fresh one.
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) { [weak self, weak controller] in
+            guard let self, let controller, controller === self.pipController,
+                  !self.pipStopObserved, controller.isPictureInPictureActive else { return }
+            LoggingService.shared.warning("MPVPiPBridge: PiP stop ignored by AVKit, recreating controller", category: .mpv)
+            self.forceTearDownActivePiP()
+        }
+        #endif
     }
+
+    #if os(macOS)
+    /// Replace an active PiP controller that refuses to stop, running the
+    /// cleanup `didStopPictureInPicture` would have done.
+    private func forceTearDownActivePiP() {
+        pipPossibleObservation?.invalidate()
+        pipPossibleObservation = nil
+        pipController?.delegate = nil
+        pipController = nil
+
+        stopLayerResizeTimer()
+        restoreHiddenPiPViews()
+        if let superlayer = sampleBufferLayer.superlayer, let sublayers = superlayer.sublayers {
+            for layer in sublayers where layer !== sampleBufferLayer {
+                layer.isHidden = false
+            }
+        }
+        sampleBufferLayer.isHidden = true
+        lastPixelBuffer = nil
+
+        createPiPController()
+        onPiPStatusChanged?(false)
+        notifyPiPPossibleState()
+    }
+    #endif
 
     /// Toggle Picture-in-Picture.
     func togglePiP() {
@@ -770,6 +818,7 @@ extension MPVPiPBridge: AVPictureInPictureControllerDelegate {
         _ pictureInPictureController: AVPictureInPictureController
     ) {
         Task { @MainActor in
+            pipStopObserved = true
             #if os(macOS)
             // Restore hidden views BEFORE cleanup to prevent crashes
             restoreHiddenPiPViews()
@@ -794,6 +843,7 @@ extension MPVPiPBridge: AVPictureInPictureControllerDelegate {
         _ pictureInPictureController: AVPictureInPictureController
     ) {
         Task { @MainActor in
+            pipStopObserved = true
             #if os(macOS)
             // Stop layer resize timer
             stopLayerResizeTimer()
