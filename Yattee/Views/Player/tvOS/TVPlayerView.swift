@@ -45,8 +45,8 @@ struct TVPlayerView: View {
     /// Whether the details panel is shown.
     @State private var isDetailsPanelVisible = false
 
-    /// Initial page for the details panel when opened.
-    @State private var detailsPanelInitialPage: PanelPageType = .info
+    /// Initial tab for the details panel when opened.
+    @State private var detailsPanelInitialTab: TVDetailsTab = .info
 
     /// Whether user is scrubbing the progress bar.
     @State private var isScrubbing = false
@@ -279,7 +279,7 @@ struct TVPlayerView: View {
                         Spacer(minLength: 0)
                         TVDetailsPanel(
                             video: playerState?.currentVideo,
-                            initialPage: detailsPanelInitialPage,
+                            initialTab: detailsPanelInitialTab,
                             onDismiss: { hideDetailsPanel() }
                         )
                         .frame(width: geo.size.width / 2)
@@ -730,9 +730,9 @@ struct TVPlayerView: View {
 
     // MARK: - Details Panel
 
-    private func showDetailsPanel(tab: PanelPageType = .info) {
+    private func showDetailsPanel(tab: TVDetailsTab = .info) {
         stopControlsTimer()
-        detailsPanelInitialPage = tab
+        detailsPanelInitialTab = tab
         withAnimation(.spring(response: 0.4, dampingFraction: 0.85)) {
             isDetailsPanelVisible = true
             controlsVisible = false

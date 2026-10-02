@@ -195,10 +195,6 @@ struct SettingsView: View {
                         Label(String(localized: "settings.playback.sectionTitle"), systemImage: "play.circle")
                     }
 
-                    NavigationLink { TVSidebarDetailContainer(systemImage: "list.bullet.rectangle", title: String(localized: "settings.playerPanels.title")) { TVPlayerPanelsSettingsView() } } label: {
-                        Label(String(localized: "settings.playerPanels.title"), systemImage: "list.bullet.rectangle")
-                    }
-
                     NavigationLink { TVSidebarDetailContainer(systemImage: "hand.raised", title: String(localized: "settings.privacy.title")) { PrivacySettingsView() } } label: {
                         Label(String(localized: "settings.privacy.title"), systemImage: "hand.raised")
                     }
