@@ -242,7 +242,7 @@ struct VideoInfoView: View {
     }
     
     /// Maximum thumbnail width - full card width on iPhone, capped on iPad/macOS
-    private var thumbnailMaxWidth: CGFloat { 640 }
+    private var thumbnailMaxWidth: CGFloat { 500 }
 
     /// Explicit thumbnail width for a given card width. Sized explicitly (not via
     /// aspectRatio fit) because the carousel's LazyHStack proposes its ideal height
