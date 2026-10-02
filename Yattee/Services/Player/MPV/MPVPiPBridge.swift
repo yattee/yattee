@@ -1016,6 +1016,19 @@ extension MPVPiPBridge {
         LoggingService.shared.debug("MPVPiPBridge: Restored \(count) hidden PiP views", category: .mpv)
     }
 
+    /// AVSampleBufferDisplayLayer lays out its internal video container
+    /// sublayer only during a layout pass of its host window. Once PiP starts
+    /// our container view collapses to zero and that pass stops reaching the
+    /// layer, so the video in the PiP window kept the size it had when PiP
+    /// started while the window around it was resized. Lay it out ourselves.
+    private func syncSampleBufferSublayers() {
+        CATransaction.begin()
+        CATransaction.setDisableActions(true)
+        sampleBufferLayer.setNeedsLayout()
+        sampleBufferLayer.layoutIfNeeded()
+        CATransaction.commit()
+    }
+
     /// Update the sample buffer layer's frame to match the PiP window size.
     private func updateLayerFrameToMatchPiPWindow() {
         // Try to find the PiP window
@@ -1043,6 +1056,7 @@ extension MPVPiPBridge {
                 sampleBufferLayer.frame = newFrame
                 CATransaction.commit()
             }
+            syncSampleBufferSublayers()
         } else {
             // Fallback: try to match superlayer
             guard let superlayer = sampleBufferLayer.superlayer else { return }
