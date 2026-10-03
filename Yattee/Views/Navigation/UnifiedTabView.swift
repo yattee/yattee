@@ -9,276 +9,9 @@
 
 import SwiftUI
 
-// MARK: - iOS Implementation
+// MARK: - iOS Tab Bar Helpers
 
 #if os(iOS)
-struct UnifiedTabView: View {
-    @Environment(\.appEnvironment) private var appEnvironment
-    @Environment(\.horizontalSizeClass) private var horizontalSizeClass
-
-    let router: NavigationRouter
-
-    // Zoom transition namespace (local to this tab view)
-    @Namespace private var zoomTransition
-
-    private var shouldShowAccessory: Bool {
-        guard let state = appEnvironment?.playerService.state else { return false }
-        return state.currentVideo != nil
-    }
-
-    private var zoomTransitionsEnabled: Bool {
-        appEnvironment?.settingsManager.zoomTransitionsEnabled ?? true
-    }
-
-    private var yatteeServerAuthHeader: String? {
-        guard let server = appEnvironment?.instancesManager.enabledYatteeServerInstances.first else { return nil }
-        return appEnvironment?.basicAuthCredentialsManager.basicAuthHeader(for: server)
-    }
-
-    var body: some View {
-        @Bindable var router = router
-
-        TabView(selection: $router.selection) {
-            mainTabs
-            sidebarSections
-        }
-        .tabViewStyle(.sidebarAdaptable)
-        .tabViewSidebarBottomBar {
-            // Same chrome the macOS sidebar hangs below its list: the sidebar
-            // is the one surface every tab shares, so the switcher lives here
-            // rather than on each screen's toolbar.
-            if DataContextSwitcherVisibility.showsPickers(in: appEnvironment) {
-                // The bottom bar pins over the list without a background of its
-                // own, so sidebar rows scrolled to the end show through the
-                // switcher. A pill of its own keeps what's beneath it blurred.
-                DataContextSwitcherSidebarRow()
-                    .padding(.horizontal, 14)
-                    .padding(.vertical, 10)
-                    .sidebarBottomBarPill()
-                    .frame(maxWidth: .infinity)
-            }
-        }
-        .iOS26TabFeatures(shouldShowAccessory: shouldShowAccessory, settingsManager: appEnvironment?.settingsManager)
-        .zoomTransitionNamespace(zoomTransition)
-        .zoomTransitionsEnabled(zoomTransitionsEnabled)
-        .onAppear {
-            configureSidebarManager()
-            router.applyStartupTabIfNeeded(settingsManager?.effectiveStartupTabForSidebar() ?? .home)
-            ensureSelectionIsAvailable(visibleMainItems: visibleMainItems)
-        }
-        .onChange(of: router.selection) { _, _ in
-            ensureSelectionIsAvailable(visibleMainItems: visibleMainItems)
-        }
-    }
-
-    // MARK: - Visible Main Items
-
-    private var visibleMainItems: [SidebarMainItem] {
-        settingsManager?.visibleSidebarMainItems() ?? SidebarMainItem.defaultOrder
-    }
-
-    // MARK: - Tab Builders
-
-    @TabContentBuilder<SidebarItem>
-    private var mainTabs: some TabContent<SidebarItem> {
-        ForEach(visibleMainItems) { item in
-            mainTab(for: item)
-        }
-    }
-
-    @TabContentBuilder<SidebarItem>
-    private func mainTab(for item: SidebarMainItem) -> some TabContent<SidebarItem> {
-        switch item {
-        case .search:
-            Tab(value: SidebarItem.search, role: .search) {
-                NavigationStack(path: router.path(for: .search)) {
-                    SearchView(searchText: Bindable(router).searchText)
-                        .withNavigationDestinations()
-                }
-            } label: {
-                Label(SidebarItem.search.title, systemImage: SidebarItem.search.systemImage)
-            }
-
-        case .home:
-            Tab(value: SidebarItem.home) {
-                NavigationStack(path: router.path(for: .home)) {
-                    HomeView()
-                        .withNavigationDestinations()
-                }
-            } label: {
-                Label(SidebarItem.home.title, systemImage: SidebarItem.home.systemImage)
-            }
-
-        case .subscriptions:
-            Tab(value: SidebarItem.subscriptionsFeed) {
-                NavigationStack(path: router.path(for: .subscriptionsFeed)) {
-                    SubscriptionsView()
-                        .withNavigationDestinations()
-                }
-            } label: {
-                Label(SidebarItem.subscriptionsFeed.title, systemImage: SidebarItem.subscriptionsFeed.systemImage)
-            }
-
-        case .bookmarks:
-            Tab(value: SidebarItem.bookmarks) {
-                NavigationStack(path: router.path(for: .bookmarks)) {
-                    BookmarksListView()
-                        .withNavigationDestinations()
-                }
-            } label: {
-                Label(SidebarItem.bookmarks.title, systemImage: SidebarItem.bookmarks.systemImage)
-            }
-
-        case .history:
-            Tab(value: SidebarItem.history) {
-                NavigationStack(path: router.path(for: .history)) {
-                    HistoryListView()
-                        .withNavigationDestinations()
-                }
-            } label: {
-                Label(SidebarItem.history.title, systemImage: SidebarItem.history.systemImage)
-            }
-
-        case .downloads:
-            Tab(value: SidebarItem.downloads) {
-                NavigationStack(path: router.path(for: .downloads)) {
-                    DownloadsView()
-                        .withNavigationDestinations()
-                }
-            } label: {
-                Label(SidebarItem.downloads.title, systemImage: SidebarItem.downloads.systemImage)
-            }
-
-        case .channels:
-            Tab(value: SidebarItem.manageChannels) {
-                NavigationStack(path: router.path(for: .manageChannels)) {
-                    ManageChannelsView()
-                        .withNavigationDestinations()
-                }
-            } label: {
-                Label(SidebarItem.manageChannels.title, systemImage: SidebarItem.manageChannels.systemImage)
-            }
-
-        case .playlists:
-            Tab(value: SidebarItem.playlistsList) {
-                NavigationStack(path: router.path(for: .playlistsList)) {
-                    PlaylistsListView()
-                        .withNavigationDestinations()
-                }
-            } label: {
-                Label(SidebarItem.playlistsList.title, systemImage: SidebarItem.playlistsList.systemImage)
-            }
-
-        case .sources:
-            Tab(value: SidebarItem.sources) {
-                NavigationStack(path: router.path(for: .sources)) {
-                    MediaSourcesView()
-                        .withNavigationDestinations()
-                }
-            } label: {
-                Label(SidebarItem.sources.title, systemImage: SidebarItem.sources.systemImage)
-            }
-
-        case .settings:
-            Tab(value: SidebarItem.settings) {
-                NavigationStack(path: router.path(for: .settings)) {
-                    SettingsView(showCloseButton: false)
-                        .withNavigationDestinations()
-                }
-            } label: {
-                Label(SidebarItem.settings.title, systemImage: SidebarItem.settings.systemImage)
-            }
-
-        case .openURL:
-            Tab(value: SidebarItem.openURL) {
-                NavigationStack(path: router.path(for: .openURL)) {
-                    OpenLinkView()
-                        .withNavigationDestinations()
-                }
-            } label: {
-                Label(SidebarItem.openURL.title, systemImage: SidebarItem.openURL.systemImage)
-            }
-
-        case .remoteControl:
-            Tab(value: SidebarItem.remoteControl) {
-                NavigationStack(path: router.path(for: .remoteControl)) {
-                    RemoteControlContentView(navigationStyle: .link)
-                        .navigationTitle(String(localized: "remoteControl.title"))
-                        .withNavigationDestinations()
-                }
-            } label: {
-                Label(SidebarItem.remoteControl.title, systemImage: SidebarItem.remoteControl.systemImage)
-            }
-
-        case .continueWatching:
-            Tab(value: SidebarItem.continueWatching) {
-                NavigationStack(path: router.path(for: .continueWatching)) {
-                    ContinueWatchingView()
-                        .withNavigationDestinations()
-                }
-            } label: {
-                Label(SidebarItem.continueWatching.title, systemImage: SidebarItem.continueWatching.systemImage)
-            }
-        }
-    }
-
-    @TabContentBuilder<SidebarItem>
-    private var sidebarSections: some TabContent<SidebarItem> {
-        // Unified Sources Section (sidebar only - shows instances + media sources)
-        TabSection(String(localized: "sidebar.section.sources")) {
-            ForEach(sidebarManager.sortedSourceItems) { item in
-                Tab(value: item) {
-                    sourceContent(for: item)
-                } label: {
-                    Label(item.title, systemImage: item.systemImage)
-                }
-            }
-        }
-        .defaultVisibility(.hidden, for: .tabBar)
-        .hidden(
-            horizontalSizeClass == .compact ||
-            sidebarManager.hasNoSources ||
-            !(settingsManager?.sidebarSourcesEnabled ?? true)
-        )
-
-        // Channels Section (sidebar only - shows subscribed channels)
-        TabSection(String(localized: "sidebar.section.channels")) {
-            ForEach(sidebarManager.channelItems) { item in
-                Tab(value: item) {
-                    channelContent(for: item)
-                } label: {
-                    channelLabel(for: item)
-                }
-            }
-        }
-        .defaultVisibility(.hidden, for: .tabBar)
-        .hidden(
-            horizontalSizeClass == .compact ||
-            sidebarManager.channelItems.isEmpty ||
-            !(settingsManager?.sidebarChannelsEnabled ?? true)
-        )
-
-        // Playlists Section (sidebar only)
-        TabSection(String(localized: "sidebar.section.playlists")) {
-            ForEach(sidebarManager.playlistItems) { item in
-                Tab(value: item) {
-                    playlistContent(for: item)
-                } label: {
-                    playlistLabel(for: item)
-                }
-            }
-        }
-        .defaultVisibility(.hidden, for: .tabBar)
-        .hidden(
-            horizontalSizeClass == .compact ||
-            sidebarManager.playlistItems.isEmpty ||
-            !(settingsManager?.sidebarPlaylistsEnabled ?? true)
-        )
-    }
-
-    private var settingsManager: SettingsManager? { appEnvironment?.settingsManager }
-}
-
 private extension View {
     @ViewBuilder
     func sidebarBottomBarPill() -> some View {
@@ -322,15 +55,14 @@ extension MiniPlayerMinimizeBehavior {
     }
 }
 
-#Preview("Unified Tab View - iOS") {
-    UnifiedTabView(router: NavigationRouter())
-        .appEnvironment(.preview)
-}
 #endif
 
-// MARK: - macOS Implementation
+// MARK: - iOS and macOS Implementation
 
-#if os(macOS)
+#if os(iOS) || os(macOS)
+/// Sidebar layout for iPad, the iPhone Duo inner screen and macOS: a
+/// split view with a list sidebar. SwiftUI's sidebarAdaptable TabView never
+/// shows a sidebar on iPhone idiom, so the split view is used on iOS too.
 struct UnifiedTabView: View {
     @Environment(\.appEnvironment) private var appEnvironment
 
@@ -344,6 +76,12 @@ struct UnifiedTabView: View {
         return appEnvironment?.basicAuthCredentialsManager.basicAuthHeader(for: server)
     }
 
+    #if os(iOS)
+    private var zoomTransitionsEnabled: Bool {
+        appEnvironment?.settingsManager.zoomTransitionsEnabled ?? true
+    }
+    #endif
+
     var body: some View {
         NavigationSplitView {
             sidebar
@@ -351,6 +89,9 @@ struct UnifiedTabView: View {
             detailForSelection
         }
         .zoomTransitionNamespace(zoomTransition)
+        #if os(iOS)
+        .zoomTransitionsEnabled(zoomTransitionsEnabled)
+        #endif
         .onAppear {
             configureSidebarManager()
             router.applyStartupTabIfNeeded(settingsManager?.effectiveStartupTabForSidebar() ?? .home)
@@ -385,13 +126,29 @@ struct UnifiedTabView: View {
         }
         #else
         sidebarList
+            .safeAreaInset(edge: .bottom) {
+                if DataContextSwitcherVisibility.showsPickers(in: appEnvironment) {
+                    // The sidebar is the one surface every section shares, so
+                    // the switcher lives here rather than on each screen's toolbar.
+                    DataContextSwitcherSidebarRow()
+                        .padding(.horizontal, 14)
+                        .padding(.vertical, 10)
+                        .sidebarBottomBarPill()
+                        .padding(.horizontal, 12)
+                        .padding(.bottom, 8)
+                }
+            }
         #endif
     }
 
     private var sidebarList: some View {
-        @Bindable var router = router
+        // List selection is optional; deselecting keeps the current section.
+        let selection = Binding<SidebarItem?>(
+            get: { router.selection },
+            set: { if let item = $0 { router.selection = item } }
+        )
 
-        return List(selection: $router.selection) {
+        return List(selection: selection) {
             ForEach(visibleMainItems) { item in
                 sidebarRow(for: item)
             }
@@ -448,7 +205,7 @@ struct UnifiedTabView: View {
             }
         case .search:
             NavigationStack(path: router.path(for: .search)) {
-                SearchView().withNavigationDestinations()
+                SearchView(searchText: Bindable(router).searchText).withNavigationDestinations()
             }
         case .subscriptionsFeed:
             NavigationStack(path: router.path(for: .subscriptionsFeed)) {
@@ -480,7 +237,11 @@ struct UnifiedTabView: View {
             }
         case .settings:
             NavigationStack(path: router.path(for: .settings)) {
+                #if os(iOS)
+                SettingsView(showCloseButton: false).withNavigationDestinations()
+                #else
                 SettingsView().withNavigationDestinations()
+                #endif
             }
         case .openURL:
             NavigationStack(path: router.path(for: .openURL)) {
@@ -511,7 +272,7 @@ struct UnifiedTabView: View {
     private var settingsManager: SettingsManager? { appEnvironment?.settingsManager }
 }
 
-#Preview("Unified Tab View - macOS") {
+#Preview("Unified Tab View") {
     UnifiedTabView(router: NavigationRouter())
         .appEnvironment(.preview)
 }

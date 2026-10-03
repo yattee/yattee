@@ -78,6 +78,10 @@ private struct HapticsSection: View {
 // MARK: - Customization Section
 
 private struct CustomizationSection: View {
+    #if os(iOS)
+    @State private var hasHinge = HingeLayoutObserver.forceTabletop
+    #endif
+
     var body: some View {
         SettingsFormSection {
             #if os(tvOS)
@@ -100,8 +104,9 @@ private struct CustomizationSection: View {
                 TabBarSettingsView()
             }
 
-            // Sidebar settings only on iPad (not iPhone)
-            if UIDevice.current.userInterfaceIdiom == .pad {
+            // Sidebar settings where the sidebar layout can appear: iPad and
+            // foldable iPhones (inner screen)
+            if UIDevice.current.userInterfaceIdiom == .pad || hasHinge {
                 SettingsNavigationRow("settings.sidebar.title", systemImage: "sidebar.leading") {
                     SidebarSettingsView()
                 }
@@ -123,6 +128,9 @@ private struct CustomizationSection: View {
             }
             #endif
         }
+        #if os(iOS)
+        .observeHinge(hasHinge: $hasHinge)
+        #endif
     }
 }
 

@@ -174,6 +174,7 @@ struct ContentView: View {
 /// selection and every stack.
 struct AdaptiveTabView: View {
     @Environment(\.horizontalSizeClass) private var horizontalSizeClass
+    @Environment(\.verticalSizeClass) private var verticalSizeClass
 
     let appEnvironment: AppEnvironment
 
@@ -199,7 +200,7 @@ struct AdaptiveTabView: View {
 
     var body: some View {
         ZStack(alignment: .bottom) {
-            if horizontalSizeClass == .compact || UIDevice.current.userInterfaceIdiom == .phone {
+            if !usesSidebar {
                 CompactTabView(router: appEnvironment.navigationCoordinator.router)
                     .environment(appEnvironment.settingsManager)
             } else {
@@ -207,8 +208,9 @@ struct AdaptiveTabView: View {
                 .environment(appEnvironment.settingsManager)
             }
 
-            // iOS 26.1+ shows the mini player as the tab bar's bottom accessory
-            if !Self.usesTabBottomAccessory {
+            // The tab bar layout on iOS 26.1+ shows the mini player as the tab
+            // bar's bottom accessory; the split-view sidebar layout has no tab bar.
+            if usesSidebar || !Self.usesTabBottomAccessory {
                 miniPlayerOverlay
             }
 
@@ -263,6 +265,10 @@ struct AdaptiveTabView: View {
         }
     }
 
+    private var usesSidebar: Bool {
+        NavigationLayout.usesSidebar(horizontalSizeClass: horizontalSizeClass, verticalSizeClass: verticalSizeClass)
+    }
+
     private static var usesTabBottomAccessory: Bool {
         if #available(iOS 26.1, *) { true } else { false }
     }
@@ -279,9 +285,9 @@ struct AdaptiveTabView: View {
                 MiniPlayerView()
             }
             .padding(.horizontal, 16)
-            // Compact width has a bottom tab bar (49pt) to clear; regular width
-            // (sidebarAdaptable) keeps its tabs at the top, so only float above the edge.
-            .padding(.bottom, horizontalSizeClass == .compact ? 49 + 8 : 12)
+            // The tab bar layout has a bottom tab bar (49pt) to clear; the sidebar
+            // layout (sidebarAdaptable) keeps its tabs at the top, so only float above the edge.
+            .padding(.bottom, usesSidebar ? 12 : 49 + 8)
             // Use move-only transition (no opacity) to prevent thumbnail flash during collapse
             // The opacity transition caused video to appear faded during player sheet dismiss
             .transition(.move(edge: .bottom))

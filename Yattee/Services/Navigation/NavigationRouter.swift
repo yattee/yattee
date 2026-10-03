@@ -144,3 +144,22 @@ final class NavigationRouter {
         selection = host
     }
 }
+
+// MARK: - Layout Choice
+
+#if os(iOS)
+enum NavigationLayout {
+    /// Whether the sidebar layout fits: regular width and height (iPad, the
+    /// iPhone Duo inner screen in either orientation). A large iPhone in
+    /// landscape is regular width but compact height, so it keeps the tab
+    /// bar. An iPad keeps the sidebar for as long as its width is regular,
+    /// even in a short Stage Manager window.
+    static func usesSidebar(
+        horizontalSizeClass: UserInterfaceSizeClass?,
+        verticalSizeClass: UserInterfaceSizeClass?
+    ) -> Bool {
+        guard horizontalSizeClass == .regular else { return false }
+        return verticalSizeClass == .regular || UIDevice.current.userInterfaceIdiom == .pad
+    }
+}
+#endif

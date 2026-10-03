@@ -19,6 +19,7 @@ struct SubscriptionsView: View {
     #endif
     #if os(iOS)
     @Environment(\.horizontalSizeClass) private var horizontalSizeClass
+    @Environment(\.verticalSizeClass) private var verticalSizeClass
     #endif
     @State private var feedCache = SubscriptionFeedCache.shared
     @State private var subscriptions: [Subscription] = []
@@ -1138,8 +1139,10 @@ struct SubscriptionsView: View {
     private static let iPadSidebarMinWidth = 220.0
     private static let iPadSidebarMaxWidth = 420.0
 
+    /// Room for the channel sidebar next to the feed: wherever the app itself
+    /// uses the sidebar layout (iPad, iPhone Duo inner screen).
     private var isIPadRegular: Bool {
-        UIDevice.current.userInterfaceIdiom == .pad && horizontalSizeClass == .regular
+        NavigationLayout.usesSidebar(horizontalSizeClass: horizontalSizeClass, verticalSizeClass: verticalSizeClass)
     }
 
     private var clampedIPadSidebarWidth: CGFloat {
