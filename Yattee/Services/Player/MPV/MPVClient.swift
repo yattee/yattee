@@ -506,28 +506,20 @@ final class MPVClient: @unchecked Sendable {
 
         // Audio
         setOptionSync("audio-client-name", "Yattee")
-        #if os(tvOS)
-        // Prefer avfoundation (AVSampleBufferAudioRenderer): audiounit can't open
-        // 32-channel HDMI routes (Atmos "Continuous Audio Output") and stays silent.
-        // mpv falls back to audiounit if avfoundation fails to initialize.
+        // Prefer avfoundation (AVSampleBufferAudioRenderer) everywhere: it is the
+        // system media path, so it gets Spatial Audio / "Spatialize Stereo" and
+        // head tracking, which audiounit/coreaudio output never does.
+        // tvOS: audiounit also can't open 32-channel HDMI routes (Atmos
+        // "Continuous Audio Output") and stays silent.
+        // macOS: coreaudio fails to initialize on macOS 27 ("unable to set the
+        // input channel layout on the audio unit … -50"), and its failed init
+        // leaks a HAL hotplug listener that crashes (use-after-free) on the next
+        // audio device change — so coreaudio must stay second in the list.
+        // mpv falls back to the second AO if avfoundation fails to initialize.
+        #if os(macOS)
+        setOptionSync("ao", "avfoundation,coreaudio")
+        #else
         setOptionSync("ao", "avfoundation,audiounit")
-        #elseif os(iOS)
-        setOptionSync("ao", "audiounit")
-        #elseif os(macOS)
-        // coreaudio is the native macOS AO, but on macOS 27 beta it fails to
-        // initialize ("unable to set the input channel layout on the audio
-        // unit … -50"), leaving playback silent. Worse, mpv's coreaudio AO
-        // registers a HAL hotplug listener before the step that fails and its
-        // init-failure path never unregisters it, so every failed init leaves
-        // a dangling listener that crashes (use-after-free) on the next audio
-        // device change. On macOS 27+ put avfoundation first so the failing
-        // coreaudio init never runs; older macOS keeps native coreaudio with
-        // avfoundation as fallback.
-        if ProcessInfo.processInfo.operatingSystemVersion.majorVersion >= 27 {
-            setOptionSync("ao", "avfoundation,coreaudio")
-        } else {
-            setOptionSync("ao", "coreaudio,avfoundation")
-        }
         #endif
 
         // Cache settings for network streams

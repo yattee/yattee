@@ -120,16 +120,10 @@ private struct DefaultOptionsSection: View {
         options.append(("framedrop", "decoder+vo"))
         options.append(("audio-client-name", "Yattee"))
 
-        #if os(tvOS)
-        options.append(("ao", "avfoundation,audiounit"))
-        #elseif os(iOS)
-        options.append(("ao", "audiounit"))
+        #if os(macOS)
+        options.append(("ao", "avfoundation,coreaudio"))
         #else
-        if ProcessInfo.processInfo.operatingSystemVersion.majorVersion >= 27 {
-            options.append(("ao", "avfoundation,coreaudio"))
-        } else {
-            options.append(("ao", "coreaudio,avfoundation"))
-        }
+        options.append(("ao", "avfoundation,audiounit"))
         #endif
 
         options.append(("cache", "yes"))
