@@ -105,6 +105,7 @@ final class DownloadManager: NSObject {
     override init() {
         super.init()
         loadDownloads()
+        excludeExistingDownloadsFromBackupIfNeeded()
         // Note: Session setup and resumeInterruptedDownloads are deferred to setDownloadSettings()
         // to ensure we have the correct cellular access setting before creating the session.
     }
@@ -1058,8 +1059,54 @@ final class DownloadManager: NSObject {
         if !fileManager.fileExists(atPath: downloadsURL.path) {
             try? fileManager.createDirectory(at: downloadsURL, withIntermediateDirectories: true)
         }
+        // Downloaded media is re-downloadable and can be large; keep it out of iCloud/device backups.
+        // Excluding the directory excludes everything inside it. Applied on every launch so
+        // directories created by earlier versions get the flag too.
+        var excludedURL = downloadsURL
+        var values = URLResourceValues()
+        values.isExcludedFromBackup = true
+        try? excludedURL.setResourceValues(values)
         Self._cachedDownloadsDirectory = downloadsURL
         return downloadsURL
+    }
+
+    private static let backupExclusionMigrationKey = "downloadsBackupExclusionMigrated"
+
+    /// One-time migration: flags every file already in the downloads directory as excluded
+    /// from iCloud/device backups. Downloads made by earlier versions were backed up.
+    private func excludeExistingDownloadsFromBackupIfNeeded() {
+        guard !UserDefaults.standard.bool(forKey: Self.backupExclusionMigrationKey) else { return }
+        let directory = downloadsDirectory()
+
+        Task.detached(priority: .utility) {
+            let fm = FileManager.default
+            var flagged = 0
+            var failed = 0
+            if let enumerator = fm.enumerator(at: directory, includingPropertiesForKeys: [.isExcludedFromBackupKey]) {
+                for case var url as URL in enumerator {
+                    if (try? url.resourceValues(forKeys: [.isExcludedFromBackupKey]))?.isExcludedFromBackup == true {
+                        continue
+                    }
+                    var values = URLResourceValues()
+                    values.isExcludedFromBackup = true
+                    do {
+                        try url.setResourceValues(values)
+                        flagged += 1
+                    } catch {
+                        failed += 1
+                    }
+                }
+            }
+
+            LoggingService.shared.logDownload(
+                "[Downloads] Backup exclusion migration",
+                details: "flagged: \(flagged), failed: \(failed)"
+            )
+            // Retry on next launch if anything failed.
+            if failed == 0 {
+                UserDefaults.standard.set(true, forKey: DownloadManager.backupExclusionMigrationKey)
+            }
+        }
     }
 
     // MARK: - Media Source Download Helpers

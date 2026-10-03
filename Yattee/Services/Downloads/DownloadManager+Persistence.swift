@@ -92,6 +92,8 @@ extension DownloadManager {
                 LoggingService.shared.logDownload(
                     "[DOWNLOADS DIAGNOSTIC] ✅ Loaded active downloads: \(activeDownloads.count)"
                 )
+
+                resetActiveDownloadPhasesWithMissingFiles()
             } catch let decodingError as DecodingError {
                 let diagnostics = diagnoseDecodingError(decodingError, dataSize: activeData.count)
                 LoggingService.shared.logDownloadError(
@@ -193,6 +195,84 @@ extension DownloadManager {
                 progress: download.progress,
                 isIndeterminate: download.hasIndeterminateProgress
             )
+        }
+    }
+
+    /// Resets already-finished parts of active downloads whose files are gone from disk,
+    /// so they are downloaded again instead of completing with a missing file. Happens after
+    /// restoring a backup: download records live in UserDefaults (backed up) while the files
+    /// are excluded from backup.
+    func resetActiveDownloadPhasesWithMissingFiles() {
+        let directory = downloadsDirectory()
+        func isMissing(_ path: String?) -> Bool {
+            guard let path else { return false }
+            return !fileManager.fileExists(atPath: directory.appendingPathComponent(path).path)
+        }
+
+        var resetCount = 0
+        for index in activeDownloads.indices {
+            var download = activeDownloads[index]
+            var resetPhases: [String] = []
+
+            if isMissing(download.localVideoPath) {
+                download.localVideoPath = nil
+                download.videoProgress = 0
+                download.resumeData = nil
+                resetPhases.append("video")
+            }
+            if isMissing(download.localAudioPath) {
+                download.localAudioPath = nil
+                download.audioProgress = 0
+                download.audioResumeData = nil
+                resetPhases.append("audio")
+            }
+            if isMissing(download.localCaptionPath) {
+                download.localCaptionPath = nil
+                download.captionProgress = 0
+                resetPhases.append("caption")
+            }
+            if isMissing(download.localStoryboardPath) {
+                download.localStoryboardPath = nil
+                download.storyboardProgress = 0
+                resetPhases.append("storyboard")
+            }
+            // Thumbnails are best-effort: drop dangling paths without re-running any phase.
+            var clearedThumbnails = false
+            if isMissing(download.localThumbnailPath) {
+                download.localThumbnailPath = nil
+                clearedThumbnails = true
+            }
+            if isMissing(download.localChannelThumbnailPath) {
+                download.localChannelThumbnailPath = nil
+                clearedThumbnails = true
+            }
+
+            guard !resetPhases.isEmpty else {
+                if clearedThumbnails {
+                    activeDownloads[index] = download
+                    resetCount += 1
+                }
+                continue
+            }
+
+            // Leave the thumbnail/complete phase so checkAndCompleteDownload runs the
+            // remaining phases again instead of waiting on a thumbnail callback.
+            if download.downloadPhase == .thumbnail || download.downloadPhase == .complete {
+                download.downloadPhase = .video
+            }
+            download.retryCount = 0
+            activeDownloads[index] = download
+            recalculateOverallProgress(for: index)
+            resetCount += 1
+
+            LoggingService.shared.warning(
+                "[Downloads] Reset missing files for active download \(download.videoID): \(resetPhases.joined(separator: ", "))",
+                category: .downloads
+            )
+        }
+
+        if resetCount > 0 {
+            saveDownloadsImmediately()
         }
     }
 
