@@ -51,9 +51,6 @@ struct YatteeApp: App {
     @State private var showingICloudProgress = false
     @State private var showingLegacyAccountsAlert = false
     @State private var showingLegacyAccountsImport = false
-    #if os(iOS)
-    @State private var showingSettings = false
-    #endif
     @State private var showingOpenLinkSheet = false
 
     // Ambiguous-link prompts are stored on NavigationCoordinator so they can
@@ -221,21 +218,10 @@ struct YatteeApp: App {
                     #endif
                 }
                 #endif
-                #if os(iOS)
-                .sheet(isPresented: $showingSettings) {
-                    SettingsView()
-                        .appEnvironment(appEnvironment)
-                }
-                #endif
                 #if !os(tvOS)
                 .sheet(isPresented: $showingOpenLinkSheet) {
                     OpenLinkSheet()
                         .appEnvironment(appEnvironment)
-                }
-                #endif
-                #if os(iOS)
-                .onReceive(NotificationCenter.default.publisher(for: .showSettings)) { _ in
-                    showingSettings = true
                 }
                 #endif
                 .onReceive(NotificationCenter.default.publisher(for: .showOpenLinkSheet)) { _ in

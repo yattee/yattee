@@ -8,7 +8,6 @@
 import Foundation
 
 extension Notification.Name {
-    static let showSettings = Notification.Name("showSettings")
     static let showOpenLinkSheet = Notification.Name("showOpenLinkSheet")
     static let openDescriptionLink = Notification.Name("openDescriptionLink")
     /// Posted when a URL shortener (bit.ly, etc.) has been resolved to an

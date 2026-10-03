@@ -256,10 +256,10 @@ struct iOS18AdaptiveTabView: View {
                 ExpandedPlayerWindowManager.shared.hide()
             }
         }
-        .onChange(of: appEnvironment.navigationCoordinator.isMiniPlayerQueueSheetPresented) { _, newValue in
+        .onChange(of: appEnvironment.navigationCoordinator.isMiniPlayerQueueSheetPresented, initial: true) { _, newValue in
             showingMiniPlayerQueueSheet = newValue
         }
-        .onChange(of: appEnvironment.navigationCoordinator.isMiniPlayerPlaylistSheetPresented) { _, newValue in
+        .onChange(of: appEnvironment.navigationCoordinator.isMiniPlayerPlaylistSheetPresented, initial: true) { _, newValue in
             showingMiniPlayerPlaylistSheet = newValue
         }
         .sheet(isPresented: $showingMiniPlayerQueueSheet, onDismiss: {
@@ -386,10 +386,10 @@ struct iOS26AdaptiveTabView: View {
                 ExpandedPlayerWindowManager.shared.hide()
             }
         }
-        .onChange(of: appEnvironment.navigationCoordinator.isMiniPlayerQueueSheetPresented) { _, newValue in
+        .onChange(of: appEnvironment.navigationCoordinator.isMiniPlayerQueueSheetPresented, initial: true) { _, newValue in
             showingMiniPlayerQueueSheet = newValue
         }
-        .onChange(of: appEnvironment.navigationCoordinator.isMiniPlayerPlaylistSheetPresented) { _, newValue in
+        .onChange(of: appEnvironment.navigationCoordinator.isMiniPlayerPlaylistSheetPresented, initial: true) { _, newValue in
             showingMiniPlayerPlaylistSheet = newValue
         }
         .sheet(isPresented: $showingMiniPlayerQueueSheet, onDismiss: {
