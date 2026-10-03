@@ -40,8 +40,7 @@ struct FloatingDetailsPanel: View {
     @State private var scrollOffset: CGFloat = 0
     @State private var panelHeight: CGFloat = 0
     @State private var scrollToTopTrigger: Bool = false
-    @State private var showQueueSheet: Bool = false
-    @State private var showPlaylistSheet: Bool = false
+    @Environment(\.presentAppSheet) private var presentAppSheet
     @State private var isDragHandleActive: Bool = false
 
     private var settingsManager: SettingsManager? { appEnvironment?.settingsManager }
@@ -172,14 +171,6 @@ struct FloatingDetailsPanel: View {
         .onChange(of: availableWidth) { _, _ in
             // Re-clamp width when available width changes (e.g., rotation)
             panelWidth = clampWidth(panelWidth)
-        }
-        .sheet(isPresented: $showQueueSheet) {
-            QueueManagementSheet()
-        }
-        .sheet(isPresented: $showPlaylistSheet) {
-            if let currentVideo = playerState?.currentVideo {
-                PlaylistSelectorSheet(video: currentVideo)
-            }
         }
     }
 
@@ -379,8 +370,7 @@ struct FloatingDetailsPanel: View {
                 }(),
                 video: video,
                 playbackRate: playerState?.rate ?? .x1,
-                showingPlaylistSheet: $showPlaylistSheet,
-                onQueueTap: { showQueueSheet = true },
+                onQueueTap: { presentAppSheet(.queue()) },
                 onPrevious: { Task { await playerService?.playPrevious() } },
                 onPlayPause: { playerService?.togglePlayPause() },
                 onNext: { Task { await playerService?.playNext() } },

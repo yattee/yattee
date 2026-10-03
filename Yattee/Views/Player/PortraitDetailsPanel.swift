@@ -42,8 +42,7 @@ struct PortraitDetailsPanel: View {
     @State private var selectedPage: PanelPageType = .info
     @State private var scrollOffset: CGFloat = 0
     @State private var scrollToTopTrigger: Bool = false
-    @State private var showQueueSheet: Bool = false
-    @State private var showPlaylistSheet: Bool = false
+    @Environment(\.presentAppSheet) private var presentAppSheet
 
     private var settingsManager: SettingsManager? { appEnvironment?.settingsManager }
     private var accentColor: Color { settingsManager?.resolvedAccentColor ?? .accentColor }
@@ -261,14 +260,6 @@ struct PortraitDetailsPanel: View {
             .onChange(of: isCommentsExpanded) { _, newValue in
                 appEnvironment?.navigationCoordinator.isCommentsExpanded = newValue
             }
-            .sheet(isPresented: $showQueueSheet) {
-                QueueManagementSheet()
-            }
-            .sheet(isPresented: $showPlaylistSheet) {
-                if let currentVideo = playerState?.currentVideo {
-                    PlaylistSelectorSheet(video: currentVideo)
-                }
-            }
         }
     }
 
@@ -431,8 +422,7 @@ struct PortraitDetailsPanel: View {
                     isOrientationLocked: appEnvironment?.settingsManager.inAppOrientationLock ?? false,
                     video: video,
                     playbackRate: playerState?.rate ?? .x1,
-                    showingPlaylistSheet: $showPlaylistSheet,
-                    onQueueTap: { showQueueSheet = true },
+                    onQueueTap: { presentAppSheet(.queue()) },
                     onPrevious: { Task { await playerService?.playPrevious() } },
                     onPlayPause: { playerService?.togglePlayPause() },
                     onNext: { Task { await playerService?.playNext() } },

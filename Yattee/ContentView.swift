@@ -24,6 +24,9 @@ struct ContentView: View {
                 ProgressView(String(localized: "common.loading"))
             }
         }
+        // Shared sheets for the main window. The expanded player hosts its own,
+        // and takes global requests while it is up.
+        .appSheetHost(isTopLevel: appEnvironment?.navigationCoordinator.isPlayerExpanded != true)
         .toastOverlay()
     }
 
@@ -101,20 +104,6 @@ struct ContentView: View {
                   appEnvironment.settingsManager.macPlayerSeparateWindow else { return }
             ExpandedPlayerWindowManager.shared.updateWindowLevel(floating: floating)
         }
-        .sheet(isPresented: Binding(
-            get: { appEnvironment.navigationCoordinator.isMiniPlayerQueueSheetPresented },
-            set: { appEnvironment.navigationCoordinator.isMiniPlayerQueueSheetPresented = $0 }
-        )) {
-            QueueManagementSheet()
-        }
-        .sheet(isPresented: Binding(
-            get: { appEnvironment.navigationCoordinator.isMiniPlayerPlaylistSheetPresented },
-            set: { appEnvironment.navigationCoordinator.isMiniPlayerPlaylistSheetPresented = $0 }
-        )) {
-            if let video = appEnvironment.playerService.state.currentVideo {
-                PlaylistSelectorSheet(video: video)
-            }
-        }
         #elseif os(tvOS)
         .fullScreenCover(isPresented: Binding(
             get: { appEnvironment.navigationCoordinator.isPlayerExpanded },
@@ -178,8 +167,6 @@ struct AdaptiveTabView: View {
 
     let appEnvironment: AppEnvironment
 
-    @State private var showingMiniPlayerQueueSheet = false
-    @State private var showingMiniPlayerPlaylistSheet = false
 
     /// Whether to show the black overlay that covers scaled content when player is expanded
     private var shouldShowExpandedOverlay: Bool {
@@ -241,26 +228,6 @@ struct AdaptiveTabView: View {
         .onChange(of: appEnvironment.navigationCoordinator.isPlayerExpanded) { _, isExpanded in
             if !isExpanded {
                 ExpandedPlayerWindowManager.shared.hide()
-            }
-        }
-        .onChange(of: appEnvironment.navigationCoordinator.isMiniPlayerQueueSheetPresented, initial: true) { _, newValue in
-            showingMiniPlayerQueueSheet = newValue
-        }
-        .onChange(of: appEnvironment.navigationCoordinator.isMiniPlayerPlaylistSheetPresented, initial: true) { _, newValue in
-            showingMiniPlayerPlaylistSheet = newValue
-        }
-        .sheet(isPresented: $showingMiniPlayerQueueSheet, onDismiss: {
-            appEnvironment.navigationCoordinator.isMiniPlayerQueueSheetPresented = false
-        }) {
-            QueueManagementSheet()
-                .presentationDetents([.medium, .large])
-        }
-        .sheet(isPresented: $showingMiniPlayerPlaylistSheet, onDismiss: {
-            appEnvironment.navigationCoordinator.isMiniPlayerPlaylistSheetPresented = false
-        }) {
-            if let video = appEnvironment.playerService.state.currentVideo {
-                PlaylistSelectorSheet(video: video)
-                    .presentationDetents([.medium, .large])
             }
         }
     }

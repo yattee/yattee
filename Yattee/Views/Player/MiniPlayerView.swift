@@ -11,6 +11,7 @@ import NukeUI
 #if os(iOS) || os(macOS)
 struct MiniPlayerView: View {
     @Environment(\.appEnvironment) private var appEnvironment
+    @Environment(\.presentAppSheet) private var presentAppSheet
 
     /// Whether this is displayed as a tab bottom accessory (affects styling)
     var isTabAccessory: Bool = false
@@ -509,7 +510,7 @@ struct MiniPlayerView: View {
     private func queueButton(config: ControlButtonConfiguration) -> some View {
         Button {
             incrementTapCount(for: config)
-            navigationCoordinator?.isMiniPlayerQueueSheetPresented = true
+            presentAppSheet(.queue(halfHeight: true))
         } label: {
             ZStack(alignment: .bottom) {
                 Image(systemName: "list.bullet")
@@ -550,7 +551,9 @@ struct MiniPlayerView: View {
     private func addToPlaylistButton(config: ControlButtonConfiguration) -> some View {
         Button {
             incrementTapCount(for: config)
-            navigationCoordinator?.isMiniPlayerPlaylistSheetPresented = true
+            if let video = appEnvironment?.playerService.state.currentVideo {
+                presentAppSheet(.addToPlaylist(video, halfHeight: true))
+            }
         } label: {
             Image(systemName: "text.badge.plus")
                 .font(isTabAccessory ? .title3 : .title2)

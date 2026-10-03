@@ -121,7 +121,7 @@ extension ExpandedPlayerSheet {
     /// Starts a download either automatically or by showing the quality sheet.
     private func startDownload(for video: Video) {
         guard let appEnvironment else {
-            showingDownloadSheet = true
+            presentDownloadOptions()
             return
         }
 
@@ -175,7 +175,7 @@ extension ExpandedPlayerSheet {
                 }
             }
         } else {
-            showingDownloadSheet = true
+            presentDownloadOptions()
         }
     }
     #else
@@ -984,7 +984,7 @@ extension ExpandedPlayerSheet {
                         await playerService.playPrevious()
                     },
                     onShowQueue: { [self] in
-                        showingQueueSheet = true
+                        presentSheet(.queue())
                     },
                     onVolumeChanged: { [weak appEnvironment] volume in
                         playerService.currentBackend?.volume = volume
@@ -1084,10 +1084,10 @@ extension ExpandedPlayerSheet {
                         showingQualitySheet = true
                     },
                     onShowQueue: { [self] in
-                        showingQueueSheet = true
+                        presentSheet(.queue())
                     },
                     onShowPlaylistSelector: { [self] in
-                        showingPlaylistSheet = true
+                        presentAddToPlaylist()
                     },
                     onRateChanged: { rate in
                         playerState.rate = rate
@@ -1268,7 +1268,7 @@ extension ExpandedPlayerSheet {
                     await playerService.playPrevious()
                 },
                 onShowQueue: { [self] in
-                    showingQueueSheet = true
+                    presentSheet(.queue())
                 },
                 forceInitialHidden: forceHidden,
                 videoAreaTop: videoAreaTop,
@@ -1373,10 +1373,10 @@ extension ExpandedPlayerSheet {
                     showingQualitySheet = true
                 },
                 onShowQueue: { [self] in
-                    showingQueueSheet = true
+                    presentSheet(.queue())
                 },
                 onShowPlaylistSelector: { [self] in
-                    showingPlaylistSheet = true
+                    presentAddToPlaylist()
                 },
                 onRateChanged: { rate in
                     playerState.rate = rate
@@ -1704,7 +1704,7 @@ extension ExpandedPlayerSheet {
                         await playerService.playPrevious()
                     },
                     onShowQueue: { [self] in
-                        showingQueueSheet = true
+                        presentSheet(.queue())
                     },
                     videoAreaTop: (availableHeight - videoHeight) / 2,
                     videoAreaHeight: videoHeight,
@@ -1855,10 +1855,10 @@ extension ExpandedPlayerSheet {
                         showingQualitySheet = true
                     },
                     onShowQueue: { [self] in
-                        showingQueueSheet = true
+                        presentSheet(.queue())
                     },
                     onShowPlaylistSelector: { [self] in
-                        showingPlaylistSheet = true
+                        presentAddToPlaylist()
                     },
                     onTitleTap: {
                         onTogglePanel()

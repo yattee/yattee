@@ -18,10 +18,7 @@ struct ExpandedPlayerSheet: View {
     // MARK: - Sheet State
 
     @State var showingQualitySheet = false
-    @State var showingPlaylistSheet = false
-    @State var showingDownloadSheet = false
     @State var showingDeleteDownloadAlert = false
-    @State var showingQueueSheet = false
     @State var showingErrorSheet = false
     @State var isCommentsExpanded: Bool = false
     @State var commentsDismissOffset: CGFloat = 0
@@ -178,14 +175,38 @@ struct ExpandedPlayerSheet: View {
         )
     }
 
+    // MARK: - Shared Sheets
+
+    /// Presents through the player's sheet host. The host sits inside this
+    /// view's body, so this view's own environment can't reach it; the global
+    /// request does, because the player host takes requests while it is up.
+    func presentSheet(_ sheet: AppSheet) {
+        appEnvironment?.navigationCoordinator.presenter.present(sheet)
+    }
+
+    func presentAddToPlaylist() {
+        guard let video = playerState?.currentVideo else { return }
+        presentSheet(.addToPlaylist(video))
+    }
+
+    #if !os(tvOS)
+    func presentDownloadOptions() {
+        guard let video = playerState?.currentVideo, let playerService = appEnvironment?.playerService else { return }
+        presentSheet(.downloadOptions(
+            video,
+            streams: playerService.availableStreams,
+            captions: playerService.availableCaptions,
+            dislikeCount: playerState?.dislikeCount
+        ))
+    }
+    #endif
+
     // MARK: - Body
 
     var body: some View {
         playerContentWithOverlays
             .applyPlayerSheets(
                 showingQualitySheet: $showingQualitySheet,
-                showingPlaylistSheet: $showingPlaylistSheet,
-                showingDownloadSheet: $showingDownloadSheet,
                 showingDeleteDownloadAlert: $showingDeleteDownloadAlert,
                 onStreamSelected: { stream, audioStream in
                     switchToStream(stream, audioStream: audioStream)
@@ -469,9 +490,6 @@ struct ExpandedPlayerSheet: View {
             }
         }
         .animation(.spring(response: 0.3, dampingFraction: 0.7), value: commentsState == .loaded && !comments.isEmpty)
-        .sheet(isPresented: $showingQueueSheet) {
-            QueueManagementSheet()
-        }
         .sheet(isPresented: $showingErrorSheet) {
             ErrorDetailsSheet(errorMessage: playerState?.errorMessage ?? "Unknown error")
         }
@@ -495,6 +513,9 @@ struct ExpandedPlayerSheet: View {
             shouldHost: (appEnvironment?.navigationCoordinator.isPlayerExpanded == true),
             appEnvironment: appEnvironment
         )
+        // Shared sheets opened from the player, and global requests while it
+        // is up, so they appear above the player window.
+        .appSheetHost(isTopLevel: appEnvironment?.navigationCoordinator.isPlayerExpanded == true)
         #if os(iOS)
         .toolbar(.hidden, for: .navigationBar)
         // Corner layout with panels visible keeps the system status bar and
@@ -516,15 +537,11 @@ private extension View {
     @ViewBuilder
     func applyPlayerSheets(
         showingQualitySheet: Binding<Bool>,
-        showingPlaylistSheet: Binding<Bool>,
-        showingDownloadSheet: Binding<Bool>,
         showingDeleteDownloadAlert: Binding<Bool>,
         onStreamSelected: @escaping (Stream, Stream?) -> Void
     ) -> some View {
         modifier(PlayerSheetsModifier(
             showingQualitySheet: showingQualitySheet,
-            showingPlaylistSheet: showingPlaylistSheet,
-            showingDownloadSheet: showingDownloadSheet,
             showingDeleteDownloadAlert: showingDeleteDownloadAlert,
             onStreamSelected: onStreamSelected
         ))
@@ -535,8 +552,6 @@ private extension View {
 private struct PlayerSheetsModifier: ViewModifier {
     @Environment(\.appEnvironment) var appEnvironment
     @Binding var showingQualitySheet: Bool
-    @Binding var showingPlaylistSheet: Bool
-    @Binding var showingDownloadSheet: Bool
     @Binding var showingDeleteDownloadAlert: Bool
     let onStreamSelected: (Stream, Stream?) -> Void
 
@@ -549,15 +564,7 @@ private struct PlayerSheetsModifier: ViewModifier {
             .sheet(isPresented: $showingQualitySheet) {
                 qualitySelectorSheet
             }
-            .sheet(isPresented: $showingPlaylistSheet) {
-                if let video = playerState?.currentVideo {
-                    PlaylistSelectorSheet(video: video)
-                }
-            }
             #if !os(tvOS)
-            .sheet(isPresented: $showingDownloadSheet) {
-                downloadSheet
-            }
             .alert(
                 String(localized: "player.deleteDownload.title"),
                 isPresented: $showingDeleteDownloadAlert
@@ -648,19 +655,6 @@ private struct PlayerSheetsModifier: ViewModifier {
         }
     }
 
-    #if !os(tvOS)
-    @ViewBuilder
-    private var downloadSheet: some View {
-        if let video = playerState?.currentVideo, let playerService {
-            DownloadQualitySheet(
-                video: video,
-                streams: playerService.availableStreams,
-                captions: playerService.availableCaptions,
-                dislikeCount: playerState?.dislikeCount
-            )
-        }
-    }
-    #endif
 }
 
 // MARK: - Player Event Handlers Modifier

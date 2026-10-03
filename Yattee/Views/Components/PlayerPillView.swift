@@ -31,7 +31,6 @@ struct PlayerPillView: View {
     // Video context for special buttons
     let video: Video?
     let playbackRate: PlaybackRate
-    @Binding var showingPlaylistSheet: Bool
 
     // Action callbacks
     let onQueueTap: () -> Void
@@ -62,7 +61,6 @@ struct PlayerPillView: View {
         isOrientationLocked: Bool = false,
         video: Video? = nil,
         playbackRate: PlaybackRate = .x1,
-        showingPlaylistSheet: Binding<Bool> = .constant(false),
         onQueueTap: @escaping () -> Void = {},
         onPrevious: @escaping () -> Void = {},
         onPlayPause: @escaping () -> Void = {},
@@ -86,7 +84,6 @@ struct PlayerPillView: View {
         self.isOrientationLocked = isOrientationLocked
         self.video = video
         self.playbackRate = playbackRate
-        self._showingPlaylistSheet = showingPlaylistSheet
         self.onQueueTap = onQueueTap
         self.onPrevious = onPrevious
         self.onPlayPause = onPlayPause
@@ -142,7 +139,6 @@ struct PlayerPillView: View {
                         isOrientationLocked: isOrientationLocked,
                         video: video,
                         playbackRate: playbackRate,
-                        showingPlaylistSheet: $showingPlaylistSheet,
                         onAction: { handleAction(for: config) },
                         onRateChanged: onRateChanged,
                         onTogglePiP: onPiP

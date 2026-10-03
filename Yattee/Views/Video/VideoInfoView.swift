@@ -19,6 +19,7 @@ enum VideoInfoInitMode: Sendable {
 
 struct VideoInfoView: View {
     @Environment(\.appEnvironment) private var appEnvironment
+    @Environment(\.presentAppSheet) private var presentAppSheet
     @Environment(\.videoQueueContext) private var videoQueueContext
 
     private let initMode: VideoInfoInitMode
@@ -45,7 +46,6 @@ struct VideoInfoView: View {
     
     @State private var isBookmarked = false
     @State private var showingErrorDetailsSheet = false
-    @State private var showingPlaylistSheet = false
     @State private var showingCommentsSheet = false
     @State private var showingRemoveBookmarkAlert = false
     @State private var currentBookmark: Bookmark?
@@ -102,7 +102,6 @@ struct VideoInfoView: View {
 
     // Download state
     @State private var download: Download?
-    @State private var showingDownloadSheet = false
     @State private var isEnqueuingDownload = false
     @State private var showingRemoveDownloadConfirmation = false
     
@@ -394,8 +393,6 @@ struct VideoInfoView: View {
 
             // Reset state when navigating to different video
             showingCommentsSheet = false
-            showingPlaylistSheet = false
-            showingDownloadSheet = false
             showingRemoveBookmarkAlert = false
             bookmarkSaveTask?.cancel()
             comments = []
@@ -441,11 +438,6 @@ struct VideoInfoView: View {
                 await loadVideoDetails()
             }
         }
-        .sheet(isPresented: $showingPlaylistSheet) {
-            if let video = displayedVideo {
-                PlaylistSelectorSheet(video: video)
-            }
-        }
         #if !os(tvOS)
         .sheet(isPresented: $showingErrorDetailsSheet) {
             ErrorDetailsSheet(errorMessage: videoDetailsLoadError ?? initialVideoLoadError ?? "Unknown error")
@@ -469,11 +461,6 @@ struct VideoInfoView: View {
             )
         }
         #if !os(tvOS)
-        .sheet(isPresented: $showingDownloadSheet) {
-            if let video = displayedVideo {
-                DownloadQualitySheet(video: video)
-            }
-        }
         .onChange(of: downloadManager?.completedDownloads) { _, newValue in
             // Update download state when completedDownloads changes
             if let video = displayedVideo {
@@ -726,7 +713,7 @@ struct VideoInfoView: View {
                 .focused($isPlayFocused)
 
                 Button {
-                    showingPlaylistSheet = true
+                    presentAddToPlaylist()
                 } label: {
                     Label(String(localized: "video.context.addToPlaylist"), systemImage: "text.badge.plus")
                         .frame(maxWidth: .infinity, minHeight: 50)
@@ -1326,7 +1313,7 @@ struct VideoInfoView: View {
             // Add to Playlist and Bookmark
             HStack(spacing: 12) {
                 Button {
-                    showingPlaylistSheet = true
+                    presentAddToPlaylist()
                 } label: {
                     Label(String(localized: "video.context.addToPlaylist"), systemImage: "text.badge.plus")
                         .frame(maxWidth: .infinity)
@@ -1409,7 +1396,7 @@ struct VideoInfoView: View {
             }
         case .addToPlaylist:
             Button {
-                showingPlaylistSheet = true
+                presentAddToPlaylist()
             } label: {
                 Label(String(localized: "video.context.addToPlaylist"), systemImage: "text.badge.plus")
             }
@@ -1565,7 +1552,7 @@ struct VideoInfoView: View {
     /// Starts a download either automatically or by showing the quality sheet.
     private func startDownload(for video: Video) {
         guard let appEnvironment else {
-            showingDownloadSheet = true
+            presentAppSheet(.downloadOptions(video))
             return
         }
 
@@ -1627,7 +1614,7 @@ struct VideoInfoView: View {
                 }
             }
         } else {
-            showingDownloadSheet = true
+            presentAppSheet(.downloadOptions(video))
         }
     }
 
@@ -2263,6 +2250,11 @@ struct VideoInfoView: View {
     }
 
     // MARK: - Actions
+
+    private func presentAddToPlaylist() {
+        guard let video = displayedVideo else { return }
+        presentAppSheet(.addToPlaylist(video))
+    }
 
     private func toggleBookmark() {
         guard let dataManager, let video = displayedVideo else { return }

@@ -166,7 +166,6 @@ struct QueueManagementSheet: View {
         tvOSQueueListView
         #else
         QueueListView(onPlay: {
-            navigationCoordinator?.isMiniPlayerQueueSheetPresented = false
             performDismiss()
         })
         #endif
@@ -177,7 +176,6 @@ struct QueueManagementSheet: View {
         TVQueueListView(
             autoFocusOnAppear: true,
             onDidSelectVideo: {
-                navigationCoordinator?.isMiniPlayerQueueSheetPresented = false
                 performDismiss()
             }
         )

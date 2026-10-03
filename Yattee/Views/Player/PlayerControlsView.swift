@@ -120,7 +120,6 @@ struct PlayerControlsView: View {
 
     // MARK: - Sheet State
 
-    @State private var showingPlaylistSheet = false
     @State private var showingCaptionsSheet = false
     @State private var showingVideoTrackSheet = false
     @State private var showingAudioTrackSheet = false
@@ -305,11 +304,6 @@ struct PlayerControlsView: View {
         .onReceive(NotificationCenter.default.publisher(for: UIScreen.brightnessDidChangeNotification)) { _ in
             currentBrightness = UIScreen.main.brightness
         }
-        .sheet(isPresented: $showingPlaylistSheet) {
-            if let video = currentVideo {
-                PlaylistSelectorSheet(video: video)
-            }
-        }
         .sheet(isPresented: $showingCaptionsSheet) {
             captionsSheet
         }
@@ -491,7 +485,12 @@ struct PlayerControlsView: View {
             },
             onRateChanged: onRateChanged,
             onCaptionSelected: onCaptionSelected,
-            onShowPlaylistSelector: { [self] in showingPlaylistSheet = true },
+            onShowPlaylistSelector: { [self] in
+                // Through the player's sheet host, which takes requests while the player is up
+                if let video = currentVideo {
+                    appEnvironment?.navigationCoordinator.presenter.present(.addToPlaylist(video))
+                }
+            },
             onShowQueue: onShowQueue,
             onShowCaptionsSelector: { [self] in showingCaptionsSheet = true },
             onShowChaptersSelector: { [self] in showingChaptersSheet = true },

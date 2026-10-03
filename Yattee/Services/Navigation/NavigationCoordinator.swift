@@ -14,6 +14,9 @@ final class NavigationCoordinator {
     /// Selected section and per-section stacks, shared by every layout.
     let router = NavigationRouter()
 
+    /// Shared sheets requested from outside the view tree.
+    let presenter = PresentationRouter()
+
     init() {
         router.onSelectionChange = { [weak self] _ in
             self?.updateHandoffForCurrentTab()
@@ -60,9 +63,6 @@ final class NavigationCoordinator {
     /// (remote control state) reads the real layout instead of screen bounds.
     var isWideScreenLayoutActive = false
 
-    /// Whether the mini player queue sheet is showing.
-    var isMiniPlayerQueueSheetPresented = false
-
     /// Video to present in the queue action sheet (e.g. a video link tapped inside
     /// a description). Set by the deep-link handler; cleared when the sheet dismisses.
     /// Presented by YatteeApp when the player is collapsed and by ExpandedPlayerSheet
@@ -78,9 +78,6 @@ final class NavigationCoordinator {
     /// Candidate URL that isn't confidently a video (loose `.externalVideo`
     /// match) awaiting user confirmation before yt-dlp extraction. Dual-hosted.
     var ambiguousExternalLinkPrompt: URL?
-
-    /// Whether the mini player playlist sheet is showing.
-    var isMiniPlayerPlaylistSheetPresented = false
 
     /// Counter that increments each time the player should expand.
     /// Used to trigger presentation even when isPlayerExpanded is already true.

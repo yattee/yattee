@@ -11,6 +11,7 @@ import SwiftUI
 
 struct PlayerPillButtonView: View {
     @Environment(\.appEnvironment) private var appEnvironment
+    @Environment(\.presentAppSheet) private var presentAppSheet
 
     let configuration: ControlButtonConfiguration
     let isPlaying: Bool
@@ -24,7 +25,6 @@ struct PlayerPillButtonView: View {
     // Context for special buttons
     let video: Video?
     let playbackRate: PlaybackRate
-    @Binding var showingPlaylistSheet: Bool
 
     // Callbacks
     let onAction: () -> Void
@@ -263,7 +263,9 @@ struct PlayerPillButtonView: View {
 
     private var addToPlaylistButton: some View {
         Button {
-            showingPlaylistSheet = true
+            if let video {
+                presentAppSheet(.addToPlaylist(video))
+            }
         } label: {
             genericButtonLabel
         }
@@ -326,7 +328,6 @@ struct PlayerPillButtonView: View {
         isOrientationLocked: false,
         video: nil,
         playbackRate: .x1,
-        showingPlaylistSheet: .constant(false),
         onAction: {},
         onRateChanged: { _ in },
         onTogglePiP: {}
@@ -348,7 +349,6 @@ struct PlayerPillButtonView: View {
             isOrientationLocked: false,
             video: nil,
             playbackRate: .x1,
-            showingPlaylistSheet: .constant(false),
             onAction: {},
             onRateChanged: { _ in },
             onTogglePiP: {}
@@ -364,7 +364,6 @@ struct PlayerPillButtonView: View {
             isOrientationLocked: false,
             video: nil,
             playbackRate: .x1,
-            showingPlaylistSheet: .constant(false),
             onAction: {},
             onRateChanged: { _ in },
             onTogglePiP: {}
