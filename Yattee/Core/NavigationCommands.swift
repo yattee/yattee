@@ -60,7 +60,7 @@ struct NavigationCommands: Commands {
 
     private var homeButton: some View {
         Button {
-            navigationCoordinator.selectedTab = .home
+            navigationCoordinator.router.select(.home)
         } label: {
             Text(String(localized: "menu.navigation.home"))
         }
@@ -69,7 +69,7 @@ struct NavigationCommands: Commands {
 
     private var subscriptionsButton: some View {
         Button {
-            navigationCoordinator.selectedTab = .subscriptions
+            navigationCoordinator.router.select(.subscriptionsFeed)
         } label: {
             Text(String(localized: "menu.navigation.subscriptions"))
         }
@@ -78,7 +78,7 @@ struct NavigationCommands: Commands {
 
     private var searchButton: some View {
         Button {
-            navigationCoordinator.selectedTab = .search
+            navigationCoordinator.router.select(.search)
         } label: {
             Text(String(localized: "menu.navigation.search"))
         }
@@ -87,7 +87,7 @@ struct NavigationCommands: Commands {
 
     private var bookmarksButton: some View {
         Button {
-            navigationCoordinator.selectedSidebarItem = .bookmarks
+            navigationCoordinator.router.select(.bookmarks)
         } label: {
             Text(String(localized: "menu.navigation.bookmarks"))
         }
@@ -96,7 +96,7 @@ struct NavigationCommands: Commands {
 
     private var historyButton: some View {
         Button {
-            navigationCoordinator.selectedSidebarItem = .history
+            navigationCoordinator.router.select(.history)
         } label: {
             Text(String(localized: "menu.navigation.history"))
         }
@@ -105,7 +105,7 @@ struct NavigationCommands: Commands {
 
     private var downloadsButton: some View {
         Button {
-            navigationCoordinator.selectedSidebarItem = .downloads
+            navigationCoordinator.router.select(.downloads)
         } label: {
             Text(String(localized: "menu.navigation.downloads"))
         }
@@ -114,7 +114,7 @@ struct NavigationCommands: Commands {
 
     private var channelsButton: some View {
         Button {
-            navigationCoordinator.selectedSidebarItem = .manageChannels
+            navigationCoordinator.router.select(.manageChannels)
         } label: {
             Text(String(localized: "menu.navigation.channels"))
         }
@@ -123,7 +123,7 @@ struct NavigationCommands: Commands {
 
     private var sourcesButton: some View {
         Button {
-            navigationCoordinator.selectedSidebarItem = .sources
+            navigationCoordinator.router.select(.sources)
         } label: {
             Text(String(localized: "menu.navigation.sources"))
         }
@@ -132,7 +132,7 @@ struct NavigationCommands: Commands {
 
     private var settingsButton: some View {
         Button {
-            navigationCoordinator.selectedSidebarItem = .settings
+            navigationCoordinator.router.select(.settings)
         } label: {
             Text(String(localized: "menu.navigation.settings"))
         }

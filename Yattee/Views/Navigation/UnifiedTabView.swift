@@ -16,34 +16,7 @@ struct UnifiedTabView: View {
     @Environment(\.appEnvironment) private var appEnvironment
     @Environment(\.horizontalSizeClass) private var horizontalSizeClass
 
-    @Binding var selectedTab: AppTab
-
-    // Sidebar manager for dynamic content
-    @State private var sidebarManager = SidebarManager()
-
-    // Navigation paths
-    @State private var homePath = NavigationPath()
-    @State private var searchPath = NavigationPath()
-    @State private var channelPaths: [String: NavigationPath] = [:]
-    @State private var playlistPaths: [UUID: NavigationPath] = [:]
-    @State private var remotePlaylistPaths: [String: NavigationPath] = [:]
-    @State private var mediaSourcePaths: [UUID: NavigationPath] = [:]
-    @State private var instancePaths: [UUID: NavigationPath] = [:]
-    @State private var bookmarksPath = NavigationPath()
-    @State private var historyPath = NavigationPath()
-    @State private var downloadsPath = NavigationPath()
-    @State private var subscriptionsFeedPath = NavigationPath()
-    @State private var manageChannelsPath = NavigationPath()
-    @State private var playlistsListPath = NavigationPath()
-    @State private var sourcesPath = NavigationPath()
-    @State private var settingsPath = NavigationPath()
-    @State private var openURLPath = NavigationPath()
-    @State private var remoteControlPath = NavigationPath()
-    @State private var continueWatchingPath = NavigationPath()
-
-    // Current selection - initial value is a placeholder; actual startup tab is applied in onAppear
-    @State private var selection: SidebarItem = .home
-    @State private var hasAppliedStartupTab = false
+    let router: NavigationRouter
 
     // Zoom transition namespace (local to this tab view)
     @Namespace private var zoomTransition
@@ -63,7 +36,9 @@ struct UnifiedTabView: View {
     }
 
     var body: some View {
-        TabView(selection: $selection) {
+        @Bindable var router = router
+
+        TabView(selection: $router.selection) {
             mainTabs
             sidebarSections
         }
@@ -88,28 +63,12 @@ struct UnifiedTabView: View {
         .zoomTransitionsEnabled(zoomTransitionsEnabled)
         .onAppear {
             configureSidebarManager()
-            applyStartupTabIfNeeded()
+            router.applyStartupTabIfNeeded(settingsManager?.effectiveStartupTabForSidebar() ?? .home)
+            ensureSelectionIsAvailable(visibleMainItems: visibleMainItems)
         }
-        .onChange(of: navigationCoordinator?.pendingNavigation) { _, newValue in
-            handlePendingNavigation(newValue)
+        .onChange(of: router.selection) { _, _ in
+            ensureSelectionIsAvailable(visibleMainItems: visibleMainItems)
         }
-        .onChange(of: selectedTab) { _, newTab in
-            selection = newTab.sidebarItem
-        }
-        .onChange(of: navigationCoordinator?.selectedSidebarItem) { _, newItem in
-            guard let item = newItem else { return }
-            selection = item
-            navigationCoordinator?.selectedSidebarItem = nil
-        }
-    }
-
-    /// Applies the configured startup tab on first appearance.
-    private func applyStartupTabIfNeeded() {
-        guard !hasAppliedStartupTab else { return }
-        hasAppliedStartupTab = true
-
-        let startupTab = settingsManager?.effectiveStartupTabForSidebar() ?? .home
-        selection = startupTab.sidebarItem
     }
 
     // MARK: - Visible Main Items
@@ -132,8 +91,8 @@ struct UnifiedTabView: View {
         switch item {
         case .search:
             Tab(value: SidebarItem.search, role: .search) {
-                NavigationStack(path: $searchPath) {
-                    SearchView()
+                NavigationStack(path: router.path(for: .search)) {
+                    SearchView(searchText: Bindable(router).searchText)
                         .withNavigationDestinations()
                 }
             } label: {
@@ -142,7 +101,7 @@ struct UnifiedTabView: View {
 
         case .home:
             Tab(value: SidebarItem.home) {
-                NavigationStack(path: $homePath) {
+                NavigationStack(path: router.path(for: .home)) {
                     HomeView()
                         .withNavigationDestinations()
                 }
@@ -152,7 +111,7 @@ struct UnifiedTabView: View {
 
         case .subscriptions:
             Tab(value: SidebarItem.subscriptionsFeed) {
-                NavigationStack(path: $subscriptionsFeedPath) {
+                NavigationStack(path: router.path(for: .subscriptionsFeed)) {
                     SubscriptionsView()
                         .withNavigationDestinations()
                 }
@@ -162,7 +121,7 @@ struct UnifiedTabView: View {
 
         case .bookmarks:
             Tab(value: SidebarItem.bookmarks) {
-                NavigationStack(path: $bookmarksPath) {
+                NavigationStack(path: router.path(for: .bookmarks)) {
                     BookmarksListView()
                         .withNavigationDestinations()
                 }
@@ -172,7 +131,7 @@ struct UnifiedTabView: View {
 
         case .history:
             Tab(value: SidebarItem.history) {
-                NavigationStack(path: $historyPath) {
+                NavigationStack(path: router.path(for: .history)) {
                     HistoryListView()
                         .withNavigationDestinations()
                 }
@@ -182,7 +141,7 @@ struct UnifiedTabView: View {
 
         case .downloads:
             Tab(value: SidebarItem.downloads) {
-                NavigationStack(path: $downloadsPath) {
+                NavigationStack(path: router.path(for: .downloads)) {
                     DownloadsView()
                         .withNavigationDestinations()
                 }
@@ -192,7 +151,7 @@ struct UnifiedTabView: View {
 
         case .channels:
             Tab(value: SidebarItem.manageChannels) {
-                NavigationStack(path: $manageChannelsPath) {
+                NavigationStack(path: router.path(for: .manageChannels)) {
                     ManageChannelsView()
                         .withNavigationDestinations()
                 }
@@ -202,7 +161,7 @@ struct UnifiedTabView: View {
 
         case .playlists:
             Tab(value: SidebarItem.playlistsList) {
-                NavigationStack(path: $playlistsListPath) {
+                NavigationStack(path: router.path(for: .playlistsList)) {
                     PlaylistsListView()
                         .withNavigationDestinations()
                 }
@@ -212,7 +171,7 @@ struct UnifiedTabView: View {
 
         case .sources:
             Tab(value: SidebarItem.sources) {
-                NavigationStack(path: $sourcesPath) {
+                NavigationStack(path: router.path(for: .sources)) {
                     MediaSourcesView()
                         .withNavigationDestinations()
                 }
@@ -222,7 +181,7 @@ struct UnifiedTabView: View {
 
         case .settings:
             Tab(value: SidebarItem.settings) {
-                NavigationStack(path: $settingsPath) {
+                NavigationStack(path: router.path(for: .settings)) {
                     SettingsView(showCloseButton: false)
                         .withNavigationDestinations()
                 }
@@ -232,7 +191,7 @@ struct UnifiedTabView: View {
 
         case .openURL:
             Tab(value: SidebarItem.openURL) {
-                NavigationStack(path: $openURLPath) {
+                NavigationStack(path: router.path(for: .openURL)) {
                     OpenLinkView()
                         .withNavigationDestinations()
                 }
@@ -242,7 +201,7 @@ struct UnifiedTabView: View {
 
         case .remoteControl:
             Tab(value: SidebarItem.remoteControl) {
-                NavigationStack(path: $remoteControlPath) {
+                NavigationStack(path: router.path(for: .remoteControl)) {
                     RemoteControlContentView(navigationStyle: .link)
                         .navigationTitle(String(localized: "remoteControl.title"))
                         .withNavigationDestinations()
@@ -253,7 +212,7 @@ struct UnifiedTabView: View {
 
         case .continueWatching:
             Tab(value: SidebarItem.continueWatching) {
-                NavigationStack(path: $continueWatchingPath) {
+                NavigationStack(path: router.path(for: .continueWatching)) {
                     ContinueWatchingView()
                         .withNavigationDestinations()
                 }
@@ -364,7 +323,7 @@ extension MiniPlayerMinimizeBehavior {
 }
 
 #Preview("Unified Tab View - iOS") {
-    UnifiedTabView(selectedTab: .constant(.home))
+    UnifiedTabView(router: NavigationRouter())
         .appEnvironment(.preview)
 }
 #endif
@@ -375,34 +334,7 @@ extension MiniPlayerMinimizeBehavior {
 struct UnifiedTabView: View {
     @Environment(\.appEnvironment) private var appEnvironment
 
-    @Binding var selectedTab: AppTab
-
-    // Sidebar manager for dynamic content
-    @State private var sidebarManager = SidebarManager()
-
-    // Navigation paths
-    @State private var homePath = NavigationPath()
-    @State private var searchPath = NavigationPath()
-    @State private var channelPaths: [String: NavigationPath] = [:]
-    @State private var playlistPaths: [UUID: NavigationPath] = [:]
-    @State private var remotePlaylistPaths: [String: NavigationPath] = [:]
-    @State private var mediaSourcePaths: [UUID: NavigationPath] = [:]
-    @State private var instancePaths: [UUID: NavigationPath] = [:]
-    @State private var bookmarksPath = NavigationPath()
-    @State private var historyPath = NavigationPath()
-    @State private var downloadsPath = NavigationPath()
-    @State private var subscriptionsFeedPath = NavigationPath()
-    @State private var manageChannelsPath = NavigationPath()
-    @State private var playlistsListPath = NavigationPath()
-    @State private var sourcesPath = NavigationPath()
-    @State private var settingsPath = NavigationPath()
-    @State private var openURLPath = NavigationPath()
-    @State private var remoteControlPath = NavigationPath()
-    @State private var continueWatchingPath = NavigationPath()
-
-    // Current selection - initial value is a placeholder; actual startup tab is applied in onAppear
-    @State private var selection: SidebarItem = .home
-    @State private var hasAppliedStartupTab = false
+    let router: NavigationRouter
 
     // Zoom transition namespace (local to this tab view)
     @Namespace private var zoomTransition
@@ -421,28 +353,12 @@ struct UnifiedTabView: View {
         .zoomTransitionNamespace(zoomTransition)
         .onAppear {
             configureSidebarManager()
-            applyStartupTabIfNeeded()
+            router.applyStartupTabIfNeeded(settingsManager?.effectiveStartupTabForSidebar() ?? .home)
+            ensureSelectionIsAvailable(visibleMainItems: visibleMainItems)
         }
-        .onChange(of: navigationCoordinator?.pendingNavigation) { _, newValue in
-            handlePendingNavigation(newValue)
+        .onChange(of: router.selection) { _, _ in
+            ensureSelectionIsAvailable(visibleMainItems: visibleMainItems)
         }
-        .onChange(of: selectedTab) { _, newTab in
-            selection = newTab.sidebarItem
-        }
-        .onChange(of: navigationCoordinator?.selectedSidebarItem) { _, newItem in
-            guard let item = newItem else { return }
-            selection = item
-            navigationCoordinator?.selectedSidebarItem = nil
-        }
-    }
-
-    /// Applies the configured startup tab on first appearance.
-    private func applyStartupTabIfNeeded() {
-        guard !hasAppliedStartupTab else { return }
-        hasAppliedStartupTab = true
-
-        let startupTab = settingsManager?.effectiveStartupTabForSidebar() ?? .home
-        selection = startupTab.sidebarItem
     }
 
     // MARK: - Visible Main Items
@@ -473,7 +389,9 @@ struct UnifiedTabView: View {
     }
 
     private var sidebarList: some View {
-        List(selection: $selection) {
+        @Bindable var router = router
+
+        return List(selection: $router.selection) {
             ForEach(visibleMainItems) { item in
                 sidebarRow(for: item)
             }
@@ -522,59 +440,60 @@ struct UnifiedTabView: View {
 
     @ViewBuilder
     private var detailForSelection: some View {
+        let selection = router.selection
         switch selection {
         case .home:
-            NavigationStack(path: $homePath) {
+            NavigationStack(path: router.path(for: .home)) {
                 HomeView().withNavigationDestinations()
             }
         case .search:
-            NavigationStack(path: $searchPath) {
+            NavigationStack(path: router.path(for: .search)) {
                 SearchView().withNavigationDestinations()
             }
         case .subscriptionsFeed:
-            NavigationStack(path: $subscriptionsFeedPath) {
+            NavigationStack(path: router.path(for: .subscriptionsFeed)) {
                 SubscriptionsView().withNavigationDestinations()
             }
         case .bookmarks:
-            NavigationStack(path: $bookmarksPath) {
+            NavigationStack(path: router.path(for: .bookmarks)) {
                 BookmarksListView().withNavigationDestinations()
             }
         case .history:
-            NavigationStack(path: $historyPath) {
+            NavigationStack(path: router.path(for: .history)) {
                 HistoryListView().withNavigationDestinations()
             }
         case .downloads:
-            NavigationStack(path: $downloadsPath) {
+            NavigationStack(path: router.path(for: .downloads)) {
                 DownloadsView().withNavigationDestinations()
             }
         case .manageChannels:
-            NavigationStack(path: $manageChannelsPath) {
+            NavigationStack(path: router.path(for: .manageChannels)) {
                 ManageChannelsView().withNavigationDestinations()
             }
         case .playlistsList:
-            NavigationStack(path: $playlistsListPath) {
+            NavigationStack(path: router.path(for: .playlistsList)) {
                 PlaylistsListView().withNavigationDestinations()
             }
         case .sources:
-            NavigationStack(path: $sourcesPath) {
+            NavigationStack(path: router.path(for: .sources)) {
                 MediaSourcesView().withNavigationDestinations()
             }
         case .settings:
-            NavigationStack(path: $settingsPath) {
+            NavigationStack(path: router.path(for: .settings)) {
                 SettingsView().withNavigationDestinations()
             }
         case .openURL:
-            NavigationStack(path: $openURLPath) {
+            NavigationStack(path: router.path(for: .openURL)) {
                 OpenLinkView().withNavigationDestinations()
             }
         case .remoteControl:
-            NavigationStack(path: $remoteControlPath) {
+            NavigationStack(path: router.path(for: .remoteControl)) {
                 RemoteControlContentView(navigationStyle: .link)
                     .navigationTitle(String(localized: "remoteControl.title"))
                     .withNavigationDestinations()
             }
         case .continueWatching:
-            NavigationStack(path: $continueWatchingPath) {
+            NavigationStack(path: router.path(for: .continueWatching)) {
                 ContinueWatchingView()
                     .withNavigationDestinations()
             }
@@ -593,7 +512,7 @@ struct UnifiedTabView: View {
 }
 
 #Preview("Unified Tab View - macOS") {
-    UnifiedTabView(selectedTab: .constant(.home))
+    UnifiedTabView(router: NavigationRouter())
         .appEnvironment(.preview)
 }
 #endif
@@ -604,33 +523,7 @@ struct UnifiedTabView: View {
 struct UnifiedTabView: View {
     @Environment(\.appEnvironment) private var appEnvironment
 
-    @Binding var selectedTab: AppTab
-
-    // Sidebar manager for dynamic content
-    @State private var sidebarManager = SidebarManager()
-
-    // Navigation paths
-    @State private var homePath = NavigationPath()
-    @State private var searchPath = NavigationPath()
-    @State private var channelPaths: [String: NavigationPath] = [:]
-    @State private var playlistPaths: [UUID: NavigationPath] = [:]
-    @State private var remotePlaylistPaths: [String: NavigationPath] = [:]
-    @State private var instancePaths: [UUID: NavigationPath] = [:]
-    @State private var mediaSourcePaths: [UUID: NavigationPath] = [:]
-    @State private var bookmarksPath = NavigationPath()
-    @State private var historyPath = NavigationPath()
-    @State private var subscriptionsFeedPath = NavigationPath()
-    @State private var manageChannelsPath = NavigationPath()
-    @State private var playlistsListPath = NavigationPath()
-    @State private var sourcesPath = NavigationPath()
-    @State private var settingsPath = NavigationPath()
-    @State private var openURLPath = NavigationPath()
-    @State private var remoteControlPath = NavigationPath()
-    @State private var continueWatchingPath = NavigationPath()
-
-    // Current selection - initial value is a placeholder; actual startup tab is applied in onAppear
-    @State private var selection: SidebarItem = .home
-    @State private var hasAppliedStartupTab = false
+    let router: NavigationRouter
 
     // Zoom transition namespace (local to this tab view)
     @Namespace private var zoomTransition
@@ -647,7 +540,9 @@ struct UnifiedTabView: View {
     }
 
     var body: some View {
-        TabView(selection: $selection) {
+        @Bindable var router = router
+
+        TabView(selection: $router.selection) {
             mainTabs
             sidebarSections
         }
@@ -655,76 +550,21 @@ struct UnifiedTabView: View {
         .zoomTransitionNamespace(zoomTransition)
         .onAppear {
             configureSidebarManager()
-            applyStartupTabIfNeeded()
+            router.applyStartupTabIfNeeded(settingsManager?.effectiveStartupTabForSidebar() ?? .home)
+            ensureSelectionIsAvailable(visibleMainItems: visibleMainItems)
         }
-        .onChange(of: navigationCoordinator?.pendingNavigation) { _, newValue in
-            handlePendingNavigation(newValue)
-        }
-        .onChange(of: navigationCoordinator?.selectedSidebarItem) { _, newItem in
-            guard let item = newItem else { return }
-            selection = item
-            navigationCoordinator?.selectedSidebarItem = nil
-        }
-        .onChange(of: selection) { oldValue, _ in
-            resetPath(for: oldValue)
+        .onChange(of: router.selection) { oldValue, _ in
+            // Pop the previously-selected tab's stack to its root so its
+            // pushed views don't linger after the user picks another item.
+            // Before the remap, which may write the stack of `oldValue`.
+            router.popToRoot(oldValue)
+            ensureSelectionIsAvailable(visibleMainItems: visibleMainItems)
             // Force any pushed TVSidebarDetailContainer (used by Settings
             // sub-pages and similar detail screens) to dismiss. Without this,
             // tvOS's sidebarAdaptable TabView leaves the previously-pushed
             // detail visible until the user manually presses Menu.
             NotificationCenter.default.post(name: .yatteeTVForcePopDetail, object: nil)
         }
-    }
-
-    /// Pops the previously-selected tab's NavigationStack to its root so its
-    /// pushed views don't linger after the user picks another sidebar item.
-    private func resetPath(for item: SidebarItem) {
-        switch item {
-        case .home:
-            homePath = NavigationPath()
-        case .search:
-            searchPath = NavigationPath()
-        case .subscriptionsFeed:
-            subscriptionsFeedPath = NavigationPath()
-        case .bookmarks:
-            bookmarksPath = NavigationPath()
-        case .history:
-            historyPath = NavigationPath()
-        case .manageChannels:
-            manageChannelsPath = NavigationPath()
-        case .playlistsList:
-            playlistsListPath = NavigationPath()
-        case .sources:
-            sourcesPath = NavigationPath()
-        case .settings:
-            settingsPath = NavigationPath()
-        case .openURL:
-            openURLPath = NavigationPath()
-        case .remoteControl:
-            remoteControlPath = NavigationPath()
-        case .continueWatching:
-            continueWatchingPath = NavigationPath()
-        case let .channel(channelID, _, _):
-            channelPaths[channelID] = NavigationPath()
-        case let .playlist(id, _):
-            playlistPaths[id] = NavigationPath()
-        case .remotePlaylist:
-            remotePlaylistPaths[item.id] = NavigationPath()
-        case let .instance(id, _, _):
-            instancePaths[id] = NavigationPath()
-        case let .mediaSource(id, _, _):
-            mediaSourcePaths[id] = NavigationPath()
-        case .nowPlaying, .downloads:
-            break
-        }
-    }
-
-    /// Applies the configured startup tab on first appearance.
-    private func applyStartupTabIfNeeded() {
-        guard !hasAppliedStartupTab else { return }
-        hasAppliedStartupTab = true
-
-        let startupTab = settingsManager?.effectiveStartupTabForSidebar() ?? .home
-        selection = startupTab.sidebarItem
     }
 
     // MARK: - Visible Main Items
@@ -745,7 +585,7 @@ struct UnifiedTabView: View {
                     .onAppear {
                         appEnvironment?.navigationCoordinator.expandPlayer()
                         // Reset selection to prevent immediate re-trigger when player is collapsed
-                        selection = .home
+                        router.select(.home)
                     }
             } label: {
                 Label("\(currentVideo.title)\n\(currentVideo.author.name)", systemImage: SidebarItem.nowPlaying.systemImage)
@@ -762,7 +602,7 @@ struct UnifiedTabView: View {
         switch item {
         case .search:
             Tab(value: SidebarItem.search, role: .search) {
-                NavigationStack(path: $searchPath) {
+                NavigationStack(path: router.path(for: .search)) {
                     SearchView()
                         .withNavigationDestinations()
                 }
@@ -772,7 +612,7 @@ struct UnifiedTabView: View {
 
         case .home:
             Tab(value: SidebarItem.home) {
-                NavigationStack(path: $homePath) {
+                NavigationStack(path: router.path(for: .home)) {
                     HomeView()
                         .withNavigationDestinations()
                 }
@@ -782,7 +622,7 @@ struct UnifiedTabView: View {
 
         case .subscriptions:
             Tab(value: SidebarItem.subscriptionsFeed) {
-                NavigationStack(path: $subscriptionsFeedPath) {
+                NavigationStack(path: router.path(for: .subscriptionsFeed)) {
                     SubscriptionsView()
                         .withNavigationDestinations()
                 }
@@ -792,7 +632,7 @@ struct UnifiedTabView: View {
 
         case .bookmarks:
             Tab(value: SidebarItem.bookmarks) {
-                NavigationStack(path: $bookmarksPath) {
+                NavigationStack(path: router.path(for: .bookmarks)) {
                     BookmarksListView()
                         .withNavigationDestinations()
                 }
@@ -802,7 +642,7 @@ struct UnifiedTabView: View {
 
         case .history:
             Tab(value: SidebarItem.history) {
-                NavigationStack(path: $historyPath) {
+                NavigationStack(path: router.path(for: .history)) {
                     HistoryListView()
                         .withNavigationDestinations()
                 }
@@ -819,7 +659,7 @@ struct UnifiedTabView: View {
 
         case .channels:
             Tab(value: SidebarItem.manageChannels) {
-                NavigationStack(path: $manageChannelsPath) {
+                NavigationStack(path: router.path(for: .manageChannels)) {
                     ManageChannelsView()
                         .withNavigationDestinations()
                 }
@@ -829,7 +669,7 @@ struct UnifiedTabView: View {
 
         case .playlists:
             Tab(value: SidebarItem.playlistsList) {
-                NavigationStack(path: $playlistsListPath) {
+                NavigationStack(path: router.path(for: .playlistsList)) {
                     PlaylistsListView()
                         .withNavigationDestinations()
                 }
@@ -839,7 +679,7 @@ struct UnifiedTabView: View {
 
         case .sources:
             Tab(value: SidebarItem.sources) {
-                NavigationStack(path: $sourcesPath) {
+                NavigationStack(path: router.path(for: .sources)) {
                     MediaSourcesView()
                         .withNavigationDestinations()
                 }
@@ -849,7 +689,7 @@ struct UnifiedTabView: View {
 
         case .settings:
             Tab(value: SidebarItem.settings) {
-                NavigationStack(path: $settingsPath) {
+                NavigationStack(path: router.path(for: .settings)) {
                     SettingsView()
                         .withNavigationDestinations()
                 }
@@ -859,7 +699,7 @@ struct UnifiedTabView: View {
 
         case .openURL:
             Tab(value: SidebarItem.openURL) {
-                NavigationStack(path: $openURLPath) {
+                NavigationStack(path: router.path(for: .openURL)) {
                     TVSidebarDetailContainer(
                         systemImage: SidebarItem.openURL.systemImage,
                         title: SidebarItem.openURL.title
@@ -874,7 +714,7 @@ struct UnifiedTabView: View {
 
         case .remoteControl:
             Tab(value: SidebarItem.remoteControl) {
-                NavigationStack(path: $remoteControlPath) {
+                NavigationStack(path: router.path(for: .remoteControl)) {
                     TVSidebarDetailContainer(
                         systemImage: SidebarItem.remoteControl.systemImage,
                         title: SidebarItem.remoteControl.title
@@ -889,7 +729,7 @@ struct UnifiedTabView: View {
 
         case .continueWatching:
             Tab(value: SidebarItem.continueWatching) {
-                NavigationStack(path: $continueWatchingPath) {
+                NavigationStack(path: router.path(for: .continueWatching)) {
                     ContinueWatchingView()
                         .withNavigationDestinations()
                 }
@@ -945,7 +785,7 @@ struct UnifiedTabView: View {
 }
 
 #Preview("Unified Tab View - tvOS") {
-    UnifiedTabView(selectedTab: .constant(.home))
+    UnifiedTabView(router: NavigationRouter())
         .appEnvironment(.preview)
 }
 #endif
@@ -956,102 +796,33 @@ extension UnifiedTabView {
 
     // MARK: - Computed Properties
 
-    var navigationCoordinator: NavigationCoordinator? {
-        appEnvironment?.navigationCoordinator
+    var sidebarManager: SidebarManager {
+        router.sidebarManager
     }
 
     // MARK: - Configuration
 
     func configureSidebarManager() {
         guard let appEnvironment else { return }
-        sidebarManager.configure(
-            dataManager: appEnvironment.dataManager,
-            settingsManager: appEnvironment.settingsManager,
-            mediaSourcesManager: appEnvironment.mediaSourcesManager,
-            instancesManager: appEnvironment.instancesManager,
-            accountsManager: appEnvironment.accountsManager,
-            subscriptionService: appEnvironment.subscriptionService,
-            remotePlaylistsCache: appEnvironment.remotePlaylistsCache,
-            contextValidator: appEnvironment.dataContextValidator
-        )
+        router.configureSidebarManagerIfNeeded(appEnvironment)
     }
 
-    // MARK: - Navigation
+    // MARK: - Layout Mapping
 
-    func handlePendingNavigation(_ destination: NavigationDestination?) {
-        guard let destination else { return }
-        switch selection {
-        case .home:
-            homePath.append(destination)
-        case .search:
-            searchPath.append(destination)
-        case .channel:
-            channelPaths[selection.id, default: NavigationPath()].append(destination)
-        case .playlist(let id, _):
-            playlistPaths[id, default: NavigationPath()].append(destination)
-        case .remotePlaylist:
-            remotePlaylistPaths[selection.id, default: NavigationPath()].append(destination)
-        case .mediaSource(let id, _, _):
-            mediaSourcePaths[id, default: NavigationPath()].append(destination)
-        case .instance(let id, _, _):
-            instancePaths[id, default: NavigationPath()].append(destination)
-        case .bookmarks:
-            bookmarksPath.append(destination)
-        case .history:
-            historyPath.append(destination)
-        case .downloads:
-            #if os(iOS) || os(macOS)
-            downloadsPath.append(destination)
-            #endif
-        case .subscriptionsFeed:
-            subscriptionsFeedPath.append(destination)
-        case .manageChannels:
-            manageChannelsPath.append(destination)
-        case .playlistsList:
-            playlistsListPath.append(destination)
-        case .sources:
-            sourcesPath.append(destination)
-        case .settings:
-            settingsPath.append(destination)
-        case .nowPlaying:
-            break // Now Playing is a root tab, not a push destination
-        case .openURL:
-            openURLPath.append(destination)
-        case .remoteControl:
-            remoteControlPath.append(destination)
-        case .continueWatching:
-            continueWatchingPath.append(destination)
-        }
-        navigationCoordinator?.clearPendingNavigation()
-    }
-
-    // MARK: - Path Bindings
-
-    func channelPathBinding(for item: SidebarItem) -> Binding<NavigationPath> {
-        Binding(
-            get: { channelPaths[item.id] ?? NavigationPath() },
-            set: { channelPaths[item.id] = $0 }
-        )
-    }
-
-    func playlistPathBinding(for id: UUID) -> Binding<NavigationPath> {
-        Binding(
-            get: { playlistPaths[id] ?? NavigationPath() },
-            set: { playlistPaths[id] = $0 }
-        )
-    }
-
-    func mediaSourcePathBinding(for id: UUID) -> Binding<NavigationPath> {
-        Binding(
-            get: { mediaSourcePaths[id] ?? NavigationPath() },
-            set: { mediaSourcePaths[id] = $0 }
-        )
-    }
-
-    func instancePathBinding(for id: UUID) -> Binding<NavigationPath> {
-        Binding(
-            get: { instancePaths[id] ?? NavigationPath() },
-            set: { instancePaths[id] = $0 }
+    /// Main items hidden from the sidebar by customization (or selected in the
+    /// tab bar layout) are remapped onto a row that can host them.
+    func ensureSelectionIsAvailable(visibleMainItems: [SidebarMainItem]) {
+        let available = Set(visibleMainItems.map(\.sidebarItem))
+        router.ensureSelectionIsAvailable(
+            isAvailable: { item in
+                switch item {
+                case .channel, .playlist, .remotePlaylist, .mediaSource, .instance, .nowPlaying:
+                    return true
+                default:
+                    return available.contains(item)
+                }
+            },
+            instance: { id in appEnvironment?.instancesManager.enabledInstances.first { $0.id == id } }
         )
     }
 
@@ -1060,7 +831,7 @@ extension UnifiedTabView {
     @ViewBuilder
     func channelContent(for item: SidebarItem) -> some View {
         if case .channel(let channelID, _, let source) = item {
-            NavigationStack(path: channelPathBinding(for: item)) {
+            NavigationStack(path: router.path(for: item)) {
                 ChannelView(channelID: channelID, source: source)
                     .withNavigationDestinations()
             }
@@ -1089,13 +860,13 @@ extension UnifiedTabView {
     func playlistContent(for item: SidebarItem) -> some View {
         switch item {
         case .playlist(let id, _):
-            NavigationStack(path: playlistPathBinding(for: id)) {
+            NavigationStack(path: router.path(for: item)) {
                 UnifiedPlaylistDetailView(source: .local(id))
                     .withNavigationDestinations()
             }
             .id(item.id)
         case .remotePlaylist(let id, let title, let accountID):
-            NavigationStack(path: remotePlaylistPathBinding(for: item)) {
+            NavigationStack(path: router.path(for: item)) {
                 // No instance passed: the detail view resolves it from the
                 // account, same as SidebarItem.navigationDestination().
                 UnifiedPlaylistDetailView(source: .remote(id, instance: nil, title: title, accountID: accountID))
@@ -1105,13 +876,6 @@ extension UnifiedTabView {
         default:
             EmptyView()
         }
-    }
-
-    func remotePlaylistPathBinding(for item: SidebarItem) -> Binding<NavigationPath> {
-        Binding(
-            get: { remotePlaylistPaths[item.id] ?? NavigationPath() },
-            set: { remotePlaylistPaths[item.id] = $0 }
-        )
     }
 
     @ViewBuilder
@@ -1131,7 +895,7 @@ extension UnifiedTabView {
     func mediaSourceContent(for item: SidebarItem) -> some View {
         if case .mediaSource(let id, _, _) = item,
            let source = appEnvironment?.mediaSourcesManager.source(byID: id) {
-            NavigationStack(path: mediaSourcePathBinding(for: id)) {
+            NavigationStack(path: router.path(for: item)) {
                 MediaBrowserView(source: source, path: "/")
                     .withNavigationDestinations()
             }
@@ -1145,7 +909,7 @@ extension UnifiedTabView {
     func instanceContent(for item: SidebarItem) -> some View {
         if case .instance(let id, _, _) = item,
            let instance = appEnvironment?.instancesManager.enabledInstances.first(where: { $0.id == id }) {
-            NavigationStack(path: instancePathBinding(for: id)) {
+            NavigationStack(path: router.path(for: item)) {
                 InstanceBrowseView(instance: instance)
                     .withNavigationDestinations()
             }

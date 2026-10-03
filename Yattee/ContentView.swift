@@ -14,11 +14,7 @@ struct ContentView: View {
         Group {
             if let appEnvironment {
                 #if os(iOS)
-                if #available(iOS 26.1, *) {
-                    iOS26AdaptiveTabView(appEnvironment: appEnvironment)
-                } else {
-                    iOS18AdaptiveTabView(appEnvironment: appEnvironment)
-                }
+                AdaptiveTabView(appEnvironment: appEnvironment)
                 #elseif os(macOS)
                 unifiedContentView(appEnvironment: appEnvironment)
                 #elseif os(tvOS)
@@ -37,20 +33,10 @@ struct ContentView: View {
     private func unifiedContentView(appEnvironment: AppEnvironment) -> some View {
         ZStack(alignment: .bottom) {
             #if os(macOS)
-            UnifiedTabView(
-                selectedTab: Binding(
-                    get: { appEnvironment.navigationCoordinator.selectedTab },
-                    set: { appEnvironment.navigationCoordinator.selectedTab = $0 }
-                )
-            )
+            UnifiedTabView(router: appEnvironment.navigationCoordinator.router)
             .environment(appEnvironment.settingsManager)
             #elseif os(tvOS)
-            UnifiedTabView(
-                selectedTab: Binding(
-                    get: { appEnvironment.navigationCoordinator.selectedTab },
-                    set: { appEnvironment.navigationCoordinator.selectedTab = $0 }
-                )
-            )
+            UnifiedTabView(router: appEnvironment.navigationCoordinator.router)
             .environment(appEnvironment.settingsManager)
             #endif
 
@@ -178,13 +164,15 @@ struct ContentView: View {
     #endif
 }
 
-// MARK: - iOS 18+ Adaptive Tab View
+// MARK: - Adaptive Tab View
 
 #if os(iOS)
 /// Switches between CompactTabView and UnifiedTabView based on horizontal size class.
 /// Compact width (iPhone, iPad Stage Manager small): CompactTabView with settings-based customization
 /// Regular width (iPad full, iPad larger windows): UnifiedTabView with sidebar adaptable
-struct iOS18AdaptiveTabView: View {
+/// Both render `NavigationRouter` state, so swapping between them keeps the
+/// selection and every stack.
+struct AdaptiveTabView: View {
     @Environment(\.horizontalSizeClass) private var horizontalSizeClass
 
     let appEnvironment: AppEnvironment
@@ -212,20 +200,17 @@ struct iOS18AdaptiveTabView: View {
     var body: some View {
         ZStack(alignment: .bottom) {
             if horizontalSizeClass == .compact || UIDevice.current.userInterfaceIdiom == .phone {
-                CompactTabView()
+                CompactTabView(router: appEnvironment.navigationCoordinator.router)
                     .environment(appEnvironment.settingsManager)
             } else {
-                UnifiedTabView(
-                    selectedTab: Binding(
-                        get: { appEnvironment.navigationCoordinator.selectedTab },
-                        set: { appEnvironment.navigationCoordinator.selectedTab = $0 }
-                    )
-                )
+                UnifiedTabView(router: appEnvironment.navigationCoordinator.router)
                 .environment(appEnvironment.settingsManager)
             }
 
-            // Mini player overlay
-            miniPlayerOverlay
+            // iOS 26.1+ shows the mini player as the tab bar's bottom accessory
+            if !Self.usesTabBottomAccessory {
+                miniPlayerOverlay
+            }
 
             // Black overlay when player is fully expanded
             // Hides scaled content behind player sheet, removed during dismiss gesture for parallax effect
@@ -276,6 +261,10 @@ struct iOS18AdaptiveTabView: View {
                     .presentationDetents([.medium, .large])
             }
         }
+    }
+
+    private static var usesTabBottomAccessory: Bool {
+        if #available(iOS 26.1, *) { true } else { false }
     }
 
     @ViewBuilder
@@ -307,113 +296,6 @@ struct iOS18AdaptiveTabView: View {
     }
 }
 
-// MARK: - iOS 26+ Adaptive Tab View
-
-/// iOS 26.1+ version with bottom accessory mini player support.
-/// Uses UnifiedTabView with sidebarAdaptable for regular width, CompactTabView for compact.
-@available(iOS 26.1, *)
-struct iOS26AdaptiveTabView: View {
-    @Environment(\.horizontalSizeClass) private var horizontalSizeClass
-
-    let appEnvironment: AppEnvironment
-
-    @State private var showingMiniPlayerQueueSheet = false
-    @State private var showingMiniPlayerPlaylistSheet = false
-
-    /// Whether to show the black overlay that covers scaled content when player is expanded
-    private var shouldShowExpandedOverlay: Bool {
-        let nav = appEnvironment.navigationCoordinator
-        // Show overlay only when:
-        // - Player window is actually visible (not just isPlayerExpanded intent)
-        // - Expand animation has completed (not animating)
-        // - Dismiss gesture is not active (so user can see scaled content during drag)
-        return nav.isPlayerWindowVisible && !nav.isPlayerSheetAnimating && !nav.isPlayerDismissGestureActive
-    }
-
-    /// Whether to show loading spinner while waiting for player window to appear
-    private var shouldShowExpandPendingSpinner: Bool {
-        let nav = appEnvironment.navigationCoordinator
-        // Show spinner when expand is requested but window isn't visible yet
-        return nav.isPlayerExpanded && !nav.isPlayerWindowVisible && !nav.isPlayerSheetAnimating
-    }
-
-    var body: some View {
-        ZStack {
-            Group {
-                if horizontalSizeClass == .compact || UIDevice.current.userInterfaceIdiom == .phone {
-                    // Compact: Use CompactTabView with settings-based customization
-                    // No bottom accessory since we're not using sidebarAdaptable style
-                    CompactTabView()
-                        .environment(appEnvironment.settingsManager)
-                } else {
-                    // Regular: Use UnifiedTabView which has bottom accessory support via sidebarAdaptable
-                    UnifiedTabView(
-                        selectedTab: Binding(
-                            get: { appEnvironment.navigationCoordinator.selectedTab },
-                            set: { appEnvironment.navigationCoordinator.selectedTab = $0 }
-                        )
-                    )
-                    .environment(appEnvironment.settingsManager)
-                }
-            }
-
-            // Black overlay when player is fully expanded
-            // Hides scaled content behind player sheet, removed during dismiss gesture for parallax effect
-            if shouldShowExpandedOverlay {
-                Color.black
-                    .ignoresSafeArea()
-                    .transaction { $0.animation = nil }
-            }
-
-            // Loading spinner when expand is pending but window not yet visible
-            // This handles the case when scene is transitioning (e.g., Control Center)
-            if shouldShowExpandPendingSpinner {
-                ZStack {
-                    Color.black.opacity(0.7)
-                    ProgressView()
-                        .tint(.white)
-                        .scaleEffect(1.2)
-                }
-                .ignoresSafeArea()
-                .transition(.opacity.animation(.easeInOut(duration: 0.2)))
-            }
-        }
-        .onChange(of: appEnvironment.navigationCoordinator.playerExpandTrigger) { _, _ in
-            presentExpandedPlayer()
-        }
-        .onChange(of: appEnvironment.navigationCoordinator.isPlayerExpanded) { _, isExpanded in
-            if !isExpanded {
-                ExpandedPlayerWindowManager.shared.hide()
-            }
-        }
-        .onChange(of: appEnvironment.navigationCoordinator.isMiniPlayerQueueSheetPresented, initial: true) { _, newValue in
-            showingMiniPlayerQueueSheet = newValue
-        }
-        .onChange(of: appEnvironment.navigationCoordinator.isMiniPlayerPlaylistSheetPresented, initial: true) { _, newValue in
-            showingMiniPlayerPlaylistSheet = newValue
-        }
-        .sheet(isPresented: $showingMiniPlayerQueueSheet, onDismiss: {
-            appEnvironment.navigationCoordinator.isMiniPlayerQueueSheetPresented = false
-        }) {
-            QueueManagementSheet()
-                .presentationDetents([.medium, .large])
-        }
-        .sheet(isPresented: $showingMiniPlayerPlaylistSheet, onDismiss: {
-            appEnvironment.navigationCoordinator.isMiniPlayerPlaylistSheetPresented = false
-        }) {
-            if let video = appEnvironment.playerService.state.currentVideo {
-                PlaylistSelectorSheet(video: video)
-                    .presentationDetents([.medium, .large])
-            }
-        }
-    }
-
-    private func presentExpandedPlayer() {
-        let shouldAnimate = !appEnvironment.navigationCoordinator.skipNextPlayerExpandAnimation
-        appEnvironment.navigationCoordinator.skipNextPlayerExpandAnimation = false
-        ExpandedPlayerWindowManager.shared.show(with: appEnvironment, animated: shouldAnimate)
-    }
-}
 #endif
 
 // MARK: - Preview

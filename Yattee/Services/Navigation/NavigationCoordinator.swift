@@ -7,58 +7,30 @@
 
 import SwiftUI
 
-/// Sheet destinations for modal presentation.
-enum SheetDestination: Identifiable {
-    case settings
-    case addToPlaylist(Video)
-    case downloadOptions(Video)
-    case newPlaylist
-
-    var id: String {
-        switch self {
-        case .settings: return "settings"
-        case .addToPlaylist(let video): return "addToPlaylist-\(video.id.id)"
-        case .downloadOptions(let video): return "downloadOptions-\(video.id.id)"
-        case .newPlaylist: return "newPlaylist"
-        }
-    }
-}
-
 /// Centralized navigation coordinator for the app.
 @Observable
 @MainActor
 final class NavigationCoordinator {
-    /// Navigation path for NavigationStack.
-    var path = NavigationPath()
+    /// Selected section and per-section stacks, shared by every layout.
+    let router = NavigationRouter()
 
-    /// Currently selected tab.
-    var selectedTab: AppTab = .home {
-        didSet {
-            updateHandoffForCurrentTab()
+    init() {
+        router.onSelectionChange = { [weak self] _ in
+            self?.updateHandoffForCurrentTab()
         }
     }
-
-    /// Directly selected sidebar item (for extended navigation commands).
-    /// When set, UnifiedTabView syncs this to its selection state.
-    var selectedSidebarItem: SidebarItem?
 
     /// Currently selected home sub-tab.
     var selectedHomeTab: HomeTab = .playlists {
         didSet {
-            if selectedTab == .home {
+            if router.selection == .home {
                 updateHandoffForCurrentTab()
             }
         }
     }
 
-    /// Currently presented sheet.
-    var presentedSheet: SheetDestination?
-
     /// Trigger to dismiss settings sheet (incremented when dismiss is needed).
     var dismissSettingsTrigger = 0
-
-    /// Mini player video (if playing).
-    var nowPlaying: Video?
 
     /// Whether the mini player is expanded to full screen.
     var isPlayerExpanded = false {
@@ -244,9 +216,6 @@ final class NavigationCoordinator {
         }
     }
 
-    /// Pending navigation destination (used when navigating from sheets/modals).
-    var pendingNavigation: NavigationDestination?
-
     /// Reference to HandoffManager for updating activities on navigation.
     private weak var handoffManager: HandoffManager?
 
@@ -267,34 +236,13 @@ final class NavigationCoordinator {
 
     // MARK: - Navigation Actions
 
-    /// Navigate to a destination.
+    /// Navigate to a destination by pushing it onto the selected section's stack.
     func navigate(to destination: NavigationDestination) {
-        pendingNavigation = destination
+        router.push(destination)
         handoffManager?.updateActivity(for: destination)
     }
 
-    /// Clear pending navigation after it's been handled.
-    func clearPendingNavigation() {
-        pendingNavigation = nil
-    }
-
-    /// Pop to the root of the current navigation stack.
-    func popToRoot() {
-        path.removeLast(path.count)
-    }
-
-    /// Pop one level back in the navigation stack.
-    func pop() {
-        guard !path.isEmpty else { return }
-        path.removeLast()
-    }
-
     // MARK: - Sheet Presentation
-
-    /// Dismiss the current sheet.
-    func dismissSheet() {
-        presentedSheet = nil
-    }
 
     /// Dismiss the settings sheet from anywhere in the app.
     func dismissSettings() {
@@ -334,21 +282,11 @@ final class NavigationCoordinator {
         }
     }
 
-    // MARK: - URL Handling
-
-    /// Handle an incoming URL.
-    func handle(url: URL) {
-        let router = URLRouter()
-        if let destination = router.route(url) {
-            navigate(to: destination)
-        }
-    }
-
     // MARK: - Convenience Navigation
 
     /// Navigate to the subscriptions tab/feed.
     func navigateToSubscriptions() {
-        selectedTab = .subscriptions
+        router.select(.subscriptionsFeed)
     }
 
     /// Navigate to a video by its ID string.
@@ -385,13 +323,11 @@ final class NavigationCoordinator {
 
     // MARK: - Handoff Updates
 
-    /// Updates Handoff activity based on current tab selection.
+    /// Updates Handoff activity based on the selected section.
     private func updateHandoffForCurrentTab() {
         let destination: NavigationDestination?
 
-        switch selectedTab {
-        case .subscriptions:
-            destination = .subscriptionsFeed
+        switch router.selection {
         case .home:
             switch selectedHomeTab {
             case .playlists:
@@ -404,10 +340,10 @@ final class NavigationCoordinator {
         case .search:
             // Search updates handoff when a search is performed, not on tab selection
             destination = nil
-        #if os(tvOS)
-        case .settings:
+        case .mediaSource, .instance, .sources:
             destination = nil
-        #endif
+        default:
+            destination = router.selection.navigationDestination()
         }
 
         if let destination {

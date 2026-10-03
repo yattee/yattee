@@ -250,8 +250,8 @@ struct HomeView: View {
                 loadData()
             }
         }
-        .onChange(of: appEnvironment?.navigationCoordinator.selectedTab) { _, newTab in
-            if newTab == .home {
+        .onChange(of: appEnvironment?.navigationCoordinator.router.selection) { _, newSelection in
+            if newSelection == .home {
                 loadData()
             }
         }
@@ -388,7 +388,7 @@ struct HomeView: View {
                 }
             }
             Button {
-                appEnvironment?.navigationCoordinator.selectedSidebarItem = .sources
+                appEnvironment?.navigationCoordinator.router.select(.sources)
             } label: {
                 Label(String(localized: "home.tvos.empty.openSources"), systemImage: "externaldrive.connected.to.line.below")
                     .padding(.horizontal, 16)

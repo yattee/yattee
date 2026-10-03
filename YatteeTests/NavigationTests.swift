@@ -603,22 +603,21 @@ struct NavigationCoordinatorTests {
     func initialState() {
         let coordinator = NavigationCoordinator()
 
-        #expect(coordinator.selectedTab == .home)
-        #expect(coordinator.path.isEmpty)
-        #expect(coordinator.presentedSheet == nil)
+        #expect(coordinator.router.selection == .home)
+        #expect(coordinator.router.stack(for: .home).isEmpty)
     }
 
-    @Test("Navigate to destination sets pending navigation")
+    @Test("Navigate pushes onto the selected section's stack")
     func navigateToDestination() {
         let coordinator = NavigationCoordinator()
         let destination = NavigationDestination.video(.id(.global("test123")))
 
         coordinator.navigate(to: destination)
 
-        #expect(coordinator.pendingNavigation == destination)
+        #expect(coordinator.router.stack(for: .home) == [destination])
     }
 
-    @Test("Multiple navigations update pending navigation")
+    @Test("Multiple navigations stack in order")
     func multipleNavigations() {
         let coordinator = NavigationCoordinator()
 
@@ -626,78 +625,125 @@ struct NavigationCoordinatorTests {
         coordinator.navigate(to: .video(.id(.global("2"))))
         coordinator.navigate(to: .video(.id(.global("3"))))
 
-        // Only the last navigation is pending
-        #expect(coordinator.pendingNavigation == .video(.id(.global("3"))))
+        #expect(coordinator.router.stack(for: .home) == [
+            .video(.id(.global("1"))),
+            .video(.id(.global("2"))),
+            .video(.id(.global("3"))),
+        ])
     }
 
-    @Test("Pop to root clears path")
+    @Test("Each section keeps its own stack")
+    func perSectionStacks() {
+        let coordinator = NavigationCoordinator()
+
+        coordinator.navigate(to: .video(.id(.global("1"))))
+        coordinator.router.select(.search)
+        coordinator.navigate(to: .video(.id(.global("2"))))
+
+        #expect(coordinator.router.stack(for: .home) == [.video(.id(.global("1")))])
+        #expect(coordinator.router.stack(for: .search) == [.video(.id(.global("2")))])
+    }
+
+    @Test("Pop to root clears the selected stack only")
     func popToRoot() {
         let coordinator = NavigationCoordinator()
+        coordinator.navigate(to: .video(.id(.global("1"))))
+        coordinator.router.select(.search)
+        coordinator.navigate(to: .video(.id(.global("2"))))
 
-        // Manually add to path to test popToRoot
-        coordinator.path.append(NavigationDestination.video(.id(.global("1"))))
-        coordinator.path.append(NavigationDestination.video(.id(.global("2"))))
-        coordinator.path.append(NavigationDestination.video(.id(.global("3"))))
+        coordinator.router.popToRoot()
 
-        #expect(coordinator.path.count == 3)
-
-        coordinator.popToRoot()
-
-        #expect(coordinator.path.isEmpty)
+        #expect(coordinator.router.stack(for: .search).isEmpty)
+        #expect(coordinator.router.stack(for: .home).count == 1)
     }
 
-    @Test("Pop removes one level")
-    func pop() {
+    @Test("Navigate to subscriptions selects the feed")
+    func navigateToSubscriptions() {
         let coordinator = NavigationCoordinator()
 
-        // Manually add to path to test pop
-        coordinator.path.append(NavigationDestination.video(.id(.global("1"))))
-        coordinator.path.append(NavigationDestination.video(.id(.global("2"))))
+        coordinator.navigateToSubscriptions()
 
-        #expect(coordinator.path.count == 2)
-
-        coordinator.pop()
-
-        #expect(coordinator.path.count == 1)
+        #expect(coordinator.router.selection == .subscriptionsFeed)
     }
 
-    @Test("Pop on empty path is safe")
-    func popOnEmptyPath() {
-        let coordinator = NavigationCoordinator()
+    @Test("Startup tab applies only once")
+    func startupTabOnce() {
+        let router = NavigationRouter()
 
-        // Should not crash
-        coordinator.pop()
+        router.applyStartupTabIfNeeded(.search)
+        router.select(.bookmarks)
+        router.applyStartupTabIfNeeded(.search)
 
-        #expect(coordinator.path.isEmpty)
+        #expect(router.selection == .bookmarks)
     }
 
-    @Test("Switch tab")
-    func switchTab() {
+    @Test("A destination pushed before startup keeps its section")
+    func deepLinkBeforeStartup() {
         let coordinator = NavigationCoordinator()
 
-        coordinator.selectedTab = .search
+        coordinator.navigate(to: .video(.id(.global("deep"))))
+        coordinator.router.applyStartupTabIfNeeded(.search)
 
-        #expect(coordinator.selectedTab == .search)
+        #expect(coordinator.router.selection == .home)
+        #expect(coordinator.router.stack(for: .home) == [.video(.id(.global("deep")))])
+    }
+}
+
+// MARK: - NavigationRouter Layout Mapping Tests
+
+@Suite("NavigationRouter Layout Mapping Tests")
+@MainActor
+struct NavigationRouterLayoutMappingTests {
+
+    @Test("Available selection is left alone")
+    func availableSelectionUnchanged() {
+        let router = NavigationRouter()
+        router.select(.bookmarks)
+        router.push(.video(.id(.global("1"))))
+
+        router.ensureSelectionIsAvailable(isAvailable: { _ in true })
+
+        #expect(router.selection == .bookmarks)
+        #expect(router.stack(for: .bookmarks).count == 1)
     }
 
-    @Test("Handle URL sets pending navigation")
-    func handleURL() {
-        let coordinator = NavigationCoordinator()
-        let url = URL(string: "https://youtube.com/watch?v=test123")!
+    @Test("Sidebar channel maps to the subscriptions tab with the channel pushed first")
+    func channelToSubscriptions() {
+        let router = NavigationRouter()
+        let source = ContentSource.global(provider: ContentSource.youtubeProvider)
+        let channel = SidebarItem.channel(channelID: "UC1", name: "Channel", source: source)
+        router.select(channel)
+        router.push(.video(.id(.global("v1"))))
 
-        coordinator.handle(url: url)
+        router.ensureSelectionIsAvailable(isAvailable: { [.home, .search, .subscriptionsFeed].contains($0) })
 
-        #expect(coordinator.pendingNavigation != nil)
+        #expect(router.selection == .subscriptionsFeed)
+        #expect(router.stack(for: .subscriptionsFeed) == [.channel("UC1", source), .video(.id(.global("v1")))])
+        #expect(router.stack(for: channel).isEmpty)
     }
 
-    @Test("Handle unknown URL does nothing")
-    func handleUnknownURL() {
-        let coordinator = NavigationCoordinator()
-        let url = URL(string: "https://example.com/unknown")!
+    @Test("Hidden tab falls back to home with its screen pushed")
+    func hiddenTabToHome() {
+        let router = NavigationRouter()
+        router.select(.bookmarks)
+        router.push(.video(.id(.global("v1"))))
 
-        coordinator.handle(url: url)
+        router.ensureSelectionIsAvailable(isAvailable: { [.home, .search].contains($0) })
 
-        #expect(coordinator.path.isEmpty)
+        #expect(router.selection == .home)
+        #expect(router.stack(for: .home) == [.bookmarks, .video(.id(.global("v1")))])
+    }
+
+    @Test("Sidebar playlist maps to the playlists tab")
+    func playlistToPlaylists() {
+        let router = NavigationRouter()
+        let id = UUID()
+        router.select(.playlist(id: id, title: "Mix"))
+
+        router.ensureSelectionIsAvailable(isAvailable: { [.home, .search, .playlistsList].contains($0) })
+
+        #expect(router.selection == .playlistsList)
+        #expect(router.stack(for: .playlistsList) == [.playlist(.local(id, title: "Mix"))])
     }
 }
 
