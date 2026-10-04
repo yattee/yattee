@@ -95,6 +95,9 @@ private struct AppSheetHost: ViewModifier {
 
     /// Whether this host presents global requests (`PresentationRouter.request`).
     let isTopLevel: Bool
+    /// Whether external navigation dismisses this host's sheet. Only the main
+    /// window's root host: the expanded player keeps its own sheets.
+    let dismissesOnExternalNavigation: Bool
 
     @State private var sheet: AppSheet?
 
@@ -104,9 +107,18 @@ private struct AppSheetHost: ViewModifier {
             .sheet(item: $sheet) { sheet in
                 sheetContent(for: sheet)
             }
+            // Declared before the request observer so a deep link that both
+            // dismisses and presents ends with its own sheet up.
+            .onChange(of: dismissGeneration) { _, _ in
+                sheet = nil
+            }
             .onChange(of: pendingRequestID, initial: true) { _, _ in
                 takePendingRequest()
             }
+    }
+
+    private var dismissGeneration: Int? {
+        dismissesOnExternalNavigation ? appEnvironment?.navigationCoordinator.dismissPresentationsGeneration : nil
     }
 
     private var pendingRequestID: String? {
@@ -144,7 +156,8 @@ private struct AppSheetHost: ViewModifier {
             #endif
             }
         }
-        // The next level: sheets opened from inside this one.
+        // The next level: sheets opened from inside this one. It goes away
+        // with this sheet, so it needn't observe external navigation itself.
         .appSheetHost(isTopLevel: false)
         .optionalAppEnvironment(appEnvironment)
     }
@@ -176,7 +189,28 @@ extension View {
     /// - Parameter isTopLevel: true for the hosts that present global requests:
     ///   the app root while the player is collapsed, the expanded player while
     ///   it is up.
-    func appSheetHost(isTopLevel: Bool) -> some View {
-        modifier(AppSheetHost(isTopLevel: isTopLevel))
+    /// - Parameter dismissesOnExternalNavigation: true for the main window's
+    ///   root host, whose sheet external navigation (notification, deep link,
+    ///   Handoff) dismisses.
+    func appSheetHost(isTopLevel: Bool, dismissesOnExternalNavigation: Bool = false) -> some View {
+        modifier(AppSheetHost(isTopLevel: isTopLevel, dismissesOnExternalNavigation: dismissesOnExternalNavigation))
+    }
+
+    /// Dismisses a screen's own sheet when navigation arrives from outside the
+    /// app, so it doesn't stay up over the screen the navigation moved to.
+    func dismissesOnExternalNavigation(_ isPresented: Binding<Bool>) -> some View {
+        modifier(ExternalNavigationDismissal(isPresented: isPresented))
+    }
+}
+
+private struct ExternalNavigationDismissal: ViewModifier {
+    @Environment(\.appEnvironment) private var appEnvironment
+    @Binding var isPresented: Bool
+
+    func body(content: Content) -> some View {
+        content
+            .onChange(of: appEnvironment?.navigationCoordinator.dismissPresentationsGeneration) { _, _ in
+                isPresented = false
+            }
     }
 }

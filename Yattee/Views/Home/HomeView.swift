@@ -197,13 +197,12 @@ struct HomeView: View {
             SettingsView()
                 .liquidGlassSheetContent(sourceID: "homeSettings", in: sheetTransition)
         }
-        .onChange(of: appEnvironment?.navigationCoordinator.dismissSettingsTrigger) {
-            showingSettings = false
-        }
+        .dismissesOnExternalNavigation($showingSettings)
         #endif
         .sheet(isPresented: $showingRemoteControl) {
             RemoteDevicesSheet()
         }
+        .dismissesOnExternalNavigation($showingRemoteControl)
         #if !os(tvOS)
         .sheet(isPresented: $showingCustomizeHome) {
             NavigationStack {
@@ -220,6 +219,7 @@ struct HomeView: View {
             .frame(minWidth: 500, minHeight: 450)
             #endif
         }
+        .dismissesOnExternalNavigation($showingCustomizeHome)
         #endif
         .onAppear {
             loadData()

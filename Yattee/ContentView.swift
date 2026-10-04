@@ -26,7 +26,10 @@ struct ContentView: View {
         }
         // Shared sheets for the main window. The expanded player hosts its own,
         // and takes global requests while it is up.
-        .appSheetHost(isTopLevel: appEnvironment?.navigationCoordinator.isPlayerExpanded != true)
+        .appSheetHost(
+            isTopLevel: appEnvironment?.navigationCoordinator.isPlayerExpanded != true,
+            dismissesOnExternalNavigation: true
+        )
         .toastOverlay()
     }
 

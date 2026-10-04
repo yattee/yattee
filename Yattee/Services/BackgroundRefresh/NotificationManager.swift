@@ -264,7 +264,9 @@ extension NotificationManager: UNUserNotificationCenterDelegate {
     func handlePendingNavigation(using coordinator: NavigationCoordinator) {
         guard UserDefaults.standard.bool(forKey: Self.pendingNavigationKey) else { return }
         UserDefaults.standard.set(false, forKey: Self.pendingNavigationKey)
-        coordinator.navigateToSubscriptions()
+        coordinator.dismissPresentations()
+        // The feed has to be visible: collapse the player that would cover it.
+        coordinator.navigateToSubscriptions(collapsePlayer: true)
     }
     #endif
 }

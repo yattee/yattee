@@ -553,6 +553,10 @@ struct SubscriptionsView: View {
                         .liquidGlassSheetContent(sourceID: "subscriptionsViewOptions", in: sheetTransition)
                     }
                     #endif
+                    .dismissesOnExternalNavigation($showViewOptions)
+                    #if os(macOS)
+                    .dismissesOnExternalNavigation($showSubscriptionsData)
+                    #endif
                     .onAppear {
                         // Synchronous load for local accounts so the sidebar is
                         // present in the first layout pass (avoids layout jump).

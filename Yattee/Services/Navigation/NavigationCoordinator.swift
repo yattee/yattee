@@ -32,8 +32,10 @@ final class NavigationCoordinator {
         }
     }
 
-    /// Trigger to dismiss settings sheet (incremented when dismiss is needed).
-    var dismissSettingsTrigger = 0
+    /// Bumped when navigation arriving from outside the app (a notification,
+    /// a deep link, Handoff) needs the main window's sheets out of the way.
+    /// Sheets observe it via `.dismissesOnExternalNavigation(_:)`.
+    var dismissPresentationsGeneration = 0
 
     /// Whether the mini player is expanded to full screen.
     var isPlayerExpanded = false {
@@ -235,9 +237,12 @@ final class NavigationCoordinator {
 
     // MARK: - Sheet Presentation
 
-    /// Dismiss the settings sheet from anywhere in the app.
-    func dismissSettings() {
-        dismissSettingsTrigger += 1
+    /// Dismiss the main window's sheets so external navigation lands on a
+    /// visible screen instead of changing tabs underneath a sheet. Call it
+    /// only from external entry points: in-app navigation and layout swaps
+    /// must keep an open sheet.
+    func dismissPresentations() {
+        dismissPresentationsGeneration += 1
     }
 
     // MARK: - Player Actions
@@ -276,7 +281,11 @@ final class NavigationCoordinator {
     // MARK: - Convenience Navigation
 
     /// Navigate to the subscriptions tab/feed.
-    func navigateToSubscriptions() {
+    func navigateToSubscriptions(collapsePlayer: Bool = false) {
+        if collapsePlayer, isPlayerExpanded {
+            isPlayerCollapsing = true
+            isPlayerExpanded = false
+        }
         router.select(.subscriptionsFeed)
     }
 

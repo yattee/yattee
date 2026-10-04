@@ -73,9 +73,11 @@ struct YatteeApp: App {
                 .handlesExternalEvents(preferring: ["*"], allowing: ["*"])
                 #endif
                 .onOpenURL { url in
+                    appEnvironment.navigationCoordinator.dismissPresentations()
                     handleDeepLink(url)
                 }
                 .onContinueUserActivity(HandoffManager.activityType) { activity in
+                    appEnvironment.navigationCoordinator.dismissPresentations()
                     handleContinuedActivity(activity)
                 }
                 .onAppear {
@@ -93,6 +95,7 @@ struct YatteeApp: App {
                 }
                 .onReceive(NotificationCenter.default.publisher(for: .continueUserActivity)) { notification in
                     if let activity = notification.object as? NSUserActivity {
+                        appEnvironment.navigationCoordinator.dismissPresentations()
                         handleContinuedActivity(activity)
                     }
                 }
