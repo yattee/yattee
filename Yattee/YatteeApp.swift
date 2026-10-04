@@ -37,14 +37,6 @@ struct YatteeApp: App {
     @State private var lastCheckedClipboardURL: URL?
     @Environment(\.scenePhase) private var scenePhase
 
-    // Deep link handling state
-    #if !os(tvOS)
-    @State private var deepLinkVideo: Video?
-    @State private var deepLinkStreams: [Stream] = []
-    @State private var deepLinkCaptions: [Caption] = []
-    @State private var showingDeepLinkDownloadSheet = false
-    #endif
-
     // First-launch state
     @State private var showingICloudAlert = false
     @State private var showingICloudProgress = false
@@ -117,18 +109,6 @@ struct YatteeApp: App {
                         Text(String(localized: "alert.openVideo.message \(url.host ?? "clipboard")"))
                     }
                 }
-                #if !os(tvOS)
-                .sheet(isPresented: $showingDeepLinkDownloadSheet) {
-                    if let video = deepLinkVideo {
-                        DownloadQualitySheet(
-                            video: video,
-                            streams: deepLinkStreams,
-                            captions: deepLinkCaptions
-                        )
-                        .appEnvironment(appEnvironment)
-                    }
-                }
-                #endif
                 #endif
                 // First-launch iCloud sync prompt
                 .alert(
@@ -702,10 +682,7 @@ struct YatteeApp: App {
                 )
 
             await MainActor.run {
-                deepLinkVideo = video
-                deepLinkStreams = streams
-                deepLinkCaptions = captions
-                showingDeepLinkDownloadSheet = true
+                appEnvironment.navigationCoordinator.presenter.present(.downloadOptions(video, streams: streams, captions: captions))
             }
         } catch {
             // Fall back to open on error
@@ -720,10 +697,7 @@ struct YatteeApp: App {
             let video = DirectMediaHelper.createVideo(from: url, probe: probe)
             let stream = DirectMediaHelper.createStream(from: url, probe: probe)
             await MainActor.run {
-                deepLinkVideo = video
-                deepLinkStreams = [stream]
-                deepLinkCaptions = []
-                showingDeepLinkDownloadSheet = true
+                appEnvironment.navigationCoordinator.presenter.present(.downloadOptions(video, streams: [stream], captions: []))
             }
             return
         }
@@ -739,10 +713,7 @@ struct YatteeApp: App {
                 .extractURL(url, instance: instance)
 
             await MainActor.run {
-                deepLinkVideo = video
-                deepLinkStreams = streams
-                deepLinkCaptions = captions
-                showingDeepLinkDownloadSheet = true
+                appEnvironment.navigationCoordinator.presenter.present(.downloadOptions(video, streams: streams, captions: captions))
             }
         } catch {
             // Fall back to open on error
