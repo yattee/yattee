@@ -44,7 +44,15 @@ final class NavigationRouter {
         let key = item.id
         return Binding(
             get: { self.stacks[key] ?? [] },
-            set: { self.stacks[key] = $0 }
+            set: {
+                // Only the selected section's stack is on screen, so only it
+                // edits its path (Back, swipe back). A NavigationSplitView
+                // detail stack that is being replaced on a selection change
+                // writes an empty path on its way out, which would throw
+                // away what the section had pushed.
+                guard key == self.selection.id else { return }
+                self.stacks[key] = $0
+            }
         )
     }
 

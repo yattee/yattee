@@ -677,6 +677,28 @@ struct NavigationCoordinatorTests {
         #expect(router.selection == .bookmarks)
     }
 
+    @Test("A stack that is no longer selected can't clear itself")
+    func offscreenStackWriteIgnored() {
+        let router = NavigationRouter()
+        router.push(.history)
+        let homePath = router.path(for: .home)
+
+        router.select(.bookmarks)
+        homePath.wrappedValue = []
+
+        #expect(router.stack(for: .home) == [.history])
+    }
+
+    @Test("The selected stack still pops")
+    func selectedStackPops() {
+        let router = NavigationRouter()
+        router.push(.history)
+
+        router.path(for: .home).wrappedValue = []
+
+        #expect(router.stack(for: .home).isEmpty)
+    }
+
     @Test("A destination pushed before startup keeps its section")
     func deepLinkBeforeStartup() {
         let coordinator = NavigationCoordinator()
