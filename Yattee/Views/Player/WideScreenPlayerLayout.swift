@@ -118,11 +118,7 @@ struct WideScreenPlayerLayout<PlayerContent: View>: View {
     /// requiring `.foregroundActive` would drop the safe area to zero while
     /// they are open and make the panel jump to the screen edge.
     private var foregroundWindow: UIWindow? {
-        let scenes = UIApplication.shared.connectedScenes.compactMap { $0 as? UIWindowScene }
-        let scene = scenes.first { $0.activationState == .foregroundActive }
-            ?? scenes.first { $0.activationState == .foregroundInactive }
-            ?? scenes.first
-        return scene?.windows.first { $0.isKeyWindow } ?? scene?.windows.first
+        UIApplication.shared.foregroundWindow
     }
     #endif
 
@@ -187,9 +183,7 @@ struct WideScreenPlayerLayout<PlayerContent: View>: View {
             // deployment target allows, and consider `traitCollection.verticalBarEdge` (iOS 27.1)
             // for the bar-edge question. Global scene lookup should be replaced by the hosting
             // window (e.g. via a UIViewRepresentable reading `view.window?.windowScene`).
-            let interfaceOrientation = UIApplication.shared.connectedScenes
-                .compactMap { $0 as? UIWindowScene }
-                .first?
+            let interfaceOrientation = UIApplication.shared.foregroundWindowScene?
                 .interfaceOrientation ?? .unknown
             // landscapeLeft = home/gesture bar on left = Dynamic Island on RIGHT
             // landscapeRight = home/gesture bar on right = Dynamic Island on LEFT

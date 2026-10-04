@@ -146,12 +146,7 @@ final class TVDisplayModeManager {
     }
 
     private func activeDisplayManager() -> AVDisplayManager? {
-        let scenes = UIApplication.shared.connectedScenes
-            .compactMap { $0 as? UIWindowScene }
-        let scene = scenes.first { $0.activationState == .foregroundActive }
-            ?? scenes.first
-        let window = scene?.windows.first { $0.isKeyWindow } ?? scene?.windows.first
-        return window?.avDisplayManager
+        UIApplication.shared.foregroundWindow?.avDisplayManager
     }
 
     private func makeFormatDescription(for dynamicRange: TVDisplayDynamicRange) -> CMVideoFormatDescription {

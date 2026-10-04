@@ -1767,9 +1767,7 @@ extension ExpandedPlayerSheet {
                             Text(verbatim: "fullH: \(Int(fullHeight)) offset: \(Int(controlsOffset))")
                             Text(verbatim: "pinned: \(isPanelPinned ? "Y" : "N") vis: \(isPanelVisible ? "Y" : "N") side: \(panelSide == .left ? "L" : "R")")
                             #if os(iOS)
-                            let orientation = UIApplication.shared.connectedScenes
-                                .compactMap { $0 as? UIWindowScene }
-                                .first?.interfaceOrientation
+                            let orientation = UIApplication.shared.foregroundWindowScene?.interfaceOrientation
                             Text(verbatim: "orient: \(orientation == .landscapeLeft ? "LL" : orientation == .landscapeRight ? "LR" : "P")")
                             #endif
                         }

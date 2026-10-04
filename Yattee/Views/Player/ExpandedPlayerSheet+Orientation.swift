@@ -15,12 +15,7 @@ extension ExpandedPlayerSheet {
 
     /// Get safe area insets from the window.
     var windowSafeAreaInsets: UIEdgeInsets {
-        UIApplication.shared.connectedScenes
-            .compactMap { $0 as? UIWindowScene }
-            .first?
-            .windows
-            .first?
-            .safeAreaInsets ?? .zero
+        UIApplication.shared.foregroundWindow?.safeAreaInsets ?? .zero
     }
 
     // MARK: - Orientation Lock

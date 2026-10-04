@@ -186,9 +186,9 @@ struct VideoSwipeActionsModifier: ViewModifier {
             activityItems: [appEnvironment?.shareURL(for: video) ?? video.shareURL],
             applicationActivities: nil
         )
-        if let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
-           let window = windowScene.windows.first,
-           let rootVC = window.rootViewController {
+        // The key window is the expanded player's while it is up, so the
+        // share sheet opens above it rather than behind it.
+        if let rootVC = UIApplication.shared.foregroundWindow?.rootViewController {
             // Find the top-most view controller
             var topVC = rootVC
             while let presented = topVC.presentedViewController {
