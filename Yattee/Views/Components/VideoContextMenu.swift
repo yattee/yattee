@@ -49,8 +49,6 @@ struct VideoContextMenuModifier: ViewModifier {
     var startTime: Double? = nil
     var watchProgress: Double? = nil
 
-    @State private var showingPlaylistSheet = false
-    @State private var showingDownloadSheet = false
     @State private var showingDeleteDownloadConfirmation = false
     @State private var downloadToDelete: Download?
     @State private var menuRefreshID = UUID()
@@ -64,8 +62,6 @@ struct VideoContextMenuModifier: ViewModifier {
                     customActions: customActions,
                     context: context,
                     startTime: startTime,
-                    showingPlaylistSheet: $showingPlaylistSheet,
-                    showingDownloadSheet: $showingDownloadSheet,
                     showingDeleteDownloadConfirmation: $showingDeleteDownloadConfirmation,
                     downloadToDelete: $downloadToDelete,
                     appEnvironment: appEnvironment
@@ -79,8 +75,6 @@ struct VideoContextMenuModifier: ViewModifier {
                     customActions: customActions,
                     context: context,
                     startTime: startTime,
-                    showingPlaylistSheet: $showingPlaylistSheet,
-                    showingDownloadSheet: $showingDownloadSheet,
                     showingDeleteDownloadConfirmation: $showingDeleteDownloadConfirmation,
                     downloadToDelete: $downloadToDelete,
                     appEnvironment: appEnvironment
@@ -98,13 +92,7 @@ struct VideoContextMenuModifier: ViewModifier {
                 .environment(\.appEnvironment, appEnvironment)
             })
             #endif
-            .sheet(isPresented: $showingPlaylistSheet) {
-                PlaylistSelectorSheet(video: video)
-            }
             #if !os(tvOS)
-            .sheet(isPresented: $showingDownloadSheet) {
-                DownloadQualitySheet(video: video)
-            }
             .alert(String(localized: "videoInfo.download.remove.title"), isPresented: $showingDeleteDownloadConfirmation) {
                 Button(String(localized: "common.cancel"), role: .cancel) {}
                 Button(String(localized: "videoInfo.download.remove.confirm"), role: .destructive) {
@@ -130,13 +118,12 @@ struct VideoContextMenuModifier: ViewModifier {
 /// All observable values are snapshotted at init time to prevent redraws during playback.
 struct VideoContextMenuContent: View {
     @Environment(\.appEnvironment) private var appEnvironment
+    @Environment(\.presentAppSheet) private var presentAppSheet
 
     let video: Video
     var customActions: [VideoContextAction] = []
     var context: VideoContextMenuContext = .default
     var startTime: Double? = nil
-    @Binding var showingPlaylistSheet: Bool
-    @Binding var showingDownloadSheet: Bool
     @Binding var showingDeleteDownloadConfirmation: Bool
     @Binding var downloadToDelete: Download?
 
@@ -168,8 +155,6 @@ struct VideoContextMenuContent: View {
         customActions: [VideoContextAction] = [],
         context: VideoContextMenuContext = .default,
         startTime: Double? = nil,
-        showingPlaylistSheet: Binding<Bool>,
-        showingDownloadSheet: Binding<Bool>,
         showingDeleteDownloadConfirmation: Binding<Bool> = .constant(false),
         downloadToDelete: Binding<Download?> = .constant(nil),
         appEnvironment: AppEnvironment? = nil
@@ -178,8 +163,6 @@ struct VideoContextMenuContent: View {
         self.customActions = customActions
         self.context = context
         self.startTime = startTime
-        self._showingPlaylistSheet = showingPlaylistSheet
-        self._showingDownloadSheet = showingDownloadSheet
         self._showingDeleteDownloadConfirmation = showingDeleteDownloadConfirmation
         self._downloadToDelete = downloadToDelete
 
@@ -427,7 +410,7 @@ struct VideoContextMenuContent: View {
         // Add to playlist
         if showAddToPlaylist {
             Button {
-                showingPlaylistSheet = true
+                presentAppSheet(.addToPlaylist(video))
             } label: {
                 Label(String(localized: "video.context.addToPlaylist"), systemImage: "text.badge.plus")
             }
@@ -440,7 +423,7 @@ struct VideoContextMenuContent: View {
     /// Starts a download either automatically or by showing the quality sheet.
     private func startDownload(for video: Video) {
         guard let appEnvironment else {
-            showingDownloadSheet = true
+            presentAppSheet(.downloadOptions(video))
             return
         }
 
@@ -494,7 +477,7 @@ struct VideoContextMenuContent: View {
                 }
             }
         } else {
-            showingDownloadSheet = true
+            presentAppSheet(.downloadOptions(video))
         }
     }
     #endif
@@ -613,8 +596,6 @@ struct VideoContextMenuView: View {
     var buttonBackgroundStyle: ButtonBackgroundStyle = .none
     var theme: ControlsTheme = .dark
 
-    @State private var showingPlaylistSheet = false
-    @State private var showingDownloadSheet = false
     @State private var showingDeleteDownloadConfirmation = false
     @State private var downloadToDelete: Download?
     @State private var refreshID = UUID()
@@ -628,8 +609,6 @@ struct VideoContextMenuView: View {
             VideoContextMenuContent(
                 video: video,
                 context: .player,
-                showingPlaylistSheet: $showingPlaylistSheet,
-                showingDownloadSheet: $showingDownloadSheet,
                 showingDeleteDownloadConfirmation: $showingDeleteDownloadConfirmation,
                 downloadToDelete: $downloadToDelete,
                 appEnvironment: appEnvironment
@@ -645,12 +624,6 @@ struct VideoContextMenuView: View {
         .menuStyle(.borderlessButton)
         .fixedSize()
         #endif
-        .sheet(isPresented: $showingPlaylistSheet) {
-            PlaylistSelectorSheet(video: video)
-        }
-        .sheet(isPresented: $showingDownloadSheet) {
-            DownloadQualitySheet(video: video)
-        }
         .alert(String(localized: "videoInfo.download.remove.title"), isPresented: $showingDeleteDownloadConfirmation) {
             Button(String(localized: "common.cancel"), role: .cancel) {}
             Button(String(localized: "videoInfo.download.remove.confirm"), role: .destructive) {

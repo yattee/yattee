@@ -106,7 +106,6 @@ struct VideoInfoView: View {
     @State private var showingRemoveDownloadConfirmation = false
     
     // Resume action sheet state
-    @State private var resumeSheetData: ResumeSheetData?
     
     // Video details cache - stores full video details loaded from API
     @State private var loadedVideoDetails: [String: Video] = [:]
@@ -452,14 +451,6 @@ struct VideoInfoView: View {
             commentsSheetContent
         }
         #endif
-        .sheet(item: $resumeSheetData) { data in
-            ResumeActionSheet(
-                video: data.video,
-                resumeTime: data.resumeTime,
-                onContinue: { playVideoWithStartTime(data.resumeTime) },
-                onStartOver: { playVideoWithStartTime(0) }
-            )
-        }
         #if !os(tvOS)
         .onChange(of: downloadManager?.completedDownloads) { _, newValue in
             // Update download state when completedDownloads changes
@@ -2571,7 +2562,12 @@ struct VideoInfoView: View {
                 playVideoWithStartTime(0)
             case .ask:
                 // Show the resume action sheet
-                resumeSheetData = ResumeSheetData(video: video, resumeTime: savedProgress)
+                presentAppSheet(.resumeAction(
+                    video,
+                    resumeTime: savedProgress,
+                    onContinue: { playVideoWithStartTime(savedProgress) },
+                    onStartOver: { playVideoWithStartTime(0) }
+                ))
             }
         } else {
             // No saved progress or video was completed - play from beginning

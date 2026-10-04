@@ -13,8 +13,7 @@
 //  The state lives on `NavigationCoordinator` so both the root app view and
 //  `ExpandedPlayerSheet` can host the dialogs. Only whichever host is currently
 //  on top presents the dialog (`shouldHost`), so the dialog is visible whether
-//  the expanded player is covering the main view or not — matching the
-//  `descriptionLinkQueueSheetVideo` pattern.
+//  the expanded player is covering the main view or not.
 //
 
 import SwiftUI

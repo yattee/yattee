@@ -493,19 +493,6 @@ struct ExpandedPlayerSheet: View {
         .sheet(isPresented: $showingErrorSheet) {
             ErrorDetailsSheet(errorMessage: playerState?.errorMessage ?? "Unknown error")
         }
-        .sheet(item: Binding<Video?>(
-            get: { appEnvironment?.navigationCoordinator.descriptionLinkQueueSheetVideo },
-            set: { newValue in
-                if newValue == nil {
-                    appEnvironment?.navigationCoordinator.descriptionLinkQueueSheetVideo = nil
-                }
-            }
-        )) { video in
-            if let appEnvironment {
-                QueueActionSheet(video: video)
-                    .appEnvironment(appEnvironment)
-            }
-        }
         // Host the resolved/ambiguous link confirmation dialogs while the
         // expanded player is up so they appear above this sheet rather than
         // being buried underneath it on the root app view.

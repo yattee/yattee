@@ -63,14 +63,8 @@ final class NavigationCoordinator {
     /// (remote control state) reads the real layout instead of screen bounds.
     var isWideScreenLayoutActive = false
 
-    /// Video to present in the queue action sheet (e.g. a video link tapped inside
-    /// a description). Set by the deep-link handler; cleared when the sheet dismisses.
-    /// Presented by YatteeApp when the player is collapsed and by ExpandedPlayerSheet
-    /// when the player is expanded, so the sheet always sits above the visible layer.
-    var descriptionLinkQueueSheetVideo: Video?
-
     /// Resolved short-link URL awaiting user confirmation ("Try in Yattee" vs
-    /// "Open in Browser"). Dual-hosted like `descriptionLinkQueueSheetVideo`
+    /// "Open in Browser"). Dual-hosted (root and expanded player)
     /// so the dialog is visible whether or not the expanded player is covering
     /// the main app view.
     var resolvedShortLinkPrompt: URL?

@@ -154,7 +154,6 @@ struct FloatingDetailsPanel: View {
             }
         }
         .environment(\.colorScheme, isPinned ? systemColorScheme : .dark)
-        .environment(\.presentationColorScheme, systemColorScheme)
         .animation(.easeInOut(duration: 0.25), value: isPinned)
         .onChange(of: video.id) { _, _ in
             // Comments state is managed by parent - just reset local state

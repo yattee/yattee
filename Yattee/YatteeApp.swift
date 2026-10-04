@@ -123,22 +123,6 @@ struct YatteeApp: App {
                     OpenLinkSheet(prefilledURL: url)
                         .appEnvironment(appEnvironment)
                 }
-                .sheet(item: Binding<Video?>(
-                    get: {
-                        // Only host the sheet here when the player is not expanded.
-                        // When expanded, ExpandedPlayerSheet hosts it so it appears above the player window.
-                        guard !appEnvironment.navigationCoordinator.isPlayerExpanded else { return nil }
-                        return appEnvironment.navigationCoordinator.descriptionLinkQueueSheetVideo
-                    },
-                    set: { newValue in
-                        if newValue == nil {
-                            appEnvironment.navigationCoordinator.descriptionLinkQueueSheetVideo = nil
-                        }
-                    }
-                )) { video in
-                    QueueActionSheet(video: video)
-                        .appEnvironment(appEnvironment)
-                }
                 #if !os(tvOS)
                 .sheet(isPresented: $showingDeepLinkDownloadSheet) {
                     if let video = deepLinkVideo {
@@ -598,7 +582,8 @@ struct YatteeApp: App {
                 instance: instance
             )
             appEnvironment.toastManager.dismiss(id: toastID)
-            appEnvironment.navigationCoordinator.descriptionLinkQueueSheetVideo = video
+            // The top-most sheet host (the player when expanded) presents it
+            appEnvironment.navigationCoordinator.presenter.present(.queueAction(video))
         } catch {
             appEnvironment.toastManager.dismiss(id: toastID)
             appEnvironment.navigationCoordinator.navigate(to: .video(.id(videoID)))

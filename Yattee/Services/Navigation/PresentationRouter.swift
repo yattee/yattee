@@ -20,6 +20,10 @@ enum AppSheet: Identifiable {
     case queue(halfHeight: Bool = false)
     /// Add a video to a playlist. `halfHeight` opens at the medium detent.
     case addToPlaylist(Video, halfHeight: Bool = false)
+    /// Play now / queue choices for a tapped video while something is playing.
+    case queueAction(Video, queueSource: QueueSource? = nil)
+    /// Continue / start over for a partially watched video.
+    case resumeAction(Video, resumeTime: TimeInterval, onContinue: () -> Void, onStartOver: () -> Void)
     #if !os(tvOS)
     /// Download quality picker. Streams and captions already loaded by the
     /// caller (the player) skip the sheet's own fetch.
@@ -32,6 +36,10 @@ enum AppSheet: Identifiable {
             return "queue"
         case .addToPlaylist(let video, _):
             return "addToPlaylist-\(video.id.id)"
+        case .queueAction(let video, _):
+            return "queueAction-\(video.id.id)"
+        case .resumeAction(let video, _, _, _):
+            return "resumeAction-\(video.id.id)"
         #if !os(tvOS)
         case .downloadOptions(let video, _, _, _):
             return "downloadOptions-\(video.id.id)"
@@ -85,16 +93,9 @@ private struct AppSheetHost: ViewModifier {
     func body(content: Content) -> some View {
         content
             .environment(\.presentAppSheet, PresentAppSheetAction { sheet = $0 })
-            #if os(tvOS)
-            .fullScreenCover(item: $sheet) { sheet in
-                sheetContent(for: sheet)
-                    .tvFullScreenCoverBackground()
-            }
-            #else
             .sheet(item: $sheet) { sheet in
                 sheetContent(for: sheet)
             }
-            #endif
             .onChange(of: pendingRequestID, initial: true) { _, _ in
                 takePendingRequest()
             }
@@ -121,6 +122,10 @@ private struct AppSheetHost: ViewModifier {
             case .addToPlaylist(let video, let halfHeight):
                 PlaylistSelectorSheet(video: video)
                     .halfHeightDetents(halfHeight)
+            case .queueAction(let video, let queueSource):
+                QueueActionSheet(video: video, queueSource: queueSource)
+            case .resumeAction(let video, let resumeTime, let onContinue, let onStartOver):
+                ResumeActionSheet(video: video, resumeTime: resumeTime, onContinue: onContinue, onStartOver: onStartOver)
             #if !os(tvOS)
             case .downloadOptions(let video, let streams, let captions, let dislikeCount):
                 DownloadQualitySheet(video: video, streams: streams, captions: captions, dislikeCount: dislikeCount)

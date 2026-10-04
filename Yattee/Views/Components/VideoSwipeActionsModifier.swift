@@ -12,22 +12,14 @@ import SwiftUI
 struct VideoSwipeActionsModifier: ViewModifier {
     @Environment(\.appEnvironment) private var appEnvironment
     @Environment(\.videoQueueContext) private var queueContext
+    @Environment(\.presentAppSheet) private var presentAppSheet
 
     let video: Video
     var fixedActions: [SwipeAction] = []
 
-    @State private var showingPlaylistSheet = false
-    @State private var showingDownloadSheet = false
-
     func body(content: Content) -> some View {
         content
             .swipeActions(actionsArray: allActions())
-            .sheet(isPresented: $showingPlaylistSheet) {
-                PlaylistSelectorSheet(video: video)
-            }
-            .sheet(isPresented: $showingDownloadSheet) {
-                DownloadQualitySheet(video: video)
-            }
     }
 
     private var visibleActions: [VideoSwipeAction] {
@@ -104,7 +96,7 @@ struct VideoSwipeActionsModifier: ViewModifier {
                 tint: action.tint,
                 background: action.backgroundColor
             ) { reset in
-                showingPlaylistSheet = true
+                presentAppSheet(.addToPlaylist(video))
                 reset()
             }
 
@@ -223,7 +215,7 @@ struct VideoSwipeActionsModifier: ViewModifier {
 
     private func startDownload() {
         guard let appEnvironment else {
-            showingDownloadSheet = true
+            presentAppSheet(.downloadOptions(video))
             return
         }
 
@@ -277,7 +269,7 @@ struct VideoSwipeActionsModifier: ViewModifier {
                 }
             }
         } else {
-            showingDownloadSheet = true
+            presentAppSheet(.downloadOptions(video))
         }
     }
 }
