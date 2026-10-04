@@ -9,6 +9,7 @@ import SwiftUI
 
 struct HomeView: View {
     @Environment(\.appEnvironment) private var appEnvironment
+    @Environment(\.presentAppSheet) private var presentAppSheet
     #if os(iOS)
     @Environment(\.horizontalSizeClass) private var horizontalSizeClass
     #endif
@@ -37,7 +38,6 @@ struct HomeView: View {
     #if !os(tvOS) && !os(macOS)
     @State private var showingSettings = false
     #endif
-    @State private var showingOpenLink = false
     @State private var showingRemoteControl = false
     @State private var showingCustomizeHome = false
     @State private var channelsCount: Int = 0
@@ -201,9 +201,6 @@ struct HomeView: View {
             showingSettings = false
         }
         #endif
-        .sheet(isPresented: $showingOpenLink) {
-            OpenLinkSheet()
-        }
         .sheet(isPresented: $showingRemoteControl) {
             RemoteDevicesSheet()
         }
@@ -712,7 +709,7 @@ struct HomeView: View {
 
     private var openURLShortcutCard: some View {
         Button {
-            showingOpenLink = true
+            presentAppSheet(.openLink(nil))
         } label: {
             HomeShortcutCardView(
                 icon: "link",
@@ -974,7 +971,7 @@ struct HomeView: View {
 
     private var openURLShortcutRow: some View {
         Button {
-            showingOpenLink = true
+            presentAppSheet(.openLink(nil))
         } label: {
             HomeShortcutRowView(
                 icon: "link",

@@ -19,7 +19,6 @@ struct ExpandedPlayerSheet: View {
 
     @State var showingQualitySheet = false
     @State var showingDeleteDownloadAlert = false
-    @State var showingErrorSheet = false
     @State var isCommentsExpanded: Bool = false
     @State var commentsDismissOffset: CGFloat = 0
     /// Direct scroll position control - use scrollTo(y:) to scroll to top
@@ -490,9 +489,6 @@ struct ExpandedPlayerSheet: View {
             }
         }
         .animation(.spring(response: 0.3, dampingFraction: 0.7), value: commentsState == .loaded && !comments.isEmpty)
-        .sheet(isPresented: $showingErrorSheet) {
-            ErrorDetailsSheet(errorMessage: playerState?.errorMessage ?? "Unknown error")
-        }
         // Host the resolved/ambiguous link confirmation dialogs while the
         // expanded player is up so they appear above this sheet rather than
         // being buried underneath it on the root app view.

@@ -22,6 +22,10 @@ enum AppSheet: Identifiable {
     case addToPlaylist(Video, halfHeight: Bool = false)
     /// Play now / queue choices for a tapped video while something is playing.
     case queueAction(Video, queueSource: QueueSource? = nil)
+    /// Details of a playback or loading error.
+    case errorDetails(String)
+    /// Open a link, optionally prefilled.
+    case openLink(URL?)
     /// Continue / start over for a partially watched video.
     case resumeAction(Video, resumeTime: TimeInterval, onContinue: () -> Void, onStartOver: () -> Void)
     #if !os(tvOS)
@@ -36,6 +40,10 @@ enum AppSheet: Identifiable {
             return "queue"
         case .addToPlaylist(let video, _):
             return "addToPlaylist-\(video.id.id)"
+        case .errorDetails:
+            return "errorDetails"
+        case .openLink:
+            return "openLink"
         case .queueAction(let video, _):
             return "queueAction-\(video.id.id)"
         case .resumeAction(let video, _, _, _):
@@ -122,6 +130,10 @@ private struct AppSheetHost: ViewModifier {
             case .addToPlaylist(let video, let halfHeight):
                 PlaylistSelectorSheet(video: video)
                     .halfHeightDetents(halfHeight)
+            case .errorDetails(let message):
+                ErrorDetailsSheet(errorMessage: message)
+            case .openLink(let url):
+                OpenLinkSheet(prefilledURL: url)
             case .queueAction(let video, let queueSource):
                 QueueActionSheet(video: video, queueSource: queueSource)
             case .resumeAction(let video, let resumeTime, let onContinue, let onStartOver):

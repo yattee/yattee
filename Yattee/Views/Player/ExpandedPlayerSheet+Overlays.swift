@@ -109,7 +109,7 @@ extension ExpandedPlayerSheet {
         VStack(spacing: 16) {
             // Error details button
             Button {
-                showingErrorSheet = true
+                presentSheet(.errorDetails(playerState?.errorMessage ?? "Unknown error"))
             } label: {
                 Label(String(localized: "player.error.button"), systemImage: "info.circle")
                     .font(.subheadline.weight(.medium))

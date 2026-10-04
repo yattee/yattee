@@ -45,7 +45,6 @@ struct VideoInfoView: View {
     @State private var loadMoreError: String?
     
     @State private var isBookmarked = false
-    @State private var showingErrorDetailsSheet = false
     @State private var showingCommentsSheet = false
     @State private var showingRemoveBookmarkAlert = false
     @State private var currentBookmark: Bookmark?
@@ -437,11 +436,6 @@ struct VideoInfoView: View {
                 await loadVideoDetails()
             }
         }
-        #if !os(tvOS)
-        .sheet(isPresented: $showingErrorDetailsSheet) {
-            ErrorDetailsSheet(errorMessage: videoDetailsLoadError ?? initialVideoLoadError ?? "Unknown error")
-        }
-        #endif
         #if os(tvOS)
         .fullScreenCover(isPresented: $showingCommentsSheet) {
             commentsSheetContent
@@ -878,7 +872,7 @@ struct VideoInfoView: View {
 
             #if !os(tvOS)
             Button {
-                showingErrorDetailsSheet = true
+                presentAppSheet(.errorDetails(videoDetailsLoadError ?? initialVideoLoadError ?? "Unknown error"))
             } label: {
                 Label(String(localized: "player.error.button"), systemImage: "info.circle")
             }
@@ -1977,7 +1971,7 @@ struct VideoInfoView: View {
 
                 #if !os(tvOS)
                 Button {
-                    showingErrorDetailsSheet = true
+                    presentAppSheet(.errorDetails(videoDetailsLoadError ?? initialVideoLoadError ?? "Unknown error"))
                 } label: {
                     Label(String(localized: "player.error.button"), systemImage: "info.circle")
                 }

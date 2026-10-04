@@ -38,7 +38,6 @@ struct YatteeApp: App {
     @Environment(\.scenePhase) private var scenePhase
 
     // Deep link handling state
-    @State private var prefilledLinkURL: URL?
     #if !os(tvOS)
     @State private var deepLinkVideo: Video?
     @State private var deepLinkStreams: [Stream] = []
@@ -51,7 +50,6 @@ struct YatteeApp: App {
     @State private var showingICloudProgress = false
     @State private var showingLegacyAccountsAlert = false
     @State private var showingLegacyAccountsImport = false
-    @State private var showingOpenLinkSheet = false
 
     // Ambiguous-link prompts are stored on NavigationCoordinator so they can
     // be dual-hosted by the root app view (here) and the expanded player sheet.
@@ -118,10 +116,6 @@ struct YatteeApp: App {
                     if let url = detectedClipboardURL {
                         Text(String(localized: "alert.openVideo.message \(url.host ?? "clipboard")"))
                     }
-                }
-                .sheet(item: $prefilledLinkURL) { url in
-                    OpenLinkSheet(prefilledURL: url)
-                        .appEnvironment(appEnvironment)
                 }
                 #if !os(tvOS)
                 .sheet(isPresented: $showingDeepLinkDownloadSheet) {
@@ -202,15 +196,9 @@ struct YatteeApp: App {
                     #endif
                 }
                 #endif
-                #if !os(tvOS)
-                .sheet(isPresented: $showingOpenLinkSheet) {
-                    OpenLinkSheet()
-                        .appEnvironment(appEnvironment)
-                }
-                #endif
                 .onReceive(NotificationCenter.default.publisher(for: .showOpenLinkSheet)) { _ in
                     appEnvironment.navigationCoordinator.isPlayerExpanded = false
-                    showingOpenLinkSheet = true
+                    appEnvironment.navigationCoordinator.presenter.present(.openLink(nil))
                 }
                 .onReceive(NotificationCenter.default.publisher(for: .openDescriptionLink)) { notification in
                     if let url = notification.object as? URL {
@@ -645,7 +633,8 @@ struct YatteeApp: App {
 
     /// Show OpenLinkSheet with a pre-filled URL.
     private func showOpenLinkSheetWithURL(_ url: URL) {
-        prefilledLinkURL = url
+        // The top-most sheet host (the player when expanded) presents it
+        appEnvironment.navigationCoordinator.presenter.present(.openLink(url))
     }
 
     /// Play a video from a deep link.

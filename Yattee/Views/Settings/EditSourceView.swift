@@ -353,19 +353,11 @@ private struct EditRemoteServerContent: View {
             }
         }
         .presentationCompactAdaptation(.sheet)
-        #if os(tvOS)
-        .fullScreenCover(item: $loginTarget) { target in
+        .platformSheet(item: $loginTarget) { target in
             InstanceLoginView(instance: instance, initialUsername: storedUsername(for: target)) { credential, username in
                 storeLogin(credential: credential, username: username, target: target)
             }
         }
-        #else
-        .sheet(item: $loginTarget) { target in
-            InstanceLoginView(instance: instance, initialUsername: storedUsername(for: target)) { credential, username in
-                storeLogin(credential: credential, username: username, target: target)
-            }
-        }
-        #endif
         // Signing out happens in the accounts section below, which cannot reach
         // this state directly. Without this the authenticated import actions
         // stay on screen after the last account is removed, and then fail.

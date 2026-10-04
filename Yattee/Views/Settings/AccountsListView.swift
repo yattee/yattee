@@ -79,15 +79,9 @@ struct AccountsListView: View {
         #if os(iOS)
         .navigationBarTitleDisplayMode(.inline)
         #endif
-        #if os(tvOS)
-        .fullScreenCover(item: $login) { login in
+        .platformSheet(item: $login) { login in
             loginSheet(login)
         }
-        #else
-        .sheet(item: $login) { login in
-            loginSheet(login)
-        }
-        #endif
         .confirmationDialog(
             pendingRemoval.map { String(localized: "accounts.remove.confirm.title \($0.name)") } ?? "",
             isPresented: Binding(
