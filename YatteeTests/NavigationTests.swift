@@ -178,6 +178,78 @@ struct URLRouterTests {
         #expect(router.unwrapped(scheme) == scheme)
     }
 
+    @Test("route() unwraps yattee://open itself, keeping inner query items")
+    func routeUnwrapsOpenWrapper() {
+        let wrapper = URL(string: "yattee://open?url=https://www.youtube.com/watch?list=PLtest123&index=2")!
+        if case .playlist(.remote(let id, _, _, _)) = router.route(wrapper) {
+            #expect(id.playlistID == "PLtest123")
+        } else {
+            Issue.record("Expected playlist destination")
+        }
+    }
+
+    @Test("yattee://open with no inner URL routes nowhere")
+    func emptyOpenWrapper() {
+        #expect(router.route(URL(string: "yattee://open")!) == nil)
+        #expect(router.route(URL(string: "yattee://open?url=")!) == nil)
+    }
+
+    // MARK: - Local File Rejection
+
+    @Test("File URLs never route, directly or wrapped")
+    func fileURLsRejected() {
+        #expect(router.route(URL(string: "file:///private/var/mobile/movie.mp4")!) == nil)
+        #expect(router.route(URL(string: "yattee://open?url=file:///private/var/mobile/movie.mp4")!) == nil)
+    }
+
+    @Test("Remote direct media still routes")
+    func remoteDirectMedia() {
+        let url = URL(string: "https://example.com/video.mp4")!
+        if case .directMedia(let media) = router.route(url) {
+            #expect(media == url)
+        } else {
+            Issue.record("Expected directMedia destination")
+        }
+    }
+
+    // MARK: - Legacy (1.x) Scheme Tests
+
+    @Test("Legacy yattee:// links route like their web equivalents", arguments: [
+        "yattee://watch?v=dQw4w9WgXcQ",
+        "yattee://www.youtube.com/watch?v=dQw4w9WgXcQ",
+        "yattee://youtube.com/watch?v=dQw4w9WgXcQ&t=30",
+        "yattee://youtu.be/dQw4w9WgXcQ",
+        "yattee://https://www.youtube.com/watch?v=dQw4w9WgXcQ",
+        "yattee://shorts/dQw4w9WgXcQ",
+    ])
+    func legacyVideoLinks(_ string: String) {
+        if case .video(let source, _) = router.route(URL(string: string)!), case .id(let videoID) = source {
+            #expect(videoID.videoID == "dQw4w9WgXcQ")
+        } else {
+            Issue.record("Expected video destination for \(string)")
+        }
+    }
+
+    @Test("Legacy playlist and channel links")
+    func legacyPlaylistAndChannel() {
+        if case .playlist(.remote(let id, _, _, _)) = router.route(URL(string: "yattee://playlist?list=PLtest123")!) {
+            #expect(id.playlistID == "PLtest123")
+        } else {
+            Issue.record("Expected playlist destination")
+        }
+        if case .channel(let id, _) = router.route(URL(string: "yattee://www.youtube.com/@somehandle")!) {
+            #expect(id == "@somehandle")
+        } else {
+            Issue.record("Expected channel destination")
+        }
+    }
+
+    @Test("Unknown yattee:// hosts still route nowhere")
+    func unknownCustomHost() {
+        #expect(router.route(URL(string: "yattee://nonsense")!) == nil)
+        #expect(router.route(URL(string: "yattee://example.com/page")!) == nil)
+    }
+
     // MARK: - PeerTube URL Tests
 
     @Test("Parse PeerTube /w/ video URL")
@@ -511,6 +583,32 @@ struct URLRouterTests {
             }
         } else {
             Issue.record("Expected channel destination with federated source")
+        }
+    }
+
+    @Test("Parse yattee:// playlist URL with PeerTube source")
+    func customSchemePeerTubePlaylist() {
+        let url = URL(string: "yattee://playlist/abc123?source=peertube&instance=https://peertube.social")!
+        if case .playlist(.remote(let id, _, _, _)) = router.route(url),
+           case .federated(_, let instance) = id.source {
+            #expect(id.playlistID == "abc123")
+            #expect(instance.host == "peertube.social")
+        } else {
+            Issue.record("Expected federated playlist destination")
+        }
+    }
+
+    @Test("PeerTube playlist web URLs route to playlists, not videos", arguments: [
+        "https://framatube.org/w/p/abc123",
+        "https://framatube.org/video-playlists/abc123",
+    ])
+    func peertubePlaylistURLs(_ string: String) {
+        if case .playlist(.remote(let id, _, _, _)) = router.route(URL(string: string)!),
+           case .federated(_, let instance) = id.source {
+            #expect(id.playlistID == "abc123")
+            #expect(instance.host == "framatube.org")
+        } else {
+            Issue.record("Expected federated playlist destination for \(string)")
         }
     }
 

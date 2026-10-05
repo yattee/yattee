@@ -73,6 +73,11 @@ struct YatteeApp: App {
                 .handlesExternalEvents(preferring: ["*"], allowing: ["*"])
                 #endif
                 .onOpenURL { url in
+                    // Leave open sheets alone when the link goes nowhere
+                    guard URLRouter().route(url) != nil else {
+                        reportUnhandledDeepLink(url)
+                        return
+                    }
                     appEnvironment.navigationCoordinator.dismissPresentations()
                     handleDeepLink(url)
                 }
@@ -505,6 +510,15 @@ struct YatteeApp: App {
 
         // All other destinations use standard navigation
         appEnvironment.navigationCoordinator.navigate(to: destination)
+    }
+
+    /// Tell the user an incoming link couldn't be opened instead of failing silently.
+    private func reportUnhandledDeepLink(_ url: URL) {
+        LoggingService.shared.warning("Deep link not handled: \(url.absoluteString)", category: .general)
+        appEnvironment.toastManager.showError(
+            String(localized: "deepLink.unsupported.title", defaultValue: "Can't open link"),
+            subtitle: url.absoluteString
+        )
     }
 
     /// Handle a link tapped inside a video description.
