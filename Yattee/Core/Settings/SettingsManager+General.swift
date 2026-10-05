@@ -627,6 +627,20 @@ extension SettingsManager {
         }
     }
 
+    /// Whether URL scheme actions that change saved state (queue, bookmark,
+    /// download, subscribe) run without asking first. Off by default: any web
+    /// page can open a yattee:// link. Local-only, like `defaultLinkAction`.
+    var linkActionsRunWithoutConfirmation: Bool {
+        get {
+            if let cached = _linkActionsRunWithoutConfirmation { return cached }
+            return localDefaults.bool(forKey: "linkActionsRunWithoutConfirmation")
+        }
+        set {
+            _linkActionsRunWithoutConfirmation = newValue
+            localDefaults.set(newValue, forKey: "linkActionsRunWithoutConfirmation")
+        }
+    }
+
     // MARK: - Video Tap Actions (iOS/macOS only)
 
     #if !os(tvOS)

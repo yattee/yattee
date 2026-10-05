@@ -73,6 +73,15 @@ struct YatteeApp: App {
                 .handlesExternalEvents(preferring: ["*"], allowing: ["*"])
                 #endif
                 .onOpenURL { url in
+                    if let action = LinkActionParser().parse(url) {
+                        if action.dismissesPresentations {
+                            appEnvironment.navigationCoordinator.dismissPresentations()
+                        }
+                        Task {
+                            _ = await LinkActionPerformer(appEnvironment: appEnvironment).perform(action)
+                        }
+                        return
+                    }
                     // Leave open sheets alone when the link goes nowhere
                     guard URLRouter().route(url) != nil else {
                         reportUnhandledDeepLink(url)

@@ -28,6 +28,8 @@ enum AppSheet: Identifiable {
     case openLink(URL?)
     /// Continue / start over for a partially watched video.
     case resumeAction(Video, resumeTime: TimeInterval, onContinue: () -> Void, onStartOver: () -> Void)
+    /// Asks before a URL scheme action changes saved state.
+    case linkActionConfirmation(LinkActionConfirmation)
     #if !os(tvOS)
     /// Download quality picker. Streams and captions already loaded by the
     /// caller (the player) skip the sheet's own fetch.
@@ -48,6 +50,8 @@ enum AppSheet: Identifiable {
             return "queueAction-\(video.id.id)"
         case .resumeAction(let video, _, _, _):
             return "resumeAction-\(video.id.id)"
+        case .linkActionConfirmation(let confirmation):
+            return "linkActionConfirmation-\(confirmation.id)"
         #if !os(tvOS)
         case .downloadOptions(let video, _, _, _):
             return "downloadOptions-\(video.id.id)"
@@ -150,6 +154,8 @@ private struct AppSheetHost: ViewModifier {
                 QueueActionSheet(video: video, queueSource: queueSource)
             case .resumeAction(let video, let resumeTime, let onContinue, let onStartOver):
                 ResumeActionSheet(video: video, resumeTime: resumeTime, onContinue: onContinue, onStartOver: onStartOver)
+            case .linkActionConfirmation(let confirmation):
+                LinkActionConfirmationSheet(confirmation: confirmation)
             #if !os(tvOS)
             case .downloadOptions(let video, let streams, let captions, let dislikeCount):
                 DownloadQualitySheet(video: video, streams: streams, captions: captions, dislikeCount: dislikeCount)

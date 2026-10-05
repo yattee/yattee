@@ -150,6 +150,13 @@ private struct LinkActionSection: View {
                 }
             }
         }
+
+        SettingsFormSection(footer: "settings.behavior.linkActionsWithoutConfirmation.footer") {
+            Toggle(
+                String(localized: "settings.behavior.linkActionsWithoutConfirmation"),
+                isOn: $settings.linkActionsRunWithoutConfirmation
+            )
+        }
     }
 }
 

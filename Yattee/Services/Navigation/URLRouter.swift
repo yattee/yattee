@@ -301,6 +301,8 @@ struct URLRouter: Sendable {
             return nil
 
         default:
+            // Action hosts (yattee://play, yattee://player/…) are LinkActionParser's
+            if LinkActionParser.hosts.contains(host) { return nil }
             return parseLegacyScheme(url)
         }
     }

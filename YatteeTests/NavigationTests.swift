@@ -881,3 +881,95 @@ struct ConnectivityMonitorTests {
         #expect(monitor.isOnline == true)
     }
 }
+
+// MARK: - LinkActionParser Tests
+
+@Suite("LinkActionParser Tests")
+struct LinkActionParserTests {
+    let parser = LinkActionParser()
+
+    private func parse(_ string: String) -> LinkAction? {
+        parser.parse(URL(string: string)!)
+    }
+
+    @Test("Encoded and raw url= give the same inner link with its own query")
+    func encodedAndRawTargets() {
+        let inner = URL(string: "https://www.youtube.com/watch?v=dQw4w9WgXcQ&list=PL123")!
+        #expect(parse("yattee://queue?url=https%3A%2F%2Fwww.youtube.com%2Fwatch%3Fv%3DdQw4w9WgXcQ%26list%3DPL123") == .addToQueue(inner))
+        #expect(parse("yattee://queue?url=https://www.youtube.com/watch?v=dQw4w9WgXcQ&list=PL123") == .addToQueue(inner))
+    }
+
+    @Test("Play takes the action's t, falling back to the link's own")
+    func playStartTime() {
+        #expect(parse("yattee://play?url=https://youtu.be/dQw4w9WgXcQ&t=1m30s")
+            == .play(URL(string: "https://youtu.be/dQw4w9WgXcQ")!, startTime: 90))
+        #expect(parse("yattee://play?url=https%3A%2F%2Fyoutu.be%2FdQw4w9WgXcQ%3Ft%3D42")
+            == .play(URL(string: "https://youtu.be/dQw4w9WgXcQ?t=42")!, startTime: 42))
+        #expect(parse("yattee://play?url=https://youtu.be/dQw4w9WgXcQ")
+            == .play(URL(string: "https://youtu.be/dQw4w9WgXcQ")!, startTime: nil))
+    }
+
+    @Test("x-callback parameters end the raw url")
+    func callbackParametersEndURL() {
+        let action = parse("yattee://bookmark?url=https://www.youtube.com/watch?v=dQw4w9WgXcQ&x-success=shortcuts://done")
+        #expect(action == .bookmark(URL(string: "https://www.youtube.com/watch?v=dQw4w9WgXcQ")!))
+    }
+
+    @Test("Every target verb parses", arguments: [
+        ("play-next", LinkAction.playNext(URL(string: "https://youtu.be/abc")!)),
+        ("download", .download(URL(string: "https://youtu.be/abc")!)),
+        ("subscribe", .subscribe(URL(string: "https://youtu.be/abc")!)),
+        ("unsubscribe", .unsubscribe(URL(string: "https://youtu.be/abc")!)),
+    ])
+    func targetVerbs(_ verb: String, _ expected: LinkAction) {
+        #expect(parse("yattee://\(verb)?url=https://youtu.be/abc") == expected)
+    }
+
+    @Test("Missing, local or non-web targets are rejected")
+    func badTargets() {
+        #expect(parse("yattee://play") == nil)
+        #expect(parse("yattee://play?url=") == nil)
+        #expect(parse("yattee://play?url=file:///etc/hosts") == nil)
+        #expect(parse("yattee://queue?url=javascript:alert(1)") == nil)
+    }
+
+    @Test("Player commands")
+    func playerCommands() {
+        #expect(parse("yattee://player/pause") == .player(.pause))
+        #expect(parse("yattee://player/play") == .player(.play))
+        #expect(parse("yattee://player/toggle") == .player(.toggle))
+        #expect(parse("yattee://player/next") == .player(.next))
+        #expect(parse("yattee://player/previous") == .player(.previous))
+        #expect(parse("yattee://player/close") == .player(.close))
+        #expect(parse("yattee://player/seek?t=90") == .player(.seek(to: 90)))
+        #expect(parse("yattee://player/seek?t=1m") == .player(.seek(to: 60)))
+        #expect(parse("yattee://player/seek?by=-10") == .player(.seekBy(-10)))
+        #expect(parse("yattee://player/rate?value=1.5") == .player(.rate(1.5)))
+    }
+
+    @Test("Invalid player commands are rejected")
+    func badPlayerCommands() {
+        #expect(parse("yattee://player") == nil)
+        #expect(parse("yattee://player/explode") == nil)
+        #expect(parse("yattee://player/seek") == nil)
+        #expect(parse("yattee://player/seek?by=nan") == nil)
+        #expect(parse("yattee://player/rate?value=0") == nil)
+        #expect(parse("yattee://player/rate?value=inf") == nil)
+    }
+
+    @Test("Screen links are not actions, and the router leaves action hosts alone")
+    func separationFromRouter() {
+        #expect(parse("yattee://playlist/PL123") == nil)
+        #expect(parse("yattee://video/abc") == nil)
+        #expect(URLRouter().route(URL(string: "yattee://play?url=https://youtu.be/abc")!) == nil)
+        #expect(URLRouter().route(URL(string: "yattee://player/pause")!) == nil)
+    }
+
+    @Test("Only play dismisses sheets")
+    func actionTraits() {
+        let url = URL(string: "https://youtu.be/abc")!
+        #expect(LinkAction.play(url, startTime: nil).dismissesPresentations)
+        #expect(!LinkAction.player(.pause).dismissesPresentations)
+        #expect(!LinkAction.bookmark(url).dismissesPresentations)
+    }
+}

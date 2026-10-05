@@ -215,6 +215,7 @@ final class SettingsManager {
 
     // Link action settings
     var _defaultLinkAction: DefaultLinkAction?
+    var _linkActionsRunWithoutConfirmation: Bool?
 
     // Video tap actions (iOS/macOS only)
     #if !os(tvOS)
@@ -554,6 +555,7 @@ final class SettingsManager {
         _handoffEnabled = nil
         _privacyFrontendSharingEnabled = nil
         _defaultLinkAction = nil
+        _linkActionsRunWithoutConfirmation = nil
         _remoteControlCustomDeviceName = nil
         _remoteControlHideWhenBackgrounded = nil
         #if !os(tvOS)
