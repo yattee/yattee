@@ -95,19 +95,6 @@ final class AccountSyncCoordinator {
     private var lastResolvedNamespace: String?
 
 
-    /// Set once the DEBUG identity-scope simulator has invented a scope, and
-    /// never cleared: from that moment this process is describing an Apple
-    /// account it is not signed in to.
-    ///
-    /// Only the *namespaces* are invented — the database, the zone and the
-    /// records in it stay real. Without this, activating under `debug-identity-A`
-    /// would bootstrap that namespace out of the genuine private zone and then
-    /// upload the results back into it stamped with a name no identity will ever
-    /// answer to, which is real data lost inside a real zone. Compiled in every
-    /// configuration so the guards below read the same everywhere; only DEBUG
-    /// has any way to set it.
-    private var debugSimulationActive = false
-
     private var isActivating = false
     private var activationRequested = false
 
@@ -282,31 +269,6 @@ final class AccountSyncCoordinator {
         database = nil
     }
 
-    #if DEBUG
-    /// Suspends account sync for the rest of this process, for the identity
-    /// scope simulator in Developer settings.
-    ///
-    /// Called *before* the first invented scope is announced. The simulator's
-    /// whole point is to drive the local→identity import without an Apple
-    /// account to sign into, and the namespaces it invents are only safe as long
-    /// as nothing carries them to the server: the private database underneath is
-    /// the real one, so a bootstrap under a fake namespace reads genuine records
-    /// and the upload that follows writes them back stamped with a name the real
-    /// identity will never recognise.
-    ///
-    /// Never lifted. The simulated scope itself lasts until the app is
-    /// relaunched, and a coordinator that resumed while the scope was still
-    /// invented would be exactly the thing this prevents.
-    func enterDebugScopeSimulation() {
-        guard !debugSimulationActive else { return }
-        debugSimulationActive = true
-
-        LoggingService.shared.logCloudKit(
-            "Account sync is suspended for this launch: the identity scope is being simulated"
-        )
-    }
-    #endif
-
     // MARK: - Fetching
 
     /// Notes which identity the fetch now starting belongs to.
@@ -330,23 +292,6 @@ final class AccountSyncCoordinator {
         let accountDeletions = deletions.filter { AccountRecordName.isAccountCategory($0.recordName) }
 
         guard !accountRecords.isEmpty || !accountDeletions.isEmpty else { return }
-
-        // Refused rather than staged, and treated exactly like records that
-        // arrived before an identity could be attributed to them. Staging is
-        // namespaced, so these genuine records would be filed under an invented
-        // name — where applying them is the pollution this is preventing, and
-        // not applying them is a durable copy of real data nothing will read
-        // again. The recovery flag is what makes them recoverable: the engine's
-        // token has moved past them, and the real identity re-bootstraps its
-        // zone from a nil token on the next launch, which is when the scope is
-        // real again.
-        guard !debugSimulationActive else {
-            store.hasPendingIdentityRecovery = true
-            LoggingService.shared.logCloudKit(
-                "Dropping \(accountRecords.count + accountDeletions.count) account records fetched under a simulated identity"
-            )
-            return
-        }
 
         // The identity the *fetch* began under, not whatever is current now.
         let owner = fetchIdentity ?? (namespace, identityGeneration)
@@ -417,15 +362,6 @@ final class AccountSyncCoordinator {
     }
 
     private func performActivation() async {
-        // Before anything is read or written, and on the same terms as the
-        // category being off: staged records are kept, nothing is applied, and
-        // nothing is enqueued. A simulated scope names an Apple account this
-        // device is not signed in to, while the database it would activate
-        // against is that device's real one.
-        guard !debugSimulationActive else {
-            LoggingService.shared.logCloudKit("Account sync is suspended: the identity scope is simulated")
-            return
-        }
         guard let namespace else { return }
         guard isCategoryEnabled() else {
             LoggingService.shared.logCloudKit("Account sync category is off — incoming records stay deferred")
@@ -628,10 +564,6 @@ final class AccountSyncCoordinator {
     /// Runs outside the engine's own token: the engine's state and every other
     /// category's pending changes are untouched.
     private func runBootstrapIfNeeded(in namespace: String) async {
-        // Unreachable through `performActivation`, which already refuses. Kept
-        // because this is the one place that reads the real zone from a nil
-        // token, and it must never do that on behalf of an invented namespace.
-        guard !debugSimulationActive else { return }
         guard !store.isBootstrapCompleted(in: namespace) else { return }
         guard let database else { return }
 
@@ -721,8 +653,6 @@ final class AccountSyncCoordinator {
     /// Safe to call repeatedly: the engine collapses duplicate pending changes,
     /// and each entry is cleared only by a server confirmation.
     func enqueueDirtyRecords() {
-        // Nothing an invented namespace owes is owed to anybody's real zone.
-        guard !debugSimulationActive else { return }
         guard let enqueueChanges, let namespace else { return }
         guard isCategoryEnabled(), store.isBootstrapCompleted(in: namespace) else { return }
         guard isManagerLoaded(for: namespace) else { return }
@@ -764,10 +694,6 @@ final class AccountSyncCoordinator {
     ///   as done.
     @discardableResult
     func uploadEverything() -> Bool {
-        // A simulated identity has no zone to fill, and marking its accounts
-        // dirty would only leave an outbox nothing can ever settle.
-        guard !debugSimulationActive else { return false }
-
         // Marking everything dirty commits the *in-memory* list to this
         // identity's zone, so it must not run against a snapshot loaded under
         // another one.
@@ -792,9 +718,7 @@ final class AccountSyncCoordinator {
     ///   must come back to it otherwise.
     @discardableResult
     func discardWhatTheZoneHeld() -> Bool {
-        // A simulated identity's zone is nobody's, and the outbox it would
-        // empty belongs to the identity actually signed in.
-        guard !debugSimulationActive, let namespace else { return false }
+        guard let namespace else { return false }
 
         // Fenced before anything is destroyed, the way `uploadEverything()` is:
         // during the reload gap the accounts in memory are still the previous
@@ -850,10 +774,6 @@ final class AccountSyncCoordinator {
     /// upload ordering. Holding is safe because the outbox is durable: the
     /// change is registered again as soon as what it waits on is confirmed.
     func recordToSave(named recordName: String) -> CKRecord? {
-        // The last gate before a record reaches the server, and the one that
-        // would stamp it with a simulated identity. Withdrawn instead: the
-        // outbox is durable, and this launch has nowhere legitimate to send it.
-        guard !debugSimulationActive else { return nil }
         guard let namespace, isCategoryEnabled(), store.isBootstrapCompleted(in: namespace) else { return nil }
         guard isManagerLoaded(for: namespace) else { return nil }
 

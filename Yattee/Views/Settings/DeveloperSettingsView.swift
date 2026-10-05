@@ -28,10 +28,6 @@ struct DeveloperSettingsView: View {
             debugSection
             testingSection
             dataSection
-            #if DEBUG
-            experimentsSection
-            identityScopeSimulatorSection
-            #endif
         }
         .navigationTitle(String(localized: "settings.developer.title"))
         #if os(iOS)
@@ -210,106 +206,6 @@ struct DeveloperSettingsView: View {
             }
         }
     }
-
-    #if DEBUG
-    @ViewBuilder
-    private var experimentsSection: some View {
-        SettingsFormSection("Experiments") {
-            #if os(tvOS)
-            NavigationLink {
-                KeychainProvenanceExperimentView()
-            } label: {
-                Label {
-                    Text(verbatim: "Keychain Provenance")
-                } icon: {
-                    Image(systemName: "key.viewfinder")
-                }
-            }
-            #else
-            SettingsNavigationRow("Keychain Provenance", systemImage: "key.viewfinder") {
-                KeychainProvenanceExperimentView()
-            }
-            #endif
-        }
-    }
-
-    /// Moves the credential identity scope by hand, the way signing in and out
-    /// of an Apple account does.
-    ///
-    /// A simulator cannot sign into iCloud, so the scope is the only seam the
-    /// local→identity import can be exercised through: switching here posts the
-    /// same notification a real resolution posts, and the production observers
-    /// do the rest — reload the account namespace, sweep the signed-out one
-    /// into it, refresh statuses.
-    ///
-    /// Account sync is suspended for the rest of the launch before the first
-    /// switch, and stays suspended. The namespaces are invented but the private
-    /// database is the device's real one, so an activation under a made-up scope
-    /// would bootstrap it out of the genuine zone and upload the results back
-    /// stamped with a name no Apple account answers to. The barrier is in the
-    /// coordinator, not in this caption.
-    @ViewBuilder
-    private var identityScopeSimulatorSection: some View {
-        if let scope = appEnvironment?.credentialIdentityScope {
-            SettingsFormSection("Identity Scope Simulator") {
-                HStack {
-                    Label {
-                        Text(verbatim: "Current scope")
-                    } icon: {
-                        Image(systemName: "person.badge.key")
-                    }
-                    Spacer()
-                    Text(verbatim: scope.current ?? "unresolved")
-                        .foregroundStyle(.secondary)
-                        .lineLimit(1)
-                        .truncationMode(.middle)
-                }
-
-                identityScopeButton("Switch to local", scope: CredentialIdentityScope.localScope, for: scope)
-                identityScopeButton("Switch to debug-identity-A", scope: "debug-identity-A", for: scope)
-                identityScopeButton("Switch to debug-identity-B", scope: "debug-identity-B", for: scope)
-            } footer: {
-                Text(
-                    verbatim: """
-                    Debug only. The scope stays where you put it until the app is relaunched, \
-                    so it no longer describes the Apple account this device is signed in to. \
-                    Switching suspends account iCloud sync — no fetching, no uploading — \
-                    for the rest of the launch, so a made-up identity can never reach the \
-                    real zone. Relaunch to sync again.
-                    """
-                )
-            }
-        }
-    }
-
-    private func identityScopeButton(
-        _ title: String,
-        scope newScope: String,
-        for identityScope: CredentialIdentityScope
-    ) -> some View {
-        HStack {
-            Button {
-                // Suspended first, and for good: the scope change is announced
-                // synchronously, so a coordinator told afterwards could already
-                // have activated against the real database under a name that
-                // belongs to nobody.
-                appEnvironment?.accountSyncCoordinator.enterDebugScopeSimulation()
-
-                // Announcing, so the observers that reload and import run —
-                // exactly what a resolution does.
-                identityScope.setFixedScope(newScope)
-            } label: {
-                Label {
-                    Text(verbatim: title)
-                } icon: {
-                    Image(systemName: "arrow.triangle.swap")
-                }
-            }
-            .disabled(identityScope.current == newScope)
-            Spacer()
-        }
-    }
-    #endif
 
     // MARK: - Data Actions
 

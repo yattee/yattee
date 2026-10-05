@@ -1127,43 +1127,6 @@ struct AccountSyncTests {
         #expect(didDiscardCachedRecords)
     }
 
-    // MARK: - Simulated identities
-
-    @Test("A simulated identity scope cannot reach the real zone")
-    func debugScopeSimulationSuspendsSync() async throws {
-        // Everything a send is normally gated on is satisfied: the category is
-        // on, the namespace has bootstrapped, the manager is loaded, and the
-        // outbox is owed a record.
-        let harness = Self.makeHarness()
-        let account = harness.accounts.addAccount(instanceID: UUID())
-        let recordName = "account-\(account.id.uuidString)"
-        #expect(harness.accounts.pendingUploads.contains(account.id))
-
-        harness.coordinator.enterDebugScopeSimulation()
-        harness.recorder.clear()
-
-        await harness.coordinator.activate()
-        harness.coordinator.enqueueDirtyRecords()
-        harness.coordinator.uploadEverything()
-
-        #expect(harness.recorder.changes.isEmpty)
-        #expect(harness.coordinator.recordToSave(named: recordName) == nil)
-
-        // Records the engine delivers are refused rather than filed under an
-        // invented name — and the real identity is told to bootstrap again, so
-        // what the change token skipped is not lost.
-        harness.coordinator.stageFetched(
-            records: [harness.mapper.toCKRecord(accountDeletionID: UUID())],
-            deletions: []
-        )
-        #expect(harness.store.stagedChanges(in: harness.scope).isEmpty)
-        #expect(harness.store.hasPendingIdentityRecovery)
-
-        // The debt itself is untouched: it is owed to whatever identity is real
-        // after the relaunch that ends the simulation.
-        #expect(harness.accounts.pendingUploads.contains(account.id))
-    }
-
     // MARK: - Importing the signed-out namespace
 
     /// What the accounts created while signed out owe the server once an Apple
