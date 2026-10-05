@@ -9,6 +9,9 @@ import SwiftUI
 
 struct ContentView: View {
     @Environment(\.appEnvironment) private var appEnvironment
+    #if os(macOS)
+    @Environment(\.openWindow) private var openWindow
+    #endif
 
     var body: some View {
         Group {
@@ -78,6 +81,9 @@ struct ContentView: View {
             } else {
                 ExpandedPlayerWindowManager.shared.endInlineOverlay()
             }
+        }
+        .onChange(of: appEnvironment.navigationCoordinator.openSettingsWindowRequest) { _, _ in
+            openWindow(id: "settings")
         }
         .onChange(of: appEnvironment.navigationCoordinator.playerExpandTrigger) { _, _ in
             if appEnvironment.settingsManager.macPlayerSeparateWindow {

@@ -170,10 +170,6 @@ RSpec.describe 'URL Schemes', :smoke do
       @axe.screenshot('url-scheme-continue-watching')
     end
 
-    # NOTE: yattee://settings deep link is broken in the app -
-    # handlePendingNavigation pushes .settings onto homePath but it doesn't render.
-    # Skipping until the app's deep link handler is fixed to present Settings properly.
-
     it 'opens Search via yattee://search?q=test' do
       open_url('yattee://search?q=test')
       sleep 1
@@ -183,6 +179,16 @@ RSpec.describe 'URL Schemes', :smoke do
       wait_for_element('Search')
       expect(@axe).to have_element('Search')
       @axe.screenshot('url-scheme-search')
+    end
+
+    # Last in the group: on iPhone Settings opens as a sheet over Home, and the
+    # next deep link dismisses it.
+    it 'opens Settings via yattee://settings' do
+      open_url('yattee://settings')
+      sleep 1
+      wait_for_text('Appearance')
+      expect(@axe).to have_text('Appearance')
+      @axe.screenshot('url-scheme-settings')
     end
   end
 end

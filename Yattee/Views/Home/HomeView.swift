@@ -198,6 +198,10 @@ struct HomeView: View {
                 .liquidGlassSheetContent(sourceID: "homeSettings", in: sheetTransition)
         }
         .dismissesOnExternalNavigation($showingSettings)
+        .onAppear { presentPendingSettingsSheet() }
+        .onChange(of: appEnvironment?.navigationCoordinator.router.pendingSettingsSheet) { _, _ in
+            presentPendingSettingsSheet()
+        }
         #endif
         .sheet(isPresented: $showingRemoteControl) {
             RemoteDevicesSheet()
@@ -305,6 +309,20 @@ struct HomeView: View {
             refreshFeedIfNeeded()
         }
     }
+
+    #if !os(tvOS) && !os(macOS)
+    /// Presents Settings for a request the layout had no Settings section for.
+    /// Deferred a turn: the same external navigation also dismisses sheets,
+    /// and that reset must not land after this one.
+    private func presentPendingSettingsSheet() {
+        guard let router = appEnvironment?.navigationCoordinator.router,
+              router.pendingSettingsSheet else { return }
+        router.pendingSettingsSheet = false
+        Task { @MainActor in
+            showingSettings = true
+        }
+    }
+    #endif
 
     // MARK: - Main Content
 

@@ -37,6 +37,12 @@ final class NavigationCoordinator {
     /// Sheets observe it via `.dismissesOnExternalNavigation(_:)`.
     var dismissPresentationsGeneration = 0
 
+    #if os(macOS)
+    /// Bumped to ask the main window to open the Settings window, which only a
+    /// view can do (`openWindow`).
+    var openSettingsWindowRequest = 0
+    #endif
+
     /// Whether the mini player is expanded to full screen.
     var isPlayerExpanded = false {
         didSet {
@@ -231,8 +237,25 @@ final class NavigationCoordinator {
 
     /// Navigate to a destination by pushing it onto the selected section's stack.
     func navigate(to destination: NavigationDestination) {
+        // Settings has its own navigation stack, so it can't be pushed onto a
+        // section's stack: it is a section, a sheet, or a window instead.
+        if case .settings = destination {
+            openSettings()
+            return
+        }
         router.push(destination)
         handoffManager?.updateActivity(for: destination)
+    }
+
+    /// Shows Settings the way the current layout presents it: the Settings
+    /// section where the layout has one, otherwise the Home screen's sheet
+    /// (`NavigationRouter.ensureSelectionIsAvailable`), or on macOS its window.
+    func openSettings() {
+        #if os(macOS)
+        openSettingsWindowRequest += 1
+        #else
+        router.select(.settings)
+        #endif
     }
 
     // MARK: - Sheet Presentation

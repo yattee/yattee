@@ -32,6 +32,11 @@ final class NavigationRouter {
     /// sidebar layout so it is created and loaded once.
     let sidebarManager = SidebarManager()
 
+    /// Set when Settings was requested in a layout without a Settings section
+    /// (the iPhone tab bar, unless the user added the tab). Home presents its
+    /// Settings sheet and clears it.
+    var pendingSettingsSheet = false
+
     @ObservationIgnored private var hasAppliedStartupTab = false
     @ObservationIgnored private var isSidebarManagerConfigured = false
 
@@ -139,6 +144,10 @@ final class NavigationRouter {
         case .sources:
             host = .home
             root = .mediaSources
+        case .settings:
+            host = .home
+            root = nil
+            pendingSettingsSheet = true
         default:
             host = .home
             root = current.navigationDestination()
