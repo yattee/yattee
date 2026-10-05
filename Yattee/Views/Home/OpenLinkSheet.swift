@@ -674,7 +674,7 @@ struct OpenLinkFormView: View {
             extractedItems[index].status = .extracting
 
             do {
-                let (video, streams) = try await extractVideo(from: url, appEnvironment: appEnvironment)
+                let (video, streams, _, _) = try await LinkVideoResolver(appEnvironment: appEnvironment).resolve(url)
                 extractedItems[index].status = .success
                 extractedItems[index].video = video
                 extractedItems[index].streams = streams
@@ -723,56 +723,6 @@ struct OpenLinkFormView: View {
         }
     }
 
-    /// Extracts video from URL, routing through appropriate API.
-    private func extractVideo(
-        from url: URL,
-        appEnvironment: AppEnvironment
-    ) async throws -> (Video, [Stream]) {
-        let router = URLRouter()
-        let destination = router.route(url)
-
-        switch destination {
-        case .video(let source, _):
-            guard case .id(let videoID) = source else {
-                throw OpenLinkError.notAVideo
-            }
-            // YouTube/PeerTube - use content-aware instance selection
-            guard let instance = appEnvironment.instancesManager.instance(for: videoID.source) else {
-                throw OpenLinkError.noInstanceAvailable
-            }
-            let (video, streams, _, _) = try await appEnvironment.contentService
-                .videoWithProxyStreamsAndCaptionsAndStoryboards(
-                    id: videoID.videoID,
-                    instance: instance
-                )
-            return (video, streams)
-
-        case .directMedia(let mediaURL):
-            // Direct media URL - no extraction needed
-            let video = DirectMediaHelper.createVideo(from: mediaURL)
-            let stream = DirectMediaHelper.createStream(from: mediaURL)
-            return (video, [stream])
-
-        case .externalVideo, nil:
-            // A file mpv plays as-is needs no extraction
-            if let probe = await DirectMediaProbe.probe(url) {
-                let video = DirectMediaHelper.createVideo(from: url, probe: probe)
-                let stream = DirectMediaHelper.createStream(from: url, probe: probe)
-                return (video, [stream])
-            }
-            // External URL - use Yattee Server
-            guard let instance = appEnvironment.instancesManager.yatteeServerInstance else {
-                throw OpenLinkError.noYatteeServer
-            }
-            let (video, streams, _) = try await appEnvironment.contentService
-                .extractURL(url, instance: instance)
-            return (video, streams)
-
-        default:
-            throw OpenLinkError.notAVideo
-        }
-    }
-
     private func playVideo(_ video: Video, sourceURL: URL, appEnvironment: AppEnvironment) {
         // Don't pass a specific stream - let the player's selectStreamAndBackend
         // choose the best video+audio combination. Using streams.first would
@@ -801,7 +751,7 @@ struct OpenLinkFormView: View {
             extractedItems[index].status = .extracting
 
             do {
-                let (video, streams, captions, storyboards) = try await extractVideoFull(from: url, appEnvironment: appEnvironment)
+                let (video, streams, captions, storyboards) = try await LinkVideoResolver(appEnvironment: appEnvironment).resolve(url)
                 extractedItems[index].status = .success
                 extractedItems[index].video = video
                 extractedItems[index].streams = streams
@@ -811,14 +761,13 @@ struct OpenLinkFormView: View {
 
                 // If auto-download is configured, enqueue immediately
                 if downloadSettings.preferredDownloadQuality != .ask {
-                    try await enqueueDownload(
+                    try await LinkVideoResolver(appEnvironment: appEnvironment).enqueueDownload(
                         video: video,
                         streams: streams,
                         captions: captions,
                         storyboards: storyboards,
                         quality: downloadSettings.preferredDownloadQuality,
-                        includeSubtitles: downloadSettings.includeSubtitlesInAutoDownload,
-                        appEnvironment: appEnvironment
+                        includeSubtitles: downloadSettings.includeSubtitlesInAutoDownload
                     )
                 }
             } catch {
@@ -871,56 +820,6 @@ struct OpenLinkFormView: View {
         }
     }
 
-    /// Extracts video with full details (including captions and storyboards) for download.
-    private func extractVideoFull(
-        from url: URL,
-        appEnvironment: AppEnvironment
-    ) async throws -> (Video, [Stream], [Caption], [Storyboard]) {
-        let router = URLRouter()
-        let destination = router.route(url)
-
-        switch destination {
-        case .video(let source, _):
-            guard case .id(let videoID) = source else {
-                throw OpenLinkError.notAVideo
-            }
-            // YouTube/PeerTube - use content-aware instance selection
-            guard let instance = appEnvironment.instancesManager.instance(for: videoID.source) else {
-                throw OpenLinkError.noInstanceAvailable
-            }
-            let (video, streams, captions, storyboards) = try await appEnvironment.contentService
-                .videoWithProxyStreamsAndCaptionsAndStoryboards(
-                    id: videoID.videoID,
-                    instance: instance
-                )
-            return (video, streams, captions, storyboards)
-
-        case .directMedia(let mediaURL):
-            // Direct media URL - no extraction needed, no captions/storyboards
-            let video = DirectMediaHelper.createVideo(from: mediaURL)
-            let stream = DirectMediaHelper.createStream(from: mediaURL)
-            return (video, [stream], [], [])
-
-        case .externalVideo, nil:
-            // A file mpv plays as-is needs no extraction, no captions/storyboards
-            if let probe = await DirectMediaProbe.probe(url) {
-                let video = DirectMediaHelper.createVideo(from: url, probe: probe)
-                let stream = DirectMediaHelper.createStream(from: url, probe: probe)
-                return (video, [stream], [], [])
-            }
-            // External URL - use Yattee Server (doesn't support storyboards)
-            guard let instance = appEnvironment.instancesManager.yatteeServerInstance else {
-                throw OpenLinkError.noYatteeServer
-            }
-            let (video, streams, captions) = try await appEnvironment.contentService
-                .extractURL(url, instance: instance)
-            return (video, streams, captions, [])
-
-        default:
-            throw OpenLinkError.notAVideo
-        }
-    }
-
     /// Downloads pending items after user selects quality.
     private func downloadPendingItems(quality: DownloadQuality, includeSubtitles: Bool) async {
         guard let appEnvironment else { return }
@@ -932,14 +831,13 @@ struct OpenLinkFormView: View {
             guard let video = item.video else { continue }
 
             do {
-                try await enqueueDownload(
+                try await LinkVideoResolver(appEnvironment: appEnvironment).enqueueDownload(
                     video: video,
                     streams: item.streams,
                     captions: item.captions,
                     storyboards: item.storyboards,
                     quality: quality,
-                    includeSubtitles: includeSubtitles,
-                    appEnvironment: appEnvironment
+                    includeSubtitles: includeSubtitles
                 )
                 successCount += 1
             } catch {
@@ -969,137 +867,7 @@ struct OpenLinkFormView: View {
         }
     }
 
-    /// Enqueues a single video for download with already-fetched streams.
-    private func enqueueDownload(
-        video: Video,
-        streams: [Stream],
-        captions: [Caption],
-        storyboards: [Storyboard],
-        quality: DownloadQuality,
-        includeSubtitles: Bool,
-        appEnvironment: AppEnvironment
-    ) async throws {
-        // Select best video stream
-        let videoStream = selectBestVideoStream(from: streams, maxQuality: quality)
-        guard let videoStream else {
-            throw DownloadError.noStreamAvailable
-        }
-
-        // Select audio stream if needed
-        var audioStream: Stream?
-        if videoStream.isVideoOnly {
-            audioStream = selectBestAudioStream(
-                from: streams,
-                preferredLanguage: appEnvironment.settingsManager.preferredAudioLanguage
-            )
-        }
-
-        // Select caption if enabled
-        var caption: Caption?
-        if includeSubtitles, let preferredLang = appEnvironment.settingsManager.preferredSubtitlesLanguage {
-            caption = selectBestCaption(from: captions, preferredLanguage: preferredLang)
-        }
-
-        let audioCodec = videoStream.isMuxed ? videoStream.audioCodec : audioStream?.audioCodec
-        let audioBitrate = videoStream.isMuxed ? nil : audioStream?.bitrate
-
-        try await appEnvironment.downloadManager.enqueue(
-            video,
-            quality: videoStream.qualityLabel,
-            formatID: videoStream.format,
-            streamURL: videoStream.url,
-            audioStreamURL: videoStream.isVideoOnly ? audioStream?.url : nil,
-            captionURL: caption?.url,
-            audioLanguage: audioStream?.audioLanguage,
-            captionLanguage: caption?.languageCode,
-            httpHeaders: videoStream.httpHeaders,
-            storyboard: storyboards.highest(),
-            dislikeCount: nil,
-            videoCodec: videoStream.videoCodec,
-            audioCodec: audioCodec,
-            videoBitrate: videoStream.bitrate,
-            audioBitrate: audioBitrate
-        )
-    }
-
-    // MARK: - Stream Selection Helpers
-
-    private func selectBestVideoStream(from streams: [Stream], maxQuality: DownloadQuality) -> Stream? {
-        let maxRes = maxQuality.maxResolution
-
-        let videoStreams = streams
-            .filter { !$0.isAudioOnly && $0.resolution != nil }
-            .filter {
-                let format = StreamFormat.detect(from: $0)
-                return format != .hls && format != .dash
-            }
-            .sorted { s1, s2 in
-                let res1 = s1.resolution ?? .p360
-                let res2 = s2.resolution ?? .p360
-                if res1 != res2 { return res1 > res2 }
-                if s1.isMuxed != s2.isMuxed { return s1.isMuxed }
-                return HardwareCapabilities.shared.codecPriority(for: s1.videoCodec) >
-                       HardwareCapabilities.shared.codecPriority(for: s2.videoCodec)
-            }
-
-        guard let maxRes else {
-            return videoStreams.first
-        }
-
-        if let stream = videoStreams.first(where: { ($0.resolution ?? .p360) <= maxRes }) {
-            return stream
-        }
-
-        return videoStreams.last
-    }
-
-    private func selectBestAudioStream(from streams: [Stream], preferredLanguage: String?) -> Stream? {
-        let audioStreams = streams.filter { $0.isAudioOnly }
-
-        if let preferred = preferredLanguage {
-            if let match = audioStreams.first(where: { ($0.audioLanguage ?? "").hasPrefix(preferred) }) {
-                return match
-            }
-        }
-
-        if let original = audioStreams.first(where: { $0.isOriginalAudio }) {
-            return original
-        }
-
-        return audioStreams.first
-    }
-
-    private func selectBestCaption(from captions: [Caption], preferredLanguage: String) -> Caption? {
-        if let exact = captions.first(where: { $0.languageCode == preferredLanguage }) {
-            return exact
-        }
-        if let prefix = captions.first(where: {
-            $0.languageCode.hasPrefix(preferredLanguage) || $0.baseLanguageCode == preferredLanguage
-        }) {
-            return prefix
-        }
-        return nil
-    }
     #endif
-}
-
-// MARK: - Errors
-
-private enum OpenLinkError: LocalizedError {
-    case noInstanceAvailable
-    case noYatteeServer
-    case notAVideo
-
-    var errorDescription: String? {
-        switch self {
-        case .noInstanceAvailable:
-            return String(localized: "openLink.noInstance")
-        case .noYatteeServer:
-            return String(localized: "openLink.noYatteeServer")
-        case .notAVideo:
-            return String(localized: "openLink.notAVideo")
-        }
-    }
 }
 
 // MARK: - Previews
