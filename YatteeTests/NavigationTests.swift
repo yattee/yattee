@@ -973,3 +973,65 @@ struct LinkActionParserTests {
         #expect(!LinkAction.bookmark(url).dismissesPresentations)
     }
 }
+
+// MARK: - XCallback Tests
+
+@Suite("XCallback Tests")
+struct XCallbackTests {
+    private func url(_ string: String) -> URL { URL(string: string)! }
+
+    @Test("x-callback-url requests parse to the same actions as plain links")
+    func actionsThroughXCallback() {
+        let parser = LinkActionParser()
+        #expect(parser.parse(url("yattee://x-callback-url/player/seek?t=9&x-success=shortcuts%3A%2F%2Fok")) == .player(.seek(to: 9)))
+        #expect(parser.parse(url("yattee://x-callback-url/player/state")) == .player(.state))
+        #expect(parser.parse(url("yattee://x-callback-url/queue?url=https://www.youtube.com/watch?v=abc&list=PL1&x-success=shortcuts%3A%2F%2Fok"))
+            == .addToQueue(url("https://www.youtube.com/watch?v=abc&list=PL1")))
+        #expect(parser.parse(url("yattee://x-callback-url/play?url=https%3A%2F%2Fyoutu.be%2Fabc&t=30"))
+            == .play(url("https://youtu.be/abc"), startTime: 30))
+        #expect(parser.parse(url("yattee://x-callback-url")) == nil)
+        #expect(parser.parse(url("yattee://x-callback-url/explode")) == nil)
+    }
+
+    @Test("Callbacks are read from the request, and only for x-callback-url")
+    func callbacksParse() throws {
+        let callback = try #require(XCallback(url("yattee://x-callback-url/player/pause?x-success=shortcuts%3A%2F%2Fx-callback-url%2Fok%3Fid%3D1&x-error=shortcuts%3A%2F%2Ferr&x-cancel=shortcuts%3A%2F%2Fcancel&x-source=Shortcuts")))
+        #expect(callback.success == url("shortcuts://x-callback-url/ok?id=1"))
+        #expect(callback.error == url("shortcuts://err"))
+        #expect(callback.cancel == url("shortcuts://cancel"))
+        #expect(callback.source == "Shortcuts")
+        #expect(XCallback(url("yattee://player/pause?x-success=shortcuts%3A%2F%2Fok")) == nil)
+    }
+
+    @Test("File and script callbacks are ignored")
+    func unsafeCallbacks() throws {
+        let callback = try #require(XCallback(url("yattee://x-callback-url/player/pause?x-success=file%3A%2F%2F%2Ftmp%2Fx&x-error=javascript%3Aalert(1)")))
+        #expect(callback.success == nil)
+        #expect(callback.error == nil)
+    }
+
+    @Test("Success appends values, keeping the callback's own query, escaping & = +")
+    func successURL() throws {
+        let callback = try #require(XCallback(url("yattee://x-callback-url/play?x-success=shortcuts%3A%2F%2Fok%3Fid%3D1")))
+        let result = try #require(callback.url(for: .success(["title": "Rock & Roll = 1+1", "videoID": "abc"])))
+        #expect(result.absoluteString == "shortcuts://ok?id=1&title=Rock%20%26%20Roll%20%3D%201%2B1&videoID=abc")
+        let items = URLComponents(url: result, resolvingAgainstBaseURL: false)?.queryItems
+        #expect(items?.first { $0.name == "title" }?.value == "Rock & Roll = 1+1")
+    }
+
+    @Test("Failure goes to x-error; cancel to x-cancel, else x-error")
+    func failureAndCancel() throws {
+        let both = try #require(XCallback(url("yattee://x-callback-url/play?x-error=app%3A%2F%2Ferr&x-cancel=app%3A%2F%2Fcancel")))
+        #expect(both.url(for: .failure(code: "noSource", message: "No source"))?.absoluteString == "app://err?errorCode=noSource&errorMessage=No%20source")
+        #expect(both.url(for: .cancelled) == url("app://cancel"))
+        #expect(both.url(for: .success()) == nil)
+
+        let errorOnly = try #require(XCallback(url("yattee://x-callback-url/play?x-error=app%3A%2F%2Ferr")))
+        #expect(errorOnly.url(for: .cancelled)?.absoluteString == "app://err?errorCode=cancelled&errorMessage=Cancelled")
+    }
+
+    @Test("The router leaves x-callback-url alone")
+    func routerIgnoresXCallback() {
+        #expect(URLRouter().route(url("yattee://x-callback-url/play?url=https://youtu.be/abc")) == nil)
+    }
+}

@@ -14,6 +14,10 @@
 //    yattee://player/play | pause | toggle | next | previous | close
 //    yattee://player/seek?t={seconds} | seek?by={±seconds}
 //    yattee://player/rate?value={rate}
+//    yattee://player/state  (reports what is playing; for x-callback-url)
+//
+//  Each also works as x-callback-url — yattee://x-callback-url/{verb}?…
+//  &x-success=…&x-error=…&x-cancel=… — see `XCallback`.
 //
 //  `url` may be percent-encoded or raw; a raw link keeps its own query
 //  (`&list=…`) because only the action's own parameters end it.
@@ -39,6 +43,8 @@ enum LinkAction: Equatable {
         case next
         case previous
         case close
+        /// Reports the player's state without changing it.
+        case state
         case seek(to: TimeInterval)
         case seekBy(TimeInterval)
         case rate(Double)
@@ -72,10 +78,15 @@ struct LinkActionParser {
 
     /// Hosts claimed by actions, so `URLRouter` never reads them as 1.x links.
     static let hosts: Set<String> = [
-        "play", "play-next", "queue", "download", "bookmark", "subscribe", "unsubscribe", "player"
+        "play", "play-next", "queue", "download", "bookmark", "subscribe", "unsubscribe", "player",
+        XCallback.host
     ]
 
     func parse(_ url: URL) -> LinkAction? {
+        // yattee://x-callback-url/{verb}… is yattee://{verb}… plus callbacks
+        if url.host?.lowercased() == XCallback.host {
+            return XCallback.actionURL(from: url).flatMap(parse)
+        }
         guard url.scheme?.lowercased() == "yattee",
               let host = url.host?.lowercased(), Self.hosts.contains(host) else {
             return nil
@@ -119,6 +130,7 @@ struct LinkActionParser {
         case "next": return .player(.next)
         case "previous": return .player(.previous)
         case "close": return .player(.close)
+        case "state": return .player(.state)
         case "seek":
             if let raw = query["by"], let delta = Double(raw), delta.isFinite {
                 return .player(.seekBy(delta))

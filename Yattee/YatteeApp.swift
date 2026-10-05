@@ -73,13 +73,24 @@ struct YatteeApp: App {
                 .handlesExternalEvents(preferring: ["*"], allowing: ["*"])
                 #endif
                 .onOpenURL { url in
+                    let callback = XCallback(url)
                     if let action = LinkActionParser().parse(url) {
                         if action.dismissesPresentations {
                             appEnvironment.navigationCoordinator.dismissPresentations()
                         }
                         Task {
-                            _ = await LinkActionPerformer(appEnvironment: appEnvironment).perform(action)
+                            let result = await LinkActionPerformer(appEnvironment: appEnvironment).perform(action)
+                            callback?.open(for: result)
                         }
+                        return
+                    }
+                    if let callback {
+                        // An x-callback-url request Yattee can't run: tell the caller
+                        reportUnhandledDeepLink(url)
+                        callback.open(for: .failure(
+                            code: "unsupportedAction",
+                            message: String(localized: "deepLink.unsupported.title", defaultValue: "Can't open link")
+                        ))
                         return
                     }
                     // Leave open sheets alone when the link goes nowhere

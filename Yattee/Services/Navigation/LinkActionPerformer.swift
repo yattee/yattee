@@ -218,6 +218,9 @@ struct LinkActionPerformer {
 
     private func perform(_ command: LinkAction.PlayerCommand) async -> LinkActionResult {
         let player = appEnvironment.playerService
+        if case .state = command {
+            return .success(playerValues())
+        }
         guard player.state.currentVideo != nil else {
             return .failure(code: "nothingPlaying", message: String(localized: "linkAction.error.nothingPlaying", defaultValue: "Nothing is playing."))
         }
@@ -237,6 +240,8 @@ struct LinkActionPerformer {
             appEnvironment.navigationCoordinator.isPlayerExpanded = false
             player.stop()
             return .success()
+        case .state:
+            break
         case .seek(let time):
             await player.seek(to: clampedTime(time))
         case .seekBy(let delta):
@@ -318,8 +323,11 @@ struct LinkActionPerformer {
 
     private func playerValues() -> [String: String] {
         let state = appEnvironment.playerService.state
-        var values = state.currentVideo.map(values(for:)) ?? [:]
+        guard let video = state.currentVideo else { return ["playing": "false"] }
+        var values = values(for: video)
+        values["playing"] = String(state.playbackState == .playing)
         values["position"] = String(Int(state.currentTime))
+        values["duration"] = String(Int(state.duration))
         values["rate"] = String(state.rate.rawValue)
         return values
     }
