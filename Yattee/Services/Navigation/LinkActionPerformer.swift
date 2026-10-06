@@ -11,6 +11,10 @@ import Foundation
 @MainActor
 struct LinkActionPerformer {
     let appEnvironment: AppEnvironment
+    /// Whether state-changing actions show the confirmation sheet (subject to
+    /// the user's setting). Off for App Intents: the person built the shortcut
+    /// themselves, so no web page can run it behind their back.
+    var asksBeforeChanges = true
 
     func perform(_ action: LinkAction) async -> LinkActionResult {
         LoggingService.shared.info("Link action: \(action)", category: .general)
@@ -306,7 +310,7 @@ struct LinkActionPerformer {
 
     /// Asks first unless the user lets automation links change things on their own.
     private func confirm(title: String, subject: String?, detail: String?, confirmTitle: String, systemImage: String) async -> Bool {
-        guard !appEnvironment.settingsManager.linkActionsRunWithoutConfirmation else { return true }
+        guard asksBeforeChanges, !appEnvironment.settingsManager.linkActionsRunWithoutConfirmation else { return true }
         let confirmation = LinkActionConfirmation(
             title: title,
             subject: subject,

@@ -151,12 +151,14 @@ struct LinkActionParser {
     private static func targetURL(_ raw: String) -> URL? {
         // A raw link keeps its percent-escapes; an encoded one is decoded once.
         let string = raw.contains("://") ? raw : (raw.removingPercentEncoding ?? raw)
-        guard let url = URL(string: string),
-              let scheme = url.scheme?.lowercased(),
-              ["http", "https", "yattee"].contains(scheme) else {
-            return nil
-        }
+        guard let url = URL(string: string), isAllowedTarget(url) else { return nil }
         return url
+    }
+
+    /// Links actions may act on: web links and yattee:// screen links.
+    static func isAllowedTarget(_ url: URL) -> Bool {
+        guard let scheme = url.scheme?.lowercased() else { return false }
+        return ["http", "https", "yattee"].contains(scheme)
     }
 
     /// Splits the query on `&`, but keeps an unencoded `url=` value whole:
