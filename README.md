@@ -21,6 +21,7 @@
 * Player component with custom controls, gestures and support for 4K playback
 * Fullscreen, Picture in Picture and background audio playback
 * [SponsorBlock](https://sponsor.ajay.app/), configurable categories to skip
+* [Automation](https://docs.yattee.stream/docs/app/automation) with the `yattee://` URL scheme, x-callback-url, Shortcuts and Siri
 
 ## License
 Yattee and its components is shared on [AGPL v3](https://www.gnu.org/licenses/agpl-3.0.en.html) license.
