@@ -116,7 +116,24 @@ actor InvidiousAPI: InstanceAPI {
         return response.toVideo(baseURL: instance.url)
     }
 
+    /// `@handle` channel IDs (youtube.com/@name links) resolved to UC… IDs, per instance.
+    private var resolvedChannelHandles: [String: String] = [:]
+
+    /// Invidious' channel endpoints only take UC… IDs, so a `@handle` is resolved first.
+    private func channelID(for id: String, instance: Instance) async throws -> String {
+        guard id.hasPrefix("@") else { return id }
+        let key = "\(instance.url.absoluteString)|\(id.lowercased())"
+        if let cached = resolvedChannelHandles[key] { return cached }
+
+        let endpoint = GenericEndpoint.get("/api/v1/resolveurl", query: ["url": "https://www.youtube.com/\(id)"])
+        let response: InvidiousResolvedURL = try await httpClient.fetch(endpoint, baseURL: instance.url)
+        guard let ucid = response.ucid, !ucid.isEmpty else { return id }
+        resolvedChannelHandles[key] = ucid
+        return ucid
+    }
+
     func channel(id: String, instance: Instance) async throws -> Channel {
+        let id = try await channelID(for: id, instance: instance)
         let endpoint = GenericEndpoint.get("/api/v1/channels/\(id)")
         let response: InvidiousChannel = try await httpClient.fetch(endpoint, baseURL: instance.url)
         return response.toChannel(baseURL: instance.url)
@@ -127,6 +144,7 @@ actor InvidiousAPI: InstanceAPI {
         if let continuation {
             query["continuation"] = continuation
         }
+        let id = try await channelID(for: id, instance: instance)
         let endpoint = GenericEndpoint.get("/api/v1/channels/\(id)/videos", query: query)
         let response: InvidiousChannelVideosWithContinuation = try await httpClient.fetch(endpoint, baseURL: instance.url)
         return ChannelVideosPage(
@@ -140,6 +158,7 @@ actor InvidiousAPI: InstanceAPI {
         if let continuation {
             query["continuation"] = continuation
         }
+        let id = try await channelID(for: id, instance: instance)
         let endpoint = GenericEndpoint.get("/api/v1/channels/\(id)/playlists", query: query)
         let response: InvidiousChannelPlaylists = try await httpClient.fetch(endpoint, baseURL: instance.url)
         return ChannelPlaylistsPage(
@@ -153,6 +172,7 @@ actor InvidiousAPI: InstanceAPI {
         if let continuation {
             query["continuation"] = continuation
         }
+        let id = try await channelID(for: id, instance: instance)
         let endpoint = GenericEndpoint.get("/api/v1/channels/\(id)/shorts", query: query)
         let response: InvidiousChannelVideosWithContinuation = try await httpClient.fetch(endpoint, baseURL: instance.url)
         return ChannelVideosPage(
@@ -166,6 +186,7 @@ actor InvidiousAPI: InstanceAPI {
         if let continuation {
             query["continuation"] = continuation
         }
+        let id = try await channelID(for: id, instance: instance)
         let endpoint = GenericEndpoint.get("/api/v1/channels/\(id)/streams", query: query)
         let response: InvidiousChannelVideosWithContinuation = try await httpClient.fetch(endpoint, baseURL: instance.url)
         return ChannelVideosPage(
@@ -408,6 +429,7 @@ actor InvidiousAPI: InstanceAPI {
     }
 
     func channelSearch(id: String, query: String, instance: Instance, page: Int) async throws -> ChannelSearchPage {
+        let id = try await channelID(for: id, instance: instance)
         let endpoint = GenericEndpoint.get("/api/v1/channels/\(id)/search", query: [
             "q": query,
             "page": String(page)
@@ -2084,4 +2106,9 @@ private struct InvidiousSearchPlaylist: Decodable, Sendable {
 private struct InvidiousSuggestions: Decodable, Sendable {
     let query: String
     let suggestions: [String]
+}
+
+/// Response of `/api/v1/resolveurl`.
+private struct InvidiousResolvedURL: Decodable, Sendable {
+    let ucid: String?
 }
