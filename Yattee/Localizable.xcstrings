@@ -137,7 +137,37 @@
     "+%lld" : {
 
     },
+    "${command} in Yattee" : {
+
+    },
+    "0.5×" : {
+
+    },
+    "0.25×" : {
+
+    },
+    "0.75×" : {
+
+    },
     "1.2M subscribers" : {
+
+    },
+    "1.5×" : {
+
+    },
+    "1.25×" : {
+
+    },
+    "1.75×" : {
+
+    },
+    "2.5×" : {
+
+    },
+    "2×" : {
+
+    },
+    "3×" : {
 
     },
     "accounts.activate" : {
@@ -556,6 +586,18 @@
         }
       }
     },
+    "Add ${link} to queue (${position})" : {
+
+    },
+    "Add Video to Queue" : {
+
+    },
+    "Adds a video to Yattee's queue, to play next or at the end." : {
+
+    },
+    "Adds a video to your Yattee bookmarks." : {
+
+    },
     "alert.ambiguousLink.message %@" : {
       "localizations" : {
         "en" : {
@@ -655,6 +697,9 @@
           }
         }
       }
+    },
+    "Back By" : {
+
     },
     "batchDownload.complete.allSkipped.subtitle" : {
       "comment" : "Toast subtitle when all videos were already downloaded",
@@ -865,6 +910,12 @@
         }
       }
     },
+    "Bookmark ${link}" : {
+
+    },
+    "Bookmark Video" : {
+
+    },
     "bookmark.remove.confirm" : {
       "localizations" : {
         "en" : {
@@ -945,6 +996,9 @@
         }
       }
     },
+    "Bookmarks" : {
+
+    },
     "bookmarks.search.placeholder" : {
       "localizations" : {
         "en" : {
@@ -954,6 +1008,12 @@
           }
         }
       }
+    },
+    "Changes the speed of what's playing in Yattee." : {
+
+    },
+    "Channel Link" : {
+
     },
     "channel.menu.disableNotifications" : {
       "localizations" : {
@@ -1329,6 +1389,12 @@
           }
         }
       }
+    },
+    "Close Player" : {
+
+    },
+    "Command" : {
+
     },
     "comments.disabled" : {
       "comment" : "Shown when comments are disabled for a video",
@@ -1849,6 +1915,9 @@
         }
       }
     },
+    "Continue Watching" : {
+
+    },
     "continueWatching.clearAll" : {
       "comment" : "Clear all continue watching entries",
       "localizations" : {
@@ -1870,6 +1939,9 @@
           }
         }
       }
+    },
+    "Control Player" : {
+
     },
     "controls.button.addToPlaylist" : {
       "localizations" : {
@@ -2689,6 +2761,12 @@
         }
       }
     },
+    "Download ${link}" : {
+
+    },
+    "Download Video" : {
+
+    },
     "download.error.audioRequired" : {
       "localizations" : {
         "en" : {
@@ -2819,6 +2897,12 @@
           }
         }
       }
+    },
+    "Downloads" : {
+
+    },
+    "Downloads a video in Yattee at your preferred download quality." : {
+
     },
     "downloads.cancel" : {
       "comment" : "Cancel in-progress download context menu item",
@@ -3059,6 +3143,9 @@
         }
       }
     },
+    "End of Queue" : {
+
+    },
     "error.noInstance" : {
 
     },
@@ -3219,6 +3306,9 @@
           }
         }
       }
+    },
+    "Forward By" : {
+
     },
     "gestures.action.cyclePlaybackSpeed" : {
       "extractionState" : "extracted_with_value",
@@ -4089,6 +4179,12 @@
         }
       }
     },
+    "Get Now Playing" : {
+
+    },
+    "History" : {
+
+    },
     "history.remote.delete.error" : {
       "comment" : "Removing a video from the account's server-side history failed",
       "localizations" : {
@@ -4120,6 +4216,9 @@
           }
         }
       }
+    },
+    "Home" : {
+
     },
     "home.bookmarks.empty" : {
       "comment" : "Empty bookmarks message",
@@ -5744,6 +5843,12 @@
         }
       }
     },
+    "Jumps to a time in what's playing in Yattee, or forward or back by some seconds." : {
+
+    },
+    "Link" : {
+
+    },
     "linkAction.confirm.bookmark.button" : {
       "extractionState" : "extracted_with_value",
       "localizations" : {
@@ -6954,6 +7059,9 @@
         }
       }
     },
+    "Mode" : {
+
+    },
     "my-server.example.com" : {
 
     },
@@ -6976,6 +7084,15 @@
           }
         }
       }
+    },
+    "Next Video" : {
+
+    },
+    "Normal" : {
+
+    },
+    "Nothing is playing in Yattee." : {
+
     },
     "notification.action.watch" : {
       "comment" : "Action button on notification to watch video",
@@ -7054,6 +7171,9 @@
         }
       }
     },
+    "Now Playing" : {
+
+    },
     "onboarding.cloud.syncing.preparing" : {
       "comment" : "Preparing sync text on iCloud onboarding",
       "localizations" : {
@@ -7075,6 +7195,12 @@
           }
         }
       }
+    },
+    "Open ${section}" : {
+
+    },
+    "Open Section" : {
+
     },
     "openLink.allFailed.subtitle %lld" : {
       "comment" : "Toast subtitle when all URLs failed",
@@ -7417,6 +7543,9 @@
         }
       }
     },
+    "Opens a section of Yattee." : {
+
+    },
     "panel.belowVideo.info" : {
       "comment" : "Corner layout below-video content option",
       "localizations" : {
@@ -7604,6 +7733,17 @@
         }
       }
     },
+    "panel.settings.defaultVisibility.footer" : {
+      "comment" : "Details panel settings picker footer",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "How the details panel appears when the player opens, per orientation. Remember Last restores the panel if it was visible the last time in that orientation."
+          }
+        }
+      }
+    },
     "panel.settings.defaultVisibility.landscape" : {
       "comment" : "Details panel default visibility picker for the landscape layout",
       "localizations" : {
@@ -7622,17 +7762,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Portrait"
-          }
-        }
-      }
-    },
-    "panel.settings.defaultVisibility.footer" : {
-      "comment" : "Details panel settings picker footer",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "How the details panel appears when the player opens, per orientation. Remember Last restores the panel if it was visible the last time in that orientation."
           }
         }
       }
@@ -7912,6 +8041,9 @@
         }
       }
     },
+    "Pause" : {
+
+    },
     "peertube.explore.added" : {
       "localizations" : {
         "en" : {
@@ -8111,6 +8243,24 @@
           }
         }
       }
+    },
+    "Play ${link}" : {
+
+    },
+    "Play Next" : {
+
+    },
+    "Play Video" : {
+
+    },
+    "Play/Pause" : {
+
+    },
+    "Playback Speed" : {
+
+    },
+    "Player Command" : {
+
     },
     "player.autoplay.cancel" : {
       "comment" : "Cancel autoplay button",
@@ -9285,6 +9435,9 @@
         }
       }
     },
+    "Playlists" : {
+
+    },
     "playlists.empty.description" : {
       "comment" : "Description shown when user has no playlists",
       "localizations" : {
@@ -9361,6 +9514,9 @@
         }
       }
     },
+    "Plays a YouTube, PeerTube or direct media link in Yattee." : {
+
+    },
     "popular.title" : {
       "comment" : "Popular videos page title",
       "localizations" : {
@@ -9371,6 +9527,15 @@
           }
         }
       }
+    },
+    "Position" : {
+
+    },
+    "Previous Video" : {
+
+    },
+    "Queue Position" : {
+
     },
     "queue.action.addToQueue" : {
       "comment" : "Add to queue action in action sheet",
@@ -9863,6 +10028,9 @@
         }
       }
     },
+    "Resume" : {
+
+    },
     "resume.action.continueAt %@" : {
       "comment" : "Continue watching action with timestamp",
       "localizations" : {
@@ -9884,6 +10052,21 @@
           }
         }
       }
+    },
+    "Resumes, pauses, skips or closes what's playing in Yattee." : {
+
+    },
+    "Returns the title of what's playing in Yattee, or nothing when the player is closed." : {
+
+    },
+    "Search For" : {
+
+    },
+    "Search Videos" : {
+
+    },
+    "Search Yattee for ${query}" : {
+
     },
     "search.bookmarks.placeholder" : {
       "localizations" : {
@@ -10333,6 +10516,36 @@
           }
         }
       }
+    },
+    "Searches for videos in Yattee." : {
+
+    },
+    "Seconds" : {
+
+    },
+    "Seconds from the start. Leave empty to use the link's own time." : {
+
+    },
+    "Section" : {
+
+    },
+    "Seek" : {
+
+    },
+    "Seek ${mode} ${seconds} seconds" : {
+
+    },
+    "Seek Mode" : {
+
+    },
+    "Set Playback Speed" : {
+
+    },
+    "Set playback speed to ${speed}" : {
+
+    },
+    "Settings" : {
+
     },
     "settings.about.community" : {
       "localizations" : {
@@ -18359,6 +18572,9 @@
         }
       }
     },
+    "Speed" : {
+
+    },
     "sponsorBlock.category.filler" : {
       "comment" : "Filler segment category",
       "localizations" : {
@@ -18579,6 +18795,9 @@
         }
       }
     },
+    "Start Time" : {
+
+    },
     "stream.adaptive" : {
       "localizations" : {
         "en" : {
@@ -18739,6 +18958,15 @@
         }
       }
     },
+    "Subscribe to ${link}" : {
+
+    },
+    "Subscribe to Channel" : {
+
+    },
+    "Subscribes to a channel from its link, in the account you're using in Yattee." : {
+
+    },
     "subscription.error.alreadySubscribed" : {
 
     },
@@ -18761,6 +18989,9 @@
 
     },
     "subscription.error.providerNotAvailable" : {
+
+    },
+    "Subscriptions" : {
 
     },
     "subscriptions.account.local" : {
@@ -19383,6 +19614,9 @@
         }
       }
     },
+    "To" : {
+
+    },
     "toast.download.completed.title" : {
       "localizations" : {
         "en" : {
@@ -19506,6 +19740,15 @@
           }
         }
       }
+    },
+    "Unsubscribe from ${link}" : {
+
+    },
+    "Unsubscribe from Channel" : {
+
+    },
+    "Unsubscribes from a channel, in the account you're using in Yattee." : {
+
     },
     "video.badge.live" : {
       "comment" : "Label for live streams",
@@ -20426,6 +20669,9 @@
           }
         }
       }
+    },
+    "Yattee can only open web links." : {
+
     }
   },
   "version" : "1.0"
