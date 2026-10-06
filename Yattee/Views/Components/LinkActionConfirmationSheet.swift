@@ -98,6 +98,8 @@ struct LinkActionConfirmationSheet: View {
 
                 Button { respond(true) } label: {
                     Label(confirmation.confirmTitle, systemImage: confirmation.systemImage)
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.7)
                         .frame(maxWidth: .infinity)
                 }
                 .buttonStyle(.borderedProminent)
