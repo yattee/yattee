@@ -124,6 +124,9 @@ struct TVPlayerView: View {
         mpvPlayerContent
             .ignoresSafeArea()
             .playerToastOverlay()
+            // Global sheet requests (e.g. link action confirmations) while the
+            // player covers the screen; the root host is underneath it.
+            .appSheetHost(isTopLevel: appEnvironment?.navigationCoordinator.isPlayerExpanded == true)
             .fullScreenCover(isPresented: $showingErrorSheet) {
                 ZStack {
                     Rectangle()
