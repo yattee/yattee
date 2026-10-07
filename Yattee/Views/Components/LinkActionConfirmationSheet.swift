@@ -44,6 +44,12 @@ final class LinkActionConfirmation {
     }
 }
 
+extension LinkActionConfirmation: Equatable {
+    nonisolated static func == (lhs: LinkActionConfirmation, rhs: LinkActionConfirmation) -> Bool {
+        lhs === rhs
+    }
+}
+
 struct LinkActionConfirmationSheet: View {
     @Environment(\.dismiss) private var dismiss
 
@@ -57,29 +63,6 @@ struct LinkActionConfirmationSheet: View {
             }
     }
 
-    #if os(tvOS)
-    private var content: some View {
-        NavigationStack {
-            List {
-                Section {
-                    header
-                        .padding(.vertical, 8)
-                }
-                Section {
-                    Button { respond(true) } label: {
-                        Label(confirmation.confirmTitle, systemImage: confirmation.systemImage)
-                    }
-                    Button(role: .cancel) { respond(false) } label: {
-                        Label(String(localized: "common.cancel"), systemImage: "xmark")
-                    }
-                }
-            }
-            .scrollClipDisabled()
-            .padding(.horizontal, 40)
-            .padding(.vertical, 24)
-        }
-    }
-    #else
     private var content: some View {
         VStack(spacing: 0) {
             header
@@ -112,10 +95,11 @@ struct LinkActionConfirmationSheet: View {
         #if os(macOS)
         .frame(width: 380)
         #endif
+        #if !os(tvOS)
         .presentationDetents([.height(210)])
         .presentationDragIndicator(.visible)
+        #endif
     }
-    #endif
 
     private var header: some View {
         VStack(alignment: .leading, spacing: 6) {
@@ -141,3 +125,35 @@ struct LinkActionConfirmationSheet: View {
         dismiss()
     }
 }
+
+#if os(tvOS)
+extension View {
+    /// Presents a link action confirmation as an alert. tvOS sheets fill most
+    /// of the screen, too much for a two-button question.
+    func linkActionConfirmationAlert(
+        _ confirmation: LinkActionConfirmation?,
+        onDismiss: @escaping () -> Void
+    ) -> some View {
+        alert(
+            confirmation?.title ?? "",
+            isPresented: Binding {
+                confirmation != nil
+            } set: { isPresented in
+                if !isPresented { onDismiss() }
+            },
+            presenting: confirmation
+        ) { confirmation in
+            Button(confirmation.confirmTitle) { confirmation.answer(true) }
+            Button(String(localized: "common.cancel"), role: .cancel) { confirmation.answer(false) }
+        } message: { confirmation in
+            Text([confirmation.subject, confirmation.detail].compactMap { $0 }.joined(separator: "\n"))
+        }
+        .onChange(of: confirmation) { previous, _ in
+            // Gone without an answer (Menu button, external navigation, another
+            // sheet): treat as cancel. Deferred so a button's answer comes first.
+            guard let previous else { return }
+            Task { @MainActor in previous.answer(false) }
+        }
+    }
+}
+#endif

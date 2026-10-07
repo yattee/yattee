@@ -130,11 +130,14 @@ private struct AppSheetHost: ViewModifier {
     func body(content: Content) -> some View {
         content
             .environment(\.presentAppSheet, PresentAppSheetAction { sheet = $0 })
-            .sheet(item: $sheet) { sheet in
+            .sheet(item: presentedSheet) { sheet in
                 sheetContent(for: sheet)
                     .sheetToastOverlay(scope: sheetToastLevel.scope, depth: sheetToastLevel.depth)
                     .environment(\.sheetToastLevel, sheetToastLevel)
             }
+            #if os(tvOS)
+            .linkActionConfirmationAlert(pendingConfirmation) { sheet = nil }
+            #endif
             // Declared before the request observer so a deep link that both
             // dismisses and presents ends with its own sheet up.
             .onChange(of: dismissGeneration) { _, _ in
@@ -144,6 +147,26 @@ private struct AppSheetHost: ViewModifier {
                 takePendingRequest()
             }
     }
+
+    /// The sheet to present as a sheet. On tvOS a link action confirmation
+    /// is a compact alert instead: a tvOS sheet fills most of the screen.
+    private var presentedSheet: Binding<AppSheet?> {
+        #if os(tvOS)
+        Binding {
+            if case .linkActionConfirmation = sheet { return nil }
+            return sheet
+        } set: { sheet = $0 }
+        #else
+        $sheet
+        #endif
+    }
+
+    #if os(tvOS)
+    private var pendingConfirmation: LinkActionConfirmation? {
+        if case .linkActionConfirmation(let confirmation) = sheet { return confirmation }
+        return nil
+    }
+    #endif
 
     private var dismissGeneration: Int? {
         dismissesOnExternalNavigation ? appEnvironment?.navigationCoordinator.dismissPresentationsGeneration : nil
