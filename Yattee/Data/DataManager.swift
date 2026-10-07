@@ -25,6 +25,16 @@ final class DataManager {
 
     /// Whether CloudKit sync is currently enabled for this instance.
     private(set) var isCloudKitEnabled: Bool = false
+
+    /// Whether the on-disk store did not exist when this container was opened.
+    ///
+    /// On tvOS SwiftData keeps the store in Library/Caches, which the system
+    /// purges under storage pressure. The CloudKit sync tokens live in
+    /// UserDefaults and survive such a purge, so a fresh store must be reported
+    /// to the sync engine — otherwise it only fetches changes made since the
+    /// old tokens and records that did not change since (subscriptions,
+    /// bookmarks) never come back.
+    private(set) var storeWasCreated: Bool = false
     
     /// Cached set of bookmarked video IDs for fast O(1) lookup.
     /// Updated when bookmarks are added/removed locally or via CloudKit sync.
@@ -71,15 +81,20 @@ final class DataManager {
             )
         }
 
+        let storeExisted = inMemory || FileManager.default.fileExists(atPath: configuration.url.path)
         self.modelContainer = try ModelContainer(
             for: Self.schema,
             configurations: [configuration]
         )
+        self.storeWasCreated = !storeExisted
         self.modelContext = modelContainer.mainContext
         self.modelContext.autosaveEnabled = true
         self.isCloudKitEnabled = false
 
-        LoggingService.shared.logCloudKit("SwiftData initialized with local storage (CloudKit sync via CKSyncEngine)")
+        LoggingService.shared.logCloudKit(
+            "SwiftData initialized with local storage (CloudKit sync via CKSyncEngine)",
+            details: inMemory ? "in-memory" : "store: \(configuration.url.path), existed: \(storeExisted)"
+        )
         
         // Initialize bookmark cache
         refreshBookmarkCache()

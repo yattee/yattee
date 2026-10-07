@@ -196,6 +196,7 @@ final class AppEnvironment {
             do {
                 dm = try DataManager(iCloudSyncEnabled: settings.iCloudSyncEnabled)
             } catch {
+                LoggingService.shared.logCloudKitError("Persistent store unavailable, falling back to in-memory storage", error: error)
                 // Fall back to in-memory storage if persistent storage fails
                 dm = try! DataManager(inMemory: true)
             }

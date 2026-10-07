@@ -160,6 +160,11 @@ final class CloudKitSyncEngine: @unchecked Sendable {
 
     /// UserDefaults key for the record schema version this app last synced with.
     private let lastSchemaVersionKey = "cloudKitLastSchemaVersion"
+
+    /// A recreated store is answered once per launch; later engine setups in
+    /// the same session (manual refresh, account change) start from the tokens
+    /// that full fetch produced.
+    private var storeLossHandled = false
     
     /// Legacy UserDefaults key for pending save record names (pre state-driven
     /// engine). Only read once for migration, then removed.
@@ -424,6 +429,7 @@ final class CloudKitSyncEngine: @unchecked Sendable {
             // re-delivered on a full fetch, so a schema upgrade must invalidate the
             // persisted state once to pick them up.
             invalidateSyncStateAfterSchemaUpgradeIfNeeded()
+            invalidateSyncStateAfterStoreLossIfNeeded()
 
             // Resume from persisted sync state so launches fetch only changes since
             // the last session instead of replaying the entire zone change history.
@@ -590,6 +596,21 @@ final class CloudKitSyncEngine: @unchecked Sendable {
             LoggingService.shared.logCloudKit("Schema version upgraded (\(storedVersion) -> \(currentVersion)), cleared sync state for full re-fetch")
         }
         UserDefaults.standard.set(Int(currentVersion), forKey: lastSchemaVersionKey)
+    }
+
+    /// Clears persisted sync state when the local store was recreated from
+    /// scratch while the tokens survived. The store lives in Library/Caches on
+    /// tvOS, which the system may purge; the tokens live in UserDefaults and
+    /// do not go with it. An incremental fetch against an empty store only
+    /// brings back records changed since the tokens, so the first sync after
+    /// a loss must be a full fetch.
+    private func invalidateSyncStateAfterStoreLossIfNeeded() {
+        guard !storeLossHandled, dataManager?.storeWasCreated == true else { return }
+        storeLossHandled = true
+        guard UserDefaults.standard.data(forKey: syncStateKey) != nil else { return }
+        UserDefaults.standard.removeObject(forKey: syncStateKey)
+        clearDeferredItems()
+        LoggingService.shared.logCloudKit("Local store was recreated while sync state persisted, cleared sync state for full re-fetch")
     }
 
     /// Loads persisted sync state from disk.
