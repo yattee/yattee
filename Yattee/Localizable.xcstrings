@@ -1390,7 +1390,13 @@
         }
       }
     },
+    "Close" : {
+
+    },
     "Close Player" : {
+
+    },
+    "Close Video" : {
 
     },
     "Command" : {
@@ -1914,6 +1920,9 @@
           }
         }
       }
+    },
+    "Continue" : {
+
     },
     "Continue Watching" : {
 
@@ -3282,6 +3291,9 @@
         }
       }
     },
+    "Feed" : {
+
+    },
     "feed.error.notLoggedIn" : {
       "comment" : "Error when trying to view feed without being logged in",
       "localizations" : {
@@ -4180,6 +4192,9 @@
       }
     },
     "Get Now Playing" : {
+
+    },
+    "Go Back" : {
 
     },
     "History" : {
@@ -7085,6 +7100,9 @@
         }
       }
     },
+    "Next" : {
+
+    },
     "Next Video" : {
 
     },
@@ -8244,10 +8262,16 @@
         }
       }
     },
+    "Play" : {
+
+    },
     "Play ${link}" : {
 
     },
     "Play Next" : {
+
+    },
+    "Play or Pause" : {
 
     },
     "Play Video" : {
@@ -9531,6 +9555,9 @@
     "Position" : {
 
     },
+    "Previous" : {
+
+    },
     "Previous Video" : {
 
     },
@@ -10057,6 +10084,9 @@
 
     },
     "Returns the title of what's playing in Yattee, or nothing when the player is closed." : {
+
+    },
+    "Saved Videos" : {
 
     },
     "Search For" : {
@@ -17307,6 +17337,12 @@
         }
       }
     },
+    "Skip" : {
+
+    },
+    "Skip Video" : {
+
+    },
     "smb.protocol.auto" : {
       "comment" : "SMB protocol auto-negotiate option",
       "localizations" : {
@@ -18798,6 +18834,9 @@
     "Start Time" : {
 
     },
+    "Stop" : {
+
+    },
     "stream.adaptive" : {
       "localizations" : {
         "en" : {
@@ -18965,6 +19004,9 @@
 
     },
     "Subscribes to a channel from its link, in the account you're using in Yattee." : {
+
+    },
+    "Subscription Feed" : {
 
     },
     "subscription.error.alreadySubscribed" : {
@@ -19730,6 +19772,9 @@
         }
       }
     },
+    "Toggle Playback" : {
+
+    },
     "trending.title" : {
       "comment" : "Trending view title",
       "localizations" : {
@@ -19740,6 +19785,9 @@
           }
         }
       }
+    },
+    "Unpause" : {
+
     },
     "Unsubscribe from ${link}" : {
 
@@ -20649,6 +20697,9 @@
           }
         }
       }
+    },
+    "Watch History" : {
+
     },
     "wideLayoutPanel.pinButton.pin" : {
       "localizations" : {

@@ -197,12 +197,13 @@ enum PlayerControlCommand: String, AppEnum {
 
     static let typeDisplayRepresentation: TypeDisplayRepresentation = "Player Command"
     static let caseDisplayRepresentations: [PlayerControlCommand: DisplayRepresentation] = [
-        .play: "Resume",
-        .pause: "Pause",
-        .toggle: "Play/Pause",
-        .next: "Next Video",
-        .previous: "Previous Video",
-        .close: "Close Player",
+        // Synonyms are what Siri also accepts in "{command} in Yattee"
+        .play: DisplayRepresentation(title: "Resume", synonyms: ["Play", "Continue", "Unpause"]),
+        .pause: DisplayRepresentation(title: "Pause", synonyms: ["Stop"]),
+        .toggle: DisplayRepresentation(title: "Play/Pause", synonyms: ["Play or Pause", "Toggle Playback"]),
+        .next: DisplayRepresentation(title: "Next Video", synonyms: ["Next", "Skip", "Skip Video"]),
+        .previous: DisplayRepresentation(title: "Previous Video", synonyms: ["Previous", "Go Back"]),
+        .close: DisplayRepresentation(title: "Close Player", synonyms: ["Close", "Close Video"]),
     ]
 
     var command: LinkAction.PlayerCommand {
@@ -344,9 +345,9 @@ enum YatteeSection: String, AppEnum {
     static let typeDisplayRepresentation: TypeDisplayRepresentation = "Section"
     static let caseDisplayRepresentations: [YatteeSection: DisplayRepresentation] = [
         .home: "Home",
-        .subscriptions: "Subscriptions",
-        .bookmarks: "Bookmarks",
-        .history: "History",
+        .subscriptions: DisplayRepresentation(title: "Subscriptions", synonyms: ["Feed", "Subscription Feed"]),
+        .bookmarks: DisplayRepresentation(title: "Bookmarks", synonyms: ["Saved Videos"]),
+        .history: DisplayRepresentation(title: "History", synonyms: ["Watch History"]),
         .playlists: "Playlists",
         .continueWatching: "Continue Watching",
         .downloads: "Downloads",
