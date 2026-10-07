@@ -13,14 +13,17 @@ struct ToastOverlayView: View {
 
     /// The scope of toasts to display in this overlay.
     let scope: ToastScope
+    /// 0 for the window's own overlay, 1 and up inside presented sheets.
+    var depth: Int = 0
 
     private var toastManager: ToastManager? {
         appEnvironment?.toastManager
     }
 
-    /// Toasts filtered by scope
+    /// Toasts filtered by scope, shown only by the top-most overlay
     private var scopedToasts: [Toast] {
-        toastManager?.toasts(for: scope) ?? []
+        guard let toastManager, toastManager.topOverlayDepth(for: scope) == depth else { return [] }
+        return toastManager.toasts(for: scope)
     }
 
     var body: some View {
@@ -45,10 +48,14 @@ struct ToastOverlayView: View {
         .padding(.top, topPadding)
         .padding(.horizontal, 16)
         .animation(.spring(response: 0.3, dampingFraction: 0.7), value: scopedToasts.count)
+        .onAppear { toastManager?.registerOverlay(scope: scope, depth: depth) }
+        .onDisappear { toastManager?.unregisterOverlay(scope: scope, depth: depth) }
     }
 
     private var topPadding: CGFloat {
         #if os(iOS)
+        // Sheets start below the status bar
+        if depth > 0 { return 16 }
         // In player scope (sheet), only need minimal padding since safe area is handled by sheet
         // In main scope, account for Dynamic Island / notch
         return scope == .player ? 8 : 60
@@ -75,6 +82,14 @@ extension View {
     func playerToastOverlay() -> some View {
         overlay(alignment: .top) {
             ToastOverlayView(scope: .player)
+        }
+    }
+
+    /// Adds a toast overlay to a presented sheet, which takes over its scope's
+    /// toasts from the overlays underneath while it is up.
+    func sheetToastOverlay(scope: ToastScope, depth: Int) -> some View {
+        overlay(alignment: .top) {
+            ToastOverlayView(scope: scope, depth: depth)
         }
     }
 }

@@ -498,7 +498,7 @@ struct ExpandedPlayerSheet: View {
         )
         // Shared sheets opened from the player, and global requests while it
         // is up, so they appear above the player window.
-        .appSheetHost(isTopLevel: appEnvironment?.navigationCoordinator.isPlayerExpanded == true)
+        .appSheetHost(isTopLevel: appEnvironment?.navigationCoordinator.isPlayerExpanded == true, toastScope: .player)
         #if os(iOS)
         .toolbar(.hidden, for: .navigationBar)
         // Corner layout with panels visible keeps the system status bar and

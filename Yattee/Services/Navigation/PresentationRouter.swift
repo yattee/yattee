@@ -92,6 +92,18 @@ extension EnvironmentValues {
     }
 }
 
+// MARK: - Toasts
+
+/// The toast overlay level of a presented sheet.
+struct SheetToastLevel {
+    let scope: ToastScope
+    let depth: Int
+}
+
+extension EnvironmentValues {
+    @Entry var sheetToastLevel = SheetToastLevel(scope: .main, depth: 0)
+}
+
 // MARK: - Host
 
 private struct AppSheetHost: ViewModifier {
@@ -103,13 +115,25 @@ private struct AppSheetHost: ViewModifier {
     /// window's root host: the expanded player keeps its own sheets.
     let dismissesOnExternalNavigation: Bool
 
+    /// The toast scope of the window this host is in; nil inherits it.
+    let toastScope: ToastScope?
+
+    @Environment(\.sheetToastLevel) private var parentToastLevel
     @State private var sheet: AppSheet?
+
+    /// Where this host's sheets show toasts: the window's scope, one level
+    /// deeper than the content they cover.
+    private var sheetToastLevel: SheetToastLevel {
+        SheetToastLevel(scope: toastScope ?? parentToastLevel.scope, depth: toastScope == nil ? parentToastLevel.depth + 1 : 1)
+    }
 
     func body(content: Content) -> some View {
         content
             .environment(\.presentAppSheet, PresentAppSheetAction { sheet = $0 })
             .sheet(item: $sheet) { sheet in
                 sheetContent(for: sheet)
+                    .sheetToastOverlay(scope: sheetToastLevel.scope, depth: sheetToastLevel.depth)
+                    .environment(\.sheetToastLevel, sheetToastLevel)
             }
             // Declared before the request observer so a deep link that both
             // dismisses and presents ends with its own sheet up.
@@ -198,8 +222,14 @@ extension View {
     /// - Parameter dismissesOnExternalNavigation: true for the main window's
     ///   root host, whose sheet external navigation (notification, deep link,
     ///   Handoff) dismisses.
-    func appSheetHost(isTopLevel: Bool, dismissesOnExternalNavigation: Bool = false) -> some View {
-        modifier(AppSheetHost(isTopLevel: isTopLevel, dismissesOnExternalNavigation: dismissesOnExternalNavigation))
+    /// - Parameter toastScope: the toast scope of the window the host is in;
+    ///   nil for hosts inside sheets, which inherit it.
+    func appSheetHost(isTopLevel: Bool, dismissesOnExternalNavigation: Bool = false, toastScope: ToastScope? = nil) -> some View {
+        modifier(AppSheetHost(
+            isTopLevel: isTopLevel,
+            dismissesOnExternalNavigation: dismissesOnExternalNavigation,
+            toastScope: toastScope
+        ))
     }
 
     /// Dismisses a screen's own sheet when navigation arrives from outside the

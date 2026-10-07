@@ -118,6 +118,29 @@ final class ToastManager {
         }
     }
 
+    // MARK: - Overlay Hosts
+
+    /// Toast overlays inside presented sheets, counted per scope and depth.
+    /// Only the deepest overlay of a scope shows its toasts, so they appear
+    /// above the sheet instead of behind it.
+    private var sheetOverlayDepths: [ToastScope: [Int: Int]] = [:]
+
+    func registerOverlay(scope: ToastScope, depth: Int) {
+        guard depth > 0 else { return }
+        sheetOverlayDepths[scope, default: [:]][depth, default: 0] += 1
+    }
+
+    func unregisterOverlay(scope: ToastScope, depth: Int) {
+        guard depth > 0, let count = sheetOverlayDepths[scope]?[depth] else { return }
+        sheetOverlayDepths[scope]?[depth] = count > 1 ? count - 1 : nil
+    }
+
+    /// Depth of the overlay that shows a scope's toasts: 0 for the window's
+    /// own overlay, higher inside sheets.
+    func topOverlayDepth(for scope: ToastScope) -> Int {
+        sheetOverlayDepths[scope]?.keys.max() ?? 0
+    }
+
     // MARK: - Filtered Access
 
     /// Returns toasts for a specific scope (filtered by activeScope).

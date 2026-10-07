@@ -31,7 +31,8 @@ struct ContentView: View {
         // and takes global requests while it is up.
         .appSheetHost(
             isTopLevel: appEnvironment?.navigationCoordinator.isPlayerExpanded != true,
-            dismissesOnExternalNavigation: true
+            dismissesOnExternalNavigation: true,
+            toastScope: .main
         )
         .toastOverlay()
     }
