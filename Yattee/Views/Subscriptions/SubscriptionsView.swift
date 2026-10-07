@@ -74,7 +74,7 @@ struct SubscriptionsView: View {
                 #if os(macOS)
                 Toggle("viewOptions.showSidebar", isOn: $showSidebar)
                 #elseif os(iOS)
-                if isIPadRegular {
+                if channelSidebarFits {
                     Toggle("viewOptions.showSidebar", isOn: $showSidebar)
                 }
                 #elseif os(tvOS)
@@ -133,7 +133,7 @@ struct SubscriptionsView: View {
                         Text(size.displayName).tag(size)
                     }
                 }
-                .disabled(isIPadRegular && showSidebar)
+                .disabled(channelSidebarFits && showSidebar)
                 #endif
             }
 
@@ -437,7 +437,7 @@ struct SubscriptionsView: View {
                         .frame(minWidth: 300, maxWidth: .infinity, maxHeight: .infinity)
                     }
                     #else
-                    if isIPadRegular && showSidebar && subscriptionsLoaded && subscriptions.count > 1 {
+                    if channelSidebarFits && showSidebar && subscriptionsLoaded && subscriptions.count > 1 {
                         HStack(spacing: 0) {
                             iOSChannelsSidebar
                                 .frame(width: clampedIPadSidebarWidth)
@@ -471,7 +471,7 @@ struct SubscriptionsView: View {
                     VStack {
                         Spacer()
 
-                        if subscriptionsLoaded && subscriptions.count > 1 && channelStripSize != .disabled && !isShowingFullScreenError && !(isIPadRegular && showSidebar) {
+                        if subscriptionsLoaded && subscriptions.count > 1 && channelStripSize != .disabled && !isShowingFullScreenError && !(channelSidebarFits && showSidebar) {
                             bottomFloatingFilterStrip
                                 .transition(.move(edge: .bottom).combined(with: .opacity))
                         }
@@ -1131,7 +1131,7 @@ struct SubscriptionsView: View {
         #if os(macOS)
         return showSidebar && subscriptionsLoaded && subscriptions.count > 1
         #elseif os(iOS)
-        return isIPadRegular && showSidebar && subscriptionsLoaded && subscriptions.count > 1
+        return channelSidebarFits && showSidebar && subscriptionsLoaded && subscriptions.count > 1
         #elseif os(tvOS)
         return showSidebar && subscriptionsLoaded && !subscriptions.isEmpty
         #else
@@ -1147,6 +1147,24 @@ struct SubscriptionsView: View {
     /// uses the sidebar layout (iPad, iPhone Duo inner screen).
     private var isIPadRegular: Bool {
         NavigationLayout.usesSidebar(horizontalSizeClass: horizontalSizeClass, verticalSizeClass: verticalSizeClass)
+    }
+
+    /// Feed width the channel sidebar must leave over, or the cards next to it
+    /// are unreadable: on the iPhone Duo inner screen with the app sidebar
+    /// open, the content column is ~490pt, which the sidebar would take half of.
+    /// The floating channel strip takes over below this, as on iPhone.
+    private static let iPadSidebarMinFeedWidth = 320.0
+    private static let iPadSidebarHandleWidth = 14.0
+
+    /// Whether the content column is wide enough for the channel sidebar next
+    /// to the feed. Gated on the sidebar's minimum, not its current width, so
+    /// widening it by drag can never make it disappear. Until the first
+    /// measurement the size class alone decides, so iPad does not flash the
+    /// strip on the first frame.
+    private var channelSidebarFits: Bool {
+        guard isIPadRegular else { return false }
+        guard viewWidth > 0 else { return true }
+        return viewWidth >= Self.iPadSidebarMinWidth + Self.iPadSidebarHandleWidth + Self.iPadSidebarMinFeedWidth
     }
 
     private var clampedIPadSidebarWidth: CGFloat {
@@ -1230,7 +1248,7 @@ struct SubscriptionsView: View {
             Rectangle()
                 .fill(.separator.opacity(0.7))
                 .frame(width: 1)
-            .frame(width: 14)
+            .frame(width: Self.iPadSidebarHandleWidth)
             .frame(maxHeight: .infinity)
             .contentShape(Rectangle())
             .highPriorityGesture(iPadSidebarResizeGesture)
