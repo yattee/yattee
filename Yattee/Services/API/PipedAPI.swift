@@ -16,6 +16,9 @@ actor PipedAPI: InstanceAPI {
     /// Populated when `channel()` or `channelVideos()` fetches `/channel/{id}`.
     private var channelTabsCache: [String: [PipedChannelTab]] = [:]
 
+    /// `@handle` channel IDs (youtube.com/@name links) resolved to UC… IDs, per instance.
+    private var resolvedChannelHandles: [String: String] = [:]
+
     init(httpClient: HTTPClient) {
         self.httpClient = httpClient
     }
@@ -87,7 +90,24 @@ actor PipedAPI: InstanceAPI {
         return response.toVideo(instanceURL: instance.url, videoId: id)
     }
 
+    /// Piped's `/channel/{id}` only takes UC… IDs; `/c/@handle` resolves a handle.
+    private func channelID(for id: String, instance: Instance) async throws -> String {
+        guard id.hasPrefix("@") else { return id }
+        let key = "\(instance.url.absoluteString)|\(id.lowercased())"
+        if let cached = resolvedChannelHandles[key] { return cached }
+
+        let endpoint = GenericEndpoint.get("/c/\(id)")
+        let response: PipedChannelResponse = try await httpClient.fetch(endpoint, baseURL: instance.url)
+        guard !response.id.isEmpty else { return id }
+        resolvedChannelHandles[key] = response.id
+        if let tabs = response.tabs {
+            channelTabsCache[response.id] = tabs
+        }
+        return response.id
+    }
+
     func channel(id: String, instance: Instance) async throws -> Channel {
+        let id = try await channelID(for: id, instance: instance)
         let endpoint = GenericEndpoint.get("/channel/\(id)")
         let response: PipedChannelResponse = try await httpClient.fetch(endpoint, baseURL: instance.url)
         if let tabs = response.tabs {
@@ -97,6 +117,7 @@ actor PipedAPI: InstanceAPI {
     }
 
     func channelVideos(id: String, instance: Instance, continuation: String?) async throws -> ChannelVideosPage {
+        let id = try await channelID(for: id, instance: instance)
         if let continuation {
             // Fetch next page of channel videos
             let endpoint = GenericEndpoint.get("/nextpage/channel/\(id)", query: ["nextpage": continuation])
@@ -184,7 +205,7 @@ actor PipedAPI: InstanceAPI {
     // MARK: - Channel Tabs
 
     func channelShorts(id: String, instance: Instance, continuation: String?) async throws -> ChannelVideosPage {
-        let page = try await fetchTab(name: "shorts", channelID: id, instance: instance, continuation: continuation)
+        let page = try await fetchTab(name: "shorts", channelID: channelID(for: id, instance: instance), instance: instance, continuation: continuation)
         let videos: [Video] = page.items.compactMap {
             if case .stream(let video) = $0 { return video.toVideo(instanceURL: instance.url) }
             return nil
@@ -193,7 +214,7 @@ actor PipedAPI: InstanceAPI {
     }
 
     func channelStreams(id: String, instance: Instance, continuation: String?) async throws -> ChannelVideosPage {
-        let page = try await fetchTab(name: "livestreams", channelID: id, instance: instance, continuation: continuation)
+        let page = try await fetchTab(name: "livestreams", channelID: channelID(for: id, instance: instance), instance: instance, continuation: continuation)
         let videos: [Video] = page.items.compactMap {
             if case .stream(let video) = $0 { return video.toVideo(instanceURL: instance.url) }
             return nil
@@ -202,7 +223,7 @@ actor PipedAPI: InstanceAPI {
     }
 
     func channelPlaylists(id: String, instance: Instance, continuation: String?) async throws -> ChannelPlaylistsPage {
-        let page = try await fetchTab(name: "playlists", channelID: id, instance: instance, continuation: continuation)
+        let page = try await fetchTab(name: "playlists", channelID: channelID(for: id, instance: instance), instance: instance, continuation: continuation)
         let playlists: [Playlist] = page.items.compactMap {
             if case .playlist(let p) = $0 { return p.toPlaylist() }
             return nil
