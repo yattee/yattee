@@ -149,6 +149,38 @@ struct LinkVideoResolver {
         )
     }
 
+    /// Resolves each link's streams and enqueues it for download.
+    /// - Returns: How many links were queued and how many failed.
+    func downloadLinks(
+        _ urls: [URL],
+        quality: DownloadQuality,
+        includeSubtitles: Bool
+    ) async -> (succeeded: Int, failed: Int) {
+        var succeeded = 0
+        var failed = 0
+        for url in urls {
+            do {
+                let (video, streams, captions, storyboards) = try await resolve(url)
+                try await enqueueDownload(
+                    video: video,
+                    streams: streams,
+                    captions: captions,
+                    storyboards: storyboards,
+                    quality: quality,
+                    includeSubtitles: includeSubtitles
+                )
+                succeeded += 1
+            } catch {
+                LoggingService.shared.warning(
+                    "Open link download failed for \(url.absoluteString): \(error.localizedDescription)",
+                    category: .downloads
+                )
+                failed += 1
+            }
+        }
+        return (succeeded, failed)
+    }
+
     // MARK: - Stream Selection Helpers
 
     private func selectBestVideoStream(from streams: [Stream], maxQuality: DownloadQuality) -> Stream? {

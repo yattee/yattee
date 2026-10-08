@@ -7220,6 +7220,87 @@
     "Open Section" : {
 
     },
+    "openedLinks.actions" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Actions"
+          }
+        }
+      }
+    },
+    "openedLinks.addAllToQueue" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Add All Videos to Queue"
+          }
+        }
+      }
+    },
+    "openedLinks.bookmarkAll" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bookmark All Videos"
+          }
+        }
+      }
+    },
+    "openedLinks.bookmarked.subtitle %lld" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld videos"
+          }
+        }
+      }
+    },
+    "openedLinks.bookmarked.title" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Added to Bookmarks"
+          }
+        }
+      }
+    },
+    "openedLinks.downloadAll" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Download All Videos"
+          }
+        }
+      }
+    },
+    "openedLinks.playAll" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Play All Videos"
+          }
+        }
+      }
+    },
+    "openedLinks.title" : {
+      "comment" : "Title of the page listing several links opened at once",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Opened Links"
+          }
+        }
+      }
+    },
     "openLink.allFailed.subtitle %lld" : {
       "comment" : "Toast subtitle when all URLs failed",
       "localizations" : {
@@ -7370,6 +7451,17 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Load"
+          }
+        }
+      }
+    },
+    "openLink.loadAll" : {
+      "comment" : "Button label: show several links as mixed results",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Load All"
           }
         }
       }

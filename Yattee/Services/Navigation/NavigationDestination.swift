@@ -48,6 +48,8 @@ enum NavigationDestination: Hashable {
     case importSubscriptions(instance: Instance)
     /// Import playlists from an instance.
     case importPlaylists(instance: Instance)
+    /// Several links opened at once, resolved into mixed results.
+    case openedLinks([URL])
 }
 
 extension NavigationDestination {
@@ -149,6 +151,8 @@ extension NavigationDestination {
             ImportSubscriptionsView(instance: instance)
         case .importPlaylists(let instance):
             ImportPlaylistsView(instance: instance)
+        case .openedLinks(let urls):
+            OpenedLinksView(urls: urls)
         }
     }
 }

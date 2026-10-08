@@ -285,6 +285,35 @@ final class InstancesManager {
         instance(for: video.id.source)
     }
 
+    /// Selects the instance to load a remote playlist from: Invidious first for
+    /// YouTube (Invidious playlists are Invidious-specific), the playlist's own
+    /// server for federated content, Yattee Server for extracted content.
+    func playlistInstance(for source: ContentSource) -> Instance? {
+        switch source {
+        case .global:
+            // For global content (YouTube), prefer Invidious instances over Yattee Server
+            // since Invidious playlists (IVPL*) are Invidious-specific
+            if let invidiousInstance = enabledInstances.first(where: { $0.type == .invidious }) {
+                return invidiousInstance
+            }
+            // Fall back to any YouTube-compatible instance
+            return enabledInstances.first(where: { $0.isYouTubeInstance })
+        case .federated(let provider, let instanceURL):
+            // For federated content, find matching instance by URL
+            if let existingInstance = instances.first(where: { $0.url == instanceURL }) {
+                return existingInstance
+            }
+            // If no configured instance matches, create a temporary one for PeerTube
+            if provider == ContentSource.peertubeProvider {
+                return Instance(type: .peertube, url: instanceURL)
+            }
+            return nil
+        case .extracted:
+            // For extracted content, use Yattee Server
+            return yatteeServerInstances.first
+        }
+    }
+
     /// Selects an enabled instance appropriate for the given content source.
     /// - For PeerTube content: prefers the exact instance, falls back to any PeerTube instance
     /// - For extracted content: requires Yattee Server (only backend with yt-dlp)

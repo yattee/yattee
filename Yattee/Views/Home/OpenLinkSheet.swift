@@ -294,17 +294,15 @@ struct OpenLinkFormView: View {
                         .disabled(!isValidInput)
                     }
 
-                    if !isMultipleURLs {
-                        Button {
-                            isTextEditorFocused = false
-                            Task { await loadURL() }
-                        } label: {
-                            Label(String(localized: "openLink.load"), systemImage: "arrow.right.circle")
-                        }
-                        .buttonStyle(.borderedProminent)
-                        .keyboardShortcut(.return, modifiers: .command)
-                        .disabled(!isValidInput)
+                    Button {
+                        isTextEditorFocused = false
+                        Task { await loadURLs() }
+                    } label: {
+                        Label(loadButtonTitle, systemImage: "arrow.right.circle")
                     }
+                    .buttonStyle(.borderedProminent)
+                    .keyboardShortcut(.return, modifiers: .command)
+                    .disabled(!isValidInput)
                 }
             }
         }
@@ -544,17 +542,16 @@ struct OpenLinkFormView: View {
                         .foregroundStyle(.secondary)
                 }
             } else {
-                // Load: show the link's video, playlist or channel screen
-                if !isMultipleURLs {
-                    Button {
-                        isTextEditorFocused = false
-                        Task { await loadURL() }
-                    } label: {
-                        Label(String(localized: "openLink.load"), systemImage: "arrow.right.circle")
-                            .fontWeight(.semibold)
-                    }
-                    .disabled(!isValidInput)
+                // Load: show the link's video, playlist or channel screen,
+                // or several links as mixed results
+                Button {
+                    isTextEditorFocused = false
+                    Task { await loadURLs() }
+                } label: {
+                    Label(loadButtonTitle, systemImage: "arrow.right.circle")
+                        .fontWeight(.semibold)
                 }
+                .disabled(!isValidInput)
 
                 if allLinksAreVideos {
                     // Play shortcut
@@ -697,6 +694,24 @@ struct OpenLinkFormView: View {
     }
 
     // MARK: - Load Action
+
+    private var loadButtonTitle: String {
+        isMultipleURLs ? String(localized: "openLink.loadAll") : String(localized: "openLink.load")
+    }
+
+    /// Shows a single link's screen, or several links on the Opened Links
+    /// page, which resolves them itself.
+    private func loadURLs() async {
+        let urls = parsedURLs
+        guard let appEnvironment, !urls.isEmpty else { return }
+        if urls.count > 1 {
+            extractedItems = []
+            dismissIfRequested()
+            appEnvironment.navigationCoordinator.navigateToOpenedLink(.openedLinks(urls))
+        } else {
+            await loadURL()
+        }
+    }
 
     /// Resolves the single link and shows its screen: a video's details page,
     /// or the playlist / channel screen. Errors stay in the form.

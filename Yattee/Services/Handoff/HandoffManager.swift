@@ -239,7 +239,7 @@ final class HandoffManager {
 
         // Don't create handoff activities for these local-only destinations
         case .settings, .mediaSources, .mediaSource, .mediaBrowser,
-             .importSubscriptions, .importPlaylists, .downloadsStorage, .directMedia:
+             .importSubscriptions, .importPlaylists, .downloadsStorage, .directMedia, .openedLinks:
             return false
         }
 
