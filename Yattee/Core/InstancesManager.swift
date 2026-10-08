@@ -8,16 +8,6 @@
 import Foundation
 import SwiftUI
 
-/// Status of an instance's connectivity and authentication.
-enum InstanceStatus: Equatable {
-    /// Instance is online and working.
-    case online
-    /// Instance requires authentication but credentials are not provided.
-    case authRequired
-    /// Instance authentication failed (wrong credentials).
-    case authFailed
-}
-
 /// Manages the list of configured backend instances with iCloud sync.
 @MainActor
 @Observable
@@ -37,9 +27,6 @@ final class InstancesManager {
 
     private(set) var instances: [Instance] = []
     private(set) var activeInstanceID: UUID?
-
-    /// Current status of each instance, keyed by instance ID.
-    private(set) var instanceStatuses: [UUID: InstanceStatus] = [:]
 
     // MARK: - Initialization
 
@@ -317,13 +304,6 @@ final class InstancesManager {
             updated.isEnabled = false
             update(updated)
         }
-    }
-
-    // MARK: - Instance Status
-
-    /// Returns the current status of an instance.
-    func status(for instance: Instance) -> InstanceStatus {
-        instanceStatuses[instance.id] ?? .online
     }
 
     /// The currently active instance for browsing content.

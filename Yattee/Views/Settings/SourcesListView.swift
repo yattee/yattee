@@ -415,11 +415,8 @@ struct SourcesListView: View {
         appEnvironment?.needsCredentials(for: instance) ?? false
     }
 
-    /// Whether one of this source's logins is being refused by the server.
-    ///
-    /// The instance-level statuses below know nothing about accounts, so a
-    /// rejected login would otherwise show up nowhere the user looks for their
-    /// sources.
+    /// Whether one of this source's logins is being refused by the server, so a
+    /// rejected login shows up where the user looks for their sources.
     private func hasRejectedAccount(_ instance: Instance) -> Bool {
         guard let accountsManager = appEnvironment?.accountsManager else { return false }
 
@@ -443,19 +440,6 @@ struct SourcesListView: View {
             Label(String(localized: "sources.status.authRequired"), systemImage: "key.fill")
                 .font(.caption2)
                 .foregroundStyle(.orange)
-        } else if let status = instancesManager?.status(for: instance) {
-            switch status {
-            case .authFailed:
-                Label(String(localized: "sources.status.authFailed"), systemImage: "exclamationmark.triangle.fill")
-                    .font(.caption2)
-                    .foregroundStyle(.orange)
-            case .authRequired:
-                Label(String(localized: "sources.status.authRequired"), systemImage: "key.fill")
-                    .font(.caption2)
-                    .foregroundStyle(.orange)
-            default:
-                EmptyView()
-            }
         }
     }
 

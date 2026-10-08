@@ -451,6 +451,7 @@ final class AppEnvironment {
         self.toastManager = toast
         toast.setNavigationCoordinator(self.navigationCoordinator)
         remoteControl.setToastManager(toast)
+        player.setToastManager(toast)
         self.downloadManager.setToastManager(toast)
         self.downloadManager.setDownloadSettings(self.downloadSettings)
 
