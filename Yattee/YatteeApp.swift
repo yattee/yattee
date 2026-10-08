@@ -602,7 +602,7 @@ struct YatteeApp: App {
         case .open:
             // Play directly (existing behavior)
             Task {
-                await playVideoFromDeepLink(videoID: videoID, startTime: startTime)
+                await playVideoFromDeepLink(videoID: videoID, url: originalURL, startTime: startTime)
             }
 
         case .download:
@@ -614,7 +614,7 @@ struct YatteeApp: App {
             #else
             // tvOS doesn't support downloads, fall back to open
             Task {
-                await playVideoFromDeepLink(videoID: videoID, startTime: startTime)
+                await playVideoFromDeepLink(videoID: videoID, url: originalURL, startTime: startTime)
             }
             #endif
 
@@ -655,6 +655,12 @@ struct YatteeApp: App {
     /// Load a link's video and show its details page. On failure, `fallback`
     /// (a screen that loads the link itself) shows the error.
     private func showLinkDetails(_ url: URL, fallback: NavigationDestination) async {
+        // A watch link inside a playlist shows both, as Open Link's Load does
+        if URLRouter().youTubePlaylistContext(url) != nil {
+            appEnvironment.navigationCoordinator.navigateToOpenedLink(.openedLinks([url]))
+            return
+        }
+
         let toastID = appEnvironment.toastManager.show(
             scopes: [.main, .player],
             category: .loading,
@@ -678,7 +684,7 @@ struct YatteeApp: App {
     }
 
     /// Play a video from a deep link.
-    private func playVideoFromDeepLink(videoID: VideoID, startTime: TimeInterval? = nil) async {
+    private func playVideoFromDeepLink(videoID: VideoID, url: URL? = nil, startTime: TimeInterval? = nil) async {
         LoggingService.shared.info(
             "Deep link play: videoID=\(videoID.videoID) source=\(videoID.source) startTime=\(startTime ?? -1)",
             category: .general
@@ -716,8 +722,9 @@ struct YatteeApp: App {
                 instance: instance
             )
             LoggingService.shared.info("Deep link play: fetched video, opening player", category: .general)
+            // A watch link inside a playlist queues the playlist around it
+            await LinkVideoResolver(appEnvironment: appEnvironment).play(video, from: url, startTime: startTime)
             appEnvironment.toastManager.dismiss(id: toastID)
-            appEnvironment.playerService.openVideo(video, startTime: startTime, forceStartTime: startTime != nil)
         } catch {
             LoggingService.shared.error(
                 "Deep link play: video fetch failed (\(error.localizedDescription)), falling back to info view",

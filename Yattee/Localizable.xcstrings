@@ -7417,7 +7417,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Supports direct video links (MP4, M4V, MOV, WebM, MKV, AVI, FLV)"
+            "value" : "Supports direct video links (MP4, M4V, MOV, WebM, MKV, AVI, FLV). Add an instance to open YouTube and PeerTube links"
           }
         }
       }
@@ -7428,7 +7428,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Supports hundreds of sites with Yattee Server"
+            "value" : "Videos, playlists and channels from YouTube and PeerTube, plus hundreds of other sites with Yattee Server"
           }
         }
       }
@@ -7439,7 +7439,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Supports YouTube and other compatible video links"
+            "value" : "Videos, playlists and channels from YouTube and PeerTube, plus direct video links"
           }
         }
       }
@@ -7483,7 +7483,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "URL is not a video"
+            "value" : "This link isn't a video"
           }
         }
       }
@@ -7616,6 +7616,17 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Maximum %lld URLs allowed"
+          }
+        }
+      }
+    },
+    "openLink.unsupportedYouTubeLink" : {
+      "comment" : "Error for a YouTube link Yattee can't open (feeds, hashtags, posts…)",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "This kind of YouTube link isn't supported"
           }
         }
       }

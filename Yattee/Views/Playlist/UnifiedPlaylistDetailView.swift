@@ -1378,22 +1378,6 @@ struct UnifiedPlaylistDetailView: View {
         }
     }
 
-    /// Generates a unique playlist name by appending (2), (3), etc. if needed.
-    private func generateUniqueName(_ baseName: String, existingTitles: Set<String>) -> String {
-        if !existingTitles.contains(baseName) {
-            return baseName
-        }
-
-        var counter = 2
-        while true {
-            let candidateName = "\(baseName) (\(counter))"
-            if !existingTitles.contains(candidateName) {
-                return candidateName
-            }
-            counter += 1
-        }
-    }
-
     /// Imports the remote playlist to local storage.
     private func importToLocal() async {
         guard let appEnvironment, let remotePlaylist else { return }
@@ -1402,8 +1386,7 @@ struct UnifiedPlaylistDetailView: View {
         importProgress = nil
 
         // Generate unique name
-        let existingTitles = Set(appEnvironment.dataManager.playlists().map(\.title))
-        let uniqueName = generateUniqueName(remotePlaylist.title, existingTitles: existingTitles)
+        let uniqueName = appEnvironment.dataManager.uniquePlaylistTitle(remotePlaylist.title)
 
         // Create local playlist
         let newLocalPlaylist = appEnvironment.dataManager.createPlaylist(

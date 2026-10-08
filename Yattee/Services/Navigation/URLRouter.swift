@@ -56,6 +56,18 @@ struct URLRouter: Sendable {
             return .video(.id(.global(videoID)))
         }
 
+        // youtube.com/results?search_query=…
+        if let query = parseYouTubeSearchURL(url) {
+            return .search(query)
+        }
+
+        // YouTube pages that hold no video (home, feeds, hashtags, Music
+        // browse pages) go nowhere rather than to a yt-dlp extraction that
+        // can only fail
+        if isYouTubeNonVideoPage(url) {
+            return nil
+        }
+
         // Try PeerTube URLs
         if let (instance, videoID) = parsePeerTubeURL(url) {
             return .video(.id(.federated(videoID, instance: instance, uuid: nil)))
@@ -343,12 +355,61 @@ struct URLRouter: Sendable {
 
     // MARK: - YouTube URL Parsing
 
+    /// Whether the host is YouTube's: youtube.com and its subdomains (www, m,
+    /// music), youtube-nocookie.com, youtu.be. Exact, so look-alike hosts such
+    /// as `notyoutube.com` don't match.
+    func isYouTubeHost(_ host: String?) -> Bool {
+        guard let host = host?.lowercased() else { return false }
+        return host == "youtu.be"
+            || host == "youtube.com" || host.hasSuffix(".youtube.com")
+            || host == "youtube-nocookie.com" || host.hasSuffix(".youtube-nocookie.com")
+    }
+
+    /// The playlist a YouTube watch link plays the video within
+    /// (`watch?v=X&list=Y`), when it is a real playlist. Mixes (`RD…`) and
+    /// private lists (Liked, Watch Later) can't be opened as playlists.
+    func youTubePlaylistContext(_ url: URL) -> String? {
+        guard isYouTubeHost(url.host), parseYouTubeURL(url) != nil,
+              let listID = URLComponents(url: url, resolvingAgainstBaseURL: false)?
+                .queryItems?.first(where: { $0.name == "list" })?.value,
+              !listID.isEmpty,
+              !listID.hasPrefix("RD"),
+              !["LL", "WL", "LM"].contains(listID) else {
+            return nil
+        }
+        return listID
+    }
+
+    /// Parse `youtube.com/results?search_query=…` into the search query.
+    private func parseYouTubeSearchURL(_ url: URL) -> String? {
+        guard isYouTubeHost(url.host), url.path == "/results" || url.path == "/search" else { return nil }
+        // Raw items: form encoding writes spaces as `+`, which must become
+        // spaces before percent-decoding (an encoded `%2B` stays a plus)
+        let items = URLComponents(url: url, resolvingAgainstBaseURL: false)?.percentEncodedQueryItems
+        let query = (items?.first(where: { $0.name == "search_query" }) ?? items?.first(where: { $0.name == "q" }))?
+            .value?
+            .replacingOccurrences(of: "+", with: " ")
+            .removingPercentEncoding?
+            .trimmingCharacters(in: .whitespacesAndNewlines)
+        guard let query, !query.isEmpty else { return nil }
+        return query
+    }
+
+    /// YouTube pages that are not a video, playlist, channel or search.
+    private func isYouTubeNonVideoPage(_ url: URL) -> Bool {
+        guard isYouTubeHost(url.host), url.host?.lowercased() != "youtu.be" else { return false }
+        let path = url.pathComponents.dropFirst()
+        guard let first = path.first?.lowercased() else { return true } // home page
+        return ["feed", "hashtag", "results", "search", "browse", "account", "premium", "explore", "gaming", "watch"]
+            .contains(first)
+    }
+
     /// Parse YouTube URLs and extract video ID.
     private func parseYouTubeURL(_ url: URL) -> String? {
         let host = url.host?.lowercased() ?? ""
 
-        // youtube.com/watch?v=VIDEO_ID
-        if host.contains("youtube.com") {
+        // youtube.com/watch?v=VIDEO_ID (also youtube-nocookie.com/embed/VIDEO_ID)
+        if isYouTubeHost(host), host != "youtu.be" {
             let components = URLComponents(url: url, resolvingAgainstBaseURL: false)
             if let videoID = components?.queryItems?.first(where: { $0.name == "v" })?.value {
                 return videoID
@@ -464,7 +525,7 @@ struct URLRouter: Sendable {
     func parseYouTubeChannelURL(_ url: URL) -> String? {
         let host = url.host?.lowercased() ?? ""
 
-        guard host.contains("youtube.com") else { return nil }
+        guard isYouTubeHost(host), host != "youtu.be" else { return nil }
 
         let pathComponents = url.pathComponents
 
@@ -500,7 +561,7 @@ struct URLRouter: Sendable {
     private func parseYouTubePlaylistURL(_ url: URL) -> String? {
         let host = url.host?.lowercased() ?? ""
 
-        guard host.contains("youtube.com") else { return nil }
+        guard isYouTubeHost(host), host != "youtu.be" else { return nil }
 
         // youtube.com/playlist?list=PLAYLIST_ID
         let components = URLComponents(url: url, resolvingAgainstBaseURL: false)

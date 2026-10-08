@@ -21,15 +21,31 @@ struct LinkActionPerformer {
         let result: LinkActionResult
         switch action {
         case .play(let url, let startTime):
-            result = await play(url, startTime: startTime)
+            if let source = playlistSource(url) {
+                result = await playPlaylist(source)
+            } else {
+                result = await play(url, startTime: startTime)
+            }
         case .playNext(let url):
-            result = await queue(url, next: true)
+            if let source = playlistSource(url) {
+                result = await queuePlaylist(source, next: true)
+            } else {
+                result = await queue(url, next: true)
+            }
         case .addToQueue(let url):
-            result = await queue(url, next: false)
+            if let source = playlistSource(url) {
+                result = await queuePlaylist(source, next: false)
+            } else {
+                result = await queue(url, next: false)
+            }
         case .download(let url):
             result = await download(url)
         case .bookmark(let url):
-            result = await bookmark(url)
+            if let source = playlistSource(url) {
+                result = await savePlaylist(source)
+            } else {
+                result = await bookmark(url)
+            }
         case .subscribe(let url):
             result = await setSubscribed(true, channelURL: url)
         case .unsubscribe(let url):
@@ -49,7 +65,8 @@ struct LinkActionPerformer {
         case .success(let video): resolved = video.0
         case .failure(let failure): return failure.result
         }
-        appEnvironment.playerService.openVideo(resolved, startTime: startTime, forceStartTime: startTime != nil)
+        // A watch link inside a playlist queues the playlist around it
+        await LinkVideoResolver(appEnvironment: appEnvironment).play(resolved, from: url, startTime: startTime)
         return .success(values(for: resolved))
     }
 
@@ -158,6 +175,118 @@ struct LinkActionPerformer {
             subtitle: video.title
         )
         return .success(values(for: video))
+    }
+
+    // MARK: - Playlist Actions
+
+    /// The playlist a link points at, when it is one.
+    private func playlistSource(_ url: URL) -> PlaylistSource? {
+        guard case .playlist(let source) = URLRouter().route(url) else { return nil }
+        return source
+    }
+
+    private func playPlaylist(_ source: PlaylistSource) async -> LinkActionResult {
+        let playlist: Playlist
+        switch await loadPlaylist(source) {
+        case .success(let loaded): playlist = loaded
+        case .failure(let failure): return failure.result
+        }
+        appEnvironment.queueManager.playFromList(
+            videos: playlist.videos,
+            index: 0,
+            queueSource: .playlist(playlistID: playlist.id.playlistID, continuation: nil),
+            sourceLabel: playlist.title
+        )
+        return .success(values(for: playlist))
+    }
+
+    private func queuePlaylist(_ source: PlaylistSource, next: Bool) async -> LinkActionResult {
+        let queueManager = appEnvironment.queueManager
+        guard queueManager.isQueueEnabled else {
+            return .failure(code: "queueDisabled", message: String(localized: "linkAction.error.queueDisabled", defaultValue: "The queue is turned off in Settings."))
+        }
+        let playlist: Playlist
+        switch await loadPlaylist(source) {
+        case .success(let loaded): playlist = loaded
+        case .failure(let failure): return failure.result
+        }
+        let count = playlist.videos.count
+        let confirmed = await confirm(
+            title: next
+                ? String(localized: "linkAction.confirm.playlistPlayNext.title", defaultValue: "Play Playlist Next?")
+                : String(localized: "linkAction.confirm.playlistQueue.title", defaultValue: "Add Playlist to Queue?"),
+            subject: playlist.title,
+            detail: String(localized: "linkAction.confirm.playlistVideoCount", defaultValue: "\(count) videos"),
+            confirmTitle: next
+                ? String(localized: "linkAction.confirm.playNext.button", defaultValue: "Play Next")
+                : String(localized: "linkAction.confirm.queue.button", defaultValue: "Add to Queue"),
+            systemImage: next ? "text.line.first.and.arrowtriangle.forward" : "text.append"
+        )
+        guard confirmed else { return .cancelled }
+
+        let queueSource = QueueSource.playlist(playlistID: playlist.id.playlistID, continuation: nil)
+        if next {
+            // Each lands right after the current video, so go last to first
+            for video in playlist.videos.reversed() {
+                queueManager.playNext(video, queueSource: queueSource)
+            }
+        } else {
+            queueManager.addToQueue(playlist.videos, queueSource: queueSource)
+        }
+        appEnvironment.toastManager.showSuccess(
+            next
+                ? String(localized: "linkAction.done.playNext", defaultValue: "Playing next")
+                : String(localized: "linkAction.done.queue", defaultValue: "Added to queue"),
+            subtitle: playlist.title
+        )
+        return .success(values(for: playlist))
+    }
+
+    /// Bookmarking a playlist saves it to the library as a local playlist.
+    private func savePlaylist(_ source: PlaylistSource) async -> LinkActionResult {
+        let playlist: Playlist
+        switch await loadPlaylist(source) {
+        case .success(let loaded): playlist = loaded
+        case .failure(let failure): return failure.result
+        }
+        let confirmed = await confirm(
+            title: String(localized: "linkAction.confirm.savePlaylist.title", defaultValue: "Save Playlist to Library?"),
+            subject: playlist.title,
+            detail: String(localized: "linkAction.confirm.playlistVideoCount", defaultValue: "\(playlist.videos.count) videos"),
+            confirmTitle: String(localized: "linkAction.confirm.savePlaylist.button", defaultValue: "Save"),
+            systemImage: "square.and.arrow.down"
+        )
+        guard confirmed else { return .cancelled }
+
+        appEnvironment.dataManager.importPlaylist(playlist)
+        appEnvironment.toastManager.showSuccess(
+            String(localized: "playlist.imported.title"),
+            subtitle: playlist.title
+        )
+        return .success(values(for: playlist))
+    }
+
+    /// Loads a playlist's videos, showing progress while it does.
+    private func loadPlaylist(_ source: PlaylistSource) async -> Result<Playlist, LinkActionFailure> {
+        let toastID = appEnvironment.toastManager.show(
+            scopes: [.main, .player],
+            category: .loading,
+            title: String(localized: "linkAction.loadingPlaylist", defaultValue: "Loading playlist…"),
+            autoDismissDelay: 30.0
+        )
+        defer { appEnvironment.toastManager.dismiss(id: toastID) }
+
+        do {
+            let playlist = try await LinkVideoResolver(appEnvironment: appEnvironment).playlist(for: source)
+            guard !playlist.videos.isEmpty else {
+                return .failure(.loadFailed(String(localized: "linkAction.error.emptyPlaylist", defaultValue: "The playlist has no videos.")))
+            }
+            return .success(playlist)
+        } catch LinkResolveError.noInstanceAvailable {
+            return .failure(.noSource)
+        } catch {
+            return .failure(.loadFailed(error.localizedDescription))
+        }
     }
 
     // MARK: - Subscriptions
@@ -301,7 +430,7 @@ struct LinkActionPerformer {
         } catch let error as LinkResolveError {
             switch error {
             case .noInstanceAvailable: return .failure(.noSource)
-            case .noYatteeServer, .notAVideo: return .failure(.notAVideo(error.localizedDescription))
+            case .noYatteeServer, .notAVideo, .unsupportedYouTubeLink: return .failure(.notAVideo(error.localizedDescription))
             }
         } catch {
             return .failure(.loadFailed(error.localizedDescription))
@@ -323,6 +452,10 @@ struct LinkActionPerformer {
 
     private func values(for video: Video) -> [String: String] {
         ["videoID": video.id.videoID, "title": video.title, "channel": video.author.name]
+    }
+
+    private func values(for playlist: Playlist) -> [String: String] {
+        ["playlistID": playlist.id.playlistID, "title": playlist.title, "count": String(playlist.videos.count)]
     }
 
     private func playerValues() -> [String: String] {

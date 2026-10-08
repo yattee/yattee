@@ -326,16 +326,59 @@ struct URLRouterTests {
         }
     }
 
-    @Test("YouTube URL without video ID routes to external video")
+    @Test("YouTube watch URL without video ID routes nowhere")
     func urlWithoutVideoID() {
         let url = URL(string: "https://www.youtube.com/watch")!
-        let destination = router.route(url)
-        // YouTube URLs without video ID are now treated as potential external videos
-        if case .externalVideo(let extractedURL) = destination {
-            #expect(extractedURL == url)
-        } else {
-            Issue.record("Expected externalVideo destination")
-        }
+        #expect(router.route(url) == nil)
+    }
+
+    @Test("YouTube pages without a video route nowhere instead of to yt-dlp", arguments: [
+        "https://www.youtube.com/",
+        "https://youtube.com",
+        "https://www.youtube.com/feed/subscriptions",
+        "https://www.youtube.com/hashtag/music",
+        "https://www.youtube.com/results",
+        "https://music.youtube.com/browse/MPREb_abc",
+    ])
+    func youTubeNonVideoPages(_ string: String) {
+        #expect(router.route(URL(string: string)!) == nil)
+    }
+
+    @Test("Other unparsed YouTube links still go to yt-dlp")
+    func youTubeClipGoesToExtraction() {
+        let url = URL(string: "https://www.youtube.com/clip/UgkxABC")!
+        #expect(router.route(url) == .externalVideo(url))
+    }
+
+    @Test("YouTube search results link routes to search")
+    func youTubeSearchLink() {
+        let url = URL(string: "https://www.youtube.com/results?search_query=swift+concurrency")!
+        #expect(router.route(url) == .search("swift concurrency"))
+    }
+
+    @Test("youtube-nocookie embed routes to video")
+    func youTubeNoCookieEmbed() {
+        let url = URL(string: "https://www.youtube-nocookie.com/embed/dQw4w9WgXcQ?start=30")!
+        #expect(router.route(url) == .video(.id(.global("dQw4w9WgXcQ"))))
+    }
+
+    @Test("Look-alike hosts are not YouTube")
+    func lookAlikeHosts() {
+        let url = URL(string: "https://notyoutube.com/watch?v=dQw4w9WgXcQ")!
+        #expect(router.route(url) == .externalVideo(url))
+        #expect(!router.isYouTubeHost("youtube.com.evil.example"))
+        #expect(router.isYouTubeHost("music.youtube.com"))
+    }
+
+    @Test("Watch link playlist context", arguments: [
+        ("https://www.youtube.com/watch?v=dQw4w9WgXcQ&list=PLtest123", "PLtest123"),
+        ("https://www.youtube.com/watch?v=dQw4w9WgXcQ&list=RDdQw4w9WgXcQ", nil),
+        ("https://www.youtube.com/watch?v=dQw4w9WgXcQ&list=WL", nil),
+        ("https://www.youtube.com/watch?v=dQw4w9WgXcQ", nil),
+        ("https://www.youtube.com/playlist?list=PLtest123", nil),
+    ] as [(String, String?)])
+    func playlistContext(_ string: String, _ expected: String?) {
+        #expect(router.youTubePlaylistContext(URL(string: string)!) == expected)
     }
 
     @Test("Known non-PeerTube hosts route to external video")

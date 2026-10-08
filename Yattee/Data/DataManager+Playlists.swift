@@ -24,6 +24,30 @@ extension DataManager {
         return playlist
     }
 
+    /// A title no local playlist has yet: the base, else "Base (2)", "Base (3)"…
+    func uniquePlaylistTitle(_ baseTitle: String) -> String {
+        let existingTitles = Set(playlists().map(\.title))
+        guard existingTitles.contains(baseTitle) else { return baseTitle }
+        var counter = 2
+        while existingTitles.contains("\(baseTitle) (\(counter))") {
+            counter += 1
+        }
+        return "\(baseTitle) (\(counter))"
+    }
+
+    /// Saves a remote playlist's videos as a new local playlist.
+    @discardableResult
+    func importPlaylist(_ playlist: Playlist) -> LocalPlaylist {
+        let localPlaylist = createPlaylist(
+            title: uniquePlaylistTitle(playlist.title),
+            description: playlist.description
+        )
+        for video in playlist.videos {
+            addToPlaylist(video, playlist: localPlaylist)
+        }
+        return localPlaylist
+    }
+
     /// Updates a playlist's title and description.
     func updatePlaylist(_ playlist: LocalPlaylist, title: String, description: String?) {
         playlist.title = title

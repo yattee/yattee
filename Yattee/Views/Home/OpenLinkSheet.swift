@@ -647,7 +647,8 @@ struct OpenLinkFormView: View {
                 if case .externalVideo = destination { return true }
                 return false
             }
-            return true
+            // YouTube pages that route nowhere are unsupported, not external
+            return !router.isYouTubeHost(url.host)
         }
     }
 
@@ -657,7 +658,8 @@ struct OpenLinkFormView: View {
         let router = URLRouter()
         return parsedURLs.allSatisfy { url in
             switch router.route(url) {
-            case .video, .externalVideo, .directMedia, nil: return true
+            case .video, .externalVideo, .directMedia: return true
+            case nil: return !router.isYouTubeHost(url.host)
             default: return false
             }
         }
@@ -704,7 +706,8 @@ struct OpenLinkFormView: View {
     private func loadURLs() async {
         let urls = parsedURLs
         guard let appEnvironment, !urls.isEmpty else { return }
-        if urls.count > 1 {
+        // A watch link inside a playlist shows both, like several links
+        if urls.count > 1 || URLRouter().youTubePlaylistContext(urls[0]) != nil {
             extractedItems = []
             dismissIfRequested()
             appEnvironment.navigationCoordinator.navigateToOpenedLink(.openedLinks(urls))
@@ -764,7 +767,7 @@ struct OpenLinkFormView: View {
 
                 if !firstVideoPlayed {
                     // Play first video - this expands player
-                    playVideo(video, sourceURL: url, appEnvironment: appEnvironment)
+                    await playVideo(video, sourceURL: url, appEnvironment: appEnvironment)
                     firstVideoPlayed = true
                 } else {
                     // Add to queue
@@ -805,13 +808,16 @@ struct OpenLinkFormView: View {
         }
     }
 
-    private func playVideo(_ video: Video, sourceURL: URL, appEnvironment: AppEnvironment) {
+    private func playVideo(_ video: Video, sourceURL: URL, appEnvironment: AppEnvironment) async {
         // Don't pass a specific stream - let the player's selectStreamAndBackend
         // choose the best video+audio combination. Using streams.first would
         // incorrectly select audio-only streams for sites like Bilibili.
         let router = URLRouter()
         let startTime = router.parseTimestamp(router.unwrapped(sourceURL))
-        appEnvironment.playerService.openVideo(video, startTime: startTime, forceStartTime: startTime != nil)
+        // A watch link inside a playlist queues the playlist around it.
+        // Awaited, so later links queue after the playlist instead of being
+        // cleared by it.
+        await LinkVideoResolver(appEnvironment: appEnvironment).play(video, from: sourceURL, startTime: startTime)
     }
 
     // MARK: - Download Action

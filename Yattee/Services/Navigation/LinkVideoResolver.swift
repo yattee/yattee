@@ -42,15 +42,24 @@ struct LinkVideoResolver {
             return (video, [stream], [], [])
 
         case .externalVideo, nil:
+            // YouTube pages that hold no video route nowhere; say so instead
+            // of asking for an extraction that can only fail
+            if destination == nil, router.isYouTubeHost(url.host) {
+                throw LinkResolveError.unsupportedYouTubeLink
+            }
             // A file mpv plays as-is needs no extraction, no captions/storyboards
             if let probe = await DirectMediaProbe.probe(url) {
                 let video = DirectMediaHelper.createVideo(from: url, probe: probe)
                 let stream = DirectMediaHelper.createStream(from: url, probe: probe)
                 return (video, [stream], [], [])
             }
-            // External URL - use Yattee Server (doesn't support storyboards)
+            // External URL - use Yattee Server (doesn't support storyboards).
+            // Without one, a YouTube link Yattee can't parse (clips, posts) is
+            // simply unsupported - asking for a server would mislead.
             guard let instance = appEnvironment.instancesManager.yatteeServerInstance else {
-                throw LinkResolveError.noYatteeServer
+                throw router.isYouTubeHost(url.host)
+                    ? LinkResolveError.unsupportedYouTubeLink
+                    : LinkResolveError.noYatteeServer
             }
             let (video, streams, captions) = try await appEnvironment.contentService
                 .extractURL(url, instance: instance)
@@ -76,7 +85,8 @@ struct LinkVideoResolver {
             return .video(.loaded(video), queueContext: context)
         }
 
-        switch router.route(url) {
+        let destination = router.route(url)
+        switch destination {
         case .video(.id(let videoID), _):
             guard let instance = appEnvironment.instancesManager.instance(for: videoID.source) else {
                 throw LinkResolveError.noInstanceAvailable
@@ -94,6 +104,43 @@ struct LinkVideoResolver {
         case .some(let destination):
             return destination
         }
+    }
+
+    /// Plays a video opened from a link. A watch link inside a playlist
+    /// (`watch?v=X&list=Y`) plays it with the playlist queued around it;
+    /// if the playlist can't be loaded, the video plays alone.
+    func play(_ video: Video, from url: URL?, startTime: TimeInterval?) async {
+        let router = URLRouter()
+        if let url, appEnvironment.queueManager.isQueueEnabled,
+           let listID = router.youTubePlaylistContext(router.unwrapped(url)) {
+            let source = PlaylistSource.remote(.global(listID), instance: nil)
+            if let playlist = try? await playlist(for: source),
+               let index = playlist.videos.firstIndex(where: { $0.id.videoID == video.id.videoID }) {
+                var videos = playlist.videos
+                videos[index] = video
+                appEnvironment.queueManager.playFromList(
+                    videos: videos,
+                    index: index,
+                    queueSource: .playlist(playlistID: listID, continuation: nil),
+                    sourceLabel: playlist.title,
+                    startTime: startTime
+                )
+                return
+            }
+        }
+        appEnvironment.playerService.openVideo(video, startTime: startTime, forceStartTime: startTime != nil)
+    }
+
+    /// Loads a remote playlist with its videos from the instance suited to it.
+    func playlist(for source: PlaylistSource) async throws -> Playlist {
+        guard case .remote(let playlistID, let instance, _, _) = source else {
+            throw LinkResolveError.notAVideo
+        }
+        guard let instance = instance
+                ?? playlistID.source.flatMap({ appEnvironment.instancesManager.playlistInstance(for: $0) }) else {
+            throw LinkResolveError.noInstanceAvailable
+        }
+        return try await appEnvironment.contentService.playlist(id: playlistID.playlistID, instance: instance)
     }
 
     #if !os(tvOS)
@@ -247,6 +294,7 @@ enum LinkResolveError: LocalizedError {
     case noInstanceAvailable
     case noYatteeServer
     case notAVideo
+    case unsupportedYouTubeLink
 
     var errorDescription: String? {
         switch self {
@@ -256,6 +304,8 @@ enum LinkResolveError: LocalizedError {
             return String(localized: "openLink.noYatteeServer")
         case .notAVideo:
             return String(localized: "openLink.notAVideo")
+        case .unsupportedYouTubeLink:
+            return String(localized: "openLink.unsupportedYouTubeLink")
         }
     }
 }

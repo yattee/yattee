@@ -37,9 +37,23 @@ final class OpenedLinksViewModel {
     private static let maxConcurrentResolutions = 4
 
     init(urls: [URL]) {
+        // A watch link inside a playlist (`watch?v=X&list=Y`) shows both the
+        // video and the playlist
+        let router = URLRouter()
+        let expanded = urls.flatMap { url -> [URL] in
+            guard let listID = router.youTubePlaylistContext(url),
+                  let playlistURL = Self.youTubePlaylistURL(listID) else { return [url] }
+            return [url, playlistURL]
+        }
         var seen = Set<String>()
-        let unique = urls.filter { seen.insert($0.absoluteString).inserted }
+        let unique = expanded.filter { seen.insert($0.absoluteString).inserted }
         links = unique.enumerated().map { OpenedLink(id: $0.offset, url: $0.element) }
+    }
+
+    private static func youTubePlaylistURL(_ listID: String) -> URL? {
+        var components = URLComponents(string: "https://www.youtube.com/playlist")
+        components?.queryItems = [URLQueryItem(name: "list", value: listID)]
+        return components?.url
     }
 
     /// Resolved videos, in link order.
@@ -111,13 +125,9 @@ final class OpenedLinksViewModel {
         case .video(.loaded(let video), _):
             return .video(video)
 
-        case .playlist(.remote(let playlistID, let instance, _, _)):
-            guard let instance = instance
-                    ?? playlistID.source.flatMap({ appEnvironment.instancesManager.playlistInstance(for: $0) }) else {
-                return .unresolved(destination, message: String(localized: "openLink.noInstance"))
-            }
+        case .playlist(let source):
             do {
-                let playlist = try await appEnvironment.contentService.playlist(id: playlistID.playlistID, instance: instance)
+                let playlist = try await LinkVideoResolver(appEnvironment: appEnvironment).playlist(for: source)
                 return .playlist(playlist, destination: destination)
             } catch {
                 return .unresolved(destination, message: error.localizedDescription)
