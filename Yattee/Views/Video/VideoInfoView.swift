@@ -37,6 +37,7 @@ struct VideoInfoView: View {
     // Carousel scroll state (iOS only) - separate from currentVideoIndex to avoid mid-scroll updates
     #if os(iOS)
     @State private var carouselScrollPosition: Int?
+    @State private var clearsCarouselPositionWhenIdle = false
     #endif
     
     // Continuation loading state
@@ -1011,6 +1012,15 @@ struct VideoInfoView: View {
             .scrollTargetBehavior(.viewAligned(limitBehavior: .alwaysByOne))
             .scrollPosition(id: $carouselScrollPosition)
             .onScrollPhaseChange { oldPhase, newPhase in
+                if newPhase == .interacting {
+                    clearsCarouselPositionWhenIdle = false
+                }
+                // Drop the re-snap request after a width change (see onChange(of: cardWidth))
+                if newPhase == .idle, clearsCarouselPositionWhenIdle {
+                    clearsCarouselPositionWhenIdle = false
+                    carouselScrollPosition = nil
+                    return
+                }
                 // Only update currentVideoIndex when scrolling ends (user lifts finger)
                 if newPhase == .idle, let newIndex = carouselScrollPosition, newIndex != currentVideoIndex {
                     currentVideoIndex = newIndex
@@ -1021,6 +1031,22 @@ struct VideoInfoView: View {
                 if let newValue, newValue != carouselScrollPosition {
                     carouselScrollPosition = newValue
                     proxy.scrollTo(newValue, anchor: .center)
+                }
+            }
+            .onChange(of: cardWidth) { _, _ in
+                // A width change (iPhone Duo unfold, rotation, split resize) keeps
+                // the old point offset, leaving the cards misaligned. Re-snap to the
+                // current card (setting the same id is a no-op, hence the nil hop).
+                // The LazyHStack keeps re-applying a programmatic position while it
+                // realizes cards, which stopped the next swipe halfway between two
+                // cards, so the position is cleared again once the re-snap settles.
+                guard let index = currentVideoIndex else { return }
+                carouselScrollPosition = nil
+                DispatchQueue.main.async {
+                    clearsCarouselPositionWhenIdle = true
+                    withAnimation(.linear(duration: 0.15)) {
+                        carouselScrollPosition = index
+                    }
                 }
             }
             .onAppear {
