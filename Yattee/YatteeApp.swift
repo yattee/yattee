@@ -619,8 +619,10 @@ struct YatteeApp: App {
             #endif
 
         case .ask:
-            // Show OpenLinkSheet with URL pre-filled
-            showOpenLinkSheetWithURL(originalURL)
+            // Show the video's details page, carrying the link's timestamp
+            Task {
+                await showLinkDetails(originalURL, fallback: .video(.id(videoID)))
+            }
         }
     }
 
@@ -643,15 +645,36 @@ struct YatteeApp: App {
             #endif
 
         case .ask:
-            // Show OpenLinkSheet with URL pre-filled
-            showOpenLinkSheetWithURL(externalURL)
+            // Extract, then show the video's details page
+            Task {
+                await showLinkDetails(externalURL, fallback: .externalVideo(externalURL))
+            }
         }
     }
 
-    /// Show OpenLinkSheet with a pre-filled URL.
-    private func showOpenLinkSheetWithURL(_ url: URL) {
-        // The top-most sheet host (the player when expanded) presents it
-        appEnvironment.navigationCoordinator.presenter.present(.openLink(url))
+    /// Load a link's video and show its details page. On failure, `fallback`
+    /// (a screen that loads the link itself) shows the error.
+    private func showLinkDetails(_ url: URL, fallback: NavigationDestination) async {
+        let toastID = appEnvironment.toastManager.show(
+            scopes: [.main, .player],
+            category: .loading,
+            title: String(localized: "deepLink.loading.title", defaultValue: "Loading video…"),
+            subtitle: url.host,
+            autoDismissDelay: 60.0
+        )
+
+        let destination: NavigationDestination
+        do {
+            destination = try await LinkVideoResolver(appEnvironment: appEnvironment).resolveDestination(url)
+        } catch {
+            LoggingService.shared.warning(
+                "Deep link details: failed to load \(url.absoluteString): \(error.localizedDescription)",
+                category: .general
+            )
+            destination = fallback
+        }
+        appEnvironment.toastManager.dismiss(id: toastID)
+        appEnvironment.navigationCoordinator.navigateToOpenedLink(destination)
     }
 
     /// Play a video from a deep link.

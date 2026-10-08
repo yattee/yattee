@@ -47,6 +47,10 @@ struct VideoQueueContext {
     /// When set, playback from VideoInfoView must route through
     /// `QueueManager.playFromMediaBrowser` using this payload.
     var mediaBrowserPlayback: MediaBrowserPlaybackInfo? = nil
+
+    /// Position requested by an opened timed link (`?t=`). Unlike `startTime`
+    /// (a resume position), it is honored as-is and skips the resume prompt.
+    var linkStartTime: TimeInterval? = nil
     
     /// Whether this context has valid queue information
     var hasQueueInfo: Bool {
@@ -91,7 +95,8 @@ extension VideoQueueContext: Equatable {
         lhs.videoList == rhs.videoList &&
         lhs.videoIndex == rhs.videoIndex &&
         lhs.startTime == rhs.startTime &&
-        lhs.mediaBrowserPlayback == rhs.mediaBrowserPlayback
+        lhs.mediaBrowserPlayback == rhs.mediaBrowserPlayback &&
+        lhs.linkStartTime == rhs.linkStartTime
     }
 }
 
@@ -104,5 +109,6 @@ extension VideoQueueContext: Hashable {
         hasher.combine(videoIndex)
         hasher.combine(startTime)
         hasher.combine(mediaBrowserPlayback)
+        hasher.combine(linkStartTime)
     }
 }

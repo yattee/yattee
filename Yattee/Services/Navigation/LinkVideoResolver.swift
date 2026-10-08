@@ -61,6 +61,41 @@ struct LinkVideoResolver {
         }
     }
 
+    /// Resolves a link to the screen that shows it: a video's details page
+    /// (loaded here so a bad link fails before navigating), or the playlist /
+    /// channel screen, which loads its own content. A `?t=` timestamp is
+    /// carried to the details page's Play.
+    func resolveDestination(_ url: URL) async throws -> NavigationDestination {
+        let router = URLRouter()
+        let url = router.unwrapped(url)
+        let startTime = router.parseTimestamp(url)
+
+        func details(_ video: Video) -> NavigationDestination {
+            var context = VideoQueueContext.single(video)
+            context.linkStartTime = startTime
+            return .video(.loaded(video), queueContext: context)
+        }
+
+        switch router.route(url) {
+        case .video(.id(let videoID), _):
+            guard let instance = appEnvironment.instancesManager.instance(for: videoID.source) else {
+                throw LinkResolveError.noInstanceAvailable
+            }
+            let video = try await appEnvironment.contentService.video(id: videoID.videoID, instance: instance)
+            return details(video)
+
+        case .video(.loaded(let video), _):
+            return details(video)
+
+        case .directMedia, .externalVideo, nil:
+            let (video, _, _, _) = try await resolve(url)
+            return details(video)
+
+        case .some(let destination):
+            return destination
+        }
+    }
+
     #if !os(tvOS)
     /// Enqueues a single video for download with already-fetched streams.
     func enqueueDownload(

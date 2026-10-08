@@ -7363,6 +7363,17 @@
         }
       }
     },
+    "openLink.load" : {
+      "comment" : "Button label: show the link's video, playlist or channel screen",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Load"
+          }
+        }
+      }
+    },
     "openLink.noInstance" : {
       "comment" : "Error message",
       "localizations" : {
@@ -7402,7 +7413,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Open"
+            "value" : "Play"
           }
         }
       }
@@ -7413,7 +7424,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Open All"
+            "value" : "Play All"
           }
         }
       }
@@ -12230,7 +12241,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Ask Every Time"
+            "value" : "Show Details"
           }
         }
       }

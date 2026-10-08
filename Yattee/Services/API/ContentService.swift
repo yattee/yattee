@@ -676,8 +676,24 @@ actor ContentService: ContentServiceProtocol {
         guard instance.type == .yatteeServer else {
             throw APIError.notSupported
         }
-        return try await yatteeServerAPI(for: instance).extractURL(url, instance: instance)
+        // Keyed by link only: callers pick the Yattee Server differently, and
+        // any server returns equivalent streams within the TTL.
+        let key = url.absoluteString
+        if let cached = recentExtractions[key], Date().timeIntervalSince(cached.date) < Self.extractionCacheTTL {
+            return cached.result
+        }
+        let result = try await yatteeServerAPI(for: instance).extractURL(url, instance: instance)
+        recentExtractions = recentExtractions.filter { Date().timeIntervalSince($0.value.date) < Self.extractionCacheTTL }
+        recentExtractions[key] = (result, Date())
+        return result
     }
+
+    /// How long an extraction is reused. A link opened from Open Link is
+    /// extracted to show its details page, which re-extracts for full details,
+    /// and Play extracts again; all three share one Yattee Server request.
+    /// Short, so a retry after a failed stream soon fetches fresh URLs.
+    private static let extractionCacheTTL: TimeInterval = 60
+    private var recentExtractions: [String: (result: (video: Video, streams: [Stream], captions: [Caption]), date: Date)] = [:]
 
     /// Extracts channel/user videos from any URL that yt-dlp supports.
     /// Requires a Yattee Server instance.

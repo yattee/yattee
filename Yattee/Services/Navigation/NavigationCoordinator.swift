@@ -312,6 +312,16 @@ final class NavigationCoordinator {
         router.select(.subscriptionsFeed)
     }
 
+    /// Navigate to an opened link's screen, collapsing the full-screen player
+    /// so the pushed screen is visible instead of landing underneath it.
+    func navigateToOpenedLink(_ destination: NavigationDestination) {
+        if isPlayerExpanded {
+            isPlayerCollapsing = true
+            isPlayerExpanded = false
+        }
+        navigate(to: destination)
+    }
+
     /// Navigate to a video by its ID string.
     /// Creates a VideoID assuming YouTube source.
     func navigateToVideo(videoID: String) {

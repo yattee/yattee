@@ -2400,7 +2400,8 @@ struct VideoInfoView: View {
             // Skip API fetch for local media sources (SMB, WebDAV, local files)
             if extractor == MediaFile.smbProvider
                 || extractor == MediaFile.webdavProvider
-                || extractor == MediaFile.localFolderProvider {
+                || extractor == MediaFile.localFolderProvider
+                || extractor == DirectMediaHelper.provider {
                 isLoadingVideoDetails = false
                 return
             }
@@ -2535,6 +2536,14 @@ struct VideoInfoView: View {
             return
         }
 
+        // An opened timed link asks for an exact position - honor it over any
+        // saved progress, without the resume prompt.
+        if let linkStartTime = videoQueueContext?.linkStartTime,
+           videoQueueContext?.video.id == video.id {
+            playVideoWithStartTime(linkStartTime, forceStartTime: true)
+            return
+        }
+
         // Get saved watch progress from database
         let savedProgress = env.dataManager.watchProgress(for: video.id.videoID)
         let videoDuration = video.duration
@@ -2570,7 +2579,7 @@ struct VideoInfoView: View {
     }
     
     /// Plays the video with the specified start time.
-    private func playVideoWithStartTime(_ time: TimeInterval) {
+    private func playVideoWithStartTime(_ time: TimeInterval, forceStartTime: Bool = false) {
         guard let video = displayedVideo else { return }
 
         // Media-browser playback must go through `playFromMediaBrowser` so the
@@ -2599,7 +2608,7 @@ struct VideoInfoView: View {
               let list = context.videoList else {
             // No queue context - play single video
             if time > 0 {
-                playerService?.openVideo(video, startTime: time)
+                playerService?.openVideo(video, startTime: time, forceStartTime: forceStartTime)
             } else {
                 playerService?.openVideo(video)
             }

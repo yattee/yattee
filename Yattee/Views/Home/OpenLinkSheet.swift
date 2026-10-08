@@ -2,7 +2,9 @@
 //  OpenLinkSheet.swift
 //  Yattee
 //
-//  Sheet for entering URLs to play or download via Yattee Server's yt-dlp extraction.
+//  Sheet for entering links: Load shows a single link's video, playlist or
+//  channel screen; Play and Download act on video links directly (YouTube,
+//  PeerTube, direct media, or anything Yattee Server's yt-dlp extracts).
 //  Supports multiple URLs (one per line) with batch processing.
 //
 
@@ -264,33 +266,45 @@ struct OpenLinkFormView: View {
                         .foregroundStyle(.secondary)
                         .font(.subheadline)
                 } else {
-                    Button {
-                        isTextEditorFocused = false
-                        Task { await downloadAllURLs() }
-                    } label: {
-                        Label(
-                            isMultipleURLs
-                                ? String(localized: "openLink.downloadAll")
-                                : String(localized: "openLink.download"),
-                            systemImage: "arrow.down.circle"
-                        )
-                    }
-                    .disabled(!isValidInput)
+                    if allLinksAreVideos {
+                        Button {
+                            isTextEditorFocused = false
+                            Task { await downloadAllURLs() }
+                        } label: {
+                            Label(
+                                isMultipleURLs
+                                    ? String(localized: "openLink.downloadAll")
+                                    : String(localized: "openLink.download"),
+                                systemImage: "arrow.down.circle"
+                            )
+                        }
+                        .disabled(!isValidInput)
 
-                    Button {
-                        isTextEditorFocused = false
-                        Task { await openAllURLs() }
-                    } label: {
-                        Label(
-                            isMultipleURLs
-                                ? String(localized: "openLink.openAll")
-                                : String(localized: "openLink.open"),
-                            systemImage: "play.fill"
-                        )
+                        Button {
+                            isTextEditorFocused = false
+                            Task { await openAllURLs() }
+                        } label: {
+                            Label(
+                                isMultipleURLs
+                                    ? String(localized: "openLink.openAll")
+                                    : String(localized: "openLink.open"),
+                                systemImage: "play.fill"
+                            )
+                        }
+                        .disabled(!isValidInput)
                     }
-                    .buttonStyle(.borderedProminent)
-                    .keyboardShortcut(.return, modifiers: .command)
-                    .disabled(!isValidInput)
+
+                    if !isMultipleURLs {
+                        Button {
+                            isTextEditorFocused = false
+                            Task { await loadURL() }
+                        } label: {
+                            Label(String(localized: "openLink.load"), systemImage: "arrow.right.circle")
+                        }
+                        .buttonStyle(.borderedProminent)
+                        .keyboardShortcut(.return, modifiers: .command)
+                        .disabled(!isValidInput)
+                    }
                 }
             }
         }
@@ -530,35 +544,49 @@ struct OpenLinkFormView: View {
                         .foregroundStyle(.secondary)
                 }
             } else {
-                // Open/Play button
-                Button {
-                    isTextEditorFocused = false
-                    Task { await openAllURLs() }
-                } label: {
-                    Label(
-                        isMultipleURLs
-                            ? String(localized: "openLink.openAll")
-                            : String(localized: "openLink.open"),
-                        systemImage: "play.fill"
-                    )
+                // Load: show the link's video, playlist or channel screen
+                if !isMultipleURLs {
+                    Button {
+                        isTextEditorFocused = false
+                        Task { await loadURL() }
+                    } label: {
+                        Label(String(localized: "openLink.load"), systemImage: "arrow.right.circle")
+                            .fontWeight(.semibold)
+                    }
+                    .disabled(!isValidInput)
                 }
-                .disabled(!isValidInput)
 
-                #if !os(tvOS)
-                // Download button
-                Button {
-                    isTextEditorFocused = false
-                    Task { await downloadAllURLs() }
-                } label: {
-                    Label(
-                        isMultipleURLs
-                            ? String(localized: "openLink.downloadAll")
-                            : String(localized: "openLink.download"),
-                        systemImage: "arrow.down.circle"
-                    )
+                if allLinksAreVideos {
+                    // Play shortcut
+                    Button {
+                        isTextEditorFocused = false
+                        Task { await openAllURLs() }
+                    } label: {
+                        Label(
+                            isMultipleURLs
+                                ? String(localized: "openLink.openAll")
+                                : String(localized: "openLink.open"),
+                            systemImage: "play.fill"
+                        )
+                    }
+                    .disabled(!isValidInput)
+
+                    #if !os(tvOS)
+                    // Download shortcut
+                    Button {
+                        isTextEditorFocused = false
+                        Task { await downloadAllURLs() }
+                    } label: {
+                        Label(
+                            isMultipleURLs
+                                ? String(localized: "openLink.downloadAll")
+                                : String(localized: "openLink.download"),
+                            systemImage: "arrow.down.circle"
+                        )
+                    }
+                    .disabled(!isValidInput)
+                    #endif
                 }
-                .disabled(!isValidInput)
-                #endif
             }
         }
     }
@@ -626,6 +654,18 @@ struct OpenLinkFormView: View {
         }
     }
 
+    /// Whether every parsed link is a video, so Play and Download apply.
+    /// Playlists and channels can only be loaded.
+    private var allLinksAreVideos: Bool {
+        let router = URLRouter()
+        return parsedURLs.allSatisfy { url in
+            switch router.route(url) {
+            case .video, .externalVideo, .directMedia, nil: return true
+            default: return false
+            }
+        }
+    }
+
     // MARK: - Clipboard
 
     private func checkClipboard() {
@@ -654,6 +694,33 @@ struct OpenLinkFormView: View {
             }
             .prefix(Self.maxURLs)
             .map { $0 }
+    }
+
+    // MARK: - Load Action
+
+    /// Resolves the single link and shows its screen: a video's details page,
+    /// or the playlist / channel screen. Errors stay in the form.
+    private func loadURL() async {
+        guard let url = parsedURLs.first, !isMultipleURLs, let appEnvironment else { return }
+
+        isExtracting = true
+        hasErrors = false
+        extractedItems = [ExtractedItem(url: url, status: .extracting)]
+
+        do {
+            let destination = try await LinkVideoResolver(appEnvironment: appEnvironment).resolveDestination(url)
+            if case .video(.loaded(let video), _) = destination {
+                extractedItems[0].video = video
+            }
+            extractedItems[0].status = .success
+            isExtracting = false
+            dismissIfRequested()
+            appEnvironment.navigationCoordinator.navigateToOpenedLink(destination)
+        } catch {
+            extractedItems[0].status = .failed(error.localizedDescription)
+            hasErrors = true
+            isExtracting = false
+        }
     }
 
     // MARK: - Open (Play) Action
