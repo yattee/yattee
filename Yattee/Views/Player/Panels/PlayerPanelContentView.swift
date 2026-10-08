@@ -71,18 +71,6 @@ struct PlayerPanelContentView: View {
         }
     }
 
-    /// Enabled pages that currently have content, in configured order.
-    static func visiblePages(
-        panelSettings: PanelSettings,
-        region: PanelRegion?,
-        video: Video,
-        appEnvironment: AppEnvironment?
-    ) -> [PanelPageConfiguration] {
-        panelSettings.enabledPages(in: region).filter {
-            isRuntimeVisible($0.pageType, video: video, appEnvironment: appEnvironment)
-        }
-    }
-
     /// Enabled pages for this host in configured order, before runtime
     /// visibility filtering. The selection tracks this list so a page that
     /// loads late (e.g. related) still wins once its content arrives.
@@ -194,7 +182,7 @@ struct PlayerPanelContentView: View {
             ChaptersPanelPage(context: context, settings: page.chaptersSettings, scrollConfig: scrollConfig)
                 .id(PanelPageType.chapters)
         case .queue:
-            QueuePanelPage(context: context, settings: page.queueSettings, bottomInset: scrollConfig.bottomInset)
+            QueuePanelPage(settings: page.queueSettings, bottomInset: scrollConfig.bottomInset)
                 .id(PanelPageType.queue)
         }
     }

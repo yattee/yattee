@@ -76,7 +76,6 @@ struct SwipeActionModifier: ViewModifier {
     @State private var progress: CGFloat = 0
 
     // Scroll tracking for auto-close on scroll
-    @State private var currentScrollOffset: CGFloat = 0
     @State private var storedScrollOffset: CGFloat?
 
     // Shared state reference (computed to avoid inclusion in memberwise init)

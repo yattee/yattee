@@ -17,9 +17,6 @@ import Foundation
 /// proxy credential covers every account on that instance.
 @MainActor
 protocol AccountCredentialsManager: AnyObject, Observable {
-    /// Accounts with a stored credential under the **current** identity scope.
-    var loggedInAccountIDs: Set<UUID> { get }
-
     /// Whether the identity scope has been resolved yet.
     ///
     /// While `false`, every read below reports "no credential" because the app
@@ -40,12 +37,6 @@ protocol AccountCredentialsManager: AnyObject, Observable {
     /// runs on its own timeline. The secret must go regardless, and the scoped
     /// key needs only the account's ID.
     func deleteCredential(forAccountID accountID: UUID)
-
-    /// Rewrites stored credentials so they carry the current iCloud sync
-    /// setting. Whether a Keychain item syncs is decided when it is written, so
-    /// enabling sync later would otherwise leave existing logins local — and
-    /// every other device with an account whose credential never arrives.
-    func resyncCredentialsWithCurrentSetting()
 
     /// The login identifier the user typed. Kept in the Keychain beside the
     /// credential so it never enters synced metadata.

@@ -59,7 +59,6 @@ enum DataContextValidity: Hashable, Sendable {
 @Observable
 final class DataContextValidator {
     private let accountsManager: AccountsManager
-    private let instancesManager: InstancesManager
     private let toastManager: ToastManager
     private weak var appEnvironment: AppEnvironment?
 
@@ -69,7 +68,6 @@ final class DataContextValidator {
         toastManager: ToastManager
     ) {
         self.accountsManager = accountsManager
-        self.instancesManager = instancesManager
         self.toastManager = toastManager
     }
 

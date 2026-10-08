@@ -39,24 +39,6 @@ enum SMBBridgeError: Error, LocalizedError, Sendable {
             return "Invalid parameters provided"
         }
     }
-    
-    /// User-friendly error messages based on common SMB errors
-    var userFriendlyMessage: String {
-        switch self {
-        case .connectionFailed(let msg) where msg.contains("errno: 13"):
-            return "Permission denied. Check username and password."
-        case .connectionFailed(let msg) where msg.contains("errno: 2"):
-            return "Share or path not found."
-        case .connectionFailed(let msg) where msg.contains("errno: 110"):
-            return "Connection timed out. Check server address and network."
-        case .connectionFailed(let msg) where msg.contains("errno: 111"):
-            return "Cannot reach server. Check server address."
-        case .listingFailed(let msg) where msg.contains("errno: 13"):
-            return "Access denied to this folder."
-        default:
-            return errorDescription ?? "Unknown error"
-        }
-    }
 }
 
 /// SMB protocol version for connection preferences (Swift wrapper).

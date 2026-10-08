@@ -55,7 +55,6 @@ struct AccountSyncTests {
     }
 
     private struct Harness {
-        let defaults: UserDefaults
         let accounts: AccountsManager
         let store: AccountSyncStore
         let coordinator: AccountSyncCoordinator
@@ -109,7 +108,6 @@ struct AccountSyncTests {
         coordinator.attach(database: nil) { recorder.record($0) }
 
         return Harness(
-            defaults: defaults,
             accounts: accounts,
             store: store,
             coordinator: coordinator,
@@ -1152,7 +1150,6 @@ struct AccountSyncTests {
             let scope: CredentialIdentityScope
             let instances: InstancesManager
             let accounts: AccountsManager
-            let store: AccountSyncStore
             let coordinator: AccountSyncCoordinator
             /// Held for the length of the test: the manager's activation hook
             /// only borrows it.
@@ -1261,7 +1258,6 @@ struct AccountSyncTests {
                 scope: scope,
                 instances: instances,
                 accounts: accounts,
-                store: store,
                 coordinator: coordinator,
                 importer: importer,
                 recorder: recorder,

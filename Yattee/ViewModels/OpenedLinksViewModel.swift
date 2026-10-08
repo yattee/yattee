@@ -72,13 +72,6 @@ final class OpenedLinksViewModel {
         }
     }
 
-    var isLoading: Bool {
-        links.contains { link in
-            if case .loading = link.state { return true }
-            return false
-        }
-    }
-
     /// Starts resolving once. Owned by the model rather than the view's
     /// `.task`, which is cancelled when a result's screen is pushed and would
     /// fail the links still loading.

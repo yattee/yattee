@@ -13,7 +13,6 @@ import SwiftUI
 
 /// Holds computed playback state flags to avoid duplicating these checks
 struct PlaybackInfo {
-    let state: PlaybackState
     let isLoading: Bool
     let isIdle: Bool
     let isEnded: Bool

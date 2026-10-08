@@ -102,10 +102,8 @@ struct SegmentedProgressBar: View {
                 ChapterSegmentView(
                     chapter: chapter,
                     nextChapterStart: chapterEnd,
-                    duration: duration,
                     currentTime: currentTime,
                     bufferedTime: bufferedTime,
-                    segmentWidth: segmentWidth,
                     playedColor: playedColor,
                     bufferedColor: bufferedColor,
                     backgroundColor: backgroundColor,
@@ -182,10 +180,8 @@ struct SegmentedProgressBar: View {
 private struct ChapterSegmentView: View {
     let chapter: VideoChapter
     let nextChapterStart: TimeInterval
-    let duration: TimeInterval
     let currentTime: TimeInterval
     let bufferedTime: TimeInterval
-    let segmentWidth: CGFloat
     let playedColor: Color
     let bufferedColor: Color
     let backgroundColor: Color

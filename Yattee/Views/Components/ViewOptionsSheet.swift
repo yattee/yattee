@@ -12,7 +12,6 @@ import SwiftUI
 /// Shows layout picker (list/grid), size options, and filter toggles.
 /// Reusable across different views with their own storage bindings.
 struct ViewOptionsSheet: View {
-    @Environment(\.appEnvironment) private var appEnvironment
     @Binding var layout: VideoListLayout
     @Binding var rowStyle: VideoRowStyle
     @Binding var gridColumns: Int

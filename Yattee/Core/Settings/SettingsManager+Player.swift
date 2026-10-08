@@ -13,17 +13,6 @@ import UIKit
 extension SettingsManager {
     // MARK: - Player Settings
 
-    var keepPlayerPinnedEnabled: Bool {
-        get {
-            if let cached = _keepPlayerPinnedEnabled { return cached }
-            return bool(for: .keepPlayerPinned, default: false)
-        }
-        set {
-            _keepPlayerPinnedEnabled = newValue
-            set(newValue, for: .keepPlayerPinned)
-        }
-    }
-
     #if os(iOS)
     /// Whether in-app orientation lock is enabled.
     /// When enabled, ignores accelerometer rotation detection and stays in current orientation.

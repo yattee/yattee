@@ -89,10 +89,6 @@ struct SearchView: View {
         searchViewModel?.hasResults ?? false
     }
 
-    private var hasSearched: Bool {
-        searchViewModel?.hasSearched ?? false
-    }
-
     /// Initialize SearchView with optional external search text binding
     init(searchText: Binding<String>? = nil, initialQuery: String? = nil) {
         self.externalSearchText = searchText
@@ -1372,11 +1368,6 @@ struct SearchView: View {
         appEnvironment?.dataManager.deleteSearchQuery(history)
     }
 
-    private func clearAllHistory() {
-        appEnvironment?.dataManager.clearSearchHistory()
-        isSearchHistoryExpanded = false
-    }
-
     private func executeSearch(_ query: String) {
         dismissKeyboard()
         suppressNextTextChangeSearch = (query != searchTextBinding.wrappedValue)
@@ -1415,14 +1406,6 @@ struct SearchView: View {
 
     private func deleteRecentPlaylist(_ playlist: RecentPlaylist) {
         appEnvironment?.dataManager.deleteRecentPlaylist(playlist)
-    }
-
-    private func clearAllRecentChannels() {
-        appEnvironment?.dataManager.clearRecentChannels()
-    }
-
-    private func clearAllRecentPlaylists() {
-        appEnvironment?.dataManager.clearRecentPlaylists()
     }
 
     private func clearAllRecents() {

@@ -60,19 +60,6 @@ final class MPVBackend: PlayerBackend {
         }
     }
 
-    /// Panscan value (0.0 = aspect fit with black bars, 1.0 = aspect fill/crop)
-    var panscan: Double {
-        get { _panscan }
-        set {
-            _panscan = max(0, min(1, newValue))
-            mpvClient?.setProperty("panscan", _panscan)
-        }
-    }
-
-    var supportedFormats: Set<StreamFormat> {
-        Set(StreamFormat.allCases) // MPV supports all formats
-    }
-
     // MARK: - Public Properties
 
     /// MPV version and build information (available after initialization).
@@ -92,15 +79,9 @@ final class MPVBackend: PlayerBackend {
     private var _rate: Float = 1.0
     private var _volume: Float = 1.0
     private var _isMuted: Bool = false
-    private var _panscan: Double = 0.0
 
     private var currentStream: Stream?
-    private var currentAudioStream: Stream?
     private var currentCaption: Caption?
-    private var pendingAutoplay: Bool = false
-
-    /// Tracks reported by mpv for the loaded file (embedded and external).
-    private(set) var currentTracks: [MPVTrack] = []
 
     // Retry mechanism: 4 attempts with increasing timeouts and delays
     // Attempt 1: 3s timeout, 1s delay | Attempt 2: 3s timeout, 3s delay
@@ -447,9 +428,6 @@ final class MPVBackend: PlayerBackend {
 
         // Store for potential retries
         currentStream = stream
-        currentAudioStream = audioStream
-        pendingAutoplay = autoplay
-        pendingUseEDL = actualUseEDL
         retryCount = 0
 
         // Reset retry state in UI
@@ -458,8 +436,6 @@ final class MPVBackend: PlayerBackend {
         // Try loading with retries
         try await loadWithRetry(stream: stream, audioStream: audioStream, autoplay: autoplay, useEDL: actualUseEDL, loadingID: loadingID)
     }
-
-    private var pendingUseEDL: Bool = true
 
     private func loadWithRetry(stream: Stream, audioStream: Stream?, autoplay: Bool, useEDL: Bool, loadingID: UUID) async throws {
         // Check if this load operation was cancelled (a new load started)
@@ -495,7 +471,6 @@ final class MPVBackend: PlayerBackend {
         mpvClient?.removeAllSubtitlesAsync()
 
         // Clear stale track info; the observer repopulates it once the new file loads
-        currentTracks = []
         delegate?.backend(self, didUpdateTracks: [])
 
         // Reset first-frame tracking for new content
@@ -618,8 +593,6 @@ final class MPVBackend: PlayerBackend {
     private func resetRetryState() {
         retryCount = 0
         currentStream = nil
-        currentAudioStream = nil
-        pendingAutoplay = false
         delegate?.backend(self, didUpdateRetryState: 0, maxRetries: maxRetries, isRetrying: false, exhausted: false)
     }
 
@@ -863,43 +836,6 @@ final class MPVBackend: PlayerBackend {
     private var pendingInitialSeek = false
 
 
-    // MARK: - Backend Switching
-
-    func captureState() -> BackendState {
-        BackendState(
-            currentTime: currentTime,
-            duration: duration,
-            rate: _rate,
-            volume: _volume,
-            isMuted: _isMuted,
-            isPlaying: isPlaying
-        )
-    }
-
-    func restore(state: BackendState) async {
-        _rate = state.rate
-        _volume = state.volume
-        _isMuted = state.isMuted
-
-        // Apply to MPV
-        mpvClient?.setProperty("speed", Double(state.rate))
-        mpvClient?.setProperty("volume", Double(state.volume * 100))
-        mpvClient?.setProperty("mute", state.isMuted)
-
-        if state.currentTime > 0 {
-            await seek(to: state.currentTime)
-        }
-
-        if state.isPlaying {
-            play()
-        }
-    }
-
-    func prepareForHandoff() {
-        mpvClient?.pause()
-        isPlaying = false
-    }
-
     // MARK: - Subtitles
 
     /// Load and display a caption/subtitle track.
@@ -920,11 +856,6 @@ final class MPVBackend: PlayerBackend {
         LoggingService.shared.debug("MPV: Loading subtitle: \(caption.displayName)", category: .mpv)
         mpvClient?.addSubtitleAsync(caption.url, select: true)
         currentCaption = caption
-    }
-
-    /// Get the currently loaded caption.
-    func getCurrentCaption() -> Caption? {
-        currentCaption
     }
 
     // MARK: - Embedded Tracks
@@ -953,16 +884,6 @@ final class MPVBackend: PlayerBackend {
     /// Caller passes milliseconds; MPVClient converts to seconds.
     func updateAudioDelay(milliseconds: Double) {
         mpvClient?.updateAudioDelay(milliseconds: milliseconds)
-    }
-
-    /// Get the actual video track dimensions from MPV.
-    /// Returns (width, height) or nil if not available.
-    func getVideoSize() -> (width: Int, height: Int)? {
-        // Use cached values (updated via property observation) to avoid sync fetch
-        guard videoWidth > 0, videoHeight > 0 else {
-            return nil
-        }
-        return (videoWidth, videoHeight)
     }
 
     /// Get debug statistics from MPV for the debug overlay.
@@ -1254,22 +1175,6 @@ final class MPVBackend: PlayerBackend {
         pipBridge.enqueueFrame(pixelBuffer, presentationTime: presentationTime)
     }
 
-    /// Clean up PiP resources.
-    func cleanupPiP() {
-        _playerView?.captureFramesForPiP = false
-        _playerView?.onFrameReady = nil
-        pipBridge?.cleanup()
-        pipBridge = nil
-        isPiPSetUp = false
-    }
-
-    /// Move the PiP layer to a new container view.
-    /// Call this before starting PiP from fullscreen to ensure the layer
-    /// is in the main window's view hierarchy.
-    func movePiPLayer(to containerView: UIView) {
-        pipBridge?.moveLayer(to: containerView)
-    }
-
     #elseif os(macOS)
 
     // MARK: - Picture-in-Picture (macOS)
@@ -1437,20 +1342,6 @@ final class MPVBackend: PlayerBackend {
 
         pipBridge.enqueueFrame(pixelBuffer, presentationTime: presentationTime)
     }
-
-    /// Clean up PiP resources.
-    func cleanupPiP() {
-        _playerView?.captureFramesForPiP = false
-        _playerView?.onFrameReady = nil
-        pipBridge?.cleanup()
-        pipBridge = nil
-        isPiPSetUp = false
-    }
-
-    /// Move the PiP layer to a new container view.
-    func movePiPLayer(to containerView: NSView) {
-        pipBridge?.moveLayer(to: containerView)
-    }
     #endif
 
     // MARK: - Private Methods
@@ -1609,7 +1500,6 @@ extension MPVBackend: MPVClientDelegate {
     nonisolated func mpvClient(_ client: MPVClient, didUpdateTrackList tracks: [MPVTrack]) {
         Task { @MainActor [weak self] in
             guard let self else { return }
-            self.currentTracks = tracks
             self.delegate?.backend(self, didUpdateTracks: tracks)
         }
     }

@@ -603,11 +603,6 @@ enum VideoSwipeAction: String, CaseIterable, Codable, Identifiable {
         }
     }
 
-    /// Default order with only download and share enabled.
-    static var defaultOrder: [VideoSwipeAction] {
-        [.download, .share]
-    }
-
     /// Default visibility: only download and share are enabled by default.
     static var defaultVisibility: [VideoSwipeAction: Bool] {
         var visibility = [VideoSwipeAction: Bool]()

@@ -36,7 +36,6 @@ final class AppEnvironment {
     let webDAVClientFactory: WebDAVClientFactory
     let smbClient: SMBClient
     let localFileClient: LocalFileClient
-    let urlSessionFactory: URLSessionFactory
     let httpClientFactory: HTTPClientFactory
     let localNetworkService: LocalNetworkService
     let remoteControlCoordinator: RemoteControlCoordinator
@@ -57,7 +56,6 @@ final class AppEnvironment {
     let localNamespaceImporter: LocalNamespaceImporter
     let homeInstanceCache: HomeInstanceCache
     let invidiousAPI: InvidiousAPI
-    let pipedAPI: PipedAPI
     let credentialProbeService: CredentialProbeService
     let accountService: AccountService
     let remotePlaylistsCache: RemotePlaylistsCache
@@ -262,7 +260,6 @@ final class AppEnvironment {
 
         // Initialize Piped API (used by SubscriptionService and SubscriptionFeedCache)
         let pipedAPI = PipedAPI(httpClient: client)
-        self.pipedAPI = pipedAPI
 
         // A 401 or 403 from an ordinary request is never allowed to reject a
         // login on its own — it is re-asked here against an endpoint that
@@ -399,7 +396,6 @@ final class AppEnvironment {
 
         // Initialize URL Session and Client Factories
         let sessionFactory = URLSessionFactory.shared
-        self.urlSessionFactory = sessionFactory
         self.httpClientFactory = HTTPClientFactory(sessionFactory: sessionFactory)
         self.webDAVClientFactory = WebDAVClientFactory(sessionFactory: sessionFactory)
 

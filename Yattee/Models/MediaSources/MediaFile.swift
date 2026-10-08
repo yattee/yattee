@@ -36,9 +36,6 @@ struct MediaFile: Identifiable, Hashable, Sendable {
     /// Creation date.
     let createdDate: Date?
 
-    /// MIME type if known.
-    let mimeType: String?
-
     // MARK: - Initialization
 
     init(
@@ -60,7 +57,6 @@ struct MediaFile: Identifiable, Hashable, Sendable {
         self.size = size
         self.modifiedDate = modifiedDate
         self.createdDate = createdDate
-        self.mimeType = mimeType
     }
 
     // MARK: - Computed Properties

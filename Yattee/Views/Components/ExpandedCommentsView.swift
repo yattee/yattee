@@ -27,14 +27,6 @@ struct ExpandedCommentsView: View {
     @State private var scrollBounceOffset: CGFloat = 0
     @State private var isDismissThresholdReached = false
 
-    private var playerState: PlayerState? { appEnvironment?.playerService.state }
-    private var contentService: ContentService? { appEnvironment?.contentService }
-    private var instancesManager: InstancesManager? { appEnvironment?.instancesManager }
-
-    private var comments: [Comment] { playerState?.comments ?? [] }
-    private var commentsState: CommentsLoadState { playerState?.commentsState ?? .idle }
-    private var videoSource: ContentSource? { playerState?.currentVideo?.id.source }
-
     private var backgroundColor: Color {
         #if os(iOS)
         Color(.systemBackground)
@@ -360,53 +352,6 @@ struct CommentsListContent: View {
     private func loadMoreComments() async {
         guard let playerState, let contentService, let instancesManager else { return }
         await playerState.loadMoreComments(contentService: contentService, instancesManager: instancesManager)
-    }
-}
-
-// MARK: - Scroll Fade Overlay
-
-/// A view modifier that applies a gradient fade overlay to the top and bottom edges of a scroll view.
-private struct ScrollFadeOverlayModifier: ViewModifier {
-    let fadeHeight: CGFloat
-
-    func body(content: Content) -> some View {
-        content
-            .overlay(alignment: .top) {
-                // Top gradient fade
-                LinearGradient(
-                    colors: [backgroundColor, .clear],
-                    startPoint: .top,
-                    endPoint: .bottom
-                )
-                .frame(height: fadeHeight)
-                .allowsHitTesting(false)
-            }
-            .overlay(alignment: .bottom) {
-                // Bottom gradient fade
-                LinearGradient(
-                    colors: [.clear, backgroundColor],
-                    startPoint: .top,
-                    endPoint: .bottom
-                )
-                .frame(height: fadeHeight)
-                .allowsHitTesting(false)
-            }
-    }
-
-    private var backgroundColor: Color {
-        #if os(iOS)
-        Color(.systemBackground)
-        #elseif os(macOS)
-        Color(nsColor: .windowBackgroundColor)
-        #else
-        Color.black
-        #endif
-    }
-}
-
-private extension View {
-    func scrollFadeMask(fadeHeight: CGFloat = 24) -> some View {
-        modifier(ScrollFadeOverlayModifier(fadeHeight: fadeHeight))
     }
 }
 

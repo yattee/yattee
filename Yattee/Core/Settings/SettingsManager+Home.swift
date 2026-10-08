@@ -337,25 +337,6 @@ extension SettingsManager {
         homeSectionVisibility = sectionVis
     }
 
-    /// Checks if an instance content item is in Home (either as card or section).
-    func isInHome(instanceID: UUID, contentType: InstanceContentType) -> (inCards: Bool, inSections: Bool) {
-        let inCards = homeShortcutOrder.contains { item in
-            if case .instanceContent(let id, let type) = item {
-                return id == instanceID && type == contentType
-            }
-            return false
-        }
-
-        let inSections = homeSectionOrder.contains { item in
-            if case .instanceContent(let id, let type) = item {
-                return id == instanceID && type == contentType
-            }
-            return false
-        }
-
-        return (inCards, inSections)
-    }
-
     /// Removes all Home items for instances that no longer exist.
     func cleanupOrphanedHomeInstanceItems(validInstanceIDs: Set<UUID>) {
         // Collect orphaned instance IDs for cache cleanup
@@ -558,25 +539,6 @@ extension SettingsManager {
         var sectionVis = homeSectionVisibility
         sectionVis.removeValue(forKey: .mediaSource(sourceID: sourceID))
         homeSectionVisibility = sectionVis
-    }
-
-    /// Checks if a media source is in Home (either as card or section).
-    func isInHome(sourceID: UUID) -> (inCards: Bool, inSections: Bool) {
-        let inCards = homeShortcutOrder.contains { item in
-            if case .mediaSource(let id) = item {
-                return id == sourceID
-            }
-            return false
-        }
-
-        let inSections = homeSectionOrder.contains { item in
-            if case .mediaSource(let id) = item {
-                return id == sourceID
-            }
-            return false
-        }
-
-        return (inCards, inSections)
     }
 
     /// Returns all available card items for a media source that are NOT already added.

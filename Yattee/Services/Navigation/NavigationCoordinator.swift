@@ -288,19 +288,6 @@ final class NavigationCoordinator {
         }
     }
 
-    /// Scrolls the player into view (uncovered position).
-    func scrollPlayerIntoView() {
-        isPlayerScrollAnimating = true
-        scrollPlayerIntoViewTrigger += 1
-    }
-
-    /// Waits until player scroll animation completes.
-    func waitForPlayerScrollAnimation() async {
-        while isPlayerScrollAnimating {
-            try? await Task.sleep(for: .milliseconds(50))
-        }
-    }
-
     // MARK: - Convenience Navigation
 
     /// Navigate to the subscriptions tab/feed.
@@ -320,13 +307,6 @@ final class NavigationCoordinator {
             isPlayerExpanded = false
         }
         navigate(to: destination)
-    }
-
-    /// Navigate to a video by its ID string.
-    /// Creates a VideoID assuming YouTube source.
-    func navigateToVideo(videoID: String) {
-        let id = VideoID(source: .global(provider: ContentSource.youtubeProvider), videoID: videoID)
-        navigate(to: .video(.id(id)))
     }
 
     /// Navigate to a video's channel/source.

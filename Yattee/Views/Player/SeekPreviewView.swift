@@ -50,7 +50,6 @@ struct SeekPreviewView: View {
     let seekTime: TimeInterval
     let storyboardService: StoryboardService
     let buttonBackground: ButtonBackgroundStyle
-    let theme: ControlsTheme
 
     @State private var thumbnail: PlatformImage?
     @State private var loadTask: Task<Void, Never>?

@@ -660,30 +660,6 @@ final class ExpandedPlayerWindowManager: NSObject {
         LoggingService.shared.debug("ExpandedPlayerWindowManager: restored corner panels after fullscreen", category: .player)
     }
 
-    /// Restores a window that was hidden for PiP mode.
-    /// Call this when returning from PiP to show the player window again.
-    func restoreFromPiP(animated: Bool = true) {
-        guard let window = playerWindow else {
-            LoggingService.shared.debug("ExpandedPlayerWindowManager: restoreFromPiP - no window to restore", category: .player)
-            return
-        }
-
-        LoggingService.shared.debug("ExpandedPlayerWindowManager: restoreFromPiP called", category: .player)
-
-        if animated {
-            window.alphaValue = 0
-            window.makeKeyAndOrderFront(nil)
-            NSAnimationContext.runAnimationGroup { context in
-                context.duration = 0.25
-                context.timingFunction = CAMediaTimingFunction(name: .easeOut)
-                window.animator().alphaValue = 1
-            }
-        } else {
-            window.alphaValue = 1
-            window.makeKeyAndOrderFront(nil)
-        }
-    }
-
     /// Cleans up a window that was hidden for PiP when PiP ends without restoring.
     /// Call this when PiP is closed via the X button (not restore).
     func cleanupAfterPiP() {

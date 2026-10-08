@@ -159,21 +159,6 @@ extension View {
         environment(\.zoomTransitionNamespace, namespace)
     }
 
-    /// Injects the zoom transition namespace into the environment (optional overload).
-    ///
-    /// If the namespace is nil, the view is returned unchanged.
-    ///
-    /// - Parameter namespace: The optional namespace to use for matched transitions.
-    /// - Returns: A view with the namespace injected into the environment, or unchanged if nil.
-    @ViewBuilder
-    func zoomTransitionNamespace(_ namespace: Namespace.ID?) -> some View {
-        if let namespace {
-            environment(\.zoomTransitionNamespace, namespace)
-        } else {
-            self
-        }
-    }
-
     /// Sets whether zoom transitions are enabled.
     ///
     /// Apply this at a high level in the view hierarchy (e.g., ContentView) to control

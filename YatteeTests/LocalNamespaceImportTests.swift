@@ -849,7 +849,6 @@ private final class TestCredentialsManager: AccountCredentialsManager {
         )
     }
 
-    var loggedInAccountIDs: Set<UUID> { credentials.loggedInAccountIDs }
     var isScopeResolved: Bool { credentials.isScopeResolved }
 
     func setCredential(_ credential: String, for account: Account) {
@@ -863,8 +862,6 @@ private final class TestCredentialsManager: AccountCredentialsManager {
     func deleteCredential(forAccountID accountID: UUID) {
         credentials.deleteCredential(forAccountID: accountID)
     }
-
-    func resyncCredentialsWithCurrentSetting() { credentials.resyncCredentialsWithCurrentSetting() }
 
     func setUsername(_ username: String, for account: Account) {
         credentials.setUsername(username, for: account)
@@ -916,14 +913,12 @@ private final class FlakyCredentialsManager: AccountCredentialsManager {
     private(set) var migrateCalls = 0
     private(set) var deleteCalls = 0
 
-    var loggedInAccountIDs: Set<UUID> { [] }
     var isScopeResolved: Bool { true }
 
     func setCredential(_: String, for _: Account) {}
     func credential(for _: Account) -> String? { nil }
     func deleteCredential(for _: Account) {}
     func deleteCredential(forAccountID _: UUID) {}
-    func resyncCredentialsWithCurrentSetting() {}
     func setUsername(_: String, for _: Account) {}
     func username(for _: Account) -> String? { nil }
     func isLoggedIn(for _: Account) -> Bool { false }

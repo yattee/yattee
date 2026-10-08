@@ -264,11 +264,6 @@ extension SettingsManager {
 
     // MARK: - Custom User-Agent
 
-    /// Generates a new random User-Agent string.
-    static func generateRandomUserAgent() -> String {
-        UserAgentGenerator.generateRandom()
-    }
-
     /// Returns the current effective User-Agent string.
     /// If randomize per request is enabled, generates a new random UA.
     /// Otherwise, returns the stored custom user agent.

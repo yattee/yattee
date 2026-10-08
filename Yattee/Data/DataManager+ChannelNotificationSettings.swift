@@ -131,41 +131,6 @@ extension DataManager {
         save()
     }
 
-    /// Deletes notification settings for a channel.
-    /// - Parameter channelID: The channel ID to delete settings for.
-    func deleteNotificationSettings(for channelID: String) {
-        let descriptor = FetchDescriptor<ChannelNotificationSettings>(
-            predicate: #Predicate { $0.channelID == channelID }
-        )
-
-        do {
-            let results = try modelContext.fetch(descriptor)
-            guard !results.isEmpty else { return }
-
-            // Capture scopes before deleting
-            let scopes = results.map {
-                SourceScope.from(
-                    sourceRawValue: $0.sourceRawValue,
-                    globalProvider: $0.globalProvider,
-                    instanceURLString: $0.instanceURLString,
-                    externalExtractor: nil
-                )
-            }
-
-            for settings in results {
-                modelContext.delete(settings)
-            }
-            save()
-
-            // Queue scoped CloudKit deletions
-            for scope in scopes {
-                cloudKitSync?.queueChannelNotificationSettingsDelete(channelID: channelID, scope: scope)
-            }
-        } catch {
-            LoggingService.shared.logCloudKitError("Failed to delete notification settings", error: error)
-        }
-    }
-
     /// Inserts or updates notification settings from CloudKit sync.
     /// - Parameter settings: The notification settings to upsert.
     func upsertChannelNotificationSettings(_ settings: ChannelNotificationSettings) {

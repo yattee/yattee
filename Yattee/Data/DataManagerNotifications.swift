@@ -40,8 +40,4 @@ struct SubscriptionChange {
     let removedChannelIDs: [String]
 
     static let userInfoKey = "subscriptionChange"
-
-    var isEmpty: Bool {
-        addedSubscriptions.isEmpty && removedChannelIDs.isEmpty
-    }
 }

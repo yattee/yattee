@@ -138,22 +138,6 @@ extension VideoListContainer where Footer == EmptyView {
     }
 }
 
-extension VideoListContainer where Header == EmptyView {
-    /// Creates a video list container with a footer but no header.
-    init(
-        listStyle: VideoListStyle,
-        rowStyle: VideoRowStyle,
-        @ViewBuilder content: @escaping () -> Content,
-        @ViewBuilder footer: @escaping () -> Footer
-    ) {
-        self.listStyle = listStyle
-        self.rowStyle = rowStyle
-        self.header = { EmptyView() }
-        self.content = content
-        self.footer = footer
-    }
-}
-
 // MARK: - Preview
 
 #Preview("Inset Style") {

@@ -25,7 +25,6 @@ struct MiniPlayerView: View {
     private var deArrowProvider: DeArrowBrandingProvider? { appEnvironment?.deArrowBrandingProvider }
     private var queueManager: QueueManager? { appEnvironment?.queueManager }
     private var playerControlsLayoutService: PlayerControlsLayoutService? { appEnvironment?.playerControlsLayoutService }
-    private var settingsManager: SettingsManager? { appEnvironment?.settingsManager }
 
     private var currentVideo: Video? { playerState?.currentVideo }
 

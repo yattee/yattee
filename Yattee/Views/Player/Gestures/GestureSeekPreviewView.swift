@@ -13,10 +13,8 @@ import SwiftUI
 struct GestureSeekPreviewView: View {
     let storyboard: Storyboard?
     let seekTime: TimeInterval
-    let duration: TimeInterval
     let storyboardService: StoryboardService
     let buttonBackground: ButtonBackgroundStyle
-    let theme: ControlsTheme
     let chapters: [VideoChapter]
     let isActive: Bool
     var availableWidth: CGFloat = 320
@@ -42,8 +40,7 @@ struct GestureSeekPreviewView: View {
                     storyboard: storyboard,
                     seekTime: seekTime,
                     storyboardService: storyboardService,
-                    buttonBackground: buttonBackground,
-                    theme: theme
+                    buttonBackground: buttonBackground
                 )
             }
         }
@@ -70,10 +67,8 @@ struct GestureSeekPreviewView: View {
         GestureSeekPreviewView(
             storyboard: nil,
             seekTime: 180,
-            duration: 600,
             storyboardService: StoryboardService(),
             buttonBackground: .regularGlass,
-            theme: .dark,
             chapters: [],
             isActive: true
         )

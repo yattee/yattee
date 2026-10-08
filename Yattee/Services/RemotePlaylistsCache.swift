@@ -105,11 +105,6 @@ final class RemotePlaylistsCache {
         lists[accountID]
     }
 
-    /// When the account's list was last fetched.
-    func listFetchDate(for accountID: UUID) -> Date? {
-        listFetchDates[accountID]
-    }
-
     /// One playlist as last fetched, or `nil` if it never was.
     func snapshot(id: String, for accountID: UUID) -> RemotePlaylistSnapshot? {
         snapshots[accountID]?[id]

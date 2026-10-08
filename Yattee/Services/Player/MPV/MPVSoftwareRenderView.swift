@@ -77,8 +77,6 @@ final class MPVSoftwareRenderView: UIView {
     /// Dedicated queue for rendering operations
     private let renderQueue = DispatchQueue(label: "stream.yattee.mpv.software-render", qos: .userInitiated)
     
-    /// Lock for buffer recreation
-    private let bufferLock = NSLock()
     private var isRecreatingBuffer = false
     
     // MARK: - Initialization

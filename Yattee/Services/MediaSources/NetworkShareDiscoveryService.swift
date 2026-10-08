@@ -22,14 +22,6 @@ struct DiscoveredShare: Identifiable, Hashable, Sendable {
         case webdavs   // _webdavs._tcp (HTTPS)
         case smb       // _smb._tcp
 
-        var displayName: String {
-            switch self {
-            case .webdav: String(localized: "discovery.shareType.webdav")
-            case .webdavs: String(localized: "discovery.shareType.webdavs")
-            case .smb: String(localized: "discovery.shareType.smb")
-            }
-        }
-
         var systemImage: String {
             switch self {
             case .webdav: "globe"

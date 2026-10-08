@@ -343,28 +343,11 @@ actor SMBClient {
 
     // MARK: - Helper Methods
 
-    /// Validates SMB URL format.
-    private func validateSMBURL(_ url: URL) throws {
-        guard url.scheme?.lowercased() == "smb" else {
-            throw MediaSourceError.unknown("URL must use smb:// scheme")
-        }
-
-        guard url.host != nil else {
-            throw MediaSourceError.unknown("SMB URL missing host")
-        }
-    }
-    
     /// Clears cached SMB context for a specific source.
     /// Call this when source credentials change or connection fails.
     func clearCache(for source: MediaSource) {
         contextCache.removeValue(forKey: source.id)
         LoggingService.shared.logMediaSourcesDebug("Cleared SMB context cache for source: \(source.id)")
-    }
-
-    /// Clears all cached SMB contexts.
-    func clearAllCaches() {
-        contextCache.removeAll()
-        LoggingService.shared.logMediaSourcesDebug("Cleared all SMB context caches")
     }
 }
 

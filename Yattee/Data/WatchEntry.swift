@@ -149,20 +149,6 @@ final class WatchEntry {
         return min(watchedSeconds / duration, 1.0)
     }
 
-    /// Formatted total duration.
-    var formattedDuration: String {
-        guard duration > 0 else { return "" }
-        let hours = Int(duration) / 3600
-        let minutes = (Int(duration) % 3600) / 60
-        let seconds = Int(duration) % 60
-
-        if hours > 0 {
-            return String(format: "%d:%02d:%02d", hours, minutes, seconds)
-        } else {
-            return String(format: "%d:%02d", minutes, seconds)
-        }
-    }
-
     /// Formatted remaining time.
     var remainingTime: String {
         let remaining = max(0, duration - watchedSeconds)

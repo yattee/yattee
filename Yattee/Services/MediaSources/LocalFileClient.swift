@@ -47,14 +47,6 @@ enum LocalFolderURLResolver {
         lock.lock(); defer { lock.unlock() }
         return cache[sourceID]
     }
-
-    static func clear(_ sourceID: UUID) {
-        lock.lock(); defer { lock.unlock() }
-        cache.removeValue(forKey: sourceID)
-        if let previous = persistentAccess.removeValue(forKey: sourceID) {
-            previous.stopAccessingSecurityScopedResource()
-        }
-    }
 }
 
 /// Actor-based client for local file system operations.
@@ -277,15 +269,6 @@ actor LocalFileClient {
         }
 
         return url
-    }
-
-    /// Resolves bookmark and starts accessing the security-scoped resource.
-    /// - Parameter bookmarkData: The stored bookmark data.
-    /// - Returns: Tuple of (URL, didStartAccessing) - caller must call stopAccessingSecurityScopedResource when done.
-    func resolveAndAccessBookmark(_ bookmarkData: Data) throws -> (URL, Bool) {
-        let url = try resolveBookmark(bookmarkData)
-        let didStart = url.startAccessingSecurityScopedResource()
-        return (url, didStart)
     }
 
     // MARK: - Private Methods

@@ -234,22 +234,11 @@ actor InvidiousAPI: InstanceAPI {
         ).toPlaylist(baseURL: instance.url)
     }
 
-    /// Fetches a user's playlist using authenticated endpoint.
-    /// Required for private playlists (IVPL* IDs).
-    /// - Parameters:
-    ///   - id: The playlist ID
-    ///   - instance: The Invidious instance
-    ///   - sid: The session ID from login
-    /// - Returns: The playlist with videos
-    func userPlaylist(id: String, instance: Instance, sid: String) async throws -> Playlist {
-        try await userPlaylistSnapshot(id: id, instance: instance, sid: sid).playlist
-    }
-
     /// Fetches a user's playlist along with the per-entry identities needed to
     /// mutate it.
     ///
-    /// Same request as ``userPlaylist(id:instance:sid:)`` — that one is a thin
-    /// wrapper over this — but it keeps the `index`/`indexId` tokens Invidious
+    /// Uses the authenticated endpoint (required for private IVPL* playlists)
+    /// and keeps the `index`/`indexId` tokens Invidious
     /// hands out for every row instead of dropping them on conversion.
     /// - Parameters:
     ///   - id: The playlist ID
@@ -453,14 +442,6 @@ actor InvidiousAPI: InstanceAPI {
         // Has more pages if we got results
         let hasResults = !items.isEmpty
         return ChannelSearchPage(items: items, nextPage: hasResults ? page + 1 : nil)
-    }
-
-    /// Fetches video details, streams, and captions in a single API call.
-    /// This is more efficient than calling video(), streams(), and captions() separately
-    /// since they all fetch from the same endpoint.
-    func videoWithStreamsAndCaptions(id: String, instance: Instance) async throws -> (video: Video, streams: [Stream], captions: [Caption]) {
-        let result = try await videoWithStreamsAndCaptionsAndStoryboards(id: id, instance: instance)
-        return (video: result.video, streams: result.streams, captions: result.captions)
     }
 
     func videoWithStreamsAndCaptionsAndStoryboards(id: String, instance: Instance) async throws -> (video: Video, streams: [Stream], captions: [Caption], storyboards: [Storyboard]) {
@@ -1852,10 +1833,6 @@ private struct InvidiousChannel: Decodable, Sendable {
             isVerified: authorVerified ?? false
         )
     }
-}
-
-private struct InvidiousChannelVideos: Decodable, Sendable {
-    let videos: [InvidiousVideo]
 }
 
 private struct InvidiousChannelVideosWithContinuation: Decodable, Sendable {

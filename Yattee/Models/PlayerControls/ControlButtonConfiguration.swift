@@ -59,16 +59,6 @@ struct ControlButtonConfiguration: Identifiable, Codable, Hashable, Sendable {
         )
     }
 
-    /// Creates a configuration for a fixed-width spacer.
-    /// - Parameter width: The fixed width in points.
-    /// - Returns: A spacer configuration with fixed width.
-    static func fixedSpacer(width: Int) -> ControlButtonConfiguration {
-        ControlButtonConfiguration(
-            buttonType: .spacer,
-            settings: .spacer(SpacerSettings(isFlexible: false, fixedWidth: width))
-        )
-    }
-
     // MARK: - Convenience Accessors
 
     /// Returns the spacer settings if this is a spacer button.

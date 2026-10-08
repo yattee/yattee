@@ -258,50 +258,6 @@ final class ToastManager {
         dismissTasks[id] = task
     }
 
-    // MARK: - Player Scope Convenience Methods
-
-    /// Show a loading toast (player-only scope, longer auto-dismiss delay).
-    @discardableResult
-    func showPlayerLoading(_ title: String, subtitle: String? = nil) -> UUID {
-        show(
-            scopes: [.player],
-            category: .loading,
-            title: title,
-            subtitle: subtitle,
-            icon: nil, // Will show ProgressView
-            iconColor: nil,
-            autoDismissDelay: 30.0 // Long timeout for loading states
-        )
-    }
-
-    /// Show a retry toast (player-only scope).
-    @discardableResult
-    func showPlayerRetry(_ title: String, subtitle: String? = nil) -> UUID {
-        show(
-            scopes: [.player],
-            category: .retry,
-            title: title,
-            subtitle: subtitle,
-            icon: "arrow.clockwise",
-            iconColor: .orange,
-            autoDismissDelay: 5.0
-        )
-    }
-
-    /// Show an error toast (player-only scope).
-    @discardableResult
-    func showPlayerError(_ title: String, subtitle: String? = nil) -> UUID {
-        show(
-            scopes: [.player],
-            category: .error,
-            title: title,
-            subtitle: subtitle,
-            icon: "exclamationmark.triangle.fill",
-            iconColor: .red,
-            autoDismissDelay: 5.0
-        )
-    }
-
     // MARK: - General Convenience Methods
 
     /// Show an error toast (shows in player if visible, otherwise main).
@@ -348,42 +304,6 @@ final class ToastManager {
     /// Dismiss a specific toast.
     func dismiss(id: UUID, animated: Bool = true) {
         dismissInternal(id: id, animated: animated)
-    }
-
-    /// Dismiss all toasts in a category (across all scopes).
-    func dismissCategory(_ category: ToastCategory) {
-        let toastsToDismiss = activeToasts.filter { $0.category == category }
-        for toast in toastsToDismiss {
-            dismissInternal(id: toast.id, animated: true)
-        }
-    }
-
-    /// Dismiss all toasts in a category for a specific active scope.
-    func dismissCategory(_ category: ToastCategory, scope: ToastScope) {
-        let toastsToDismiss = activeToasts.filter { $0.category == category && $0.activeScope == scope }
-        for toast in toastsToDismiss {
-            dismissInternal(id: toast.id, animated: true)
-        }
-    }
-
-    /// Dismiss all toasts in a specific active scope.
-    func dismissScope(_ scope: ToastScope) {
-        let toastsToDismiss = activeToasts.filter { $0.activeScope == scope }
-        for toast in toastsToDismiss {
-            dismissInternal(id: toast.id, animated: true)
-        }
-    }
-
-    /// Dismiss all toasts.
-    func dismissAll() {
-        for task in dismissTasks.values {
-            task.cancel()
-        }
-        dismissTasks.removeAll()
-
-        withAnimation(.easeInOut(duration: 0.25)) {
-            activeToasts.removeAll()
-        }
     }
 
     // MARK: - Private

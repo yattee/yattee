@@ -12,8 +12,6 @@ import SwiftUI
 enum InstanceStatus: Equatable {
     /// Instance is online and working.
     case online
-    /// Instance is offline or unreachable.
-    case offline
     /// Instance requires authentication but credentials are not provided.
     case authRequired
     /// Instance authentication failed (wrong credentials).
@@ -172,11 +170,6 @@ final class InstancesManager {
         }
     }
 
-    /// Alias for add method to maintain consistency.
-    func addInstance(_ instance: Instance) {
-        add(instance)
-    }
-
     /// Toggles the enabled state of an instance.
     func toggleEnabled(_ instance: Instance) {
         if let index = instances.firstIndex(where: { $0.id == instance.id }) {
@@ -211,37 +204,10 @@ final class InstancesManager {
         saveInstances()
     }
 
-    /// Sets the given instance as the primary (first) instance.
-    func setPrimary(_ instance: Instance) {
-        LoggingService.shared.debug("[InstancesManager] setPrimary called for: \(instance.displayName)", category: .general)
-        LoggingService.shared.debug("[InstancesManager] Current instances: \(instances.map { $0.displayName })", category: .general)
-
-        guard let index = instances.firstIndex(where: { $0.id == instance.id }) else {
-            LoggingService.shared.debug("[InstancesManager] Instance not found in list", category: .general)
-            return
-        }
-
-        if index == 0 {
-            LoggingService.shared.debug("[InstancesManager] Instance already at index 0, skipping", category: .general)
-            return
-        }
-
-        LoggingService.shared.debug("[InstancesManager] Moving instance from index \(index) to 0", category: .general)
-        // Move to front
-        let removed = instances.remove(at: index)
-        instances.insert(removed, at: 0)
-        saveInstances()
-        LoggingService.shared.debug("[InstancesManager] After move: \(instances.map { $0.displayName })", category: .general)
-    }
-
     // MARK: - Computed Properties
 
     var enabledInstances: [Instance] {
         instances.filter(\.isEnabled)
-    }
-
-    var youtubeInstances: [Instance] {
-        instances.filter(\.isYouTubeInstance)
     }
 
     var peertubeInstances: [Instance] {
@@ -360,42 +326,6 @@ final class InstancesManager {
         instanceStatuses[instance.id] ?? .online
     }
 
-    /// Updates the status of an instance.
-    func updateStatus(_ status: InstanceStatus, for instance: Instance) {
-        instanceStatuses[instance.id] = status
-    }
-
-    /// Updates status based on an API error.
-    func updateStatusFromError(_ error: Error, for instance: Instance) {
-        if let apiError = error as? APIError {
-            switch apiError {
-            case .unauthorized:
-                updateStatus(.authFailed, for: instance)
-            case .noConnection, .timeout, .connectionFailed:
-                updateStatus(.offline, for: instance)
-            default:
-                // Don't change status for other errors
-                break
-            }
-        } else {
-            // Generic network errors
-            let nsError = error as NSError
-            if nsError.domain == NSURLErrorDomain {
-                updateStatus(.offline, for: instance)
-            }
-        }
-    }
-
-    /// Clears the status of an instance (resets to online).
-    func clearStatus(for instance: Instance) {
-        instanceStatuses.removeValue(forKey: instance.id)
-    }
-
-    /// Instances that have auth issues (need attention).
-    var instancesWithAuthIssues: [Instance] {
-        instances.filter { instanceStatuses[$0.id] == .authFailed || instanceStatuses[$0.id] == .authRequired }
-    }
-
     /// The currently active instance for browsing content.
     /// Falls back to the first enabled instance if no active instance is set.
     var activeInstance: Instance? {
@@ -404,21 +334,6 @@ final class InstancesManager {
             return instance
         }
         return enabledInstances.first
-    }
-
-    /// Sets the given instance as the active instance for browsing.
-    func setActive(_ instance: Instance) {
-        guard enabledInstances.contains(where: { $0.id == instance.id }) else { return }
-        activeInstanceID = instance.id
-        saveActiveInstance()
-        NotificationCenter.default.post(name: .activeInstanceDidChange, object: nil)
-    }
-
-    /// Clears the active instance, falling back to the first enabled instance.
-    func clearActiveInstance() {
-        activeInstanceID = nil
-        localDefaults.removeObject(forKey: activeInstanceKey)
-        NotificationCenter.default.post(name: .activeInstanceDidChange, object: nil)
     }
 
     // MARK: - Private Methods
@@ -453,19 +368,10 @@ final class InstancesManager {
             activeInstanceID = uuid
         }
     }
-
-    private func saveActiveInstance() {
-        if let id = activeInstanceID {
-            localDefaults.set(id.uuidString, forKey: activeInstanceKey)
-        } else {
-            localDefaults.removeObject(forKey: activeInstanceKey)
-        }
-    }
 }
 
 // MARK: - Notifications
 
 extension Notification.Name {
     static let instancesDidChange = Notification.Name("stream.yattee.instancesDidChange")
-    static let activeInstanceDidChange = Notification.Name("stream.yattee.activeInstanceDidChange")
 }

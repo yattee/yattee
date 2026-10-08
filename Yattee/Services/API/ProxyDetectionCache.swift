@@ -45,13 +45,6 @@ actor ProxyDetectionCache {
         return entry.decision
     }
 
-    /// Most-recently-seen CDN URL for this instance. Used by ``prewarm`` so we
-    /// don't have to wait for the current video's API response just to learn a
-    /// URL to probe.
-    func lastSampleURL(for instance: Instance) -> URL? {
-        entries[instance.id]?.sampleURL
-    }
-
     /// Records a verdict (decision + the URL we probed against, kept as a
     /// future probe sample). Refreshes the TTL.
     func record(decision: Bool, sampleURL: URL?, for instance: Instance) {
@@ -114,13 +107,5 @@ actor ProxyDetectionCache {
         entries.removeValue(forKey: instance.id)
         inFlight[instance.id]?.cancel()
         inFlight.removeValue(forKey: instance.id)
-    }
-
-    /// Drop all entries — e.g. after a network reachability change or when the
-    /// instances collection mutates broadly.
-    func invalidateAll() {
-        entries.removeAll()
-        for (_, task) in inFlight { task.cancel() }
-        inFlight.removeAll()
     }
 }

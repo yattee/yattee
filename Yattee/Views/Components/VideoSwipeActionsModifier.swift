@@ -11,7 +11,6 @@ import SwiftUI
 /// View modifier that applies user-configurable swipe actions plus fixed context-specific actions.
 struct VideoSwipeActionsModifier: ViewModifier {
     @Environment(\.appEnvironment) private var appEnvironment
-    @Environment(\.videoQueueContext) private var queueContext
     @Environment(\.presentAppSheet) private var presentAppSheet
 
     let video: Video

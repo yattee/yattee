@@ -87,12 +87,6 @@ struct InstanceBrowseView: View {
     }
     private var yatteeServerURL: URL? { yatteeServer?.url }
 
-    /// Auth header for Yattee Server instances (when browsing a Yattee Server directly)
-    private var yatteeServerAuthHeader: String? {
-        guard instance.type == .yatteeServer else { return nil }
-        return appEnvironment?.basicAuthCredentialsManager.basicAuthHeader(for: instance)
-    }
-
     /// Auth header for avatar loading (uses Yattee Server for YouTube channel avatars)
     private var avatarAuthHeader: String? {
         guard let server = yatteeServer else { return nil }

@@ -297,18 +297,6 @@ private struct ActiveDownloadsSectionContentView: View {
         }
     }
 
-    // MARK: - Section Header
-
-    private func sectionHeader(_ text: String) -> some View {
-        Text(text)
-            .font(.subheadline.weight(.semibold))
-            .foregroundStyle(.secondary)
-            .frame(maxWidth: .infinity, alignment: .leading)
-            .padding(.horizontal, listStyle == .inset ? 16 : 16)
-            .padding(.top, 8)
-            .padding(.bottom, 8)
-    }
-
     // MARK: - Swipe Actions
 
     private func swipeActionsFor(_ download: Download) -> [SwipeAction] {

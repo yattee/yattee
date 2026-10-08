@@ -385,21 +385,10 @@ actor PipedAPI: InstanceAPI {
         return response.map { $0.toPlaylist() }
     }
 
-    /// Fetches a user playlist with its videos.
-    /// - Parameters:
-    ///   - id: The playlist ID (UUID)
-    ///   - instance: The Piped instance
-    ///   - authToken: The auth token from login
-    /// - Returns: Playlist with videos
-    func userPlaylist(id: String, instance: Instance, authToken: String) async throws -> Playlist {
-        try await userPlaylistSnapshot(id: id, instance: instance, authToken: authToken).playlist
-    }
-
     /// Fetches a user playlist along with the per-entry identities needed to
     /// mutate it.
     ///
-    /// Same request as ``userPlaylist(id:instance:authToken:)`` — that one is a
-    /// thin wrapper over this. Piped has no per-entry token, so entries are
+    /// Piped has no per-entry token, so entries are
     /// addressed by their position in this fetch and are only valid until the
     /// playlist next changes.
     /// - Parameters:

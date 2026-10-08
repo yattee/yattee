@@ -12,18 +12,6 @@ enum QualitySelectorTab: String, CaseIterable, Sendable {
     case video
     case audio
     case subtitles
-
-    /// Localized display label for the tab.
-    var label: String {
-        switch self {
-        case .video:
-            String(localized: "player.quality.video")
-        case .audio:
-            String(localized: "stream.audio")
-        case .subtitles:
-            String(localized: "stream.subtitles")
-        }
-    }
 }
 
 /// Navigation destination for quality selector detail pages.

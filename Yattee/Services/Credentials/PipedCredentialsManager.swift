@@ -199,7 +199,6 @@ final class PipedCredentialsManager: InstanceCredentialsManager {
 // MARK: - AccountCredentialsManager
 
 extension PipedCredentialsManager: AccountCredentialsManager {
-    var loggedInAccountIDs: Set<UUID> { accountCredentials.loggedInAccountIDs }
     var isScopeResolved: Bool { accountCredentials.isScopeResolved }
 
     func setCredential(_ credential: String, for account: Account) {

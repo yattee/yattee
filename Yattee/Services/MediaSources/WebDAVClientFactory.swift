@@ -22,12 +22,4 @@ final class WebDAVClientFactory: Sendable {
         let session = sessionFactory.session(allowInvalidCertificates: source.allowInvalidCertificates)
         return WebDAVClient(session: session)
     }
-
-    /// Creates a WebDAVClient with explicit SSL settings.
-    /// - Parameter allowInvalidCertificates: Whether to bypass SSL certificate validation.
-    /// - Returns: A WebDAVClient with the specified SSL settings.
-    func createClient(allowInvalidCertificates: Bool) -> WebDAVClient {
-        let session = sessionFactory.session(allowInvalidCertificates: allowInvalidCertificates)
-        return WebDAVClient(session: session)
-    }
 }

@@ -59,8 +59,6 @@ struct PortraitDetailsPanel: View {
 
     // Queue helpers
     private var queue: [QueuedVideo] { playerState?.queue ?? [] }
-    private var history: [QueuedVideo] { playerState?.history ?? [] }
-    private var isQueueEnabled: Bool { settingsManager?.queueEnabled ?? true }
 
     // Player pill helpers
     private var playerPillSettings: PlayerPillSettings {

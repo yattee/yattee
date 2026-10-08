@@ -83,52 +83,6 @@ struct ErrorStateView: View {
     }
 }
 
-// MARK: - Load State View (Generic Container)
-
-/// A generic container that handles loading, error, and content states.
-///
-/// Example usage:
-/// ```swift
-/// LoadStateView(
-///     isLoading: viewModel.isLoading,
-///     errorMessage: viewModel.error,
-///     data: viewModel.data,
-///     loadingMessage: "Loading...",
-///     errorTitle: "Error",
-///     onRetry: { await viewModel.load() }
-/// ) { data in
-///     ContentView(data: data)
-/// }
-/// ```
-struct LoadStateView<Content: View, Data>: View {
-    let isLoading: Bool
-    let errorMessage: String?
-    let data: Data?
-    var loadingMessage: String? = nil
-    var loadingSubtext: String? = nil
-    var errorTitle: String = "Error"
-    var onRetry: (() async -> Void)? = nil
-    var onDismiss: (() -> Void)? = nil
-    @ViewBuilder let content: (Data) -> Content
-
-    var body: some View {
-        Group {
-            if isLoading && data == nil {
-                LoadingView(message: loadingMessage, subtext: loadingSubtext)
-            } else if let error = errorMessage, data == nil {
-                ErrorStateView(
-                    title: errorTitle,
-                    message: error,
-                    onRetry: onRetry,
-                    onDismiss: onDismiss
-                )
-            } else if let data {
-                content(data)
-            }
-        }
-    }
-}
-
 // MARK: - Previews
 
 #Preview("Loading") {
@@ -142,39 +96,4 @@ struct LoadStateView<Content: View, Data>: View {
         onRetry: { try? await Task.sleep(for: .seconds(1)) },
         onDismiss: {}
     )
-}
-
-#Preview("LoadStateView - Loading") {
-    LoadStateView(
-        isLoading: true,
-        errorMessage: nil,
-        data: nil as String?,
-        loadingMessage: "Fetching data..."
-    ) { data in
-        Text(data)
-    }
-}
-
-#Preview("LoadStateView - Error") {
-    LoadStateView(
-        isLoading: false,
-        errorMessage: "Network error occurred",
-        data: nil as String?,
-        errorTitle: "Failed to Load",
-        onRetry: {}
-    ) { data in
-        Text(data)
-    }
-}
-
-#Preview("LoadStateView - Content") {
-    LoadStateView(
-        isLoading: false,
-        errorMessage: nil,
-        data: "Hello, World!",
-        loadingMessage: "Loading..."
-    ) { data in
-        Text(data)
-            .font(.largeTitle)
-    }
 }

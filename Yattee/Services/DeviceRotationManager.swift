@@ -252,11 +252,6 @@ final class DeviceRotationManager {
         }
     }
 
-    /// Check if device is currently in landscape orientation
-    var isLandscape: Bool {
-        detectedOrientation == .landscapeLeft || detectedOrientation == .landscapeRight
-    }
-
     /// Check if device is currently in portrait orientation
     var isPortrait: Bool {
         detectedOrientation == .portrait || detectedOrientation == .portraitUpsideDown

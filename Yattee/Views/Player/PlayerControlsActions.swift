@@ -95,9 +95,7 @@ struct PlayerControlsActions {
     let currentAudioStream: Stream?
 
     /// Embedded (in-container) tracks reported by mpv for the loaded file
-    var embeddedAudioTracks: [MPVTrack] = []
     var embeddedSubtitleTracks: [MPVTrack] = []
-    var currentEmbeddedAudioTrackID: Int? = nil
     var currentEmbeddedSubtitleTrackID: Int? = nil
 
     #if os(iOS)
@@ -232,11 +230,6 @@ struct PlayerControlsActions {
             return nil
         }
         return String(format: "%.2gx", rate.rawValue)
-    }
-
-    /// Whether share is available (has video with share URL)
-    var canShare: Bool {
-        currentVideo != nil
     }
 
     /// Whether add to playlist is available

@@ -172,26 +172,6 @@ final class Bookmark {
         }
     }
 
-    /// Formatted view count string.
-    var formattedViewCount: String? {
-        guard let viewCount else { return nil }
-        return CountFormatter.compact(viewCount)
-    }
-
-    /// Formatted published date, preferring parsed Date over API-provided text.
-    ///
-    /// A date that would render as "in 0 seconds" is shown as nothing at all —
-    /// see ``Video/formattedPublishedDate``.
-    var formattedPublishedDate: String? {
-        if let publishedAt {
-            guard !RelativeDateFormatter.isEffectivelyNow(publishedAt) else { return nil }
-            let formatter = RelativeDateTimeFormatter()
-            formatter.unitsStyle = .full
-            return formatter.localizedString(for: publishedAt, relativeTo: Date())
-        }
-        return publishedText
-    }
-
     /// Converts this bookmark to a Video model for playback.
     func toVideo() -> Video {
         let videoIDObj: VideoID

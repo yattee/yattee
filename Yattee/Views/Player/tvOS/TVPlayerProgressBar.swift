@@ -76,12 +76,6 @@ struct TVPlayerProgressBar: View {
         return min(max(displayTime / duration, 0), 1)
     }
 
-    /// Buffered progress as a fraction (0-1).
-    private var bufferedProgress: Double {
-        guard duration > 0 else { return 0 }
-        return min(bufferedTime / duration, 1)
-    }
-
     var body: some View {
         Button {
             if isScrubbing {
@@ -92,7 +86,7 @@ struct TVPlayerProgressBar: View {
         } label: {
             progressContent
         }
-        .buttonStyle(TVProgressBarButtonStyle(isFocused: isFocused))
+        .buttonStyle(TVProgressBarButtonStyle())
         .disabled(isLive)
         .overlay {
             // Gesture capture layer (only when scrubbing). Siri Remote pan
@@ -602,8 +596,6 @@ class TVPanGestureUIView: UIView {
 
 /// Button style for the progress bar.
 struct TVProgressBarButtonStyle: ButtonStyle {
-    let isFocused: Bool
-
     func makeBody(configuration: Configuration) -> some View {
         configuration.label
             .scaleEffect(configuration.isPressed ? 0.98 : 1.0)

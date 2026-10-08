@@ -131,7 +131,6 @@ struct ManageChannelsView: View {
 
     private var dataManager: DataManager? { appEnvironment?.dataManager }
     private var subscriptionService: SubscriptionService? { appEnvironment?.subscriptionService }
-    private var settingsManager: SettingsManager? { appEnvironment?.settingsManager }
     private var toastManager: ToastManager? { appEnvironment?.toastManager }
     private var yatteeServer: Instance? {
         appEnvironment?.instancesManager.enabledYatteeServerInstances.first

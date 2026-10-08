@@ -57,11 +57,6 @@ final class MPVOGLView: NSView {
     /// Actual display link frame rate.
     var displayLinkActualFPS: Double = 60.0
 
-    /// Current display link target frame rate (for debug overlay).
-    var displayLinkTargetFPS: Double {
-        displayLinkActualFPS
-    }
-
     // MARK: - PiP Properties (forwarded to layer)
 
     /// Whether to capture frames for PiP.
@@ -251,12 +246,6 @@ final class MPVOGLView: NSView {
 
         // Report frame swap to MPV for vsync timing
         mpvClient?.reportSwap()
-    }
-
-    /// Update display link for the current display.
-    func updateDisplayLink() {
-        // With CADisplayLink, we just need to update the refresh rate info
-        updateDisplayRefreshRate()
     }
 
     /// Update the cached display refresh rate.

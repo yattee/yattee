@@ -866,20 +866,6 @@ final class DownloadManager: NSObject {
 
     // MARK: - Batch Operations
 
-    /// Pause all active downloads.
-    func pauseAll() async {
-        for download in activeDownloads where download.status == .downloading {
-            await pause(download)
-        }
-    }
-
-    /// Resume all paused downloads.
-    func resumeAll() async {
-        for download in activeDownloads where download.status == .paused {
-            await resume(download)
-        }
-    }
-
     /// Delete all completed downloads.
     func deleteAllCompleted() async {
         for download in completedDownloads {
@@ -1022,16 +1008,6 @@ final class DownloadManager: NSObject {
         }
 
         return (video, stream, audioStream, captionURL, download.dislikeCount)
-    }
-
-    /// Creates a Video and Stream for playing a downloaded video by video ID.
-    /// Returns nil if the video is not downloaded or the file doesn't exist.
-    /// Also returns the stored dislike count, audio stream, and caption URL if available.
-    func videoAndStream(for videoID: VideoID) -> (video: Video, stream: Stream, audioStream: Stream?, captionURL: URL?, dislikeCount: Int?)? {
-        guard let download = completedDownloads.first(where: { $0.videoID == videoID }) else {
-            return nil
-        }
-        return videoAndStream(for: download)
     }
 
     // MARK: - Private Helpers
@@ -1226,36 +1202,12 @@ final class DownloadManager {
     private(set) var storageUsed: Int64 = 0
     var maxConcurrentDownloads: Int { 2 }
 
-    func enqueue(_ video: Video, quality: String, formatID: String, streamURL: URL, audioStreamURL: URL? = nil, captionURL: URL? = nil, audioLanguage: String? = nil, captionLanguage: String? = nil, httpHeaders: [String: String]? = nil, storyboard: Storyboard? = nil, dislikeCount: Int? = nil, priority: DownloadPriority = .normal, videoCodec: String? = nil, audioCodec: String? = nil, videoBitrate: Int? = nil, audioBitrate: Int? = nil, suppressStartToast: Bool = false) async throws {
-        throw DownloadError.notSupported
-    }
-
-    func autoEnqueue(_ video: Video, preferredQuality: DownloadQuality, preferredAudioLanguage: String?, preferredSubtitlesLanguage: String?, includeSubtitles: Bool, contentService: ContentService, instance: Instance, suppressStartToast: Bool = false) async throws {
-        throw DownloadError.notSupported
-    }
-
-    func autoEnqueueMediaSource(_ video: Video, mediaSourcesManager: MediaSourcesManager, webDAVClient: WebDAVClient, smbClient: SMBClient) async throws {
-        throw DownloadError.notSupported
-    }
-
-    func pause(_ download: Download) async {}
-    func resume(_ download: Download) async {}
-    func cancel(_ download: Download) async {}
-    func delete(_ download: Download) async {}
-    func moveInQueue(_ download: Download, to position: Int) async {}
-    func pauseAll() async {}
-    func resumeAll() async {}
-    func deleteAllCompleted() async {}
-    func calculateStorageUsed() async -> Int64 { 0 }
     func getAvailableStorage() -> Int64 { 0 }
-    func deleteWatchedDownloads(watchedVideoIDs: Set<String>) async {}
     func isDownloaded(_ videoID: VideoID) -> Bool { false }
     func isDownloading(_ videoID: VideoID) -> Bool { false }
     func download(for videoID: VideoID) -> Download? { nil }
     func localURL(for videoID: VideoID) -> URL? { nil }
-    func resolveLocalURL(for download: Download) -> URL? { nil }
     func videoAndStream(for download: Download) -> (video: Video, stream: Stream, audioStream: Stream?, captionURL: URL?, dislikeCount: Int?)? { nil }
-    func videoAndStream(for videoID: VideoID) -> (video: Video, stream: Stream, audioStream: Stream?, captionURL: URL?, dislikeCount: Int?)? { nil }
     func setToastManager(_ manager: ToastManager) {}
     func setDownloadSettings(_ settings: DownloadSettings) {}
     func downloadsDirectory() -> URL { URL(fileURLWithPath: NSTemporaryDirectory()) }

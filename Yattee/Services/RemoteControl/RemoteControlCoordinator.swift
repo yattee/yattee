@@ -79,17 +79,6 @@ final class RemoteControlCoordinator {
     /// The device that's controlling us, if any.
     private(set) var controllingDevice: DiscoveredDevice?
 
-    /// This device's name for display.
-    var deviceName: String {
-        get { networkService.deviceName }
-        set { networkService.deviceName = newValue }
-    }
-
-    /// This device's ID.
-    var deviceID: String {
-        networkService.deviceID
-    }
-
     // MARK: - Dependencies
 
     private let networkService: LocalNetworkService
@@ -337,24 +326,7 @@ final class RemoteControlCoordinator {
         }
     }
 
-    /// Send a command to all connected devices.
-    func broadcastCommand(_ command: RemoteControlCommand) async {
-        let commandDesc = String(describing: command).prefix(50)
-        rcDebug("COMMAND", "Broadcasting: \(commandDesc)")
-        await networkService.broadcast(command: command)
-    }
-
     // MARK: - Convenience Commands
-
-    /// Send play command to a device.
-    func play(on device: DiscoveredDevice) async {
-        await sendCommand(.play, to: device)
-    }
-
-    /// Send pause command to a device.
-    func pause(on device: DiscoveredDevice) async {
-        await sendCommand(.pause, to: device)
-    }
 
     /// Send toggle play/pause command to a device.
     func togglePlayPause(on device: DiscoveredDevice) async {
@@ -439,11 +411,6 @@ final class RemoteControlCoordinator {
     /// Close the current video on a device.
     func closeVideo(on device: DiscoveredDevice) async {
         await sendCommand(.closeVideo, to: device)
-    }
-
-    /// Toggle fullscreen on a device.
-    func toggleFullscreen(on device: DiscoveredDevice) async {
-        await sendCommand(.toggleFullscreen, to: device)
     }
 
     /// Play next video in queue on a device.
@@ -1011,18 +978,6 @@ final class RemoteControlCoordinator {
             playerService?.openVideo(video, startTime: startTime)
             rcLog("LOADVIDEO", "Extracted video opened: \(video.title)", details: "startTime=\(startTime ?? 0)")
         }
-    }
-
-    private func expandPlayerIfNeeded() {
-        #if os(iOS) || os(macOS)
-        let isPiPActive = (playerService?.currentBackend as? MPVBackend)?.isPiPActive ?? false
-        rcDebug("PLAYER", "expandPlayerIfNeeded - isPiPActive=\(isPiPActive)")
-        if !isPiPActive {
-            navigationCoordinator?.expandPlayer()
-        }
-        #else
-        navigationCoordinator?.expandPlayer()
-        #endif
     }
 
     // MARK: - State Broadcasting

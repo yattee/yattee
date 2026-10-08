@@ -13,8 +13,6 @@ import SwiftUI
 /// Automatically handles DeArrow integration.
 /// Supports optional queue context for auto-play functionality.
 struct BookmarkRowView: View {
-    @Environment(\.appEnvironment) private var appEnvironment
-
     let bookmark: Bookmark
     var style: VideoRowStyle = .regular
     var watchProgress: Double? = nil
@@ -26,10 +24,6 @@ struct BookmarkRowView: View {
     var videoList: [Video]? = nil
     var videoIndex: Int? = nil
     var loadMoreVideos: LoadMoreVideosCallback? = nil
-
-    private var accentColor: Color {
-        appEnvironment?.settingsManager.resolvedAccentColor ?? .accentColor
-    }
 
     private var isBookmarkValid: Bool {
         bookmark.modelContext != nil && !bookmark.isDeleted

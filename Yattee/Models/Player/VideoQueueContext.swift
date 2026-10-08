@@ -57,12 +57,6 @@ struct VideoQueueContext {
         videoList != nil && videoIndex != nil
     }
     
-    /// Number of videos that will be queued after the current one
-    var remainingVideosCount: Int {
-        guard let list = videoList, let index = videoIndex else { return 0 }
-        return max(0, list.count - index - 1)
-    }
-    
     /// Whether more videos can be loaded via continuation
     var canLoadMore: Bool {
         let hasCallback = loadMoreVideos != nil

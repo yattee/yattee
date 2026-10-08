@@ -804,11 +804,6 @@ struct RemoteControlView: View {
         isConnecting = false
     }
 
-    private func disconnect() {
-        remoteControl?.disconnect(from: device)
-        isConnected = false
-    }
-
     /// Returns the previous playback rate, or nil if at minimum.
     private func previousRate() -> PlaybackRate? {
         let allRates = PlaybackRate.allCases

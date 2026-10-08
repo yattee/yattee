@@ -23,19 +23,15 @@ final class BackgroundRefreshManager {
 
     // MARK: - Dependencies
 
-    private weak var appEnvironment: AppEnvironment?
     private let backgroundRefresher: BackgroundFeedRefresher
-    private let notificationManager: NotificationManager
 
     // MARK: - Initialization
 
     init(notificationManager: NotificationManager) {
-        self.notificationManager = notificationManager
         self.backgroundRefresher = BackgroundFeedRefresher(notificationManager: notificationManager)
     }
 
     func setAppEnvironment(_ environment: AppEnvironment) {
-        self.appEnvironment = environment
         backgroundRefresher.setAppEnvironment(environment)
     }
 
@@ -147,11 +143,6 @@ final class BackgroundRefreshManager {
         activityScheduler?.invalidate()
         activityScheduler = nil
         LoggingService.shared.debug("Invalidated macOS background scheduler", category: .notifications)
-    }
-
-    func restartMacOSScheduler() {
-        invalidateMacOSScheduler()
-        registerMacOSBackgroundActivity()
     }
     #endif
 

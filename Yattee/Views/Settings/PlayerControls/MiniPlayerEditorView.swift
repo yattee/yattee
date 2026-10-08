@@ -17,8 +17,7 @@ struct MiniPlayerEditorView: View {
     var body: some View {
         List {
             MiniPlayerPreviewView(
-                buttons: viewModel.miniPlayerButtons,
-                showVideo: showVideo
+                buttons: viewModel.miniPlayerButtons
             )
             .listRowInsets(EdgeInsets())
             .listRowBackground(Color.clear)
@@ -213,7 +212,6 @@ struct MiniPlayerEditorView: View {
 
 private struct MiniPlayerPreviewView: View {
     let buttons: [ControlButtonConfiguration]
-    let showVideo: Bool
 
     private let buttonSize: CGFloat = 28
     private let buttonSpacing: CGFloat = 4

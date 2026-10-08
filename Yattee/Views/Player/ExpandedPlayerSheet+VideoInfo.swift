@@ -12,23 +12,6 @@ import SwiftUI
 extension ExpandedPlayerSheet {
     // MARK: - Scroll & Comments
 
-    /// Scrolls the content to the top.
-    func scrollToTop() {
-        withAnimation(.easeOut(duration: 0.25)) {
-            scrollPosition.scrollTo(y: 0)
-        }
-    }
-
-    /// Expands the comments overlay.
-    func expandComments() {
-        // Scroll player to top so video is fully visible
-        scrollPosition.scrollTo(y: 0)
-        // Use same animation as player sheet expand (0.3s, no bounce)
-        withAnimation(.smooth(duration: 0.3)) {
-            isCommentsExpanded = true
-        }
-    }
-
     /// Collapses the comments overlay.
     func collapseComments() {
         navigationCoordinator?.commentsFrame = .zero

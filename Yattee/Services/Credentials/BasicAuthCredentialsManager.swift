@@ -179,16 +179,6 @@ final class BasicAuthCredentialsManager: InstanceCredentialsManager {
         return hasCreds
     }
 
-    /// Refreshes the logged-in status for an instance.
-    /// Call this when the view appears to ensure UI is in sync.
-    func refreshLoginStatus(for instance: Instance) {
-        if credentials(for: instance) != nil {
-            loggedInInstanceIDs.insert(instance.id)
-        } else {
-            loggedInInstanceIDs.remove(instance.id)
-        }
-    }
-
     // MARK: - InstanceCredentialsManager Protocol
 
     /// Stores a credential for an instance (protocol conformance).

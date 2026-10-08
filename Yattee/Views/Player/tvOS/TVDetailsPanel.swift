@@ -12,7 +12,6 @@ import NukeUI
 /// Details panel that slides up from the bottom showing video information.
 struct TVDetailsPanel: View {
     let video: Video?
-    let initialTab: TVDetailsTab
     let onDismiss: () -> Void
 
     @Environment(\.appEnvironment) private var appEnvironment
@@ -22,7 +21,6 @@ struct TVDetailsPanel: View {
 
     init(video: Video?, initialTab: TVDetailsTab = .info, onDismiss: @escaping () -> Void) {
         self.video = video
-        self.initialTab = initialTab
         self.onDismiss = onDismiss
         _selectedTab = State(initialValue: initialTab)
     }
@@ -302,7 +300,6 @@ enum TVDetailsTab: String, CaseIterable {
 enum TVDetailsFocusItem: Hashable {
     case tabPicker
     case channelButton
-    case description
 }
 
 /// Scrollable description view with click-to-lock scrolling.
@@ -615,7 +612,7 @@ struct TVFocusableCommentView: View {
             } label: {
                 commentContent
             }
-            .buttonStyle(TVCommentButtonStyle(hasReplies: comment.replyCount > 0))
+            .buttonStyle(TVCommentButtonStyle())
 
             // Replies section
             if showReplies && comment.replyCount > 0 {
@@ -791,7 +788,7 @@ struct TVReplyView: View {
         } label: {
             replyContent
         }
-        .buttonStyle(TVCommentButtonStyle(hasReplies: false))
+        .buttonStyle(TVCommentButtonStyle())
     }
 
     private var replyContent: some View {
@@ -865,7 +862,6 @@ struct TVReplyView: View {
 
 /// Button style for focusable comments.
 struct TVCommentButtonStyle: ButtonStyle {
-    let hasReplies: Bool
     @Environment(\.isFocused) private var isFocused
 
     func makeBody(configuration: Configuration) -> some View {

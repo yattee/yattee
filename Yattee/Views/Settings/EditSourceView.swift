@@ -10,9 +10,6 @@ import SwiftUI
 struct EditSourceView: View {
     let source: UnifiedSource
 
-    @Environment(\.dismiss) private var dismiss
-    @Environment(\.appEnvironment) private var appEnvironment
-
     var body: some View {
         switch source {
         case .remoteServer(let instance):
@@ -399,10 +396,6 @@ private struct EditRemoteServerContent: View {
     }
 
     // MARK: - Computed Properties
-
-    private var hasYatteeServer: Bool {
-        appEnvironment?.instancesManager.hasYatteeServerInstances ?? false
-    }
 
     private func invidiousDisplayValue(_ info: InstanceDetectorModels.YatteeServerFullInfo) -> String {
         guard let invidiousInstance = info.config?.invidiousInstance else {

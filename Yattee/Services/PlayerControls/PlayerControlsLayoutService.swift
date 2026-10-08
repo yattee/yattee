@@ -179,22 +179,6 @@ actor PlayerControlsLayoutService {
 
     // MARK: - Preset Management
 
-    /// Returns all presets for the current device class.
-    func allPresets() async -> [LayoutPreset] {
-        if !isLoaded {
-            _ = try? await loadPresets()
-        }
-        return presets.filter { $0.deviceClass == .current }
-    }
-
-    /// Returns a preset by ID.
-    func preset(forID id: UUID) async -> LayoutPreset? {
-        if !isLoaded {
-            _ = try? await loadPresets()
-        }
-        return presets.first { $0.id == id }
-    }
-
     /// Saves a new or updated preset.
     func savePreset(_ preset: LayoutPreset) async throws {
         if !isLoaded {
@@ -290,13 +274,6 @@ actor PlayerControlsLayoutService {
         }
     }
 
-    /// Duplicates a preset with a new name.
-    func duplicatePreset(_ preset: LayoutPreset, newName: String) async throws -> LayoutPreset {
-        let duplicate = preset.duplicate(name: newName)
-        try await savePreset(duplicate)
-        return duplicate
-    }
-
     /// Renames a preset.
     func renamePreset(_ presetID: UUID, to newName: String) async throws {
         if !isLoaded {
@@ -378,31 +355,6 @@ actor PlayerControlsLayoutService {
         GlobalLayoutSettings.cached = layout.globalSettings
         MiniPlayerSettings.cached = layout.effectiveMiniPlayerSettings
         return layout
-    }
-
-    // MARK: - Validation
-
-    /// Checks if a preset can be deleted.
-    func canDeletePreset(id: UUID) async -> Bool {
-        if !isLoaded {
-            _ = try? await loadPresets()
-        }
-
-        guard let preset = presets.first(where: { $0.id == id }) else {
-            return false
-        }
-
-        // Cannot delete built-in presets
-        if preset.isBuiltIn {
-            return false
-        }
-
-        // Cannot delete active preset
-        if activePresetID() == id {
-            return false
-        }
-
-        return true
     }
 
     // MARK: - NEW Badge Support

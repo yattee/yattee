@@ -294,18 +294,6 @@ extension SponsorBlockSegmentSettings {
     func settings(for category: SponsorBlockCategory) -> SponsorBlockCategorySettings {
         settings(forKey: category.rawValue)
     }
-
-    /// Returns a copy with updated settings for a specific category.
-    /// - Parameters:
-    ///   - category: The category to update.
-    ///   - settings: The new settings.
-    /// - Returns: Updated SponsorBlockSegmentSettings.
-    func withUpdatedSettings(
-        for category: SponsorBlockCategory,
-        _ settings: SponsorBlockCategorySettings
-    ) -> SponsorBlockSegmentSettings {
-        withUpdatedSettings(forKey: category.rawValue, settings)
-    }
 }
 
 // MARK: - Font Style

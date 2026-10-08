@@ -34,17 +34,4 @@ extension View {
             falseTransform(self)
         }
     }
-
-    /// Conditionally applies a transformation when an optional value is present.
-    @ViewBuilder
-    func ifLet<T, Transform: View>(
-        _ value: T?,
-        transform: (Self, T) -> Transform
-    ) -> some View {
-        if let value {
-            transform(self, value)
-        } else {
-            self
-        }
-    }
 }

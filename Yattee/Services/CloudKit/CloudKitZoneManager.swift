@@ -82,9 +82,4 @@ actor CloudKitZoneManager {
             throw error
         }
     }
-    
-    /// Fetches all zones in the private database.
-    func fetchAllZones() async throws -> [CKRecordZone] {
-        try await database.allRecordZones()
-    }
 }

@@ -13,7 +13,6 @@ import SwiftUI
 
 struct ExpandedPlayerSheet: View {
     @Environment(\.appEnvironment) var appEnvironment
-    @Environment(\.dismiss) private var dismiss
 
     // MARK: - Sheet State
 
@@ -23,9 +22,7 @@ struct ExpandedPlayerSheet: View {
     @State var commentsDismissOffset: CGFloat = 0
     /// Direct scroll position control - use scrollTo(y:) to scroll to top
     @State var scrollPosition: ScrollPosition = .init(y: 0)
-    @State private var currentScrollOffset: CGFloat = 0
     @State var currentPlayerHeight: CGFloat = 0
-    @State private var isBottomOverscroll: Bool = false
     @State var isPortraitPanelVisible: Bool = true
     /// Temporarily hide controls during fullscreen transition to avoid animation glitch
     @State var hideControlsDuringTransition: Bool = false
@@ -95,9 +92,6 @@ struct ExpandedPlayerSheet: View {
     /// Task for preloading comments - cancelled when video changes
     @State var commentsPreloadTask: Task<Void, Never>?
 
-    /// Namespace for matchedGeometryEffect transitions
-    @Namespace var playerNamespace
-
     // MARK: - Layout State (iOS)
 
     #if os(iOS)
@@ -120,9 +114,7 @@ struct ExpandedPlayerSheet: View {
 
     var playerService: PlayerService? { appEnvironment?.playerService }
     var playerState: PlayerState? { playerService?.state }
-    var downloadManager: DownloadManager? { appEnvironment?.downloadManager }
     var navigationCoordinator: NavigationCoordinator? { appEnvironment?.navigationCoordinator }
-    var accentColor: Color { appEnvironment?.settingsManager.resolvedAccentColor ?? .accentColor }
 
     #if os(iOS)
     var inAppOrientationLock: Bool { appEnvironment?.settingsManager.inAppOrientationLock ?? false }
@@ -136,7 +128,6 @@ struct ExpandedPlayerSheet: View {
     // MARK: - Queue Helpers
 
     var queue: [QueuedVideo] { playerState?.queue ?? [] }
-    var history: [QueuedVideo] { playerState?.history ?? [] }
     var isQueueEnabled: Bool { appEnvironment?.settingsManager.queueEnabled ?? true }
     var hasQueueItems: Bool { !queue.isEmpty && isQueueEnabled }
 
@@ -165,7 +156,6 @@ struct ExpandedPlayerSheet: View {
         let isFailed = if case .failed = state { true } else { false }
         let hasBackend = playerService?.currentBackend != nil && !isLoading && !isIdle && !isEnded && !isFailed
         return PlaybackInfo(
-            state: state,
             isLoading: isLoading,
             isIdle: isIdle,
             isEnded: isEnded,
@@ -187,18 +177,6 @@ struct ExpandedPlayerSheet: View {
         guard let video = playerState?.currentVideo else { return }
         presentSheet(.addToPlaylist(video))
     }
-
-    #if !os(tvOS)
-    func presentDownloadOptions() {
-        guard let video = playerState?.currentVideo, let playerService = appEnvironment?.playerService else { return }
-        presentSheet(.downloadOptions(
-            video,
-            streams: playerService.availableStreams,
-            captions: playerService.availableCaptions,
-            dislikeCount: playerState?.dislikeCount
-        ))
-    }
-    #endif
 
     // MARK: - Body
 

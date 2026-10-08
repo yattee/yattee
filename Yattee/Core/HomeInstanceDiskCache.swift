@@ -99,15 +99,6 @@ actor HomeInstanceDiskCache {
             }
         }
     }
-
-    /// Clears the cache from both memory and disk.
-    func clear() async {
-        cachedData = nil
-        try? fileManager.removeItem(at: cacheFileURL)
-        await MainActor.run {
-            LoggingService.shared.debug("HomeInstanceDiskCache.clear: Cache cleared", category: .general)
-        }
-    }
 }
 
 // MARK: - Cache Data Model

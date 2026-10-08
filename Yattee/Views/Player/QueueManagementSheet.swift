@@ -26,12 +26,9 @@ struct QueueManagementSheet: View {
 
     private var queueManager: QueueManager? { appEnvironment?.queueManager }
     private var playerState: PlayerState? { appEnvironment?.playerService.state }
-    private var navigationCoordinator: NavigationCoordinator? { appEnvironment?.navigationCoordinator }
 
     private var queue: [QueuedVideo] { playerState?.queue ?? [] }
     private var history: [QueuedVideo] { playerState?.history ?? [] }
-    private var isLoadingMore: Bool { queueManager?.isLoadingMore ?? false }
-    private var hasMoreItems: Bool { queueManager?.hasMoreItems() ?? false }
     private var queueSourceLabel: String? { queueManager?.currentQueueSourceLabel }
 
     var body: some View {

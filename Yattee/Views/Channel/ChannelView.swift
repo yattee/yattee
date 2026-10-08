@@ -307,11 +307,6 @@ struct ChannelView: View {
         avatarSize - (avatarSize - collapsedAvatarSize) * collapseProgress
     }
 
-    /// Opacity for expanded content (fades out as we scroll)
-    private var expandedContentOpacity: CGFloat {
-        1 - min(collapseProgress * 2, 1)
-    }
-
     /// Opacity for collapsed title (fades in as we scroll)
     private var collapsedTitleOpacity: CGFloat {
         max((collapseProgress - 0.5) * 2, 0)
@@ -783,11 +778,6 @@ struct ChannelView: View {
         .padding(.vertical, 8)
         .frame(maxHeight: .infinity, alignment: .top)
         .animation(.easeInOut(duration: 0.25), value: isDescriptionScrollLocked)
-    }
-
-    @ViewBuilder
-    private func tvOSAvatar(for channel: Channel) -> some View {
-        tvOSAvatar(name: channel.name, thumbnailURL: channel.thumbnailURL)
     }
 
     @ViewBuilder
@@ -2246,13 +2236,6 @@ struct ChannelView: View {
         isSearchLoading = false
     }
 
-    private func clearSearch() {
-        isSearchActive = false
-        hasSearched = false
-        searchResults = .empty
-        searchText = ""
-    }
-
     // MARK: - Error View
 
     private func errorView(_ error: String) -> some View {
@@ -2271,11 +2254,6 @@ struct ChannelView: View {
     }
 
     // MARK: - Helpers
-
-    private func formatSubscribers(_ count: Int) -> String {
-        let formatted = CountFormatter.compact(count)
-        return String(localized: "channel.subscriberCount \(formatted)")
-    }
 
     /// Returns the appropriate instance for the channel's content source
     private func instanceForSource() -> Instance? {

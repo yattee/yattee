@@ -206,12 +206,6 @@ actor YatteeServerAPI: InstanceAPI {
         }
     }
 
-    func streams(videoID: String, instance: Instance) async throws -> [Stream] {
-        let endpoint = GenericEndpoint.get("/api/v1/videos/\(videoID)")
-        let response: YatteeVideoDetails = try await httpClient.fetch(endpoint, baseURL: instance.url)
-        return response.toStreams()
-    }
-
     func captions(videoID: String, instance: Instance) async throws -> [Caption] {
         let endpoint = GenericEndpoint.get("/api/v1/videos/\(videoID)")
         let response: YatteeVideoDetails = try await httpClient.fetch(endpoint, baseURL: instance.url)
@@ -237,12 +231,6 @@ actor YatteeServerAPI: InstanceAPI {
         return ChannelSearchPage(items: items, nextPage: hasResults ? page + 1 : nil)
     }
 
-    /// Fetches video details, streams, and captions in a single API call.
-    func videoWithStreamsAndCaptions(id: String, instance: Instance) async throws -> (video: Video, streams: [Stream], captions: [Caption]) {
-        let result = try await videoWithStreamsAndCaptionsAndStoryboards(id: id, instance: instance)
-        return (video: result.video, streams: result.streams, captions: result.captions)
-    }
-
     func videoWithStreamsAndCaptionsAndStoryboards(id: String, instance: Instance) async throws -> (video: Video, streams: [Stream], captions: [Caption], storyboards: [Storyboard]) {
         let endpoint = GenericEndpoint.get("/api/v1/videos/\(id)")
         let response: YatteeVideoDetails = try await httpClient.fetch(endpoint, baseURL: instance.url)
@@ -266,16 +254,6 @@ actor YatteeServerAPI: InstanceAPI {
     enum ProxyMode: String {
         case relay
         case download
-    }
-
-    /// Fetches streams with URLs that proxy through the Yattee Server.
-    func proxyStreams(videoID: String, instance: Instance, mode: ProxyMode) async throws -> [Stream] {
-        let endpoint = GenericEndpoint.get(
-            "/api/v1/videos/\(videoID)",
-            query: ["proxy": "true", "proxy_mode": mode.rawValue]
-        )
-        let response: YatteeVideoDetails = try await httpClient.fetch(endpoint, baseURL: instance.url)
-        return response.toStreams()
     }
 
     /// Fetches video details, proxy streams, captions, and storyboards in a single API call.
@@ -1322,10 +1300,6 @@ private struct YatteeChannel: Decodable, Sendable {
             isVerified: authorVerified ?? false
         )
     }
-}
-
-private struct YatteeChannelVideos: Decodable, Sendable {
-    let videos: [YatteeVideo]
 }
 
 private struct YatteeChannelSearchResponse: Decodable, Sendable {

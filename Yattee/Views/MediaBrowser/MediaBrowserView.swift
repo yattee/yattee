@@ -11,7 +11,6 @@ struct MediaBrowserView: View {
     @Environment(\.appEnvironment) private var appEnvironment
 
     let source: MediaSource
-    let initialPath: String
 
     @Namespace private var sheetTransition
     @State private var currentPath: String
@@ -33,7 +32,6 @@ struct MediaBrowserView: View {
 
     init(source: MediaSource, path: String = "/", showOnlyPlayable: Bool = false) {
         self.source = source
-        self.initialPath = path
         _currentPath = State(initialValue: path)
 
         let defaults = UserDefaults.standard

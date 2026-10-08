@@ -63,24 +63,6 @@ actor PlayerControlsBackupService {
         return presets
     }
 
-    /// Checks if a valid backup exists.
-    /// - Returns: True if a valid backup file exists.
-    func hasValidBackup() async -> Bool {
-        guard fileManager.fileExists(atPath: backupFileURL.path) else {
-            return false
-        }
-
-        // Try to decode to verify it's valid
-        do {
-            let data = try Data(contentsOf: backupFileURL)
-            _ = try decoder.decode([LayoutPreset].self, from: data)
-            return true
-        } catch {
-            LoggingService.shared.error("Backup file exists but is invalid: \(error.localizedDescription)")
-            return false
-        }
-    }
-
     /// Attempts to create a recovered preset from corrupted data.
     /// - Parameter data: The corrupted data.
     /// - Returns: A recovered preset if partial recovery is possible.
@@ -115,16 +97,6 @@ actor PlayerControlsBackupService {
 
         LoggingService.shared.error("Failed to recover any preset from corrupted data")
         return nil
-    }
-
-    /// Deletes the backup file.
-    func deleteBackup() async throws {
-        guard fileManager.fileExists(atPath: backupFileURL.path) else {
-            return
-        }
-
-        try fileManager.removeItem(at: backupFileURL)
-        LoggingService.shared.info("Deleted player controls backup")
     }
 
     // MARK: - Helpers

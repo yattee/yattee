@@ -294,11 +294,6 @@ enum ControlButtonType: String, Codable, Hashable, Sendable, CaseIterable {
         #endif
     }
 
-    /// Button types for center section (play/pause, seek).
-    static var availableForCenterSection: [ControlButtonType] {
-        [.playPause, .seekBackward, .seekForward]
-    }
-
     /// Button types available for the player pill (curated subset).
     static var availableForPill: [ControlButtonType] {
         [

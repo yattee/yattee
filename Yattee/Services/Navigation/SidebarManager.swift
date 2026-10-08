@@ -244,7 +244,7 @@ final class SidebarManager {
     private func loadPlaylists() {
         guard let dataManager else { return }
 
-        // Cache playlists for use in videoCount(for:)
+        // Cache playlists for use in thumbnailURL(for:)
         cachedPlaylists = dataManager.playlists()
         let sortOrder = settingsManager?.sidebarPlaylistSort ?? .alphabetical
         let limitEnabled = settingsManager?.sidebarPlaylistsLimitEnabled ?? false
@@ -423,20 +423,6 @@ final class SidebarManager {
     }
 
     // MARK: - Playlist Data Access
-
-    /// Returns video count for a playlist sidebar item.
-    /// Uses cached playlists to avoid repeated DB queries during layout.
-    func videoCount(for item: SidebarItem) -> Int {
-        switch item {
-        case .playlist(let id, _):
-            return cachedPlaylists.first { $0.id == id }?.videoCount ?? 0
-        case .remotePlaylist(let id, _, let accountID):
-            return remotePlaylistsCache?.playlists(for: accountID)?
-                .first { $0.id == id }?.videoCount ?? 0
-        default:
-            return 0
-        }
-    }
 
     /// Returns thumbnail URL for a playlist sidebar item.
     /// Uses cached playlists to avoid repeated DB queries during layout.

@@ -103,17 +103,11 @@ final class PlayerService {
     /// The current download being played, if any.
     private(set) var currentDownload: Download?
 
-    /// Whether we're currently playing downloaded content.
-    var isPlayingDownloadedContent: Bool {
-        currentDownload != nil
-    }
-
     /// Whether online streams are currently being loaded.
     private(set) var isLoadingOnlineStreams: Bool = false
 
     // MARK: - Dependencies
 
-    private let httpClient: HTTPClient
     private let contentService: ContentService
     private let sponsorBlockAPI: SponsorBlockAPI
     private let returnYouTubeDislikeAPI: ReturnYouTubeDislikeAPI
@@ -184,7 +178,6 @@ final class PlayerService {
         dataManager: DataManager,
         backendFactory: BackendFactory? = nil
     ) {
-        self.httpClient = httpClient
         self.contentService = contentService
         self.dataManager = dataManager
         self.sponsorBlockAPI = SponsorBlockAPI(httpClient: httpClient)
@@ -226,22 +219,6 @@ final class PlayerService {
     }
 
     // MARK: - Public Methods
-
-    /// Prepares a video for playback without loading streams.
-    /// Shows the video in the player with a play button overlay.
-    /// Call `play(video:)` to actually start loading and playing.
-    /// - Parameter video: The video to prepare
-    func prepare(video: Video) {
-        LoggingService.shared.logPlayer("Preparing video: \(video.id.id)")
-
-        // Clear streams
-        availableStreams = []
-        originalStreams = []
-
-        // Set video in state but keep idle (not loading)
-        state.setCurrentVideo(video, stream: nil)
-        state.setPlaybackState(.idle)
-    }
 
     /// Plays a video with optional starting time.
     /// - Parameters:
@@ -1785,113 +1762,6 @@ final class PlayerService {
 
     // MARK: - Media Browser Stream Resolution
 
-    /// Resolves stream and captions for a media browser video on-demand.
-    /// - Parameters:
-    ///   - video: The video to resolve
-    ///   - context: Media browser context with source and folder files
-    /// - Returns: Tuple of (stream, captions) ready for playback
-    func resolveMediaBrowserStream(
-        for video: Video,
-        context: MediaBrowserQueueContext
-    ) async throws -> (stream: Stream, captions: [Caption]) {
-        // Find the MediaFile for this video in the folder
-        // videoID format: "sourceUUID:path"
-        guard let mediaFile = context.allFilesInFolder.first(where: { $0.id == video.id.videoID }) else {
-            throw MediaSourceError.pathNotFound("Video file not found in folder context")
-        }
-
-        // Find matching subtitle files
-        let subtitleFiles = mediaFile.findMatchingSubtitles(in: context.allFilesInFolder)
-
-        let source = context.source
-        let password = mediaSourcesManager?.password(for: source)
-
-        switch source.type {
-        case .webdav:
-            // Get auth headers for WebDAV
-            var authHeaders: [String: String]?
-            if let webDAVClient {
-                authHeaders = await webDAVClient.authHeaders(for: source, password: password)
-            }
-            let stream = mediaFile.toStream(authHeaders: authHeaders)
-            // Subtitles can use remote URLs directly for WebDAV
-            return (stream, subtitleFiles)
-
-        case .smb:
-            guard let smbClient else {
-                throw MediaSourceError.unknown("SMB client not available")
-            }
-
-            let folderKey = source.id.uuidString + ":" + context.folderPath
-
-            // Pre-download ALL subtitles in folder on first access.
-            // Must complete before MPV opens any SMB connection.
-            // For queued videos from the same folder, subtitles will already be cached.
-            if !preDownloadedSubtitleFolders.contains(folderKey) {
-                let allSubtitleFiles = context.allFilesInFolder.filter { $0.isSubtitle }
-                LoggingService.shared.logMediaSources("Pre-downloading \(allSubtitleFiles.count) subtitle(s) from folder: \(context.folderPath)")
-
-                for subtitleFile in allSubtitleFiles {
-                    do {
-                        let localURL = try await smbClient.downloadSubtitleToTemp(
-                            file: subtitleFile,
-                            source: source,
-                            password: password,
-                            videoID: folderKey
-                        )
-                        downloadedSubtitlesCache[subtitleFile.id] = localURL
-                        LoggingService.shared.logMediaSources("Pre-downloaded subtitle: \(subtitleFile.name) → \(localURL.lastPathComponent)")
-                    } catch {
-                        LoggingService.shared.error(
-                            "Failed to pre-download subtitle \(subtitleFile.name): \(error.localizedDescription)",
-                            category: .general
-                        )
-                    }
-                }
-
-                preDownloadedSubtitleFolders.insert(folderKey)
-
-                // Release app SMB context before MPV opens its connection.
-                // libsmbclient uses process-global talloc state that corrupts
-                // when two contexts access the same server concurrently.
-                await smbClient.clearCache(for: source)
-                LoggingService.shared.logMediaSources("Cleared SMB context cache before playback")
-            }
-
-            // Construct video playback URL (pure string manipulation, no libsmbclient)
-            let playbackURL = try await smbClient.constructPlaybackURL(
-                for: mediaFile,
-                source: source,
-                password: password
-            )
-            let stream = Stream(url: playbackURL, resolution: nil, format: mediaFile.fileExtension)
-
-            // Build captions from pre-downloaded local files
-            var localCaptions: [Caption] = []
-            for subtitle in subtitleFiles {
-                if let subtitleFile = context.allFilesInFolder.first(where: { $0.url == subtitle.url }),
-                   let localURL = downloadedSubtitlesCache[subtitleFile.id] {
-                    localCaptions.append(Caption(
-                        label: subtitle.label,
-                        languageCode: subtitle.languageCode,
-                        url: localURL
-                    ))
-                    LoggingService.shared.info(
-                        "Using pre-downloaded subtitle: \(subtitleFile.name)",
-                        category: .general
-                    )
-                }
-            }
-
-            return (stream, localCaptions)
-
-        case .localFolder:
-            // Local folder - no auth needed, use file:// URLs directly
-            let stream = mediaFile.toStream(authHeaders: nil)
-            return (stream, subtitleFiles)
-        }
-    }
-
     /// Resolves stream and subtitles for a media source video by fetching folder contents on-demand.
     /// Works for all media source types (WebDAV, SMB, local folders) from any playback source
     /// (Media Browser, Continue Watching, etc.).
@@ -2688,7 +2558,6 @@ final class PlayerService {
     func setSettingsManager(_ manager: SettingsManager) {
         self.settingsManager = manager
         self.backendSwitcher.settingsManager = manager
-        self.nowPlayingService.settingsManager = manager
         // Reconfigure remote commands now that we have settings
         nowPlayingService.configureRemoteCommands()
         // Note: preferredBackendType is now computed directly from settingsManager
@@ -3182,10 +3051,6 @@ extension PlayerService: PlayerBackendDelegate {
         if !state.isBufferReady && !isLocalFile {
             state.bufferProgress = progress
         }
-    }
-
-    func backend(_ backend: any PlayerBackend, didEncounterError error: Error) {
-        delegate?.playerService(self, didEncounterError: error)
     }
 
     func backend(_ backend: any PlayerBackend, didUpdateVideoSize width: Int, height: Int) {

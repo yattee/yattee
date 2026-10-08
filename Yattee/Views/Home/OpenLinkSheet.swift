@@ -83,7 +83,6 @@ struct OpenLinkView: View {
 struct OpenLinkFormView: View {
     @Environment(\.appEnvironment) private var appEnvironment
 
-    let prefilledURL: URL?
     let onRequestDismiss: (() -> Void)?
 
     @State private var urlText: String
@@ -103,7 +102,6 @@ struct OpenLinkFormView: View {
     fileprivate static let maxURLs = 20
 
     init(prefilledURL: URL?, onRequestDismiss: (() -> Void)?) {
-        self.prefilledURL = prefilledURL
         self.onRequestDismiss = onRequestDismiss
         _urlText = State(initialValue: prefilledURL?.absoluteString ?? "")
     }

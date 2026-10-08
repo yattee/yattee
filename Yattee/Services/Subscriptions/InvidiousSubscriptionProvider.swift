@@ -18,7 +18,6 @@ final class InvidiousSubscriptionProvider: SubscriptionProvider {
     /// The account this provider is bound to. One provider per account, so two
     /// logins on the same instance never share a subscription cache.
     let account: Account
-    var context: DataContext { .account(account.id) }
 
     private let invidiousAPI: InvidiousAPI
     private let credentialsManager: InvidiousCredentialsManager
@@ -36,7 +35,6 @@ final class InvidiousSubscriptionProvider: SubscriptionProvider {
 
         accountsManager.recordServerOutcome(error, for: account)
     }
-    private let settingsManager: SettingsManager
 
     /// In-memory cache of subscribed channel IDs for fast lookup.
     private var cachedChannelIDs: Set<String> = []
@@ -60,7 +58,6 @@ final class InvidiousSubscriptionProvider: SubscriptionProvider {
         self.invidiousAPI = invidiousAPI
         self.credentialsManager = credentialsManager
         self.accountsManager = accountsManager
-        self.settingsManager = settingsManager
     }
 
     // MARK: - SubscriptionProvider

@@ -66,12 +66,6 @@ final class HTTPClientFactory: Sendable {
         makeClient(session: sessionFactory.session(allowInvalidCertificates: allowInvalidCertificates))
     }
 
-    /// Creates an HTTPClient with low network priority for background/prefetch work.
-    /// - Returns: An HTTPClient configured with `.background` network service type.
-    func createLowPriorityClient() -> HTTPClient {
-        makeClient(session: sessionFactory.lowPrioritySession())
-    }
-
     /// Builds the client with the current User-Agent baked in.
     ///
     /// Passed through the initializer rather than set afterwards: these clients

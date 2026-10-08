@@ -49,12 +49,6 @@ struct RetryState: Equatable, Sendable {
     let exhausted: Bool
 
     static let idle = RetryState(currentRetry: 0, maxRetries: 5, isRetrying: false, exhausted: false)
-
-    /// Text to display during retries (e.g., "Retrying... (1/5)").
-    var displayText: String? {
-        guard isRetrying, currentRetry > 0 else { return nil }
-        return String(localized: "player.retry.status \(currentRetry) \(maxRetries)")
-    }
 }
 
 /// Represents a queued video for playback.
@@ -441,12 +435,6 @@ final class PlayerState {
     /// Updated by MPV's cache-buffering-state property during initial buffering.
     /// nil when not buffering or when using AVPlayer backend.
     var bufferProgress: Int?
-
-    /// Whether the video is vertical (portrait orientation).
-    var isVerticalVideo: Bool {
-        guard let ratio = videoAspectRatio else { return false }
-        return ratio < 1.0
-    }
 
     /// Display aspect ratio for UI - falls back to 16:9 if unknown.
     var displayAspectRatio: Double {

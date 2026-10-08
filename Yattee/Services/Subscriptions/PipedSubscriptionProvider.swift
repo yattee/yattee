@@ -18,7 +18,6 @@ final class PipedSubscriptionProvider: SubscriptionProvider {
     /// The account this provider is bound to. One provider per account, so two
     /// logins on the same instance never share a subscription cache.
     let account: Account
-    var context: DataContext { .account(account.id) }
 
     private let pipedAPI: PipedAPI
     private let credentialsManager: PipedCredentialsManager
@@ -36,7 +35,6 @@ final class PipedSubscriptionProvider: SubscriptionProvider {
 
         accountsManager.recordServerOutcome(error, for: account)
     }
-    private let settingsManager: SettingsManager
 
     /// In-memory cache of subscribed channel IDs for fast lookup.
     private var cachedChannelIDs: Set<String> = []
@@ -60,7 +58,6 @@ final class PipedSubscriptionProvider: SubscriptionProvider {
         self.pipedAPI = pipedAPI
         self.credentialsManager = credentialsManager
         self.accountsManager = accountsManager
-        self.settingsManager = settingsManager
     }
 
     // MARK: - SubscriptionProvider

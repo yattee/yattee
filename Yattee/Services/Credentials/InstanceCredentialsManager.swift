@@ -13,10 +13,6 @@ import Foundation
 /// across different instance types (Invidious, Piped, etc.).
 @MainActor
 protocol InstanceCredentialsManager: AnyObject, Observable {
-    /// Set of instance IDs that are currently logged in.
-    /// Used for reactive UI updates when login state changes.
-    var loggedInInstanceIDs: Set<UUID> { get }
-
     /// Stores a credential (SID for Invidious, token for Piped) for an instance.
     /// - Parameters:
     ///   - credential: The credential value to store
@@ -36,9 +32,4 @@ protocol InstanceCredentialsManager: AnyObject, Observable {
     /// - Parameter instance: The instance to check
     /// - Returns: true if logged in, false otherwise
     func isLoggedIn(for instance: Instance) -> Bool
-
-    /// Refreshes the login status for an instance from the Keychain.
-    /// Call this when a view appears to ensure UI is in sync with stored state.
-    /// - Parameter instance: The instance to refresh status for
-    func refreshLoginStatus(for instance: Instance)
 }

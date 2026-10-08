@@ -104,12 +104,8 @@ final class MPVRenderView: UIView {
     private var renderWidth: GLint = 0
     private var renderHeight: GLint = 0
 
-    /// Last known stable size (for throttling resize events)
-    private var lastStableSize: CGSize = .zero
     /// Pending resize work item (for debouncing)
     private var pendingResizeWorkItem: DispatchWorkItem?
-    /// Minimum time between framebuffer recreations
-    private let resizeDebounceInterval: TimeInterval = 0.1
 
     /// Dedicated queue for OpenGL rendering (off main thread).
     private let renderQueue = DispatchQueue(label: "stream.yattee.mpv.render", qos: .userInteractive)
@@ -507,7 +503,6 @@ final class MPVRenderView: UIView {
 
         // Always recreate framebuffer immediately to ensure video is properly sized
         // This is important during rotation animations
-        lastStableSize = bounds.size
         renderQueue.sync {
             destroyFramebuffer()
             createFramebuffer()
@@ -565,7 +560,6 @@ final class MPVRenderView: UIView {
 
             // Create framebuffer only if view has valid bounds
             // (createFramebuffer makes the context current itself and unbinds on exit)
-            lastStableSize = bounds.size
             if bounds.size != .zero {
                 renderQueue.sync {
                     createFramebuffer()

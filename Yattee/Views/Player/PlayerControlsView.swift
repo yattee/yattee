@@ -45,9 +45,6 @@ struct PlayerControlsView: View {
     var isPanelPinned: Bool = false
     /// Corner layout: fullscreen button toggles the panels
     var isCornerLayout: Bool = false
-    /// Safe area padding from layout (when panel is pinned)
-    var layoutLeadingSafeArea: CGFloat = 0
-    var layoutTrailingSafeArea: CGFloat = 0
     var onToggleOrientationLock: (() -> Void)? = nil
     var isOrientationLocked: Bool = false
     var onToggleDetailsVisibility: (() -> Void)? = nil
@@ -140,11 +137,8 @@ struct PlayerControlsView: View {
     @State private var targetSeekProgress: Double = 0
     @State private var hideTimer: Timer?
     @State private var showControls: Bool?
-    @State private var isAdjustingVolume = false
-    @State private var isAdjustingBrightness = false
     /// Tracks brightness value for side slider (needed because UIScreen.main.brightness isn't observable)
     @State private var currentBrightness: Double = UIScreen.main.brightness
-    @State private var playNextTapCount = 0
     /// Track safe area to force re-render when it changes
     @State private var currentSafeArea: UIEdgeInsets = .zero
     /// Window hosting these controls, captured by `HostWindowReader`. Safe
@@ -440,9 +434,7 @@ struct PlayerControlsView: View {
             availableStreams: availableStreams,
             currentStream: currentStream,
             currentAudioStream: currentAudioStream,
-            embeddedAudioTracks: embeddedAudioTracks,
             embeddedSubtitleTracks: embeddedSubtitleTracks,
-            currentEmbeddedAudioTrackID: currentEmbeddedAudioTrackID,
             currentEmbeddedSubtitleTrackID: currentEmbeddedSubtitleTrackID,
             panscanValue: panscanValue,
             isPanscanAllowed: isPanscanAllowed,
@@ -1044,8 +1036,7 @@ struct PlayerControlsView: View {
                 storyboard: storyboard,
                 seekTime: seekTime,
                 storyboardService: StoryboardService.shared,
-                buttonBackground: activeLayout.globalSettings.buttonBackground,
-                theme: activeLayout.globalSettings.theme
+                buttonBackground: activeLayout.globalSettings.buttonBackground
             )
             .position(x: xPosition, y: yPosition)
             .transition(.opacity.combined(with: .scale(scale: 0.9)))
@@ -1212,10 +1203,8 @@ struct PlayerControlsView: View {
                     GestureSeekPreviewView(
                         storyboard: playerState.preferredStoryboard,
                         seekTime: seekGesturePreviewTime,
-                        duration: playerState.duration,
                         storyboardService: StoryboardService.shared,
                         buttonBackground: activeLayout.globalSettings.buttonBackground,
-                        theme: activeLayout.globalSettings.theme,
                         chapters: playerState.chapters,
                         isActive: isSeekGestureActive,
                         availableWidth: gestureGeometry.size.width

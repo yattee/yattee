@@ -236,16 +236,6 @@ final class InvidiousCredentialsManager: InstanceCredentialsManager {
         return hasSession
     }
 
-    /// Refreshes the logged-in status for an instance.
-    /// Call this when the view appears to ensure UI is in sync.
-    func refreshLoginStatus(for instance: Instance) {
-        if sid(for: instance) != nil {
-            loggedInInstanceIDs.insert(instance.id)
-        } else {
-            loggedInInstanceIDs.remove(instance.id)
-        }
-    }
-
     // MARK: - InstanceCredentialsManager Protocol
 
     /// Stores a credential (SID) for an Invidious instance.
@@ -270,7 +260,6 @@ final class InvidiousCredentialsManager: InstanceCredentialsManager {
 // MARK: - AccountCredentialsManager
 
 extension InvidiousCredentialsManager: AccountCredentialsManager {
-    var loggedInAccountIDs: Set<UUID> { accountCredentials.loggedInAccountIDs }
     var isScopeResolved: Bool { accountCredentials.isScopeResolved }
 
     func setCredential(_ credential: String, for account: Account) {

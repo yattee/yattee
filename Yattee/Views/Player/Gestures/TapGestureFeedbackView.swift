@@ -203,7 +203,6 @@ struct SeekFeedbackView: View {
                     // Ripple circles
                     ForEach(0..<3) { index in
                         SeekRipple(
-                            isForward: isForward,
                             delay: Double(index) * 0.1,
                             isActive: rippleCount > index
                         )
@@ -252,7 +251,6 @@ struct SeekFeedbackView: View {
 }
 
 private struct SeekRipple: View {
-    let isForward: Bool
     let delay: Double
     let isActive: Bool
 

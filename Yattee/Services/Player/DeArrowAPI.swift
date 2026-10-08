@@ -138,18 +138,6 @@ actor DeArrowAPI {
         }
     }
 
-    /// Returns the current thumbnail base URL.
-    nonisolated func currentThumbnailBaseURL() -> URL {
-        // Note: This returns the default URL when called from nonisolated context.
-        // For dynamic URL access, use the async version.
-        Self.defaultThumbnailURL
-    }
-
-    /// Returns the current thumbnail base URL (async version for isolation).
-    func getThumbnailBaseURL() -> URL {
-        thumbnailBaseURL
-    }
-
     /// Fetches branding data for a YouTube video.
     /// - Parameter videoID: The YouTube video ID.
     /// - Returns: The branding data, or nil if not available.
@@ -211,19 +199,6 @@ actor DeArrowAPI {
     /// - Returns: The thumbnail URL.
     func thumbnailURL(for videoID: String, timestamp: Double? = nil) -> URL {
         var components = URLComponents(url: thumbnailBaseURL, resolvingAgainstBaseURL: false)!
-        components.path = "/api/v1/getThumbnail"
-        var queryItems = [URLQueryItem(name: "videoID", value: videoID)]
-        if let timestamp {
-            queryItems.append(URLQueryItem(name: "time", value: String(format: "%.2f", timestamp)))
-        }
-        components.queryItems = queryItems
-        return components.url!
-    }
-
-    /// Generates a thumbnail URL using the default thumbnail base URL.
-    /// Use this when you need a URL synchronously without actor isolation.
-    nonisolated static func defaultThumbnailURL(for videoID: String, timestamp: Double? = nil) -> URL {
-        var components = URLComponents(url: defaultThumbnailURL, resolvingAgainstBaseURL: false)!
         components.path = "/api/v1/getThumbnail"
         var queryItems = [URLQueryItem(name: "videoID", value: videoID)]
         if let timestamp {

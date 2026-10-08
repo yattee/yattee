@@ -9,40 +9,6 @@ import Foundation
 import AVFoundation
 import SwiftUI
 
-#if os(iOS) || os(tvOS)
-import UIKit
-#elseif os(macOS)
-import AppKit
-#endif
-
-// MARK: - Backend State
-
-/// Captured state for backend switching.
-struct BackendState: Sendable {
-    let currentTime: TimeInterval
-    let duration: TimeInterval
-    let rate: Float
-    let volume: Float
-    let isMuted: Bool
-    let isPlaying: Bool
-
-    init(
-        currentTime: TimeInterval = 0,
-        duration: TimeInterval = 0,
-        rate: Float = 1.0,
-        volume: Float = 1.0,
-        isMuted: Bool = false,
-        isPlaying: Bool = false
-    ) {
-        self.currentTime = currentTime
-        self.duration = duration
-        self.rate = rate
-        self.volume = volume
-        self.isMuted = isMuted
-        self.isPlaying = isPlaying
-    }
-}
-
 // MARK: - Stream Format
 
 /// Stream format categories for backend compatibility.
@@ -56,12 +22,6 @@ enum StreamFormat: String, CaseIterable, Sendable {
     case audioAAC      // AAC audio
     case audioOpus     // Opus audio
     case audioMP3      // MP3 audio
-
-    /// Whether MPV can play this format.
-    var isMPVCompatible: Bool {
-        // MPV supports all formats
-        true
-    }
 
     /// Detect format from stream properties.
     static func detect(from stream: Stream) -> StreamFormat {
@@ -148,7 +108,6 @@ protocol PlayerBackendDelegate: AnyObject {
     func backend(_ backend: any PlayerBackend, didChangeState state: PlaybackState)
     func backend(_ backend: any PlayerBackend, didUpdateBufferedTime time: TimeInterval)
     func backend(_ backend: any PlayerBackend, didUpdateBufferProgress progress: Int)
-    func backend(_ backend: any PlayerBackend, didEncounterError error: Error)
     func backend(_ backend: any PlayerBackend, didUpdateVideoSize width: Int, height: Int)
     func backend(_ backend: any PlayerBackend, didUpdateRetryState currentRetry: Int, maxRetries: Int, isRetrying: Bool, exhausted: Bool)
     func backend(_ backend: any PlayerBackend, didRequestStreamRefresh atTime: TimeInterval?)
@@ -169,21 +128,6 @@ protocol PlayerBackend: AnyObject {
     /// Delegate for callbacks.
     var delegate: PlayerBackendDelegate? { get set }
 
-    /// Current playback time in seconds.
-    var currentTime: TimeInterval { get }
-
-    /// Total duration in seconds.
-    var duration: TimeInterval { get }
-
-    /// Buffered time in seconds.
-    var bufferedTime: TimeInterval { get }
-
-    /// Whether the backend is ready to play.
-    var isReady: Bool { get }
-
-    /// Whether playback is currently active.
-    var isPlaying: Bool { get }
-
     /// Current playback rate (1.0 = normal).
     var rate: Float { get set }
 
@@ -192,9 +136,6 @@ protocol PlayerBackend: AnyObject {
 
     /// Whether audio is muted.
     var isMuted: Bool { get set }
-
-    /// Formats this backend can play.
-    var supportedFormats: Set<StreamFormat> { get }
 
     // MARK: - Playback Control
 
@@ -226,27 +167,6 @@ protocol PlayerBackend: AnyObject {
     /// preventing a flash of the video at position 0 before jumping to resume position.
     func prepareForInitialSeek()
 
-    // MARK: - Backend Switching
-
-    /// Capture current state for switching.
-    func captureState() -> BackendState
-
-    /// Restore state after switching.
-    func restore(state: BackendState) async
-
-    /// Prepare for handoff to another backend.
-    func prepareForHandoff()
-
-    // MARK: - View
-
-    #if os(iOS) || os(tvOS)
-    /// The view displaying video content (UIKit).
-    var playerView: UIView? { get }
-    #elseif os(macOS)
-    /// The view displaying video content (AppKit).
-    var playerView: NSView? { get }
-    #endif
-
     // MARK: - Background Playback
 
     /// Handle scene phase changes for background playback.
@@ -261,24 +181,6 @@ protocol PlayerBackend: AnyObject {
 // MARK: - Default Implementations
 
 extension PlayerBackend {
-    /// Check if this backend can play a given stream.
-    func canPlay(stream: Stream) -> Bool {
-        let format = StreamFormat.detect(from: stream)
-        return supportedFormats.contains(format)
-    }
-
-    /// Capture current state with all properties.
-    func captureState() -> BackendState {
-        BackendState(
-            currentTime: currentTime,
-            duration: duration,
-            rate: rate,
-            volume: volume,
-            isMuted: isMuted,
-            isPlaying: isPlaying
-        )
-    }
-
     /// Default implementation does nothing.
     func handleScenePhase(_ phase: ScenePhase, isPiPActive: Bool) {
         // No-op by default

@@ -13,9 +13,6 @@ import NukeUI
 extension ExpandedPlayerSheet {
     // MARK: - Layout Constants
 
-    /// Minimum width required to show widescreen layout with floating panel.
-    static let minWidthForWidescreen: CGFloat = 700
-
     /// Minimum width required for the corner layout; below this the corner
     /// preset setting falls back to the stacked widescreen layout (Split View,
     /// narrow windows).
@@ -96,91 +93,6 @@ extension ExpandedPlayerSheet {
             && size.width >= Self.minWidthForCornerLayout
             && isWideScreenLayout(size: size)
     }
-    #endif
-
-    // MARK: - Download Action Handler
-
-    #if !os(tvOS)
-    /// Handles download button action based on current state.
-    func handleDownloadAction(for video: Video) {
-        let isDownloaded = downloadManager?.isDownloaded(video.id) ?? false
-        let download = downloadManager?.download(for: video.id)
-        let isDownloading = download?.status == .downloading || download?.status == .queued
-
-        if isDownloading, let download {
-            Task {
-                await downloadManager?.cancel(download)
-            }
-        } else if isDownloaded {
-            showingDeleteDownloadAlert = true
-        } else {
-            startDownload(for: video)
-        }
-    }
-
-    /// Starts a download either automatically or by showing the quality sheet.
-    private func startDownload(for video: Video) {
-        guard let appEnvironment else {
-            presentDownloadOptions()
-            return
-        }
-
-        // Media source videos (SMB/WebDAV/local) use direct file URLs - no API call needed
-        if video.isFromMediaSource {
-            Task {
-                do {
-                    try await appEnvironment.downloadManager.autoEnqueueMediaSource(
-                        video,
-                        mediaSourcesManager: appEnvironment.mediaSourcesManager,
-                        webDAVClient: appEnvironment.webDAVClient,
-                        smbClient: appEnvironment.smbClient
-                    )
-                } catch {
-                    appEnvironment.toastManager.show(
-                        category: .error,
-                        title: String(localized: "download.error.title"),
-                        subtitle: error.localizedDescription,
-                        icon: "exclamationmark.triangle",
-                        iconColor: .red
-                    )
-                }
-            }
-            return
-        }
-
-        let downloadSettings = appEnvironment.downloadSettings
-
-        // Check if auto-download mode
-        if downloadSettings.preferredDownloadQuality != .ask,
-           let instance = appEnvironment.instancesManager.instance(for: video) {
-            Task {
-                do {
-                    try await appEnvironment.downloadManager.autoEnqueue(
-                        video,
-                        preferredQuality: downloadSettings.preferredDownloadQuality,
-                        preferredAudioLanguage: appEnvironment.settingsManager.preferredAudioLanguage,
-                        preferredSubtitlesLanguage: appEnvironment.settingsManager.preferredSubtitlesLanguage,
-                        includeSubtitles: downloadSettings.includeSubtitlesInAutoDownload,
-                        contentService: appEnvironment.contentService,
-                        instance: instance
-                    )
-                } catch {
-                    appEnvironment.toastManager.show(
-                        category: .error,
-                        title: String(localized: "download.error.title"),
-                        subtitle: error.localizedDescription,
-                        icon: "exclamationmark.triangle",
-                        iconColor: .red
-                    )
-                }
-            }
-        } else {
-            presentDownloadOptions()
-        }
-    }
-    #else
-    /// No-op on tvOS.
-    func handleDownloadAction(for video: Video) {}
     #endif
 
     // MARK: - Standard/Portrait Layout
@@ -766,20 +678,6 @@ extension ExpandedPlayerSheet {
         }
         navigationCoordinator?.isPortraitPanelVisible = newValue
         appEnvironment?.settingsManager.portraitDetailsPanelLastVisible = newValue
-    }
-
-    /// Hide floating panel with animation
-    private func hideFloatingPanel() {
-        withAnimation(.easeInOut(duration: 0.3)) {
-            isPortraitPanelVisible = false
-        }
-        navigationCoordinator?.isPortraitPanelVisible = false
-        appEnvironment?.settingsManager.portraitDetailsPanelLastVisible = false
-
-        // Reset main window transform when hiding panel to fix safe area clipping (iOS only)
-        #if os(iOS)
-        ExpandedPlayerWindowManager.shared.resetMainWindowImmediate()
-        #endif
     }
 
     // MARK: - Portrait Player Area
@@ -1688,8 +1586,6 @@ extension ExpandedPlayerSheet {
                     panelSide: panelSide,
                     isPanelPinned: isPanelPinned,
                     isCornerLayout: appEnvironment?.navigationCoordinator.isCornerLayoutActive == true,
-                    layoutLeadingSafeArea: 0.01, // Non-zero indicates safe areas handled externally
-                    layoutTrailingSafeArea: 0.01,
                     onToggleOrientationLock: { [weak appEnvironment] in
                         appEnvironment?.settingsManager.inAppOrientationLock.toggle()
                     },

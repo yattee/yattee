@@ -113,7 +113,6 @@ func makeGridColumns(count: Int) -> [GridItem] {
 /// // Then use:
 /// // gridConfig.effectiveColumns - actual column count
 /// // gridConfig.isCompactCards - whether to use compact card styling
-/// // gridConfig.columns - GridItem array for LazyVGrid
 /// // gridConfig.maxColumns - for ViewOptionsSheet
 /// ```
 struct GridLayoutConfiguration {
@@ -133,10 +132,5 @@ struct GridLayoutConfiguration {
     /// Whether cards should use compact styling (3+ columns).
     var isCompactCards: Bool {
         effectiveColumns >= GridConstants.compactThreshold
-    }
-
-    /// GridItem array for LazyVGrid columns parameter.
-    var columns: [GridItem] {
-        makeGridColumns(count: effectiveColumns)
     }
 }

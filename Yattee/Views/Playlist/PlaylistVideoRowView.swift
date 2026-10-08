@@ -38,18 +38,6 @@ struct PlaylistVideoRowView: View {
     }
 }
 
-// MARK: - Convenience Initializers
-
-extension PlaylistVideoRowView {
-    /// Initialize from a LocalPlaylistItem model.
-    init(item: LocalPlaylistItem, index: Int, watchProgress: Double? = nil, onRemove: @escaping () -> Void) {
-        self.index = index
-        self.video = item.toVideo()
-        self.watchProgress = watchProgress
-        self.onRemove = onRemove
-    }
-}
-
 // MARK: - Preview
 
 #Preview {

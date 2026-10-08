@@ -167,7 +167,6 @@ private final class WebDAVResponseParser: NSObject, XMLParserDelegate {
 
     private var files: [MediaFile] = []
     private var currentResponse: ResponseData?
-    private var currentElement: String = ""
     private var currentText: String = ""
 
     // Temporary storage for current response properties
@@ -209,7 +208,6 @@ private final class WebDAVResponseParser: NSObject, XMLParserDelegate {
         qualifiedName: String?,
         attributes: [String: String]
     ) {
-        currentElement = elementName
         currentText = ""
 
         if elementName == "response" {

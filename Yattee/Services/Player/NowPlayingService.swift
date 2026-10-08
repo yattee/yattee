@@ -37,7 +37,6 @@ final class NowPlayingService {
 
     weak var playerService: PlayerService?
     weak var deArrowBrandingProvider: DeArrowBrandingProvider?
-    weak var settingsManager: SettingsManager?
     weak var playerControlsLayoutService: PlayerControlsLayoutService?
 
     // MARK: - Initialization

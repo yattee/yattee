@@ -313,11 +313,6 @@ extension LoggingService {
         self.error(message, category: .downloads, details: error?.localizedDescription)
     }
 
-    /// Log a notification event.
-    nonisolated func logNotification(_ message: String, details: String? = nil) {
-        info(message, category: .notifications, details: details)
-    }
-
     /// Log a notification error.
     nonisolated func logNotificationError(_ message: String, error: Error? = nil) {
         self.error(message, category: .notifications, details: error?.localizedDescription)

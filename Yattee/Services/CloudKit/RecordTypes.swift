@@ -109,29 +109,6 @@ enum SyncableRecordType: Sendable {
     case dataContext
     case accountDeletion(accountID: UUID)
 
-    /// The CloudKit record type name.
-    var recordTypeName: String {
-        switch self {
-        case .subscription: RecordType.subscription
-        case .watchEntry: RecordType.watchEntry
-        case .bookmark: RecordType.bookmark
-        case .localPlaylist: RecordType.localPlaylist
-        case .localPlaylistItem: RecordType.localPlaylistItem
-        case .searchHistory: RecordType.searchHistory
-        case .recentChannel: RecordType.recentChannel
-        case .recentPlaylist: RecordType.recentPlaylist
-        case .appSettings: RecordType.appSettings
-        case .instance: RecordType.instance
-        case .mediaSource: RecordType.mediaSource
-        case .channelNotificationSettings: RecordType.channelNotificationSettings
-        case .controlsPreset: RecordType.controlsPreset
-        case .account: RecordType.account
-        case .legacyAccountMigration: RecordType.legacyAccountMigration
-        case .dataContext: RecordType.dataContext
-        case .accountDeletion: RecordType.accountDeletion
-        }
-    }
-
     /// CloudKit rejects record names longer than this with a fatal
     /// `CKException` at `CKRecord.ID` construction time.
     static let maxRecordNameLength = 255
@@ -288,24 +265,5 @@ enum AccountRecordName {
             || recordName.hasPrefix(accountDeletionPrefix)
             || recordName.hasPrefix(legacyMigrationPrefix)
             || recordName.hasPrefix(accountPrefix)
-    }
-}
-
-/// Sync operation type.
-enum SyncOperation: Sendable {
-    case save
-    case delete
-}
-
-/// Pending sync change to be uploaded to CloudKit.
-struct PendingSyncChange: Sendable {
-    let recordType: SyncableRecordType
-    let operation: SyncOperation
-    let timestamp: Date
-    
-    init(recordType: SyncableRecordType, operation: SyncOperation) {
-        self.recordType = recordType
-        self.operation = operation
-        self.timestamp = Date()
     }
 }

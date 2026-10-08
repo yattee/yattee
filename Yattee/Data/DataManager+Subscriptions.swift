@@ -43,61 +43,6 @@ extension DataManager {
         }
     }
 
-    /// Subscribes to a channel from an Author.
-    /// - Parameters:
-    ///   - author: The author/channel to subscribe to.
-    ///   - source: The content source (YouTube or PeerTube).
-    func subscribe(to author: Author, source: ContentSource) {
-        let channelID = author.id
-        let descriptor = FetchDescriptor<Subscription>(
-            predicate: #Predicate { $0.channelID == channelID }
-        )
-
-        do {
-            let existing = try modelContext.fetch(descriptor)
-            guard existing.isEmpty else {
-                return
-            }
-
-            let sourceRaw: String
-            var instanceURL: String?
-
-            switch source {
-            case .global:
-                sourceRaw = "global"
-            case .federated(_, let instance):
-                sourceRaw = "federated"
-                instanceURL = instance.absoluteString
-            case .extracted:
-                // Extracted sources don't support subscriptions
-                return
-            }
-
-            let subscription = Subscription(
-                channelID: channelID,
-                sourceRawValue: sourceRaw,
-                instanceURLString: instanceURL,
-                name: author.name,
-                subscriberCount: author.subscriberCount,
-                avatarURLString: author.thumbnailURL?.absoluteString
-            )
-            modelContext.insert(subscription)
-            save()
-            
-            // Queue for CloudKit sync
-            cloudKitSync?.queueSubscriptionSave(subscription)
-            
-            let change = SubscriptionChange(addedSubscriptions: [subscription], removedChannelIDs: [])
-            NotificationCenter.default.post(
-                name: .subscriptionsDidChange,
-                object: nil,
-                userInfo: [SubscriptionChange.userInfoKey: change]
-            )
-        } catch {
-            LoggingService.shared.logCloudKitError("Failed to subscribe", error: error)
-        }
-    }
-
     /// Unsubscribes from a channel.
     func unsubscribe(from channelID: String) {
         let descriptor = FetchDescriptor<Subscription>(
@@ -134,42 +79,6 @@ extension DataManager {
             )
         } catch {
             LoggingService.shared.logCloudKitError("Failed to unsubscribe", error: error)
-        }
-    }
-
-    /// Bulk adds subscriptions from channel data (for testing).
-    func bulkAddSubscriptions(_ channels: [(id: String, name: String)]) {
-        var addedCount = 0
-
-        for channel in channels {
-            let channelID = channel.id
-            let descriptor = FetchDescriptor<Subscription>(
-                predicate: #Predicate { $0.channelID == channelID }
-            )
-
-            do {
-                let existing = try modelContext.fetch(descriptor)
-                guard existing.isEmpty else {
-                    continue
-                }
-
-                let subscription = Subscription(
-                    channelID: channel.id,
-                    sourceRawValue: "youtube",
-                    instanceURLString: nil,
-                    name: channel.name
-                )
-                modelContext.insert(subscription)
-                addedCount += 1
-            } catch {
-                continue
-            }
-        }
-
-        if addedCount > 0 {
-            save()
-            SubscriptionFeedCache.shared.invalidate()
-            LoggingService.shared.info("Bulk added \(addedCount) subscriptions", category: .general)
         }
     }
 
@@ -255,40 +164,6 @@ extension DataManager {
     func deleteSubscription(_ subscription: Subscription) {
         modelContext.delete(subscription)
         // Note: caller is responsible for calling save() after batch operations
-    }
-
-    /// Removes subscriptions matching the given channel IDs.
-    func removeSubscriptions(matching channelIDs: Set<String>) {
-        let allSubscriptions = subscriptions()
-        var removedCount = 0
-        var deleteInfo: [(channelID: String, scope: SourceScope)] = []
-
-        for subscription in allSubscriptions {
-            if channelIDs.contains(subscription.channelID) {
-                // Capture scope before deleting
-                let scope = SourceScope.from(
-                    sourceRawValue: subscription.sourceRawValue,
-                    globalProvider: subscription.providerName,
-                    instanceURLString: subscription.instanceURLString,
-                    externalExtractor: nil
-                )
-                deleteInfo.append((subscription.channelID, scope))
-                modelContext.delete(subscription)
-                removedCount += 1
-            }
-        }
-
-        if removedCount > 0 {
-            save()
-
-            // Queue CloudKit deletions
-            for info in deleteInfo {
-                cloudKitSync?.queueSubscriptionDelete(channelID: info.channelID, scope: info.scope)
-            }
-
-            SubscriptionFeedCache.shared.invalidate()
-            LoggingService.shared.info("Removed \(removedCount) test subscriptions", category: .general)
-        }
     }
 
     /// Deletes all locally stored subscriptions, including their iCloud copies.

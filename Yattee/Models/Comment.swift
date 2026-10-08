@@ -94,6 +94,4 @@ struct CommentsPage: Sendable {
     /// Continuation token for loading more comments. Nil if no more pages.
     let continuation: String?
 
-    /// Whether there are more comments to load.
-    var hasMore: Bool { continuation != nil }
 }

@@ -26,12 +26,6 @@ enum IntegrationTestConstants {
     /// Rick Astley's channel ID.
     static let testChannelID = "UCuAXFkgsw1L7xaCfnd5JJOw"
 
-    /// A popular music playlist ID.
-    static let testPlaylistID = "PLrAXtmErZgOeiKm4sgNOknGvNjby9efdf"
-
     /// A stable search query.
     static let testSearchQuery = "never gonna give you up"
-
-    /// Timeout for network requests (30 seconds).
-    static let networkTimeout: TimeInterval = 30
 }

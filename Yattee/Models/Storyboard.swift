@@ -170,15 +170,6 @@ extension Storyboard {
 // MARK: - Storyboard Selection
 
 extension Array where Element == Storyboard {
-    /// Selects the preferred storyboard based on desired width.
-    /// Prefers the largest storyboard that doesn't exceed maxWidth.
-    /// - Parameter maxWidth: Maximum preferred width (default 160)
-    /// - Returns: Best matching storyboard, or nil if array is empty
-    func preferred(maxWidth: Int = 160) -> Storyboard? {
-        let suitable = filter { $0.width <= maxWidth }
-        return suitable.max(by: { $0.width < $1.width }) ?? first
-    }
-
     /// Returns the highest quality storyboard (largest width).
     func highest() -> Storyboard? {
         self.max(by: { $0.width < $1.width })

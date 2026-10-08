@@ -187,14 +187,12 @@ private final class DragToDismissGestureHandler: NSObject, UIGestureRecognizerDe
     // Main window scaling callbacks (Apple Music-style effect)
     var onMainWindowScaleChanged: ((CGFloat) -> Void)?
     var onMainWindowScaleAnimated: ((CGFloat) -> Void)?  // Animated scale to progress
-    var onMainWindowScaleReset: ((Bool) -> Void)? // Bool = animated
 
     private let dismissThreshold: CGFloat = 100
     private var isDismissing = false
     private var scrollViewAtTop = false
     private weak var trackedScrollView: UIScrollView?
     private var scrollObservation: NSKeyValueObservation?
-    private var originalBackgroundColor: UIColor?
 
     // Panscan gesture state
     private var basePanscan: Double = 0.0
@@ -632,12 +630,6 @@ final class ExpandedPlayerWindowManager {
         return window
     }
 
-    /// The view to apply transforms to (first subview of main window)
-    /// Note: For actual transformations, use scaledPresentingView which caches the reference
-    private var presentingView: UIView? {
-        mainWindow?.subviews.first
-    }
-
     /// Applies scale and corner radius to main window based on progress (0 = normal, 1 = fully scaled)
     func scaleMainWindow(progress: CGFloat) {
         // Capture the presenting view reference on first call
@@ -686,18 +678,6 @@ final class ExpandedPlayerWindowManager {
                 .scaledBy(x: scale, y: scale)
                 .translatedBy(x: 0, y: offsetY)
             presentingView.layer.cornerRadius = cornerRadius
-        }
-    }
-
-    /// Resets main window to normal state with animation
-    func resetMainWindowAnimated(duration: TimeInterval = 0.3) {
-        let view = scaledPresentingView ?? mainWindow?.subviews.first
-        UIView.animate(withDuration: duration) {
-            view?.layer.cornerRadius = 0
-            view?.transform = .identity
-        } completion: { [weak self] _ in
-            view?.layer.masksToBounds = false
-            self?.scaledPresentingView = nil
         }
     }
 
@@ -762,10 +742,6 @@ final class ExpandedPlayerWindowManager {
             }
             LoggingService.shared.logPlayer("[WindowScale] handleRotationDuringSession: rotation settled, re-applied scale")
         }
-    }
-
-    var isPresented: Bool {
-        expandedWindow != nil
     }
 
     func show(with appEnvironment: AppEnvironment, animated: Bool = true) {

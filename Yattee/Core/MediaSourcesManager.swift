@@ -89,11 +89,6 @@ final class MediaSourcesManager {
         }
     }
 
-    /// Sets the settings manager reference (for dependency injection after init).
-    func configure(settingsManager: SettingsManager) {
-        self.settingsManager = settingsManager
-    }
-
     /// Sets the data manager reference (for cleanup when sources are deleted).
     func setDataManager(_ manager: DataManager) {
         self.dataManager = manager
@@ -344,51 +339,6 @@ final class MediaSourcesManager {
         passwordStoredSourceIDs.remove(source.id)
     }
 
-    // MARK: - Bookmarks (Local Folders)
-
-    /// Updates the bookmark data for a local folder source.
-    func updateBookmark(_ bookmarkData: Data, for source: MediaSource) {
-        if let index = sources.firstIndex(where: { $0.id == source.id }) {
-            var updated = sources[index]
-            updated.bookmarkData = bookmarkData
-            sources[index] = updated
-            saveSources()
-        }
-    }
-
-    /// Resolves and accesses a local folder source.
-    /// - Parameter source: The local folder source.
-    /// - Returns: The resolved URL, or nil if bookmark resolution failed.
-    func resolveLocalFolderURL(for source: MediaSource) -> URL? {
-        guard source.type == .localFolder,
-              let bookmarkData = source.bookmarkData else {
-            return source.url
-        }
-
-        var isStale = false
-
-        #if os(macOS)
-        let options: URL.BookmarkResolutionOptions = [.withSecurityScope]
-        #else
-        let options: URL.BookmarkResolutionOptions = []
-        #endif
-
-        do {
-            let url = try URL(
-                resolvingBookmarkData: bookmarkData,
-                options: options,
-                relativeTo: nil,
-                bookmarkDataIsStale: &isStale
-            )
-
-            // If bookmark is stale, we should re-create it
-            // but we can't do that without user interaction
-            return url
-        } catch {
-            return nil
-        }
-    }
-
     // MARK: - iCloud Sync
 
     /// Whether iCloud sync is enabled and media sources sync is enabled.
@@ -499,19 +449,5 @@ final class MediaSourcesManager {
 
         // Synchronize to get latest values
         ubiquitousStore.synchronize()
-    }
-}
-
-// MARK: - Preview Support
-
-extension MediaSourcesManager {
-    /// Preview manager with sample data.
-    static var preview: MediaSourcesManager {
-        let manager = MediaSourcesManager()
-        manager.sources = [
-            .webdav(name: "My NAS", url: URL(string: "https://nas.local:5006")!, username: "user"),
-            .localFolder(name: "Downloads", url: URL(fileURLWithPath: "/Users/user/Downloads"))
-        ]
-        return manager
     }
 }

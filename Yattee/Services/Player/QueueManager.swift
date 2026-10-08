@@ -283,20 +283,10 @@ final class QueueManager {
         playerService?.openVideo(videoToPlay)
     }
 
-    /// Clears the media browser context when switching to a different queue source.
-    func clearMediaBrowserContext() {
-        mediaBrowserContext = nil
-    }
-
     /// Whether there are more items that can be loaded from the queue source.
     func hasMoreItems() -> Bool {
         guard let source = currentQueueSource else { return false }
         return source.supportsContinuation
-    }
-
-    /// Sets the queue source for continuation loading.
-    func setQueueSource(_ source: QueueSource?) {
-        currentQueueSource = source
     }
 
     // MARK: - Proactive Continuation Loading

@@ -59,7 +59,6 @@ struct MPVRenderHealth {
     var draws: UInt64
     var skips: UInt64
     var droppedDraws: UInt64
-    var lastDrawAge: TimeInterval?
 }
 
 // MARK: - MPVOpenGLLayer
@@ -113,7 +112,6 @@ final class MPVOpenGLLayer: CAOpenGLLayer {
     private var successfulDrawCount: UInt64 = 0
     private var skipRenderCount: UInt64 = 0
     private var droppedDrawCount: UInt64 = 0
-    private var lastSuccessfulDrawTime: CFTimeInterval?
     private var skipsSinceLastDraw: UInt64 = 0
     private let renderHealthLock = NSLock()
 
@@ -377,7 +375,6 @@ final class MPVOpenGLLayer: CAOpenGLLayer {
         renderHealthLock.withLock {
             successfulDrawCount += 1
             skipsSinceLastDraw = 0
-            lastSuccessfulDrawTime = CACurrentMediaTime()
         }
 
         // Clear the buffer
@@ -699,8 +696,7 @@ final class MPVOpenGLLayer: CAOpenGLLayer {
             MPVRenderHealth(
                 draws: successfulDrawCount,
                 skips: skipRenderCount,
-                droppedDraws: droppedDrawCount,
-                lastDrawAge: lastSuccessfulDrawTime.map { CACurrentMediaTime() - $0 }
+                droppedDraws: droppedDrawCount
             )
         }
     }

@@ -50,12 +50,9 @@ enum DetectionError: Error, Sendable {
 /// Result of instance detection including type and authentication requirements.
 struct InstanceDetectionResult: Sendable {
     let type: InstanceType
-    /// Whether this instance requires authentication (Basic Auth for Yattee Server).
-    let requiresAuth: Bool
 
     init(type: InstanceType, requiresAuth: Bool = false) {
         self.type = type
-        self.requiresAuth = requiresAuth
     }
 }
 
@@ -65,27 +62,6 @@ actor InstanceDetector {
 
     init(httpClient: HTTPClient) {
         self.httpClient = httpClient
-    }
-
-    /// Detects the instance type for a given URL.
-    /// - Parameter url: The base URL of the instance.
-    /// - Returns: The detected instance type, or nil if detection failed.
-    func detect(url: URL) async -> InstanceType? {
-        let result = await detectWithAuth(url: url)
-        return result?.type
-    }
-
-    /// Detects the instance type and authentication requirements for a given URL.
-    /// - Parameter url: The base URL of the instance.
-    /// - Returns: The detection result including type and auth requirements, or nil if detection failed.
-    func detectWithAuth(url: URL) async -> InstanceDetectionResult? {
-        let result = await detectWithResult(url: url)
-        switch result {
-        case .success(let detectionResult):
-            return detectionResult
-        case .failure:
-            return nil
-        }
     }
 
     /// Detects the instance type with detailed error reporting.

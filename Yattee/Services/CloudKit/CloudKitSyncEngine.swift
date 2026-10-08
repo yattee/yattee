@@ -1225,21 +1225,6 @@ final class CloudKitSyncEngine: @unchecked Sendable {
         LoggingService.shared.logCloudKit("Queued channel notification settings save: \(settings.channelID)")
     }
 
-    /// Queue channel notification settings deletion for sync (debounced).
-    func queueChannelNotificationSettingsDelete(channelID: String, scope: SourceScope) {
-        guard canSyncSubscriptions else { return }
-
-        let recordID = SyncableRecordType.channelNotificationSettings(channelID: channelID, scope: scope).recordID(in: zone)
-        addPendingChanges([.deleteRecord(recordID)])
-        LoggingService.shared.logCloudKit("Queued channel notification settings delete: \(channelID)")
-    }
-    
-    /// Upload all existing channel notification settings to CloudKit (for initial sync).
-    func uploadAllLocalChannelNotificationSettings() async {
-        guard enqueueAllLocalChannelNotificationSettings() else { return }
-        await sync()
-    }
-
     /// Registers all channel notification settings for upload without sending.
     /// - Returns: whether anything was registered.
     @discardableResult

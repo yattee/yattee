@@ -77,9 +77,4 @@ actor GitHubAPI {
             throw APIError.decodingError(error)
         }
     }
-
-    /// Clears the cache.
-    func clearCache() {
-        contributorsCache = nil
-    }
 }

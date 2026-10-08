@@ -12,7 +12,6 @@ import SwiftUI
 /// A view modifier that applies the controls theme color scheme to preview.
 struct PreviewThemeModifier: ViewModifier {
     let theme: ControlsTheme
-    @Environment(\.colorScheme) private var systemColorScheme
 
     func body(content: Content) -> some View {
         if let forcedScheme = theme.colorScheme {

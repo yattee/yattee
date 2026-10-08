@@ -215,22 +215,6 @@ enum SidebarItem: Hashable, Identifiable {
 
     // MARK: - Item Categories
 
-    /// Whether this is a fixed navigation item (always visible).
-    var isFixedNavigation: Bool {
-        switch self {
-        case .home, .search, .sources, .settings, .nowPlaying, .openURL, .remoteControl:
-            return true
-        default:
-            return false
-        }
-    }
-
-    /// Whether this is a dynamic channel item.
-    var isChannel: Bool {
-        if case .channel = self { return true }
-        return false
-    }
-
     /// Whether this is a dynamic playlist item.
     var isPlaylist: Bool {
         switch self {

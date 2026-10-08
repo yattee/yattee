@@ -377,25 +377,6 @@ final class SubscriptionService {
         }
     }
 
-    /// Refreshes the subscription cache from the current provider.
-    func refreshCache() async throws {
-        guard let provider = readProvider else {
-            throw SubscriptionError.providerNotAvailable
-        }
-
-        isLoading = true
-        lastError = nil
-
-        do {
-            try await provider.refreshCache()
-            isLoading = false
-        } catch {
-            lastError = error
-            isLoading = false
-            throw error
-        }
-    }
-
     // MARK: - Import
 
     /// Imports parsed external subscriptions (YouTube CSV / OPML) into the active account.

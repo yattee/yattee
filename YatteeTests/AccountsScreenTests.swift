@@ -231,7 +231,6 @@ private final class DeletionOrderStore: AccountCredentialsManager {
         self.accountsManager = accountsManager
     }
 
-    var loggedInAccountIDs: Set<UUID> { [] }
     var isScopeResolved: Bool { true }
 
     func setCredential(_: String, for _: Account) {}
@@ -245,7 +244,6 @@ private final class DeletionOrderStore: AccountCredentialsManager {
 
     func migrateCredential(forAccountID _: UUID, fromScope _: String) -> Bool { true }
     func deleteCredential(forAccountID _: UUID, inScope _: String) -> Bool { true }
-    func resyncCredentialsWithCurrentSetting() {}
     func setUsername(_: String, for _: Account) {}
     func username(for _: Account) -> String? { nil }
     func isLoggedIn(for _: Account) -> Bool { false }

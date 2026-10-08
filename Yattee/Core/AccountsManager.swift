@@ -161,11 +161,6 @@ final class AccountsManager {
         }
     }
 
-    func setInstancesManager(_ manager: InstancesManager) {
-        instancesManager = manager
-        reconcileLegacyAccounts()
-    }
-
     // MARK: - Lookup
 
     func account(id: UUID) -> Account? {

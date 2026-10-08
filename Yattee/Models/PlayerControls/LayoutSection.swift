@@ -34,35 +34,10 @@ struct LayoutSection: Codable, Hashable, Sendable {
         buttons.append(button)
     }
 
-    /// Adds a button with the given type to the end of the section.
-    /// - Parameter type: The button type to add with default configuration.
-    mutating func add(buttonType type: ControlButtonType) {
-        buttons.append(.defaultConfiguration(for: type))
-    }
-
-    /// Removes a button at the specified index.
-    /// - Parameter index: The index of the button to remove.
-    mutating func remove(at index: Int) {
-        guard buttons.indices.contains(index) else { return }
-        buttons.remove(at: index)
-    }
-
     /// Removes a button with the specified ID.
     /// - Parameter id: The ID of the button to remove.
     mutating func remove(id: UUID) {
         buttons.removeAll { $0.id == id }
-    }
-
-    /// Moves a button from one position to another.
-    /// - Parameters:
-    ///   - source: The current index of the button.
-    ///   - destination: The target index for the button.
-    mutating func move(from source: Int, to destination: Int) {
-        guard buttons.indices.contains(source) else { return }
-        let button = buttons.remove(at: source)
-        let targetIndex = destination > source ? destination - 1 : destination
-        let clampedIndex = max(0, min(buttons.count, targetIndex))
-        buttons.insert(button, at: clampedIndex)
     }
 
     /// Moves buttons from source indices to a destination index.
@@ -95,13 +70,6 @@ struct LayoutSection: Codable, Hashable, Sendable {
     /// Returns the button types currently in this section.
     var buttonTypes: [ControlButtonType] {
         buttons.map(\.buttonType)
-    }
-
-    /// Checks if a button type is already in this section.
-    /// - Parameter type: The button type to check.
-    /// - Returns: True if the type is already present.
-    func contains(buttonType type: ControlButtonType) -> Bool {
-        buttons.contains { $0.buttonType == type }
     }
 
     /// Returns buttons filtered by visibility for the given layout state.

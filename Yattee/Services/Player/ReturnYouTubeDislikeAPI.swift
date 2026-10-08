@@ -78,9 +78,4 @@ actor ReturnYouTubeDislikeAPI {
             throw error
         }
     }
-
-    /// Clears the cache.
-    func clearCache() {
-        votesCache.removeAll()
-    }
 }

@@ -67,9 +67,6 @@ final class MPVPiPBridge: NSObject {
     /// KVO observation for isPictureInPicturePossible
     private var pipPossibleObservation: NSKeyValueObservation?
 
-    /// Current PiP render size from AVPictureInPictureController
-    private var currentPiPRenderSize: CMVideoDimensions?
-
     /// Current video aspect ratio (width / height)
     private var videoAspectRatio: CGFloat = 16.0 / 9.0
 
@@ -396,36 +393,6 @@ final class MPVPiPBridge: NSObject {
     }
     #endif
 
-    /// Move the sample buffer layer to a new container view.
-    /// This is needed when transitioning from fullscreen to PiP,
-    /// as the layer must be in a visible window hierarchy.
-    func moveLayer(to containerView: PlatformView) {
-        sampleBufferLayer.removeFromSuperlayer()
-        self.containerView = containerView
-        if let frame = sanitizedGeometry(containerView.bounds, from: "moveLayer(to:)") {
-            sampleBufferLayer.frame = frame
-        }
-        #if os(iOS)
-        containerView.layer.addSublayer(sampleBufferLayer)
-        #elseif os(macOS)
-        containerView.wantsLayer = true
-        containerView.layer?.addSublayer(sampleBufferLayer)
-        #endif
-    }
-
-    /// Clean up and release resources.
-    func cleanup() {
-        NotificationCenter.default.removeObserver(self)
-        pipPossibleObservation?.invalidate()
-        pipPossibleObservation = nil
-        lastPixelBuffer = nil
-        pipController?.stopPictureInPicture()
-        pipController = nil
-        sampleBufferLayer.removeFromSuperlayer()
-        sampleBufferLayer.sampleBufferRenderer.flush(removingDisplayedImage: true, completionHandler: nil)
-        mpvBackend = nil
-    }
-
     /// Flush the sample buffer to clear any displayed frame.
     /// Call this when stopping playback to prevent stale frames when reusing backend.
     func flushBuffer() {
@@ -633,20 +600,6 @@ final class MPVPiPBridge: NSObject {
         notifyPiPPossibleState()
     }
     #endif
-
-    /// Toggle Picture-in-Picture.
-    func togglePiP() {
-        if isPiPActive {
-            stopPiP()
-        } else {
-            startPiP()
-        }
-    }
-
-    /// Invalidate and update the playback state in PiP window.
-    func invalidatePlaybackState() {
-        pipController?.invalidatePlaybackState()
-    }
 }
 
 // MARK: - AVPictureInPictureSampleBufferPlaybackDelegate
@@ -720,7 +673,6 @@ extension MPVPiPBridge: AVPictureInPictureSampleBufferPlaybackDelegate {
         didTransitionToRenderSize newRenderSize: CMVideoDimensions
     ) {
         Task { @MainActor in
-            currentPiPRenderSize = newRenderSize
             onPiPRenderSizeChanged?(newRenderSize)
             LoggingService.shared.debug("MPVPiPBridge: PiP render size changed to \(newRenderSize.width)x\(newRenderSize.height)", category: .mpv)
         }
@@ -734,8 +686,6 @@ extension MPVPiPBridge: AVPictureInPictureControllerDelegate {
         _ pictureInPictureController: AVPictureInPictureController
     ) {
         Task { @MainActor in
-            // Reset PiP render size - will be updated by didTransitionToRenderSize
-            currentPiPRenderSize = nil
             // Reset restore flag - will be set if user clicks restore button
             restoreWasRequested = false
             // Show the sample buffer layer when PiP starts

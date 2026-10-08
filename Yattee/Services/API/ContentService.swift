@@ -8,25 +8,7 @@
 import Foundation
 
 /// Protocol defining the common content fetching interface.
-protocol ContentServiceProtocol: Sendable {
-    func trending(for instance: Instance) async throws -> [Video]
-    func popular(for instance: Instance) async throws -> [Video]
-    func feed(for instance: Instance, credential: String) async throws -> [Video]
-    func subscriptions(for instance: Instance, credential: String) async throws -> [Channel]
-    func search(query: String, instance: Instance, page: Int, filters: SearchFilters) async throws -> SearchResult
-    func searchSuggestions(query: String, instance: Instance) async throws -> [String]
-    func video(id: String, instance: Instance) async throws -> Video
-    func channel(id: String, instance: Instance) async throws -> Channel
-    func channelVideos(id: String, instance: Instance, continuation: String?) async throws -> ChannelVideosPage
-    func channelPlaylists(id: String, instance: Instance, continuation: String?) async throws -> ChannelPlaylistsPage
-    func channelShorts(id: String, instance: Instance, continuation: String?) async throws -> ChannelVideosPage
-    func channelStreams(id: String, instance: Instance, continuation: String?) async throws -> ChannelVideosPage
-    func playlist(id: String, instance: Instance) async throws -> Playlist
-    func comments(videoID: String, instance: Instance, continuation: String?) async throws -> CommentsPage
-    func streams(videoID: String, instance: Instance) async throws -> [Stream]
-    func captions(videoID: String, instance: Instance) async throws -> [Caption]
-    func channelSearch(id: String, query: String, instance: Instance, page: Int) async throws -> ChannelSearchPage
-}
+protocol ContentServiceProtocol: Sendable {}
 
 /// Unified content service that routes requests to the appropriate API based on instance type.
 actor ContentService: ContentServiceProtocol {
@@ -52,17 +34,6 @@ actor ContentService: ContentServiceProtocol {
         self.defaultPipedAPI = PipedAPI(httpClient: httpClient)
         self.defaultPeerTubeAPI = PeerTubeAPI(httpClient: httpClient)
         self.defaultYatteeServerAPI = YatteeServerAPI(httpClient: httpClient)
-        self.basicAuthCredentialsManager = basicAuthCredentialsManager
-    }
-
-    init(httpClientFactory: HTTPClientFactory, basicAuthCredentialsManager: BasicAuthCredentialsManager? = nil) {
-        self.httpClientFactory = httpClientFactory
-        // Create default client for instances that don't need insecure SSL
-        self.defaultHTTPClient = httpClientFactory.createClient(allowInvalidCertificates: false)
-        self.defaultInvidiousAPI = InvidiousAPI(httpClient: defaultHTTPClient)
-        self.defaultPipedAPI = PipedAPI(httpClient: defaultHTTPClient)
-        self.defaultPeerTubeAPI = PeerTubeAPI(httpClient: defaultHTTPClient)
-        self.defaultYatteeServerAPI = YatteeServerAPI(httpClient: defaultHTTPClient)
         self.basicAuthCredentialsManager = basicAuthCredentialsManager
     }
 
@@ -254,10 +225,6 @@ actor ContentService: ContentServiceProtocol {
 
     func comments(videoID: String, instance: Instance, continuation: String? = nil) async throws -> CommentsPage {
         try await api(for: instance).comments(videoID: videoID, instance: instance, continuation: continuation)
-    }
-
-    func streams(videoID: String, instance: Instance) async throws -> [Stream] {
-        try await api(for: instance).streams(videoID: videoID, instance: instance)
     }
 
     func captions(videoID: String, instance: Instance) async throws -> [Caption] {
@@ -588,17 +555,6 @@ actor ContentService: ContentServiceProtocol {
             // belongs here the moment that row turns true.
             throw APIError.notSupported
         }
-    }
-
-    /// Fetches streams with proxy URLs for downloads (Yattee Server: hits /proxy/fast/
-    /// so the server caches the file on disk; other backends apply Invidious URL rewriting).
-    func proxyStreams(videoID: String, instance: Instance) async throws -> [Stream] {
-        if instance.type == .yatteeServer {
-            return try await yatteeServerAPI(for: instance)
-                .proxyStreams(videoID: videoID, instance: instance, mode: .download)
-        }
-        let fetchedStreams = try await streams(videoID: videoID, instance: instance)
-        return await InvidiousAPI.proxyStreamsIfNeeded(fetchedStreams, instance: instance)
     }
 
     /// Fetches video details + streams for downloads. For Yattee Server this routes
