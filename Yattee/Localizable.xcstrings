@@ -2706,6 +2706,7 @@
     },
     "discovery.shareType.smb" : {
       "comment" : "SMB share type name",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -2717,6 +2718,7 @@
     },
     "discovery.shareType.webdav" : {
       "comment" : "WebDAV share type name",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -2728,6 +2730,7 @@
     },
     "discovery.shareType.webdavs" : {
       "comment" : "WebDAV (SSL) share type name",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -5908,6 +5911,39 @@
         }
       }
     },
+    "linkAction.confirm.playlistPlayNext.title" : {
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Play Playlist Next?"
+          }
+        }
+      }
+    },
+    "linkAction.confirm.playlistQueue.title" : {
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Add Playlist to Queue?"
+          }
+        }
+      }
+    },
+    "linkAction.confirm.playlistVideoCount" : {
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%lld videos"
+          }
+        }
+      }
+    },
     "linkAction.confirm.playNext.button" : {
       "extractionState" : "extracted_with_value",
       "localizations" : {
@@ -5948,6 +5984,28 @@
           "stringUnit" : {
             "state" : "new",
             "value" : "Add to Queue?"
+          }
+        }
+      }
+    },
+    "linkAction.confirm.savePlaylist.button" : {
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Save"
+          }
+        }
+      }
+    },
+    "linkAction.confirm.savePlaylist.title" : {
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Save Playlist to Library?"
           }
         }
       }
@@ -6062,6 +6120,17 @@
         }
       }
     },
+    "linkAction.error.emptyPlaylist" : {
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "The playlist has no videos."
+          }
+        }
+      }
+    },
     "linkAction.error.notAChannel" : {
       "extractionState" : "extracted_with_value",
       "localizations" : {
@@ -6113,6 +6182,17 @@
           "stringUnit" : {
             "state" : "new",
             "value" : "Supported rates: %@"
+          }
+        }
+      }
+    },
+    "linkAction.loadingPlaylist" : {
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Loading playlist…"
           }
         }
       }
@@ -9010,16 +9090,6 @@
         }
       }
     },
-    "player.retry.status %lld %lld" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "player.retry.status %1$lld %2$lld"
-          }
-        }
-      }
-    },
     "player.retry.tryResolution %@" : {
       "localizations" : {
         "en" : {
@@ -11395,6 +11465,7 @@
       }
     },
     "settings.advanced.logs.export.copy" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -18570,6 +18641,7 @@
     },
     "sources.status.authFailed" : {
       "comment" : "Status when authentication was rejected",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -20165,6 +20237,7 @@
     },
     "video.navigation.next" : {
       "comment" : "Accessibility label for next video button",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -20176,6 +20249,7 @@
     },
     "video.navigation.previous" : {
       "comment" : "Accessibility label for previous video button",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
