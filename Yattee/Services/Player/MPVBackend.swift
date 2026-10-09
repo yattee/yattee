@@ -68,6 +68,9 @@ final class MPVBackend: PlayerBackend {
     // MARK: - Private Properties
 
     private var mpvClient: MPVClient?
+    #if os(iOS)
+    private var videoFillsFrame = false
+    #endif
     #if os(macOS)
     private var renderView: MPVOGLView?
     #elseif targetEnvironment(simulator) && (os(iOS) || os(tvOS))
@@ -171,6 +174,14 @@ final class MPVBackend: PlayerBackend {
     func pauseRendering() {
         MPVLogging.log("MPVBackend.pauseRendering called")
         _playerView?.pauseRendering()
+    }
+
+    /// Stretch the video over the whole view (ignoring its aspect ratio)
+    /// instead of letterboxing it.
+    func setVideoFillsFrame(_ fills: Bool) {
+        guard fills != videoFillsFrame else { return }
+        videoFillsFrame = fills
+        mpvClient?.setProperty("keepaspect", !fills)
     }
 
     /// Resume video rendering

@@ -18,10 +18,16 @@ struct MPVRenderViewRepresentable: UIViewRepresentable {
     /// Optional player state to update PiP availability
     var playerState: PlayerState?
 
+    /// Stretch the video to fill the view instead of letterboxing it (the mini
+    /// player's tiny preview, where bars look like a glitch).
+    var fillsFrame = false
+
     func makeUIView(context: Context) -> UIView {
         // Create a container that will hold the actual player view
         let container = MPVContainerView()
         container.backgroundColor = .black
+        container.backend = backend
+        container.fillsFrame = fillsFrame
 
         MPVLogging.log("MPVRenderViewRepresentable.makeUIView: creating container",
             details: "hasPlayerView:\(backend.playerView != nil)")
@@ -63,6 +69,10 @@ extension Notification.Name {
 private class MPVContainerView: UIView {
     private weak var currentPlayerView: UIView?
     private let containerID = UUID()
+
+    /// Applied to the backend whenever this container takes the player view
+    weak var backend: MPVBackend?
+    var fillsFrame = false
 
     // Track all living containers to enable view transfer on deinit
     private static var livingContainers = NSHashTable<MPVContainerView>.weakObjects()
@@ -159,6 +169,9 @@ private class MPVContainerView: UIView {
             playerView.trailingAnchor.constraint(equalTo: trailingAnchor)
         ])
         currentPlayerView = playerView
+        #if os(iOS)
+        backend?.setVideoFillsFrame(fillsFrame)
+        #endif
         // Size it (and re-render its framebuffer) before anyone reacts to the move
         if !bounds.isEmpty {
             layoutIfNeeded()

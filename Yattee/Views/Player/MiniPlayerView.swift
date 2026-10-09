@@ -344,8 +344,13 @@ struct MiniPlayerView: View {
             if let backend = playerService?.currentBackend as? MPVBackend,
                let playerState,
                shouldMountVideoView {
+                #if os(iOS)
+                MPVRenderViewRepresentable(backend: backend, playerState: playerState, fillsFrame: true)
+                    .allowsHitTesting(false)
+                #else
                 MPVRenderViewRepresentable(backend: backend, playerState: playerState)
                     .allowsHitTesting(false)
+                #endif
             }
 
             // Thumbnail layer - on top so it can cover the black MPV view during PiP
