@@ -1364,8 +1364,18 @@ extension ExpandedPlayerSheet {
                 #if os(iOS)
                 self.toggleFullscreen()
                 #endif
-            }
+            },
+            isHingeSplit: isHingeSplitActive
         )
+    }
+
+    /// The corner layout splits on the hinge while it's partially open.
+    private var isHingeSplitActive: Bool {
+        #if os(iOS)
+        isTabletopHinge
+        #else
+        false
+        #endif
     }
 
     // MARK: - Widescreen Player Area

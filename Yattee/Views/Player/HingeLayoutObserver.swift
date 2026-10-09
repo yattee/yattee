@@ -18,6 +18,28 @@ struct HingeLayoutObserver: ViewModifier {
     /// tabletop layout on simulators without a hinge control.
     static let forceTabletop = ProcessInfo.processInfo.environment["YATTEE_FORCE_TABLETOP"] == "1"
 
+    /// Last reported tabletop state, outliving the player sheet: re-presenting
+    /// the player seeds from it so the layout doesn't animate in from the
+    /// unfolded state.
+    @MainActor static var lastKnownTabletop = false
+
+    /// The first report after appearing corrects the seed without animation.
+    @State private var hasReceivedReport = false
+
+    private func apply(_ tabletop: Bool) {
+        Self.lastKnownTabletop = tabletop
+        let animated = hasReceivedReport
+        hasReceivedReport = true
+        guard tabletop != isTabletop else { return }
+        if animated {
+            withAnimation(.easeInOut(duration: 0.3)) { isTabletop = tabletop }
+        } else {
+            var transaction = Transaction()
+            transaction.disablesAnimations = true
+            withTransaction(transaction) { isTabletop = tabletop }
+        }
+    }
+
     func body(content: Content) -> some View {
         if Self.forceTabletop {
             // The override stands in for a half-open hinge, which only exists
@@ -29,10 +51,7 @@ struct HingeLayoutObserver: ViewModifier {
                 // Mirror the real hinge state: no programmatic rotation (and no
                 // orientation lock) while the hinge is open.
                 OrientationManager.shared.canRotateProgrammatically = !isInterior
-                guard isInterior != isTabletop else { return }
-                withAnimation(.easeInOut(duration: 0.3)) {
-                    isTabletop = isInterior
-                }
+                apply(isInterior)
             }
         } else if #available(iOS 27.1, *) {
             content.onHingeChange { _, context in
@@ -43,11 +62,9 @@ struct HingeLayoutObserver: ViewModifier {
                     // programmatic rotation, so the player must not offer it.
                     OrientationManager.shared.canRotateProgrammatically = status == .closed
                 }
-                let tabletop = context.hinge?.status == .partiallyOpen
-                guard tabletop != isTabletop else { return }
-                withAnimation(.easeInOut(duration: 0.3)) {
-                    isTabletop = tabletop
-                }
+                // nil when leaving the hierarchy: keep the last state then
+                guard let status = context.hinge?.status else { return }
+                apply(status == .partiallyOpen)
             }
         } else {
             content

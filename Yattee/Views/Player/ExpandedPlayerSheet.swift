@@ -100,7 +100,9 @@ struct ExpandedPlayerSheet: View {
     /// Foldable hinge partially open (iPhone Duo laptop position): the
     /// fullscreen portrait layout keeps the video on the upper half and
     /// moves every control to the lower half.
-    @State var isTabletopHinge = false
+    /// Seeded from the last hinge report so a re-presented player starts in
+    /// the right layout instead of animating into it.
+    @State var isTabletopHinge = HingeLayoutObserver.lastKnownTabletop
     #endif
 
     #if os(iOS) || os(macOS)

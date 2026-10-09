@@ -28,6 +28,10 @@ struct CornerPlayerLayout<PlayerContent: View>: View {
 
     let onChannelTap: (() -> Void)?
     var onFullscreen: (() -> Void)? = nil
+    /// Foldable hinge partially open (iPhone Duo, book posture): the side
+    /// column (grabber included) takes exactly the trailing half so the
+    /// split lands on the hinge. Not resizable then — only overdrag-hide.
+    var isHingeSplit = false
 
     /// Seed the panel visibility BEFORE the first frame — applying the
     /// preset's default visibility via onAppear/onChange animates the panels
@@ -44,8 +48,10 @@ struct CornerPlayerLayout<PlayerContent: View>: View {
             _ height: CGFloat
         ) -> PlayerContent,
         onChannelTap: (() -> Void)?,
-        onFullscreen: (() -> Void)? = nil
+        onFullscreen: (() -> Void)? = nil,
+        isHingeSplit: Bool = false
     ) {
+        self.isHingeSplit = isHingeSplit
         self.playerControlsLayout = playerControlsLayout
         self.playerContent = playerContent
         self.onChannelTap = onChannelTap
@@ -179,9 +185,10 @@ struct CornerPlayerLayout<PlayerContent: View>: View {
     }
 
     private func clampColumnWidth(_ width: CGFloat, availableWidth: CGFloat) -> CGFloat {
+        // Up to half the window, grabber included
         let maxWidth = max(
             Self.minColumnWidth,
-            min(Self.maxColumnWidthCap, availableWidth * 0.45, availableWidth - Self.minVideoColumnWidth)
+            min(Self.maxColumnWidthCap, availableWidth / 2 - Self.grabberWidth, availableWidth - Self.minVideoColumnWidth)
         )
         return min(max(width, Self.minColumnWidth), maxWidth)
     }
@@ -227,10 +234,12 @@ struct CornerPlayerLayout<PlayerContent: View>: View {
             // away on its own while the panel stays nominally visible.
             let showsAnyRegion = showsSideColumn || showsBelowVideo
 
-            let effectiveColumnWidth = clampColumnWidth(columnWidth, availableWidth: width)
             // Grabber sits on the column's leading edge, inside the column
             // background — narrow strip matching the panel drag handle look.
             let grabberWidth = Self.grabberWidth
+            // Hinge split ignores (and never overwrites) the saved width.
+            let hingeColumnWidth = max(Self.minColumnWidth, width / 2 - grabberWidth)
+            let effectiveColumnWidth = isHingeSplit ? hingeColumnWidth : clampColumnWidth(columnWidth, availableWidth: width)
             let totalColumnWidth = effectiveColumnWidth + grabberWidth
 
             // Panels never move. Both sit at their home positions (column on
@@ -315,9 +324,9 @@ struct CornerPlayerLayout<PlayerContent: View>: View {
                 if hasSideColumn, let video {
                     HStack(spacing: 0) {
                         PanelResizeGrabber(
-                            panelWidth: $columnWidth,
-                            minWidth: Self.minColumnWidth,
-                            maxWidth: clampColumnWidth(.infinity, availableWidth: width),
+                            panelWidth: isHingeSplit ? .constant(hingeColumnWidth) : $columnWidth,
+                            minWidth: isHingeSplit ? hingeColumnWidth : Self.minColumnWidth,
+                            maxWidth: isHingeSplit ? hingeColumnWidth : clampColumnWidth(.infinity, availableWidth: width),
                             panelSide: .right,
                             isPinned: true,
                             isDragActive: $isGrabberActive,
