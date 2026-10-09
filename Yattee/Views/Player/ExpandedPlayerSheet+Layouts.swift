@@ -151,8 +151,10 @@ extension ExpandedPlayerSheet {
         // control. `layoutHeight` replaces the full screen height wherever the
         // fullscreen video is fitted and positioned.
         #if os(iOS)
+        let isHingeSplit = isTabletopHinge
         let isTabletop = isTabletopHinge && !isPortraitPanelVisible
         #else
+        let isHingeSplit = false
         let isTabletop = false
         #endif
         let layoutHeight = isTabletop ? fullScreenHeight / 2 : fullScreenHeight
@@ -164,8 +166,8 @@ extension ExpandedPlayerSheet {
         let uncappedFitWidth: CGFloat = fitHeightFromWidth > screenHeight ? fitWidthFromHeight : screenWidth
 
         // Apply max height constraint to leave space for panel (or to the
-        // upper half in tabletop)
-        let fitHeightCap = isTabletop ? min(maxVideoHeight, layoutHeight) : maxVideoHeight
+        // upper half while the hinge is partially open, panel shown or not)
+        let fitHeightCap = isHingeSplit ? min(maxVideoHeight, fullScreenHeight / 2) : maxVideoHeight
         let fitHeight = max(1, min(uncappedFitHeight, fitHeightCap))
         let fitWidth = max(1, fitHeight < uncappedFitHeight ? fitHeight * aspectRatio : uncappedFitWidth)
 
@@ -201,7 +203,10 @@ extension ExpandedPlayerSheet {
 
         // Panel height when pinned (capped by maxPanelHeight for widescreen videos without description)
         let naturalPanelHeight = screenHeight - fitHeight
-        let pinnedPanelHeight = min(naturalPanelHeight, maxPanelHeight)
+        // Hinge partially open: the panel takes the whole lower half, its top
+        // edge on the hinge, so the video keeps the upper half either way.
+        let hingeY = fullScreenHeight / 2 - safeAreaInsets.top
+        let pinnedPanelHeight = isHingeSplit ? max(1, screenHeight - hingeY) : min(naturalPanelHeight, maxPanelHeight)
         let pillsOverlayOpacity: CGFloat = {
             guard isPanelDragging, panelDragOffset > 0 else { return 1 }
             let fadeDistance: CGFloat = 48
@@ -218,7 +223,6 @@ extension ExpandedPlayerSheet {
         //
         // videoYOffset is a @State that we animate explicitly for smooth drag release animation.
         // Base positions are computed, then videoYOffset is added.
-        let topY = videoAreaHeight / 2  // Video centered in video area (above panel)
         // Video center when the panel is hidden, in content-area coordinates:
         // full-screen center shifted up by the top safe area. NOT screenHeight/2 —
         // top and bottom insets differ (the player window adds extra bottom
@@ -237,6 +241,9 @@ extension ExpandedPlayerSheet {
         let hiddenLayoutHeight = fullScreenHeight
         #endif
         let hiddenVideoY = hiddenLayoutHeight / 2 - safeAreaInsets.top
+        // Video centered in video area (above panel). Hinge split: the same
+        // spot as with the panel hidden, so toggling the panel never moves it.
+        let topY = isHingeSplit ? hiddenVideoY : videoAreaHeight / 2
 
         let videoY: CGFloat = {
             if isPortraitPanelVisible {
