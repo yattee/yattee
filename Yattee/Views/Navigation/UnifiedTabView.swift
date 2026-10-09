@@ -87,6 +87,9 @@ struct UnifiedTabView: View {
             sidebar
         } detail: {
             detailForSelection
+                #if os(iOS)
+                .safeAreaInset(edge: .bottom, spacing: 0) { miniPlayerInset }
+                #endif
         }
         .zoomTransitionNamespace(zoomTransition)
         #if os(iOS)
@@ -270,6 +273,28 @@ struct UnifiedTabView: View {
     }
 
     private var settingsManager: SettingsManager? { appEnvironment?.settingsManager }
+
+    #if os(iOS)
+    /// The split view has no tab bar to host the mini player as a bottom
+    /// accessory, so it takes the detail column's bottom safe area instead:
+    /// floating content such as the subscriptions channel strip and the last
+    /// rows of every list then clear it, as they clear the tab accessory.
+    private var miniPlayerInset: some View {
+        let hasActiveVideo = appEnvironment?.playerService.state.currentVideo != nil
+        let isExpanded = appEnvironment?.navigationCoordinator.isPlayerExpanded ?? false
+
+        return VStack(spacing: 0) {
+            if hasActiveVideo && !isExpanded {
+                MiniPlayerView()
+                    .padding(.horizontal, 16)
+                    .padding(.bottom, 12)
+                    // Move-only transition (no opacity) prevents a thumbnail flash during collapse
+                    .transition(.move(edge: .bottom))
+            }
+        }
+        .animation(.spring(response: 0.3), value: hasActiveVideo)
+    }
+    #endif
 }
 
 #Preview("Unified Tab View") {

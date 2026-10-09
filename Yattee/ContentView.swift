@@ -206,8 +206,9 @@ struct AdaptiveTabView: View {
             }
 
             // The tab bar layout on iOS 26.1+ shows the mini player as the tab
-            // bar's bottom accessory; the split-view sidebar layout has no tab bar.
-            if usesSidebar || !Self.usesTabBottomAccessory {
+            // bar's bottom accessory; the split-view sidebar layout insets it
+            // into its detail column.
+            if !usesSidebar && !Self.usesTabBottomAccessory {
                 miniPlayerOverlay
             }
 
@@ -262,9 +263,8 @@ struct AdaptiveTabView: View {
                 MiniPlayerView()
             }
             .padding(.horizontal, 16)
-            // The tab bar layout has a bottom tab bar (49pt) to clear; the sidebar
-            // layout (sidebarAdaptable) keeps its tabs at the top, so only float above the edge.
-            .padding(.bottom, usesSidebar ? 12 : 49 + 8)
+            // Clear the bottom tab bar (49pt)
+            .padding(.bottom, 49 + 8)
             // Use move-only transition (no opacity) to prevent thumbnail flash during collapse
             // The opacity transition caused video to appear faded during player sheet dismiss
             .transition(.move(edge: .bottom))
