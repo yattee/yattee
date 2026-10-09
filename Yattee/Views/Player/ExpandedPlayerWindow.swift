@@ -264,16 +264,9 @@ private final class DragToDismissGestureHandler: NSObject, UIGestureRecognizerDe
                     // Trigger haptic immediately on release
                     onHapticFeedback?()
 
-                    // Animate off screen then dismiss - fast and smooth without bounce
-                    // Main window scale reset is handled by hide() which is called via onDismiss
-                    UIView.animate(withDuration: 0.3, delay: 0, usingSpringWithDamping: 1.0, initialSpringVelocity: 0, options: []) {
-                        window.frame.origin.y = window.bounds.height
-                        // Continue scaling main window to fully normal during dismiss animation
-                        self.onMainWindowScaleChanged?(0)
-                    } completion: { [weak self] _ in
-                        self?.onDismissGestureStateChanged?(false)
-                        self?.onDismiss?()
-                    }
+                    // The window manager owns the dismiss animation (morph into
+                    // the mini player, or slide off screen) from the current position
+                    onDismiss?()
                 } else {
                     // Snap back - restore main window scale to fully scaled
                     UIView.animate(withDuration: 0.3, delay: 0, usingSpringWithDamping: 0.7, initialSpringVelocity: 0) {
@@ -500,6 +493,12 @@ final class ExpandedPlayerWindowManager {
     private var expandedWindow: UIWindow?
     private weak var appEnvironment: AppEnvironment?
     private var dragHandler: DragToDismissGestureHandler?
+    /// Whether a hide is in flight (window still up, cleanup pending).
+    private var isHiding = false
+    /// Whether the morph has ended and the window waits for the mini player to
+    /// adopt the video view before hiding (any hide meanwhile must not animate).
+    private var isHandingOffToMiniPlayer = false
+    private var pendingHandOffHideCompletions: [() -> Void] = []
 
     // MARK: - Window Scaling Effect (Apple Music-style)
 
@@ -832,10 +831,7 @@ final class ExpandedPlayerWindowManager {
             self?.appEnvironment?.settingsManager.triggerHapticFeedback(for: .playerDismiss)
         }
         handler.onDismiss = { [weak self] in
-            // Set collapsing state BEFORE isPlayerExpanded=false to ensure mini player
-            // shows video immediately when it appears (it checks isPlayerCollapsing)
-            self?.appEnvironment?.navigationCoordinator.isPlayerCollapsing = true
-            self?.appEnvironment?.navigationCoordinator.isPlayerExpanded = false
+            self?.dismissFromGesture()
         }
         handler.onDismissGestureStateChanged = { [weak self] isActive in
             self?.appEnvironment?.navigationCoordinator.isPlayerDismissGestureActive = isActive
@@ -974,6 +970,227 @@ final class ExpandedPlayerWindowManager {
         LoggingService.shared.logPlayer("[ExpandedPlayerWindowManager] show complete")
     }
 
+    /// Drag-to-dismiss released past the threshold: morph the video into the
+    /// mini player when its preview is on screen, otherwise slide off screen.
+    private func dismissFromGesture() {
+        guard let nav = appEnvironment?.navigationCoordinator else { return }
+
+        if morphIntoMiniPlayer(completion: { [weak self] in
+            self?.handOffToMiniPlayer()
+        }) {
+            return
+        }
+
+        // Slide off: hide() animates from the dragged position and marks the
+        // window not visible before the gesture flag clears (no black overlay
+        // frame). isPlayerExpanded flips last, so the mini player doesn't take
+        // the video view from the sliding window.
+        expandedWindow?.isUserInteractionEnabled = false
+        hide(animated: true) {
+            nav.isPlayerExpanded = false
+        }
+        nav.isPlayerDismissGestureActive = false
+    }
+
+    /// Ends the morph: un-expands so the mini player mounts its video view, and
+    /// hides the window only once that view has actually moved into the mini
+    /// player. SwiftUI may mount it a frame later; hiding first left a frame
+    /// with neither (a blank preview).
+    private func handOffToMiniPlayer() {
+        guard let nav = appEnvironment?.navigationCoordinator else { return }
+        let playerView = (appEnvironment?.playerService.currentBackend as? MPVBackend)?.playerView
+
+        nonisolated(unsafe) var observer: (any NSObjectProtocol)?
+        let finish: () -> Void = { [weak self] in
+            if let observer {
+                NotificationCenter.default.removeObserver(observer)
+            }
+            observer = nil
+            nav.isPlayerMorphingToMini = false
+            guard let self, self.isHandingOffToMiniPlayer else { return }
+            self.isHandingOffToMiniPlayer = false
+            // Hide now, in the same pass the mini player adopts the view; the full
+            // cleanup (layout passes, orientation) runs outside that SwiftUI update
+            self.expandedWindow?.isHidden = true
+            let completions = self.pendingHandOffHideCompletions
+            self.pendingHandOffHideCompletions = []
+            DispatchQueue.main.async { [weak self] in
+                self?.hide(animated: false) {
+                    completions.forEach { $0() }
+                }
+            }
+        }
+
+        isHandingOffToMiniPlayer = true
+        if let playerView, playerView.window === expandedWindow {
+            // Adopting isn't enough: the view keeps its old size and the new
+            // container is still zero-sized until the next layout pass, so the
+            // preview is blank for a frame. Wait until it's laid out there.
+            observer = NotificationCenter.default.addObserver(
+                forName: .mpvPlayerViewDidChangeContainer, object: playerView, queue: nil
+            ) { [weak self] _ in
+                MainActor.assumeIsolated {
+                    if let observer {
+                        NotificationCenter.default.removeObserver(observer)
+                    }
+                    observer = nil
+                    self?.waitUntilLaidOutInMiniPlayer(playerView, then: finish)
+                }
+            }
+            // Fallback when the mini player never takes the view (video hidden in it)
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) { finish() }
+        } else {
+            DispatchQueue.main.async { finish() }
+        }
+
+        nav.isPlayerDismissGestureActive = false
+        nav.isPlayerCollapsing = true
+        nav.isPlayerExpanded = false
+    }
+
+    /// Calls `then` on the first display frame after the player view sits,
+    /// sized, in a container outside the expanded window: by then that layout
+    /// pass has re-rendered it into its resized framebuffer.
+    private func waitUntilLaidOutInMiniPlayer(_ playerView: UIView, then: @escaping () -> Void) {
+        let isLaidOut = { [weak self] in
+            let size = playerView.bounds.size
+            return playerView.window != nil
+                && playerView.window !== self?.expandedWindow
+                && size.width > 1 && size.height > 1
+                && playerView.superview?.bounds.size == size
+        }
+        // The container adopts it already sized and redrawn: hide right away,
+        // in the same frame (the window has a black hole where the video was)
+        if isLaidOut() {
+            then()
+            return
+        }
+        var wasLaidOut = false
+        let ticker = DisplayLinkTicker()
+        ticker.start { [weak self] in
+            guard let self, self.isHandingOffToMiniPlayer else {
+                ticker.stop()
+                return
+            }
+            if wasLaidOut {
+                ticker.stop()
+                then()
+            }
+            wasLaidOut = isLaidOut()
+        }
+    }
+
+    /// Shrinks the expanded window onto its video and flies it into the mini
+    /// player's video preview. Returns false (doing nothing) when no target is
+    /// available, so the caller falls back to sliding off screen.
+    private func morphIntoMiniPlayer(completion: @escaping () -> Void) -> Bool {
+        guard let window = expandedWindow,
+              let hostView = window.rootViewController?.view,
+              let nav = appEnvironment?.navigationCoordinator,
+              !didRotateDuringSession,
+              let playerView = (appEnvironment?.playerService.currentBackend as? MPVBackend)?.playerView,
+              playerView.window === window,
+              mainWindow.map({ $0.bounds.size == window.bounds.size }) == true else {
+            return false
+        }
+
+        // The mini player frame is a layout frame in the main window, unaffected by
+        // the scale transform that animates back to identity alongside the morph
+        let target = nav.miniPlayerVideoFrame
+        let renderRect = playerView.convert(playerView.bounds, to: window)
+        let source = visibleVideoRect(in: renderRect, panelFrame: hostView.convert(nav.portraitPanelFrame, to: window), nav: nav)
+        guard target.width > 1, target.height > 1, window.bounds.contains(target),
+              source.width > 1, source.height > 1 else {
+            return false
+        }
+
+        // The mask doesn't stop hit testing: keep stray touches off the hidden controls
+        window.isUserInteractionEnabled = false
+        hostView.layer.removeAllAnimations()
+        nav.isPlayerMorphingToMini = true
+        nav.isPlayerWindowVisible = false
+
+        // Only the video morphs: the window mask keeps the video opaque as it
+        // flies to the target and fades everything around it (title, panels) out.
+        // The window keeps its drag offset and animates back to 0 alongside the
+        // morph; content and mask share that offset, so both are expressed in
+        // un-offset window coordinates. (Transforming the UIWindow itself stops
+        // it rendering.)
+        let mask = UIView(frame: window.bounds)
+        let surroundingMask = UIView(frame: window.bounds)
+        surroundingMask.backgroundColor = .black
+        let videoMask = UIView(frame: source)
+        videoMask.backgroundColor = .black
+        videoMask.layer.cornerCurve = .continuous
+        mask.addSubview(surroundingMask)
+        mask.addSubview(videoMask)
+        window.mask = mask
+
+        // Map the source rect onto the target rect (a view transform applies about its center)
+        let center = hostView.center
+        let scaleX = target.width / source.width
+        let scaleY = target.height / source.height
+        let finalTransform = CGAffineTransform(
+            a: scaleX, b: 0, c: 0, d: scaleY,
+            tx: target.midX - center.x - scaleX * (source.midX - center.x),
+            ty: target.midY - center.y - scaleY * (source.midY - center.y)
+        )
+
+        // UIKit derives a view's safe area from its transformed frame: once scaled
+        // toward the mini player the host no longer overlaps the status bar, its
+        // top inset drops to 0 and SwiftUI re-lays the player out higher — out
+        // from under the mask. Capture the insets to pin them below.
+        let insetsBefore = hostView.safeAreaInsets
+
+        UIView.animate(withDuration: 0.15) {
+            surroundingMask.alpha = 0
+        }
+        UIView.animate(withDuration: 0.4, delay: 0, usingSpringWithDamping: 1.0, initialSpringVelocity: 0, options: []) {
+            window.frame.origin.y = 0
+            hostView.transform = finalTransform
+            videoMask.frame = target
+            videoMask.layer.cornerRadius = nav.miniPlayerVideoCornerRadius
+            self.scaleMainWindow(progress: 0)
+        } completion: { _ in
+            completion()
+        }
+
+        // Pin the safe area: add back whatever the transform took away
+        if let hostingController = window.rootViewController {
+            window.layoutIfNeeded()
+            let insetsAfter = hostView.safeAreaInsets
+            let additional = hostingController.additionalSafeAreaInsets
+            hostingController.additionalSafeAreaInsets = UIEdgeInsets(
+                top: additional.top + insetsBefore.top - insetsAfter.top,
+                left: additional.left + insetsBefore.left - insetsAfter.left,
+                bottom: additional.bottom + insetsBefore.bottom - insetsAfter.bottom,
+                right: additional.right + insetsBefore.right - insetsAfter.right
+            )
+            hostView.layoutIfNeeded()
+        }
+        return true
+    }
+
+    /// The part of the render view that shows video: the aspect-fit picture,
+    /// minus whatever the portrait details panel covers.
+    private func visibleVideoRect(in renderRect: CGRect, panelFrame panel: CGRect, nav: NavigationCoordinator) -> CGRect {
+        let aspect = CGFloat(appEnvironment?.playerService.state.displayAspectRatio ?? 16.0 / 9.0)
+        var rect = renderRect
+        if aspect > 0 {
+            if renderRect.width / renderRect.height > aspect {
+                let width = renderRect.height * aspect
+                rect = CGRect(x: renderRect.midX - width / 2, y: renderRect.minY, width: width, height: renderRect.height)
+            } else {
+                let height = renderRect.width / aspect
+                rect = CGRect(x: renderRect.minX, y: renderRect.midY - height / 2, width: renderRect.width, height: height)
+            }
+        }
+        if nav.isPortraitPanelVisible, panel.height > 0, panel.minY < rect.maxY, panel.minY > rect.minY {
+            rect.size.height = panel.minY - rect.minY
+        }
+        return rect
+    }
+
     func hide(animated: Bool = true, completion: (() -> Void)? = nil) {
         LoggingService.shared.logPlayer("[ExpandedPlayerWindowManager] hide called, expandedWindow=\(expandedWindow != nil), animated=\(animated)")
 
@@ -982,19 +1199,37 @@ final class ExpandedPlayerWindowManager {
         showRetryCount = 0
         pendingScaleApplication = false
 
-        // Mark window as not visible immediately and start collapsing animation
         appEnvironment?.navigationCoordinator.isPlayerWindowVisible = false
-        appEnvironment?.navigationCoordinator.isPlayerCollapsing = true
-        LoggingService.shared.logPlayer("[ExpandedPlayerWindowManager] hide: isPlayerWindowVisible=false, isPlayerCollapsing=true")
 
         guard let window = expandedWindow else {
             completion?()
             return
         }
 
+        // The morphed window sits on the mini player until the mini player has
+        // laid out the video; the handoff hides it then
+        if isHandingOffToMiniPlayer {
+            if let completion {
+                pendingHandOffHideCompletions.append(completion)
+            }
+            return
+        }
+
+        // A hide is already running (e.g. the gesture's hide followed by the
+        // isPlayerExpanded onChange); a second one would clean up twice
+        guard !isHiding else {
+            completion?()
+            return
+        }
+        isHiding = true
+        // Start collapsing animation
+        appEnvironment?.navigationCoordinator.isPlayerCollapsing = true
+        LoggingService.shared.logPlayer("[ExpandedPlayerWindowManager] hide: isPlayerWindowVisible=false, isPlayerCollapsing=true")
+
         let cleanup: () -> Void = { [weak self] in
             LoggingService.shared.logPlayer("[ExpandedPlayerWindowManager] hide: cleanup")
-            
+            self?.isHiding = false
+
             // Always ensure main window transform is fully reset (safeguard against race conditions)
             self?.resetMainWindowImmediate()
             
@@ -1089,6 +1324,32 @@ final class ExpandedPlayerWindowManager {
             resetMainWindowImmediate()
             cleanup()
         }
+    }
+}
+#endif
+
+#if os(iOS)
+/// Runs a closure once per display frame until stopped.
+@MainActor
+private final class DisplayLinkTicker: NSObject {
+    private var displayLink: CADisplayLink?
+    private var tick: (() -> Void)?
+
+    func start(_ tick: @escaping () -> Void) {
+        self.tick = tick
+        let link = CADisplayLink(target: self, selector: #selector(fire))
+        link.add(to: .main, forMode: .common)
+        displayLink = link
+    }
+
+    func stop() {
+        displayLink?.invalidate()
+        displayLink = nil
+        tick = nil
+    }
+
+    @objc private func fire() {
+        tick?()
     }
 }
 #endif

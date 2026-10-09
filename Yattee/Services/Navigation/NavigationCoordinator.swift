@@ -155,6 +155,15 @@ final class NavigationCoordinator {
     /// Comments overlay frame in screen coordinates (for gesture conflict resolution).
     var commentsFrame: CGRect = .zero
 
+    /// Mini player video preview frame in the main window's coordinates and its
+    /// corner radius — the target the expanded player morphs into on dismiss.
+    var miniPlayerVideoFrame: CGRect = .zero
+    var miniPlayerVideoCornerRadius: CGFloat = 0
+
+    /// Whether the expanded player is morphing into the mini player. The mini
+    /// player keeps its thumbnail hidden so the arriving video isn't covered.
+    var isPlayerMorphingToMini = false
+
     /// Current panscan value from UIKit pinch gesture (0.0 = fit, 1.0 = fill).
     /// Updated by ExpandedPlayerWindow's pinch gesture handler.
     var pinchPanscan: Double = 0.0

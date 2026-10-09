@@ -192,7 +192,9 @@ struct AdaptiveTabView: View {
     private var shouldShowExpandPendingSpinner: Bool {
         let nav = appEnvironment.navigationCoordinator
         // Show spinner when expand is requested but window isn't visible yet
+        // (a gesture dismiss hides the window before un-expanding — not pending)
         return nav.isPlayerExpanded && !nav.isPlayerWindowVisible && !nav.isPlayerSheetAnimating
+            && !nav.isPlayerCollapsing && !nav.isPlayerMorphingToMini
     }
 
     var body: some View {
@@ -255,9 +257,10 @@ struct AdaptiveTabView: View {
     private var miniPlayerOverlay: some View {
         let playerState = appEnvironment.playerService.state
         let hasActiveVideo = playerState.currentVideo != nil
-        let isExpanded = appEnvironment.navigationCoordinator.isPlayerExpanded
 
-        if hasActiveVideo && !isExpanded {
+        // Stays mounted under the expanded player: the dismiss gesture morphs
+        // the video into its preview, so it must already be in place
+        if hasActiveVideo {
             VStack(spacing: 0) {
                 Spacer()
                 MiniPlayerView()

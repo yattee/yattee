@@ -47,6 +47,13 @@ struct MiniPlayerView: View {
         return isVideoReady && !isPlayerActive
     }
 
+    /// Whether the thumbnail is hidden: live video shows instead, or the
+    /// expanded player is morphing its video into this preview.
+    private var isThumbnailHidden: Bool {
+        if navigationCoordinator?.isPlayerMorphingToMini == true { return true }
+        return shouldShowVideoPreview && !isPiPActive
+    }
+
     /// Whether we should include the MPVRenderView in the hierarchy (even if hidden)
     /// During collapse, we want the view mounted so it can receive the player view immediately
     private var shouldMountVideoView: Bool {
@@ -56,7 +63,9 @@ struct MiniPlayerView: View {
         guard miniPlayerSettings.showVideo else { return false }
         // Mount when: not expanding AND (collapsing OR should show preview)
         // This ensures the container exists during collapse to receive the player view
-        return !nav.isPlayerExpanding && (nav.isPlayerCollapsing || shouldShowVideoPreview)
+        // (not while still expanded: the mini player stays mounted under the
+        // player window, and a slide-off dismiss collapses before un-expanding)
+        return !nav.isPlayerExpanding && ((nav.isPlayerCollapsing && !nav.isPlayerExpanded) || shouldShowVideoPreview)
     }
 
     /// The title to display, preferring DeArrow title if available.
@@ -176,6 +185,7 @@ struct MiniPlayerView: View {
             videoPreviewView
                 .frame(width: 64, height: 36)
                 .clipShape(RoundedRectangle(cornerRadius: 6))
+                .reportsMiniPlayerVideoFrame(cornerRadius: 6, navigationCoordinator: navigationCoordinator)
                 .contentShape(Rectangle())
                 .onTapGesture {
                     handleVideoPreviewTap()
@@ -233,6 +243,7 @@ struct MiniPlayerView: View {
             videoPreviewView
                 .frame(width: capsulePreviewSize.width, height: capsulePreviewSize.height)
                 .clipShape(RoundedRectangle(cornerRadius: 4))
+                .reportsMiniPlayerVideoFrame(cornerRadius: 4, navigationCoordinator: navigationCoordinator)
                 .contentShape(Rectangle())
                 .onTapGesture {
                     handleVideoPreviewTap()
@@ -340,7 +351,7 @@ struct MiniPlayerView: View {
             // Thumbnail layer - on top so it can cover the black MPV view during PiP
             // Shown when video not ready, during expand animation, or during PiP
             thumbnailView
-                .opacity(shouldShowVideoPreview && !isPiPActive ? 0 : 1)
+                .opacity(isThumbnailHidden ? 0 : 1)
                 .animation(.easeInOut(duration: 0.15), value: shouldShowVideoPreview)
                 .animation(.easeInOut(duration: 0.25), value: isPiPActive)
                 .allowsHitTesting(false)
@@ -659,6 +670,28 @@ struct MiniPlayerView: View {
 
     private func incrementTapCount(for config: ControlButtonConfiguration) {
         buttonTapCounts[config.id, default: 0] += 1
+    }
+}
+
+// MARK: - Video Frame Reporting
+
+private extension View {
+    /// Publishes the video preview's frame as the expanded player's dismiss
+    /// morph target (iOS only; macOS's player is a separate window or overlay).
+    @ViewBuilder
+    func reportsMiniPlayerVideoFrame(cornerRadius: CGFloat, navigationCoordinator: NavigationCoordinator?) -> some View {
+        #if os(iOS)
+        onGeometryChange(for: CGRect.self) { $0.frame(in: .global) } action: { frame in
+            guard let navigationCoordinator, navigationCoordinator.miniPlayerVideoFrame != frame else { return }
+            navigationCoordinator.miniPlayerVideoFrame = frame
+            navigationCoordinator.miniPlayerVideoCornerRadius = cornerRadius
+        }
+        .onDisappear {
+            navigationCoordinator?.miniPlayerVideoFrame = .zero
+        }
+        #else
+        self
+        #endif
     }
 }
 

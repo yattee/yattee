@@ -506,6 +506,15 @@ final class MPVRenderView: UIView {
         renderQueue.sync {
             destroyFramebuffer()
             createFramebuffer()
+
+            // The new layer storage is empty until something is presented into it;
+            // waiting for the next display link tick shows a blank blink (e.g. the
+            // expanded player handing its view to the mini player). Draw the current
+            // frame now so the resize lands with content.
+            if framebuffer != 0, !isInBackground, mpvHasFrameReady {
+                performRender()
+                EAGLContext.setCurrent(nil)
+            }
         }
     }
 

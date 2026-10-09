@@ -281,10 +281,11 @@ struct UnifiedTabView: View {
     /// rows of every list then clear it, as they clear the tab accessory.
     private var miniPlayerInset: some View {
         let hasActiveVideo = appEnvironment?.playerService.state.currentVideo != nil
-        let isExpanded = appEnvironment?.navigationCoordinator.isPlayerExpanded ?? false
 
+        // Stays mounted under the expanded player: the dismiss gesture morphs
+        // the video into its preview, so it must already be in place
         return VStack(spacing: 0) {
-            if hasActiveVideo && !isExpanded {
+            if hasActiveVideo {
                 MiniPlayerView()
                     .padding(.horizontal, 16)
                     .padding(.bottom, 12)
