@@ -1091,21 +1091,6 @@ final class ExpandedPlayerWindowManager {
         rootVC.view.layoutIfNeeded()
     }
 
-    /// Maps a rect seen inside the scaled main window content to where it sits
-    /// once `scaleMainWindow(progress: 0)` restores the identity transform.
-    private func unscaledMainWindowRect(_ rect: CGRect) -> CGRect {
-        guard let presentingView = scaledPresentingView, !presentingView.transform.isIdentity else { return rect }
-        let center = presentingView.center
-        let inverse = presentingView.transform.inverted()
-        func unscale(_ point: CGPoint) -> CGPoint {
-            let local = CGPoint(x: point.x - center.x, y: point.y - center.y).applying(inverse)
-            return CGPoint(x: local.x + center.x, y: local.y + center.y)
-        }
-        let origin = unscale(rect.origin)
-        let corner = unscale(CGPoint(x: rect.maxX, y: rect.maxY))
-        return CGRect(x: origin.x, y: origin.y, width: corner.x - origin.x, height: corner.y - origin.y)
-    }
-
     /// Shrinks the expanded window onto its video and flies it into the mini
     /// player's video preview. Returns false (doing nothing) when no target is
     /// available, so the caller falls back to sliding off screen.
@@ -1120,12 +1105,13 @@ final class ExpandedPlayerWindowManager {
             return false
         }
 
-        // The mini player reports where it is now, inside the main window's
-        // scaled-down content; the morph lands once that scale is back to identity.
-        // The scaled content also got a smaller bottom safe area (UIKit derives it
+        // The mini player reports its SwiftUI global frame, which ignores the scale
+        // transform on the main window's content (that animates back to identity
+        // alongside the morph), so it is already where the mini player ends up.
+        // The scaled content did get a smaller bottom safe area (UIKit derives it
         // from the transformed frame), which comes back once unscaled and lifts
         // the bottom-anchored mini player by the difference.
-        var target = unscaledMainWindowRect(nav.miniPlayerVideoFrame)
+        var target = nav.miniPlayerVideoFrame
         if let mainWindow, let mainRootView = mainWindow.rootViewController?.view {
             target.origin.y -= max(0, mainWindow.safeAreaInsets.bottom - mainRootView.safeAreaInsets.bottom)
         }
