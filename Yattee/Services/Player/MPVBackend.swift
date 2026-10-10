@@ -48,7 +48,7 @@ final class MPVBackend: PlayerBackend {
         get { _volume }
         set {
             _volume = newValue
-            mpvClient?.setProperty("volume", Double(newValue * 100))
+            mpvClient?.setVolume(Double(newValue * 100), muted: _isMuted)
         }
     }
 
@@ -56,7 +56,7 @@ final class MPVBackend: PlayerBackend {
         get { _isMuted }
         set {
             _isMuted = newValue
-            mpvClient?.setProperty("mute", newValue)
+            mpvClient?.setVolume(Double(_volume * 100), muted: newValue)
         }
     }
 
@@ -1564,16 +1564,6 @@ extension MPVBackend: MPVClientDelegate {
         case "speed":
             if let speed = value as? Double {
                 _rate = Float(speed)
-            }
-
-        case "volume":
-            if let vol = value as? Double {
-                _volume = Float(vol / 100)
-            }
-
-        case "mute":
-            if let muted = value as? Bool {
-                _isMuted = muted
             }
 
         case "core-idle":

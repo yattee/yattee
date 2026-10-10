@@ -628,8 +628,6 @@ final class MPVClient: @unchecked Sendable {
         observeProperty("demuxer-cache-time", format: MPV_FORMAT_DOUBLE)
         observeProperty("demuxer-cache-state", format: MPV_FORMAT_NODE)
         observeProperty("speed", format: MPV_FORMAT_DOUBLE)
-        observeProperty("volume", format: MPV_FORMAT_DOUBLE)
-        observeProperty("mute", format: MPV_FORMAT_FLAG)
         observeProperty("core-idle", format: MPV_FORMAT_FLAG)
         observeProperty("seeking", format: MPV_FORMAT_FLAG)
         // Cache-related properties for debugging playback start issues
@@ -889,6 +887,54 @@ final class MPVClient: @unchecked Sendable {
         mpvQueue.async { [weak self] in
             self?.setPropertyUnsafe(name, value)
         }
+    }
+
+    /// Desired volume (0–100) and mute state; only touched on mpvQueue.
+    private var desiredVolume: Double = 100
+    private var desiredMute = false
+
+    /// Set the playback volume (0–100) and mute state.
+    ///
+    /// mpv's `volume`/`mute` properties are software volume applied before
+    /// samples reach the AO, so with avfoundation (AVSampleBufferAudioRenderer
+    /// queues ~2s ahead) changes are heard only after the queue drains. When
+    /// avfoundation is active, drive the renderer via `ao-volume`/`ao-mute`
+    /// instead (instant) and keep software volume neutral. Other AOs
+    /// (audiounit/coreaudio) keep using software volume.
+    func setVolume(_ volume: Double, muted: Bool) {
+        mpvQueue.async { [weak self] in
+            guard let self else { return }
+            self.desiredVolume = volume
+            self.desiredMute = muted
+            self.applyVolumeUnsafe()
+        }
+    }
+
+    /// Must be called on mpvQueue. Re-run on every audio reconfig, since a new
+    /// AO instance (new renderer) starts at full volume.
+    private func applyVolumeUnsafe() {
+        guard let mpv, !isDestroyed else { return }
+
+        var currentAo: String?
+        if let cString = mpv_get_property_string(mpv, "current-ao") {
+            currentAo = String(cString: cString)
+            mpv_free(cString)
+        }
+
+        var softVolume = desiredVolume
+        var softMute: Int32 = desiredMute ? 1 : 0
+        if currentAo == "avfoundation" {
+            var aoVolume = desiredVolume
+            var aoMute: Int32 = desiredMute ? 1 : 0
+            let volumeResult = mpv_set_property(mpv, "ao-volume", MPV_FORMAT_DOUBLE, &aoVolume)
+            let muteResult = mpv_set_property(mpv, "ao-mute", MPV_FORMAT_FLAG, &aoMute)
+            if volumeResult >= 0 && muteResult >= 0 {
+                softVolume = 100
+                softMute = 0
+            }
+        }
+        mpv_set_property(mpv, "volume", MPV_FORMAT_DOUBLE, &softVolume)
+        mpv_set_property(mpv, "mute", MPV_FORMAT_FLAG, &softMute)
     }
 
     /// Internal property setter (must be called on mpvQueue).
@@ -1450,6 +1496,11 @@ final class MPVClient: @unchecked Sendable {
                     guard let self else { return }
                     self.delegate?.mpvClientDidEndFile(self, reason: reason, errorCode: errorCode, errorString: errorString)
                 }
+            }
+
+        case MPV_EVENT_AUDIO_RECONFIG:
+            mpvQueue.async { [weak self] in
+                self?.applyVolumeUnsafe()
             }
 
         case MPV_EVENT_LOG_MESSAGE:
