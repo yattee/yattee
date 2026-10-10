@@ -55,6 +55,9 @@ struct SubscriptionsView: View {
     #elseif os(iOS)
     @AppStorage("subscriptionsIPadSidebarWidth") private var iPadSidebarWidth = 260.0
     @State private var iPadSidebarDragStartWidth: Double?
+    /// Whether the trailing status-bar column holds the channel rail, so the
+    /// bottom strip and the feed's bottom space for it go away.
+    @State private var channelRailFits = false
     #endif
 
     /// List style from centralized settings.
@@ -174,6 +177,16 @@ struct SubscriptionsView: View {
     /// the errors it is already the answer to.
     private var displayedFeedError: FeedLoadState.FeedLoadError? {
         feedCache.feedLoadState.displayedError(contextBannerVisible: contextUnavailability != nil)
+    }
+
+    /// Whether the channel filter is a rail in the trailing column rather than
+    /// a bottom strip, so the feed needs no bottom space for it.
+    private var usesChannelRail: Bool {
+        #if os(iOS)
+        channelRailFits
+        #else
+        false
+        #endif
     }
 
     private var isShowingFullScreenError: Bool {
@@ -471,7 +484,7 @@ struct SubscriptionsView: View {
                     VStack {
                         Spacer()
 
-                        if subscriptionsLoaded && subscriptions.count > 1 && channelStripSize != .disabled && !isShowingFullScreenError && !(channelSidebarFits && showSidebar) {
+                        if showsChannelStrip && !channelRailFits {
                             bottomFloatingFilterStrip
                                 .transition(.move(edge: .bottom).combined(with: .opacity))
                         }
@@ -674,6 +687,27 @@ struct SubscriptionsView: View {
             .onChange(of: geometry.size.width, initial: true) { _, newWidth in
                 viewWidth = newWidth
             }
+            #if os(iOS)
+            // Outside the ZStack so the rail is placed in the reader's own
+            // coordinate space, which the column geometry is measured in.
+            //
+            // The placement is computed in the same pass as the geometry, not
+            // kept in state: the reader's origin moves while the large title
+            // collapses on scroll, and a placement applied a pass late would
+            // ride along with it for a frame before snapping back.
+            .overlay(alignment: .topLeading) {
+                if showsChannelStrip, channelRailFits, let placement = channelRailPlacement(in: geometry) {
+                    channelRailView(placement)
+                        .offset(x: placement.x, y: placement.top)
+                        .transition(.opacity)
+                }
+            }
+            // Recomputed on every geometry pass, which includes the reserved
+            // regions changing when the Dynamic Island grows or shrinks.
+            .onChange(of: channelRailPlacement(in: geometry) != nil, initial: true) { _, fits in
+                channelRailFits = fits
+            }
+            #endif
         }
     }
 
@@ -694,7 +728,7 @@ struct SubscriptionsView: View {
         } footer: {
             #if os(iOS)
             // Bottom spacer for channel strip overlay (outside the card)
-            if channelStripSize != .disabled && subscriptions.count > 1 && !isShowingFullScreenError {
+            if channelStripSize != .disabled && subscriptions.count > 1 && !isShowingFullScreenError && !usesChannelRail {
                 Color.clear.frame(height: channelStripSize.totalHeight)
             }
             #else
@@ -834,7 +868,7 @@ struct SubscriptionsView: View {
                 }
 
                 // Bottom spacer for channel strip overlay
-                if channelStripSize != .disabled && subscriptions.count > 1 && !isShowingFullScreenError {
+                if channelStripSize != .disabled && subscriptions.count > 1 && !isShowingFullScreenError && !usesChannelRail {
                     Color.clear.frame(height: channelStripSize.totalHeight)
                 }
             }
@@ -879,34 +913,71 @@ struct SubscriptionsView: View {
     /// The HStack containing channel filter chips (extracted to avoid duplication).
     private var channelChipsHStack: some View {
         HStack(spacing: channelStripSize.chipSpacing) {
-            ForEach(sortedSubscriptions, id: \.channelID) { subscription in
-                ChannelFilterChip(
-                    channelID: subscription.channelID,
-                    name: subscription.name,
-                    avatarURL: subscription.avatarURL,
-                    serverURL: yatteeServerURL,
-                    isSelected: selectedChannelID == subscription.channelID,
-                    avatarSize: channelStripSize.avatarSize,
-                    onTap: {
-                        if selectedChannelID == subscription.channelID {
-                            selectedChannelID = nil
-                        } else {
-                            selectedChannelID = subscription.channelID
-                        }
-                    },
-                    onGoToChannel: {
-                        appEnvironment?.navigationCoordinator.navigate(
-                            to: .channel(subscription.channelID, subscription.contentSource)
-                        )
-                    },
-                    onUnsubscribe: {
-                        unsubscribeChannel(subscription.channelID)
-                    },
-                    authHeader: yatteeServerAuthHeader
-                )
-            }
+            channelChips(avatarSize: channelStripSize.avatarSize)
         }
     }
+
+    /// One filter chip per channel, laid out by the caller.
+    private func channelChips(avatarSize: CGFloat) -> some View {
+        ForEach(sortedSubscriptions, id: \.channelID) { subscription in
+            ChannelFilterChip(
+                channelID: subscription.channelID,
+                name: subscription.name,
+                avatarURL: subscription.avatarURL,
+                serverURL: yatteeServerURL,
+                isSelected: selectedChannelID == subscription.channelID,
+                avatarSize: avatarSize,
+                onTap: {
+                    if selectedChannelID == subscription.channelID {
+                        selectedChannelID = nil
+                    } else {
+                        selectedChannelID = subscription.channelID
+                    }
+                },
+                onGoToChannel: {
+                    appEnvironment?.navigationCoordinator.navigate(
+                        to: .channel(subscription.channelID, subscription.contentSource)
+                    )
+                },
+                onUnsubscribe: {
+                    unsubscribeChannel(subscription.channelID)
+                },
+                authHeader: yatteeServerAuthHeader
+            )
+        }
+    }
+
+    #if os(iOS)
+    /// The channel filter as a vertical rail in the trailing status-bar column
+    /// (iPhone Duo inner screen), stacked from the bottom so the system's status
+    /// items above never reach a short list, and scrolling when it outgrows the
+    /// column.
+    private func channelRailView(_ placement: ChannelRailPlacement) -> some View {
+        // The large strip size is wider than the column. It gives up padding
+        // before avatar size, so it still reads as larger than normal.
+        let available = placement.width - Self.channelRailSideInset * 2
+        let avatarSize = min(channelStripSize.avatarSize, available - 2 * Self.channelRailMinPadding)
+        let padding = max(Self.channelRailMinPadding, min(channelStripSize.verticalPadding, (available - avatarSize) / 2))
+        let chips = VStack(spacing: channelStripSize.chipSpacing) {
+            channelChips(avatarSize: avatarSize)
+        }
+        .padding(padding)
+
+        return ViewThatFits(in: .vertical) {
+            chips
+                .clipShape(Capsule())
+                .glassBackground(.regular, in: .capsule, fallback: .regularMaterial)
+
+            ScrollView(.vertical, showsIndicators: false) {
+                chips
+            }
+            .clipShape(Capsule())
+            .glassBackground(.regular, in: .capsule, fallback: .regularMaterial)
+        }
+        .frame(width: placement.width, height: placement.height, alignment: .bottom)
+        .animation(.smooth, value: placement.height)
+    }
+    #endif
 
     // MARK: - tvOS Channels Sidebar
 
@@ -1165,6 +1236,59 @@ struct SubscriptionsView: View {
         guard isIPadRegular else { return false }
         guard viewWidth > 0 else { return true }
         return viewWidth >= Self.iPadSidebarMinWidth + Self.iPadSidebarHandleWidth + Self.iPadSidebarMinFeedWidth
+    }
+
+    /// Whether the channel filter shows at all, as a bottom strip or a rail:
+    /// enough channels to filter and no channel sidebar doing the job.
+    private var showsChannelStrip: Bool {
+        subscriptionsLoaded && subscriptions.count > 1 && channelStripSize != .disabled
+            && !isShowingFullScreenError && !(channelSidebarFits && showSidebar)
+    }
+
+    /// The rail's frame in the content's coordinate space: the trailing
+    /// safe-area column, below whatever the system draws there.
+    struct ChannelRailPlacement: Equatable {
+        var x: CGFloat
+        var top: CGFloat
+        var width: CGFloat
+        var height: CGFloat
+    }
+
+    /// Narrower than this the column is a notch or rounded-corner inset, not
+    /// room for avatars.
+    private static let channelRailMinColumnWidth = 60.0
+    /// Below this the rail would hold only two or three avatars, which the
+    /// bottom strip shows just as well.
+    private static let channelRailMinHeight = 240.0
+    private static let channelRailEdgeSpacing = 8.0
+    private static let channelRailSideInset = 4.0
+    private static let channelRailMinPadding = 8.0
+
+    /// Where the channel rail fits, decided by space rather than device: a
+    /// trailing safe-area column wide enough for avatars (the iPhone Duo's
+    /// vertical status bar) with enough height left below the system's status
+    /// items and Dynamic Island. Those are read as occlusion reserved regions,
+    /// which grow and shrink with the island while the safe area stays put.
+    ///
+    /// The tab layout is ruled out because its tab bar takes the same column
+    /// (Duo exterior screen), and the tab bar is not a reserved region.
+    private func channelRailPlacement(in geometry: GeometryProxy) -> ChannelRailPlacement? {
+        guard #available(iOS 27.1, *) else { return nil }
+        guard isIPadRegular else { return nil }
+
+        let width = geometry.safeAreaInsets.trailing
+        guard width >= Self.channelRailMinColumnWidth else { return nil }
+
+        let columnMinX = geometry.size.width
+        let occludedBottom = geometry.reservedRegions(kind: .occlusion)
+            .filter { $0.frame.maxX > columnMinX }
+            .map(\.frame.maxY)
+            .max() ?? -geometry.safeAreaInsets.top
+        let top = occludedBottom + Self.channelRailEdgeSpacing
+        let bottom = geometry.size.height - Self.channelRailEdgeSpacing
+        guard bottom - top >= Self.channelRailMinHeight else { return nil }
+
+        return ChannelRailPlacement(x: columnMinX, top: top, width: width, height: bottom - top)
     }
 
     private var clampedIPadSidebarWidth: CGFloat {
