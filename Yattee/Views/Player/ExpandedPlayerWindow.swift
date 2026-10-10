@@ -1080,6 +1080,32 @@ final class ExpandedPlayerWindowManager {
         }
     }
 
+    /// Makes the main window's SwiftUI content pick up its current safe area
+    /// (setNeedsLayout alone doesn't invalidate SwiftUI's cached insets).
+    private func refreshMainWindowSafeArea() {
+        guard let rootVC = mainWindow?.rootViewController else { return }
+        let insets = rootVC.additionalSafeAreaInsets
+        rootVC.additionalSafeAreaInsets = UIEdgeInsets(top: insets.top + 1, left: insets.left, bottom: insets.bottom, right: insets.right)
+        rootVC.additionalSafeAreaInsets = insets
+        rootVC.view.setNeedsLayout()
+        rootVC.view.layoutIfNeeded()
+    }
+
+    /// Maps a rect seen inside the scaled main window content to where it sits
+    /// once `scaleMainWindow(progress: 0)` restores the identity transform.
+    private func unscaledMainWindowRect(_ rect: CGRect) -> CGRect {
+        guard let presentingView = scaledPresentingView, !presentingView.transform.isIdentity else { return rect }
+        let center = presentingView.center
+        let inverse = presentingView.transform.inverted()
+        func unscale(_ point: CGPoint) -> CGPoint {
+            let local = CGPoint(x: point.x - center.x, y: point.y - center.y).applying(inverse)
+            return CGPoint(x: local.x + center.x, y: local.y + center.y)
+        }
+        let origin = unscale(rect.origin)
+        let corner = unscale(CGPoint(x: rect.maxX, y: rect.maxY))
+        return CGRect(x: origin.x, y: origin.y, width: corner.x - origin.x, height: corner.y - origin.y)
+    }
+
     /// Shrinks the expanded window onto its video and flies it into the mini
     /// player's video preview. Returns false (doing nothing) when no target is
     /// available, so the caller falls back to sliding off screen.
@@ -1094,9 +1120,15 @@ final class ExpandedPlayerWindowManager {
             return false
         }
 
-        // The mini player frame is a layout frame in the main window, unaffected by
-        // the scale transform that animates back to identity alongside the morph
-        let target = nav.miniPlayerVideoFrame
+        // The mini player reports where it is now, inside the main window's
+        // scaled-down content; the morph lands once that scale is back to identity.
+        // The scaled content also got a smaller bottom safe area (UIKit derives it
+        // from the transformed frame), which comes back once unscaled and lifts
+        // the bottom-anchored mini player by the difference.
+        var target = unscaledMainWindowRect(nav.miniPlayerVideoFrame)
+        if let mainWindow, let mainRootView = mainWindow.rootViewController?.view {
+            target.origin.y -= max(0, mainWindow.safeAreaInsets.bottom - mainRootView.safeAreaInsets.bottom)
+        }
         let renderRect = playerView.convert(playerView.bounds, to: window)
         let source = visibleVideoRect(in: renderRect, panelFrame: hostView.convert(nav.portraitPanelFrame, to: window), nav: nav)
         guard target.width > 1, target.height > 1, window.bounds.contains(target),
@@ -1154,6 +1186,10 @@ final class ExpandedPlayerWindowManager {
         } completion: { _ in
             completion()
         }
+
+        // Unscaled, the main content gets its full safe area back: re-lay it out
+        // now, under the morphing video, rather than with a late jump at the end
+        refreshMainWindowSafeArea()
 
         // Pin the safe area: add back whatever the transform took away
         if let hostingController = window.rootViewController {
