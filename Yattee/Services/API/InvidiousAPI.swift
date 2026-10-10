@@ -1432,7 +1432,9 @@ private struct InvidiousRecommendedVideo: Decodable, Sendable {
             id: .global(videoId),
             title: title,
             description: nil,
-            author: Author(id: authorId, name: author),
+            // An empty authorId (unlinked recommendation author) can't open a
+            // channel, so it hides Go to Channel instead of failing to load.
+            author: Author(id: authorId, name: author, hasRealChannelInfo: !authorId.isEmpty),
             duration: TimeInterval(lengthSeconds),
             publishedAt: nil,
             publishedText: nil,

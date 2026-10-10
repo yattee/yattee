@@ -370,13 +370,9 @@ struct VideoContextMenuContent: View {
 
         // Video Info
         Button {
-            // Dismiss player if in player context
-            if context == .player {
-                // Set collapsing first so mini player shows video immediately
-                appEnvironment?.navigationCoordinator.isPlayerCollapsing = true
-                appEnvironment?.navigationCoordinator.isPlayerExpanded = false
-            }
-            appEnvironment?.navigationCoordinator.navigate(to: .video(.loaded(video)))
+            // Collapses the expanded player (also for related/queue rows
+            // shown inside it) so the pushed screen isn't left underneath.
+            appEnvironment?.navigationCoordinator.navigateToOpenedLink(.video(.loaded(video)))
         } label: {
             Label(String(localized: "video.context.info"), systemImage: "info.circle")
         }
@@ -384,7 +380,10 @@ struct VideoContextMenuContent: View {
         // Go to channel (hidden for media browser, or when no real channel info)
         if showGoToChannel && video.author.hasRealChannelInfo {
             Button {
-                appEnvironment?.navigationCoordinator.navigateToChannel(for: video, collapsePlayer: context == .player)
+                appEnvironment?.navigationCoordinator.navigateToChannel(
+                    for: video,
+                    collapsePlayer: appEnvironment?.navigationCoordinator.isPlayerExpanded == true
+                )
             } label: {
                 Label(String(localized: "video.context.goToChannel"), systemImage: "person.circle")
             }
