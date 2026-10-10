@@ -1443,6 +1443,21 @@ struct PlayerControlsView: View {
             .modifier(SideSliderBackgroundModifier(buttonBackground: buttonBackground, theme: theme))
             .opacity(playerState.isControlsLocked ? 0.5 : 1.0)
             .allowsHitTesting(!playerState.isControlsLocked)
+            // Publish the slider frame (with slop) so the window-level dismiss
+            // pan never begins from a slider drag
+            .background {
+                GeometryReader { proxy in
+                    let isActive = shouldShowControls && !playerState.isControlsLocked
+                    let frame = isActive ? proxy.frame(in: .global).insetBy(dx: -12, dy: -12) : .zero
+                    Color.clear
+                        .onChange(of: frame, initial: true) { _, frame in
+                            appEnvironment?.navigationCoordinator.playerSideSliderFrames[isLeading] = frame
+                        }
+                        .onDisappear {
+                            appEnvironment?.navigationCoordinator.playerSideSliderFrames[isLeading] = nil
+                        }
+                }
+            }
         }
     }
 

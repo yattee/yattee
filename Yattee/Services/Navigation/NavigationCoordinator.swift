@@ -144,6 +144,12 @@ final class NavigationCoordinator {
     /// otherwise be cancelled and dismiss the player instead).
     var panelResizeGrabberFrame: CGRect = .zero
 
+    /// Volume/brightness side slider frames in screen coordinates, keyed by
+    /// edge (leading = true). Touches inside must not start the sheet dismiss
+    /// pan — the window pan recognizes before SwiftUI's slider DragGesture
+    /// sets `isAdjustingPlayerSliders`, so the flag alone loses the race.
+    var playerSideSliderFrames: [Bool: CGRect] = [:]
+
     /// Corner layout: width of the trailing screen-edge strip reserved for
     /// the side column reveal swipe while the column is collapsed (0 when
     /// not collapsed) — the seek pan must not begin from inside it.

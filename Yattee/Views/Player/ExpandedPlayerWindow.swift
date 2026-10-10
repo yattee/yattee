@@ -175,6 +175,7 @@ private final class DragToDismissGestureHandler: NSObject, UIGestureRecognizerDe
     var getCornerBelowPanelFrame: (() -> CGRect)?
     /// Returns the panel resize grabber strip frame in screen coordinates (blocks dismiss pan)
     var getPanelResizeGrabberFrame: (() -> CGRect)?
+    var getPlayerSideSliderFrames: (() -> [CGRect])?
     /// Returns whether the portrait panel is currently visible (not hidden off-screen)
     var isPortraitPanelVisible: (() -> Bool)?
     /// Returns the progress bar frame in screen coordinates (for gesture conflict resolution)
@@ -380,6 +381,13 @@ private final class DragToDismissGestureHandler: NSObject, UIGestureRecognizerDe
 
         // Don't begin dismiss gesture when adjusting volume/brightness sliders
         if isAdjustingPlayerSliders?() == true {
+            return false
+        }
+
+        // ...or when the touch starts on a slider: the flag above is set by
+        // SwiftUI's DragGesture, which fires after this pan recognizes
+        let sliderTouch = panGesture.location(in: nil)
+        if (getPlayerSideSliderFrames?() ?? []).contains(where: { $0.contains(sliderTouch) }) {
             return false
         }
 
@@ -870,6 +878,9 @@ final class ExpandedPlayerWindowManager {
         }
         handler.getPanelResizeGrabberFrame = { [weak self] in
             self?.appEnvironment?.navigationCoordinator.panelResizeGrabberFrame ?? .zero
+        }
+        handler.getPlayerSideSliderFrames = { [weak self] in
+            self?.appEnvironment?.navigationCoordinator.playerSideSliderFrames.values.filter { !$0.isEmpty } ?? []
         }
         handler.isPortraitPanelVisible = { [weak self] in
             self?.appEnvironment?.navigationCoordinator.isPortraitPanelVisible ?? true
