@@ -27,7 +27,8 @@ actor InvidiousAPI: InstanceAPI {
     func popular(instance: Instance) async throws -> [Video] {
         let endpoint = GenericEndpoint.get("/api/v1/popular")
         let response: [InvidiousVideo] = try await httpClient.fetch(endpoint, baseURL: instance.url)
-        return response.map { $0.toVideo(baseURL: instance.url) }
+        // Popular is read from the same RSS-fed table as the subscription feed.
+        return response.map { $0.toVideo(baseURL: instance.url, isShort: $0.isLikelyFeedShort) }
     }
 
     func search(query: String, instance: Instance, page: Int, filters: SearchFilters = .defaults) async throws -> SearchResult {
@@ -1199,13 +1200,14 @@ private struct InvidiousVideo: Decodable, Sendable {
     let isUpcoming: Bool?
     let premiereTimestamp: Int64?
 
-    /// Whether this subscription-feed entry is most likely a Short.
+    /// Whether this subscription-feed or popular entry is most likely a Short.
     ///
     /// Invidious builds the feed from the channel's RSS, which lists Shorts, and
     /// takes each video's length from the channel's Videos tab, which doesn't.
     /// A Short therefore arrives with no length, and so does a stream or
     /// premiere, which is why those are ruled out. Only meaningful for
-    /// `/api/v1/auth/feed`: other lists give zero length for other reasons.
+    /// `/api/v1/auth/feed` and `/api/v1/popular`, which Invidious reads from
+    /// the same table: other lists give zero length for other reasons.
     var isLikelyFeedShort: Bool {
         lengthSeconds == 0 && liveNow != true && isUpcoming != true && premiereTimestamp == nil
     }
