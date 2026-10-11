@@ -146,6 +146,9 @@ final class SettingsManager {
 
     // Tab bar startup
     var _tabBarStartupTab: SidebarMainItem?
+    #if os(iOS)
+    var _navigationStyle: NavigationStyle?
+    #endif
     var _sidebarSourcesEnabled: Bool?
     var _sidebarSourceSort: SidebarSourceSort?
     var _sidebarSourcesLimitEnabled: Bool?
@@ -509,6 +512,9 @@ final class SettingsManager {
         _sidebarMainItemVisibility = nil
         _sidebarStartupTab = nil
         _tabBarStartupTab = nil
+        #if os(iOS)
+        _navigationStyle = nil
+        #endif
         _sidebarSourcesEnabled = nil
         _sidebarSourceSort = nil
         _sidebarSourcesLimitEnabled = nil

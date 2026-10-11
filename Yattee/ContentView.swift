@@ -246,7 +246,11 @@ struct AdaptiveTabView: View {
     }
 
     private var usesSidebar: Bool {
-        NavigationLayout.usesSidebar(horizontalSizeClass: horizontalSizeClass, verticalSizeClass: verticalSizeClass)
+        NavigationLayout.usesSidebar(
+            horizontalSizeClass: horizontalSizeClass,
+            verticalSizeClass: verticalSizeClass,
+            style: appEnvironment.settingsManager.navigationStyle
+        )
     }
 
     private static var usesTabBottomAccessory: Bool {

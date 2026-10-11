@@ -170,12 +170,13 @@ enum NavigationLayout {
     /// iPhone Duo inner screen in either orientation). A large iPhone in
     /// landscape is regular width but compact height, so it keeps the tab
     /// bar. An iPad keeps the sidebar for as long as its width is regular,
-    /// even in a short Stage Manager window.
+    /// even in a short Stage Manager window. The `.tabBar` style opts out.
     static func usesSidebar(
         horizontalSizeClass: UserInterfaceSizeClass?,
-        verticalSizeClass: UserInterfaceSizeClass?
+        verticalSizeClass: UserInterfaceSizeClass?,
+        style: NavigationStyle = .automatic
     ) -> Bool {
-        guard horizontalSizeClass == .regular else { return false }
+        guard style == .automatic, horizontalSizeClass == .regular else { return false }
         return verticalSizeClass == .regular || UIDevice.current.userInterfaceIdiom == .pad
     }
 }

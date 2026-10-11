@@ -964,6 +964,23 @@ extension SettingsManager {
         }
     }
 
+    // MARK: - Navigation Style
+
+    #if os(iOS)
+    /// Whether screens that fit the sidebar (iPad, iPhone Duo inner screen)
+    /// use it, or keep the tab bar. Default is automatic.
+    var navigationStyle: NavigationStyle {
+        get {
+            if let cached = _navigationStyle { return cached }
+            return NavigationStyle(rawValue: string(for: .navigationStyle) ?? "") ?? .automatic
+        }
+        set {
+            _navigationStyle = newValue
+            set(newValue.rawValue, for: .navigationStyle)
+        }
+    }
+    #endif
+
     // MARK: - Startup Tab Settings
 
     /// The startup tab for tab bar mode (compact/iPhone). Default is home.

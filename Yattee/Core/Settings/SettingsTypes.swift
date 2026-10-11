@@ -386,6 +386,27 @@ enum MiniPlayerVideoTapAction: String, CaseIterable, Codable {
     }
 }
 
+// MARK: - Navigation Style
+
+/// Navigation layout on screens that fit the sidebar (iPad, iPhone Duo inner screen).
+#if os(iOS)
+enum NavigationStyle: String, CaseIterable, Codable {
+    /// Sidebar where it fits, tab bar elsewhere.
+    case automatic
+    /// Tab bar everywhere.
+    case tabBar
+
+    var displayName: String {
+        switch self {
+        case .automatic:
+            return String(localized: "settings.navigationStyle.automatic")
+        case .tabBar:
+            return String(localized: "settings.navigationStyle.tabBar")
+        }
+    }
+}
+#endif
+
 // MARK: - Mini Player Minimize Behavior
 
 /// Behavior for minimizing the mini player (iOS 26+ only).

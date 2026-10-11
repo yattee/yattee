@@ -88,6 +88,9 @@ enum SettingsKey: String, CaseIterable {
     // Top Shelf (tvOS)
     case topShelfSections
 
+    // Navigation layout (iPad, iPhone Duo inner screen)
+    case navigationStyle
+
     // Tab Bar (compact size class)
     case tabBarItemOrder
     case tabBarItemVisibility
@@ -162,7 +165,7 @@ enum SettingsKey: String, CaseIterable {
              // Top Shelf — tvOS only
              .topShelfSections,
              // Tab bar (compact size class) layout
-             .tabBarItemOrder, .tabBarItemVisibility, .tabBarStartupTab,
+             .navigationStyle, .tabBarItemOrder, .tabBarItemVisibility, .tabBarStartupTab,
              // Sidebar layout/selection
              .sidebarMainItemOrder, .sidebarMainItemVisibility, .sidebarStartupTab,
              .sidebarSourcesEnabled, .sidebarSourceSort, .sidebarSourcesLimitEnabled, .sidebarMaxSources,

@@ -13974,6 +13974,83 @@
         }
       }
     },
+    "settings.navigationStyle" : {
+      "comment" : "Picker label for choosing sidebar or tab bar navigation",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Navigation"
+          }
+        }
+      }
+    },
+    "settings.navigationStyle.automatic" : {
+      "comment" : "Navigation style option: sidebar on large screens, tab bar elsewhere",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Automatic"
+          }
+        }
+      }
+    },
+    "settings.navigationStyle.confirm.change" : {
+      "comment" : "Confirm button for changing the navigation style",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Change"
+          }
+        }
+      }
+    },
+    "settings.navigationStyle.confirm.message" : {
+      "comment" : "Alert message before changing the navigation style",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The app's navigation will be rebuilt for the new layout. Settings will close and you'll return to Home."
+          }
+        }
+      }
+    },
+    "settings.navigationStyle.confirm.title" : {
+      "comment" : "Alert title before changing the navigation style",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Change Navigation?"
+          }
+        }
+      }
+    },
+    "settings.navigationStyle.footer" : {
+      "comment" : "Footer explaining the navigation style setting",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Automatic uses the sidebar when the screen is large enough. Tab Bar always uses the tab bar."
+          }
+        }
+      }
+    },
+    "settings.navigationStyle.tabBar" : {
+      "comment" : "Navigation style option: always use the tab bar",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tab Bar"
+          }
+        }
+      }
+    },
     "settings.notifications.defaultForNew" : {
       "comment" : "Toggle for enabling notifications on new subscriptions",
       "localizations" : {
