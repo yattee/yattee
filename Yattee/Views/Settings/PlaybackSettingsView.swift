@@ -9,6 +9,9 @@ import SwiftUI
 
 struct PlaybackSettingsView: View {
     @Environment(\.appEnvironment) private var appEnvironment
+    #if os(iOS)
+    @State private var hasHinge = HingeLayoutObserver.forceTabletop
+    #endif
 
     var body: some View {
         SettingsFormContainer {
@@ -23,10 +26,17 @@ struct PlaybackSettingsView: View {
                 QueueSection(settings: settings)
                 #if os(iOS)
                 OrientationSection(settings: settings)
-                FoldableSection(settings: settings)
+                if hasHinge {
+                    FoldableSection(settings: settings)
+                }
                 #endif
             }
         }
+        #if os(iOS)
+        // Observed on the always-present form: an observer on the hidden
+        // section itself would have no view to attach to and never fire.
+        .observeHinge(hasHinge: $hasHinge)
+        #endif
         #if !os(tvOS)
         .navigationTitle(String(localized: "settings.playback.title"))
         #endif
@@ -369,23 +379,17 @@ private struct QueueSection: View {
 /// iPhone Duo only: options for the tabletop (laptop-like) player layout.
 private struct FoldableSection: View {
     @Bindable var settings: SettingsManager
-    @State private var hasHinge = HingeLayoutObserver.forceTabletop
 
     var body: some View {
-        Group {
-            if hasHinge {
-                SettingsFormSection(
-                    "settings.playback.foldable.header",
-                    footer: "settings.playback.foldable.tabletopReflection.footer"
-                ) {
-                    Toggle(
-                        String(localized: "settings.playback.foldable.tabletopReflection"),
-                        isOn: $settings.tabletopReflection
-                    )
-                }
-            }
+        SettingsFormSection(
+            "settings.playback.foldable.header",
+            footer: "settings.playback.foldable.tabletopReflection.footer"
+        ) {
+            Toggle(
+                String(localized: "settings.playback.foldable.tabletopReflection"),
+                isOn: $settings.tabletopReflection
+            )
         }
-        .observeHinge(hasHinge: $hasHinge)
     }
 }
 #endif
