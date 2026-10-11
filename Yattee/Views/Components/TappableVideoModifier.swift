@@ -8,8 +8,8 @@
 import SwiftUI
 
 /// View modifier that wraps content in a button that plays a video when tapped.
-/// When queue is enabled and not empty, shows a sheet with queue options.
-/// When queue is empty or disabled, plays the video directly and queues subsequent videos.
+/// When queue is enabled and a video is playing or queued, shows a sheet with queue options.
+/// When nothing is playing or queue is disabled, plays the video directly and queues subsequent videos.
 struct TappableVideoModifier: ViewModifier {
     @Environment(\.appEnvironment) private var appEnvironment
     @Environment(\.presentAppSheet) private var presentAppSheet
@@ -36,12 +36,14 @@ struct TappableVideoModifier: ViewModifier {
     @State private var sourceNeedingPassword: MediaSource?
     @State private var passwordInput = ""
 
-    /// Whether queue feature is enabled and queue has items
+    /// Whether queue feature is enabled and something is playing or queued,
+    /// so "Play Next" / "Add to Queue" are meaningful alternatives to replacing playback.
     private var shouldShowQueueSheet: Bool {
         guard let env = appEnvironment else { return false }
         let queueEnabled = env.settingsManager.queueEnabled
-        let queueHasItems = !env.playerService.state.queue.isEmpty
-        return queueEnabled && queueHasItems
+        let state = env.playerService.state
+        let hasActivePlayback = state.currentVideo != nil || !state.queue.isEmpty
+        return queueEnabled && hasActivePlayback
     }
 
     func body(content: Content) -> some View {
