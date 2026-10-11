@@ -50,6 +50,7 @@ struct SearchView: View {
     @AppStorage("searchRowStyle") private var rowStyle: VideoRowStyle = .regular
     @AppStorage("searchGridColumns") private var gridColumns = 2
     @AppStorage("searchHideWatched") private var hideWatched = false
+    @AppStorage("searchHideShorts") private var hideShorts = false
 
     /// List style from centralized settings.
     private var listStyle: VideoListStyle {
@@ -172,6 +173,9 @@ struct SearchView: View {
         .onChange(of: hideWatched) { _, newValue in
             searchViewModel?.hideWatchedVideos = newValue
         }
+        .onChange(of: hideShorts) { _, newValue in
+            searchViewModel?.hideShorts = newValue
+        }
         .onChange(of: saveRecentSearches) { _, _ in
             loadSearchHistory()
         }
@@ -203,6 +207,7 @@ struct SearchView: View {
             rowStyle: $rowStyle,
             gridColumns: $gridColumns,
             hideWatched: $hideWatched,
+            hideShorts: $hideShorts,
             maxGridColumns: gridConfig.maxColumns
         )
     }
@@ -389,6 +394,7 @@ struct SearchView: View {
             settingsManager: appEnvironment.settingsManager
         )
         searchViewModel?.hideWatchedVideos = hideWatched
+        searchViewModel?.hideShorts = hideShorts
         loadFilters()
         loadSearchHistory()
         loadRecentChannels()
@@ -410,6 +416,7 @@ struct SearchView: View {
             settingsManager: appEnvironment.settingsManager
         )
         searchViewModel?.hideWatchedVideos = hideWatched
+        searchViewModel?.hideShorts = hideShorts
         loadFilters()
 
         // Re-run search if we had results

@@ -44,6 +44,7 @@ struct SubscriptionsView: View {
     @AppStorage("subscriptionsRowStyle") private var rowStyle: VideoRowStyle = .regular
     @AppStorage("subscriptionsGridColumns") private var gridColumns = 2
     @AppStorage("subscriptionsHideWatched") private var hideWatched = false
+    @AppStorage("subscriptionsHideShorts") private var hideShorts = false
     @AppStorage("subscriptionsChannelStripSize") private var channelStripSize: ChannelStripSize = .normal
     @AppStorage("subscriptionsShowSidebar") private var showSidebar = true
     /// Whether the last completed load produced enough channels for the sidebar,
@@ -126,8 +127,13 @@ struct SubscriptionsView: View {
                     Text("common.on").tag(true)
                     Text("common.off").tag(false)
                 }
+                PlatformMenuPicker(String(localized: "viewOptions.hideShorts"), selection: $hideShorts) {
+                    Text("common.on").tag(true)
+                    Text("common.off").tag(false)
+                }
                 #else
                 Toggle("viewOptions.hideWatched", isOn: $hideWatched)
+                Toggle("viewOptions.hideShorts", isOn: $hideShorts)
                 #endif
 
                 #if os(iOS)
@@ -245,12 +251,16 @@ struct SubscriptionsView: View {
             .joined(separator: "|")
     }
 
-    /// Videos filtered by selected channel and watch status.
+    /// Videos filtered by selected channel, watch status and Shorts.
     private var filteredVideos: [Video] {
         var videos = feedCache.videos
 
         if let channelID = selectedChannelID {
             videos = videos.filter { $0.author.id == channelID }
+        }
+
+        if hideShorts {
+            videos = videos.filter { !$0.isKnownShort }
         }
 
         if hideWatched {

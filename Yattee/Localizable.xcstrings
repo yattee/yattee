@@ -20765,6 +20765,16 @@
         }
       }
     },
+    "viewOptions.hideShorts" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hide Shorts"
+          }
+        }
+      }
+    },
     "viewOptions.hideWatched" : {
       "localizations" : {
         "en" : {

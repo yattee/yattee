@@ -51,6 +51,9 @@ final class SearchViewModel {
     /// Hide watched videos (controlled by view options, not filters)
     var hideWatchedVideos: Bool = false
 
+    /// Hide Shorts (controlled by view options, not filters)
+    var hideShorts: Bool = false
+
     /// Unified result items preserving API order (for InstanceBrowseView style display).
     private(set) var resultItems: [SearchResultItem] = []
 
@@ -161,7 +164,7 @@ final class SearchViewModel {
 
                 if resetResults {
                     // Fresh results
-                    videos = filterWatchedVideos(result.videos)
+                    videos = filterHiddenVideos(result.videos)
                     channels = result.channels
                     playlists = result.playlists
 
@@ -169,8 +172,8 @@ final class SearchViewModel {
                     resultItems = result.orderedItems.enumerated().compactMap { _, item in
                         switch item {
                         case .video(let video):
-                            // Skip watched videos if filter is enabled
-                            if hideWatchedVideos && isVideoWatched(video) {
+                            // Skip watched videos and Shorts if those filters are enabled
+                            if isVideoHidden(video) {
                                 return nil
                             }
                             if let index = videos.firstIndex(where: { $0.id == video.id }) {
@@ -189,7 +192,7 @@ final class SearchViewModel {
                     let existingChannelIDs = Set(channels.map(\.id))
                     let existingPlaylistIDs = Set(playlists.map(\.id))
 
-                    let filteredNewVideos = filterWatchedVideos(result.videos)
+                    let filteredNewVideos = filterHiddenVideos(result.videos)
                     let newVideos = filteredNewVideos.filter { !existingVideoIDs.contains($0.id) }
                     let newChannels = result.channels.filter { !existingChannelIDs.contains($0.id) }
                     let newPlaylists = result.playlists.filter { !existingPlaylistIDs.contains($0.id) }
@@ -203,8 +206,8 @@ final class SearchViewModel {
                     for item in result.orderedItems {
                         switch item {
                         case .video(let video):
-                            // Skip watched videos if filter is enabled
-                            if hideWatchedVideos && isVideoWatched(video) {
+                            // Skip watched videos and Shorts if those filters are enabled
+                            if isVideoHidden(video) {
                                 continue
                             }
                             guard !existingVideoIDs.contains(video.id) else { continue }
@@ -331,8 +334,14 @@ final class SearchViewModel {
         deArrowProvider.prefetch(videoIDs: youtubeIDs)
     }
     
-    /// Filters out watched videos if hideWatchedVideos is enabled.
-    private func filterWatchedVideos(_ videos: [Video]) -> [Video] {
+    /// Filters out watched videos and Shorts when those filters are enabled.
+    private func filterHiddenVideos(_ videos: [Video]) -> [Video] {
+        var videos = videos
+
+        if hideShorts {
+            videos = videos.filter { !$0.isKnownShort }
+        }
+
         guard hideWatchedVideos, let dataManager else {
             return videos
         }
@@ -342,6 +351,11 @@ final class SearchViewModel {
             guard let entry = watchMap[video.id.videoID] else { return true }
             return !entry.isFinished
         }
+    }
+
+    /// Whether the view options hide this video from results.
+    private func isVideoHidden(_ video: Video) -> Bool {
+        (hideShorts && video.isKnownShort) || (hideWatchedVideos && isVideoWatched(video))
     }
     
     /// Checks if a video is watched (finished).

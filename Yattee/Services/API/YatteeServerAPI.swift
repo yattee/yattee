@@ -392,6 +392,7 @@ struct ServerFeedVideo: Decodable, Sendable {
     let videoUrl: String?
     let isUpcoming: Bool?
     let premiereTimestamp: Int64?
+    let isShort: Bool?
 
     func toVideo() -> Video? {
         // Determine content source based on extractor
@@ -418,7 +419,8 @@ struct ServerFeedVideo: Decodable, Sendable {
             thumbnails: videoThumbnails?.map { $0.toThumbnail() } ?? [],
             isLive: false,
             isUpcoming: isUpcoming ?? false,
-            scheduledStartTime: premiereTimestamp.map { Date(timeIntervalSince1970: TimeInterval($0)) }
+            scheduledStartTime: premiereTimestamp.map { Date(timeIntervalSince1970: TimeInterval($0)) },
+            isShort: isShort
         )
     }
 }
@@ -611,6 +613,7 @@ private struct YatteeVideo: Decodable, Sendable {
     let liveNow: Bool?
     let isUpcoming: Bool?
     let premiereTimestamp: Int64?
+    let isShort: Bool?
 
     nonisolated func toVideo() -> Video {
         Video(
@@ -626,7 +629,8 @@ private struct YatteeVideo: Decodable, Sendable {
             thumbnails: videoThumbnails?.map { $0.toThumbnail() } ?? [],
             isLive: liveNow ?? false,
             isUpcoming: isUpcoming ?? false,
-            scheduledStartTime: premiereTimestamp.map { Date(timeIntervalSince1970: TimeInterval($0)) }
+            scheduledStartTime: premiereTimestamp.map { Date(timeIntervalSince1970: TimeInterval($0)) },
+            isShort: isShort
         )
     }
 }

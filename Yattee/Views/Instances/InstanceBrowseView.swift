@@ -50,6 +50,7 @@ struct InstanceBrowseView: View {
     @AppStorage var rowStyle: VideoRowStyle
     @AppStorage var gridColumnCount: Int
     @AppStorage var hideWatched: Bool
+    @AppStorage var hideShorts: Bool
     
     // View options UI state
     @State private var showViewOptions = false
@@ -74,6 +75,7 @@ struct InstanceBrowseView: View {
         _rowStyle = AppStorage(wrappedValue: .regular, "instanceBrowse.\(instance.id).rowStyle")
         _gridColumnCount = AppStorage(wrappedValue: 2, "instanceBrowse.\(instance.id).gridColumns")
         _hideWatched = AppStorage(wrappedValue: false, "instanceBrowse.\(instance.id).hideWatched")
+        _hideShorts = AppStorage(wrappedValue: false, "instanceBrowse.\(instance.id).hideShorts")
     }
 
     /// List style from centralized settings.
@@ -126,6 +128,7 @@ struct InstanceBrowseView: View {
             rowStyle: $rowStyle,
             gridColumns: $gridColumnCount,
             hideWatched: $hideWatched,
+            hideShorts: $hideShorts,
             maxGridColumns: gridConfig.maxColumns
         )
     }
@@ -825,6 +828,10 @@ struct InstanceBrowseView: View {
                 guard let entry = watchEntriesMap[video.id.videoID] else { return true }
                 return !entry.isFinished
             }
+        }
+
+        if hideShorts {
+            videos = videos.filter { !$0.isKnownShort }
         }
         
         return videos

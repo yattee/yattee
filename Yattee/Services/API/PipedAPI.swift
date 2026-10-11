@@ -884,7 +884,8 @@ private struct PipedVideo: Decodable, Sendable {
             thumbnails: Thumbnail.fallbackChain(for: thumbnail.flatMap { URL(string: $0) }),
             isLive: duration == -1,
             isUpcoming: false,
-            scheduledStartTime: nil
+            scheduledStartTime: nil,
+            isShort: isShort
         )
     }
 }
@@ -1092,6 +1093,7 @@ private struct PipedSearchItem: Decodable, Sendable {
     let views: Int64?
     let videos: Int64?
     let subscribers: Int64?
+    let isShort: Bool?
 
     var videoId: String? {
         url?.replacingOccurrences(of: "/watch?v=", with: "")
@@ -1123,7 +1125,8 @@ private struct PipedSearchItem: Decodable, Sendable {
             thumbnails: Thumbnail.fallbackChain(for: thumbnail.flatMap { URL(string: $0) }),
             isLive: duration == -1,
             isUpcoming: false,
-            scheduledStartTime: nil
+            scheduledStartTime: nil,
+            isShort: isShort
         )
     }
 

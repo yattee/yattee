@@ -51,6 +51,9 @@ struct Video: Identifiable, Codable, Sendable {
     /// Related/recommended videos (populated from video details API).
     let relatedVideos: [Video]?
 
+    /// Whether this is a YouTube Short: `nil` when the source can't tell.
+    let isShort: Bool?
+
     // MARK: - Explicit Initializer
 
     init(
@@ -67,7 +70,8 @@ struct Video: Identifiable, Codable, Sendable {
         isLive: Bool,
         isUpcoming: Bool,
         scheduledStartTime: Date?,
-        relatedVideos: [Video]? = nil
+        relatedVideos: [Video]? = nil,
+        isShort: Bool? = nil
     ) {
         self.id = id
         self.title = title
@@ -83,6 +87,7 @@ struct Video: Identifiable, Codable, Sendable {
         self.isUpcoming = isUpcoming
         self.scheduledStartTime = scheduledStartTime
         self.relatedVideos = relatedVideos
+        self.isShort = isShort
     }
 
     // MARK: - Standing in for metadata
@@ -132,6 +137,12 @@ struct Video: Identifiable, Codable, Sendable {
             isUpcoming: false,
             scheduledStartTime: nil
         )
+    }
+
+    /// Whether a "Hide Shorts" filter should drop this video: only when the
+    /// source said it is a Short, never when it couldn't tell.
+    var isKnownShort: Bool {
+        isShort == true
     }
 
     /// Whether the title is only the video's own ID standing in for one.
@@ -518,6 +529,7 @@ extension Video: Equatable {
             && lhs.thumbnails == rhs.thumbnails
             && lhs.description == rhs.description
             && lhs.relatedVideos == rhs.relatedVideos
+            && lhs.isShort == rhs.isShort
     }
 }
 

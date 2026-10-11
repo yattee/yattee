@@ -592,7 +592,7 @@ actor InvidiousAPI: InstanceAPI {
         
         // Combine notifications and videos arrays - Invidious returns feed items in notifications
         let allVideos = (response.notifications ?? []) + response.videos
-        let videos = allVideos.map { $0.toVideo(baseURL: instance.url) }
+        let videos = allVideos.map { $0.toVideo(baseURL: instance.url, isShort: $0.isLikelyFeedShort) }
         
         LoggingService.shared.debug(
             "Invidious feed: \(response.notifications?.count ?? 0) notifications + \(response.videos.count) videos = \(videos.count) total",
@@ -1199,7 +1199,18 @@ private struct InvidiousVideo: Decodable, Sendable {
     let isUpcoming: Bool?
     let premiereTimestamp: Int64?
 
-    nonisolated func toVideo(baseURL: URL) -> Video {
+    /// Whether this subscription-feed entry is most likely a Short.
+    ///
+    /// Invidious builds the feed from the channel's RSS, which lists Shorts, and
+    /// takes each video's length from the channel's Videos tab, which doesn't.
+    /// A Short therefore arrives with no length, and so does a stream or
+    /// premiere, which is why those are ruled out. Only meaningful for
+    /// `/api/v1/auth/feed`: other lists give zero length for other reasons.
+    var isLikelyFeedShort: Bool {
+        lengthSeconds == 0 && liveNow != true && isUpcoming != true && premiereTimestamp == nil
+    }
+
+    nonisolated func toVideo(baseURL: URL, isShort: Bool? = nil) -> Video {
         let publishedReading = InvidiousSentinel.published(
             published,
             text: publishedText,
@@ -1219,7 +1230,8 @@ private struct InvidiousVideo: Decodable, Sendable {
             thumbnails: videoThumbnails?.map { $0.toThumbnail(baseURL: baseURL) } ?? [],
             isLive: liveNow ?? false,
             isUpcoming: isUpcoming ?? false,
-            scheduledStartTime: premiereTimestamp.map { Date(timeIntervalSince1970: TimeInterval($0)) }
+            scheduledStartTime: premiereTimestamp.map { Date(timeIntervalSince1970: TimeInterval($0)) },
+            isShort: isShort
         )
     }
 }
