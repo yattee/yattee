@@ -28,7 +28,8 @@ struct YatteeServerFeedChunkingTests {
             extractor: "youtube",
             videoUrl: nil,
             isUpcoming: nil,
-            premiereTimestamp: nil
+            premiereTimestamp: nil,
+            isShort: nil
         )
     }
 
