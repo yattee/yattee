@@ -151,26 +151,25 @@ struct MPVVideoView: View {
             // black screen when the shared render view reappears without a window re-parent.
             backend.resumeRendering()
             #endif
-            // Start debug updates if overlay is already visible when view appears
-            if playerState.showDebugOverlay {
-                startDebugUpdates()
-            }
+            startDebugUpdates()
         }
-        .onChange(of: playerState.showDebugOverlay) { _, isVisible in
-            if isVisible {
-                startDebugUpdates()
-            } else {
-                stopDebugUpdates()
-            }
+        .onChange(of: shouldUpdateDebugStats) { _, _ in
+            startDebugUpdates()
         }
         .onDisappear {
             stopDebugUpdates()
         }
     }
 
+    private var shouldUpdateDebugStats: Bool {
+        showsDebugOverlay && !isWideScreenLayout && playerState.showDebugOverlay
+    }
+
     private func startDebugUpdates() {
         // Stop any existing timer first
         stopDebugUpdates()
+
+        guard shouldUpdateDebugStats else { return }
 
         // Update immediately
         debugStats = backend.getDebugStats()
