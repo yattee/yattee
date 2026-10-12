@@ -363,13 +363,15 @@ struct ManageChannelsView: View {
     }
 
     private var listContent: some View {
-        VideoListContainer(listStyle: listStyle, rowStyle: rowStyle) {
+        let visibleChannels = filteredChannels
+
+        return VideoListContainer(listStyle: listStyle, rowStyle: rowStyle) {
             Spacer()
                 .frame(height: 16)
         } content: {
-            ForEach(Array(filteredChannels.enumerated()), id: \.element.id.channelID) { index, channel in
+            ForEach(Array(visibleChannels.enumerated()), id: \.element.id.channelID) { index, channel in
                 VideoListRow(
-                    isLast: index == filteredChannels.count - 1,
+                    isLast: index == visibleChannels.count - 1,
                     rowStyle: rowStyle,
                     listStyle: listStyle
                 ) {
