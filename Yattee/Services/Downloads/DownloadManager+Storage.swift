@@ -214,6 +214,8 @@ extension DownloadManager {
     /// Log detailed diagnostic information about orphaned files.
     /// Call this to debug storage discrepancy issues.
     func logOrphanDiagnostics() {
+        guard LoggingService.shared.isEnabled else { return }
+
         let (orphanedFiles, totalOrphanedSize, trackedSize, actualDiskSize) = findOrphanedFiles()
 
         LoggingService.shared.logDownload(
