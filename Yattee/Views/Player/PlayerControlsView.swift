@@ -149,6 +149,10 @@ struct PlayerControlsView: View {
     @Environment(\.statusBarVisibilityController) private var statusBarController
     /// Active player controls layout from preset (passed from parent to avoid flashing during view recreation)
     var activeLayout: PlayerControlsLayout = .default
+    /// Moves the buttons off the leading part of the controls frame while the
+    /// dimming background and tap handling keep covering all of it (foldable
+    /// book posture: buttons on the half right of the hinge).
+    var buttonsLeadingInset: CGFloat = 0
     /// Animation trigger for seek backward button
     @State private var seekBackwardTrigger = false
     /// Animation trigger for seek forward button
@@ -512,6 +516,7 @@ struct PlayerControlsView: View {
 
             // Controls layout - explicitly fill parent bounds
             controlsVStack
+                .padding(.leading, buttonsLeadingInset)
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
         }
     }

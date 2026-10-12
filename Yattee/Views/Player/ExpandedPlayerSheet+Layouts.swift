@@ -30,6 +30,9 @@ extension ExpandedPlayerSheet {
     /// center controls and side sliders clear of both.
     static let tabletopTopBarInset: CGFloat = 72
     static let tabletopBottomBarInset: CGFloat = 96
+    /// Book posture (hinge vertical): clearance between the hinge line and
+    /// the controls confined to the trailing half.
+    static let bookFoldHingeGap: CGFloat = 16
 
     #if os(iOS)
     /// Reflection strength at the hinge line; it fades to nothing at
@@ -1419,6 +1422,21 @@ extension ExpandedPlayerSheet {
         // Calculate offset for controls positioning (used for animation)
         let controlsOffset = (leadingSafeArea - trailingSafeArea) / 2
 
+        #if os(iOS)
+        // Foldable in book posture (hinge partially open, landscape, the
+        // player spanning the fold): the buttons move to the trailing half so
+        // nothing sits on the hinge; dimming and taps still cover the whole
+        // screen. The corner layout's hinge split with panels shown already
+        // gives the player one half only.
+        let bookFoldButtonsInset: CGFloat = {
+            guard isTabletopHinge,
+                  fullWidth > fullHeight,
+                  fullWidth >= Self.minWidthForCornerLayout else { return 0 }
+            // Controls frame starts at the leading safe area
+            return max(0, fullWidth / 2 + Self.bookFoldHingeGap - leadingSafeArea)
+        }()
+        #endif
+
         // Calculate video frame size based on panscan
         // At panscan 0: aspect-fit (may have black bars)
         // At panscan 1: aspect-fill (cropped to fill)
@@ -1665,7 +1683,8 @@ extension ExpandedPlayerSheet {
                     onTogglePanscan: { [weak navigationCoordinator] in
                         navigationCoordinator?.togglePanscan()
                     },
-                    activeLayout: playerControlsLayout
+                    activeLayout: playerControlsLayout,
+                    buttonsLeadingInset: bookFoldButtonsInset
                 )
                 .frame(width: availableWidth, height: availableHeight)
                 .offset(x: controlsOffset)
