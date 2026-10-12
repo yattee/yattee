@@ -478,16 +478,56 @@ struct PanelSettings: Codable, Hashable, Sendable {
         PanelPageConfiguration(pageType: .queue, region: .primary),
     ])
 
+    /// Panel settings of the built-in presets: the default pages in the
+    /// corner layout. The player still falls back to the stacked layout where
+    /// the corner layout doesn't fit (iPhone, iPad portrait, narrow windows).
+    /// `default` stays stacked so presets saved without panel settings keep
+    /// the layout they had.
+    static let builtInDefault: PanelSettings = {
+        var settings = PanelSettings.default
+        settings.layoutMode = .corner
+        return settings
+    }()
+
     var effectiveLayoutMode: PanelLayoutMode { layoutMode ?? .stacked }
 
     /// The default visibility for an orientation: its own value, else the
-    /// legacy single value, else portrait visible / landscape hidden.
+    /// legacy single value, else portrait visible / landscape hidden — except
+    /// landscape in the corner layout on a device that can show it, where the
+    /// panels are the point of the layout and open visible.
     func effectiveDefaultVisibility(for orientation: PanelOrientation) -> PanelDefaultVisibility {
         switch orientation {
         case .portrait:
             return portraitDefaultVisibility ?? defaultVisibility ?? .visible
         case .landscape:
-            return landscapeDefaultVisibility ?? defaultVisibility ?? .hidden
+            let fallback: PanelDefaultVisibility =
+                effectiveLayoutMode == .corner && Self.canHostCornerLayout ? .visible : .hidden
+            return landscapeDefaultVisibility ?? defaultVisibility ?? fallback
+        }
+    }
+
+    /// Whether this device has a screen the corner layout fits on: iPad,
+    /// macOS, and foldable iPhones (interior display).
+    static var canHostCornerLayout: Bool {
+        #if os(macOS)
+        return true
+        #elseif os(iOS)
+        return UIDevice.current.userInterfaceIdiom == .pad || deviceHasHinge
+        #else
+        return false
+        #endif
+    }
+
+    private static let deviceHasHingeKey = "deviceHasHinge"
+
+    /// Whether a hinge has ever been reported on this device (foldable
+    /// iPhone). Hinge state only arrives through views, so the hinge
+    /// observers record it here for code that runs without one. Local only.
+    static var deviceHasHinge: Bool {
+        get { UserDefaults.standard.bool(forKey: deviceHasHingeKey) }
+        set {
+            guard newValue != deviceHasHinge else { return }
+            UserDefaults.standard.set(newValue, forKey: deviceHasHingeKey)
         }
     }
 

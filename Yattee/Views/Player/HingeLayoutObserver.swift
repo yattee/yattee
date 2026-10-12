@@ -64,6 +64,7 @@ struct HingeLayoutObserver: ViewModifier {
                 }
                 // nil when leaving the hierarchy: keep the last state then
                 guard let status = context.hinge?.status else { return }
+                PanelSettings.deviceHasHinge = true
                 apply(status == .partiallyOpen)
             }
         } else {
@@ -83,6 +84,7 @@ private struct HingePresenceObserver: ViewModifier {
                 // nil also when leaving a hinge-providing hierarchy; keep the last value then
                 guard context.hinge != nil else { return }
                 hasHinge = true
+                PanelSettings.deviceHasHinge = true
             }
         } else {
             content

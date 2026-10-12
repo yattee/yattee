@@ -323,4 +323,27 @@ struct PanelSettingsTests {
         #expect(settings.belowVideoContent == .nothing)
         #expect(settings.effectiveRegion(for: .comments) == .primary)
     }
+
+    @Test("Built-in presets default to the corner layout; legacy presets keep stacked")
+    func builtInPresetsUseCornerLayout() {
+        #expect(PanelSettings.builtInDefault.effectiveLayoutMode == .corner)
+        #expect(PanelSettings.builtInDefault.pages == PanelSettings.default.pages)
+        #expect(PanelSettings.default.effectiveLayoutMode == .stacked)
+        for preset in LayoutPreset.allBuiltIn() {
+            #expect(preset.layout.effectivePanelSettings.effectiveLayoutMode == .corner)
+        }
+    }
+
+    @Test("Landscape opens visible only in the corner layout on corner-capable devices")
+    func cornerLandscapeDefaultVisibility() {
+        let corner = PanelSettings.builtInDefault
+        let expected: PanelDefaultVisibility = PanelSettings.canHostCornerLayout ? .visible : .hidden
+        #expect(corner.effectiveDefaultVisibility(for: .landscape) == expected)
+        #expect(corner.effectiveDefaultVisibility(for: .portrait) == .visible)
+        #expect(PanelSettings.default.effectiveDefaultVisibility(for: .landscape) == .hidden)
+
+        var explicit = corner
+        explicit.landscapeDefaultVisibility = .hidden
+        #expect(explicit.effectiveDefaultVisibility(for: .landscape) == .hidden)
+    }
 }
