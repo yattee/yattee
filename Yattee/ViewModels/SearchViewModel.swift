@@ -159,9 +159,11 @@ final class SearchViewModel {
                 // Check if filters changed while we were waiting - discard stale results
                 guard versionAtStart == filterVersion else { return }
 
+                let watchMap = hideWatchedVideos ? (dataManager?.watchEntriesMap() ?? [:]) : [:]
+
                 if resetResults {
                     // Fresh results
-                    videos = filterWatchedVideos(result.videos)
+                    videos = filterWatchedVideos(result.videos, watchMap: watchMap)
                     channels = result.channels
                     playlists = result.playlists
 
@@ -170,7 +172,7 @@ final class SearchViewModel {
                         switch item {
                         case .video(let video):
                             // Skip watched videos if filter is enabled
-                            if hideWatchedVideos && isVideoWatched(video) {
+                            if isVideoWatched(video, watchMap: watchMap) {
                                 return nil
                             }
                             if let index = videos.firstIndex(where: { $0.id == video.id }) {
@@ -189,7 +191,7 @@ final class SearchViewModel {
                     let existingChannelIDs = Set(channels.map(\.id))
                     let existingPlaylistIDs = Set(playlists.map(\.id))
 
-                    let filteredNewVideos = filterWatchedVideos(result.videos)
+                    let filteredNewVideos = filterWatchedVideos(result.videos, watchMap: watchMap)
                     let newVideos = filteredNewVideos.filter { !existingVideoIDs.contains($0.id) }
                     let newChannels = result.channels.filter { !existingChannelIDs.contains($0.id) }
                     let newPlaylists = result.playlists.filter { !existingPlaylistIDs.contains($0.id) }
@@ -204,7 +206,7 @@ final class SearchViewModel {
                         switch item {
                         case .video(let video):
                             // Skip watched videos if filter is enabled
-                            if hideWatchedVideos && isVideoWatched(video) {
+                            if isVideoWatched(video, watchMap: watchMap) {
                                 continue
                             }
                             guard !existingVideoIDs.contains(video.id) else { continue }
@@ -332,12 +334,11 @@ final class SearchViewModel {
     }
     
     /// Filters out watched videos if hideWatchedVideos is enabled.
-    private func filterWatchedVideos(_ videos: [Video]) -> [Video] {
-        guard hideWatchedVideos, let dataManager else {
+    private func filterWatchedVideos(_ videos: [Video], watchMap: [String: WatchEntry]) -> [Video] {
+        guard !watchMap.isEmpty else {
             return videos
         }
         
-        let watchMap = dataManager.watchEntriesMap()
         return videos.filter { video in
             guard let entry = watchMap[video.id.videoID] else { return true }
             return !entry.isFinished
@@ -345,9 +346,7 @@ final class SearchViewModel {
     }
     
     /// Checks if a video is watched (finished).
-    private func isVideoWatched(_ video: Video) -> Bool {
-        guard let dataManager else { return false }
-        let watchMap = dataManager.watchEntriesMap()
+    private func isVideoWatched(_ video: Video, watchMap: [String: WatchEntry]) -> Bool {
         guard let entry = watchMap[video.id.videoID] else { return false }
         return entry.isFinished
     }
