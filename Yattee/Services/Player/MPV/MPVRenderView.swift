@@ -990,9 +990,10 @@ final class MPVRenderView: UIView {
     private func setupPiPCapture(width: Int, height: Int) {
         guard let eaglContext else { return }
 
-        // Calculate scaled dimensions for PiP (smaller = faster)
-        let captureWidth = Int(CGFloat(width) * pipCaptureScale)
-        let captureHeight = Int(CGFloat(height) * pipCaptureScale)
+        // Match the capped source dimensions before applying the capture scale.
+        let dimensions = pipSourceDimensions(videoWidth: width, videoHeight: height)
+        let captureWidth = Int(CGFloat(dimensions.width) * pipCaptureScale)
+        let captureHeight = Int(CGFloat(dimensions.height) * pipCaptureScale)
 
         // Skip if dimensions unchanged
         if captureWidth == pipCaptureWidth && captureHeight == pipCaptureHeight && textureCache != nil {
@@ -1096,9 +1097,6 @@ final class MPVRenderView: UIView {
 
     /// Clean up PiP capture resources
     private func destroyPiPCapture() {
-        // Also destroy the PiP source framebuffer when PiP capture ends
-        destroyFullResFramebuffer()
-
         if pipFramebuffer != 0 {
             glDeleteFramebuffers(1, &pipFramebuffer)
             pipFramebuffer = 0
@@ -1115,25 +1113,23 @@ final class MPVRenderView: UIView {
 
     // MARK: - Full Resolution Framebuffer
 
+    private func pipSourceDimensions(videoWidth: Int, videoHeight: Int) -> (width: Int, height: Int) {
+        guard videoHeight > maxFullResHeight else {
+            return (videoWidth, videoHeight)
+        }
+        let scale = Double(maxFullResHeight) / Double(videoHeight)
+        return (Int(Double(videoWidth) * scale), maxFullResHeight)
+    }
+
     /// Set up or update the full-resolution offscreen framebuffer.
     /// MPV renders to this buffer when PiP capture is active, then we blit to the display buffer.
     /// This allows high-quality PiP even when the view is small (e.g., mini player).
     private func setupFullResFramebuffer(videoWidth: Int, videoHeight: Int) {
         guard let eaglContext else { return }
 
-        // Calculate target dimensions with 1080p cap to save memory
-        let targetWidth: Int
-        let targetHeight: Int
-
-        if videoHeight > maxFullResHeight {
-            // Scale down proportionally to fit within 1080p height
-            let scale = Double(maxFullResHeight) / Double(videoHeight)
-            targetWidth = Int(Double(videoWidth) * scale)
-            targetHeight = maxFullResHeight
-        } else {
-            targetWidth = videoWidth
-            targetHeight = videoHeight
-        }
+        let dimensions = pipSourceDimensions(videoWidth: videoWidth, videoHeight: videoHeight)
+        let targetWidth = dimensions.width
+        let targetHeight = dimensions.height
 
         // Skip if dimensions unchanged
         guard targetWidth != Int(fullResWidth) || targetHeight != Int(fullResHeight) else {
