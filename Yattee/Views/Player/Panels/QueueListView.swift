@@ -131,7 +131,27 @@ struct QueueListView: View {
     private var hasMoreItems: Bool { queueManager?.hasMoreItems() ?? false }
     private var listStyle: VideoListStyle { appEnvironment?.settingsManager.listStyle ?? .inset }
 
+    /// Nothing to list: no queued videos, and the history and now-playing
+    /// sections are hidden or have nothing to show.
+    private var hasNoRows: Bool {
+        queue.isEmpty
+            && (!showHistory || history.isEmpty)
+            && (!showNowPlaying || playerState?.currentVideo == nil)
+    }
+
     var body: some View {
+        if hasNoRows {
+            ContentUnavailableView(
+                String(localized: "queue.sheet.empty"),
+                systemImage: "list.bullet",
+                description: Text(String(localized: "queue.sheet.emptyHint"))
+            )
+        } else {
+            list
+        }
+    }
+
+    private var list: some View {
         ScrollViewReader { proxy in
             List {
                 // History section - show previously played videos
