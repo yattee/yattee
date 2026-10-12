@@ -230,11 +230,13 @@ struct MediaBrowserView: View {
     }
 
     private var fileListScrollView: some View {
-        ScrollView {
+        let visibleFiles = displayedFiles
+
+        return ScrollView {
             LazyVStack(spacing: 0) {
                 sectionCard {
-                    ForEach(Array(displayedFiles.enumerated()), id: \.element.id) { index, file in
-                        let isLast = index == displayedFiles.count - 1
+                    ForEach(Array(visibleFiles.enumerated()), id: \.element.id) { index, file in
+                        let isLast = index == visibleFiles.count - 1
                         let isFirst = index == 0
 
                         SourceListRow(isLast: isLast, listStyle: listStyle) {
