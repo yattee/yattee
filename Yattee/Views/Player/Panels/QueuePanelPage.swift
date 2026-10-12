@@ -14,9 +14,12 @@ struct QueuePanelPage: View {
     var bottomInset: CGFloat = 0
 
     var body: some View {
-        QueueListView(showHistory: settings.effectiveShowHistory)
-            .safeAreaPadding(.bottom, bottomInset)
-            .panelListLeadingMargin()
+        QueueListView(
+            showHistory: settings.effectiveShowHistory,
+            showNowPlaying: settings.effectiveShowNowPlaying
+        )
+        .safeAreaPadding(.bottom, bottomInset)
+        .panelListLeadingMargin()
     }
 }
 

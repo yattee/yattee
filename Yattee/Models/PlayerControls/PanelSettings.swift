@@ -260,8 +260,12 @@ struct RelatedPageSettings: Codable, Hashable, Sendable {
 /// Element toggles for the queue page.
 struct QueuePageSettings: Codable, Hashable, Sendable {
     var showHistory: Bool?
+    /// Whether the playing video is listed between history and the queue.
+    /// Off by default: the player itself already shows it.
+    var showNowPlaying: Bool?
 
     var effectiveShowHistory: Bool { showHistory ?? true }
+    var effectiveShowNowPlaying: Bool { showNowPlaying ?? false }
 }
 
 /// Element toggles for the chapters page.

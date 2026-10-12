@@ -27,6 +27,7 @@ struct PanelPageEditorView: View {
     @State private var showChapterThumbnails: Bool = true
     @State private var chaptersExpandedByDefault: Bool = true
     @State private var showHistory: Bool = true
+    @State private var showNowPlaying: Bool = false
 
     private var configuration: PanelPageConfiguration? {
         viewModel.panelSettings.configuration(for: pageType)
@@ -292,6 +293,15 @@ struct PanelPageEditorView: View {
                 guard newValue != queueSettings.effectiveShowHistory else { return }
                 viewModel.updatePanelQueueSettingsSync { $0.showHistory = newValue }
             }
+
+            Toggle(
+                String(localized: "panel.settings.queue.showNowPlaying"),
+                isOn: $showNowPlaying
+            )
+            .onChange(of: showNowPlaying) { _, newValue in
+                guard newValue != queueSettings.effectiveShowNowPlaying else { return }
+                viewModel.updatePanelQueueSettingsSync { $0.showNowPlaying = newValue }
+            }
         } header: {
             Text(String(localized: "panel.settings.elements.header"))
         } footer: {
@@ -337,6 +347,7 @@ struct PanelPageEditorView: View {
         showChapterThumbnails = chaptersSettings.effectiveShowThumbnails
         chaptersExpandedByDefault = chaptersSettings.effectiveExpandedByDefault
         showHistory = queueSettings.effectiveShowHistory
+        showNowPlaying = queueSettings.effectiveShowNowPlaying
     }
 }
 

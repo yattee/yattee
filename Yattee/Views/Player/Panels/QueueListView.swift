@@ -119,6 +119,9 @@ struct QueueListView: View {
     /// When false, hides the previously-played section (queue page setting).
     var showHistory: Bool = true
 
+    /// When false, hides the now-playing section (queue page setting).
+    var showNowPlaying: Bool = true
+
     private var queueManager: QueueManager? { appEnvironment?.queueManager }
     private var playerState: PlayerState? { appEnvironment?.playerService.state }
 
@@ -158,7 +161,7 @@ struct QueueListView: View {
                 }
 
                 // Now Playing section - show the currently playing video from playerState
-                if let currentVideo = playerState?.currentVideo {
+                if showNowPlaying, let currentVideo = playerState?.currentVideo {
                     Section {
                         // Create a temporary QueuedVideo for display
                         let nowPlayingItem = QueuedVideo(
@@ -234,6 +237,7 @@ struct QueueListView: View {
                                 .foregroundStyle(.secondary)
                         }
                     }
+                    .id("up-next")
                 }
             }
             #if os(iOS)
@@ -244,9 +248,14 @@ struct QueueListView: View {
             })
             #endif
             .onAppear {
-                // Scroll to now playing section (no animation for instant positioning)
+                // Scroll past history to the now playing section, or to the
+                // queue when that is hidden (no animation for instant positioning)
                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-                    proxy.scrollTo("now-playing", anchor: .center)
+                    if showNowPlaying {
+                        proxy.scrollTo("now-playing", anchor: .center)
+                    } else {
+                        proxy.scrollTo("up-next", anchor: .top)
+                    }
                 }
             }
         }

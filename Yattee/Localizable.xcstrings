@@ -8149,7 +8149,18 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Show videos played earlier in this session above the queue."
+            "value" : "Previously Played shows videos played earlier in this session above the queue. Currently Playing shows the video playing now."
+          }
+        }
+      }
+    },
+    "panel.settings.queue.showNowPlaying" : {
+      "comment" : "Queue page element toggle",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Currently Playing"
           }
         }
       }
