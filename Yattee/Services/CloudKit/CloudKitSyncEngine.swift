@@ -517,6 +517,7 @@ final class CloudKitSyncEngine: @unchecked Sendable {
             let encoder = PropertyListEncoder()
             let data = try encoder.encode(serialization)
             UserDefaults.standard.set(data, forKey: syncStateKey)
+            LoggingService.shared.logCloudKit("Sync state updated and saved (\(data.count) bytes)")
         } catch {
             LoggingService.shared.logCloudKitError("Failed to save sync state", error: error)
         }
@@ -1654,9 +1655,6 @@ extension CloudKitSyncEngine: CKSyncEngineDelegate {
             await MainActor.run {
                 switch event {
                 case .stateUpdate(let update):
-                    let encoder = PropertyListEncoder()
-                    let stateSize = (try? encoder.encode(update.stateSerialization))?.count ?? 0
-                    LoggingService.shared.logCloudKit("Sync state updated and saved (\(stateSize) bytes)")
                     saveSyncState(update.stateSerialization)
                     updatePendingCount()
 
