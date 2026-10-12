@@ -139,6 +139,7 @@ struct DownloadsStorageView: View {
     @ViewBuilder
     private var downloadsList: some View {
         let backgroundStyle: ListBackgroundStyle = listStyle == .inset ? .grouped : .plain
+        let sortedDownloads = completedDownloads
 
         backgroundStyle.color
             .ignoresSafeArea()
@@ -148,8 +149,8 @@ struct DownloadsStorageView: View {
                         Spacer().frame(height: 16)
 
                         VideoListContent(listStyle: listStyle) {
-                            ForEach(Array(completedDownloads.enumerated()), id: \.element.id) { index, download in
-                                storageRow(download, isLast: index == completedDownloads.count - 1)
+                            ForEach(Array(sortedDownloads.enumerated()), id: \.element.id) { index, download in
+                                storageRow(download, isLast: index == sortedDownloads.count - 1)
                             }
                         }
                     }
