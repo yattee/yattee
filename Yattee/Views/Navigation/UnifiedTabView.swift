@@ -82,27 +82,58 @@ struct UnifiedTabView: View {
     }
     #endif
 
+    #if os(iOS)
+    @State private var columnVisibility: NavigationSplitViewVisibility = .automatic
+    /// Global trailing edge of the sidebar column and leading edge of the split
+    /// view, so the mini player can sit over the detail column.
+    @State private var sidebarTrailingEdge: CGFloat = 0
+    @State private var splitViewLeadingEdge: CGFloat = 0
+    @State private var miniPlayerClearance: CGFloat = 0
+    #endif
+
     var body: some View {
+        splitView
+            .zoomTransitionNamespace(zoomTransition)
+            #if os(iOS)
+            .zoomTransitionsEnabled(zoomTransitionsEnabled)
+            .onGeometryChange(for: CGFloat.self) { $0.frame(in: .global).minX } action: {
+                splitViewLeadingEdge = $0
+            }
+            // The detail column absorbs its NavigationStack, so modifiers on the
+            // stack only reach its root page and vanish on push. The mini player
+            // floats over the whole split view instead, and every page reserves
+            // room for it through the environment.
+            .overlay(alignment: .bottom) { miniPlayerOverlay }
+            .environment(\.miniPlayerBottomClearance, miniPlayerClearance)
+            #endif
+            .onAppear {
+                configureSidebarManager()
+                router.applyStartupTabIfNeeded(settingsManager?.effectiveStartupTabForSidebar() ?? .home)
+                ensureSelectionIsAvailable(visibleMainItems: visibleMainItems)
+            }
+            .onChange(of: router.selection) { _, _ in
+                ensureSelectionIsAvailable(visibleMainItems: visibleMainItems)
+            }
+    }
+
+    @ViewBuilder
+    private var splitView: some View {
+        #if os(iOS)
+        NavigationSplitView(columnVisibility: $columnVisibility) {
+            sidebar
+                .onGeometryChange(for: CGFloat.self) { $0.frame(in: .global).maxX } action: {
+                    sidebarTrailingEdge = $0
+                }
+        } detail: {
+            detailForSelection
+        }
+        #else
         NavigationSplitView {
             sidebar
         } detail: {
             detailForSelection
-                #if os(iOS)
-                .safeAreaInset(edge: .bottom, spacing: 0) { miniPlayerInset }
-                #endif
         }
-        .zoomTransitionNamespace(zoomTransition)
-        #if os(iOS)
-        .zoomTransitionsEnabled(zoomTransitionsEnabled)
         #endif
-        .onAppear {
-            configureSidebarManager()
-            router.applyStartupTabIfNeeded(settingsManager?.effectiveStartupTabForSidebar() ?? .home)
-            ensureSelectionIsAvailable(visibleMainItems: visibleMainItems)
-        }
-        .onChange(of: router.selection) { _, _ in
-            ensureSelectionIsAvailable(visibleMainItems: visibleMainItems)
-        }
     }
 
     // MARK: - Visible Main Items
@@ -276,11 +307,15 @@ struct UnifiedTabView: View {
 
     #if os(iOS)
     /// The split view has no tab bar to host the mini player as a bottom
-    /// accessory, so it takes the detail column's bottom safe area instead:
-    /// floating content such as the subscriptions channel strip and the last
-    /// rows of every list then clear it, as they clear the tab accessory.
-    private var miniPlayerInset: some View {
+    /// accessory, so it floats at the bottom of the detail column and pages
+    /// reserve its height as bottom safe area: floating content such as the
+    /// subscriptions channel strip and the last rows of every list then clear
+    /// it, as they clear the tab accessory.
+    private var miniPlayerOverlay: some View {
         let hasActiveVideo = appEnvironment?.playerService.state.currentVideo != nil
+        let sidebarWidth = columnVisibility == .detailOnly
+            ? 0
+            : max(0, sidebarTrailingEdge - splitViewLeadingEdge)
 
         // Stays mounted under the expanded player: the dismiss gesture morphs
         // the video into its preview, so it must already be in place
@@ -293,6 +328,10 @@ struct UnifiedTabView: View {
                     .transition(.move(edge: .bottom))
             }
         }
+        .onGeometryChange(for: CGFloat.self) { $0.size.height } action: {
+            miniPlayerClearance = $0
+        }
+        .padding(.leading, sidebarWidth)
         .animation(.spring(response: 0.3), value: hasActiveVideo)
     }
     #endif
