@@ -500,12 +500,20 @@ struct PanelSettings: Codable, Hashable, Sendable {
     /// landscape in the corner layout on a device that can show it, where the
     /// panels are the point of the layout and open visible.
     func effectiveDefaultVisibility(for orientation: PanelOrientation) -> PanelDefaultVisibility {
+        effectiveDefaultVisibility(for: orientation, cornerLayoutFits: Self.canHostCornerLayout)
+    }
+
+    /// Same as `effectiveDefaultVisibility(for:)`, but the corner fallback
+    /// follows whether the corner layout fits the current screen — the iPhone
+    /// Duo exterior display can't host it and falls back to the floating
+    /// widescreen panel, which must not open by default.
+    func effectiveDefaultVisibility(for orientation: PanelOrientation, cornerLayoutFits: Bool) -> PanelDefaultVisibility {
         switch orientation {
         case .portrait:
             return portraitDefaultVisibility ?? defaultVisibility ?? .visible
         case .landscape:
             let fallback: PanelDefaultVisibility =
-                effectiveLayoutMode == .corner && Self.canHostCornerLayout ? .visible : .hidden
+                effectiveLayoutMode == .corner && cornerLayoutFits ? .visible : .hidden
             return landscapeDefaultVisibility ?? defaultVisibility ?? fallback
         }
     }

@@ -51,6 +51,7 @@ final class NavigationCoordinator {
             if !isPlayerExpanded {
                 hasAppliedPanelDefaultVisibility = false
                 isCornerLayoutActive = false
+                cornerLayoutFits = false
                 isWideScreenLayoutActive = false
             }
         }
@@ -65,6 +66,11 @@ final class NavigationCoordinator {
     /// (iPad/macOS). Drives macOS window aspect-lock gating, which lives in a
     /// different view than the layout resolver.
     var isCornerLayoutActive = false
+
+    /// Whether the expanded player's current size fits the corner layout,
+    /// regardless of the preset's layout mode. Lets the async preset load
+    /// resolve the landscape panel default for the screen actually in use.
+    var cornerLayoutFits = false
 
     /// Whether the expanded player currently resolves to the widescreen
     /// (landscape) layout. Set from the sheet's layout pass so non-view code

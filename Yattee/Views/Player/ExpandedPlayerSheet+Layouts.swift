@@ -90,11 +90,17 @@ extension ExpandedPlayerSheet {
     /// `size` must include the safe areas so the status bar toggling with the
     /// layout can't feed back into the decision.
     func isCornerLayout(size: CGSize) -> Bool {
+        playerControlsLayout.effectivePanelSettings.effectiveLayoutMode == .corner
+            && cornerLayoutFits(size: size)
+    }
+
+    /// The size half of `isCornerLayout(size:)`, independent of the preset's
+    /// layout mode.
+    func cornerLayoutFits(size: CGSize) -> Bool {
         #if os(iOS)
         guard size.height >= Self.minHeightForCornerLayout else { return false }
         #endif
-        return playerControlsLayout.effectivePanelSettings.effectiveLayoutMode == .corner
-            && size.width >= Self.minWidthForCornerLayout
+        return size.width >= Self.minWidthForCornerLayout
             && isWideScreenLayout(size: size)
     }
     #endif

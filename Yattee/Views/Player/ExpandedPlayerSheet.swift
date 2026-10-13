@@ -329,10 +329,14 @@ struct ExpandedPlayerSheet: View {
             // Gate on the full size including safe areas: the corner layout
             // shows the status bar, which would otherwise shrink the measured
             // height and flip the decision back (layout oscillation).
-            let cornerActive = isCornerLayout(size: CGSize(
+            let fullSize = CGSize(
                 width: geometry.size.width + geometry.safeAreaInsets.leading + geometry.safeAreaInsets.trailing,
                 height: geometry.size.height + geometry.safeAreaInsets.top + geometry.safeAreaInsets.bottom
-            ))
+            )
+            let cornerActive = isCornerLayout(size: fullSize)
+            let cornerFits = cornerLayoutFits(size: fullSize)
+            #else
+            let cornerFits = false
             #endif
 
             ZStack(alignment: .top) {
@@ -397,6 +401,9 @@ struct ExpandedPlayerSheet: View {
             .onChange(of: cornerActive) { _, newValue in
                 navigationCoordinator?.isCornerLayoutActive = newValue
             }
+            .onChange(of: cornerFits, initial: true) { _, newValue in
+                navigationCoordinator?.cornerLayoutFits = newValue
+            }
             #endif
             .onChange(of: wideScreen, initial: true) { _, newValue in
                 navigationCoordinator?.isWideScreenLayoutActive = newValue
@@ -422,6 +429,7 @@ struct ExpandedPlayerSheet: View {
                         // Entering landscape: apply the preset's default
                         applyPanelDefaultVisibility(
                             playerControlsLayout.effectivePanelSettings,
+                            cornerLayoutFits: cornerFits,
                             settingsManager: appEnvironment?.settingsManager
                         )
                         // Portrait panel doesn't exist in wide layout - clear flag so gesture handler allows pinch
@@ -450,6 +458,7 @@ struct ExpandedPlayerSheet: View {
                 if navigationCoordinator?.hasAppliedPanelDefaultVisibility != true {
                     let visible = applyPanelDefaultVisibility(
                         PanelSettings.cached,
+                        cornerLayoutFits: cornerFits,
                         settingsManager: appEnvironment?.settingsManager
                     )
                     #if os(iOS) || os(macOS)
@@ -760,6 +769,7 @@ private struct PlayerEventHandlersModifier: ViewModifier {
             if navigationCoordinator?.hasAppliedPanelDefaultVisibility != true {
                 let visible = applyPanelDefaultVisibility(
                     layout.effectivePanelSettings,
+                    cornerLayoutFits: navigationCoordinator?.cornerLayoutFits ?? PanelSettings.canHostCornerLayout,
                     settingsManager: appEnvironment?.settingsManager
                 )
                 #if os(iOS) || os(macOS)
@@ -786,10 +796,14 @@ private struct PlayerEventHandlersModifier: ViewModifier {
 /// state, which lives in view @State rather than settings.
 @MainActor
 @discardableResult
-private func applyPanelDefaultVisibility(_ settings: PanelSettings, settingsManager: SettingsManager?) -> Bool {
+private func applyPanelDefaultVisibility(
+    _ settings: PanelSettings,
+    cornerLayoutFits: Bool,
+    settingsManager: SettingsManager?
+) -> Bool {
     guard let settingsManager else { return true }
     settingsManager.landscapeDetailsPanelVisible = settings
-        .effectiveDefaultVisibility(for: .landscape)
+        .effectiveDefaultVisibility(for: .landscape, cornerLayoutFits: cornerLayoutFits)
         .resolve(lastVisible: settingsManager.landscapeDetailsPanelLastVisible)
     return settings
         .effectiveDefaultVisibility(for: .portrait)
