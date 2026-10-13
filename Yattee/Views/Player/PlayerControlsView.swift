@@ -606,21 +606,29 @@ struct PlayerControlsView: View {
             // Extra padding at bottom to account for space below video area
             let bottomExtraPadding = geometry.size.height - effectiveVideoBottom
 
+            // A top safe area that only comes from a corner cutout (iPhone
+            // Duo exterior in landscape: camera and status items in one top
+            // corner) would drop the whole top bar; keep it at the edge and
+            // clear the cutout sideways instead
+            let barTopPadding = isWideScreenLayout && topBarOffset == 0
+                && isTopSafeAreaCornerOnly(in: geometry, safeAreaTop: safeArea.top)
+                ? topPadding - safeArea.top
+                : topPadding
+            let topBarTop = barTopPadding + topBarOffset
+
             // Keep the bars' ends clear of a camera cutout in a screen corner
             // (iPhone Duo exterior display in landscape)
-            let topBarBandBottom = topPadding + topBarOffset + Self.cutoutBarBandHeight
             let topCutout = cutoutClearance(
                 in: geometry,
-                band: 0...topBarBandBottom,
+                band: topBarTop...(topBarTop + Self.cutoutBarBandHeight),
                 leadingPadding: leftPadding,
                 trailingPadding: rightPadding
             )
-            let bottomBarBandTop = geometry.size.height - bottomPadding
+            let bottomBarBottom = geometry.size.height - bottomPadding
                 - (isPanelVisible && !isPanelPinned ? bottomExtraPadding : 0)
-                - Self.cutoutBarBandHeight
             let bottomCutout = cutoutClearance(
                 in: geometry,
-                band: bottomBarBandTop...geometry.size.height,
+                band: (bottomBarBottom - Self.cutoutBarBandHeight)...bottomBarBottom,
                 leadingPadding: leftPadding,
                 trailingPadding: rightPadding
             )
@@ -629,8 +637,10 @@ struct PlayerControlsView: View {
                 // Top bar - aligned to screen top (stays fixed regardless of video area)
                 VStack {
                     topBar
-                        .padding(.top, topPadding + topBarOffset)
-                        .padding(.leading, leftPadding + topCutout.leading)
+                        .padding(.top, barTopPadding + topBarOffset)
+                        // The leading top corner is cleared by the corner
+                        // adaptation offset below
+                        .padding(.leading, leftPadding)
                         .padding(.trailing, rightPadding + topCutout.trailing)
                         .applyCornerAdaptationOffset()
                         .overlay {
@@ -754,6 +764,21 @@ struct PlayerControlsView: View {
     private static let cutoutBarBandHeight: CGFloat = 80
     /// Space between a cutout and the nearest end of a bar.
     private static let cutoutBarGap: CGFloat = 8
+
+    /// Whether everything occluding the top safe area sits in one top corner,
+    /// so the rest of the top edge is free. False without occlusion regions
+    /// (a plain status bar keeps its safe area).
+    private func isTopSafeAreaCornerOnly(in geometry: GeometryProxy, safeAreaTop: CGFloat) -> Bool {
+        guard #available(iOS 27.1, *), safeAreaTop > 0 else { return false }
+
+        let width = geometry.size.width
+        let topRegions = geometry.reservedRegions(kind: .occlusion)
+            .map(\.frame)
+            .filter { $0.minY < safeAreaTop && $0.maxX > 0 && $0.minX < width }
+        guard !topRegions.isEmpty else { return false }
+        return topRegions.allSatisfy { $0.maxX < width / 2 }
+            || topRegions.allSatisfy { $0.minX > width / 2 }
+    }
 
     /// Extra leading/trailing padding that keeps a bar clear of occluding
     /// hardware reaching into its `band` (the iPhone Duo exterior camera
