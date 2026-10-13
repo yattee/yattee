@@ -265,6 +265,13 @@ struct CornerPlayerLayout<PlayerContent: View>: View {
             let sideColumnSlide = hasSideColumnLayout ? min(sideColumnHideTravel, max(0, sideColumnDragOffset)) : 0
             let columnVideoWidth = hasSideColumnLayout ? min(width, shownVideoWidth + sideColumnSlide) : width
             let videoWidth = isPanelVisible ? columnVideoWidth : width
+            // Hinge split: as the column hides, the below panel widens over
+            // the fold, so its pills slide from the leading half's center to
+            // the trailing half's in lockstep with the column (and back on
+            // reveal). The pills' width (panel width minus inset) stays half
+            // the screen throughout.
+            let sideColumnHiddenProgress: CGFloat = hasSideColumnLayout ? sideColumnSlide / max(1, sideColumnHideTravel) : 1
+            let hingePillsLeadingInset: CGFloat = isHingeSplit ? width / 2 * sideColumnHiddenProgress : 0
             let shownVideoHeight: CGFloat = {
                 let rawAspectRatio = playerState?.displayAspectRatio ?? (16.0 / 9.0)
                 let aspectRatio = rawAspectRatio > 0 ? rawAspectRatio : (16.0 / 9.0)
@@ -414,7 +421,12 @@ struct CornerPlayerLayout<PlayerContent: View>: View {
                         Spacer(minLength: 0)
                             .frame(height: panelSpacerHeight)
 
-                        belowVideoInfoPanel(video: video, hideTravel: panelHideTravel, publishesFrame: showsBelowVideo)
+                        belowVideoInfoPanel(
+                            video: video,
+                            hideTravel: panelHideTravel,
+                            publishesFrame: showsBelowVideo,
+                            pillsLeadingInset: hingePillsLeadingInset
+                        )
                             .frame(width: columnVideoWidth)
                             .frame(height: panelHeight)
                             .offset(y: belowPanelSlide)
@@ -642,7 +654,7 @@ struct CornerPlayerLayout<PlayerContent: View>: View {
     /// pill hidden and no inline chapters/related — those live in the side
     /// column tabs.
     @ViewBuilder
-    private func belowVideoInfoPanel(video: Video, hideTravel: CGFloat, publishesFrame: Bool) -> some View {
+    private func belowVideoInfoPanel(video: Video, hideTravel: CGFloat, publishesFrame: Bool, pillsLeadingInset: CGFloat) -> some View {
         Group {
             #if os(iOS)
             PortraitDetailsPanel(
@@ -653,6 +665,7 @@ struct CornerPlayerLayout<PlayerContent: View>: View {
                 hidesCommentsPill: !hasBelowVideoComments,
                 inlineInfoSections: false,
                 panelCornerRadius: 0,
+                pillsLeadingInset: pillsLeadingInset,
                 onDragChanged: { offset in
                     if appEnvironment?.navigationCoordinator.isPanelDragging != true {
                         appEnvironment?.navigationCoordinator.isPanelDragging = true

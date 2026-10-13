@@ -30,6 +30,10 @@ struct PortraitDetailsPanel: View {
     /// Panel clip rounding — the corner layout's below-video host uses 0
     /// for a plain rectangle.
     var panelCornerRadius: CGFloat = 16
+    /// Moves the pills off the leading part of the panel (foldable book
+    /// posture with the side column hidden: pills centered on the half right
+    /// of the hinge).
+    var pillsLeadingInset: CGFloat = 0
 
     // Drag gesture callbacks
     var onDragChanged: ((CGFloat) -> Void)?
@@ -240,6 +244,7 @@ struct PortraitDetailsPanel: View {
             .overlay {
                 if !isCommentsExpanded {
                     pillsOverlay
+                        .padding(.leading, pillsLeadingInset)
                         .opacity(pillsOverlayOpacity)
                         .allowsHitTesting(pillsOverlayOpacity > 0.01)
                 }
