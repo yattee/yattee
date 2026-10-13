@@ -606,13 +606,32 @@ struct PlayerControlsView: View {
             // Extra padding at bottom to account for space below video area
             let bottomExtraPadding = geometry.size.height - effectiveVideoBottom
 
+            // Keep the bars' ends clear of a camera cutout in a screen corner
+            // (iPhone Duo exterior display in landscape)
+            let topBarBandBottom = topPadding + topBarOffset + Self.cutoutBarBandHeight
+            let topCutout = cutoutClearance(
+                in: geometry,
+                band: 0...topBarBandBottom,
+                leadingPadding: leftPadding,
+                trailingPadding: rightPadding
+            )
+            let bottomBarBandTop = geometry.size.height - bottomPadding
+                - (isPanelVisible && !isPanelPinned ? bottomExtraPadding : 0)
+                - Self.cutoutBarBandHeight
+            let bottomCutout = cutoutClearance(
+                in: geometry,
+                band: bottomBarBandTop...geometry.size.height,
+                leadingPadding: leftPadding,
+                trailingPadding: rightPadding
+            )
+
             ZStack {
                 // Top bar - aligned to screen top (stays fixed regardless of video area)
                 VStack {
                     topBar
                         .padding(.top, topPadding + topBarOffset)
-                        .padding(.leading, leftPadding)
-                        .padding(.trailing, rightPadding)
+                        .padding(.leading, leftPadding + topCutout.leading)
+                        .padding(.trailing, rightPadding + topCutout.trailing)
                         .applyCornerAdaptationOffset()
                         .overlay {
                             if showPlayerAreaDebug {
@@ -696,8 +715,8 @@ struct PlayerControlsView: View {
                         // Only apply bottomExtraPadding when floating panel is visible (to stay above panel)
                         // When panel is pinned (side panel), bottom bar stays at screen bottom
                         .padding(.bottom, bottomPadding + (isPanelVisible && !isPanelPinned ? bottomExtraPadding : 0))
-                        .padding(.leading, leftPadding)
-                        .padding(.trailing, rightPadding)
+                        .padding(.leading, leftPadding + bottomCutout.leading)
+                        .padding(.trailing, rightPadding + bottomCutout.trailing)
                         .overlay {
                             if showPlayerAreaDebug {
                                 Rectangle().stroke(Color.blue, lineWidth: 1)
@@ -717,6 +736,7 @@ struct PlayerControlsView: View {
                         Text(verbatim: "vidTop: \(Int(effectiveVideoTop)) vidH: \(Int(effectiveVideoHeight))")
                         Text(verbatim: "centerOff: \(Int(centerYOffset)) btmExtra: \(Int(bottomExtraPadding))")
                         Text(verbatim: "vis: \(isPanelVisible ? "Y" : "N") fitH: \(Int(videoFitHeight ?? -1)) effVH: \(Int(effectiveVideoHeight))")
+                        Text(verbatim: "cutout top L:\(Int(topCutout.leading)) R:\(Int(topCutout.trailing)) btm L:\(Int(bottomCutout.leading)) R:\(Int(bottomCutout.trailing))")
                     }
                     .font(.system(size: 9, weight: .medium, design: .monospaced))
                     .foregroundStyle(.cyan)
@@ -727,6 +747,41 @@ struct PlayerControlsView: View {
             }
             .frame(width: geometry.size.width, height: geometry.size.height)
         }
+    }
+
+    /// Height of the strip along the top and bottom edges where a bar's
+    /// buttons and progress bar sit, for matching against cutouts.
+    private static let cutoutBarBandHeight: CGFloat = 80
+    /// Space between a cutout and the nearest end of a bar.
+    private static let cutoutBarGap: CGFloat = 8
+
+    /// Extra leading/trailing padding that keeps a bar clear of occluding
+    /// hardware reaching into its `band` (the iPhone Duo exterior camera
+    /// sits in a screen corner in landscape, outside the safe area). Regions
+    /// spanning the middle, like a Dynamic Island in portrait, are left to
+    /// the safe area.
+    private func cutoutClearance(
+        in geometry: GeometryProxy,
+        band: ClosedRange<CGFloat>,
+        leadingPadding: CGFloat,
+        trailingPadding: CGFloat
+    ) -> (leading: CGFloat, trailing: CGFloat) {
+        guard #available(iOS 27.1, *) else { return (0, 0) }
+
+        let width = geometry.size.width
+        var leading: CGFloat = 0
+        var trailing: CGFloat = 0
+        for region in geometry.reservedRegions(kind: .occlusion) {
+            let frame = region.frame
+            guard frame.maxY > band.lowerBound, frame.minY < band.upperBound,
+                  frame.maxX > 0, frame.minX < width else { continue }
+            if frame.maxX < width / 2 {
+                leading = max(leading, frame.maxX + Self.cutoutBarGap - leadingPadding)
+            } else if frame.minX > width / 2 {
+                trailing = max(trailing, width - frame.minX + Self.cutoutBarGap - trailingPadding)
+            }
+        }
+        return (leading, trailing)
     }
 
     // MARK: - Top Bar
