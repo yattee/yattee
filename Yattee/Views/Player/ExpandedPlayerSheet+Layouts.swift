@@ -22,7 +22,8 @@ extension ExpandedPlayerSheet {
     /// keeps it off tall-phone landscape (iPhone Pro Max is 956×440) while
     /// the iPhone Duo interior (951×669) and every iPad qualify. The gate is
     /// size-only — the Duo interior behaves like a small iPad, and the
-    /// exterior display never reaches the width.
+    /// exterior display never reaches the width. On macOS it is not a gate
+    /// but the player window's resize floor while the corner layout is on.
     static let minHeightForCornerLayout: CGFloat = 600
 
     /// Tabletop (foldable, hinge partially open): vertical room reserved on

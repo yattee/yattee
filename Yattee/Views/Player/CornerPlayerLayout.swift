@@ -71,8 +71,15 @@ struct CornerPlayerLayout<PlayerContent: View>: View {
     /// matching the panel drag handle look.
     static var grabberWidth: CGFloat { 12 }
     static var maxColumnWidthCap: CGFloat { 560 }
-    /// Minimum width kept for the video column.
-    static var minVideoColumnWidth: CGFloat { 480 }
+    /// Minimum width kept for the video column. macOS needs room for the
+    /// floating control bar (up to 500pt wide plus its edge margins).
+    static var minVideoColumnWidth: CGFloat {
+        #if os(macOS)
+        560
+        #else
+        480
+        #endif
+    }
     /// Maximum fraction of the window height the video area may take when a
     /// below-video region needs space.
     static var maxVideoHeightFraction: CGFloat { 0.72 }

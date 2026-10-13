@@ -330,7 +330,10 @@ struct MacOSPlayerControlsView: View {
                         // AppKit claims drags on the glass capsule as window moves
                         // and the reposition gesture never fires.
                         .background(WindowDragBlockingView())
-                        .frame(width: 650)
+                        // Never wider than the container: a wider bar frame
+                        // widens the whole VStack, and the top bar then
+                        // overflows (and is clipped) on both sides.
+                        .frame(width: min(650, geometry.size.width))
                         .padding(.bottom, BarDrag.bottomPadding)
                         .offset(barOffset(in: geometry.size))
                         .gesture(barDragGesture(in: geometry.size))

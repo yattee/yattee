@@ -789,11 +789,51 @@ final class ExpandedPlayerWindowManager: NSObject {
             restoreOverlaySizingConstraints(on: window)
         } else {
             window.contentResizeIncrements = NSSize(width: 1, height: 1)
+            growToCornerLayoutMinimum(window)
         }
         LoggingService.shared.debug(
             "unlockAspectRatio (corner layout) aspect=\(window.contentAspectRatio) increments=\(window.contentResizeIncrements)",
             category: .player
         )
+    }
+
+    /// Smallest window the corner layout fits in: its width threshold (below
+    /// it the layout falls back to stacked), room for the narrowest side
+    /// column next to a video column wide enough for the controls, and
+    /// enough height for the video plus the below-video panel, capped to the
+    /// screen.
+    static func cornerLayoutMinimumSize(for screen: NSScreen?) -> NSSize {
+        let columnsWidth = CornerPlayerLayout<EmptyView>.minColumnWidth
+            + CornerPlayerLayout<EmptyView>.grabberWidth
+            + CornerPlayerLayout<EmptyView>.minVideoColumnWidth
+        var size = NSSize(
+            width: max(ExpandedPlayerSheet.minWidthForCornerLayout, columnsWidth),
+            height: ExpandedPlayerSheet.minHeightForCornerLayout
+        )
+        if let visibleFrame = screen?.visibleFrame {
+            size.width = min(size.width, visibleFrame.width)
+            size.height = min(size.height, visibleFrame.height)
+        }
+        return size
+    }
+
+    /// The corner layout resolves from window width only, so it can take over
+    /// a window shorter than it needs; grow the height (keeping the top edge)
+    /// so the floor `windowWillResize(_:to:)` enforces holds from the start.
+    private func growToCornerLayoutMinimum(_ window: NSWindow) {
+        guard !isActivePlayerWindowFullScreen else { return }
+        let screen = window.screen ?? NSScreen.main
+        let minimum = Self.cornerLayoutMinimumSize(for: screen)
+        var frame = window.frame
+        guard frame.width < minimum.width || frame.height < minimum.height else { return }
+        let top = frame.maxY
+        frame.size.width = max(frame.width, minimum.width)
+        frame.size.height = max(frame.height, minimum.height)
+        frame.origin.y = top - frame.height
+        if let screen {
+            frame = constrainToScreen(frame, screen: screen)
+        }
+        window.setFrame(frame, display: true, animate: true)
     }
 
     // MARK: - Private Helpers
@@ -1019,8 +1059,12 @@ extension ExpandedPlayerWindowManager: NSWindowDelegate {
                 // Free resize (corner layout): clamp each axis on its own.
                 // Preserving the proposal's ratio here would widen the window
                 // while the user drags only its bottom edge past the floor.
-                width = max(frameSize.width, 320)
-                height = max(frameSize.height, Self.minHeight)
+                // The floor is the corner layout's own minimum, so a drag
+                // can't squeeze the layout or push it under its width
+                // threshold (which would flip it to stacked mid-drag).
+                let minimum = Self.cornerLayoutMinimumSize(for: window.screen ?? NSScreen.main)
+                width = max(frameSize.width, minimum.width)
+                height = max(frameSize.height, minimum.height)
             }
 
             return NSSize(width: width, height: height)
