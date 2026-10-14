@@ -131,6 +131,8 @@ final class PlayerService {
 
     private var progressSaveTimer: Timer?
     private let progressSaveInterval: TimeInterval = 5
+    /// Last position written by the periodic progress save.
+    private var lastSavedProgress: (videoID: String, seconds: TimeInterval)?
 
     /// Now Playing service for Control Center/Lock Screen.
     private let nowPlayingService = NowPlayingService()
@@ -2781,8 +2783,30 @@ final class PlayerService {
         guard let video = state.currentVideo,
               state.currentTime > 0 else { return }
 
+        // A paused player keeps the timer running; rewriting the same position
+        // only adds database writes, including while the app is being suspended.
+        let position = (videoID: video.id.videoID, seconds: state.currentTime)
+        guard lastSavedProgress?.videoID != position.videoID
+            || lastSavedProgress?.seconds != position.seconds else { return }
+        lastSavedProgress = position
+
         // Save locally only during playback - no iCloud sync overhead.
         // Live streams still get a history entry, but no resume position.
+        #if os(iOS)
+        // In the background (audio playback) the app can be suspended the
+        // moment playback stops. Suspending mid-save holds the SQLite lock in
+        // the shared app-group container and iOS kills the app with
+        // 0xdead10cc, so keep it running until the save has committed.
+        var backgroundTask: UIBackgroundTaskIdentifier = .invalid
+        if UIApplication.shared.applicationState != .active {
+            backgroundTask = UIApplication.shared.beginBackgroundTask(withName: "SaveWatchProgress")
+        }
+        defer {
+            if backgroundTask != .invalid {
+                UIApplication.shared.endBackgroundTask(backgroundTask)
+            }
+        }
+        #endif
         dataManager.updateWatchProgressLocal(for: video, seconds: state.currentTime, duration: state.duration, isLive: state.isLive)
         watchHistorySyncService?.recordProgress(videoID: video.id.videoID)
 
