@@ -17,6 +17,113 @@
 #include <fcntl.h>
 #include <unistd.h>
 
+// MARK: - libsmbclient thread support
+//
+// libsmbclient keeps its talloc stackframe and a few global locks behind a
+// table of thread functions. Without one installed (smbc_thread_posix() is not
+// exported by this build), every thread shares a single stackframe, so two
+// threads using libsmbclient at once - a download through this bridge and
+// FFmpeg playing an smb:// file - free each other's allocations and abort in
+// talloc. The table mirrors `struct smb_thread_functions` from Samba's
+// lib/util/smb_threads.h; this is the SMB_THREADS_DEF_PTHREAD_IMPLEMENTATION.
+
+struct smb_thread_functions {
+    int (*create_mutex)(const char *lockname, void **pplock, const char *location);
+    void (*destroy_mutex)(void *plock, const char *location);
+    int (*lock_mutex)(void *plock, int lock_type, const char *location);
+    int (*create_tls)(const char *keyname, void **ppkey, const char *location);
+    void (*destroy_tls)(void **ppkey, const char *location);
+    int (*set_tls)(void *pkey, const void *pval, const char *location);
+    void *(*get_tls)(void *pkey, const char *location);
+};
+
+extern int smb_thread_set_functions(const struct smb_thread_functions *tf);
+
+#define SMB_THREAD_UNLOCK 2
+
+static pthread_mutex_t smb_create_tls_mutex = PTHREAD_MUTEX_INITIALIZER;
+
+static int smb_create_mutex_pthread(const char *lockname, void **pplock, const char *location) {
+    pthread_mutex_t *mutex = (pthread_mutex_t *)malloc(sizeof(pthread_mutex_t));
+    if (!mutex) return ENOMEM;
+    pthread_mutex_init(mutex, NULL);
+    *pplock = mutex;
+    return 0;
+}
+
+static void smb_destroy_mutex_pthread(void *plock, const char *location) {
+    pthread_mutex_destroy((pthread_mutex_t *)plock);
+    free(plock);
+}
+
+static int smb_lock_pthread(void *plock, int lock_type, const char *location) {
+    if (lock_type == SMB_THREAD_UNLOCK) {
+        return pthread_mutex_unlock((pthread_mutex_t *)plock);
+    }
+    return pthread_mutex_lock((pthread_mutex_t *)plock);
+}
+
+static int smb_create_tls_pthread(const char *keyname, void **ppkey, const char *location) {
+    pthread_mutex_lock(&smb_create_tls_mutex);
+    if (*ppkey) {
+        pthread_mutex_unlock(&smb_create_tls_mutex);
+        return 0;
+    }
+    pthread_key_t *key = (pthread_key_t *)malloc(sizeof(pthread_key_t));
+    if (!key) {
+        pthread_mutex_unlock(&smb_create_tls_mutex);
+        return ENOMEM;
+    }
+    int ret = pthread_key_create(key, NULL);
+    if (ret) {
+        free(key);
+        pthread_mutex_unlock(&smb_create_tls_mutex);
+        return ret;
+    }
+    *ppkey = key;
+    pthread_mutex_unlock(&smb_create_tls_mutex);
+    return 0;
+}
+
+static void smb_destroy_tls_pthread(void **ppkey, const char *location) {
+    pthread_mutex_lock(&smb_create_tls_mutex);
+    if (*ppkey) {
+        pthread_key_delete(*(pthread_key_t *)*ppkey);
+        free(*ppkey);
+        *ppkey = NULL;
+    }
+    pthread_mutex_unlock(&smb_create_tls_mutex);
+}
+
+static int smb_set_tls_pthread(void *pkey, const void *pval, const char *location) {
+    if (!pkey) return -1;
+    return pthread_setspecific(*(pthread_key_t *)pkey, pval) == 0 ? 0 : -1;
+}
+
+// talloc reads its stackframe before the key exists (the key is created on
+// the first stackframe), so a missing key reads as "no value yet".
+static void *smb_get_tls_pthread(void *pkey, const char *location) {
+    if (!pkey) return NULL;
+    return pthread_getspecific(*(pthread_key_t *)pkey);
+}
+
+static const struct smb_thread_functions smb_pthread_functions = {
+    smb_create_mutex_pthread,
+    smb_destroy_mutex_pthread,
+    smb_lock_pthread,
+    smb_create_tls_pthread,
+    smb_destroy_tls_pthread,
+    smb_set_tls_pthread,
+    smb_get_tls_pthread,
+};
+
+// Installed at load time: the stackframe must become thread-local before any
+// libsmbclient use, including FFmpeg's, which this bridge does not see.
+__attribute__((constructor))
+static void smb_install_thread_functions(void) {
+    smb_thread_set_functions(&smb_pthread_functions);
+}
+
 // Context wrapper that bundles SMBCCTX with auth data
 struct SMBContextWrapper {
     SMBCCTX *ctx;             // Isolated libsmbclient context
