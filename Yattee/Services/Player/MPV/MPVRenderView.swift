@@ -900,6 +900,16 @@ final class MPVRenderView: UIView {
 
     private func performRender() {
         defer { isRendering = false }
+
+        // GPU work is not permitted in the background, and presenting there
+        // aborts inside the GL driver. The display link already checks this,
+        // but renders queued by appDidBecomeActive/resumeRendering can run
+        // after the app went back to the background. PiP keeps rendering.
+        guard !isInBackground || isPiPActive else {
+            MPVLogging.log("performRender: skipped (app in background)")
+            return
+        }
+
         let frameStart = Date()
         let tFrameStart = CACurrentMediaTime()
         let gapSincePrevFrame = lastRenderStartMediaTime > 0 ? tFrameStart - lastRenderStartMediaTime : 0
@@ -967,8 +977,11 @@ final class MPVRenderView: UIView {
 
         let tRenderEnd = CACurrentMediaTime()
 
-        // Present the renderbuffer (skip when PiP is active - main view is hidden anyway)
-        if !isPiPActive {
+        // Present the renderbuffer (skip when PiP is active - main view is hidden anyway).
+        // Re-checked here: the app can enter the background while mpv renders.
+        if isInBackground && !isPiPActive {
+            MPVLogging.log("performRender: present skipped (app entered background)")
+        } else if !isPiPActive {
             glBindRenderbuffer(GLenum(GL_RENDERBUFFER), colorRenderbuffer)
             let presented = eaglContext.presentRenderbuffer(Int(GL_RENDERBUFFER))
             if !presented {
