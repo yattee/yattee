@@ -348,9 +348,11 @@ struct VideoInfoView: View {
             #if !os(tvOS)
             VideoInfoPlayThumbnailTip.isToolbarLayout = showsThumbnailPlayTip
             #endif
-            // Initialize current index from queue context
+            // Initialize current index from queue context, resuming where this
+            // page was before a layout swap rebuilt it
             if currentVideoIndex == nil, let context = videoQueueContext {
-                currentVideoIndex = context.videoIndex
+                extendedVideoList = context.pageState.extendedVideoList
+                currentVideoIndex = context.pageState.currentVideoIndex ?? context.videoIndex
             }
             
             // Load initial video data (only if video is already loaded)
@@ -387,6 +389,8 @@ struct VideoInfoView: View {
             bookmarkSaveTask?.cancel()
         }
         .onChange(of: currentVideoIndex) { oldValue, newValue in
+            videoQueueContext?.pageState.currentVideoIndex = newValue
+
             // Skip if this is the initial value setting (handled by onAppear)
             guard oldValue != nil else { return }
 
@@ -1004,6 +1008,12 @@ struct VideoInfoView: View {
                     }
                 }
                 .scrollTargetLayout()
+                // The lazy stack keeps the old widths of cards it laid out
+                // off-screen, so after a resize (split view sidebar appearing,
+                // rotation, Duo unfold) every later card sits at a stale offset
+                // and the re-snap below lands between cards. A new identity per
+                // width drops those cached sizes.
+                .id(cardWidth)
             }
             // Pin the viewport to the page width so paging stays aligned even
             // when the scroll view extends under a horizontal safe area (iPhone
@@ -2745,6 +2755,7 @@ struct VideoInfoView: View {
             let videosToAdd = Array(newVideos.prefix(remainingCapacity))
             
             extendedVideoList.append(contentsOf: videosToAdd)
+            videoQueueContext?.pageState.extendedVideoList = extendedVideoList
         } catch {
             loadMoreError = error.localizedDescription
         }

@@ -19,6 +19,16 @@ struct MediaBrowserPlaybackInfo: Equatable, Hashable {
     let allFilesInFolder: [MediaFile]
 }
 
+/// Where a video info page has got to in its queue. A layout swap (tab bar ↔
+/// split view sidebar) rebuilds the page from its path entry, so this lives on
+/// the entry's context rather than in the page's view state.
+/// `NavigationRouter.push` gives every pushed page its own instance.
+final class VideoInfoPageState {
+    var currentVideoIndex: Int?
+    /// Videos appended through continuation loading, past the original list.
+    var extendedVideoList: [Video] = []
+}
+
 /// Context information for playing a video with queue support.
 /// Used when navigating from list views (subscriptions, search, etc.) to video info pages.
 struct VideoQueueContext {
@@ -51,6 +61,9 @@ struct VideoQueueContext {
     /// Position requested by an opened timed link (`?t=`). Unlike `startTime`
     /// (a resume position), it is honored as-is and skips the resume prompt.
     var linkStartTime: TimeInterval? = nil
+
+    /// Page position kept across rebuilds; ignored by equality and hashing.
+    var pageState = VideoInfoPageState()
     
     /// Whether this context has valid queue information
     var hasQueueInfo: Bool {

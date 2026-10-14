@@ -67,6 +67,13 @@ final class NavigationRouter {
 
     /// Pushes a destination onto the selected section's stack.
     func push(_ destination: NavigationDestination) {
+        var destination = destination
+        // A row hands out the same context on every tap until it re-renders,
+        // so a page pushed again must not inherit the earlier page's position.
+        if case .video(let source, var queueContext?) = destination {
+            queueContext.pageState = VideoInfoPageState()
+            destination = .video(source, queueContext: queueContext)
+        }
         stacks[selection.id, default: []].append(destination)
     }
 
