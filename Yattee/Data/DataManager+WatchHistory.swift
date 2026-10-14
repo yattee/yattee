@@ -136,7 +136,9 @@ extension DataManager {
     /// Returns a dictionary of video ID to WatchEntry for efficient bulk lookup.
     func watchEntriesMap() -> [String: WatchEntry] {
         let entries = watchHistory(limit: 10000)
-        return Dictionary(uniqueKeysWithValues: entries.map { ($0.videoID, $0) })
+        // The same video ID can be recorded under several source scopes; the
+        // history is most recent first, so the first entry is the one to keep.
+        return Dictionary(entries.map { ($0.videoID, $0) }, uniquingKeysWith: { first, _ in first })
     }
 
     /// Gets the total count of watch history entries.

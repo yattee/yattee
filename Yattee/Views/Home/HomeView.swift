@@ -1990,9 +1990,10 @@ struct HomeView: View {
         }
 
         let known: [String: Video] = Dictionary(
-            uniqueKeysWithValues: ids.compactMap { id in
+            ids.compactMap { id in
                 dataManager?.watchEntry(for: id).map { (id, $0.toVideo()) }
-            }
+            },
+            uniquingKeysWith: { first, _ in first }
         )
 
         return await withTaskGroup(of: (Int, Video).self) { group in

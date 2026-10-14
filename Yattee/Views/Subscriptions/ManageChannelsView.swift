@@ -263,8 +263,10 @@ struct ManageChannelsView: View {
             if let syncChannels = subscriptionService?.fetchSubscriptionsSync() {
                 channels = syncChannels
             }
+            // A channel can be subscribed under several account scopes.
             subscriptionMetadata = Dictionary(
-                uniqueKeysWithValues: (dataManager?.subscriptions() ?? []).map { ($0.channelID, $0) }
+                (dataManager?.subscriptions() ?? []).map { ($0.channelID, $0) },
+                uniquingKeysWith: { first, _ in first }
             )
         }
         .task {
