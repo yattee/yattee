@@ -149,7 +149,7 @@ struct AccountSyncTests {
             // Only the user-set label syncs; the username lives in the Keychain
             // beside the credential.
             #expect(record["username"] == nil)
-            #expect(record.allKeys().sorted() == ["accountID", "dateAdded", "displayName", "instanceID", "schemaVersion", "updatedAt"])
+            #expect(record.allKeys().sorted() == ["accountID", "dateAdded", "displayName", "instanceID", "isActive", "schemaVersion", "updatedAt"])
         }
 
         @Test("A record whose payload disagrees with its name is rejected")
