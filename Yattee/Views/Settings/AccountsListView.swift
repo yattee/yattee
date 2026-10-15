@@ -158,6 +158,17 @@ struct AccountsListView: View {
             Label(String(localized: "accounts.empty.title"), systemImage: "person.crop.circle")
         } description: {
             Text(String(localized: "accounts.empty.description"))
+        } actions: {
+            #if os(tvOS)
+            // Without a focusable element the focus engine has nowhere to
+            // land, and the remote can no longer reach the sidebar either.
+            // Sources is also where an account is actually signed in.
+            NavigationLink {
+                SourcesListView()
+            } label: {
+                Label(String(localized: "accounts.empty.openSources"), systemImage: "server.rack")
+            }
+            #endif
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
     }

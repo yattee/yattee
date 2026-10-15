@@ -256,6 +256,17 @@
         }
       }
     },
+    "accounts.empty.openSources" : {
+      "comment" : "tvOS button on the empty Accounts screen that opens the Sources list",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Open Sources"
+          }
+        }
+      }
+    },
     "accounts.empty.title" : {
       "localizations" : {
         "en" : {
