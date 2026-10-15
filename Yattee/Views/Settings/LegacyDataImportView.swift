@@ -134,11 +134,20 @@ struct LegacyAccountsImportView: View {
     }
 
     private var emptyState: some View {
-        ContentUnavailableView(
-            String(localized: "migration.accounts.empty.title"),
-            systemImage: "person.badge.key",
-            description: Text(String(localized: "migration.accounts.empty.description"))
-        )
+        ContentUnavailableView {
+            Label(String(localized: "migration.accounts.empty.title"), systemImage: "person.badge.key")
+        } description: {
+            Text(String(localized: "migration.accounts.empty.description"))
+        } actions: {
+            #if os(tvOS)
+            // The toolbar Done is iOS/macOS only. Once the last item is
+            // imported or removed nothing else is focusable, and the remote
+            // would be stuck — in the full screen cover and when pushed alike.
+            Button(String(localized: "common.done")) {
+                dismiss()
+            }
+            #endif
+        }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
     }
 
