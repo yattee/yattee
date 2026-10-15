@@ -19,9 +19,6 @@ enum RecordType {
     static let searchHistory = "SearchHistory"
     static let recentChannel = "RecentChannel"
     static let recentPlaylist = "RecentPlaylist"
-    static let appSettings = "AppSettings"
-    static let instance = "Instance"
-    static let mediaSource = "MediaSource"
     static let channelNotificationSettings = "ChannelNotificationSettings"
     static let controlsPreset = "ControlsPreset"
 
@@ -99,9 +96,6 @@ enum SyncableRecordType: Sendable {
     case searchHistory(id: UUID)
     case recentChannel(channelID: String, scope: SourceScope)
     case recentPlaylist(playlistID: String, scope: SourceScope)
-    case appSettings
-    case instance(id: UUID)
-    case mediaSource(id: UUID)
     case channelNotificationSettings(channelID: String, scope: SourceScope)
     case controlsPreset(id: UUID)
     case account(id: UUID)
@@ -177,12 +171,6 @@ enum SyncableRecordType: Sendable {
             recordName = Self.scopedRecordName(prefix: "recent-channel-", id: channelID, scope: scope)
         case .recentPlaylist(let playlistID, let scope):
             recordName = Self.scopedRecordName(prefix: "recent-playlist-", id: playlistID, scope: scope)
-        case .appSettings:
-            recordName = "settings-singleton"
-        case .instance(let id):
-            recordName = "instance-\(id.uuidString)"
-        case .mediaSource(let id):
-            recordName = "source-\(id.uuidString)"
         case .channelNotificationSettings(let channelID, let scope):
             recordName = Self.scopedRecordName(prefix: "channel-notif-", id: channelID, scope: scope)
         case .controlsPreset(let id):
