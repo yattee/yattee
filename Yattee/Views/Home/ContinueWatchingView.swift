@@ -219,6 +219,16 @@ struct ContinueWatchingView: View {
             Label(String(localized: "home.continueWatching.title"), systemImage: "play.circle")
         } description: {
             Text(String(localized: "home.continueWatching.empty"))
+        } actions: {
+            #if os(tvOS)
+            // Without a focusable element the focus engine has nowhere to
+            // land, and the remote can no longer reach the sidebar either.
+            Button {
+                appEnvironment?.navigationCoordinator.router.select(.search)
+            } label: {
+                Label(String(localized: "continueWatching.empty.search"), systemImage: "magnifyingglass")
+            }
+            #endif
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
     }

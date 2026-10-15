@@ -1949,6 +1949,17 @@
         }
       }
     },
+    "continueWatching.empty.search" : {
+      "comment" : "tvOS button on the empty Continue Watching screen that opens Search",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Search Videos"
+          }
+        }
+      }
+    },
     "continueWatching.remove" : {
       "comment" : "Remove from continue watching",
       "localizations" : {
