@@ -97,7 +97,8 @@ end
 
 platform :ios do
   desc "Push a new beta build to TestFlight"
-  lane :beta do
+  lane :beta do |options|
+    internal_only = options[:internal_only] == true || options[:internal_only].to_s == "true"
     ensure_temp_keychain(TEMP_KEYCHAIN_USER, TEMP_KEYCHAIN_PASSWORD)
 
     api_key = app_store_connect_api_key(
@@ -162,15 +163,16 @@ platform :ios do
       api_key: api_key,
       ipa: lane_context[SharedValues::IPA_OUTPUT_PATH],
       changelog: changelog,
-      distribute_external: true,
-      groups: all_testflight_group_names(api_key)
+      distribute_external: !internal_only,
+      groups: internal_only ? nil : all_testflight_group_names(api_key)
     )
   end
 end
 
 platform :tvos do
   desc "Push a new beta build to TestFlight"
-  lane :beta do
+  lane :beta do |options|
+    internal_only = options[:internal_only] == true || options[:internal_only].to_s == "true"
     ensure_temp_keychain(TEMP_KEYCHAIN_USER, TEMP_KEYCHAIN_PASSWORD)
 
     api_key = app_store_connect_api_key(
@@ -236,15 +238,16 @@ platform :tvos do
       api_key: api_key,
       ipa: lane_context[SharedValues::IPA_OUTPUT_PATH],
       changelog: changelog,
-      distribute_external: true,
-      groups: all_testflight_group_names(api_key)
+      distribute_external: !internal_only,
+      groups: internal_only ? nil : all_testflight_group_names(api_key)
     )
   end
 end
 
 platform :mac do
   desc "Push a new beta build to TestFlight"
-  lane :beta do
+  lane :beta do |options|
+    internal_only = options[:internal_only] == true || options[:internal_only].to_s == "true"
     ensure_temp_keychain(TEMP_KEYCHAIN_USER, TEMP_KEYCHAIN_PASSWORD)
 
     api_key = app_store_connect_api_key(
@@ -302,8 +305,8 @@ platform :mac do
       api_key: api_key,
       pkg: lane_context[SharedValues::PKG_OUTPUT_PATH],
       changelog: changelog,
-      distribute_external: true,
-      groups: all_testflight_group_names(api_key)
+      distribute_external: !internal_only,
+      groups: internal_only ? nil : all_testflight_group_names(api_key)
     )
   end
 
