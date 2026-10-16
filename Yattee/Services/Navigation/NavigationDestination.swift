@@ -190,6 +190,14 @@ private struct MediaSourceByIDView: View {
                 Label(String(localized: "navigation.sourceNotFound"), systemImage: "externaldrive.badge.exclamationmark")
             } description: {
                 Text(String(localized: "navigation.sourceNotFound.description"))
+            } actions: {
+                #if os(tvOS)
+                // Nothing else here is focusable, and as a sidebar source this
+                // is a tab root that Menu cannot pop.
+                Button(String(localized: "navigation.sourceNotFound.openSources")) {
+                    appEnvironment?.navigationCoordinator.router.select(.sources)
+                }
+                #endif
             }
         }
     }

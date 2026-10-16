@@ -7202,6 +7202,17 @@
         }
       }
     },
+    "navigation.sourceNotFound.openSources" : {
+      "comment" : "tvOS button on the media-source-not-found screen that opens the Sources list",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Open Sources"
+          }
+        }
+      }
+    },
     "Next" : {
 
     },
