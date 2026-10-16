@@ -412,6 +412,11 @@ struct UnifiedPlaylistDetailView: View {
                 ProgressView()
                     .frame(maxWidth: .infinity)
                     .padding(.top, 40)
+            } else if let errorMessage {
+                // A remote playlist arrives with its title, so a failed load
+                // lands in playlistContent rather than the body's error branch.
+                errorView(errorMessage)
+                    .padding(.top, 40)
             } else {
                 emptyPlaylistView
             }
