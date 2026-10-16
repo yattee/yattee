@@ -252,12 +252,7 @@ struct UnifiedPlaylistDetailView: View {
             } else if let error = errorMessage {
                 errorView(error)
             } else {
-                ContentUnavailableView(
-                    String(localized: "playlist.notFound"),
-                    systemImage: "list.bullet.rectangle",
-                    description: Text(String(localized: "playlist.notFound.description"))
-                )
-                .frame(maxWidth: .infinity, maxHeight: .infinity)
+                notFoundView
             }
         }
         #if !os(tvOS)
@@ -819,9 +814,42 @@ struct UnifiedPlaylistDetailView: View {
             Label(String(localized: "playlist.empty"), systemImage: "music.note.list")
         } description: {
             Text(String(localized: "playlist.empty.description"))
+        } actions: {
+            #if os(tvOS)
+            // The left column has no buttons for an empty remote playlist this
+            // account does not own; without one the remote has nowhere to go.
+            if case .remote = source {
+                Button(String(localized: "common.refresh")) {
+                    Task { await loadPlaylist() }
+                }
+            }
+            #endif
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .padding(.top, 40)
+    }
+
+    private var notFoundView: some View {
+        ContentUnavailableView {
+            Label(String(localized: "playlist.notFound"), systemImage: "list.bullet.rectangle")
+        } description: {
+            Text(String(localized: "playlist.notFound.description"))
+        } actions: {
+            #if os(tvOS)
+            // Nothing else on this screen is focusable, and as a sidebar
+            // playlist it is a tab root that Menu cannot pop.
+            if case .remote = source {
+                Button(String(localized: "common.retry")) {
+                    Task { await loadPlaylist() }
+                }
+            } else {
+                Button(String(localized: "playlist.notFound.openPlaylists")) {
+                    appEnvironment?.navigationCoordinator.router.select(.playlistsList)
+                }
+            }
+            #endif
+        }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
     }
 
     private var videoList: some View {

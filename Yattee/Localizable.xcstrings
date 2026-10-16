@@ -9391,6 +9391,17 @@
         }
       }
     },
+    "playlist.notFound.openPlaylists" : {
+      "comment" : "tvOS button on the playlist-not-found screen that opens the Playlists list",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Open Playlists"
+          }
+        }
+      }
+    },
     "playlist.play" : {
       "comment" : "Play button in playlist toolbar menu",
       "localizations" : {
