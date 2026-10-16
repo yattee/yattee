@@ -152,6 +152,18 @@ struct PeerTubeInstancesExploreView: View {
                 Label(String(localized: "peertube.explore.noResults"), systemImage: "magnifyingglass")
             } description: {
                 Text(String(localized: "peertube.explore.noResults.description"))
+            } actions: {
+                #if os(tvOS)
+                // With nothing loaded the search header is hidden too, so
+                // without this the remote would have nothing to focus.
+                if allInstances.isEmpty {
+                    Button(String(localized: "common.retry")) {
+                        Task {
+                            await loadAllInstances()
+                        }
+                    }
+                }
+                #endif
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity)
         } else {
