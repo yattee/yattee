@@ -11,6 +11,9 @@ import SwiftUI
 
 struct OpenedLinksView: View {
     @Environment(\.appEnvironment) private var appEnvironment
+    #if os(tvOS)
+    @Environment(\.dismiss) private var dismiss
+    #endif
     @AppStorage("searchRowStyle") private var rowStyle: VideoRowStyle = .regular
 
     @State private var viewModel: OpenedLinksViewModel
@@ -68,6 +71,16 @@ struct OpenedLinksView: View {
             VStack(alignment: .leading, spacing: 24) {
                 HStack(spacing: 24) {
                     batchActions
+
+                    // The batch buttons stay disabled until a video resolves,
+                    // and loading or failed rows are not focusable: with every
+                    // link still loading or failed, this is the only thing the
+                    // remote can land on.
+                    if viewModel.videos.isEmpty {
+                        Button(String(localized: "common.done")) {
+                            dismiss()
+                        }
+                    }
                 }
                 .padding(.horizontal, 48)
 
