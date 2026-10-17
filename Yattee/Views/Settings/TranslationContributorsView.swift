@@ -9,6 +9,9 @@ import NukeUI
 import SwiftUI
 
 struct TranslationContributorsView: View {
+    #if os(tvOS)
+    @Environment(\.dismiss) private var dismiss
+    #endif
     @State private var contributors: [TranslationContributor] = []
 
     var body: some View {
@@ -30,6 +33,13 @@ struct TranslationContributorsView: View {
         if contributors.isEmpty {
             ContentUnavailableView {
                 Label(String(localized: "settings.translators.empty"), systemImage: "globe")
+            } actions: {
+                #if os(tvOS)
+                // Nothing else here is focusable; without it the remote is stuck.
+                Button(String(localized: "common.done")) {
+                    dismiss()
+                }
+                #endif
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity)
         } else {
