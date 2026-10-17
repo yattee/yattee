@@ -13,7 +13,9 @@ struct ContributorsView: View {
     @Environment(\.appEnvironment) private var appEnvironment
 
     @State private var contributors: [GitHubContributor] = []
-    @State private var isLoading = false
+    /// Starts true so the first frame, before `.task` runs, is the spinner and
+    /// not an empty list.
+    @State private var isLoading = true
     @State private var errorMessage: String?
 
     var body: some View {
@@ -40,6 +42,19 @@ struct ContributorsView: View {
                 Label(String(localized: "common.error"), systemImage: "exclamationmark.triangle")
             } description: {
                 Text(error)
+            } actions: {
+                Button(String(localized: "common.retry")) {
+                    Task {
+                        await loadContributors()
+                    }
+                }
+                .buttonStyle(.borderedProminent)
+            }
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
+        } else if contributors.isEmpty {
+            // An empty form has nothing focusable, which strands the tvOS remote.
+            ContentUnavailableView {
+                Label(String(localized: "settings.contributors.title"), systemImage: "person.2")
             } actions: {
                 Button(String(localized: "common.retry")) {
                     Task {
@@ -121,7 +136,10 @@ struct ContributorsView: View {
     // MARK: - Data Loading
 
     private func loadContributors() async {
-        guard let appEnvironment else { return }
+        guard let appEnvironment else {
+            isLoading = false
+            return
+        }
         let api = GitHubAPI(httpClient: appEnvironment.httpClient)
 
         isLoading = true
