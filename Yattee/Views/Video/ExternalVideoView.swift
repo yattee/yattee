@@ -24,7 +24,8 @@ struct ExternalVideoView: View {
             if isLoading {
                 LoadingView(
                     message: String(localized: "externalVideo.extracting"),
-                    subtext: url.host ?? url.absoluteString
+                    subtext: url.host ?? url.absoluteString,
+                    onCancel: { dismiss() }
                 )
             } else if let error = errorMessage {
                 ErrorStateView(
