@@ -21,6 +21,9 @@ struct VideoInfoView: View {
     @Environment(\.appEnvironment) private var appEnvironment
     @Environment(\.presentAppSheet) private var presentAppSheet
     @Environment(\.videoQueueContext) private var videoQueueContext
+    #if os(tvOS)
+    @Environment(\.dismiss) private var dismiss
+    #endif
 
     private let initMode: VideoInfoInitMode
 
@@ -274,14 +277,17 @@ struct VideoInfoView: View {
     var body: some View {
         Group {
             if isLoadingInitialVideo || (displayedVideoIsPlaceholder && isLoadingVideoDetails) {
-                ProgressView()
-                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+                loadingView
             } else if let error = initialVideoLoadError {
                 videoLoadErrorView(error)
             } else if let error = videoDetailsLoadError, displayedVideoIsPlaceholder {
                 videoLoadErrorView(error)
             } else if displayedVideo != nil {
                 videoContent
+            } else {
+                // The first frame in videoID mode, before the load has started:
+                // rendering nothing here would leave tvOS nothing to focus.
+                loadingView
             }
         }
         // Opaque background so the header gradient (which fades to windowBackgroundColor)
@@ -857,6 +863,14 @@ struct VideoInfoView: View {
         }
     }
     #endif
+
+    private var loadingView: some View {
+        ProgressView()
+            #if os(tvOS)
+            .tvStalledLoadCancel { dismiss() }
+            #endif
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
+    }
 
     /// Error view shown when the video fails to load — either the initial
     /// fetch in videoID mode, or the details fetch for a placeholder video
