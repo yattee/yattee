@@ -72,6 +72,15 @@ struct NetworkShareDiscoverySheet: View {
                             Text(String(localized: "discovery.scanning"))
                                 .foregroundStyle(.secondary)
                         }
+
+                        #if os(tvOS)
+                        // The toolbar Cancel is iOS/macOS only. Until a share
+                        // turns up, this is the only thing the remote can focus.
+                        Button(String(localized: "common.cancel")) {
+                            service.stopDiscovery()
+                            dismiss()
+                        }
+                        #endif
                     }
                 }
 
@@ -133,6 +142,12 @@ struct NetworkShareDiscoverySheet: View {
                 Label(String(localized: "discovery.unavailable.title"), systemImage: "exclamationmark.triangle")
             } description: {
                 Text(String(localized: "discovery.unavailable.description"))
+            } actions: {
+                #if os(tvOS)
+                Button(String(localized: "common.cancel")) {
+                    dismiss()
+                }
+                #endif
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity)
         }
