@@ -1161,6 +1161,9 @@ struct UnifiedPlaylistDetailView: View {
 
     /// Shows a playlist that came from the public endpoint.
     private func apply(_ playlist: Playlist) {
+        // A load the user stopped on tvOS may still land; the playlist it
+        // brings replaces the "stopped" error.
+        errorMessage = nil
         remotePlaylist = playlist
         title = playlist.title
         descriptionText = playlist.description
