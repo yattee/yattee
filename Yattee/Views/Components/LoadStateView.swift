@@ -61,16 +61,22 @@ struct TVStalledLoadCancelButton: View {
     let action: () -> Void
 
     @State private var isShown = false
+    @FocusState private var isFocused: Bool
 
     var body: some View {
         Group {
             if isShown {
                 Button(String(localized: "common.cancel"), action: action)
+                    .focused($isFocused)
             }
         }
         .task {
             guard (try? await Task.sleep(for: delay)) != nil else { return }
             isShown = true
+            // Focus was already lost by the time the button appears, and the
+            // focus engine is not guaranteed to pick up a late arrival.
+            guard (try? await Task.sleep(for: .milliseconds(100))) != nil else { return }
+            isFocused = true
         }
     }
 }
