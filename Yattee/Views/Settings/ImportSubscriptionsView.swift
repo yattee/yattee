@@ -12,6 +12,9 @@ struct ImportSubscriptionsView: View {
     let instance: Instance
 
     @Environment(\.appEnvironment) private var appEnvironment
+    #if os(tvOS)
+    @Environment(\.dismiss) private var dismiss
+    #endif
 
     @State private var channels: [Channel] = []
     @State private var subscribedChannelIDs: Set<String> = []
@@ -133,11 +136,19 @@ struct ImportSubscriptionsView: View {
     }
 
     private var emptyView: some View {
-        ContentUnavailableView(
-            String(localized: "import.subscriptions.emptyTitle"),
-            systemImage: "person.2.slash",
-            description: Text(String(localized: "import.subscriptions.emptyDescription"))
-        )
+        ContentUnavailableView {
+            Label(String(localized: "import.subscriptions.emptyTitle"), systemImage: "person.2.slash")
+        } description: {
+            Text(String(localized: "import.subscriptions.emptyDescription"))
+        } actions: {
+            #if os(tvOS)
+            // Nothing in the content is focusable here; the container's
+            // toolbar Done is not something to rely on to keep the remote free.
+            Button(String(localized: "common.done")) {
+                dismiss()
+            }
+            #endif
+        }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .accessibilityIdentifier(AccessibilityID.emptyState)
     }

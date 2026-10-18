@@ -11,6 +11,9 @@ struct ImportPlaylistsView: View {
     let instance: Instance
 
     @Environment(\.appEnvironment) private var appEnvironment
+    #if os(tvOS)
+    @Environment(\.dismiss) private var dismiss
+    #endif
 
     @State private var playlists: [Playlist] = []
     @State private var importedPlaylistIDs: Set<String> = []
@@ -177,11 +180,19 @@ struct ImportPlaylistsView: View {
     }
 
     private var emptyView: some View {
-        ContentUnavailableView(
-            String(localized: "import.playlists.emptyTitle"),
-            systemImage: "list.bullet.rectangle",
-            description: Text(String(localized: "import.playlists.emptyDescription"))
-        )
+        ContentUnavailableView {
+            Label(String(localized: "import.playlists.emptyTitle"), systemImage: "list.bullet.rectangle")
+        } description: {
+            Text(String(localized: "import.playlists.emptyDescription"))
+        } actions: {
+            #if os(tvOS)
+            // Nothing in the content is focusable here; the container's
+            // toolbar Done is not something to rely on to keep the remote free.
+            Button(String(localized: "common.done")) {
+                dismiss()
+            }
+            #endif
+        }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .accessibilityIdentifier(AccessibilityID.emptyState)
     }
