@@ -189,9 +189,21 @@ struct ChannelView: View {
                     loadingContent(cachedHeader)
                 } else if isLoading {
                     ProgressView()
+                        #if os(tvOS)
+                        // As a sidebar channel this is a tab root that cannot
+                        // be popped, so Cancel lands on the error and its Retry.
+                        .tvStalledLoadCancel {
+                            isLoading = false
+                            errorMessage = String(localized: "common.loadingStopped")
+                        }
+                        #endif
                         .frame(maxWidth: .infinity, maxHeight: .infinity)
                 } else if let error = errorMessage {
                     errorView(error)
+                } else {
+                    // The channel request failed while the videos one did not,
+                    // with no cached header to build the channel from.
+                    errorView(String(localized: "channelView.loadError"))
                 }
             }
         }

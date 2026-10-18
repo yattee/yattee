@@ -1745,6 +1745,17 @@
         }
       }
     },
+    "common.loadingStopped" : {
+      "comment" : "Shown in place of content after the user cancels a slow load on tvOS",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Loading was stopped."
+          }
+        }
+      }
+    },
     "common.loadMore" : {
       "localizations" : {
         "en" : {
