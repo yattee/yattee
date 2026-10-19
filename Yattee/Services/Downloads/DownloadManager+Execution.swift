@@ -91,6 +91,33 @@ extension DownloadManager {
         }
     }
 
+    /// Creates a download task, catching CFNetwork's Objective-C exceptions. If the
+    /// session turns out to be invalidated, builds a fresh one and tries once more,
+    /// so a dead session doesn't fail every download until relaunch (#975).
+    private func makeDownloadTask(
+        _ make: (URLSession) -> URLSessionDownloadTask
+    ) -> (URLSessionDownloadTask?, NSException?) {
+        func attempt() -> (URLSessionDownloadTask?, NSException?) {
+            var caughtException: NSException?
+            var task: URLSessionDownloadTask?
+            let success = tryCatchObjCException({
+                task = make(self.urlSession)
+            }, &caughtException)
+            return (success ? task : nil, caughtException)
+        }
+
+        let first = attempt()
+        guard first.0 == nil,
+              first.1?.reason?.localizedCaseInsensitiveContains("invalidated") == true else {
+            return first
+        }
+
+        LoggingService.shared.logDownload("[Downloads] Session was invalidated, recreating before retry")
+        urlSession = nil
+        setupSession()
+        return attempt()
+    }
+
     /// Start a download task for a specific stream phase
     func startStreamDownload(
         downloadID: UUID,
@@ -115,13 +142,9 @@ extension DownloadManager {
         let task: URLSessionDownloadTask
 
         if let resumeData {
-            var caughtException: NSException?
-            var resumeTask: URLSessionDownloadTask?
-            let success = tryCatchObjCException({
-                resumeTask = self.urlSession.downloadTask(withResumeData: resumeData)
-            }, &caughtException)
+            let (resumeTask, caughtException) = makeDownloadTask { $0.downloadTask(withResumeData: resumeData) }
 
-            guard success, let resumeTask else {
+            guard let resumeTask else {
                 LoggingService.shared.logDownloadError(
                     "[Downloads] NSException creating resume task (\(phase))",
                     error: DownloadError.downloadFailed("CFNetwork exception: \(caughtException?.reason ?? "unknown")")
@@ -160,13 +183,9 @@ extension DownloadManager {
                 }
             }
 
-            var caughtException: NSException?
-            var newTask: URLSessionDownloadTask?
-            let success = tryCatchObjCException({
-                newTask = self.urlSession.downloadTask(with: request)
-            }, &caughtException)
+            let (newTask, caughtException) = makeDownloadTask { $0.downloadTask(with: request) }
 
-            guard success, let newTask else {
+            guard let newTask else {
                 LoggingService.shared.logDownloadError(
                     "[Downloads] NSException creating download task (\(phase))",
                     error: DownloadError.downloadFailed("CFNetwork exception: \(caughtException?.reason ?? "unknown")")

@@ -206,6 +206,12 @@ extension DownloadManager: URLSessionDownloadDelegate {
         }
     }
 
+    nonisolated func urlSession(_ session: URLSession, didBecomeInvalidWithError error: Error?) {
+        Task { @MainActor in
+            self.handleSessionInvalidated(session, error: error)
+        }
+    }
+
     nonisolated func urlSessionDidFinishEvents(forBackgroundURLSession session: URLSession) {
         // Called when all background tasks are complete
         // Could be used to update UI or show notification

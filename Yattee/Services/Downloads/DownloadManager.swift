@@ -63,6 +63,10 @@ final class DownloadManager: NSObject {
     let minimumValidFileSize: Int64 = 1024  // 1 KB
 
     var urlSession: URLSession!
+    /// Callers waiting for a replaced background session to finish invalidating,
+    /// keyed by session. A new session with the same identifier must not be
+    /// created while the old one is still alive.
+    var sessionInvalidationWaiters: [ObjectIdentifier: CheckedContinuation<Void, Never>] = [:]
     /// Tracks video download tasks by download ID
     var videoTasks: [UUID: URLSessionDownloadTask] = [:]
     /// Tracks audio download tasks by download ID
@@ -110,7 +114,7 @@ final class DownloadManager: NSObject {
         // to ensure we have the correct cellular access setting before creating the session.
     }
 
-    private func setupSession() {
+    func setupSession() {
         let config = URLSessionConfiguration.background(
             withIdentifier: AppIdentifiers.downloadSession
         )
@@ -193,8 +197,14 @@ final class DownloadManager: NSObject {
         }
 
         // 3. Invalidate the old session (use finishTasksAndInvalidate since downloads are already paused)
-        urlSession?.finishTasksAndInvalidate()
-        urlSession = nil
+        //    and wait for it to go away: a background session created with the same identifier
+        //    while the old one is still invalidating hands out tasks that throw "Task created in
+        //    a session that has been invalidated" (#975).
+        if let oldSession = urlSession {
+            urlSession = nil
+            oldSession.finishTasksAndInvalidate()
+            await waitForInvalidation(of: oldSession)
+        }
 
         // 4. Create new session with updated cellular config
         setupSession()
@@ -217,6 +227,36 @@ final class DownloadManager: NSObject {
         await startNextDownloadIfNeeded()
     }
     #endif
+
+    /// Suspends until the delegate reports `session` invalidated, or a timeout passes.
+    private func waitForInvalidation(of session: URLSession, timeout: TimeInterval = 5) async {
+        let key = ObjectIdentifier(session)
+        await withCheckedContinuation { continuation in
+            sessionInvalidationWaiters[key] = continuation
+            Task { @MainActor [weak self] in
+                try? await Task.sleep(for: .seconds(timeout))
+                guard let waiter = self?.sessionInvalidationWaiters.removeValue(forKey: key) else { return }
+                LoggingService.shared.logDownload("[Downloads] Session invalidation timed out, continuing")
+                waiter.resume()
+            }
+        }
+    }
+
+    /// Called from the URLSession delegate when a session becomes invalid.
+    func handleSessionInvalidated(_ session: URLSession, error: Error?) {
+        LoggingService.shared.logDownload(
+            "[Downloads] Session invalidated",
+            details: "current: \(session === urlSession), error: \(error?.localizedDescription ?? "none")"
+        )
+        sessionInvalidationWaiters.removeValue(forKey: ObjectIdentifier(session))?.resume()
+
+        // The live session died without us replacing it; build a fresh one so
+        // new downloads don't keep failing until the app is relaunched.
+        if session === urlSession {
+            urlSession = nil
+            setupSession()
+        }
+    }
 
     // MARK: - Auto Download
 
