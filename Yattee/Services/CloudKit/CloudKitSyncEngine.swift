@@ -1629,21 +1629,32 @@ final class CloudKitSyncEngine: @unchecked Sendable {
 
         LoggingService.shared.logCloudKit("Refreshing sync state (clearing local tokens)...")
 
+        // Unsent local changes live in the engine state being discarded below;
+        // carry them over so a refresh never drops queued saves or deletions.
+        let unsentChanges = (syncEngine?.state.pendingRecordZoneChanges ?? []) + pendingChangesBuffer
+
         // Clear local sync state so CKSyncEngine fetches everything fresh
         UserDefaults.standard.removeObject(forKey: syncStateKey)
 
         // Tear down existing engine
         debounceTimer?.invalidate()
         debounceTimer = nil
-        pendingChangesBuffer.removeAll()
         conflictResolvedRecords.removeAll()
         retryCount.removeAll()
         syncEngine = nil
+        pendingChangesBuffer = unsentChanges
         updatePendingCount()
 
         // Reinitialize - with the persisted state cleared above, setup starts
-        // from nil state serialization (forces full fetch)
+        // from nil state serialization (forces full fetch). Setup hands the
+        // carried-over buffer to the new engine.
         await setupSyncEngine()
+
+        if !unsentChanges.isEmpty {
+            LoggingService.shared.logCloudKit("Refresh sync carried over \(unsentChanges.count) unsent changes")
+            updatePendingCount()
+            scheduleDebounceSync()
+        }
 
         LoggingService.shared.logCloudKit("Refresh sync completed")
     }
