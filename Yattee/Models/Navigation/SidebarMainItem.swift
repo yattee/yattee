@@ -110,6 +110,13 @@ enum SidebarMainItem: String, CaseIterable, Codable, Identifiable, Sendable {
         switch self {
         case .search, .home:
             return true
+        case .settings:
+            // tvOS has no other route to Settings, so hiding it would lock the user out.
+            #if os(tvOS)
+            return true
+            #else
+            return false
+            #endif
         default:
             return false
         }

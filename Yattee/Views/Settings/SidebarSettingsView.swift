@@ -260,7 +260,7 @@ struct SidebarSettingsView: View {
 
     private func mainItemBinding(for item: SidebarMainItem) -> Binding<Bool> {
         Binding(
-            get: { mainItemVisibility[item] ?? true },
+            get: { item.isRequired || (mainItemVisibility[item] ?? true) },
             set: { newValue in
                 mainItemVisibility[item] = newValue
                 saveMainNavigationSettings()
