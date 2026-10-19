@@ -1221,8 +1221,17 @@ struct UnifiedPlaylistDetailView: View {
     private func playAll() {
         guard !videos.isEmpty, let appEnvironment else { return }
 
+        // In shuffle mode start from a random video (#988). Rotate rather than
+        // pick an index so every other video stays in the queue instead of
+        // being pushed to history as "already played".
+        var orderedVideos = videos
+        if appEnvironment.playerService.state.queueMode == .shuffle {
+            let start = Int.random(in: 0..<videos.count)
+            orderedVideos = Array(videos[start...] + videos[..<start])
+        }
+
         appEnvironment.queueManager.playFromList(
-            videos: videos,
+            videos: orderedVideos,
             index: 0,
             queueSource: queueSource,
             sourceLabel: title
