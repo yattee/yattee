@@ -31,7 +31,10 @@ extension DataManager {
             
             // Queue for CloudKit sync
             cloudKitSync?.queueSubscriptionSave(subscription)
-            
+
+            // The stateless feed must be rebuilt from the new channel list (#968)
+            SubscriptionFeedCache.shared.invalidate()
+
             let change = SubscriptionChange(addedSubscriptions: [subscription], removedChannelIDs: [])
             NotificationCenter.default.post(
                 name: .subscriptionsDidChange,
@@ -70,6 +73,8 @@ extension DataManager {
             for scope in scopes {
                 cloudKitSync?.queueSubscriptionDelete(channelID: channelID, scope: scope)
             }
+
+            SubscriptionFeedCache.shared.invalidate()
 
             let change = SubscriptionChange(addedSubscriptions: [], removedChannelIDs: [channelID])
             NotificationCenter.default.post(

@@ -104,7 +104,8 @@ actor FeedCache {
     /// Invalidates the cache by clearing the lastUpdated timestamp.
     /// The cached videos remain available but will be considered stale.
     func invalidate() async {
-        guard var data = cachedData else { return }
+        // Already stale: skip the disk write (remote syncs invalidate once per record).
+        guard var data = cachedData, data.lastUpdated != .distantPast else { return }
         data.lastUpdated = .distantPast
         cachedData = data
         await save(videos: data.videos, lastUpdated: .distantPast)
