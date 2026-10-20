@@ -83,9 +83,15 @@ jobs:
     if: ${{ inputs.build_ios }}
     needs: [determine_build_number]
     name: Release iOS to TestFlight
-    runs-on: macos-26
+    runs-on: xcode-27
     steps:
       - uses: actions/checkout@v4
+      - name: Select Xcode 27.1 RC
+        # Pinned by full path: the Xcode_27.1.app symlink is ambiguous between
+        # beta and RC, and App Store Connect rejects beta-built uploads.
+        run: |
+          sudo xcode-select -s /Applications/Xcode_27.1_Release_Candidate.app
+          xcodebuild -version
       - uses: ruby/setup-ruby@v1
         with:
           ruby-version: '3.4'
@@ -109,9 +115,15 @@ jobs:
     if: ${{ inputs.build_tvos }}
     needs: [determine_build_number]
     name: Release tvOS to TestFlight
-    runs-on: macos-26
+    runs-on: xcode-27
     steps:
       - uses: actions/checkout@v4
+      - name: Select Xcode 27.1 RC
+        # Pinned by full path: the Xcode_27.1.app symlink is ambiguous between
+        # beta and RC, and App Store Connect rejects beta-built uploads.
+        run: |
+          sudo xcode-select -s /Applications/Xcode_27.1_Release_Candidate.app
+          xcodebuild -version
       - uses: ruby/setup-ruby@v1
         with:
           ruby-version: '3.4'
@@ -135,9 +147,15 @@ jobs:
     if: ${{ inputs.build_mac_beta }}
     needs: [determine_build_number]
     name: Release macOS to TestFlight
-    runs-on: macos-26
+    runs-on: xcode-27
     steps:
       - uses: actions/checkout@v4
+      - name: Select Xcode 27.1 RC
+        # Pinned by full path: the Xcode_27.1.app symlink is ambiguous between
+        # beta and RC, and App Store Connect rejects beta-built uploads.
+        run: |
+          sudo xcode-select -s /Applications/Xcode_27.1_Release_Candidate.app
+          xcodebuild -version
       - uses: ruby/setup-ruby@v1
         with:
           ruby-version: '3.4'
@@ -161,12 +179,18 @@ jobs:
     if: ${{ inputs.build_mac_notarized }}
     needs: [determine_build_number]
     name: Build and notarize macOS app
-    runs-on: macos-26
+    runs-on: xcode-27
     env:
       BUILD_NUMBER: ${{ needs.determine_build_number.outputs.build_number }}
       VERSION_NUMBER: ${{ needs.determine_build_number.outputs.version_number }}
     steps:
       - uses: actions/checkout@v4
+      - name: Select Xcode 27.1 RC
+        # Pinned by full path: the Xcode_27.1.app symlink is ambiguous between
+        # beta and RC, and App Store Connect rejects beta-built uploads.
+        run: |
+          sudo xcode-select -s /Applications/Xcode_27.1_Release_Candidate.app
+          xcodebuild -version
       - uses: ruby/setup-ruby@v1
         with:
           ruby-version: '3.4'
@@ -248,7 +272,7 @@ jobs:
     if: ${{ inputs.build_mac_notarized && inputs.create_release && !cancelled() && !failure() }}
     needs: [determine_build_number, mac_notarized, release]
     name: Publish Sparkle appcast
-    runs-on: macos-26
+    runs-on: xcode-27
     permissions:
       contents: write
     env:
@@ -268,6 +292,12 @@ jobs:
       - uses: actions/checkout@v4
         with:
           token: ${{ secrets.REPO_TOKEN }}
+      - name: Select Xcode 27.1 RC
+        # Pinned by full path: the Xcode_27.1.app symlink is ambiguous between
+        # beta and RC, and App Store Connect rejects beta-built uploads.
+        run: |
+          sudo xcode-select -s /Applications/Xcode_27.1_Release_Candidate.app
+          xcodebuild -version
       - name: Download notarized mac artifact
         uses: actions/download-artifact@v4
         with:
