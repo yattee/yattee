@@ -1974,6 +1974,8 @@ private struct InvidiousComment: Decodable, Sendable {
     let author: String
     let authorId: String
     let authorThumbnails: [InvidiousThumbnail]?
+    /// Newer Invidious versions send a single avatar URL instead of `authorThumbnails`.
+    let authorThumbnail: String?
     let authorIsChannelOwner: Bool?
     let content: String
     let published: Int64?
@@ -1984,6 +1986,17 @@ private struct InvidiousComment: Decodable, Sendable {
     let creatorHeart: InvidiousCreatorHeart?
     let replies: InvidiousCommentReplies?
 
+    nonisolated private func authorThumbnailURL(baseURL: URL) -> URL? {
+        guard let authorThumbnail, !authorThumbnail.isEmpty else { return nil }
+        if authorThumbnail.hasPrefix("//") {
+            return URL(string: "https:" + authorThumbnail)
+        }
+        if authorThumbnail.hasPrefix("/") {
+            return URL(string: authorThumbnail, relativeTo: baseURL)?.absoluteURL
+        }
+        return URL(string: authorThumbnail)
+    }
+
     nonisolated func toComment(baseURL: URL) -> Comment {
         Comment(
             id: commentId,
@@ -1991,6 +2004,7 @@ private struct InvidiousComment: Decodable, Sendable {
                 id: authorId,
                 name: author,
                 thumbnailURL: authorThumbnails?.first?.thumbnailURL(baseURL: baseURL)
+                    ?? authorThumbnailURL(baseURL: baseURL)
             ),
             content: content,
             publishedAt: published.map { Date(timeIntervalSince1970: TimeInterval($0)) },
