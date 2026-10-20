@@ -12,6 +12,9 @@ import SwiftUI
 struct PanelPageEditorView: View {
     let pageType: PanelPageType
     @Bindable var viewModel: PlayerControlsSettingsViewModel
+    /// Whether the panel list configures inline sections (iPhone, or a
+    /// foldable iPhone outside the corner layout) rather than pages.
+    let usesSections: Bool
 
     // Local state for immediate UI updates
     @State private var isEnabled: Bool = true
@@ -38,12 +41,15 @@ struct PanelPageEditorView: View {
         pageType == PanelSettings.pinnedPageType
     }
 
-    /// iPhone configures inline sections rather than pages.
-    private var usesSections: Bool { PanelSettings.isSectionsOnlyDevice }
+    /// Comments on an inline-sections host only show as the pill, whose
+    /// mode includes off: no separate toggle.
+    private var hasEnabledToggle: Bool {
+        !isPinnedPage && !(usesSections && pageType == .comments)
+    }
 
     var body: some View {
         Form {
-            if !isPinnedPage {
+            if hasEnabledToggle {
                 enabledSection
             }
 
@@ -176,6 +182,7 @@ struct PanelPageEditorView: View {
 
     // MARK: - Comments Elements Section
 
+    @ViewBuilder
     private var commentsElementsSection: some View {
         Section {
             Toggle(
@@ -186,9 +193,18 @@ struct PanelPageEditorView: View {
                 guard newValue != commentsSettings.effectiveShowAvatars else { return }
                 viewModel.updatePanelCommentsSettingsSync { $0.showAvatars = newValue }
             }
+        } header: {
+            Text(String(localized: "panel.settings.elements.header"))
+        } footer: {
+            if !hasEnabledToggle, !viewModel.canEditActivePreset {
+                Text(String(localized: "settings.playerControls.duplicateToEdit"))
+            }
+        }
+        .disabled(!viewModel.canEditActivePreset)
 
+        Section {
             Picker(
-                String(localized: "commentsPill.mode.title"),
+                String(localized: "panel.settings.comments.pillMode"),
                 selection: $commentsPillMode
             ) {
                 ForEach(CommentsPillMode.allCases, id: \.self) { mode in
@@ -199,8 +215,8 @@ struct PanelPageEditorView: View {
                 guard newValue != commentsSettings.effectivePillMode else { return }
                 viewModel.updatePanelCommentsSettingsSync { $0.pillMode = newValue }
             }
-        } header: {
-            Text(String(localized: "panel.settings.elements.header"))
+        } footer: {
+            Text(String(localized: "panel.settings.comments.pillMode.footer"))
         }
         .disabled(!viewModel.canEditActivePreset)
     }

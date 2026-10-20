@@ -1527,16 +1527,6 @@
         }
       }
     },
-    "commentsPill.mode.title" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Comments"
-          }
-        }
-      }
-    },
     "common.add" : {
       "localizations" : {
         "en" : {
@@ -7963,6 +7953,28 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Corner shows the video in the top corner with pages in a side column. Only the info panel can sit below the video; comments there show as its pill. Related, chapters and queue always use the side column. The standard layout is used automatically when the window is too narrow."
+          }
+        }
+      }
+    },
+    "panel.settings.comments.pillMode" : {
+      "comment" : "Comments page editor picker label",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Comments Pill"
+          }
+        }
+      }
+    },
+    "panel.settings.comments.pillMode.footer" : {
+      "comment" : "Comments page editor picker footer",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "How comments show below the video details: as a pill that collapses on scroll, as a button, or not at all."
           }
         }
       }

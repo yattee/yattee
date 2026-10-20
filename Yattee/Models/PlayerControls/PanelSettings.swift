@@ -671,14 +671,6 @@ struct PanelSettings: Codable, Hashable, Sendable {
         #endif
     }
 
-    /// Page types the settings list hides on this device because the panel
-    /// never renders them as pages: iPhone shows only the info page with
-    /// inline sections, so queue has no effect there and comments live on
-    /// the pill/overlay (configured in their own settings group).
-    static var hiddenSettingsPageTypes: Set<PanelPageType> {
-        isSectionsOnlyDevice ? [.queue, .comments] : []
-    }
-
     /// Enabled pages an inline-sections host renders below the video info,
     /// in configured order, with their per-page element settings.
     func inlineSections(in region: PanelRegion? = nil) -> [PanelPageConfiguration] {

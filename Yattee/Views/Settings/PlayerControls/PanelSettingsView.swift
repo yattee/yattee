@@ -19,8 +19,6 @@ struct PanelSettingsView: View {
     @State private var wideLayoutSide: FloatingPanelSide = .right
     @State private var belowVideoContent: PanelBelowVideoContent = .info
     @State private var showPageBarLabels: Bool = true
-    @State private var commentsShowAvatars: Bool = true
-    @State private var commentsPillMode: CommentsPillMode = .pill
 
     /// Corner layout exists on iPad and macOS, and on a foldable iPhone whose
     /// interior display is large enough (see `hasHinge`).
@@ -37,8 +35,23 @@ struct PanelSettingsView: View {
 
     private var showsLayoutSection: Bool { Self.supportsCornerLayout || hasHinge }
 
+    /// Whether the corner layout is selected and available on this device.
+    private var isCornerLayout: Bool { layoutMode == .corner && showsLayoutSection }
+
     /// iPhone has no page bar: the list configures inline sections instead.
-    private var usesSections: Bool { PanelSettings.isSectionsOnlyDevice }
+    /// A foldable iPhone in the corner layout gets a side column with real
+    /// pages (comments and queue included), so it configures pages there.
+    private var usesSections: Bool {
+        PanelSettings.isSectionsOnlyDevice && !isCornerLayout
+    }
+
+    /// Comments shown as the pill on the info panel rather than as a page:
+    /// always on inline-sections hosts, and in the corner layout when they
+    /// sit below the video.
+    private var commentsIsPill: Bool {
+        usesSections
+            || (isCornerLayout && viewModel.panelSettings.effectiveRegion(for: .comments) == .belowVideo)
+    }
 
     var body: some View {
         List {
@@ -50,9 +63,6 @@ struct PanelSettingsView: View {
                 pageBarSection
             }
             pagesSection
-            if usesSections {
-                commentsSection
-            }
         }
         .navigationTitle(String(localized: "settings.playerControls.detailsPanel"))
         #if os(iOS)
@@ -213,76 +223,40 @@ struct PanelSettingsView: View {
         }
     }
 
-    // MARK: - Comments Section (iPhone)
-
-    /// iPhone never renders a comments page: comments live on the pill and
-    /// overlay, so their settings sit here instead of in the sections list.
-    private var commentsSettings: CommentsPageSettings {
-        viewModel.panelSettings.configuration(for: .comments)?.commentsSettings ?? CommentsPageSettings()
-    }
-
-    private var commentsSection: some View {
-        Section {
-            Picker(
-                String(localized: "commentsPill.mode.title"),
-                selection: $commentsPillMode
-            ) {
-                ForEach(CommentsPillMode.allCases, id: \.self) { mode in
-                    Text(mode.displayName).tag(mode)
-                }
-            }
-            .onChange(of: commentsPillMode) { _, newValue in
-                guard newValue != commentsSettings.effectivePillMode else { return }
-                viewModel.updatePanelCommentsSettingsSync { $0.pillMode = newValue }
-            }
-
-            Toggle(
-                String(localized: "panel.settings.comments.showAvatars"),
-                isOn: $commentsShowAvatars
-            )
-            .onChange(of: commentsShowAvatars) { _, newValue in
-                guard newValue != commentsSettings.effectiveShowAvatars else { return }
-                viewModel.updatePanelCommentsSettingsSync { $0.showAvatars = newValue }
-            }
-        } header: {
-            Text(String(localized: "player.comments"))
-        } footer: {
-            if !viewModel.canEditActivePreset {
-                Text(String(localized: "settings.playerControls.duplicateToEdit"))
-            }
-        }
-        .disabled(!viewModel.canEditActivePreset)
-    }
-
     // MARK: - Pages Section
 
+    /// Page types this layout never renders: inline-sections hosts have no
+    /// queue (comments stay listed as the pill row).
+    private var hiddenPageTypes: Set<PanelPageType> {
+        usesSections ? [.queue] : []
+    }
+
     /// Page types whose slot the user cannot change: the pinned page (info)
-    /// and, in the corner layout with the comments pill below the video,
-    /// comments too, since it is no longer a page in the side column.
+    /// and comments while they show as the pill, since the pill is not part
+    /// of the page/section order.
     private var lockedPageTypes: Set<PanelPageType> {
         var locked: Set<PanelPageType> = [PanelSettings.pinnedPageType]
-        if layoutMode == .corner, Self.supportsCornerLayout,
-           viewModel.panelSettings.effectiveRegion(for: .comments) == .belowVideo {
+        if commentsIsPill {
             locked.insert(.comments)
         }
         return locked
     }
 
     /// Locked pages are rendered outside the reorderable list so they get no
-    /// drag handle and nothing can be dropped between or above them.
-    private var lockedPages: [PanelPageConfiguration] {
-        let locked = lockedPageTypes
-        let hidden = PanelSettings.hiddenSettingsPageTypes
+    /// drag handle and nothing can be dropped between them: the pinned page
+    /// above, the comments pill below.
+    private func lockedPages(_ types: Set<PanelPageType>) -> [PanelPageConfiguration] {
+        let hidden = hiddenPageTypes
         return viewModel.panelPages.filter {
-            locked.contains($0.pageType) && !hidden.contains($0.pageType)
+            types.contains($0.pageType) && lockedPageTypes.contains($0.pageType) && !hidden.contains($0.pageType)
         }
     }
 
     /// Pages the user can reorder: everything but the locked pages and the
-    /// types this device never renders (iPhone: queue, comments).
+    /// types this layout never renders.
     private var reorderablePages: [PanelPageConfiguration] {
         let locked = lockedPageTypes
-        let hidden = PanelSettings.hiddenSettingsPageTypes
+        let hidden = hiddenPageTypes
         return viewModel.panelPages.filter {
             !locked.contains($0.pageType) && !hidden.contains($0.pageType)
         }
@@ -290,7 +264,7 @@ struct PanelSettingsView: View {
 
     private var pagesSection: some View {
         Section {
-            ForEach(lockedPages) { page in
+            ForEach(lockedPages([PanelSettings.pinnedPageType])) { page in
                 pageRow(for: page)
                     .moveDisabled(true)
                     .deleteDisabled(true)
@@ -307,6 +281,12 @@ struct PanelSettingsView: View {
                     fromOffsets: source,
                     toOffset: destination
                 )
+            }
+
+            ForEach(lockedPages([.comments])) { page in
+                pageRow(for: page)
+                    .moveDisabled(true)
+                    .deleteDisabled(true)
             }
         } header: {
             Text(usesSections
@@ -327,7 +307,11 @@ struct PanelSettingsView: View {
     @ViewBuilder
     private func pageRow(for page: PanelPageConfiguration) -> some View {
         NavigationLink {
-            PanelPageEditorView(pageType: page.pageType, viewModel: viewModel)
+            PanelPageEditorView(
+                pageType: page.pageType,
+                viewModel: viewModel,
+                usesSections: usesSections
+            )
         } label: {
             HStack {
                 Label(page.pageType.displayName, systemImage: page.pageType.systemImage)
@@ -340,7 +324,11 @@ struct PanelSettingsView: View {
                         .background(Capsule().fill(.tint))
                 }
                 Spacer()
-                if page.isEnabled, layoutMode == .corner, Self.supportsCornerLayout {
+                if page.pageType == .comments, usesSections {
+                    // The pill has no page toggle: its mode includes off.
+                    Text(commentsPillMode.displayName)
+                        .foregroundStyle(.secondary)
+                } else if page.isEnabled, isCornerLayout {
                     Text(viewModel.panelSettings.effectiveRegion(for: page.pageType).displayName)
                         .foregroundStyle(.secondary)
                 } else {
@@ -355,6 +343,10 @@ struct PanelSettingsView: View {
 
     // MARK: - Helpers
 
+    private var commentsPillMode: CommentsPillMode {
+        viewModel.panelSettings.commentsPillMode
+    }
+
     private func syncLocalState() {
         portraitDefaultVisibility = viewModel.panelDefaultVisibility(for: .portrait)
         landscapeDefaultVisibility = viewModel.panelDefaultVisibility(for: .landscape)
@@ -363,8 +355,6 @@ struct PanelSettingsView: View {
         // Clamp to what this platform offers so the picker never shows blank.
         belowVideoContent = viewModel.panelSettings.effectiveBelowVideoContent
         showPageBarLabels = viewModel.panelShowPageBarLabels
-        commentsShowAvatars = commentsSettings.effectiveShowAvatars
-        commentsPillMode = commentsSettings.effectivePillMode
     }
 }
 
