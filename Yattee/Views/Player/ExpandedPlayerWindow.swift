@@ -180,6 +180,10 @@ private final class DragToDismissGestureHandler: NSObject, UIGestureRecognizerDe
     var getPortraitPanelFrame: (() -> CGRect)?
     /// Returns the corner layout below-video panel frame in screen coordinates (blocks dismiss pan)
     var getCornerBelowPanelFrame: (() -> CGRect)?
+    /// Returns true while the corner layout is active (its panels don't block pinch)
+    var isCornerLayoutActive: (() -> Bool)?
+    /// Returns the corner layout video region frame in screen coordinates (pinch must start inside it)
+    var getCornerVideoFrame: (() -> CGRect)?
     /// Returns the panel resize grabber strip frame in screen coordinates (blocks dismiss pan)
     var getPanelResizeGrabberFrame: (() -> CGRect)?
     var getPlayerSideSliderFrames: (() -> [CGRect])?
@@ -356,6 +360,12 @@ private final class DragToDismissGestureHandler: NSObject, UIGestureRecognizerDe
         // Don't allow pinch gesture when pinned panel is visible on screen or seek gesture is active
         if gestureRecognizer is UIPinchGestureRecognizer {
             if isSeekGestureActive?() == true { return false }
+            // Corner layout: the video sits in its own region beside the
+            // panels, so pinching it is fine — but not over the panels
+            if isCornerLayoutActive?() == true {
+                let videoFrame = getCornerVideoFrame?() ?? .zero
+                return videoFrame.isEmpty || videoFrame.contains(gestureRecognizer.location(in: nil))
+            }
             if isPortraitPanelVisible?() == true { return false }
             return !(isPanelPinnedAndVisible?() ?? false)
         }
@@ -882,6 +892,12 @@ final class ExpandedPlayerWindowManager {
         }
         handler.getCornerBelowPanelFrame = { [weak self] in
             self?.appEnvironment?.navigationCoordinator.cornerBelowPanelFrame ?? .zero
+        }
+        handler.isCornerLayoutActive = { [weak self] in
+            self?.appEnvironment?.navigationCoordinator.isCornerLayoutActive ?? false
+        }
+        handler.getCornerVideoFrame = { [weak self] in
+            self?.appEnvironment?.navigationCoordinator.cornerVideoFrame ?? .zero
         }
         handler.getPanelResizeGrabberFrame = { [weak self] in
             self?.appEnvironment?.navigationCoordinator.panelResizeGrabberFrame ?? .zero

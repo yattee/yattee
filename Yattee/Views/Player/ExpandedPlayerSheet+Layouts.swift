@@ -1373,6 +1373,19 @@ extension ExpandedPlayerSheet {
                     fullWidth: width,
                     fullHeight: height
                 )
+                #if os(iOS)
+                .background {
+                    GeometryReader { proxy in
+                        Color.clear
+                            .onChange(of: proxy.frame(in: .global), initial: true) { _, frame in
+                                navigationCoordinator?.cornerVideoFrame = frame
+                            }
+                            .onDisappear {
+                                navigationCoordinator?.cornerVideoFrame = .zero
+                            }
+                    }
+                }
+                #endif
             },
             onChannelTap: video.author.hasRealChannelInfo ? {
                 navigationCoordinator?.navigateToChannel(for: video, collapsePlayer: true)
@@ -1686,7 +1699,10 @@ extension ExpandedPlayerSheet {
                         playerService.selectEmbeddedSubtitleTrack(trackID)
                     },
                     panscanValue: navigationCoordinator?.pinchPanscan ?? 0.0,
-                    isPanscanAllowed: !(isPanelPinned && isPanelVisible),
+                    // Corner layout: the video owns its own region, so it can
+                    // fill it even with the panels showing
+                    isPanscanAllowed: !(isPanelPinned && isPanelVisible)
+                        || appEnvironment?.navigationCoordinator.isCornerLayoutActive == true,
                     onTogglePanscan: { [weak navigationCoordinator] in
                         navigationCoordinator?.togglePanscan()
                     },

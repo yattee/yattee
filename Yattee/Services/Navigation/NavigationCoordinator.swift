@@ -145,6 +145,10 @@ final class NavigationCoordinator {
     /// inside it must not start the sheet dismiss pan (drag handle conflict).
     var cornerBelowPanelFrame: CGRect = .zero
 
+    /// Corner layout video region frame in screen coordinates — the pinch
+    /// panscan gesture only begins inside it while the panels are showing.
+    var cornerVideoFrame: CGRect = .zero
+
     /// Panel resize grabber strip frame in screen coordinates — touches inside
     /// it must not start the sheet dismiss pan (a diagonal resize drag would
     /// otherwise be cancelled and dismiss the player instead).
