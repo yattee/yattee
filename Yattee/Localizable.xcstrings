@@ -20190,6 +20190,16 @@
         }
       }
     },
+    "video.context.copyLink" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Copy Link"
+          }
+        }
+      }
+    },
     "video.context.download" : {
       "localizations" : {
         "en" : {

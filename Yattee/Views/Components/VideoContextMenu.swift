@@ -267,6 +267,17 @@ struct VideoContextMenuContent: View {
             Label(String(localized: "video.context.share"), systemImage: "square.and.arrow.up")
         }
         #endif
+
+        // The macOS ShareLink menu has no Copy Link item (#972)
+        #if os(macOS)
+        Button {
+            let pasteboard = NSPasteboard.general
+            pasteboard.clearContents()
+            pasteboard.setString((appEnvironment?.shareURL(for: video) ?? video.shareURL).absoluteString, forType: .string)
+        } label: {
+            Label(String(localized: "video.context.copyLink"), systemImage: "link")
+        }
+        #endif
     }
 
     var body: some View {
