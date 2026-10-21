@@ -13,10 +13,15 @@ import SwiftUI
 /// material, which picks up a wallpaper tint (often bluish in dark mode) and
 /// clashes with views that draw `windowBackgroundColor` themselves (lists,
 /// gradient fades). No-op on other platforms.
+///
+/// The view is expanded to fill the proposed space first, so content-sized
+/// pages (empty states, placeholders, spinners) don't paint only a strip
+/// behind themselves while the rest stays on the window material.
 struct OpaqueWindowBackgroundModifier: ViewModifier {
     func body(content: Content) -> some View {
         #if os(macOS)
         content
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
             .background(Color(nsColor: .windowBackgroundColor).ignoresSafeArea())
         #else
         content
