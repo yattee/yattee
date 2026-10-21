@@ -42,7 +42,9 @@ struct TappableVideoModifier: ViewModifier {
         guard let env = appEnvironment else { return false }
         let queueEnabled = env.settingsManager.queueEnabled
         let state = env.playerService.state
-        let hasActivePlayback = state.currentVideo != nil || !state.queue.isEmpty
+        // A video that played to the end no longer counts: replacing it loses nothing.
+        let hasUnfinishedVideo = state.currentVideo != nil && state.playbackState != .ended
+        let hasActivePlayback = hasUnfinishedVideo || !state.queue.isEmpty
         return queueEnabled && hasActivePlayback
     }
 
