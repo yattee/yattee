@@ -107,6 +107,14 @@ final class MPVRenderView: UIView {
     /// Pending resize work item (for debouncing)
     private var pendingResizeWorkItem: DispatchWorkItem?
 
+    /// When the view size last changed away from the framebuffer size.
+    private var lastSizeChangeTime: CFTimeInterval = 0
+
+    /// Size changes closer together than this are one continuous resize
+    /// (animated layout change, rotation) and recreate the framebuffer only
+    /// once it settles.
+    private static let continuousResizeWindow: CFTimeInterval = 0.15
+
     /// Dedicated queue for OpenGL rendering (off main thread).
     private let renderQueue = DispatchQueue(label: "stream.yattee.mpv.render", qos: .userInteractive)
 
@@ -501,8 +509,28 @@ final class MPVRenderView: UIView {
         // Cancel any pending resize
         pendingResizeWorkItem?.cancel()
 
-        // Always recreate framebuffer immediately to ensure video is properly sized
-        // This is important during rotation animations
+        // A continuous resize (corner layout panel toggles, rotation) changes
+        // the size every animation frame. Recreating + rendering per step
+        // blocks main on renderQueue.sync (waiting out the in-flight render,
+        // then rendering again) and drops the animation to a few fps. Let the
+        // layer stretch the last frame meanwhile — the view keeps the video's
+        // aspect ratio — and recreate once the size settles. A one-off resize
+        // (e.g. handing the view to the mini player) still recreates now.
+        let now = CACurrentMediaTime()
+        let isContinuousResize = now - lastSizeChangeTime < Self.continuousResizeWindow
+        lastSizeChangeTime = now
+        if isContinuousResize {
+            MPVLogging.log("layoutSubviews: deferring framebuffer recreation (continuous resize)")
+            let workItem = DispatchWorkItem { [weak self] in
+                // Settled: the next layout pass recreates immediately
+                self?.lastSizeChangeTime = 0
+                self?.setNeedsLayout()
+            }
+            pendingResizeWorkItem = workItem
+            DispatchQueue.main.asyncAfter(deadline: .now() + Self.continuousResizeWindow, execute: workItem)
+            return
+        }
+
         renderQueue.sync {
             destroyFramebuffer()
             createFramebuffer()
