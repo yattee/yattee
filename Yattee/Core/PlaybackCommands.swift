@@ -79,6 +79,13 @@ struct PlaybackCommands: Commands {
 
             // Display modes
             pipButton
+
+            Divider()
+
+            // Corner layout panels
+            toggleInfoPanelButton
+            toggleSidebarButton
+            toggleAllPanelsButton
             
             Divider()
             closeVideoButton
@@ -309,6 +316,42 @@ struct PlaybackCommands: Commands {
         .disabled(!hasActiveVideo || !state.isPiPPossible || state.currentStream?.isAudioOnly == true)
     }
     
+    // MARK: - Corner Layout Panels
+
+    private var isCornerLayoutActive: Bool {
+        isPlayerExpanded && navigationCoordinator.isCornerLayoutActive
+    }
+
+    private var toggleInfoPanelButton: some View {
+        Button {
+            navigationCoordinator.cornerPanelToggleRequest = CornerPanelToggleRequest(target: .belowVideo)
+        } label: {
+            Text(String(localized: "menu.playback.toggleInfoPanel"))
+        }
+        .keyboardShortcut("i", modifiers: [.command, .option])
+        .disabled(!isCornerLayoutActive)
+    }
+
+    private var toggleSidebarButton: some View {
+        Button {
+            navigationCoordinator.cornerPanelToggleRequest = CornerPanelToggleRequest(target: .sideColumn)
+        } label: {
+            Text(String(localized: "menu.playback.toggleSidebar"))
+        }
+        .keyboardShortcut("s", modifiers: [.command, .option])
+        .disabled(!isCornerLayoutActive)
+    }
+
+    private var toggleAllPanelsButton: some View {
+        Button {
+            navigationCoordinator.cornerPanelToggleRequest = CornerPanelToggleRequest(target: .all)
+        } label: {
+            Text(String(localized: "menu.playback.toggleAllPanels"))
+        }
+        .keyboardShortcut("p", modifiers: [.command, .option])
+        .disabled(!isCornerLayoutActive)
+    }
+
     // MARK: - Close video button
     
     private var closeVideoButton: some View {

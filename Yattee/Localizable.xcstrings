@@ -6907,6 +6907,36 @@
         }
       }
     },
+    "menu.playback.toggleAllPanels" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Toggle All Panels"
+          }
+        }
+      }
+    },
+    "menu.playback.toggleInfoPanel" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Toggle Info Panel"
+          }
+        }
+      }
+    },
+    "menu.playback.toggleSidebar" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Toggle Sidebar"
+          }
+        }
+      }
+    },
     "menu.playback.volumeDown" : {
       "localizations" : {
         "en" : {

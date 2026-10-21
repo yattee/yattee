@@ -652,6 +652,10 @@ struct CornerPlayerLayout<PlayerContent: View>: View {
                 panelToggleGeneration += 1
             }
         }
+        .onChange(of: appEnvironment?.navigationCoordinator.cornerPanelToggleRequest) { _, request in
+            guard let request else { return }
+            handlePanelToggleRequest(request.target)
+        }
     }
 
     // MARK: - Panels
@@ -848,6 +852,50 @@ struct CornerPlayerLayout<PlayerContent: View>: View {
             panelToggleGeneration += 1
             settingsManager?.landscapeDetailsPanelVisible = show
             settingsManager?.landscapeDetailsPanelLastVisible = show
+        }
+    }
+
+    /// Keyboard shortcut toggles from the menu bar. `.all` is the toggle
+    /// button; the single-region toggles flip one region and keep the other
+    /// as it is on screen.
+    private func handlePanelToggleRequest(_ target: CornerPanelToggle) {
+        let showsBelow = isPanelVisible && isBelowPanelVisible && hasBelowVideoInfo
+        let showsSide = isPanelVisible && isSideColumnVisible && hasSideColumn
+        switch target {
+        case .all:
+            togglePanel()
+        case .belowVideo:
+            guard hasBelowVideoInfo else { return }
+            setRegionsVisible(below: !showsBelow, side: showsSide)
+        case .sideColumn:
+            guard hasSideColumn else { return }
+            setRegionsVisible(below: showsBelow, side: !showsSide)
+        }
+    }
+
+    /// Shows exactly the given regions, animated like the toggle button.
+    /// Hiding the last visible region hides the whole panel instead (video
+    /// fullscreen state), leaving both regions armed for the next show.
+    private func setRegionsVisible(below: Bool, side: Bool) {
+        let showsAny = (below && hasBelowVideoInfo) || (side && hasSideColumn)
+        withAnimation(.easeInOut(duration: 0.25)) {
+            // Drop any in-flight drag geometry — the flags alone define
+            // the layout from here
+            isRevealDragActive = false
+            isSideColumnRevealDragActive = false
+            sideColumnDragOffset = 0
+            belowPanelDragOffset = 0
+            if !below || !showsAny { collapseBelowPanelUnderVideo() }
+            isBelowPanelVisible = showsAny ? below : true
+            isSideColumnVisible = showsAny ? side : true
+            isPanelVisible = showsAny
+            panelToggleGeneration += 1
+            // Also gates the macOS window aspect lock
+            // (`isCornerPanelLayoutActive`)
+            if settingsManager?.landscapeDetailsPanelVisible != showsAny {
+                settingsManager?.landscapeDetailsPanelVisible = showsAny
+                settingsManager?.landscapeDetailsPanelLastVisible = showsAny
+            }
         }
     }
 

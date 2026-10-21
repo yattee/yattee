@@ -165,6 +165,11 @@ final class NavigationCoordinator {
     /// not collapsed) — the seek pan must not begin from inside it.
     var cornerSideColumnEdgeRevealInset: CGFloat = 0
 
+    /// Corner layout panel toggle requested from outside the layout (menu
+    /// bar keyboard shortcuts). Each request carries its own id so repeating
+    /// the same shortcut fires again.
+    var cornerPanelToggleRequest: CornerPanelToggleRequest?
+
     /// Progress bar frame in screen coordinates (for gesture conflict resolution).
     var progressBarFrame: CGRect = .zero
 
@@ -388,4 +393,19 @@ final class NavigationCoordinator {
             handoffManager?.updateActivity(for: destination)
         }
     }
+}
+
+/// Corner layout regions a panel toggle request targets.
+enum CornerPanelToggle: Equatable {
+    /// The info panel below the video (with the comments pill on iOS).
+    case belowVideo
+    /// The tabbed side column on the trailing edge.
+    case sideColumn
+    /// Every region at once — same as the in-player panel toggle button.
+    case all
+}
+
+struct CornerPanelToggleRequest: Equatable {
+    let target: CornerPanelToggle
+    let id = UUID()
 }
