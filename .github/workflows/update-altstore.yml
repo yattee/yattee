@@ -76,3 +76,25 @@ jobs:
           git diff --cached --quiet && echo "No changes to commit" && exit 0
           git commit -m "Update AltStore source for ${{ env.VERSION_NUMBER }} (${{ env.BUILD_NUMBER }})"
           git push
+      - name: Publish to dl.yattee.stream (gh-pages)
+        run: |
+          # Served as https://dl.yattee.stream/altstore.json. The release
+          # workflow's Sparkle job pushes appcast.xml to the same branch, so
+          # retry on a rejected push instead of racing it.
+          git fetch origin +refs/heads/gh-pages:refs/heads/gh-pages
+          git worktree add gh-pages gh-pages
+          cd gh-pages
+          for attempt in 1 2 3; do
+            cp ../altstore-source.json altstore.json
+            git add altstore.json
+            if git diff --cached --quiet; then
+              echo "altstore.json already up to date"
+              exit 0
+            fi
+            git commit -m "Publish AltStore source: ${{ env.VERSION_NUMBER }} (${{ env.BUILD_NUMBER }})"
+            git push origin gh-pages && exit 0
+            git reset --hard -q HEAD~1
+            git pull -q --rebase origin gh-pages
+          done
+          echo "::error::Could not push altstore.json to gh-pages"
+          exit 1
