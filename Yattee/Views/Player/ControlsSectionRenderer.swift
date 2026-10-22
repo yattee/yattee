@@ -460,7 +460,7 @@ struct ControlsSectionRenderer: View {
 
     /// Brightness icon image using variable value SF Symbol.
     private var brightnessImage: Image {
-        Image(systemName: "sun.max.fill", variableValue: UIScreen.main.brightness)
+        Image(systemName: "sun.max.fill", variableValue: PlayerBrightness.value(for: actions.screen))
     }
 
     /// Panel toggle button content with glass background support.
@@ -796,9 +796,9 @@ struct ControlsSectionRenderer: View {
             if effectiveBehavior == .alwaysVisible || isBrightnessExpanded {
                 Slider(
                     value: Binding(
-                        get: { UIScreen.main.brightness },
+                        get: { PlayerBrightness.value(for: actions.screen) },
                         set: { newValue in
-                            UIScreen.main.brightness = newValue
+                            PlayerBrightness.set(newValue, for: actions.screen)
                         }
                     ),
                     in: 0...1,

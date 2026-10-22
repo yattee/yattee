@@ -137,8 +137,8 @@ struct PlayerControlsView: View {
     @State private var targetSeekProgress: Double = 0
     @State private var hideTimer: Timer?
     @State private var showControls: Bool?
-    /// Tracks brightness value for side slider (needed because UIScreen.main.brightness isn't observable)
-    @State private var currentBrightness: Double = UIScreen.main.brightness
+    /// Tracks brightness value for side slider (needed because UIScreen.brightness isn't observable)
+    @State private var currentBrightness: Double = PlayerBrightness.value(for: nil)
     /// Track safe area to force re-render when it changes
     @State private var currentSafeArea: UIEdgeInsets = .zero
     /// Window hosting these controls, captured by `HostWindowReader`. Safe
@@ -146,6 +146,7 @@ struct PlayerControlsView: View {
     /// display's window (iPhone Duo exterior with its 84pt status bar inset
     /// while the player sits on the interior in Split View).
     @State private var hostWindow: UIWindow?
+    private var hostScreen: UIScreen? { hostWindow?.windowScene?.screen }
     @Environment(\.statusBarVisibilityController) private var statusBarController
     /// Active player controls layout from preset (passed from parent to avoid flashing during view recreation)
     var activeLayout: PlayerControlsLayout = .default
@@ -272,6 +273,7 @@ struct PlayerControlsView: View {
             guard window !== hostWindow else { return }
             hostWindow = window
             currentSafeArea = windowSafeArea
+            currentBrightness = PlayerBrightness.value(for: hostScreen)
         })
         .onAppear {
             // Update safe area on appear to ensure correct layout
@@ -300,7 +302,7 @@ struct PlayerControlsView: View {
             appEnvironment?.navigationCoordinator.shouldSnapPanscan = newValue
         }
         .onReceive(NotificationCenter.default.publisher(for: UIScreen.brightnessDidChangeNotification)) { _ in
-            currentBrightness = UIScreen.main.brightness
+            currentBrightness = PlayerBrightness.value(for: hostScreen)
         }
         .sheet(isPresented: $showingCaptionsSheet) {
             captionsSheet
@@ -429,6 +431,7 @@ struct PlayerControlsView: View {
             panelSide: panelSide,
             isIPad: isIPad,
             canRotate: OrientationManager.shared.canRotateProgrammatically,
+            screen: hostWindow?.windowScene?.screen,
             showVolumeControls: showVolumeControls,
             showDebugButton: onToggleDebug != nil,
             showCloseButton: onClose != nil,
@@ -1585,7 +1588,7 @@ struct PlayerControlsView: View {
     /// Always goes to the next higher preset from current position, wrapping from 100 to 0.
     private func cycleBrightnessPreset() {
         let presets: [Double] = [0.0, 0.25, 0.5, 0.75, 1.0]
-        let current = UIScreen.main.brightness
+        let current = PlayerBrightness.value(for: hostScreen)
 
         // Find next higher preset (with small tolerance for floating point)
         let newValue: Double
@@ -1596,7 +1599,7 @@ struct PlayerControlsView: View {
             newValue = 0.0
         }
 
-        UIScreen.main.brightness = newValue
+        PlayerBrightness.set(newValue, for: hostScreen)
         currentBrightness = newValue
     }
 
@@ -1632,7 +1635,7 @@ struct PlayerControlsView: View {
                 value: Binding(
                     get: { currentBrightness },
                     set: { newValue in
-                        UIScreen.main.brightness = newValue
+                        PlayerBrightness.set(newValue, for: hostScreen)
                         currentBrightness = newValue
                     }
                 ),

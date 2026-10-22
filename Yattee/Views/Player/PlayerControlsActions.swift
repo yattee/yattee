@@ -57,6 +57,10 @@ struct PlayerControlsActions {
     /// behavior (details toggle, no rotate glyph, no orientation lock).
     var canRotate: Bool = true
 
+    /// Screen of the window hosting the controls; brightness targets it
+    /// (iPhone Duo interior and exterior are separate screens).
+    var screen: UIScreen?
+
     /// iPad, or an iPhone windowing mode that can't rotate on request.
     var usesRotationFreeFullscreen: Bool { isIPad || !canRotate }
 
