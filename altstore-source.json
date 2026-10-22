@@ -3,7 +3,6 @@
   "subtitle": "Privacy-focused video player",
   "description": "Yattee is a privacy-focused video player for iPhone, iPad, Mac, and Apple TV. Watch YouTube via Invidious, Piped, or self-hosted Yattee Server. Supports PeerTube, local files, SMB shares, and WebDAV. Features include 4K playback, Picture in Picture, background audio, SponsorBlock, DeArrow, playback queue, subscriptions, bookmarks, downloads, and iCloud sync.",
   "iconURL": "https://raw.githubusercontent.com/yattee/yattee/main/Assets/yattee-icon-512.png",
-  "headerURL": "",
   "website": "https://github.com/yattee/yattee",
   "tintColor": "#5B8DF5",
   "apps": [
@@ -87,8 +86,12 @@
           "com.apple.developer.icloud-container-identifiers",
           "com.apple.developer.icloud-services",
           "com.apple.developer.ubiquity-kvstore-identifier",
-          "aps-environment"
-        ]
+          "aps-environment",
+          "com.apple.security.application-groups"
+        ],
+        "privacy": {
+          "NSLocalNetworkUsageDescription": "Yattee uses local network to discover and control playback on other Yattee devices."
+        }
       }
     }
   ],
