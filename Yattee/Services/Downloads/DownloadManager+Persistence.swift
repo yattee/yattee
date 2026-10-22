@@ -375,6 +375,8 @@ extension DownloadManager {
 
     /// Diagnoses orphaned files by comparing disk storage with loaded downloads.
     func diagnoseOrphanedFiles() async {
+        guard LoggingService.shared.isEnabled else { return }
+
         do {
             let downloadsDir = downloadsDirectory()
             let contents = try fileManager.contentsOfDirectory(
