@@ -114,6 +114,9 @@ struct UnifiedTabView: View {
             .onChange(of: router.selection) { _, _ in
                 ensureSelectionIsAvailable(visibleMainItems: visibleMainItems)
             }
+            .onChange(of: sidebarManager.sortedSourceItems) { _, items in
+                leaveRemovedSource(remaining: items)
+            }
     }
 
     @ViewBuilder
@@ -391,6 +394,9 @@ struct UnifiedTabView: View {
             // detail visible until the user manually presses Menu.
             NotificationCenter.default.post(name: .yatteeTVForcePopDetail, object: nil)
         }
+        .onChange(of: sidebarManager.sortedSourceItems) { _, items in
+            leaveRemovedSource(remaining: items)
+        }
     }
 
     // MARK: - Visible Main Items
@@ -650,6 +656,16 @@ extension UnifiedTabView {
             },
             instance: { id in appEnvironment?.instancesManager.enabledInstances.first { $0.id == id } }
         )
+    }
+
+    /// A source removed (or disabled) while selected leaves its row with
+    /// nothing to render, so the user lands on Home instead of a blank page.
+    func leaveRemovedSource(remaining items: [SidebarItem]) {
+        let current = router.selection
+        guard current.isMediaSource || current.isInstance,
+              !items.contains(where: { $0.id == current.id }) else { return }
+        router.popToRoot(current)
+        router.select(.home)
     }
 
     // MARK: - Channel Content & Labels
