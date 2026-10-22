@@ -1,74 +1,120 @@
 name: Bug Report
-description: Report a bug or unexpected behavior
+description: Report a bug or unexpected behavior in the Yattee app
 labels: "bug"
 body:
   - type: markdown
     attributes:
       value: |
-        **Before You Submit Your Issue**
-        - This is not a right place to ask questions. Use [Discussions](https://github.com/yattee/yattee/discussions) or contact directly via [Discord](https://yattee.stream/discord) or [Matrix Channel](https://matrix.to/#/#Yattee:matrix.org)
+        Thanks for taking the time to report a bug! Please read the [Reporting Issues](https://docs.yattee.stream/docs/guides/reporting-issues) guide first. Reports with logs and clear steps to reproduce get fixed much faster.
+
+        - Questions go to [Discussions](https://github.com/yattee/yattee/discussions), [Discord](https://yattee.stream/discord) or [Matrix](https://matrix.to/#/#Yattee:matrix.org).
+        - Problems with Yattee Server go to [yattee/yattee-server](https://github.com/yattee/yattee-server/issues).
+        - Please report one issue per report.
 
   - type: checkboxes
     attributes:
       label: Guidelines
-      description: Please ensure you've completed the following
+      description: Please make sure you've done the following
       options:
-        - label: I have searched the [issue tracker](https://github.com/yattee/yattee/issues) and I haven't found bug report like this
+        - label: I have searched the [issue tracker](https://github.com/yattee/yattee/issues) and haven't found a report of this bug
+          required: true
+        - label: I can reproduce this bug on the latest version of the app
           required: true
 
   - type: textarea
     attributes:
-      label: Current Behavior
-      description: Describe what happened and the steps you have done to encounter the problem
+      label: Description
+      description: What happened? Describe the problem clearly
+    validations:
+      required: true
+
+  - type: textarea
+    attributes:
+      label: Steps to Reproduce
+      description: The fewer steps you need to reproduce the bug, the faster it gets fixed
+      placeholder: |
+        1. Open a channel from a Yattee Server source
+        2. Play any video
+        3. Rotate the device
+        4. ...
     validations:
       required: true
 
   - type: textarea
     attributes:
       label: Expected Behavior
-      description: Describe what you expected to happen
+      description: What did you expect to happen?
+    validations:
+      required: true
+
+  - type: input
+    attributes:
+      label: App Version & Build
+      description: Shown at the bottom of the Settings screen
+      placeholder: e.g. 2.0.0 (275)
+    validations:
+      required: true
+
+  - type: dropdown
+    attributes:
+      label: Platform
+      description: Select every platform where you see this bug
+      multiple: true
+      options:
+        - iOS
+        - iPadOS
+        - macOS
+        - tvOS
     validations:
       required: true
 
   - type: input
     attributes:
       label: Device & OS Version
-      description: What device and operating system version are you running? You can find it in device settings
-      placeholder: e.g. iPhone, iOS 16.1
+      placeholder: e.g. iPhone 16 Pro, iOS 26.1
     validations:
       required: true
 
-  - type: input
+  - type: dropdown
     attributes:
-      label: App Build
-      description: What build of the application are you running? You can find this in the bottom of the Settings page
-      placeholder: e.g. 112
+      label: Source Type
+      description: Which source types does this bug happen with? Select every one that applies
+      multiple: true
+      options:
+        - Yattee Server
+        - Invidious
+        - Piped
+        - Local files
+        - Network share (SMB / WebDAV)
+        - Not related to a source
     validations:
       required: true
 
   - type: textarea
     attributes:
-      label: App Settings
-      description: If the issue is related to some non-default configuration, please provide the settings you have changed
+      label: Logs
+      description: |
+        Please attach logs captured while reproducing the bug:
+        1. Open **Settings → Advanced → Developer** and turn on **Enable Logging**. For playback or remote control problems, also turn on **Verbose MPV Logging** or **Verbose Remote Control Logging**.
+        2. Reproduce the bug.
+        3. Open **View Logs** and tap **Export Logs**. On tvOS, scan the QR code or open the URL shown on another device.
+        4. Drag the exported file into this field.
+
+        If the app crashed, also attach the crash log from **Settings → Privacy & Security → Analytics & Improvements → Analytics Data** (entries starting with `Yattee`).
+      placeholder: Drag the exported log file here
     validations:
       required: false
 
   - type: textarea
     attributes:
-      label: Crash log
-      description: If you are reporing a crash, attach crash log here
-      placeholder: |
-          1. Go to 'Settings'
-          2. Click on 'Privacy'
-          3. Scroll down and open 'Analytics & Improvements'
-          4. Go to 'Analytics Data'
-          4. See crash log
+      label: Screenshots & Videos
+      description: Screenshots or a screen recording often make the problem much easier to understand
     validations:
       required: false
 
   - type: textarea
     attributes:
-      label: Screenshots, Videos and other files
-      description: Submit screenshots, video of the issue or other files that can help to understand the problem better. If you are reporting issue with playback in MPV, attach [logs from MPV](https://github.com/yattee/yattee/wiki/Getting-MPV-logs)
+      label: Additional Context
+      description: Anything else that might help, such as settings you've changed from their defaults or whether the bug started after an update
     validations:
       required: false

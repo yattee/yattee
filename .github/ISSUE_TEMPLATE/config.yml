@@ -1,1 +1,11 @@
-blank_issues_enabled: true
+blank_issues_enabled: false
+contact_links:
+  - name: Yattee Server issue
+    url: https://github.com/yattee/yattee-server/issues
+    about: Report problems with Yattee Server in its own repository
+  - name: Question or help
+    url: https://github.com/yattee/yattee/discussions
+    about: Ask questions and get help from the community
+  - name: Documentation
+    url: https://docs.yattee.stream
+    about: Guides, troubleshooting and how to report issues
