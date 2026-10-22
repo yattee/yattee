@@ -251,6 +251,11 @@ final class NavigationCoordinator {
     /// Reference to MediaSourcesManager for navigating to media source directories.
     private weak var mediaSourcesManager: MediaSourcesManager?
 
+    #if os(macOS)
+    /// Reference to SettingsManager for the player window mode.
+    private weak var settingsManager: SettingsManager?
+    #endif
+
     // MARK: - Handoff Integration
 
     /// Set the HandoffManager reference for activity updates.
@@ -262,6 +267,13 @@ final class NavigationCoordinator {
     func setMediaSourcesManager(_ manager: MediaSourcesManager) {
         self.mediaSourcesManager = manager
     }
+
+    #if os(macOS)
+    /// Set the SettingsManager reference for the player window mode.
+    func setSettingsManager(_ manager: SettingsManager) {
+        self.settingsManager = manager
+    }
+    #endif
 
     // MARK: - Navigation Actions
 
@@ -331,8 +343,15 @@ final class NavigationCoordinator {
 
     /// Navigate to an opened link's screen, collapsing the full-screen player
     /// so the pushed screen is visible instead of landing underneath it.
+    /// A macOS player in its own window doesn't cover the main window, so it
+    /// stays open.
     func navigateToOpenedLink(_ destination: NavigationDestination) {
-        if isPlayerExpanded {
+        #if os(macOS)
+        let coversMainWindow = settingsManager?.macPlayerSeparateWindow != true
+        #else
+        let coversMainWindow = true
+        #endif
+        if isPlayerExpanded, coversMainWindow {
             isPlayerCollapsing = true
             isPlayerExpanded = false
         }
