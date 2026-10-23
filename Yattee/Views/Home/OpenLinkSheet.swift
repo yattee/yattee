@@ -39,7 +39,7 @@ private enum ExtractionStatus {
 // MARK: - OpenLinkSheet
 
 /// Sheet for entering URLs to play or download from external sites.
-/// Supports multiple URLs (one per line, max 20).
+/// Supports multiple URLs (one per line, max 200).
 struct OpenLinkSheet: View {
     @Environment(\.dismiss) private var dismiss
     let prefilledURL: URL?
@@ -99,7 +99,7 @@ struct OpenLinkFormView: View {
     @State private var pendingDownloadItems: [ExtractedItem] = []
 
     /// Maximum number of URLs allowed.
-    fileprivate static let maxURLs = 20
+    fileprivate static let maxURLs = 200
 
     init(prefilledURL: URL?, onRequestDismiss: (() -> Void)?) {
         self.onRequestDismiss = onRequestDismiss
