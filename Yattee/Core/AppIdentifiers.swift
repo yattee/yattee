@@ -12,6 +12,17 @@ enum AppIdentifiers {
         "iCloud.\(bundleIdentifier)"
     }
 
+    /// CloudKit environment this build is signed for ("Development" or "Production"),
+    /// from the `CLOUDKIT_ENV` build setting. Debug builds use Production unless
+    /// built with the Debug-CKDev configuration ("Yattee (CloudKit Dev)" scheme).
+    static var iCloudEnvironment: String {
+        Bundle.main.object(forInfoDictionaryKey: "YatteeCloudKitEnvironment") as? String ?? "Production"
+    }
+
+    static var isCloudKitDevelopmentEnvironment: Bool {
+        iCloudEnvironment == "Development"
+    }
+
     // MARK: - Background Tasks
 
     static var backgroundFeedRefresh: String {

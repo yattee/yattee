@@ -311,6 +311,7 @@ final class CloudKitSyncEngine: @unchecked Sendable {
             self.container = container
             self.database = database
             self.zoneManager = CloudKitZoneManager(database: database)
+            LoggingService.shared.logCloudKit("CloudKit environment: \(AppIdentifiers.iCloudEnvironment)")
         } else {
             LoggingService.shared.logCloudKit("iCloud container entitlement missing (re-signed build) - CloudKit sync unavailable")
             self.container = nil

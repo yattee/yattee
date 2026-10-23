@@ -167,15 +167,15 @@ struct SettingsView: View {
                     } label: {
                         HStack {
                             Label(String(localized: "settings.icloud.title"), systemImage: "icloud")
-                            #if DEBUG
-                            Spacer()
-                            Text(String(localized: "settings.icloud.dev.badge"))
-                                .font(.caption2.bold())
-                                .foregroundStyle(.white)
-                                .padding(.horizontal, 6)
-                                .padding(.vertical, 2)
-                                .background(.orange, in: Capsule())
-                            #endif
+                            if AppIdentifiers.isCloudKitDevelopmentEnvironment {
+                                Spacer()
+                                Text(String(localized: "settings.icloud.dev.badge"))
+                                    .font(.caption2.bold())
+                                    .foregroundStyle(.white)
+                                    .padding(.horizontal, 6)
+                                    .padding(.vertical, 2)
+                                    .background(.orange, in: Capsule())
+                            }
                         }
                     }
 
@@ -287,15 +287,15 @@ struct SettingsView: View {
                         } label: {
                             HStack {
                                 Label(String(localized: "settings.icloud.title"), systemImage: "icloud")
-                                #if DEBUG
-                                Spacer()
-                                Text(String(localized: "settings.icloud.dev.badge"))
-                                    .font(.caption2.bold())
-                                    .foregroundStyle(.white)
-                                    .padding(.horizontal, 6)
-                                    .padding(.vertical, 2)
-                                    .background(.orange, in: Capsule())
-                                #endif
+                                if AppIdentifiers.isCloudKitDevelopmentEnvironment {
+                                    Spacer()
+                                    Text(String(localized: "settings.icloud.dev.badge"))
+                                        .font(.caption2.bold())
+                                        .foregroundStyle(.white)
+                                        .padding(.horizontal, 6)
+                                        .padding(.vertical, 2)
+                                        .background(.orange, in: Capsule())
+                                }
                             }
                         }
 

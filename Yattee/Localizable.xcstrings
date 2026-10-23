@@ -13673,7 +13673,6 @@
       }
     },
     "settings.icloud.dev.badge" : {
-      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -13684,7 +13683,6 @@
       }
     },
     "settings.icloud.dev.footer" : {
-      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -13695,7 +13693,6 @@
       }
     },
     "settings.icloud.dev.title" : {
-      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {

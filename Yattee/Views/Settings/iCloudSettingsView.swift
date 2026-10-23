@@ -50,13 +50,13 @@ struct iCloudSettingsView: View {
 
     var body: some View {
         SettingsFormContainer {
-            #if DEBUG
-            SettingsFormSection(footer: "settings.icloud.dev.footer") {
-                Label(String(localized: "settings.icloud.dev.title"), systemImage: "hammer.fill")
-                    .foregroundStyle(.orange)
-                    .font(.subheadline)
+            if AppIdentifiers.isCloudKitDevelopmentEnvironment {
+                SettingsFormSection(footer: "settings.icloud.dev.footer") {
+                    Label(String(localized: "settings.icloud.dev.title"), systemImage: "hammer.fill")
+                        .foregroundStyle(.orange)
+                        .font(.subheadline)
+                }
             }
-            #endif
 
             if cloudKitSync?.isCloudKitAvailable == false {
                 SettingsFormSection(footer: "settings.icloud.unavailable.footer") {

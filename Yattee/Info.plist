@@ -46,6 +46,8 @@
 	<array>
 		<string>stream.yattee.app.activity</string>
 	</array>
+	<key>YatteeCloudKitEnvironment</key>
+	<string>$(CLOUDKIT_ENV)</string>
 	<key>UIBackgroundModes</key>
 	<array>
 		<string>audio</string>
