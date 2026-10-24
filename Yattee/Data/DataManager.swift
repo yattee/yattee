@@ -134,6 +134,7 @@ final class DataManager {
 
     /// Forces a save of any pending changes.
     func save() {
+        PerfCounter.count("data.save")
         do {
             try modelContext.save()
         } catch {

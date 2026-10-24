@@ -179,6 +179,8 @@ actor HTTPClient {
 
         do {
             (data, response) = try await session.data(for: finalRequest)
+            PerfCounter.count("net.api.request")
+            PerfCounter.count("net.api.bytes", by: data.count)
         } catch let error as URLError {
             let apiError = mapURLError(error)
             // Add more context for cancelled requests

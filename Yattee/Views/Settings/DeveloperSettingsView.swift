@@ -11,6 +11,7 @@ struct DeveloperSettingsView: View {
     @Environment(\.appEnvironment) private var appEnvironment
     @Bindable private var loggingService = LoggingService.shared
     @State private var loggingEnabled = LoggingService.shared.isEnabled
+    @State private var performanceLoggingEnabled = PerformanceMonitor.shared.isEnabled
 
     // Data management state
     @State private var showingDeduplicateConfirmation = false
@@ -136,6 +137,13 @@ struct DeveloperSettingsView: View {
                     set: { settingsManager.verboseRemoteControlLogging = $0 }
                 )) {
                     Label(String(localized: "settings.advanced.debug.verboseRemote"), systemImage: "antenna.radiowaves.left.and.right")
+                }
+
+                Toggle(isOn: $performanceLoggingEnabled) {
+                    Label(String(localized: "settings.advanced.debug.performanceLogging"), systemImage: "gauge.with.dots.needle.67percent")
+                }
+                .onChange(of: performanceLoggingEnabled) { _, newValue in
+                    PerformanceMonitor.shared.setEnabled(newValue)
                 }
             }
         }

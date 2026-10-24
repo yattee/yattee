@@ -1493,6 +1493,9 @@ final class MPVBackend: PlayerBackend {
 
 extension MPVBackend: MPVClientDelegate {
     nonisolated func mpvClient(_ client: MPVClient, didUpdateProperty property: String, value: Any?) {
+        if PerfCounter.enabled {
+            PerfCounter.count("mpv.property." + property)
+        }
         Task { @MainActor [weak self] in
             self?.handlePropertyChange(property: property, value: value)
         }

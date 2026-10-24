@@ -58,6 +58,11 @@ struct YatteeApp: App {
         // Register background tasks early — Apple requires BGTaskScheduler.register()
         // to be called during the app launch sequence, before the run loop starts.
         appEnvironment.backgroundRefreshManager.registerBackgroundTasks()
+
+        #if os(iOS)
+        BackgroundDiagnostics.shared.start(playerService: AppEnvironment.shared.playerService)
+        #endif
+        PerformanceMonitor.shared.start(appEnvironment: AppEnvironment.shared)
     }
 
     var body: some Scene {
@@ -334,6 +339,7 @@ struct YatteeApp: App {
                 // assertion keeps the app alive until the async flush finishes.
                 var backgroundTask: UIBackgroundTaskIdentifier = .invalid
                 backgroundTask = UIApplication.shared.beginBackgroundTask(withName: "PersistOnBackground") {
+                    LoggingService.shared.warning("Background task PersistOnBackground expired", category: .diagnostics)
                     if backgroundTask != .invalid {
                         UIApplication.shared.endBackgroundTask(backgroundTask)
                         backgroundTask = .invalid
@@ -349,6 +355,7 @@ struct YatteeApp: App {
                     // before the assertion is given up.
                     await appEnvironment.watchHistorySync.flushPending()
                     if backgroundTask != .invalid {
+                        LoggingService.shared.info("Background task PersistOnBackground finished", category: .diagnostics)
                         UIApplication.shared.endBackgroundTask(backgroundTask)
                         backgroundTask = .invalid
                     }

@@ -37,6 +37,7 @@ struct MarqueeText: View {
     // MARK: - Body
 
     var body: some View {
+        let _ = PerfCounter.body("MarqueeText")
         GeometryReader { geometry in
             Group {
                 if needsScrolling {
@@ -73,6 +74,7 @@ struct MarqueeText: View {
         // Paused outside the active scene: the timeline otherwise keeps
         // re-rendering every frame while the app plays in the background.
         TimelineView(.animation(paused: scenePhase != .active)) { context in
+            let _ = PerfCounter.body("MarqueeText.frame")
             HStack(spacing: spacing) {
                 textView
                 textView

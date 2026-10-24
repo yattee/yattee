@@ -11196,6 +11196,17 @@
         }
       }
     },
+    "settings.advanced.debug.performanceLogging" : {
+      "comment" : "Toggle label for logging CPU, energy and activity every few seconds",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Performance Logging"
+          }
+        }
+      }
+    },
     "settings.advanced.debug.playerAreaDebug" : {
       "comment" : "Toggle label",
       "localizations" : {

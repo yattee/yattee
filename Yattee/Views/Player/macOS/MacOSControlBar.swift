@@ -60,6 +60,7 @@ struct MacOSControlBar: View {
     // MARK: - Body
 
     var body: some View {
+        let _ = PerfCounter.body("MacOSControlBar")
         VStack(spacing: 8) {
             // Top row: preset-driven button row
             MacOSControlsSectionRenderer(

@@ -50,6 +50,7 @@ struct ControlsSectionRenderer: View {
     @State private var isBrightnessExpanded = false
 
     var body: some View {
+        let _ = PerfCounter.body("ControlsSectionRenderer")
         HStack {
             ForEach(section.visibleButtons(isWideLayout: actions.isWideScreenLayout)) { config in
                 renderButton(config)

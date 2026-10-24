@@ -139,6 +139,7 @@ struct MiniPlayerView: View {
     }
 
     var body: some View {
+        let _ = PerfCounter.body("MiniPlayerView")
         Group {
             #if os(macOS)
             capsuleLayout

@@ -183,6 +183,7 @@ struct ExpandedPlayerSheet: View {
     // MARK: - Body
 
     var body: some View {
+        let _ = PerfCounter.body("ExpandedPlayerSheet")
         playerContentWithOverlays
             .applyPlayerSheets(
                 showingQualitySheet: $showingQualitySheet,

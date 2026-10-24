@@ -39,6 +39,8 @@ enum LogCategory: String, Codable, CaseIterable, Sendable {
     case imageLoading = "ImageLoading"
     case mediaSources = "MediaSources"
     case subscriptions = "Subscriptions"
+    case diagnostics = "Diagnostics"
+    case performance = "Performance"
     case general = "General"
 
     var icon: String {
@@ -55,6 +57,8 @@ enum LogCategory: String, Codable, CaseIterable, Sendable {
         case .imageLoading: return "photo"
         case .mediaSources: return "externaldrive.connected.to.line.below"
         case .subscriptions: return "person.2"
+        case .diagnostics: return "stethoscope"
+        case .performance: return "gauge.with.dots.needle.67percent"
         case .general: return "doc.text"
         }
     }
@@ -191,6 +195,7 @@ final class LoggingService: Sendable {
     /// This method is nonisolated to allow safe logging from any thread.
     /// OSLog output is synchronous; in-app storage is dispatched to MainActor.
     nonisolated func log(level: LogLevel, category: LogCategory, message: String, details: String? = nil) {
+        PerfCounter.count("log.entry")
         // Log to OSLog in DEBUG builds for Xcode console visibility
         // OSLog/Logger is thread-safe, so this can be called from any thread.
         // The master "Enable Logging" toggle gates this too - it takes
@@ -214,6 +219,10 @@ final class LoggingService: Sendable {
         }
         #endif
 
+        // Timestamp at the call site: the MainActor hop below can be late when
+        // the main thread is busy, which is exactly when timing matters.
+        let timestamp = Date()
+
         // Dispatch in-app storage to MainActor asynchronously
         // This ensures thread-safety for the entries array
         Task { @MainActor [weak self] in
@@ -221,6 +230,7 @@ final class LoggingService: Sendable {
             guard self.isEnabled else { return }
 
             let entry = LogEntry(
+                timestamp: timestamp,
                 level: level,
                 category: category,
                 message: message,
@@ -228,6 +238,7 @@ final class LoggingService: Sendable {
             )
 
             self.entries.insert(entry, at: 0)
+            LogFileStore.shared.append(entry)
 
             // Trim old entries
             if self.entries.count > self.maxEntries {
@@ -241,9 +252,13 @@ final class LoggingService: Sendable {
     /// Clear all log entries.
     func clearLogs() {
         entries.removeAll()
+        LogFileStore.shared.clear()
     }
 
     /// Export logs as text.
+    ///
+    /// Includes the previous app session read back from disk, so logs survive
+    /// the app being killed (e.g. swiped away while the phone was hot).
     func exportLogs() -> String {
         let header = "Yattee Logs - Exported \(Date().formatted())\n"
         let separator = String(repeating: "=", count: 60) + "\n"
@@ -253,7 +268,12 @@ final class LoggingService: Sendable {
             return "[\(entry.formattedTimestamp)] [\(entry.level.rawValue.uppercased())] [\(entry.category.rawValue)] \(entry.message)\(details)"
         }.joined(separator: "\n")
 
-        return header + separator + logLines
+        guard let previous = LogFileStore.shared.previousSessionText(), !previous.isEmpty else {
+            return header + separator + logLines
+        }
+        return header + separator
+            + "PREVIOUS SESSION (read from disk)\n" + separator + previous + "\n"
+            + separator + "CURRENT SESSION\n" + separator + logLines
     }
 
     /// Reset filters.

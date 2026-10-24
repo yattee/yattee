@@ -49,6 +49,7 @@ struct SegmentedProgressBar: View {
     }
 
     var body: some View {
+        let _ = PerfCounter.body("SegmentedProgressBar")
         GeometryReader { geometry in
             if chapters.count >= 2 {
                 segmentedBar(geometry: geometry)
@@ -217,6 +218,7 @@ private struct ChapterSegmentView: View {
     }
 
     var body: some View {
+        let _ = PerfCounter.body("ChapterSegmentView")
         GeometryReader { geometry in
             ZStack(alignment: .leading) {
                 // Background

@@ -2798,6 +2798,7 @@ final class PlayerService {
     }
 
     private func saveProgress() {
+        PerfCounter.count("player.progressSave")
         guard settingsManager?.incognitoModeEnabled != true,
               settingsManager?.saveWatchHistory != false else { return }
 
@@ -2884,6 +2885,7 @@ final class PlayerService {
     }
 
     private func checkSponsorBlockSegments(at time: Double) {
+        PerfCounter.count("player.sponsorBlockCheck")
         // Read settings - use defaults if settings manager not available
         let enabled = settingsManager?.sponsorBlockEnabled ?? true
         let enabledCategories = settingsManager?.sponsorBlockCategories ?? SponsorBlockCategory.defaultEnabled

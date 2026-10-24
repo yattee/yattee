@@ -127,4 +127,9 @@ private final class TokenStrippingPipelineDelegate: ImagePipelineDelegate {
         guard let url = request.url else { return nil }
         return ImageLoadingService.cacheKey(for: url)
     }
+
+    func imageTask(_ task: ImageTask, didCompleteWithResult result: Result<ImageResponse, ImagePipeline.Error>, pipeline _: ImagePipeline) {
+        guard PerfCounter.enabled, case let .success(response) = result else { return }
+        PerfCounter.count(response.cacheType == nil ? "image.loadFromNetwork" : "image.loadFromCache")
+    }
 }

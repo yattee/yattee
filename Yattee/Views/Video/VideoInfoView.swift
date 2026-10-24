@@ -275,6 +275,7 @@ struct VideoInfoView: View {
     }
 
     var body: some View {
+        let _ = PerfCounter.body("VideoInfoView")
         Group {
             if isLoadingInitialVideo || (displayedVideoIsPlaceholder && isLoadingVideoDetails) {
                 loadingView

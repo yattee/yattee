@@ -14,6 +14,7 @@ struct ContentView: View {
     #endif
 
     var body: some View {
+        let _ = PerfCounter.body("ContentView")
         Group {
             if let appEnvironment {
                 #if os(iOS)

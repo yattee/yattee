@@ -141,6 +141,7 @@ final class NowPlayingService {
 
     /// Updates playback time without changing other metadata.
     func updatePlaybackTime(currentTime: TimeInterval, duration: TimeInterval, isPlaying: Bool) {
+        PerfCounter.count("nowPlaying.update")
         guard var info = cachedNowPlayingInfo ?? infoCenter.nowPlayingInfo else { return }
 
         info[MPNowPlayingInfoPropertyElapsedPlaybackTime] = currentTime

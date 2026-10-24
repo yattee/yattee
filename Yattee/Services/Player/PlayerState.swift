@@ -228,8 +228,10 @@ final class PlayerState {
         }
         set {
             if publishesTimeUpdates {
+                PerfCounter.count("player.time.published")
                 withMutation(keyPath: \.currentTime) { storedCurrentTime = newValue }
             } else {
+                PerfCounter.count("player.time.suppressed")
                 storedCurrentTime = newValue
             }
             updateActiveChapter()

@@ -198,6 +198,7 @@ struct PlayerControlsView: View {
     }
 
     var body: some View {
+        let _ = PerfCounter.body("PlayerControlsView")
         GeometryReader { geometry in
 
             ZStack {
@@ -1018,6 +1019,7 @@ struct PlayerControlsView: View {
 
     private var progressBar: some View {
         GeometryReader { geometry in
+            let _ = PerfCounter.body("PlayerControlsView.progressBar")
             ZStack(alignment: .bottomLeading) {
                 if playerState.isLive {
                     // For live streams, show simple red indicator (no scrubbing)

@@ -58,6 +58,7 @@ struct TVPlayerControlsView: View {
     }
 
     var body: some View {
+        let _ = PerfCounter.body("TVPlayerControlsView")
         ZStack {
             // Gradient overlay for readability
             gradientOverlay

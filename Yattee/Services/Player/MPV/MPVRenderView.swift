@@ -239,6 +239,36 @@ final class MPVRenderView: UIView {
     /// Tracks whether app is in background (to prevent GPU work)
     private var isInBackground = false
 
+    // MARK: - Diagnostics
+
+    /// Live render views, sampled by `BackgroundDiagnostics`.
+    private static let liveInstances = NSHashTable<MPVRenderView>.weakObjects()
+
+    static var diagnosticsInstances: [MPVRenderView] {
+        liveInstances.allObjects
+    }
+
+    /// Render activity since the last diagnostics sample (written from main and the render queue).
+    private let diagnosticsCounters = RenderDiagnosticsCounters()
+
+    /// One-line render state for the diagnostics heartbeat. Resets the activity counters.
+    func diagnosticsSummary() -> String {
+        let counts = diagnosticsCounters.take()
+        let link: String
+        if let displayLink {
+            link = displayLink.isPaused ? "paused" : "running@\(Int(videoFPS))"
+        } else {
+            link = "none"
+        }
+        return "view=\(String(UInt(bitPattern: ObjectIdentifier(self).hashValue), radix: 16).suffix(6))"
+            + " window=\(window != nil) superview=\(superview != nil) hidden=\(isHidden) setup=\(isSetup)"
+            + " displayLink=\(link) inBackground=\(isInBackground) pip=\(isPiPActive)"
+            + " capturePiP=\(captureFramesForPiP) bgTimer=\(backgroundRenderTimer != nil)"
+            + " fb=\(renderWidth)x\(renderHeight)"
+            + " | linkFires=\(counts.linkFires) renders=\(counts.renders) presents=\(counts.presents)"
+            + " backgroundRenders=\(counts.backgroundRenders) skippedInBackground=\(counts.skippedInBackground)"
+    }
+
     // MARK: - Video Dimensions for PiP
 
     /// Current video width (actual video content, not view size) - set by backend
@@ -270,6 +300,7 @@ final class MPVRenderView: UIView {
     }
 
     private func commonInit() {
+        Self.liveInstances.add(self)
         backgroundColor = .black
         contentScaleFactor = traitCollection.displayScale
         registerForTraitChanges([UITraitDisplayScale.self]) { (self: MPVRenderView, _) in
@@ -903,6 +934,9 @@ final class MPVRenderView: UIView {
     // MARK: - Rendering
 
     @objc private func displayLinkFired() {
+        diagnosticsCounters.increment(\.linkFires)
+        PerfCounter.count("render.displayLink")
+
         // Skip if not setup, already rendering, or app is in background (GPU work not permitted)
         guard isSetup, !isRendering, !isInBackground else { return }
 
@@ -934,8 +968,16 @@ final class MPVRenderView: UIView {
         // but renders queued by appDidBecomeActive/resumeRendering can run
         // after the app went back to the background. PiP keeps rendering.
         guard !isInBackground || isPiPActive else {
+            diagnosticsCounters.increment(\.skippedInBackground)
+            PerfCounter.count("render.skippedInBackground")
             MPVLogging.log("performRender: skipped (app in background)")
             return
+        }
+        diagnosticsCounters.increment(\.renders)
+        PerfCounter.count("render.frame")
+        if isInBackground {
+            diagnosticsCounters.increment(\.backgroundRenders)
+            PerfCounter.count("render.frameInBackground")
         }
 
         let frameStart = Date()
@@ -1012,6 +1054,10 @@ final class MPVRenderView: UIView {
         } else if !isPiPActive {
             glBindRenderbuffer(GLenum(GL_RENDERBUFFER), colorRenderbuffer)
             let presented = eaglContext.presentRenderbuffer(Int(GL_RENDERBUFFER))
+            if presented {
+                diagnosticsCounters.increment(\.presents)
+                PerfCounter.count("render.present")
+            }
             if !presented {
                 MPVLogging.warn("performRender: presentRenderbuffer FAILED",
                     details: "fb:\(framebuffer) rb:\(colorRenderbuffer) layer:\(layer.bounds) superview:\(superview != nil)")

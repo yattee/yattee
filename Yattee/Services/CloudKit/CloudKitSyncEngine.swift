@@ -1930,6 +1930,9 @@ final class CloudKitSyncEngine: @unchecked Sendable {
 
 extension CloudKitSyncEngine: CKSyncEngineDelegate {
     nonisolated func handleEvent(_ event: CKSyncEngine.Event, syncEngine: CKSyncEngine) async {
+        if PerfCounter.enabled {
+            PerfCounter.count("cloudkit.event." + Self.performanceName(of: event))
+        }
         // Marks the whole callback tree, so anything that re-enters the engine
         // from inside it says so in a debug build instead of trapping on
         // someone's device. Inherited by every plain `Task { }` started below
@@ -1937,6 +1940,25 @@ extension CloudKitSyncEngine: CKSyncEngineDelegate {
         // `Task.detached`, which is the fix.
         await CloudKitDelegateScope.$isHandlingEvent.withValue(true) {
             await handleDelegateEvent(event)
+        }
+    }
+
+    /// Event name for performance counters (the event's description includes its payload).
+    private nonisolated static func performanceName(of event: CKSyncEngine.Event) -> String {
+        switch event {
+        case .stateUpdate: "stateUpdate"
+        case .accountChange: "accountChange"
+        case .fetchedDatabaseChanges: "fetchedDatabaseChanges"
+        case .fetchedRecordZoneChanges: "fetchedRecordZoneChanges"
+        case .sentDatabaseChanges: "sentDatabaseChanges"
+        case .sentRecordZoneChanges: "sentRecordZoneChanges"
+        case .willFetchChanges: "willFetchChanges"
+        case .willFetchRecordZoneChanges: "willFetchRecordZoneChanges"
+        case .didFetchRecordZoneChanges: "didFetchRecordZoneChanges"
+        case .didFetchChanges: "didFetchChanges"
+        case .willSendChanges: "willSendChanges"
+        case .didSendChanges: "didSendChanges"
+        @unknown default: "other"
         }
     }
 
