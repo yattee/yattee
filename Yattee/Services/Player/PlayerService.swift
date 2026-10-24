@@ -283,9 +283,13 @@ final class PlayerService {
             desiredEmbeddedSubtitleTrackID = nil
         }
 
-        // Clear sponsor block state from previous video
-        state.sponsorSegments = []
-        state.currentSegment = nil
+        // Clear sponsor block state from previous video. A same-video stream
+        // switch (manual quality/format change) keeps the segments we already
+        // have so skipping and the progress bar overlay survive the switch.
+        if isNewVideo {
+            state.sponsorSegments = []
+            state.currentSegment = nil
+        }
         lastSkippedSegmentID = nil
 
         // Reset stream refresh counter for new video
@@ -312,9 +316,15 @@ final class PlayerService {
         state.setCurrentVideo(video, stream: stream, audioStream: audioStream)
 
         // Start fetching SponsorBlock segments early (in parallel with stream loading)
-        // so we have them ready before playback starts
+        // so we have them ready before playback starts.
+        // This runs for any online stream - auto-selected (`stream == nil`) or
+        // explicitly picked (manual quality/format switch, queue, fallback).
+        // Only local file:// streams skip it. A same-video switch that already
+        // has segments reuses them instead of refetching.
+        let isLocalStream = stream?.url.isFileURL ?? false
         var sponsorBlockTask: Task<Void, Never>?
-        if stream == nil, case .global = video.id.source, settingsManager?.sponsorBlockEnabled == true {
+        if !isLocalStream, case .global = video.id.source, settingsManager?.sponsorBlockEnabled == true,
+           isNewVideo || state.sponsorSegments.isEmpty {
             sponsorBlockTask = Task {
                 await fetchSponsorBlockSegments(for: video.id.videoID)
             }
@@ -565,10 +575,11 @@ final class PlayerService {
             // Update Handoff activity for cross-device continuation
             handoffManager?.updateActivity(for: .video(.id(video.id)))
 
-            // Fetch dislike counts for YouTube videos (only for online content)
+            // Fetch dislike counts for YouTube videos (only for online content,
+            // and only once per video - a same-video stream switch keeps them)
             // Note: SponsorBlock is fetched earlier in parallel with stream loading
             // Note: Captions are now fetched together with video details and streams
-            if stream == nil, case .global = video.id.source {
+            if !isLocalStream, isNewVideo, case .global = video.id.source {
                 await fetchReturnYouTubeDislikeCounts(for: video.id.videoID)
             }
 
