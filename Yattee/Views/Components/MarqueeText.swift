@@ -22,6 +22,8 @@ struct MarqueeText: View {
     @State private var textWidth: CGFloat = 0
     @State private var startTime: Date?
 
+    @Environment(\.scenePhase) private var scenePhase
+
     // MARK: - Computed Properties
 
     private var needsScrolling: Bool {
@@ -68,7 +70,9 @@ struct MarqueeText: View {
     // MARK: - Scrolling Content
 
     private var scrollingContent: some View {
-        TimelineView(.animation) { context in
+        // Paused outside the active scene: the timeline otherwise keeps
+        // re-rendering every frame while the app plays in the background.
+        TimelineView(.animation(paused: scenePhase != .active)) { context in
             HStack(spacing: spacing) {
                 textView
                 textView

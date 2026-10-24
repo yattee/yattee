@@ -219,16 +219,60 @@ final class PlayerState {
 
     // MARK: - Time & Progress
 
-    /// Current playback time in seconds.
-    var currentTime: TimeInterval = 0 {
-        didSet { updateActiveChapter() }
+    /// Current playback time in seconds. Always current when read; observing
+    /// views are only notified while `publishesTimeUpdates` is true.
+    var currentTime: TimeInterval {
+        get {
+            access(keyPath: \.currentTime)
+            return storedCurrentTime
+        }
+        set {
+            if publishesTimeUpdates {
+                withMutation(keyPath: \.currentTime) { storedCurrentTime = newValue }
+            } else {
+                storedCurrentTime = newValue
+            }
+            updateActiveChapter()
+        }
+    }
+
+    @ObservationIgnored private var storedCurrentTime: TimeInterval = 0
+
+    /// When false, `currentTime` and `bufferedTime` keep updating without
+    /// invalidating views that read them. Turned off while the app is in the
+    /// background: every mpv time-pos tick otherwise re-renders the hidden
+    /// player UI (progress bar, time labels, chapter segments) several times
+    /// per second, which drains the battery during long background or
+    /// audio-only playback.
+    @ObservationIgnored var publishesTimeUpdates = true {
+        didSet {
+            // Resuming: publish the times accumulated while suppressed.
+            guard publishesTimeUpdates, !oldValue else { return }
+            withMutation(keyPath: \.currentTime) {}
+            withMutation(keyPath: \.bufferedTime) {}
+        }
     }
 
     /// Total duration in seconds.
     var duration: TimeInterval = 0
 
-    /// Buffered time in seconds.
-    var bufferedTime: TimeInterval = 0
+    /// Buffered time in seconds. Follows `currentTime`, so it is published
+    /// under the same `publishesTimeUpdates` gate.
+    var bufferedTime: TimeInterval {
+        get {
+            access(keyPath: \.bufferedTime)
+            return storedBufferedTime
+        }
+        set {
+            if publishesTimeUpdates {
+                withMutation(keyPath: \.bufferedTime) { storedBufferedTime = newValue }
+            } else {
+                storedBufferedTime = newValue
+            }
+        }
+    }
+
+    @ObservationIgnored private var storedBufferedTime: TimeInterval = 0
 
     /// Whether duration updates from the player backend should be ignored.
     /// Set to true when playing through fast endpoint where duration is known from API

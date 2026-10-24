@@ -96,16 +96,14 @@ final class ToastManager {
             var lastPlayerVisible = self.isPlayerVisible
             
             while !Task.isCancelled {
-                // Wait for navigationCoordinator.isPlayerExpanded to change
-                // (On macOS, ExpandedPlayerWindowManager.isPresented is updated when window shows,
-                // but we track the NavigationCoordinator state which triggers the window)
-                if let coordinator = self.navigationCoordinator {
-                    _ = withObservationTracking {
-                        coordinator.isPlayerExpanded
-                    } onChange: { }
-                }
-                
+                #if os(macOS)
+                // ExpandedPlayerWindowManager.isPresented follows the window
+                // and is not observable, so poll it.
                 try? await Task.sleep(for: .milliseconds(100))
+                #else
+                guard let coordinator = self.navigationCoordinator else { break }
+                await observationChange { _ = coordinator.isPlayerExpanded }
+                #endif
                 guard !Task.isCancelled else { break }
                 
                 let currentPlayerVisible = self.isPlayerVisible

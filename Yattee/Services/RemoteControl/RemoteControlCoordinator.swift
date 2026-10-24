@@ -229,16 +229,11 @@ final class RemoteControlCoordinator {
     private func startIncognitoObserver() {
         incognitoObserverTask?.cancel()
         incognitoObserverTask = Task { [weak self] in
+            guard let settings = self?.settingsManager else { return }
             while !Task.isCancelled {
-                guard let self, let settings = self.settingsManager else { break }
-
                 let wasIncognito = settings.incognitoModeEnabled
-                _ = withObservationTracking {
-                    settings.incognitoModeEnabled
-                } onChange: { }
-
-                try? await Task.sleep(for: .milliseconds(100))
-                guard !Task.isCancelled else { break }
+                await observationChange { _ = settings.incognitoModeEnabled }
+                guard let self, !Task.isCancelled else { break }
 
                 let isIncognito = settings.incognitoModeEnabled
                 if isIncognito != wasIncognito {

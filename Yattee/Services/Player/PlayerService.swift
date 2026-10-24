@@ -211,6 +211,27 @@ final class PlayerService {
                 factory?.drainPool()
             }
         }
+
+        // Stop re-rendering the hidden player UI on every time update while
+        // the app is in the background (see PlayerState.publishesTimeUpdates).
+        NotificationCenter.default.addObserver(
+            forName: UIApplication.didEnterBackgroundNotification,
+            object: nil,
+            queue: .main
+        ) { [weak self] _ in
+            MainActor.assumeIsolated {
+                self?.state.publishesTimeUpdates = false
+            }
+        }
+        NotificationCenter.default.addObserver(
+            forName: UIApplication.willEnterForegroundNotification,
+            object: nil,
+            queue: .main
+        ) { [weak self] _ in
+            MainActor.assumeIsolated {
+                self?.state.publishesTimeUpdates = true
+            }
+        }
         #endif
     }
 
