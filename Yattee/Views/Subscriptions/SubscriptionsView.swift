@@ -59,6 +59,11 @@ struct SubscriptionsView: View {
     /// Whether the trailing status-bar column holds the channel rail, so the
     /// bottom strip and the feed's bottom space for it go away.
     @State private var channelRailFits = false
+    /// Occlusion reserved regions in global coordinates, read by a reader
+    /// that reaches into the safe area. SwiftUI reports only the regions
+    /// that intersect the querying view, and the content stops short of the
+    /// status-bar column it would place the rail in.
+    @State private var globalOcclusionFrames: [CGRect] = []
     #endif
 
     /// List style from centralized settings.
@@ -717,6 +722,15 @@ struct SubscriptionsView: View {
             .onChange(of: channelRailPlacement(in: geometry) != nil, initial: true) { _, fits in
                 channelRailFits = fits
             }
+            .background {
+                GeometryReader { fullBleed in
+                    Color.clear
+                        .onChange(of: occlusionFrames(in: fullBleed), initial: true) { _, frames in
+                            globalOcclusionFrames = frames
+                        }
+                }
+                .ignoresSafeArea()
+            }
             #endif
         }
     }
@@ -1290,15 +1304,25 @@ struct SubscriptionsView: View {
         guard width >= Self.channelRailMinColumnWidth else { return nil }
 
         let columnMinX = geometry.size.width
-        let occludedBottom = geometry.reservedRegions(kind: .occlusion)
-            .filter { $0.frame.maxX > columnMinX }
-            .map(\.frame.maxY)
+        let origin = geometry.frame(in: .global).origin
+        let occludedBottom = globalOcclusionFrames
+            .map { $0.offsetBy(dx: -origin.x, dy: -origin.y) }
+            .filter { $0.maxX > columnMinX }
+            .map(\.maxY)
             .max() ?? -geometry.safeAreaInsets.top
         let top = occludedBottom + Self.channelRailEdgeSpacing
         let bottom = geometry.size.height - Self.channelRailEdgeSpacing
         guard bottom - top >= Self.channelRailMinHeight else { return nil }
 
         return ChannelRailPlacement(x: columnMinX, top: top, width: width, height: bottom - top)
+    }
+
+    /// Active occlusion regions seen by `geometry`, in global coordinates.
+    private func occlusionFrames(in geometry: GeometryProxy) -> [CGRect] {
+        guard #available(iOS 27.1, *) else { return [] }
+        let origin = geometry.frame(in: .global).origin
+        return geometry.reservedRegions(kind: .occlusion)
+            .map { $0.frame.offsetBy(dx: origin.x, dy: origin.y) }
     }
 
     private var clampedIPadSidebarWidth: CGFloat {
