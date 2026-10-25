@@ -23,6 +23,7 @@ struct MarqueeText: View {
     @State private var startTime: Date?
 
     @Environment(\.scenePhase) private var scenePhase
+    @Environment(\.isMarqueePaused) private var isMarqueePaused
 
     // MARK: - Computed Properties
 
@@ -71,9 +72,9 @@ struct MarqueeText: View {
     // MARK: - Scrolling Content
 
     private var scrollingContent: some View {
-        // Paused outside the active scene: the timeline otherwise keeps
-        // re-rendering every frame while the app plays in the background.
-        TimelineView(.animation(paused: scenePhase != .active)) { context in
+        // Paused outside the active scene or when the container says it is
+        // hidden: the timeline otherwise re-renders every frame regardless.
+        TimelineView(.animation(paused: scenePhase != .active || isMarqueePaused)) { context in
             let _ = PerfCounter.body("MarqueeText.frame")
             HStack(spacing: spacing) {
                 textView
@@ -202,4 +203,9 @@ private extension View {
         .border(Color.gray)
     }
     .padding()
+}
+
+extension EnvironmentValues {
+    /// Pauses `MarqueeText` scrolling, for containers that are covered or hidden.
+    @Entry var isMarqueePaused = false
 }

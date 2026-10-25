@@ -100,17 +100,20 @@ struct SegmentedProgressBar: View {
                 let segmentWidth = segmentWidth(for: chapter, index: index, availableWidth: availableWidth)
                 let chapterEnd = nextChapterStart(after: index)
 
+                // Fractions are clamped here, so only the chapter under the
+                // playhead (or buffer edge) gets new inputs on a time update.
                 ChapterSegmentView(
                     chapter: chapter,
                     nextChapterStart: chapterEnd,
-                    currentTime: currentTime,
-                    bufferedTime: bufferedTime,
+                    playedProgress: fraction(of: currentTime, from: chapter.startTime, to: chapterEnd),
+                    bufferedProgress: fraction(of: bufferedTime, from: chapter.startTime, to: chapterEnd),
                     playedColor: playedColor,
                     bufferedColor: bufferedColor,
                     backgroundColor: backgroundColor,
                     sponsorSegments: segmentsInRange(start: chapter.startTime, end: chapterEnd),
                     sponsorBlockSettings: sponsorBlockSettings
                 )
+                .equatable()
                 .frame(width: segmentWidth, height: height)
             }
         }
@@ -167,6 +170,13 @@ struct SegmentedProgressBar: View {
         return duration
     }
 
+    /// How far `time` is through the range, clamped to 0-1.
+    private func fraction(of time: TimeInterval, from start: TimeInterval, to end: TimeInterval) -> Double {
+        let length = end - start
+        guard length > 0 else { return 0 }
+        return min(max((time - start) / length, 0), 1)
+    }
+
     /// Returns sponsor segments that overlap with the given time range.
     private func segmentsInRange(start: TimeInterval, end: TimeInterval) -> [SponsorBlockSegment] {
         visibleSponsorSegments.filter { segment in
@@ -178,43 +188,30 @@ struct SegmentedProgressBar: View {
 // MARK: - Chapter Segment View
 
 /// A single chapter segment within the progress bar.
-private struct ChapterSegmentView: View {
+private struct ChapterSegmentView: View, Equatable {
     let chapter: VideoChapter
     let nextChapterStart: TimeInterval
-    let currentTime: TimeInterval
-    let bufferedTime: TimeInterval
+    /// How much of this chapter has been played (0-1).
+    let playedProgress: Double
+    /// How much of this chapter has been buffered (0-1).
+    let bufferedProgress: Double
     let playedColor: Color
     let bufferedColor: Color
     let backgroundColor: Color
     let sponsorSegments: [SponsorBlockSegment]
     let sponsorBlockSettings: SponsorBlockSegmentSettings
 
-    /// How much of this chapter has been played (0-1).
-    private var playedProgress: Double {
-        let chapterDuration = nextChapterStart - chapter.startTime
-        guard chapterDuration > 0 else { return 0 }
-
-        if currentTime <= chapter.startTime {
-            return 0
-        } else if currentTime >= nextChapterStart {
-            return 1
-        } else {
-            return (currentTime - chapter.startTime) / chapterDuration
-        }
-    }
-
-    /// How much of this chapter has been buffered (0-1).
-    private var bufferedProgress: Double {
-        let chapterDuration = nextChapterStart - chapter.startTime
-        guard chapterDuration > 0 else { return 0 }
-
-        if bufferedTime <= chapter.startTime {
-            return 0
-        } else if bufferedTime >= nextChapterStart {
-            return 1
-        } else {
-            return (bufferedTime - chapter.startTime) / chapterDuration
-        }
+    static func == (lhs: Self, rhs: Self) -> Bool {
+        lhs.chapter.id == rhs.chapter.id
+            && lhs.chapter.startTime == rhs.chapter.startTime
+            && lhs.nextChapterStart == rhs.nextChapterStart
+            && lhs.playedProgress == rhs.playedProgress
+            && lhs.bufferedProgress == rhs.bufferedProgress
+            && lhs.playedColor == rhs.playedColor
+            && lhs.bufferedColor == rhs.bufferedColor
+            && lhs.backgroundColor == rhs.backgroundColor
+            && lhs.sponsorSegments.map(\.uuid) == rhs.sponsorSegments.map(\.uuid)
+            && lhs.sponsorBlockSettings == rhs.sponsorBlockSettings
     }
 
     var body: some View {

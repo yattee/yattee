@@ -495,6 +495,10 @@ final class MPVBackend: PlayerBackend {
 
         // Clear the render view to black to hide any old frame from previous video
         renderView?.clearToBlack()
+        #if !os(macOS) && !targetEnvironment(simulator)
+        // Audio-only streams have nothing to draw; don't render at display rate.
+        renderView?.hasNoVideo = stream.isAudioOnly
+        #endif
 
         // Load the stream
         do {

@@ -134,6 +134,19 @@ final class MPVRenderView: UIView {
     /// Callback when view is added to a window (for PiP setup)
     var onDidMoveToWindow: ((UIView) -> Void)?
 
+    /// Set while the loaded stream has no video (audio-only). There is
+    /// nothing to draw, so the display link keeps itself paused instead of
+    /// rendering at display rate; any resume pauses it again on its first fire.
+    var hasNoVideo = false {
+        didSet {
+            guard hasNoVideo != oldValue else { return }
+            MPVLogging.log("hasNoVideo = \(hasNoVideo)")
+            if !hasNoVideo, !isInBackground {
+                displayLink?.isPaused = false
+            }
+        }
+    }
+
     // MARK: - PiP Frame Capture
 
     /// Whether to capture frames for PiP (set by MPVBackend when PiP is active)
@@ -936,6 +949,11 @@ final class MPVRenderView: UIView {
     @objc private func displayLinkFired() {
         diagnosticsCounters.increment(\.linkFires)
         PerfCounter.count("render.displayLink")
+
+        if hasNoVideo, !captureFramesForPiP {
+            displayLink?.isPaused = true
+            return
+        }
 
         // Skip if not setup, already rendering, or app is in background (GPU work not permitted)
         guard isSetup, !isRendering, !isInBackground else { return }

@@ -153,6 +153,11 @@ struct MiniPlayerView: View {
         }
         .accessibilityIdentifier("player.miniPlayer")
         .accessibilityLabel("player.miniPlayer")
+        #if !os(macOS)
+        // Hidden under the expanded player: stop the scrolling titles.
+        // (macOS shows the expanded player in its own window.)
+        .environment(\.isMarqueePaused, navigationCoordinator?.isPlayerExpanded == true)
+        #endif
         .modifier(MiniPlayerContextMenuModifier(video: currentVideo) {
             closeVideo()
         })

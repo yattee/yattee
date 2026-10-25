@@ -222,7 +222,9 @@ final class PerformanceMonitor: @unchecked Sendable {
         lines.append(contentsOf: Self.describeCounts(counts, over: sample.wall))
         lines.append("context: \(context)")
 
-        log(sample.cpuPercent >= threshold ? .warning : .info, message, details: lines.joined(separator: "\n"))
+        // The first sample of a period includes the transition work itself.
+        let isHigh = sample.cpuPercent >= threshold && (period?.sampleCount ?? 0) > 1
+        log(isHigh ? .warning : .info, message, details: lines.joined(separator: "\n"))
     }
 
     /// Must run on `queue`.
@@ -360,6 +362,7 @@ final class PerformanceMonitor: @unchecked Sendable {
 /// Totals for one foreground or background period.
 private struct Period {
     let background: Bool
+    var sampleCount = 0
     var wall: TimeInterval = 0
     var cpuSeconds: Double = 0
     var maxCPU: Double = 0
@@ -372,6 +375,7 @@ private struct Period {
     }
 
     mutating func add(_ sample: ResourceSample, counts: [String: Int]) {
+        sampleCount += 1
         wall += sample.wall
         cpuSeconds += sample.cpuPercent / 100 * sample.wall
         if sample.wall >= 1 {
