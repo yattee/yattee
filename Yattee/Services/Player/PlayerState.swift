@@ -240,6 +240,11 @@ final class PlayerState {
 
     @ObservationIgnored private var storedCurrentTime: TimeInterval = 0
 
+    /// `currentTime` without observing it, for views that are hidden: they
+    /// show the latest value whenever they render for another reason but are
+    /// not re-rendered on every time update.
+    var untrackedCurrentTime: TimeInterval { storedCurrentTime }
+
     /// When false, `currentTime` and `bufferedTime` keep updating without
     /// invalidating views that read them. Turned off while the app is in the
     /// background: every mpv time-pos tick otherwise re-renders the hidden
@@ -275,6 +280,9 @@ final class PlayerState {
     }
 
     @ObservationIgnored private var storedBufferedTime: TimeInterval = 0
+
+    /// `bufferedTime` without observing it (see `untrackedCurrentTime`).
+    var untrackedBufferedTime: TimeInterval { storedBufferedTime }
 
     /// Whether duration updates from the player backend should be ignored.
     /// Set to true when playing through fast endpoint where duration is known from API

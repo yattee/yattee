@@ -1028,12 +1028,16 @@ struct PlayerControlsView: View {
                         .frame(height: 4)
                         .clipShape(Capsule())
                 } else {
-                    // Regular VOD progress bar with chapter segments
+                    // Regular VOD progress bar with chapter segments.
+                    // While the controls are hidden, read the times untracked so
+                    // the invisible bar isn't re-rendered on every time update.
+                    let isVisible = shouldShowControls
                     SegmentedProgressBar(
                         chapters: activeLayout.progressBarSettings.showChapters ? playerState.chapters : [],
                         duration: playerState.duration,
-                        currentTime: (isDragging || isPendingSeek) ? dragProgress * playerState.duration : playerState.currentTime,
-                        bufferedTime: playerState.bufferedTime,
+                        currentTime: (isDragging || isPendingSeek) ? dragProgress * playerState.duration
+                            : isVisible ? playerState.currentTime : playerState.untrackedCurrentTime,
+                        bufferedTime: isVisible ? playerState.bufferedTime : playerState.untrackedBufferedTime,
                         height: 4,
                         gapWidth: 2,
                         playedColor: activeLayout.progressBarSettings.playedColor.color,
@@ -1101,7 +1105,8 @@ struct PlayerControlsView: View {
                         }
                 }
             }
-            .onChange(of: playerState.progress) { _, newProgress in
+            // Only observed while a seek is pending (progress changes every time update).
+            .onChange(of: isPendingSeek ? playerState.progress : -1) { _, newProgress in
                 // Clear isPendingSeek when playerState.progress converges to target (within 2%)
                 if isPendingSeek && abs(newProgress - targetSeekProgress) < 0.02 {
                     isPendingSeek = false

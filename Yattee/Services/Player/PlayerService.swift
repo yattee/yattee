@@ -143,6 +143,9 @@ final class PlayerService {
     /// Tracks the last skipped segment to prevent duplicate skips.
     private var lastSkippedSegmentID: String?
 
+    /// 5-second bucket of the last Now Playing elapsed-time update.
+    private var lastNowPlayingTimeBucket: Int?
+
     /// Tracks if the current video ended naturally (reached EOF).
     /// Used to prevent saving progress when switching to next video after natural completion.
     private var videoEndedNaturally = false
@@ -2906,7 +2909,9 @@ final class PlayerService {
                 }
             }
         } else {
-            state.currentSegment = nil
+            if state.currentSegment != nil {
+                state.currentSegment = nil
+            }
             // Clear last skipped when not in any segment (allows re-skip if user seeks back)
             lastSkippedSegmentID = nil
         }
@@ -2942,6 +2947,7 @@ final class PlayerService {
 
         progressSaveTimer?.invalidate()
         progressSaveTimer = nil
+        lastNowPlayingTimeBucket = nil
 
         // Remove audio session interruption observer
         #if os(iOS) || os(tvOS)
@@ -3051,9 +3057,12 @@ extension PlayerService: PlayerBackendDelegate {
         delegate?.playerService(self, didUpdateTime: time)
         checkSponsorBlockSegments(at: time)
 
-        // Update Now Playing time periodically (every ~5 seconds to avoid excessive updates)
-        let shouldUpdateNowPlaying = Int(time) % 5 == 0
-        if shouldUpdateNowPlaying {
+        // Update Now Playing time once per 5-second bucket. Time updates arrive
+        // every frame, so a plain `Int(time) % 5 == 0` check would fire for every
+        // frame of that second.
+        let nowPlayingBucket = Int(time) / 5
+        if nowPlayingBucket != lastNowPlayingTimeBucket {
+            lastNowPlayingTimeBucket = nowPlayingBucket
             nowPlayingService.updatePlaybackTime(
                 currentTime: time,
                 duration: state.duration,

@@ -624,13 +624,13 @@ struct ControlsSectionRenderer: View {
 
                 switch format {
                 case .currentOnly:
-                    Text(playerState.formattedCurrentTime)
+                    Text(formattedCurrentTime)
                         .font(timeFont)
                         .foregroundStyle(.white)
 
                 case .currentAndTotal:
                     HStack(spacing: 0) {
-                        Text(playerState.formattedCurrentTime)
+                        Text(formattedCurrentTime)
                             .font(timeFont)
                             .foregroundStyle(.white)
 
@@ -646,7 +646,7 @@ struct ControlsSectionRenderer: View {
                 case .currentAndTotalExcludingSponsor:
                     // TODO: Calculate SponsorBlock-adjusted duration
                     HStack(spacing: 0) {
-                        Text(playerState.formattedCurrentTime)
+                        Text(formattedCurrentTime)
                             .font(timeFont)
                             .foregroundStyle(.white)
 
@@ -661,7 +661,7 @@ struct ControlsSectionRenderer: View {
 
                 case .currentAndRemaining:
                     HStack(spacing: 0) {
-                        Text(playerState.formattedCurrentTime)
+                        Text(formattedCurrentTime)
                             .font(timeFont)
                             .foregroundStyle(.white)
 
@@ -677,7 +677,7 @@ struct ControlsSectionRenderer: View {
                 case .currentAndRemainingExcludingSponsor:
                     // TODO: Calculate SponsorBlock-adjusted remaining
                     HStack(spacing: 0) {
-                        Text(playerState.formattedCurrentTime)
+                        Text(formattedCurrentTime)
                             .font(timeFont)
                             .foregroundStyle(.white)
 
@@ -697,8 +697,18 @@ struct ControlsSectionRenderer: View {
         .truncationMode(.middle)
     }
 
+    /// Current time for the time display. Read untracked while the controls
+    /// are hidden so the invisible labels aren't re-rendered on every time update.
+    private var displayedCurrentTime: TimeInterval {
+        controlsVisible ? actions.playerState.currentTime : actions.playerState.untrackedCurrentTime
+    }
+
+    private var formattedCurrentTime: String {
+        displayedCurrentTime.formattedAsTimestamp
+    }
+
     private var formattedRemainingTime: String {
-        let remaining = max(0, actions.playerState.duration - actions.playerState.currentTime)
+        let remaining = max(0, actions.playerState.duration - displayedCurrentTime)
         return remaining.formattedAsTimestamp
     }
 

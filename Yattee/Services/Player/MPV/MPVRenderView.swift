@@ -147,6 +147,20 @@ final class MPVRenderView: UIView {
         }
     }
 
+    /// Set while playback is paused. The frame on screen stays current until
+    /// mpv asks for a redraw (seek, track or subtitle change), so the display
+    /// link skips rendering instead of redrawing the same frame at display rate.
+    var isPlaybackPaused = false {
+        didSet {
+            guard isPlaybackPaused != oldValue else { return }
+            needsRedraw = true
+        }
+    }
+
+    /// Set by mpv's render update callback; cleared when a render is queued.
+    /// Main thread only.
+    private var needsRedraw = true
+
     // MARK: - PiP Frame Capture
 
     /// Whether to capture frames for PiP (set by MPVBackend when PiP is active)
@@ -168,6 +182,8 @@ final class MPVRenderView: UIView {
     /// Whether PiP is currently active (skip presenting to main view to save performance)
     var isPiPActive = false {
         didSet {
+            // The main view wasn't presented to during PiP
+            needsRedraw = true
             // When PiP ends and view is not in hierarchy, stop the display link
             // (we kept it running for PiP frame capture, now it can be stopped)
             if !isPiPActive && superview == nil && !captureFramesForPiP {
@@ -665,6 +681,7 @@ final class MPVRenderView: UIView {
         // Set up render update callback (for general redraws)
         client.onRenderUpdate = { [weak self] in
             DispatchQueue.main.async {
+                self?.needsRedraw = true
                 self?.setNeedsDisplay()
             }
         }
@@ -923,6 +940,7 @@ final class MPVRenderView: UIView {
         frameGeneration += 1  // Invalidate any pending callbacks from previous video
         hasRenderedFirstFrame = false
         mpvHasFrameReady = false
+        needsRedraw = true
     }
 
     /// Clear the render view to black (call when switching videos to hide old frame)
@@ -957,6 +975,14 @@ final class MPVRenderView: UIView {
 
         // Skip if not setup, already rendering, or app is in background (GPU work not permitted)
         guard isSetup, !isRendering, !isInBackground else { return }
+
+        // Paused with the current frame already on screen: nothing new to draw.
+        // PiP capture keeps feeding its sample buffer layer at its own pace.
+        if isPlaybackPaused, !needsRedraw, hasRenderedFirstFrame, !captureFramesForPiP {
+            PerfCounter.count("render.skippedPaused")
+            return
+        }
+        needsRedraw = false
 
         isRendering = true
 

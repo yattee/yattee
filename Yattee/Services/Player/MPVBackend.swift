@@ -1553,6 +1553,9 @@ extension MPVBackend: MPVClientDelegate {
             if let paused = value as? Bool {
                 LoggingService.shared.debug("MPV: pause = \(paused), isReady = \(isReady), hasReachedEOF = \(hasReachedEOF)", category: .mpv)
                 isPlaying = !paused
+                #if !os(macOS) && !targetEnvironment(simulator)
+                renderView?.isPlaybackPaused = paused
+                #endif
                 // Only send state changes after we're ready (have actual video)
                 // This prevents premature transition from loading to playing
                 // Don't override ended state when MPV pauses at EOF (keep-open=yes)
