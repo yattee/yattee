@@ -71,6 +71,7 @@ struct MarqueeText: View {
 
     // MARK: - Scrolling Content
 
+    #if os(macOS)
     private var scrollingContent: some View {
         // Paused outside the active scene or when the container says it is
         // hidden: the timeline otherwise re-renders every frame regardless.
@@ -88,20 +89,48 @@ struct MarqueeText: View {
             }
         }
     }
+    #else
+    private var scrollingContent: some View {
+        // The text is drawn once and Core Animation slides it, so scrolling
+        // costs no per-frame work in the app. A TimelineView here re-rendered
+        // the text every frame (~17% of the main thread on an iPhone 12 mini
+        // for the mini player's two lines).
+        MarqueeLayerScroller(
+            content: HStack(spacing: spacing) {
+                plainTextView
+                plainTextView
+            },
+            contentWidth: textWidth + totalScrollDistance,
+            distance: totalScrollDistance,
+            scrollDuration: totalScrollDistance / velocity,
+            delay: delayBeforeScrolling,
+            isPaused: scenePhase != .active || isMarqueePaused,
+            restartToken: text
+        )
+        // Keeps measuring the text in this view tree (sizes the scroller)
+        .background(alignment: .leading) {
+            textView.hidden()
+        }
+    }
+    #endif
 
     // MARK: - Text View
 
     private var textView: some View {
-        Text(text)
-            .font(font.weight(fontWeight))
-            .foregroundStyle(foregroundStyle)
-            .lineLimit(1)
-            .fixedSize()
+        plainTextView
             .measureWidth { width in
                 if textWidth != width {
                     textWidth = width
                 }
             }
+    }
+
+    private var plainTextView: some View {
+        Text(text)
+            .font(font.weight(fontWeight))
+            .foregroundStyle(foregroundStyle)
+            .lineLimit(1)
+            .fixedSize()
     }
 
     // MARK: - Text Height
