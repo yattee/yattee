@@ -41,6 +41,8 @@ struct VideoInfoView: View {
     #if os(iOS)
     @State private var carouselScrollPosition: Int?
     @State private var clearsCarouselPositionWhenIdle = false
+    /// Last scroll offset, kept in a box so tracking it doesn't re-render the view every frame
+    @State private var carouselOffset = CarouselOffsetBox()
     #endif
     
     // Continuation loading state
@@ -1036,6 +1038,9 @@ struct VideoInfoView: View {
             .frame(width: cardWidth)
             .scrollTargetBehavior(.viewAligned(limitBehavior: .alwaysByOne))
             .scrollPosition(id: $carouselScrollPosition)
+            .onScrollGeometryChange(for: CGFloat.self) { $0.contentOffset.x } action: { _, new in
+                carouselOffset.value = new
+            }
             .onScrollPhaseChange { oldPhase, newPhase in
                 if newPhase == .interacting {
                     clearsCarouselPositionWhenIdle = false
@@ -1058,18 +1063,23 @@ struct VideoInfoView: View {
                     proxy.scrollTo(newValue, anchor: .center)
                 }
             }
-            .onChange(of: cardWidth) { _, _ in
+            .onChange(of: cardWidth) { oldW, _ in
                 // A width change (iPhone Duo unfold, rotation, split resize) keeps
                 // the old point offset, leaving the cards misaligned. Re-snap to the
                 // current card (setting the same id is a no-op, hence the nil hop).
                 // The LazyHStack keeps re-applying a programmatic position while it
                 // realizes cards, which stopped the next swipe halfway between two
                 // cards, so the position is cleared again once the re-snap settles.
+                // Only animate when the current card was on screen at the old width
+                // (unfold, rotation). The first layout of a page opened on a later
+                // card also arrives as a width change (iPhone Duo status column
+                // inset), and animating that scrolls visibly from the first card.
                 guard let index = currentVideoIndex else { return }
+                let wasShowingCard = abs(carouselOffset.value - CGFloat(index) * (oldW + carouselSpacing)) < 1
                 carouselScrollPosition = nil
                 DispatchQueue.main.async {
                     clearsCarouselPositionWhenIdle = true
-                    withAnimation(.linear(duration: 0.15)) {
+                    withAnimation(wasShowingCard ? .linear(duration: 0.15) : nil) {
                         carouselScrollPosition = index
                     }
                 }
@@ -2873,3 +2883,9 @@ private struct VideoInfoScrollOffsetModifier: ViewModifier {
             .videoQueueContext(.init(video: .preview, queueSource: .manual, sourceLabel: "Manual", videoList: [.preview, .livePreview], videoIndex: 0, startTime: 0, loadMoreVideos: .none))
     }
 }
+
+#if os(iOS)
+private final class CarouselOffsetBox {
+    var value: CGFloat = 0
+}
+#endif
