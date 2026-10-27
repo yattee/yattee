@@ -1142,6 +1142,21 @@ final class MPVClient: @unchecked Sendable {
         }
     }
 
+    /// Get a double property value asynchronously (non-blocking).
+    func getDoubleAsync(_ name: String) async -> Double? {
+        await withCheckedContinuation { continuation in
+            mpvQueue.async { [weak self] in
+                guard let self, let mpv = self.mpv, !self.isDestroyed else {
+                    continuation.resume(returning: nil)
+                    return
+                }
+                var value: Double = 0
+                let result = mpv_get_property(mpv, name, MPV_FORMAT_DOUBLE, &value)
+                continuation.resume(returning: result >= 0 ? value : nil)
+            }
+        }
+    }
+
     /// Get MPV version and build information asynchronously (non-blocking).
     /// Use this from MainActor code instead of getVersionInfo() to avoid blocking the UI.
     /// - Returns: The version information, or nil if unavailable or MPV is destroyed

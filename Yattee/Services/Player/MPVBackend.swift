@@ -440,6 +440,7 @@ final class MPVBackend: PlayerBackend {
         // Store for potential retries
         currentStream = stream
         retryCount = 0
+        loadedStreamHasVideo = !stream.isAudioOnly
 
         // Reset retry state in UI
         delegate?.backend(self, didUpdateRetryState: 0, maxRetries: maxRetries, isRetrying: false, exhausted: false)
@@ -507,7 +508,7 @@ final class MPVBackend: PlayerBackend {
                 audioURL: audioStream?.url,
                 httpHeaders: stream.httpHeaders,
                 useEDL: useEDL,
-                disableVideoTrack: stream.requiresVideoTrackDisabled
+                disableVideoTrack: stream.requiresVideoTrackDisabled || isVideoDisabledForBackground
             )
             
             // Give MPV a moment to process the loadfile command
@@ -778,6 +779,7 @@ final class MPVBackend: PlayerBackend {
         duration = 0
         bufferedTime = 0
         currentStream = nil
+        loadedStreamHasVideo = false
         #if os(tvOS)
         videoGamma = ""
         clearTVDisplayCriteria()
@@ -977,6 +979,12 @@ final class MPVBackend: PlayerBackend {
         MPVLogging.logAppLifecycle("handleScenePhase(\(phase))",
             isPiPActive: pipActive, isRendering: nil)
 
+        #if os(iOS)
+        if phase == .active {
+            restoreVideoAfterBackground()
+        }
+        #endif
+
         guard !pipActive else {
             MPVLogging.log("handleScenePhase: skipping (pip:\(pipActive))")
             return
@@ -996,6 +1004,9 @@ final class MPVBackend: PlayerBackend {
             #else
             (playerView as? MPVRenderView)?.pauseRendering()
             #endif
+            #if os(iOS)
+            scheduleBackgroundVideoDisable()
+            #endif
 
         case .active:
             // Resume rendering
@@ -1013,6 +1024,73 @@ final class MPVBackend: PlayerBackend {
             break
         }
     }
+
+    // MARK: - Background Video Decoding
+
+    #if os(iOS)
+    /// Seconds in the background before video decoding is turned off, so a
+    /// quick app switch returns without the resync hitch.
+    private static let backgroundVideoDisableDelay: TimeInterval = 5
+
+    private var backgroundVideoDisableWork: DispatchWorkItem?
+    #endif
+
+    /// Video decoding is off (`vid=no`) because the app is in the background
+    /// without PiP. Pausing rendering alone keeps mpv decoding every frame
+    /// (hardware decode plus a copy back to memory) only to drop it, which
+    /// heats the device during long background playback.
+    private var isVideoDisabledForBackground = false
+
+    /// Whether the loaded stream has a video track to decode. (`currentStream`
+    /// is only kept for retries and is cleared once loading succeeds.)
+    private var loadedStreamHasVideo = false
+
+    #if os(iOS)
+    private func scheduleBackgroundVideoDisable() {
+        backgroundVideoDisableWork?.cancel()
+        let work = DispatchWorkItem { [weak self] in
+            self?.disableVideoForBackground()
+        }
+        backgroundVideoDisableWork = work
+        DispatchQueue.main.asyncAfter(deadline: .now() + Self.backgroundVideoDisableDelay, execute: work)
+    }
+
+    private func disableVideoForBackground() {
+        backgroundVideoDisableWork = nil
+        guard !isVideoDisabledForBackground, !isPiPActive, loadedStreamHasVideo else { return }
+        isVideoDisabledForBackground = true
+        LoggingService.shared.info("MPV: Disabling video decoding in background", category: .mpv)
+        mpvClient?.setProperty("vid", "no")
+    }
+
+    private func restoreVideoAfterBackground() {
+        backgroundVideoDisableWork?.cancel()
+        backgroundVideoDisableWork = nil
+        guard isVideoDisabledForBackground else { return }
+        isVideoDisabledForBackground = false
+        // A stream loaded while disabled may be audio-only (vid stays off)
+        guard loadedStreamHasVideo else { return }
+
+        LoggingService.shared.info("MPV: Re-enabling video decoding at \(String(format: "%.2f", currentTime))s", category: .mpv)
+        mpvClient?.setProperty("vid", "auto")
+        // Video re-enabled live starts behind the audio (see
+        // handlePlayerSheetVisibility); an exact seek to the current position
+        // restarts both in sync.
+        mpvClient?.seekAsync(to: currentTime, mode: "absolute+exact")
+
+        // Report how well audio and video line up once playback settles
+        Task { @MainActor [weak self] in
+            try? await Task.sleep(for: .seconds(3))
+            guard let client = self?.mpvClient else { return }
+            let avsync = await client.getDoubleAsync("avsync")
+            let drops = await client.getDoubleAsync("frame-drop-count")
+            LoggingService.shared.info(
+                "MPV: Video resynced after background - avsync=\(avsync.map { String(format: "%.3f", $0) } ?? "n/a")s, dropped=\(drops.map { String(Int($0)) } ?? "n/a")",
+                category: .mpv
+            )
+        }
+    }
+    #endif
 
     /// Handles player sheet visibility changes for background audio playback.
     /// - Parameter isVisible: true when sheet appears, false when it disappears
