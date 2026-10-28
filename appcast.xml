@@ -9,13 +9,22 @@
     </description>
     <language>en</language>
     <item>
+      <title>Version 2.0.0 (276)</title>
+      <pubDate>Wed, 28 Oct 2026 21:58:48 -0000</pubDate>
+      <sparkle:version>276</sparkle:version>
+      <sparkle:shortVersionString>2.0.0</sparkle:shortVersionString>
+      <sparkle:minimumSystemVersion>15.0</sparkle:minimumSystemVersion>
+      <sparkle:channel>beta</sparkle:channel>
+      <enclosure url='https://github.com/yattee/yattee/releases/download/2.0.0-beta.276/Yattee-2.0.0-macOS.zip' type='application/octet-stream' sparkle:edSignature='SCPBvF2Df5HRvdesMj1yn4TbCVoNvK5ylY71PIci4Wb0XP/tJuNJHKs/dHxx6phrp3uMh+h/81eBU0REZPlSDw==' length='53000950'/>
+    </item>
+    <item>
       <title>Version 2.0.0 (275)</title>
       <pubDate>Thu, 22 Oct 2026 10:53:39 -0000</pubDate>
       <sparkle:version>275</sparkle:version>
       <sparkle:shortVersionString>2.0.0</sparkle:shortVersionString>
       <sparkle:minimumSystemVersion>15.0</sparkle:minimumSystemVersion>
       <sparkle:channel>beta</sparkle:channel>
-      <enclosure url='https://github.com/yattee/yattee/releases/download/2.0.0-beta.275/Yattee-2.0.0-macOS.zip' type='application/octet-stream' sparkle:edSignature='vEPJMTKq2iI89WfGCmmHbBwcgIptK5l9h2x+1i3uQwStrG9nS5fneAOSZoFDCttne7XRTMTcpD1ARJrXG7rKDQ==' length='53406432'/>
+      <enclosure url="https://github.com/yattee/yattee/releases/download/2.0.0-beta.275/Yattee-2.0.0-macOS.zip" type="application/octet-stream" sparkle:edSignature="vEPJMTKq2iI89WfGCmmHbBwcgIptK5l9h2x+1i3uQwStrG9nS5fneAOSZoFDCttne7XRTMTcpD1ARJrXG7rKDQ==" length="53406432"/>
     </item>
     <item>
       <title>Version 2.0.0 (270)</title>
