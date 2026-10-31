@@ -6,8 +6,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/yattee/MPVKit.git",
       "state" : {
-        "revision" : "671d3484b00f438407564573a4e188631d81bc90",
-        "version" : "1.0.1"
+        "revision" : "29051134058937871b37ad42f520f9eb6129966a",
+        "version" : "1.0.2"
       }
     },
     {
