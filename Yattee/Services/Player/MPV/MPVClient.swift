@@ -252,6 +252,10 @@ final class MPVClient: @unchecked Sendable {
 
         let line = MPVLogLine(prefix: prefix, level: level, text: text)
 
+        if prefix == "ao/avfoundation", text.hasPrefix("restarting due to system notification") {
+            reloadAudioOutputIfPaused()
+        }
+
         logBufferLock.lock()
         recentLogBuffer.append(line)
         if recentLogBuffer.count > recentLogBufferCapacity {
@@ -274,6 +278,22 @@ final class MPVClient: @unchecked Sendable {
             if level == "info" || rendererRelevant {
                 Task { @MainActor in LoggingService.shared.logMPV(formatted) }
             }
+        }
+    }
+
+    /// mpv's avfoundation AO restarts its renderer on route changes and automatic
+    /// flushes, and the restart always starts it (synchronizer rate 1, requesting
+    /// data) even while paused. Paused mpv supplies no samples, so the empty
+    /// renderer re-requests in a tight loop on its dispatch queue (~35% CPU), and
+    /// the running renderer keeps iOS from suspending the app in the background.
+    /// Reloading the AO rebuilds it in the paused state.
+    private func reloadAudioOutputIfPaused() {
+        mpvQueue.async { [weak self] in
+            guard let self, let mpv = self.mpv, !self.isDestroyed else { return }
+            var paused: Int32 = 0
+            guard mpv_get_property(mpv, "pause", MPV_FORMAT_FLAG, &paused) >= 0, paused != 0 else { return }
+            self.logWarning("avfoundation AO restarted while paused - reloading audio output")
+            _ = self.commandUnsafe(["ao-reload"])
         }
     }
 
@@ -1153,6 +1173,21 @@ final class MPVClient: @unchecked Sendable {
                 var value: Double = 0
                 let result = mpv_get_property(mpv, name, MPV_FORMAT_DOUBLE, &value)
                 continuation.resume(returning: result >= 0 ? value : nil)
+            }
+        }
+    }
+
+    /// Get a string property value asynchronously (non-blocking).
+    func getStringAsync(_ name: String) async -> String? {
+        await withCheckedContinuation { continuation in
+            mpvQueue.async { [weak self] in
+                guard let self, let mpv = self.mpv, !self.isDestroyed,
+                      let cString = mpv_get_property_string(mpv, name) else {
+                    continuation.resume(returning: nil)
+                    return
+                }
+                defer { mpv_free(cString) }
+                continuation.resume(returning: String(cString: cString))
             }
         }
     }

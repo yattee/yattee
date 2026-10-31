@@ -20078,6 +20078,28 @@
         }
       }
     },
+    "toast.player.hwdecFallback.subtitle" : {
+      "comment" : "Toast subtitle shown (only with Enable Logging on) when hardware video decoding stopped mid-playback",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Details were logged — please export logs and report it"
+          }
+        }
+      }
+    },
+    "toast.player.hwdecFallback.title" : {
+      "comment" : "Toast title shown (only with Enable Logging on) when hardware video decoding stopped mid-playback",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hardware Decoding Stopped"
+          }
+        }
+      }
+    },
     "toast.player.refreshingStream.title" : {
       "comment" : "Toast title shown when stream URLs are being refreshed due to expiration",
       "localizations" : {

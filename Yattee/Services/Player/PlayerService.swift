@@ -3145,6 +3145,17 @@ extension PlayerService: PlayerBackendDelegate {
         state.isFirstFrameReady = true
     }
 
+    func backendDidFallBackToSoftwareDecoding(_ backend: any PlayerBackend) {
+        toastManager?.show(
+            category: .playerStatus,
+            title: String(localized: "toast.player.hwdecFallback.title"),
+            subtitle: String(localized: "toast.player.hwdecFallback.subtitle"),
+            icon: "cpu",
+            iconColor: .orange,
+            autoDismissDelay: 8.0
+        )
+    }
+
     func backendDidFinishPlaying(_ backend: any PlayerBackend) {
         // Mark that video ended naturally - prevents play() from saving progress again
         // when switching to next video (100% is already saved below)

@@ -861,6 +861,9 @@ final class MPVRenderView: UIView {
     private func startDisplayLink() {
         MPVLogging.logDisplayLink("creating", targetFPS: videoFPS)
         displayLink = CADisplayLink(target: self, selector: #selector(displayLinkFired))
+        // Created in the background (view re-added during a lock): stay paused
+        // until appDidBecomeActive, as in resumeRendering.
+        displayLink?.isPaused = isInBackground && !isPiPActive && !captureFramesForPiP
         updateDisplayLinkFrameRate()
         displayLink?.add(to: .main, forMode: .common)
         MPVLogging.logDisplayLink("started", isPaused: displayLink?.isPaused, targetFPS: videoFPS)
@@ -918,6 +921,16 @@ final class MPVRenderView: UIView {
         guard let displayLink else {
             MPVLogging.log("resumeRendering: no displayLink, will be created when view is added to superview")
             LoggingService.shared.debug("MPV RenderView: resumeRendering skipped - no displayLink", category: .mpv)
+            return
+        }
+
+        // Layout can rebuild the player's container after the app entered the
+        // background (e.g. a lock during a quick inactive/active bounce), which
+        // calls this. The display link never fires there, but left running it
+        // matched a TestFlight report of ~36% CPU on an unnamed thread for as
+        // long as the app stayed alive. appDidBecomeActive resumes it.
+        guard !isInBackground || isPiPActive || captureFramesForPiP else {
+            LoggingService.shared.info("MPV RenderView: resumeRendering ignored in background", category: .mpv)
             return
         }
 

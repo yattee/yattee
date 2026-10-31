@@ -114,6 +114,9 @@ protocol PlayerBackendDelegate: AnyObject {
     func backend(_ backend: any PlayerBackend, didUpdateTracks tracks: [MPVTrack])
     func backendDidBecomeReady(_ backend: any PlayerBackend)
     func backendDidFinishPlaying(_ backend: any PlayerBackend)
+    /// Hardware decoding stopped mid-playback for a file that was hardware decoded.
+    /// Only reported while "Enable Logging" is on, and only once the app is active.
+    func backendDidFallBackToSoftwareDecoding(_ backend: any PlayerBackend)
 }
 
 // MARK: - Player Backend Protocol

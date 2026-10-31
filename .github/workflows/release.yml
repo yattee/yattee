@@ -58,13 +58,13 @@ jobs:
       build_number: ${{ steps.calc.outputs.build_number }}
       version_number: ${{ steps.version.outputs.version_number }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - uses: ruby/setup-ruby@v1
         with:
           ruby-version: '3.4'
           bundler-cache: true
           cache-version: 1
-      - uses: maierj/fastlane-action@v3.0.0
+      - uses: maierj/fastlane-action@v3.2.0
         with:
           lane: latest_build_number
       - name: Calculate next build number
@@ -85,7 +85,7 @@ jobs:
     name: Release iOS to TestFlight
     runs-on: xcode-27
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - name: Select Xcode 27.2 RC
         # Pinned by full path to the RC; App Store Connect rejects beta-built uploads.
         run: |
@@ -101,10 +101,10 @@ jobs:
           sed -i '' 's/CURRENT_PROJECT_VERSION = [0-9]*/CURRENT_PROJECT_VERSION = ${{ needs.determine_build_number.outputs.build_number }}/' Yattee.xcodeproj/project.pbxproj
       - name: Clear SPM cache
         run: rm -rf ~/Library/Caches/org.swift.swiftpm/artifacts
-      - uses: maierj/fastlane-action@v3.0.0
+      - uses: maierj/fastlane-action@v3.2.0
         with:
           lane: ios beta
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
           name: ios-beta-build
           path: fastlane/builds/**/*.ipa
@@ -116,7 +116,7 @@ jobs:
     name: Release tvOS to TestFlight
     runs-on: xcode-27
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - name: Select Xcode 27.2 RC
         # Pinned by full path to the RC; App Store Connect rejects beta-built uploads.
         run: |
@@ -132,10 +132,10 @@ jobs:
           sed -i '' 's/CURRENT_PROJECT_VERSION = [0-9]*/CURRENT_PROJECT_VERSION = ${{ needs.determine_build_number.outputs.build_number }}/' Yattee.xcodeproj/project.pbxproj
       - name: Clear SPM cache
         run: rm -rf ~/Library/Caches/org.swift.swiftpm/artifacts
-      - uses: maierj/fastlane-action@v3.0.0
+      - uses: maierj/fastlane-action@v3.2.0
         with:
           lane: tvos beta
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
           name: tvos-beta-build
           path: fastlane/builds/**/*.ipa
@@ -147,7 +147,7 @@ jobs:
     name: Release macOS to TestFlight
     runs-on: xcode-27
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - name: Select Xcode 27.2 RC
         # Pinned by full path to the RC; App Store Connect rejects beta-built uploads.
         run: |
@@ -163,10 +163,10 @@ jobs:
           sed -i '' 's/CURRENT_PROJECT_VERSION = [0-9]*/CURRENT_PROJECT_VERSION = ${{ needs.determine_build_number.outputs.build_number }}/' Yattee.xcodeproj/project.pbxproj
       - name: Clear SPM cache
         run: rm -rf ~/Library/Caches/org.swift.swiftpm/artifacts
-      - uses: maierj/fastlane-action@v3.0.0
+      - uses: maierj/fastlane-action@v3.2.0
         with:
           lane: mac beta
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
           name: mac-beta-build
           path: fastlane/builds/**/*.pkg
@@ -181,7 +181,7 @@ jobs:
       BUILD_NUMBER: ${{ needs.determine_build_number.outputs.build_number }}
       VERSION_NUMBER: ${{ needs.determine_build_number.outputs.version_number }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - name: Select Xcode 27.2 RC
         # Pinned by full path to the RC; App Store Connect rejects beta-built uploads.
         run: |
@@ -197,7 +197,7 @@ jobs:
           sed -i '' 's/CURRENT_PROJECT_VERSION = [0-9]*/CURRENT_PROJECT_VERSION = ${{ env.BUILD_NUMBER }}/' Yattee.xcodeproj/project.pbxproj
       - name: Clear SPM cache
         run: rm -rf ~/Library/Caches/org.swift.swiftpm/artifacts
-      - uses: maierj/fastlane-action@v3.0.0
+      - uses: maierj/fastlane-action@v3.2.0
         with:
           lane: mac build_and_notarize
       - name: Resolve artifact paths
@@ -206,7 +206,7 @@ jobs:
           echo "APP_PATH=$DIR/Yattee.app" >> $GITHUB_ENV
           echo "ZIP_PATH=$DIR/Yattee-${{ env.VERSION_NUMBER }}-macOS.zip" >> $GITHUB_ENV
           echo "DMG_PATH=$DIR/Yattee-${{ env.VERSION_NUMBER }}-macOS.dmg" >> $GITHUB_ENV
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
           name: mac-notarized-build
           path: |
@@ -228,7 +228,7 @@ jobs:
       VERSION_NUMBER: ${{ needs.determine_build_number.outputs.version_number }}
       RELEASE_CHANNEL: ${{ inputs.release_channel }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with:
           token: ${{ secrets.REPO_TOKEN }}
       - name: Commit build number
@@ -241,7 +241,7 @@ jobs:
             git commit -m "Bump build number to ${{ env.BUILD_NUMBER }}"
             git push origin ${{ github.ref_name }}
           }
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@v8
         with:
           path: artifacts
       - name: Compute release tag
@@ -285,7 +285,7 @@ jobs:
             echo "::error::SPARKLE_ED_PRIVATE_KEY secret is not set. Configure it with the base64-encoded private key exported via 'generate_keys -x'."
             exit 1
           fi
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with:
           token: ${{ secrets.REPO_TOKEN }}
       - name: Select Xcode 27.2 RC
@@ -294,7 +294,7 @@ jobs:
           sudo xcode-select -s /Applications/Xcode_27.2_Release_Candidate.app
           xcodebuild -version
       - name: Download notarized mac artifact
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           name: mac-notarized-build
           path: mac-artifacts
