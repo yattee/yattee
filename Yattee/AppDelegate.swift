@@ -16,6 +16,39 @@ class AppDelegate: NSObject, UIApplicationDelegate {
         _ application: UIApplication,
         didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]? = nil
     ) -> Bool {
+        // Open the SwiftData stores (TipKit's and the app's) here rather than in
+        // `YatteeApp.init()`, which also runs during prewarm launches that iOS
+        // suspends before `UIApplicationMain` (0xdead10cc if an SQLite lock is
+        // held). The assertion keeps a background launch running until the
+        // opens, including any WAL recovery, have finished and released locks.
+        DataManager.didFinishLaunching = true
+        var storeTask: UIBackgroundTaskIdentifier = .invalid
+        storeTask = application.beginBackgroundTask(withName: "OpenDataStore") {
+            LoggingService.shared.warning("Background task OpenDataStore expired", category: .diagnostics)
+            if storeTask != .invalid {
+                application.endBackgroundTask(storeTask)
+                storeTask = .invalid
+            }
+        }
+        LoggingService.shared.info(
+            "didFinishLaunching",
+            category: .diagnostics,
+            details: "applicationState: \(application.applicationState.rawValue), "
+                + "prewarm: \(ProcessInfo.processInfo.environment["ActivePrewarm"] == "1"), "
+                + "launchOptions: \(launchOptions?.keys.map(\.rawValue).sorted() ?? []), "
+                // `.invalid` means iOS granted no background time. The stores
+                // are opened anyway — deferring would only move the same
+                // unprotected open to the first caller (e.g. a silent-push
+                // sync) — but the log makes that launch identifiable.
+                + "assertion: \(storeTask != .invalid)"
+        )
+        YatteeApp.configureTips()
+        AppEnvironment.shared.dataManager.openStore(trigger: "didFinishLaunching")
+        if storeTask != .invalid {
+            application.endBackgroundTask(storeTask)
+            storeTask = .invalid
+        }
+
         // Required for CKSyncEngine to receive silent push notifications for remote changes.
         // The remote-notification background mode is already in Info.plist.
         LoggingService.shared.logCloudKit("Requesting remote notification registration...")

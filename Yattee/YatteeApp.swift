@@ -46,13 +46,23 @@ struct YatteeApp: App {
     // Ambiguous-link prompts are stored on NavigationCoordinator so they can
     // be dual-hosted by the root app view (here) and the expanded player sheet.
 
+    #if !os(tvOS)
+    /// Configures TipKit. Called once per launch.
+    static func configureTips() {
+        try? Tips.configure([.displayFrequency(.immediate), .datastoreLocation(.applicationDefault)])
+    }
+    #endif
+
     init() {
         // Configure Nuke image loading pipeline
         ImageLoadingService.shared.configure()
 
-        #if !os(tvOS)
-        // TipKit: one-time hints such as the video info "tap thumbnail to play" tip
-        try? Tips.configure([.displayFrequency(.immediate), .datastoreLocation(.applicationDefault)])
+        // TipKit: one-time hints such as the video info "tap thumbnail to play" tip.
+        // TipKit opens its own SwiftData store, so on iOS it is configured from
+        // `AppDelegate.didFinishLaunching` together with the app store, never
+        // here: this init also runs during prewarm launches (0xdead10cc).
+        #if os(macOS)
+        Self.configureTips()
         #endif
 
         // Register background tasks early — Apple requires BGTaskScheduler.register()
