@@ -14,6 +14,23 @@ GIT_AUTHORIZATION = ENV['GIT_AUTHORIZATION']
 XCODEPROJ = "#{APP_NAME}.xcodeproj"
 SCHEME = APP_NAME
 
+# Xcode 27.2's altool logs a spurious
+# "ERROR: ... Failed to create URL for 'CDUploaderStateInfoResumeFilePath'"
+# line even when the upload succeeds. fastlane treats any ERROR: line as a
+# failure, which aborts upload_to_testflight before changelog/distribution.
+module IgnoreBenignAltoolErrors
+  BENIGN_ALTOOL_ERRORS = ["CDUploaderStateInfoResumeFilePath"].freeze
+
+  def parse_line(line, hide_output)
+    if BENIGN_ALTOOL_ERRORS.any? { |pattern| line.include?(pattern) }
+      UI.important("[altool] Ignoring benign error: #{line.strip}")
+      return
+    end
+    super
+  end
+end
+FastlaneCore::AltoolTransporterExecutor.prepend(IgnoreBenignAltoolErrors)
+
 def delete_temp_keychain(name)
   delete_keychain(
     name: name
