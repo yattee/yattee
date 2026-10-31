@@ -104,6 +104,9 @@ final class BackgroundDiagnostics {
                 + " backend=\(playerService.currentBackendType) video=\(state.currentVideo?.id.videoID ?? "none")"
                 + " time=\(Int(state.currentTime))/\(Int(state.duration))"
                 + " publishesTime=\(state.publishesTimeUpdates)")
+            if let mpvBackend = playerService.currentBackend as? MPVBackend {
+                lines.append("decoder: " + mpvBackend.decoderDiagnosticsSummary)
+            }
         }
 
         let session = AVAudioSession.sharedInstance()

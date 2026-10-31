@@ -126,6 +126,15 @@ final class MPVBackend: PlayerBackend {
     private var videoCodec: String = ""
     private var hwdecCurrent: String = ""
     private var hwdecInterop: String = ""
+    // Software-fallback detection (logged + toasted only with "Enable Logging" on).
+    // mpv falls back to software one-way and does not always emit a property
+    // event for it, so the stats loop also polls hwdec-current.
+    private var hwdecTrackingArmed = false
+    private var hwdecUsedForCurrentFile: String?
+    private var hwdecFallbackReported = false
+    private var hwdecFallbackAlertPending = false
+    private var lastScenePhase: ScenePhase = .active
+    private var lastScenePhaseChange: Date?
     #if os(tvOS)
     private var videoGamma: String = ""
     #endif
@@ -423,7 +432,8 @@ final class MPVBackend: PlayerBackend {
             LoggingService.shared.debug("MPV: Disabling EDL for live stream (live streams not compatible with EDL)", category: .mpv)
         }
         
-        LoggingService.shared.logMPV("MPV loading stream", details: "\(stream.qualityLabel) - \(stream.format)\n\(stream.url.absoluteString)\nEDL: \(actualUseEDL) (requested: \(useEDL), isLive: \(stream.isLive))\nStream info: videoCodec=\(stream.videoCodec ?? "nil"), audioCodec=\(stream.audioCodec ?? "nil")")
+        resetHwdecFallbackTracking()
+        LoggingService.shared.logMPV("MPV loading stream", details:"\(stream.qualityLabel) - \(stream.format)\n\(stream.url.absoluteString)\nEDL: \(actualUseEDL) (requested: \(useEDL), isLive: \(stream.isLive))\nStream info: videoCodec=\(stream.videoCodec ?? "nil"), audioCodec=\(stream.audioCodec ?? "nil")")
         if let audioStream {
             LoggingService.shared.logMPV("MPV loading separate audio track", details: "\(audioStream.audioLanguage ?? "default") - \(audioStream.format)\n\(audioStream.url.absoluteString)\nAudio codec: \(audioStream.audioCodec ?? "nil")")
         }
@@ -780,6 +790,7 @@ final class MPVBackend: PlayerBackend {
         bufferedTime = 0
         currentStream = nil
         loadedStreamHasVideo = false
+        resetHwdecFallbackTracking()
         #if os(tvOS)
         videoGamma = ""
         clearTVDisplayCriteria()
@@ -978,6 +989,15 @@ final class MPVBackend: PlayerBackend {
 
         MPVLogging.logAppLifecycle("handleScenePhase(\(phase))",
             isPiPActive: pipActive, isRendering: nil)
+
+        if phase != lastScenePhase {
+            lastScenePhase = phase
+            lastScenePhaseChange = Date()
+        }
+        if phase == .active, hwdecFallbackAlertPending {
+            hwdecFallbackAlertPending = false
+            delegate?.backendDidFallBackToSoftwareDecoding(self)
+        }
 
         #if os(iOS)
         if phase == .active {
@@ -1762,6 +1782,7 @@ extension MPVBackend: MPVClientDelegate {
         case "hwdec-current":
             if let hwdec = value as? String {
                 hwdecCurrent = hwdec
+                checkHwdecFallback(hwdec, source: "event")
             }
 
         case "hwdec-interop":
@@ -1907,6 +1928,7 @@ extension MPVBackend: MPVClientDelegate {
         switch event {
         case MPV_EVENT_FILE_LOADED:
             LoggingService.shared.debug("MPV: File loaded", category: .mpv)
+            hwdecTrackingArmed = true
             startPlaybackStatsLogging()
             // Log hwdec diagnostics on tvOS (use cached values to avoid sync fetch)
             #if os(tvOS)
@@ -2065,6 +2087,71 @@ extension MPVBackend: MPVClientDelegate {
         LoggingService.shared.debug("MPV: Buffer stall detection stopped", category: .mpv)
     }
 
+    // MARK: - Hardware Decoding Fallback Detection
+
+    /// Decoder state for diagnostics heartbeats, from cached values (no mpv fetch).
+    var decoderDiagnosticsSummary: String {
+        "codec=\(videoCodec.isEmpty ? "none" : videoCodec) hwdec=\(hwdecCurrent.isEmpty ? "none" : hwdecCurrent)"
+            + " hwUsedThisFile=\(hwdecUsedForCurrentFile ?? "no") fallbackReported=\(hwdecFallbackReported)"
+    }
+
+    private func resetHwdecFallbackTracking() {
+        hwdecTrackingArmed = false
+        hwdecUsedForCurrentFile = nil
+        hwdecFallbackReported = false
+    }
+
+    /// Detects mpv dropping from hardware to software decoding mid-file.
+    /// Armed at FILE_LOADED so stale events from the previous file are ignored;
+    /// only a file that was seen hardware decoded can report a fallback.
+    private func checkHwdecFallback(_ hwdec: String, source: String) {
+        // The poll sees silent fallbacks the property event misses; keep the cache current.
+        if !hwdec.isEmpty { hwdecCurrent = hwdec }
+        guard hwdecTrackingArmed, !hwdec.isEmpty else { return }
+
+        guard hwdec == "no" else {
+            if hwdecFallbackReported {
+                LoggingService.shared.warning("MPV: Hardware decoding resumed (\(hwdec), via \(source))", category: .mpv)
+                hwdecFallbackReported = false
+            }
+            hwdecUsedForCurrentFile = hwdec
+            return
+        }
+
+        guard let previous = hwdecUsedForCurrentFile, !hwdecFallbackReported,
+              LoggingService.shared.isEnabled else { return }
+        hwdecFallbackReported = true
+
+        var context = [
+            "hwdec: \(previous) -> no (detected via \(source))",
+            "codec: \(videoCodec.isEmpty ? "unknown" : videoCodec) \(videoWidth)x\(videoHeight)"
+                + " stream=\(currentStream?.qualityLabel ?? "?") \(currentStream?.format ?? "")",
+            "playback: time=\(Int(currentTime))/\(Int(duration)) playing=\(isPlaying)",
+            "scene: \(lastScenePhase)"
+                + (lastScenePhaseChange.map { String(format: " (changed %.0fs ago)", Date().timeIntervalSince($0)) } ?? " (no change since launch)"),
+            "thermal: \(ProcessInfo.processInfo.thermalState.rawValue)"
+                + " lowPower: \(ProcessInfo.processInfo.isLowPowerModeEnabled)",
+        ]
+        #if os(iOS) || os(macOS)
+        context.append("pip: \(isPiPActive)")
+        #endif
+        let recentLines = mpvClient?.recentLogLines().map(\.formatted) ?? []
+        context.append("recent mpv log (\(recentLines.count) lines):")
+        context.append(contentsOf: recentLines)
+
+        LoggingService.shared.warning(
+            "MPV: Hardware decoding fell back to software mid-playback",
+            category: .mpv,
+            details: context.joined(separator: "\n")
+        )
+
+        if lastScenePhase == .active {
+            delegate?.backendDidFallBackToSoftwareDecoding(self)
+        } else {
+            hwdecFallbackAlertPending = true
+        }
+    }
+
     // MARK: - Playback Stats Logging
 
     /// Log cache/frame-drop/pacing stats every 10s while a file is loaded, at INFO level
@@ -2088,11 +2175,21 @@ extension MPVBackend: MPVClientDelegate {
                 // watchdog below). Elsewhere the batched mpv_get_property
                 // calls contend with the playback core and caused a visible
                 // stutter every 10s on tvOS, so skip the fetch entirely
-                // unless verbose logging wants the stats line.
-                guard MPVLogging.verboseEnabled else { continue }
+                // unless verbose logging wants the stats line. The single
+                // hwdec-current read is the fallback detector's poll.
+                guard MPVLogging.verboseEnabled else {
+                    if LoggingService.shared.isEnabled, self.hwdecUsedForCurrentFile != nil,
+                       let hwdec = await client.getStringAsync("hwdec-current") {
+                        self.checkHwdecFallback(hwdec, source: "poll")
+                    }
+                    continue
+                }
                 #endif
 
                 let props = await client.getDebugPropertiesAsync()
+                if let hwdec = props.hwdecCurrent {
+                    self.checkHwdecFallback(hwdec, source: "poll")
+                }
 
                 #if os(macOS)
                 // Render watchdog — runs every tick regardless of the verbose

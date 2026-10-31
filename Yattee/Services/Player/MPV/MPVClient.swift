@@ -1177,6 +1177,21 @@ final class MPVClient: @unchecked Sendable {
         }
     }
 
+    /// Get a string property value asynchronously (non-blocking).
+    func getStringAsync(_ name: String) async -> String? {
+        await withCheckedContinuation { continuation in
+            mpvQueue.async { [weak self] in
+                guard let self, let mpv = self.mpv, !self.isDestroyed,
+                      let cString = mpv_get_property_string(mpv, name) else {
+                    continuation.resume(returning: nil)
+                    return
+                }
+                defer { mpv_free(cString) }
+                continuation.resume(returning: String(cString: cString))
+            }
+        }
+    }
+
     /// Get MPV version and build information asynchronously (non-blocking).
     /// Use this from MainActor code instead of getVersionInfo() to avoid blocking the UI.
     /// - Returns: The version information, or nil if unavailable or MPV is destroyed
